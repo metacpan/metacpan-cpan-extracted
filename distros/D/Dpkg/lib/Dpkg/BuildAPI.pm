@@ -13,6 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+=encoding utf8
+
+=head1 NAME
+
+Dpkg::BuildAPI - handle build API versions
+
+=head1 DESCRIPTION
+
+The Dpkg::BuildAPI module provides functions to fetch the current dpkg
+build API level.
+
+B<Note>: This is a private module, its API can change at any time.
+
+=cut
+
 package Dpkg::BuildAPI 0.01;
 
 use strict;
@@ -38,17 +53,6 @@ use constant {
 
 my $build_api;
 
-=encoding utf8
-
-=head1 NAME
-
-Dpkg::BuildAPI - handle build API versions
-
-=head1 DESCRIPTION
-
-The Dpkg::BuildAPI module provides functions to fetch the current dpkg
-build API level.
-
 =head1 FUNCTIONS
 
 =over 4
@@ -56,7 +60,7 @@ build API level.
 =item $level = get_build_api([$ctrl])
 
 Get the build API level, from the environment variable B<DPKG_BUILD_API>,
-or if not defined and a $ctrl C<Dpkg::Control::Info> object passed as an
+or if not defined and a $ctrl L<Dpkg::Control::Info> object passed as an
 argument, from its build dependency fields. If no $ctrl object gets passed
 the previous value obtained is returned.
 

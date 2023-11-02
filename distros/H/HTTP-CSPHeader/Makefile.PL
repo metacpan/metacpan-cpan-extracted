@@ -30,13 +30,13 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => 0,
     "Plack::Middleware::ContentLength" => 0,
     "Plack::Middleware::Head" => 0,
+    "Test2::V0" => 0,
     "Test::Differences" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.3.2",
+  "VERSION" => "v0.3.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,9 +53,9 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Plack::Middleware::ContentLength" => 0,
   "Plack::Middleware::Head" => 0,
+  "Test2::V0" => 0,
   "Test::Differences" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
   "Types::Common" => "2.000000",
   "namespace::autoclean" => 0,
   "strict" => 0,

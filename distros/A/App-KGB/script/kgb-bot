@@ -4,10 +4,11 @@ use utf8;
 # vim: ts=4:sw=4:et:ai:sts=4
 #
 # KGB - an IRC bot helping collaboration
-# Copyright © 2008 Martín Ferrari
+# Copyright © 2008 Martina Ferrari
 # Copyright © 2008,2009,2010,2011,2012,2013,2018,2019 Damyan Ivanov
 # Copyright © 2010 gregor herrmann
 # Copyright © 2018 James Clarke
+# Copyright © 2020 Iain Lane
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -1538,9 +1539,11 @@ use File::Basename;
 use HTTP::Status;
 use JSON;
 use App::KGB::Painter;
+use List::MoreUtils qw(any);
 use List::Util qw(max);
 use Net::IP;
 use POE;
+use Text::Glob qw(match_glob);
 
 sub colorize { KGB::SOAP::colorize( @_ ) };
 sub colorize_change { KGB::SOAP::colorize_change( @_ ) };
@@ -1573,7 +1576,7 @@ C<gitlab_webhook_*> event, asynchronously.
 
 my @array_webhook_params =
     qw( channel pipeline_only_status always_squash_branch only_branch
-        always_squash_outside_dir );
+        only_tag always_squash_outside_dir );
 my %array_webhook_params = map( ( $_ => 1 ), @array_webhook_params );
 
 sub webhook_request {
@@ -1918,7 +1921,7 @@ sub gitlab_webhook_push {
 
     return
         if @{ $opts->{only_branch} }
-        and not grep { $_ eq $branch } @{ $opts->{only_branch} };
+        and not any { match_glob ($_, $branch) } @{ $opts->{only_branch} };
 
     my $rev_prefix = $opts->{rev_prefix} // '';
 
@@ -2237,6 +2240,10 @@ sub gitlab_webhook_tag_push {
 
     my $tag = $body->{ref};
     $tag =~ s{^refs/tags/}{};
+
+    return
+        if @{ $opts->{only_tag} }
+        and not any { match_glob ($_, $tag) } @{ $opts->{only_tag} };
 
     my $branch = 'tags';
 

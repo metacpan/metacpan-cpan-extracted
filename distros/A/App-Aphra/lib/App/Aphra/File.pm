@@ -5,6 +5,8 @@ use Carp;
 use File::Basename;
 use File::Path 'make_path';
 use File::Copy;
+use Text::FrontMatter::YAML;
+use Path::Tiny ();
 
 has [qw[path name extension ]] => (
   isa => 'Str',
@@ -103,7 +105,15 @@ sub process {
     my $out      = $self->output_name;
 
     debug("tt: $template -> $out");
-    $self->app->template->process($template, {}, $out)
+
+    my $template_text = Path::Tiny::path($self->full_name)->slurp_utf8;
+    my $front_matter = Text::FrontMatter::YAML->new(
+      document_string => $template_text,
+    );
+
+    $self->app->template->process($template, {
+      page => ($front_matter->frontmatter_hashref // {}),
+    }, $out)
       or croak $self->app->template->error;
   } else {
     my $file = $self->full_name;

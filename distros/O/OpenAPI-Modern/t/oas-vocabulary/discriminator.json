@@ -1,6 +1,74 @@
 [
     {
-        "description": "discriminator value is not an object",
+        "description": "bad syntax (validated against metaschema)",
+        "schema": {
+            "$ref": "https://spec.openapis.org/oas/3.1/dialect/base"
+        },
+        "tests": [
+            {
+                "description": "descriminator value is not an object",
+                "data": {
+                    "discriminator": "not an object"
+                },
+                "valid": false
+            },
+            {
+                "description": "missing required field propertyName",
+                "data": {
+                    "discriminator": {}
+                },
+                "valid": false
+            },
+            {
+                "description": "discriminator propertyName is not a string",
+                "data": {
+                    "discriminator": {
+                        "propertyName": [ "not a string" ]
+                    }
+                },
+                "valid": false
+            },
+            {
+                "description": "missing oneOf, anyOf, allOf",
+                "data": {
+                     "discriminator": {
+                         "propertyName": "petType"
+                     }
+                },
+                "valid": false
+            },
+            {
+                "description": "discriminator mapping is not an object",
+                "data": {
+                    "discriminator": {
+                        "propertyName": "petType",
+                        "mapping": "not an object"
+                    },
+                    "allOf": [
+                        { "$ref": "#/components/cat" }
+                    ]
+                },
+                "valid": false
+            },
+            {
+                "description": "discriminator mapping value is not a string",
+                "data": {
+                    "discriminator": {
+                        "propertyName": "petType",
+                        "mapping": {
+                            "cat": [ "not a string" ]
+                        }
+                    },
+                    "allOf": [
+                        { "$ref": "#/components/schemas/cat" }
+                    ]
+                },
+                "valid": false
+            }
+        ]
+    },
+    {
+        "description": "discriminator value is not an object (evaluated)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
             "discriminator": "not an object"
@@ -14,7 +82,7 @@
         ]
     },
     {
-        "description": "missing required field propertyName",
+        "description": "missing required field propertyName (evaluated)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
             "discriminator": {}
@@ -28,7 +96,7 @@
         ]
     },
     {
-        "description": "discriminator propertyName is not a string",
+        "description": "discriminator propertyName is not a string (evaluated)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
             "discriminator": {
@@ -44,7 +112,7 @@
         ]
     },
     {
-        "description": "missing oneOf, anyOf, allOf",
+        "description": "missing oneOf, anyOf, allOf (evaluated)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
             "discriminator": {
@@ -60,7 +128,7 @@
         ]
     },
     {
-        "description": "discriminator mapping is not an object",
+        "description": "discriminator mapping is not an object (evaluated)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
             "discriminator": {
@@ -80,7 +148,7 @@
         ]
     },
     {
-        "description": "discriminator mapping value is not a string",
+        "description": "discriminator mapping value is not a string (evaluated)",
         "schema": {
             "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
             "discriminator": {
@@ -90,100 +158,13 @@
                 }
             },
             "allOf": [
-                { "$ref": "#/components/cat" }
+                { "$ref": "#/components/schemas/cat" }
             ]
         },
         "tests": [
             {
                 "description": "mapping property value not a string",
                 "data": {},
-                "valid": false
-            }
-        ]
-    },
-    {
-        "description": "runtime: use discriminator to determine petType",
-        "schema": {
-            "$schema": "https://spec.openapis.org/oas/3.1/dialect/base",
-            "discriminator": {
-                "propertyName": "petType",
-                "mapping": {
-                    "fish": "#/components/schemas/definitions/$defs/aquatic"
-                }
-            },
-            "anyOf": [
-                { "$ref": "#/components/schemas/cat" },
-                { "$ref": "#/components/schemas/definitions/$defs/aquatic" }
-            ],
-            "components": {
-                "schemas": {
-                    "cat": {
-                        "required": [ "meow" ],
-                        "properties": {
-                            "petType": { "const": "cat" },
-                            "meow": { "const": true }
-                        }
-                    },
-                    "definitions": {
-                        "$defs": {
-                            "aquatic": {
-                                "required": [ "swims" ],
-                                "properties": {
-                                    "petType": { "enum": [ "fish", "whale" ] },
-                                    "swims": { "const": true }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "tests": [
-            {
-                "description": "missing required discriminator field \"petType\"",
-                "data": {
-                    "meow": true
-                },
-                "valid": false
-            },
-            {
-                "description": "petType exists in /components/schemas/; false result",
-                "data": {
-                    "petType": "cat",
-                    "meow": false
-                },
-                "valid": false
-            },
-            {
-                "description": "petType exists in /components/schemas/; true result",
-                "data": {
-                    "petType": "cat",
-                    "meow": true
-                },
-                "valid": true
-            },
-            {
-                "description": "petType does not exist in /components/schemas/, but a mapping exists; false result",
-                "data": {
-                    "petType": "fish",
-                    "swims": false
-                },
-                "valid": false
-            },
-            {
-                "description": "petType does not exist in /components/schemas/, but a mapping exists; true result",
-                "data": {
-                    "petType": "fish",
-                    "swims": true
-                },
-                "valid": true
-            },
-            {
-                "description": "no mapping for petType found",
-                "data": {
-                    "petType": "dog",
-                    "barks": true
-                },
                 "valid": false
             }
         ]

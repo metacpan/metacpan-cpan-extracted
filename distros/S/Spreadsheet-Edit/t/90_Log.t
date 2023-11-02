@@ -3,9 +3,7 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp
 use t_TestCommon # Test2::V0 etc.
-  qw/t_like t_ok $silent $verbose $debug/;
-
-use Capture::Tiny qw/capture/;
+  qw/t_like t_ok my_capture $silent $verbose $debug/;
 
 package Inner;
 our @ISA = ('Outer');
@@ -63,7 +61,7 @@ sub checklog(&$;$$) {
   my $exp = ref($exptail) ? qr/\A\Q$exphead\E$exptail\n\z/
                           : $exphead.$exptail."\n";
   chomp( $test_label ||= $exp );
-  my ($out, $err) = capture { $code->() };
+  my ($out, $err) = my_capture { $code->() };
   @_ = ($err, $exp, $test_label);
   unless ($out eq "") {
     &Test2::V0::like;

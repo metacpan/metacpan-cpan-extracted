@@ -14,6 +14,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Future' => 0,
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004',

@@ -40,10 +40,10 @@
    "provides" : {
       "Parse::H" : {
          "file" : "lib/Parse/H.pm",
-         "version" : "0.20"
+         "version" : "0.21"
       }
    },
    "release_status" : "stable",
-   "version" : "0.20",
+   "version" : "0.21",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

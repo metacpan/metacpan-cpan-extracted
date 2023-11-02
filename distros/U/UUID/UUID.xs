@@ -16,6 +16,13 @@ extern "C" {
 #include <rpcdce.h>
 #endif
 
+#ifdef PERL__UUID__WIN_INT
+#ifndef RPC_CSTR
+typedef unsigned char* RPC_CSTR;
+#define UuidCreateSequential(x) UuidCreate(x)
+#endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif

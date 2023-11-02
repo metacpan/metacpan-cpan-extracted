@@ -44,7 +44,7 @@ sub btwN($@) {
   $fn =~ s/(.)\.[a-z]+$/$1/a;
   local $_ = join("",@_);
   s/\n\z//s;
-  printf "%s:%d: %s\n", $fn, $lno, $_;
+  printf STDERR "%s:%d: %s\n", $fn, $lno, $_;
 }
 
 sub import {

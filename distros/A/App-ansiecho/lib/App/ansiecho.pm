@@ -1,6 +1,6 @@
 package App::ansiecho;
 
-our $VERSION = "1.06";
+our $VERSION = "1.07";
 
 use v5.14;
 use warnings;
@@ -17,6 +17,12 @@ use Data::Dumper;
 use open IO => 'utf8', ':std';
 use Pod::Usage;
 
+use App::ansiecho::Util qw(decode_argv unescape);
+use Getopt::EX v1.24.1;
+use Text::ANSI::Printf 2.03 qw(ansi_sprintf);
+$Text::ANSI::Printf::REORDER = 1;
+use List::Util qw(max);
+
 use Getopt::EX::Hashed; {
     Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
     has debug      => "      " ;
@@ -30,7 +36,7 @@ use Getopt::EX::Hashed; {
 
     has '+separate' => sub {
 	my($name, $arg) = map "$_", @_;
-	$_->$name = safe_backslash($arg);
+	$_->$name = unescape($arg);
     };
 
     has '+rgb24' => sub {
@@ -52,13 +58,6 @@ use Getopt::EX::Hashed; {
     has params     => default => [];
 
 } no Getopt::EX::Hashed;
-
-use App::ansiecho::Util;
-use Getopt::EX v1.24.1;
-use Text::ANSI::Printf 2.01 qw(ansi_sprintf);
-$Text::ANSI::Printf::REORDER = 1;
-
-use List::Util qw(sum max);
 
 sub run {
     my $app = shift;
@@ -103,13 +102,13 @@ sub retrieve {
 	# -c, -C
 	if ($arg =~ /^-([cC])(.+)?$/) {
 	    my $target = $1 eq 'c' ? \@effect : \@style;
-	    my($color) = defined $2 ? safe_backslash($2) : $app->retrieve(1);
+	    my($color) = defined $2 ? unescape($2) : $app->retrieve(1);
 	    unshift @$target, [ \&ansi_color, $color ];
 	    next;
 	}
 	# -F
 	if ($arg =~ /^-(F)(.+)?$/) {
-	    my($format) = defined $2 ? safe_backslash($2) : $app->retrieve(1);
+	    my($format) = defined $2 ? unescape($2) : $app->retrieve(1);
 	    unshift @style, [ \&ansi_sprintf, $format ];
 	    next;
 	}
@@ -141,19 +140,21 @@ sub retrieve {
 	# -f : format
 	#
 	elsif ($arg =~ /^-f(.+)?$/) {
-	    my($format) = defined $1 ? safe_backslash($1) : $app->retrieve(1);
+	    my($format) = defined $1 ? unescape($1) : $app->retrieve(1);
 	    state $param_re = do {
 		my $P = qr/\d+\$/;
 		my $W = qr/\d+|\*$P?/;
 		qr{ %% |
-		    (?<A> % $P?) [-+#0]*+
-		    (?: (?<B>$W) (?:\.(?<C>$W))? | \.(?<D>$W) )? [a-zA-Z]
+		    (?<I> % $P?) [-+#0\ ]*+
+		    (?: (?<V> \* $P?+ )? v )?+
+		    (?: (?<A>$W) (?:\.(?<B>$W))?+ | \.(?<C>$W) )?+
+		    (?:[hjlqLltz]|[csduoxefgXEGbBpnaAiDUOF])
 		}x;
 	    };
 	    my($pos, $n) = (0, 0);
 	    while ($format =~ /$param_re/g) {
-		$+{A} // next;
-		for ($+{A}, grep { defined and /\*/ } @+{qw(B C D)}) {
+		$+{I} // next;
+		for ($+{I}, grep { defined and /\*/ } @+{qw(I V A B C)}) {
 		    if (/(\d+)\$/) {
 			$pos = max($pos, $1);
 		    } else {
@@ -169,7 +170,7 @@ sub retrieve {
 	#
 	else {
 	    if ($app->escape) {
-		$arg = safe_backslash($arg);
+		$arg = unescape($arg);
 	    }
 	}
 

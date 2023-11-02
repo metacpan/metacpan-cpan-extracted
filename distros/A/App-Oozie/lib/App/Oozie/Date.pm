@@ -1,8 +1,11 @@
 package App::Oozie::Date;
-$App::Oozie::Date::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Constants qw(
@@ -68,8 +71,8 @@ sub yesterday {
 
 sub diff {
     my $self   = shift;
-    my $date_1 = shift || croak "First date is missing";
-    my $date_2 = shift || croak "Second date is missing";
+    my $date_1 = shift || croak 'First date is missing';
+    my $date_2 = shift || croak 'Second date is missing';
 
     my $dt1 = $self->strp->parse_datetime( $date_1 );
     my $dt2 = $self->strp->parse_datetime( $date_2 );
@@ -83,10 +86,10 @@ sub diff {
 
 sub is_valid {
     my $self = shift;
-    my $date = shift || croak "Date is missing";
+    my $date = shift || croak 'Date is missing';
     my $rv = $self->strp_silent->parse_datetime( $date );
     if ( ! $rv ) {
-        warn sprintf "The date value `%s` is invalid: %s",
+        warn sprintf 'The date value `%s` is invalid: %s',
                         $date,
                         $self->strp->errmsg;
     }
@@ -95,8 +98,8 @@ sub is_valid {
 
 sub move {
     my $self = shift;
-    my $date = shift || croak "No date parameter was specified";
-    my $by   = shift || croak "No days to shift by were specified";
+    my $date = shift || croak 'No date parameter was specified';
+    my $by   = shift || croak 'No days to shift by were specified';
 
     my $dt = $self->strp->parse_datetime( $date );
     $dt->add( days => $by );
@@ -109,14 +112,22 @@ sub _stringify_dt {
     my $dt   = shift;
     return sprintf '%d-%02d-%02d',
                     map { $dt->$_ }
-                    qw( year month day );
+                    qw(
+                        year
+                        month
+                        day
+                    );
 }
 
 sub intersection {
     state $usage = sub {
         my $missing = shift;
-        my $msg = "Usage: intersection(first_start, first_end, second_start, second_end)";
-        $msg .= ". You didn't specify `$missing`" if $missing;
+        my $msg = 'Usage: intersection(first_start, first_end, second_start, second_end)';
+        if ( $missing ) {
+            $msg .= sprintf q{. You didn't specify `%s`},
+                                $missing,
+                    ;
+        }
         croak $msg;
     };
 
@@ -148,7 +159,7 @@ sub intersection {
 
 sub epoch_yyyy_mm_dd_hh_mm_ss {
     my $self  = shift;
-    my $epoch = shift || Carp::confess "Epoch not specified!";
+    my $epoch = shift || Carp::confess 'Epoch not specified!';
     my $strp  = DateTime::Format::Strptime->new(
                     pattern   => '%Y-%m-%d %H:%M:%S %Z',
                     time_zone => $self->timezone,
@@ -176,7 +187,7 @@ App::Oozie::Date
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

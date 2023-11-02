@@ -4,7 +4,7 @@
       "MacGyveR <dumb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -30,7 +30,7 @@
             "CGI" : "0",
             "CGI::Compile" : "0",
             "CGI::Emulate::PSGI" : "0",
-            "DBD::mysql" : "0",
+            "DBD::MariaDB" : "0",
             "DBI" : "0",
             "File::Share" : "0",
             "File::ShareDir" : "1.00",
@@ -38,7 +38,8 @@
             "Module::Build::Pluggable" : "0",
             "Module::Build::Pluggable::CPANfile" : "0",
             "Plack::App::MCCS" : "0",
-            "Plack::Builder" : "0"
+            "Plack::Builder" : "0",
+            "perl" : "5.036"
          }
       },
       "test" : {
@@ -50,7 +51,7 @@
    "provides" : {
       "Plack::App::WebMySQL" : {
          "file" : "lib/Plack/App/WebMySQL.pm",
-         "version" : "3.03"
+         "version" : "4.0"
       },
       "Plack::App::WebMySQL::General" : {
          "file" : "lib/Plack/App/WebMySQL/General.pm"
@@ -71,6 +72,6 @@
          "url" : "https://github.com/thedumbterminal/Plack-App-WebMySQL"
       }
    },
-   "version" : "3.03",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "4.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

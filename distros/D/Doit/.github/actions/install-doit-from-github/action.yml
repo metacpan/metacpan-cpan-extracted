@@ -1,0 +1,34 @@
+name: install-doit-from-github
+
+inputs:
+  ref:
+    required: false
+    type: string
+    default: master
+
+runs:
+  using: composite
+  steps:
+    - name: Install Doit.pm
+      uses: actions/checkout@v4
+      with:
+        repository: eserte/Doit
+        ref: ${{ inputs.ref }}
+        path: Doit
+        sparse-checkout: |
+          lib
+        clean: false
+        show-progress: false
+    - name: Extend PERL5LIB for Doit.pm
+      shell: sh {0}
+      run: |
+        if [ -z "$PERL5LIB" ]; then
+          echo "PERL5LIB=$GITHUB_WORKSPACE/Doit/lib" >> $GITHUB_ENV
+        else
+          echo "PERL5LIB=$GITHUB_WORKSPACE/Doit/lib:$PERL5LIB" >> $GITHUB_ENV
+        fi
+    - name: Test Doit.pm
+      shell: perl {0}
+      run: |
+        use Doit;
+        print $Doit::VERSION, "\n";

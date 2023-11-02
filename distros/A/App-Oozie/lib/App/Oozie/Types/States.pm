@@ -1,9 +1,10 @@
-## no critic (RequireStrictDeclarations ProhibitUselessNoCritic)
 package App::Oozie::Types::States;
-$App::Oozie::Types::States::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
 
 use Type::Library -base;
 use Type::Utils -all;
@@ -39,7 +40,7 @@ App::Oozie::Types::States
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

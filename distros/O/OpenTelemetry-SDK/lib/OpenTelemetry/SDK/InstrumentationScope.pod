@@ -1,0 +1,87 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::InstrumentationScope - A logical unit of instrumented code
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry::SDK::InstrumentationScope;
+
+    my $scope = OpenTelemetry::SDK::InstrumentationScope->new(
+        name    => 'my_scope',  # mandatory
+        version => '1.2.3',     # optional
+    );
+
+    my $tracer = OpenTelemetry->tracer_provider->tracer($scope);
+
+=head1 DESCRIPTION
+
+The instrumentation scope represents a logical unit of application code that
+can be instrumented to emit telemetry data. The decision of what constitutes
+as this logical boundary is ultimately up to application authors, but in the
+context of instrumentation libraries, the library will often be the scope.
+
+The main use of a class representing the instrumentation scope is to request
+a tracer or meter from the appropriate providers.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::Attributes> role. Please consult
+that module's documentation for details on the behaviours it provides.
+
+=head2 new
+
+    $scope = OpenTelemetry::SDK::InstrumentationScope->new(
+        name    => $name,
+        version => $version // '',
+    );
+
+Create a new instrumentation scope, with a name and an optional version
+string. The empty string will be used if no version is provided.
+
+Creating a scope without a name will set the name of the scope to the
+empty string and raise a warning.
+
+=head2 name
+
+    $name = $scope->name;
+
+Retrieves the name of the scope as a string. This might be empty f none
+was provided when the scope was constructed.
+
+=head2 version
+
+    $version = $scope->version;
+
+Retrieves the version of the scope as a string. This might be empty if none
+was provided when the scope was constructed.
+
+=head2 to_string
+
+    $string = $scope->to_string;
+
+Generates a string with the name and possibly the version of the scope. This
+string is suitable to be used as an identifier for the scope. Two scopes that
+generate the same string will represent the same scope.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Attributes>
+
+=item L<OpenTelemetry::Trace::TracerProvider>
+
+=item L<OpenTelemetry::SDK::Trace::TracerProvider>
+
+=item L<OpenTelemetry specification on InstrumentationScope|https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/glossary.md#instrumentation-scope>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

@@ -32,9 +32,9 @@ $layout->set_font_description($font);
 $font->{underline_thickness} = 45;
 $font->{underline_position} = -100;
 $layout->set_markup( qq{<u>the <s>quick</s> <span underline="double" underline_color="red">brown</span> fox _ jumps</u>} );
-
-
 $layout->render( 50, 650, $text );
+$layout->set_markup( qq{the <span bgcolor='yellow'>quick</span> brown fox _ jumps} );
+$layout->render( 50, 550, $text );
 
 
 $pdf->saveas("underline.pdf");

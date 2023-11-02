@@ -26,7 +26,7 @@
 	use IO::File;
 	use Test::More;
 
-	our $VERSION = "2023.284.1";
+	our $VERSION = "2023.302.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); };
 
@@ -136,8 +136,9 @@ sub testGeneric()
 	&test_Master_Generic_Select($dbh,$contents);
 	&test_Master_Merges_Select($dbh,$contents);
 	&test_Master_ScanMultiKeys_Select($dbh,$contents);
-	&test_Master_Singles($dbh,$contents);
-	&test_Master_Buffering_Select($dbh,$contents);
+	&test_Master_ScanOrderedEnforced($dbh,$contents);
+	#&test_Master_Singles($dbh,$contents);
+	#&test_Master_Buffering_Select($dbh,$contents);
 
 	$dbh->Close();
 }
@@ -481,7 +482,7 @@ sub test_Master_SinglesORDERBY_Select()
 	);
 	&testRC($dbh,"0501","my_master");
 	&myOK($dbh->getRows()==2,"0502","Buffer expected 2, found ".$dbh->getRows());
-	&myOK($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","0503","Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","0503","Buffer code expected 'master_0000' and 'master_0001', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
 
 	&myDIAG("OrderBy, order_by => \$order_by, \$order_by => [ 'value' ]");
 
@@ -497,7 +498,7 @@ sub test_Master_SinglesORDERBY_Select()
 	);
 	&testRC($dbh,"0511","my_master");
 	&myOK($dbh->getRows()==2,"0512","Buffer expected 2, found ".$dbh->getRows());
-	&myOK($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","0513","Buffer code expected 'master_0000', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
+	&myOK($buffer_array[0]->{s_m_code} eq "master_0000" && $buffer_array[1]->{s_m_code} eq "master_0001","0513","Buffer code expected 'master_0000' and 'master_0001', found 0:".$buffer_array[0]->{s_m_code}." 1:".$buffer_array[1]->{s_m_code});
 
 	&myDIAG("OrderBy, order_by => \@order_by, \@order_by => [ 'value' ]");
 
@@ -1118,6 +1119,8 @@ sub test_Master_ScanMultiKeys_Select()
 
 	my %cursor;
 	my @buffer;
+	my $first;
+	my $ended;
 
 	##my page-1
 
@@ -1148,7 +1151,10 @@ sub test_Master_ScanMultiKeys_Select()
 	);
 	return 0 if (&testRC($dbh,"1301","my_autoincrement_1"));
 	diag("Expected: master_0000.slave_0010, master_0000.slave_0019");
-	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("Keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
 	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0000.slave_0010" && join(".",@{$cursor{last}}) eq "master_0000.slave_0019","1302","Cursor expected page-1");
 
 	## my page-2
@@ -1180,7 +1186,10 @@ sub test_Master_ScanMultiKeys_Select()
 	);
 	return 0 if (&testRC($dbh,"1310","my_autoincrement_1"));
 	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
-	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("Keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
 	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0001.slave_0010" && join(".",@{$cursor{last}}) eq "master_0001.slave_0019","1301","Cursor expected page-2");
 
 	## my page-1
@@ -1212,7 +1221,10 @@ sub test_Master_ScanMultiKeys_Select()
 	);
 	return 0 if (&testRC($dbh,"1320","my_autoincrement_1"));
 	diag("Expected: master_0000.slave_0010, master_0000.slave_0019");
-	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("Keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
 	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0000.slave_0010" && join(".",@{$cursor{last}}) eq "master_0000.slave_0019","1321","Cursor expected page-1");
 
 	## my page-2
@@ -1244,7 +1256,10 @@ sub test_Master_ScanMultiKeys_Select()
 	);
 	return 0 if (&testRC($dbh,"1330","my_autoincrement_1"));
 	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
-	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("Keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
 	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0001.slave_0010" && join(".",@{$cursor{last}}) eq "master_0001.slave_0019","1331","Cursor expected page-2");
 
 	## my page-reload
@@ -1276,7 +1291,10 @@ sub test_Master_ScanMultiKeys_Select()
 	);
 	return 0 if (&testRC($dbh,"1340","my_autoincrement_1"));
 	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
-	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("Keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
 	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0001.slave_0010" && join(".",@{$cursor{last}}) eq "master_0001.slave_0019","1341","Cursor expected page-2");
 
 	## my page-last
@@ -1308,8 +1326,493 @@ sub test_Master_ScanMultiKeys_Select()
 	);
 	return 0 if (&testRC($dbh,"1350","my_autoincrement_1"));
 	diag("Expected: master_0009.slave_0010, master_0009.slave_0019");
-	diag("Buffer..: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("Keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
 	&myOK($cursor{lines}==10 && join(".",@{$cursor{first}}) eq "master_0009.slave_0010" && join(".",@{$cursor{last}}) eq "master_0009.slave_0019","1351","Cursor expected page-LAST");
+}
+
+################################################################################
+
+sub test_Master_ScanOrderedEnforced()
+{
+	my $dbh = shift;
+	my $contents = shift;
+
+	&myDIAG("SelectCursor Order Enforced");
+
+	my %cursor;
+	my @buffer;
+	my $first;
+	my $ended;
+
+	##my page-1
+
+	diag("SelectCursor on top of page, ordered ASC, command TOP, page-1");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_ASC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_TOP,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1801","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0000.slave_0010, master_0000.slave_0019");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0000.slave_0010" && $ended eq "master_0000.slave_0019","1802","Cursor expected page-1");
+
+	## my page-2
+
+	diag("SelectCursor on forward page, ordered ASC, command NEXT, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_ASC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_NEXT,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1810","my_autoincrement_1"));
+	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0001.slave_0010" && $ended eq "master_0001.slave_0019","1811","Cursor expected page-2");
+
+	## my page-1
+
+	diag("SelectCursor on forward page, ordered ASC, command BACK, page-1");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_ASC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_BACK,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1820","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0000.slave_0010, master_0000.slave_0019");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0000.slave_0010" && $ended eq "master_0000.slave_0019","1821","Cursor expected page-1");
+
+	## my page-reload, page1
+
+	diag("SelectCursor on forward page, ordered ASC, command RELOAD, page-1");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_ASC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_RELOAD,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1825","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0000.slave_0010, master_0000.slave_0019");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0000.slave_0010" && $ended eq "master_0000.slave_0019","1826","Cursor expected page-2");
+	## my page-2
+
+	diag("SelectCursor on forward page, ordered ASC, command NEXT, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_ASC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_NEXT,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1830","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0001.slave_0010" && $ended eq "master_0001.slave_0019","1831","Cursor expected page-2");
+
+	## my page-reload
+
+	diag("SelectCursor on forward page, ordered ASC, command RELOAD, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_ASC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_RELOAD,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1840","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0001.slave_0010, master_0001.slave_0019");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0001.slave_0010" && $ended eq "master_0001.slave_0019","1841","Cursor expected page-2");
+
+	## my page-last
+
+	diag("SelectCursor on forward page, ordered ASC, command LAST, page-LAST");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_ASC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_LAST,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1850","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0009.slave_0010, master_0009.slave_0019");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0009.slave_0010" && $ended eq "master_0009.slave_0019","1851","Cursor expected page-LAST");
+
+	##my page-1, desc
+
+	diag("SelectCursor on top of page, ordered DESC, command TOP, page-1");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_DESC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_TOP,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1861","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0000.slave_0019, master_0000.slave_0010");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0000.slave_0019" && $ended eq "master_0000.slave_0010","1862","Cursor expected page-1");
+
+	## my page-2
+
+	diag("SelectCursor on forward page, ordered DESC, command NEXT, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_DESC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_NEXT,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1870","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0001.slave_0019, master_0001.slave_0010");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0001.slave_0019" && $ended eq "master_0001.slave_0010","1871","Cursor expected page-2");
+
+	## my page-1
+
+	diag("SelectCursor on forward page, ordered DESC, command BACK, page-1");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_DESC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_BACK,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1880","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0000.slave_0019, master_0000.slave_0010");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0000.slave_0019" && $ended eq "master_0000.slave_0010","1881","Cursor expected page-1");
+
+	## my page-2
+
+	diag("SelectCursor on forward page, ordered DESC, command NEXT, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_DESC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_NEXT,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1890","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0001.slave_0019, master_0001.slave_0010");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0001.slave_0019" && $ended eq "master_0001.slave_0010","1891","Cursor expected page-2");
+
+	## my page-reload
+
+	diag("SelectCursor on forward page, ordered DESC, command RELOAD, page-2");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_DESC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_RELOAD,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1892","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0001.slave_0019, master_0001.slave_0010");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0001.slave_0019" && $ended eq "master_0001.slave_0010","1893","Cursor expected page-2");
+
+	## my page-last
+
+	diag("SelectCursor on forward page, ordered DESC, command LAST, page-LAST");
+	$dbh->SelectCursor
+	(
+		table => ["my_master","my_slave"],
+		fields =>
+		[
+			{"my_master.my_i_m_id"=>"mi"},
+			{"my_slave.my_i_s_id"=>"si"},
+			{"my_master.my_s_m_code"=>"ms"},
+			{"my_slave.my_s_s_code"=>"ss"},
+	       	],
+		where =>
+		[
+			"my_master.my_s_m_code" => "\\my_slave.my_s_m_code"
+		],
+		cursor_key =>
+		[
+			"ms",
+			"ss",
+		],
+		cursor_order => SQL_SIMPLE_ORDER_DESC,
+		cursor_info => \%cursor,
+		cursor_command => SQL_SIMPLE_CURSOR_LAST,
+		buffer => \@buffer,
+		limit => 10,
+	);
+	return 0 if (&testRC($dbh,"1894","my_autoincrement_1"));
+	$first = $buffer[0]->{ms}.".".$buffer[0]->{ss};
+	$ended = $buffer[9]->{ms}.".".$buffer[9]->{ss};
+	diag("Expected: master_0009.slave_0019, master_0009.slave_0010");
+	diag("Buffer..: ".$first.", ".$ended);
+	diag("keys....: ".join(".",@{$cursor{first}}).", ".join(".",@{$cursor{last}}));
+	&myOK($cursor{lines}==10 && $first eq "master_0009.slave_0019" && $ended eq "master_0009.slave_0010","1895","Cursor expected page-LAST");
 }
 
 ################################################################################

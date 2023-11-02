@@ -167,21 +167,24 @@ NOTE:  Since this module only looks for any streams found on any
 specifed website, this function usually returns the base name of 
 the website being searched, or the full URL passed in, unless an 
 html <TITLE> tag is found, in which case that will be returned.  
-If 'I<desc>' is specified, then it will always be full URL of the 
-website being searched.
+If 'I<desc>' is specified, then it will usually be full URL of the 
+website being searched, unless a standard "description" HTML metatag 
+is found, in which case that will be returned.
 
 =item $station->B<getIconURL>()
 
 Returns the URL for the station's "cover art" icon image, if any.  
-NOTE:  Since this module only looks for any streams found on any 
-specifed website, this function always returns an empty string!
+NOTE:  For most websites, this will return an empty string, however, 
+a few have an image link contained in a standard HTML meta-tag which, 
+if found, will be returned.
 
 =item $station->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
 "gif", "jpeg", etc.) and the actual icon image (binary data), if any.
-NOTE:  Since this module only looks for any streams found on any 
-specifed website, this function always returns an empty array!
+NOTE:  For most websites, this will return an empty string, however, 
+a few have an image link contained in a standard HTML meta-tag which, 
+if found, will be fetched and returned as image data.
 
 =item $station->B<getImageURL>()
 

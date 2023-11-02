@@ -196,8 +196,7 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                     }
                 };
                 if (control.getSelection){
-                    control.getSelection().addListener("change", callback, this);
-                }
+                    control.getSelection().addListener("change", callback, this);                }
                 else {
                     control.addListener('changeValue',callback,this);
                 }

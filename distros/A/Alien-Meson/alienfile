@@ -107,6 +107,13 @@ sub do_binary {
     patch sub {
       my $cwd = Path::Tiny->cwd;
       $_->remove for $cwd->children( qr/\.msi$/ );
+
+      my $PFiles = $cwd->child('PFiles64');
+      if( -d $PFiles ) {
+        File::Copy::Recursive::rmove( "$PFiles/*", $cwd );
+        $PFiles->remove_tree;
+      }
+
       my $Meson = $cwd->child('Meson');
       $Meson->child('ninja.exe')->remove;
       File::Copy::Recursive::rmove( "$Meson/*", $cwd );

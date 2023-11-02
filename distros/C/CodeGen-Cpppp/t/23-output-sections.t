@@ -26,4 +26,10 @@ is( $tpl->output, object {
    call [ get => 'private' ], "int example(struct Example *e) {\n   (void)e;\n}\n";
 });
 
+is( '' . $tpl->output, 
+   "struct Example;\nextern int example(struct Example *);\n"
+   ."struct Example {\n   int a;\n};\n"
+   ."int example(struct Example *e) {\n   (void)e;\n}\n"
+);
+
 done_testing;

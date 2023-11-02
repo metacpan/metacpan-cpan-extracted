@@ -1,9 +1,10 @@
 package Test::Smoke::BuildCFG;
 use strict;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Cwd;
+use File::Basename qw( dirname );
 use File::Spec;
 require File::Path;
 use Test::Smoke::LogMixin;
@@ -464,6 +465,41 @@ sub default_buildcfg() {
 -DDEBUGGING
 __EOCONFIG__
 }
+
+=head2 Test::Smoke::BuildCFG->os_default_buildcfg($os)
+
+Check for C<MSWin32> or C<VMS> and return one of the three prepared configs.
+
+=cut
+
+sub os_default_buildcfg {
+    my $self = shift;
+    my ($os) = @_;
+
+    (my $inc_name = __PACKAGE__ . ".pm") =~ s{::}{/}g;
+    my $base_dir = dirname($INC{$inc_name});
+    my $bcfg_file = 'perlcurrent.cfg';
+    GIVEN: {
+        local $_ = $os;
+
+        /^MSWin32$/ && do { $bcfg_file = 'w32current.cfg'; last GIVEN; };
+        /^VMS$/     && do { $bcfg_file = 'vmsperl.cfg'; last GIVEN; };
+    }
+
+    my $fullname = File::Spec->catfile($base_dir, $bcfg_file);
+    my $content;
+    if (open(my $fh, '<', $fullname)) {
+        $content = do { local $/; <$fh> };
+        close($fh);
+    }
+    else {
+        warn("Cannot open($fullname): $!");
+        $content = $self->default_buildcfg();
+    }
+
+    return $content;
+}
+
 
 =head2 new_configuration( $config )
 

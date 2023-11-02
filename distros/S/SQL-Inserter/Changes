@@ -1,7 +1,10 @@
 Revision history for SQL-Inserter
 
+0.03    2023-10-29
+        - Add support for Oracle Database.
+
 0.02    2023-06-30
-        Duplicates handling for hash inserts.
+        - Duplicates handling for hash inserts.
 
 0.01    2023-06-26
-        First public release.
+        - First public release.

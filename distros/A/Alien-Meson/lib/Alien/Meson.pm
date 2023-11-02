@@ -1,5 +1,5 @@
 package Alien::Meson;
-
+$Alien::Meson::VERSION = '0.05';
 use strict;
 use warnings;
 use base qw( Alien::Base );
@@ -20,6 +20,27 @@ Command line tool:
 
  unshift @PATH, Alien::Meson->bin_dir;
  system "@{[ Alien::Meson->exe ]}";
+
+Use in L<alienfile>:
+
+  share {
+    requires 'Alien::Meson';
+    requires 'Alien::Ninja';
+    # ...
+    my $build_dir = '_build';
+    build [
+      sub {
+        my $build = shift;
+        Alien::Build::CommandSequence->new([
+          Alien::Meson->exe, 'setup',
+            '--prefix=%{.install.prefix}',
+            $build_dir,
+        ])->execute($build);
+      },
+      [ '%{ninja}', qw(-C), $build_dir, "test" ],
+      [ '%{ninja}', qw(-C), $build_dir, 'install' ],
+    ];
+  }
 
 =head1 DESCRIPTION
 
@@ -74,6 +95,11 @@ sub bin_dir {
 
  %{meson}
 
+B<WARNING>: This interpolation is deprecated. This will be removed in a future
+version as some share installs of Meson are not callable as a single executable
+(they need to be prefixed with the Python interpreter). Instead use
+C<< Alien::Meson->exe >> directly.
+
 Returns 'meson', 'meson.py', or appropriate command for
 platform.
 
@@ -82,7 +108,8 @@ platform.
 sub alien_helper {
   return +{
     meson => sub {
-      Alien::Meson->exe;
+      warn "Interpolation of %{meson} is deprecated. See POD for Alien::Meson.";
+      join " ", Alien::Meson->exe;
     },
   };
 }

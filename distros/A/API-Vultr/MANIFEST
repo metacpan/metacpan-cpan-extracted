@@ -1,5 +1,5 @@
-API-Vultr-0.001/META.json
-API-Vultr-0.001/META.yml
+API-Vultr-0.002.tar.gz
+cpanfile
 lib/API/Vultr.pm
 Makefile.PL
 MANIFEST			This list of files

@@ -20,10 +20,14 @@ no_index:
     - examples
     - t
 requires:
-  perl: '5.008'
+  LWP::UserAgent: '6.72'
+  Test::LWP::UserAgent: '0.036'
+  Test::Simple: '1.302195'
+  URI: '5.21'
+  perl: v5.8.1
 resources:
   bugtracker: https://github.com/rawleyfowler/API-Vultr/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/rawleyfowler/API-Vultr
-version: '0.001'
+version: '0.003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

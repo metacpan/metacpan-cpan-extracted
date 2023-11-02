@@ -1,3 +1,21 @@
+0.47.9 2023-10-26 10:05:30 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - better fix, based on https://github.com/qooxdoo/qooxdoo/pull/10632
+
+0.47.8 2023-10-24 11:23:11 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - force button to focus when it is touched ... this seems to
+   resolve the event order problem
+
+0.47.7 2023-10-24 11:08:14 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - force button to focus when it is clicked
+
+0.47.6 2023-10-24 10:50:48 +0200 Tobias Oetiker <tobi@oetiker.ch>
+
+ - fix event ordering problem on ios and android
+ - add longer timeout for downloads and views
+
 0.47.5 2023-10-19 14:06:22 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - ios compatiblity issue can not easily be fixed outside qx

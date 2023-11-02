@@ -67,6 +67,7 @@ sub sync {
         my $cloneout = $gitbin->run(
             clone => $self->{gitorigin},
             $self->{gitdir},
+            ($^O eq 'MSWin32' ? ('--config', 'core.autocrlf=input') : ()),
             '2>&1'
         );
         if ( my $gitexit = $gitbin->exitcode ) {
@@ -97,6 +98,7 @@ sub sync {
         my $cloneout = $gitbin->run(
             clone         => $self->{gitdir},
             $self->{ddir},
+            ($^O eq 'MSWin32' ? ('--config', 'core.autocrlf=input') : ()),
             '2>&1'
         );
         if ( my $gitexit = $gitbin->exitcode ) {

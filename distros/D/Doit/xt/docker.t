@@ -44,7 +44,7 @@ eval {
     $doit->system('docker', 'rm', $name);
 };
 eval {
-    $doit->system('docker', 'run', '--detach', '-h', $name, "--name=$name", 'debian:stretch', 'sleep', '3600');
+    $doit->system('docker', 'run', '--detach', '-h', $name, "--name=$name", 'debian:bookworm', 'sleep', '3600');
     $doit->system('docker', 'exec', $name, 'sh', '-c', 'apt-get update && apt-get install -y perl-modules');
 };
 plan skip_all => "Cannot create docker container: $@"

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 13;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigFloat;
@@ -11,6 +11,27 @@ use Math::BigFloat;
 my ($x, $y);
 
 note("as_float() as a class method");
+
+$x = Math::BigFloat -> as_float("Inf");
+subtest '$x = Math::BigFloat -> as_float("Inf");' => sub {
+    plan tests => 2;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    cmp_ok($x, "==", "Inf", '$x == Inf');
+};
+
+$x = Math::BigFloat -> as_float("-Inf");
+subtest '$x = Math::BigFloat -> as_float("-Inf");' => sub {
+    plan tests => 2;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    cmp_ok($x, "==", "-Inf", '$x == -Inf');
+};
+
+$x = Math::BigFloat -> as_float("NaN");
+subtest '$x = Math::BigFloat -> as_float("NaN");' => sub {
+    plan tests => 2;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is($x, "NaN", '$x is NaN');
+};
 
 $x = Math::BigFloat -> as_float("2");
 subtest '$x = Math::BigFloat -> new("2"); $x -> as_float();' => sub {
@@ -27,6 +48,33 @@ subtest '$x = Math::BigFloat -> as_float("2.5");' => sub {
 };
 
 note("as_float() as an instance method");
+
+$x = Math::BigFloat -> new("Inf"); $y = $x -> as_float();
+subtest '$x = Math::BigFloat -> new("Inf"); $y = $x -> as_float();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($y), 'Math::BigFloat', '$y is a Math::BigFloat');
+    cmp_ok($y, "==", "Inf", '$y == Inf');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
+$x = Math::BigFloat -> new("-Inf"); $y = $x -> as_float();
+subtest '$x = Math::BigFloat -> new("-Inf"); $y = $x -> as_float();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($y), 'Math::BigFloat', '$y is a Math::BigFloat');
+    cmp_ok($y, "==", "-Inf", '$y == -Inf');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
+$x = Math::BigFloat -> new("NaN"); $y = $x -> as_float();
+subtest '$x = Math::BigFloat -> new("NaN"); $y = $x -> as_float();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($y), 'Math::BigFloat', '$y is a Math::BigFloat');
+    is($y, "NaN", '$y is NaN');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
 
 $x = Math::BigFloat -> new("2"); $y = $x -> as_float();
 subtest '$x = Math::BigFloat -> new("2"); $y = $x -> as_float();' => sub {

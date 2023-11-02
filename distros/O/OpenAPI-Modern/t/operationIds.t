@@ -7,17 +7,10 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use JSON::Schema::Modern::Utilities 'jsonp';
+
 use lib 't/lib';
 use Helper;
-
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
-use JSON::Schema::Modern;
-use JSON::Schema::Modern::Document::OpenAPI;
-use JSON::Schema::Modern::Utilities 'jsonp';
-use YAML::PP;
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 
 # the document where most constraints are defined
 use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';

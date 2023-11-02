@@ -66,7 +66,7 @@ subtest "coerce_to=Date::TimeOfDay" => sub {
 
     subtest "from hms string" => sub {
         my $d = $c->("23:59:59");
-        is(ref $d, "Date::TimeOfDay");
+        is(ref $d, "Date::TimeOfDay") or return;
         is($d->hms, "23:59:59");
 
         #like($c->("24:00:00"), "24:00:00"); # invalid
@@ -77,7 +77,7 @@ subtest "coerce_to=Date::TimeOfDay" => sub {
         my $tod = Date::TimeOfDay->new(hour=>23, minute=>59, second=>59);
         my $d = $c->($tod);
 
-        is(ref $d, "Date::TimeOfDay");
+        is(ref $d, "Date::TimeOfDay") or return;
         is($d->hms, "23:59:59");
     };
 };

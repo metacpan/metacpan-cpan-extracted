@@ -1,10 +1,14 @@
 package App::Oozie::Role::Git;
-$App::Oozie::Role::Git::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
+use App::Oozie::Constants qw( EMPTY_STRING );
 use App::Oozie::Types::Common qw( IsDir );
 use File::Find::Rule;
 use Git::Repository;
@@ -35,7 +39,7 @@ option git_repo_path => (
 
 has git_deploy_tag_pattern => (
     is      => 'rw',
-    default => sub { qr// },
+    default => sub { qr{}xms },
 );
 
 has git_tag_fetcher => (
@@ -45,7 +49,7 @@ has git_tag_fetcher => (
     default => sub {
         my $self = shift;
         return if ! $self->gitfeatures;
-        die "git_tag_fetcher was not set!";
+        die 'git_tag_fetcher was not set!';
     },
 );
 
@@ -66,33 +70,33 @@ has git => (
 
 sub get_latest_git_commit {
     my $self = shift;
-    die "Git features are disabled!" if ! $self->gitfeatures;
-    $self->git->run( 'rev-parse' => 'HEAD' );
+    die 'Git features are disabled!' if ! $self->gitfeatures;
+    return $self->git->run( 'rev-parse' => 'HEAD' );
 }
 
 sub get_git_status {
     my $self = shift;
-    die "Git features are disabled!" if ! $self->gitfeatures;
-    $self->git->run( status => qw( -s -b --porcelain ) );
+    die 'Git features are disabled!' if ! $self->gitfeatures;
+    return $self->git->run( status => qw( -s -b --porcelain ) );
 }
 
 sub get_git_sha1_of_folder {
     my $self = shift;
     my $folder = shift;
 
-    die "Git features are disabled!" if ! $self->gitfeatures;
+    die 'Git features are disabled!' if ! $self->gitfeatures;
 
     my $repo_dir = $self->git_repo_path;
     my $git      = $self->git;
 
-    return $git->run('rev-list',"-1","HEAD","--",$folder);
+    return $git->run( 'rev-list', q{-1}, 'HEAD', q{--}, $folder );
 }
 
 sub get_git_info_on_all_files_in {
     my $self = shift;
     my $folder = shift;
 
-    die "Git features are disabled!" if ! $self->gitfeatures;
+    die 'Git features are disabled!' if ! $self->gitfeatures;
 
     my $logger   = $self->logger;
 
@@ -102,7 +106,10 @@ sub get_git_info_on_all_files_in {
                                 ->in( $folder );
 
     # Note that this ideally should be kept up-to-date with lib/ttree.cfg
-    @all_files_in_folder = grep { $_ !~ /.sw[a-z]$/ } @all_files_in_folder;
+    @all_files_in_folder = grep {
+                                $_ !~ m{ .sw[a-z] \z }xms
+                            }
+                            @all_files_in_folder;
 
     $logger->info(
         sprintf 'Collecting git logs for %d files (this might take a while)',
@@ -138,7 +145,7 @@ sub _collect_git_info {
     my $verbose  = $self->verbose;
     my $logger   = $self->logger;
 
-    my $git_info = "";
+    my $git_info = EMPTY_STRING;
 
     my $file = File::Spec->abs2rel($rel_file, $repo_dir);
     my $got_basic_data = 1;
@@ -148,22 +155,26 @@ sub _collect_git_info {
     }
 
     eval {
-        $git_info = $self->git->run("ls-files", "-s", $file);
+        $git_info = $self->git->run( 'ls-files', '-s', $file);
         1;
     } or do {
         my $eval_error = $@ || 'Zombie error';
-        $git_info = "$eval_error Have you set GIT_TREE to point to the repo you are deploying from, before running the script?";
+        $git_info = sprintf '%s Have you set GIT_TREE to point to the repo you are deploying from, before running the script?',
+                            $eval_error,
+                    ;
         $got_basic_data = 0;
     };
 
     if ( ! $git_info) {
-        $git_info = "No git data available for $file (not part of repository or the deployment is not being made from the repo this script knows of, see above)";
+        $git_info = sprintf 'No git data available for %s (not part of repository or the deployment is not being made from the repo this script knows of, see above)',
+                                $file,
+                    ;
         $got_basic_data = 0;
     }
 
     if ( $got_basic_data ) {
         # slow
-        $git_info .= sprintf " (%s)", $self->_collect_git_mtime( $file );
+        $git_info .= sprintf ' (%s)', $self->_collect_git_mtime( $file );
     }
 
     return $git_info;
@@ -177,9 +188,9 @@ sub _collect_git_mtime {
     my $rv;
 
     $rv = eval {
-        my @latest_git_log_record_for_file = $self->git->run("log", "-1", "--", $file);
+        my @latest_git_log_record_for_file = $self->git->run('log', q{-1}, q{--}, $file);
 
-        my $date_line_prefix        = "Date:";
+        my $date_line_prefix        = 'Date:';
         my $date_line_prefix_length = length($date_line_prefix);
 
         foreach my $line (@latest_git_log_record_for_file) {
@@ -197,7 +208,10 @@ sub _collect_git_mtime {
 
         1;
     } or do {
-        $rv = "Failed to get modification date. ".$@;
+        my $eval_error = $@ || 'Zombie error';
+        $rv = sprintf 'Failed to get modification date. %s;',
+                        $eval_error,
+            ;
     };
 
     return $rv;
@@ -206,7 +220,7 @@ sub _collect_git_mtime {
 sub verify_git_tag {
     my $self = shift;
 
-    die "Git features are disabled!" if ! $self->gitfeatures;
+    die 'Git features are disabled!' if ! $self->gitfeatures;
 
     my $oozie_base_dir = $self->local_oozie_code_path;
     my $repo_dir       = $self->git_repo_path;
@@ -215,7 +229,7 @@ sub verify_git_tag {
     # If you are using http://git-deploy.github.io/ (for example)
     # then you may have tagged releases for live code which you
     # can have a check against in here.
-    my $git_tag        = $self->git_tag_fetcher->() || die "Failed to locate a git tag!";
+    my $git_tag        = $self->git_tag_fetcher->() || die 'Failed to locate a git tag!';
     my $gitforce       = $self->gitforce;
 
     my $git = $self->git;
@@ -233,20 +247,28 @@ sub verify_git_tag {
         my $eval_error = $@ || 'Zombie error';
         if ( $eval_error =~ m{ fatal: .* \Qnot a valid ref\E  }xms ) {
             $logger->error(
-                "Your repo does not seem to have the current live git-deploy tag.",
-                "Be sure that your repo is up to date if you're using a local copy!",
-                "If you are in a branch, be sure to have the latest changes (merge/rebase)."
+                'Your repo does not seem to have the current live git-deploy tag.',
+                q{Be sure that your repo is up to date if you're using a local copy!},
+                'If you are in a branch, be sure to have the latest changes (merge/rebase).'
             );
         }
         else {
-            $logger->error( "Unknown error returned from git: $eval_error" );
+            $logger->error(
+                sprintf 'Unknown error returned from git: %s',
+                        $eval_error,
+            );
         }
         $logger->logdie( 'Failed' ) if ! $gitforce;
     };
 
-    $logger->info( "The current live tag `$git_tag` exists in the repo (that doesn't show that the repo is up to date)" );
+    $logger->info(
+        sprintf q{The current live tag `%s` exists in the repo (that doesn't show that the repo is up to date)},
+                $git_tag,
+    );
 
-    $logger->info( 'Probing the git status. This might take some time depending on the number of files and the state of the filesystem' );
+    $logger->info(
+        'Probing the git status. This might take some time depending on the number of files and the state of the filesystem'
+    );
 
     my(@dirty);
     eval {
@@ -257,12 +279,18 @@ sub verify_git_tag {
         my $eval_error = $@ || 'Zombie error';
         if ( $eval_error =~ m{ \QNot a git repository (or any of the parent directories):\E }xms ) {
             $logger->error(
-                "The repo directory $repo_dir is not a valid git repository.",
-                " Please deploy from a repo",
+                sprintf(
+                    'The repo directory %s is not a valid git repository.',
+                    $repo_dir,
+                ),
+                ' Please deploy from a repo',
             );
         }
         else {
-            $logger->error( "git returned unknown error: $eval_error" );
+            $logger->error(
+                sprintf 'git returned unknown error: %s',
+                        $eval_error,
+            );
         }
         $logger->logdie( 'Failed' ) if ! $gitforce;
     };
@@ -270,30 +298,43 @@ sub verify_git_tag {
     return if not @dirty && !$gitforce;
 
     # 'M file', '?? file'
-    @dirty = map { (split m{\s+}, trim($_), 2)[1] } @dirty;
+    @dirty = map {
+                (split m{ \s+ }xms, trim($_), 2)[1]
+            }
+            @dirty;
 
     my $fail = 0;
     foreach my $dirt ( @dirty ) {
-        my $test = $repo_dir . '/' . $dirt;
+        my $test = $repo_dir . q{/} . $dirt;
         if ( $test =~ m{ \A \Q$oozie_base_dir\E (.*) \z }xms) {
             $test = $1;
-            $logger->warn( "The oozie workflow directory has untracked changes in $dirt" );
+            $logger->warn(
+                sprintf 'The oozie workflow directory has untracked changes in %s',
+                        $dirt,
+            );
             $fail++;
         }
         else {
-            $logger->warn( "Git reported a modified/new file in the repo: $test (ignoring as it's not in the workflow directory)" );
+            $logger->warn(
+                sprintf q{Git reported a modified/new file in the repo: %s (ignoring as it's not in the workflow directory)},
+                $test,
+            );
         }
-        $self->dirty_deployed_files($fail);
+
+        $self->dirty_deployed_files( $fail );
     }
 
     if ( $fail ) {
-        $logger->error( "Git tree is not clean and there are $fail untracked changes in the workflow path. Please deploy from a clean repo" );
+        $logger->error(
+            sprintf 'Git tree is not clean and there are %s untracked changes in the workflow path. Please deploy from a clean repo',
+                    $fail,
+        );
         $logger->logdie( 'Failed' ) if ! $gitforce;
-        $logger->warn( "Proceeding anyway, I hope you KNOW WHAT YOU'RE DOING" );
+        $logger->warn( q{Proceeding anyway, I hope you KNOW WHAT YOU'RE DOING} );
     }
 
     if ( !$fail || $fail && $gitforce ) {
-        $logger->info( "The related paths are clean as far as git and this tool is concerned" );
+        $logger->info( 'The related paths are clean as far as git and this tool is concerned' );
     }
 
     return;
@@ -302,7 +343,7 @@ sub verify_git_tag {
 sub get_latest_git_tag {
     my $self = shift;
 
-    die "Git features are disabled!" if ! $self->gitfeatures;
+    die 'Git features are disabled!' if ! $self->gitfeatures;
 
     my $pat  = $self->git_deploy_tag_pattern;
     my $latest_tag;
@@ -311,7 +352,7 @@ sub get_latest_git_tag {
         my $git = $self->git;
 
         my @all_tags = $git->run(
-                            "for-each-ref",
+                            'for-each-ref',
                                 '--sort=taggerdate',
                                 '--format' => q['%(refname)'],
                                 'refs/tags'
@@ -327,10 +368,10 @@ sub get_latest_git_tag {
         1;
     } or do {
         my $eval_error = $@ || 'Zombie error';
-        return "Failed to find latest tag in the git repo: ". $eval_error;
+        return sprintf 'Failed to find latest tag in the git repo: %s', $eval_error;
     };
 
-    return $latest_tag || "Latest git tag not found in git repo";
+    return $latest_tag || 'Latest git tag not found in git repo';
 }
 
 1;
@@ -347,7 +388,7 @@ App::Oozie::Role::Git
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

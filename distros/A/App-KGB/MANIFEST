@@ -67,6 +67,8 @@ t/76-webhook-pipeline.t
 t/77-webhook-build.t
 t/78-webhook-push-squash.t
 t/79-webhook-push-author.t
+t/80-webhook-glob-push.t
+t/81-webhook-push-tag-only-tag.t
 t/changes.t
 t/critic.t
 t/perlcriticrc

@@ -1,0 +1,377 @@
+Revision history for Ubic
+
+{{$NEXT}}
+
+1.55    2013-07-26
+    * support PERLBREW_ROOT
+    (thanks to github:spacebat for the patch, see https://github.com/berekuk/Ubic/pull/54)
+
+1.54    2013-05-28
+    * 'auto_start' option in Ubic::Service and SimpleDaemon
+
+1.53    2013-05-18
+    * fix crontab generation on setup!
+
+1.52    2013-05-12
+    * always add /usr/local/bin to $PATH
+
+1.51    2013-04-14
+    * autoflush stdout and stdin in ubic-guardian
+      (especially when we're proxying daemon's logs)
+
+1.50_01 2013-04-03
+    * support 'term_timeout' option in SimpleDaemon
+
+1.49    2013-03-13
+    * stable release, no code changes
+
+1.48_02 2013-02-26
+    * 'ubic status' exits with status code 0 if there're disabled services
+
+1.48_01 2013-01-31
+    * guardian supports logs proxying and reopening them on SIGHUP
+     (see https://github.com/berekuk/Ubic/pull/47)
+    * hint about 'ubic help' on unknown command
+
+1.48    2012-12-07
+    * detect ubic-watchdog location and put its full path to the crontab on setup
+    * 'ubic help' command (see https://github.com/berekuk/Ubic/issues/31)
+
+1.47    2012-12-03
+    * compatibility with perl 5.17 hash randomization
+     (see https://github.com/berekuk/Ubic/issues/45)
+    * append watchdog logs in crontab (instead of rewriting)
+
+1.46    2012-11-08
+    * require modern BSD::Resource version
+      (see https://github.com/berekuk/Ubic/issues/43)
+    * relax timing conditions in t/watchdog.t
+
+1.45    2012-11-01
+    * more robust t/simple-daemon.t
+
+1.44_03 2012-10-30
+    * setup process now offers auto-configuration
+    * typo fix in crontab code (thanks to Anton Ukolov)
+
+1.44_02 2012-10-30
+    * Solaris compatibility (thanks to Martin Schultheis!)
+
+1.44_01 2012-08-02
+    * support perlbrew, custom PATH and custom PELR5LIB
+
+1.44    2012-06-21
+    * stable release, no code changes
+
+1.43_04 2012-06-20
+    * fix SimpleDaemon to work on perl <5.14
+
+1.43_03 2012-06-20
+    * fix tests for systems which don't set LOGNAME or USERNAME
+
+1.43_02 2012-06-19
+    * dependency on BSD::Resource is optional in code and tests
+
+1.43_01 2012-06-19
+    * ulimit support in SimpleDaemon
+    * json-style configs
+    * 'start_hook' option in start_daemon()
+
+1.43    2012-06-16
+    * actually merge the fix
+
+1.42    2012-06-15
+    * critical bugfix: fix credentials application order
+    (all non-root services were broken when operated from root, 1.39-1.41 releases were affected)
+
+1.41    2012-06-11
+    * pid2cmd doesn't die on errors
+    * Ubic::Run supports the explicit service names
+    * lots of minor POD spelling fixes and improvements
+
+1.40    2012-05-27
+    * improve tests stability
+
+1.39    2012-05-23
+    * new SimpleDaemon options:
+     - reload_signal
+     - daemon_user/daemon_group
+    * 'credentials' option in start_daemon()
+    * various doc improvements
+
+1.38_01 2012-04-23
+    * freebsd credentials fix - set real uid first and effective uid after that
+
+1.38    2012-04-14
+    * stable release
+
+1.37_03 2012-04-13
+    * log early exiting daemons correctly; fix tests
+
+1.37_02 2012-03-28
+    * non-root dir multiservices allow operations without --force
+    * minor docs improvements, including replacing "flexible perl-based" with "polymorphic" everywhere
+
+1.37_01 2012-03-27
+    * Ubic::Daemon::OS::Linux: fix guid calculating code
+    * Ubic::Daemon:
+     - better logging
+     - die if can't calculate guid
+
+1.37    2012-03-15
+    * Ubic::UA pod
+    * prohibit building on Solaris
+
+1.36_02 2012-02-15
+    * ubic.ping improvements:
+     - use Ubic::UA instead of LWP::UserAgent to reduce the number of dependencies
+     - increase timeout options to avoid start failures on slow systems
+
+1.36    2011-12-09
+    * Ubic::Multiservice::Dir: don't warn about configs with taboo extensions
+
+1.35_02 2011-11-17
+        * custom service loaders:
+         - ini-style syntax for configs with .ini extension
+         - extension-based polimorphism which will let us implement more config syntaxes in the future
+        * always sync pidfiles and status files to disk
+        * small doc and output message improvements
+
+1.35_01 2011-11-04
+        * ubic-admin:
+         - fix local installation mode
+         - document all command-line options
+
+1.35    2011-10-07
+        * fix build - ubic-daemon doesn't fail compile test if ubic is not installed
+
+1.34    2011-09-25
+        * example system paths in setup depend on os
+        * contrubitors section in Ubic.pm
+
+1.33_04 2011-09-20
+        * use pure perl for mkdir and chmod operations
+
+1.33_03 2011-09-20
+        * fix typo in the path to freebsd ubic.cfg
+
+1.33_02 2011-09-20
+        * comply to hier(7) on freebsd
+        * ubic-daemon improvements:
+         - pod advicing not to use this script
+         - --stop and --list features
+         - use Ubic::Settings instead of hard-coded pid_dir path
+
+1.33_01 2011-09-02
+        * fix setup.t - don't fail if ubic is already installed
+        * more questions in Ubic::Manual::FAQ, other various doc improvements
+        * partially align status column on 'ubic status' command
+        * silently skip configs with taboo extensions, complain about others to stderr
+          (see https://github.com/berekuk/Ubic/issues/15)
+        * Ubic::Daemon on linux doesn't fail if can't read from /proc cmdline file:
+          there are cases when it is a possible state (usually after reboot)
+
+1.33    2011-07-22
+        * stable release
+
+1.32_04 2011-07-18
+        * don't mess with crontab on setup tests
+        (see https://github.com/berekuk/Ubic/issues/17)
+
+1.32_03 2011-07-17
+        * fix daemon tests
+
+1.32_02 2011-07-13
+        * Ubic::Daemon improvements:
+         - 'cwd' and 'env' options (SimpleDaemon now just passes them to start_daemon())
+         - log signal name, exit code and other events to ubic_log prettier and more consistently
+        * document 'cwd' and 'env' options in Ubic::Service::SimpleDaemon
+
+1.32_01 2011-07-13
+        * new options in Ubic::Service::SimpleDaemon:
+         - cwd - set daemon working dir
+         - env - set daemon environment
+        * minimal setup test
+
+1.32    2011-07-07
+        * Fix ubic-admin setup again. Sorry.
+
+1.31    2011-06-30
+        * fix ubic-admin setup - forgot to import IO::Handle
+        (https://github.com/berekuk/Ubic/issues/13)
+
+1.30    2011-06-28
+        * Ubic::AtomicFile for storing any file safely
+        * POD improvements:
+         - Ubic::Manual::Overview
+         - Ubic::Service::SimpleDaemon now makes sense
+
+1.29    2011-06-07
+        * ubic-admin script: fix crontab install when user doesn't have previous crontab
+        * ubic script: fix 'ubic unknown-cmd' error reporting
+        * watchdog improvements:
+         - don't ask for status twice if service works
+         - permanently set credentials instead of using forks for non-root services
+         - log status obtained by status check, instead of just logging 'service is broken'
+        * POD improvements:
+         - Ubic::Manual::Intro
+         - Ubic::Manual::Multiservices
+         - various POD fixes
+
+1.28    2011-04-21
+        * 'ubic status' always shows non-cached statuses if called by root
+        * ubic.ping status now uses sane timeout when it checks service via http
+
+1.27    2011-04-17
+        * ubic-admin script:
+         - system-wide setup with one command 'ubic-admin setup'
+         - home directory setup with the same 'ubic-admin setup' command
+         - batch-mode with flag "--batch-mode"
+        * configurable default_user (very helpful for home directory setup)
+        * 'ubic status' changes:
+         - real status will be checked and printed if current user is equal
+           to service user
+         - "Not a root, printing cached statuses" message removed;
+           instead, 'ubic status' will print "[cached]" note for every cached status
+        * ubic-ping service renamed to ubic.ping
+        * ubic-watchdog and ubic-update now run as ubic.watchdog and ubic.update services
+        instead of cron jobs; "ubic-watchdog ubic.watchdog" cron job is still recommended.
+        * ubic-periodic script for recurrent job running
+
+1.26    2011-04-10
+        Hotfix release (https://github.com/berekuk/Ubic/issues/12):
+        * don't depend on Win32 modules
+        * stale Win32 code removed
+        (it didn't work anyway, so there is no point in packaging it in CPAN releases).
+
+1.25    2011-03-31
+        * MacOSX support (and probably other POSIX systems too, including FreeBSD)
+        * lots of refactoring:
+         - Ubic::Daemon::OS modules family for OS-specific daemonization tasks
+         - Ubic::Credentials::OS modules family for OS-specific user/group tasks
+
+1.24    Wed Feb 23, 2011
+        * ubic-watchdog: change process name while checking specific service
+        * check that uid change was successful before calling service action methods
+        * default check_timeout() lowered from 10 minutes to 1 minute
+
+1.23    Thu Dec 02, 2010
+        * ubic-ping: 404 message content fixed
+        * ubic-watchdog:
+         - set check_timeout alarm a bit earlier
+         - another alarm before compiling services
+
+1.22    Sun Nov 07, 2010
+        * Ubic::Multiservice:
+         - default implementation of 'has_simple_service' method
+         - POD improvements
+
+1.21_01 Thu Oct 21, 2010
+        * fixed races in t/daemon.t
+
+1.21    Tue Oct 19, 2010
+        * Ubic.pm:
+         - set_ubic_dir() renamed to set_data_dir()
+         (set_ubic_dir still remains in code for backward compatibility)
+         - get_data_dir() and get_service_dir() methods
+         - UBIC_LOCK_DIR, UBIC_TMP_DIR and UBIC_WATCHDOG_DIR env variables are deprecated;
+         UBIC_DIR variable or set_data_dir() method should be used instead
+         - bugfix in forked_call() method - it thrown "temp file not found after fork" exception occasionally in some cases
+         - more consistent params validation in many methods
+        * ubic-watchdog improvements:
+         - separate non-blocking per-service lock (http://github.com/berekuk/ubic/issues#issue/1)
+         - ubic-watchdog can now check selected set of services by name or glob
+         - ubic-watchdog kills itself after $service->check_timeout() seconds
+        * deprecated Ubic::Catalog module removed (it was renamed into Ubic::Multiservice long time ago)
+
+
+1.20    Wed Oct 13, 2010
+        * documentation improvements
+
+1.19    Tue Sep 14, 2010
+        * ubic-watchdog always uses Ubic->status interface to check service status
+
+1.18    Tue Sep 14, 2010
+        * critical bugfix: ubic-watchdog correctly interpret extended statuses
+        (thanks to Sawyer X for noticing this, see http://github.com/berekuk/Ubic/issues#issue/7)
+        * Ubic::Lockf::Alarm moved to separate file, so PODs are now correct
+
+1.17    Mon Sep 13, 2010
+        * Ubic::Run: recognize RedHat init script names
+        (thanks to Sawyer X for the patch, see http://github.com/berekuk/Ubic/issues/#issue/5)
+        * test improvements:
+         - ubic-ping uses Config.pm to determine full perl binary path
+         - memory-leak.t is more robust
+
+1.16    Tue Sep 07, 2010
+        * Ubic::Daemon:
+         - check_daemon() now returns proper Ubic::Daemon::Status object
+         - don't log warning if daemon exited by sigterm
+         - minor logging cleanup
+        * Ubic::Service::SimpleDaemon returns daemon pid in status msg
+        * test improvements:
+         - using Test::TCP when testing ubic-ping
+         - watchdog.t skips all tests if 'fakeroot' is not present
+        * Ubic::Cmd: print 'running' result as good when it contains extended message
+
+1.15    Mon Sep 06, 2010
+        * tests fixed to work under root user (http://github.com/berekuk/Ubic/issues#issue/4)
+
+1.14    Thu Sep 02, 2010
+        * handle supplementary groups correctly
+        * ubic-watchdog doesn't require root privileges anymore (unless service requires them, of course)
+        * repo and bugtracker resources in META.yml
+        * PodWeaver in dist.ini config, so all modules now have proper AUTHOR and COPYRIGHT sections
+        * SimpleDaemon and Common services accept arrayref as 'group' value
+
+1.13    Wed Sep 01, 2010
+        * Perl6::Slurp removed from dependencies
+        * Ubic::Manual::FAQ now is actually added
+        * group() method in services:
+         - services can specify group(s) from which service should run, analogous to user() method
+         - ubic will call setgid() before invoking any service methods
+         - default group list consists only of main user's group, as returned by getpwnam; supplementary groups are not supported yet
+
+1.12    Thu Aug 26, 2010
+        * Ubic::Manual::FAQ with first 2 questions
+        * Ubic::Log documentation updated according to 1.11 changes
+
+1.11    Thu Aug 26, 2010
+        * ubic-watchdog prints errors to stdout only
+
+1.10    Wed Aug 18, 2010
+        * security bugfix: store all statuses in JSON format
+
+1.09    Thu Aug 12, 2010
+        * bugfix: custom commands print 'ok' using green color and exit with zero
+        code when there are not errors
+
+1.08    Tue Aug 03, 2010
+        * bugfix: has_service for nested unexistent services
+        * debian/ dir in distribution too
+
+1.07    Fri Jul 30, 2010
+        * localize $@ in destructors
+        * Ubic::Cmd refactoring, more consistent console results printing
+
+1.06    Fri Jun 18, 2010
+        * using $Config{perlpath} in tests - should fix CPAN tests
+        * Dist::Zilla
+
+1.05    Sun Jun 13, 2010
+        MANIFEST up-to-date.
+        Small POD improvements.
+
+1.04    Tue May 25, 2010
+        - important bugfix: service locks fixed!
+        - Ubic::Daemon: join all bin args if bin is arrayref.
+        - Remove old configs from old yandex-ubic package.
+
+1.02    Tue May 4, 2010
+        Remove old configs from old yandex-ubic package.
+
+1.01    Thu Apr 29, 2010
+        Just fixing debian dependency issues.
+
+1.00    Wed Apr 28, 2010
+        First opensource release.

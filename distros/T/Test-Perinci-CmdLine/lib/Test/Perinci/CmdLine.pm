@@ -2,27 +2,25 @@
 
 package Test::Perinci::CmdLine;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-07'; # DATE
-our $DIST = 'Test-Perinci-CmdLine'; # DIST
-our $VERSION = '1.481'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
-use Devel::Confess;
+use Test::More 0.98;
 
-use Perinci::CmdLine::Gen qw(gen_pericmd_script);
+use Devel::Confess;
+use Exporter qw(import);
 use Capture::Tiny qw(capture);
 use File::Path qw(remove_tree);
 use File::Slurper qw(read_text write_text);
 use File::Temp qw(tempdir tempfile);
 use IPC::System::Options qw(run);
+use Perinci::CmdLine::Gen qw(gen_pericmd_script);
 
-use Test::More 0.98;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-30'; # DATE
+our $DIST = 'Test-Perinci-CmdLine'; # DIST
+our $VERSION = '1.484'; # VERSION
 
-require Exporter;
-our @ISA = qw(Exporter);
 our @EXPORT = (
     'pericmd_ok', # old, back-compat
     'pericmd_run_suite_ok',
@@ -292,8 +290,8 @@ sub pericmd_run_test_groups_ok {
 
             if ($include_tags) {
                 my $found;
-                for (@$tags) {
-                    if ($_ ~~ @$include_tags) {
+                for my $tag (@$tags) {
+                    if (grep { $_ eq $tag } @$include_tags) {
                         $found++; last;
                     }
                 }
@@ -304,9 +302,9 @@ sub pericmd_run_test_groups_ok {
                 }
             }
             if ($exclude_tags) {
-                for (@$tags) {
-                    if ($_ ~~ @$exclude_tags) {
-                        plan skip_all => "Has one of the exclude_tag: $_";
+                for my $tag (@$tags) {
+                    if (grep { $_ eq $tag } @$exclude_tags) {
+                        plan skip_all => "Has one of the exclude_tag: $tag";
                         return;
                     }
                 }
@@ -1315,7 +1313,7 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                         inline_gen_args => {load_module=>["Perinci::Examples::Stream"]},
                         argv        => ["$tempdir/infile-invalid-words"],
                         exit_code_like => qr/[1-9]/,
-                        stdout_like => qr/fails validation/,
+                        stderr_like => qr/fails validation/,
                     },
                     {
                         tags        => ['streaming', 'streaming-input', 'validate-streaming-input'],
@@ -1324,7 +1322,7 @@ sub square { my %args=@_; [200, "OK", $args{num}**2] }
                         inline_gen_args => {load_module=>["Perinci::Examples::Stream"]},
                         argv        => ["$tempdir/infile-invalid-words"],
                         exit_code_like => qr/[1-9]/,
-                        stdout_like => qr/fails validation/,
+                        stderr_like => qr/fails validation/,
                     },
                     {
                         tags        => ['streaming', 'streaming-input', 'validate-streaming-input'],
@@ -1812,7 +1810,7 @@ Test::Perinci::CmdLine - Common test suite for Perinci::CmdLine::{Lite,Classic,I
 
 =head1 VERSION
 
-This document describes version 1.481 of Test::Perinci::CmdLine (from Perl distribution Test-Perinci-CmdLine), released on 2021-05-07.
+This document describes version 1.484 of Test::Perinci::CmdLine (from Perl distribution Test-Perinci-CmdLine), released on 2023-10-30.
 
 =for Pod::Coverage ^(pericmd_ok)$
 
@@ -1823,7 +1821,7 @@ This document describes version 1.481 of Test::Perinci::CmdLine (from Perl distr
 
 Usage:
 
- pericmd_run_ok(%args) -> [status, msg, payload, meta]
+ pericmd_run_ok(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run a single test of a Perinci::CmdLine script.
 
@@ -1961,12 +1959,12 @@ Test output of generated CLI script.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -1976,7 +1974,7 @@ Return value:  (any)
 
 Usage:
 
- pericmd_run_suite_ok(%args) -> [status, msg, payload, meta]
+ pericmd_run_suite_ok(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Common test suite for Perinci::CmdLine::{Lite,Classic,Inline}.
 
@@ -1995,12 +1993,12 @@ Which Perinci::CmdLine class are we testing.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2010,7 +2008,7 @@ Return value:  (any)
 
 Usage:
 
- pericmd_run_test_groups_ok(%args) -> [status, msg, payload, meta]
+ pericmd_run_test_groups_ok(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run groups of Perinci::CmdLine tests.
 
@@ -2026,11 +2024,19 @@ Which Perinci::CmdLine class are we testing.
 
 =item * B<cleanup_tempdir> => I<bool>
 
+(No description)
+
 =item * B<exclude_tags> => I<array[str]>
+
+(No description)
 
 =item * B<groups>* => I<array>
 
+(No description)
+
 =item * B<include_tags> => I<array[str]>
+
+(No description)
 
 =item * B<tempdir> => I<str>
 
@@ -2042,12 +2048,12 @@ C<tempdir()>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2057,7 +2063,7 @@ Return value:  (any)
 
 Usage:
 
- pericmd_run_tests_ok(%args) -> [status, msg, payload, meta]
+ pericmd_run_tests_ok(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Run a group of tests of a Perinci::CmdLine script.
 
@@ -2073,19 +2079,23 @@ Which Perinci::CmdLine class are we testing.
 
 =item * B<name> => I<str>
 
+(No description)
+
 =item * B<tests>* => I<array[hash]>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -2112,14 +2122,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Test-Perin
 
 Source repository is at L<https://github.com/perlancar/perl-Test-Perinci-CmdLine>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Test-Perinci-CmdLine/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Supported Perinci::CmdLine backends: L<Perinci::CmdLine::Inline>,
@@ -2129,11 +2131,37 @@ L<Perinci::CmdLine::Lite>, L<Perinci::CmdLine::Classic>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Perinci-CmdLine>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

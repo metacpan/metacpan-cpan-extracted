@@ -1,0 +1,56 @@
+---
+abstract: 'PayProp API Public Client'
+author:
+  - 'Yanga Kandeni <yangak@cpan.org>'
+build_requires:
+  FindBin: '0'
+  JSON::PP: '0'
+  Test::Most: '0'
+  lib: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PayProp-API-Public-Client
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Cache::Memcached: '0'
+  Crypt::CBC: '0'
+  IO::Socket::INET: '0'
+  MIME::Base64: '0'
+  Module::Load: '0'
+  Mojo::Promise: '0'
+  Mojo::URL: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious: '0'
+  Mouse: '0'
+  Mouse::Role: '0'
+  Mouse::Util::TypeConstraints: '0'
+  POSIX: '0'
+  Parallel::ForkManager: '0'
+  Time::HiRes: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Humanstate/api-client-public-module/issues
+  homepage: https://github.com/Humanstate/api-client-public-module
+  repository: https://github.com/Humanstate/api-client-public-module.git
+version: '0.02'
+x_contributors:
+  - 'yangakandeni <kandeni.yanga@gmail.com>'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

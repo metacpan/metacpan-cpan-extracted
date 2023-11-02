@@ -28,16 +28,15 @@ no_index:
     - xt
 requires:
   Class::Utils: 0
+  English: 0
   Getopt::Std: 0
   Unicode::UTF8: 0
   Wikibase::API: 0.04
-  Wikibase::Datatype::Print::Item: 0.12
-  Wikibase::Datatype::Print::Lexeme: 0.12
-  Wikibase::Datatype::Print::Property: 0.12
+  Wikibase::Datatype::Print: 0.16
   perl: 5.6.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/App-Wikidata-Print/issues
   homepage: https://github.com/michal-josef-spacek/App-Wikidata-Print
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Wikidata-Print
-version: '0.02'
+version: '0.03'

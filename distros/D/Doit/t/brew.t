@@ -26,9 +26,8 @@ $d->add_component('brew');
 plan skip_all => "No homebrew available" if !$d->can_brew;
 plan 'no_plan';
 
-if ($ENV{TRAVIS}) {
-    # XXX brew install started to fail recently --- maybe updating
-    # first fixes the problem.
+if (0) {
+    # activate if homebrew needs an update before
     $d->system(qw(brew update));
 }
 
@@ -51,8 +50,8 @@ if ($ENV{TRAVIS}) {
     }
 }
 
-if ($ENV{TRAVIS}) {
-    my $test_package = 'perl@5.18';
+if ($ENV{GITHUB_ACTIONS}) {
+    my $test_package = 'hello';
     $d->brew_install_packages($test_package);
     my @missing_packages = $d->brew_missing_packages($test_package);
     is_deeply(\@missing_packages, []);

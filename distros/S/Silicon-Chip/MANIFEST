@@ -1,0 +1,11 @@
+Build.PL
+CHANGES
+CONTRIBUTING
+lib/Silicon/Chip.pm
+MANIFEST
+README
+README.md
+test.md
+test.pl
+META.yml
+META.json

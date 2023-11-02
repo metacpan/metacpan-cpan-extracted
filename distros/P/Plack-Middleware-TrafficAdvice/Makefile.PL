@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.008005;
+use 5.012000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Plack-Middleware-TrafficAdvice",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.008005",
+  "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "Plack::Middleware::TrafficAdvice",
   "PREREQ_PM" => {
     "Cwd" => 0,
@@ -24,7 +24,6 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => "1.004000",
     "Plack::Middleware" => 0,
     "parent" => 0,
-    "strict" => 0,
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
@@ -34,12 +33,14 @@ my %WriteMakefileArgs = (
     "Plack::Builder" => 0,
     "Plack::Middleware::ContentLength" => 0,
     "Plack::Test" => 0,
+    "Test2::Tools::Compare" => 0,
+    "Test2::V0" => 0,
     "Test::Differences" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
+    "strict" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.2.4",
+  "VERSION" => "v0.2.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,9 +60,10 @@ my %FallbackPrereqs = (
   "Plack::Middleware" => 0,
   "Plack::Middleware::ContentLength" => 0,
   "Plack::Test" => 0,
+  "Test2::Tools::Compare" => 0,
+  "Test2::V0" => 0,
   "Test::Differences" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
   "parent" => 0,
   "strict" => 0,
   "utf8" => 0,

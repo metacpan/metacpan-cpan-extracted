@@ -12,7 +12,7 @@ my %opt_args = (
 	extra_compiler_flags => [ '-march=native' ],
 );
 
-my $optimized = eval { $cbuilder->compile(%opt_args) };
+my $optimized = $ENV{PERL5_CPAN_IS_RUNNING} && eval { $cbuilder->compile(%opt_args) };
 my ($dir, $compiler_flags, $linker_flags) = $optimized ? ('opt', ['-march=native']) : ('ref');
 
 if ($^O ne 'MSWin32') {

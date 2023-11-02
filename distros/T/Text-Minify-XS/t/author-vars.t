@@ -10,7 +10,7 @@ BEGIN {
   }
 }
 
-use Test::More;
+use Test2::V0;
 
 eval "use Test::Vars";
 

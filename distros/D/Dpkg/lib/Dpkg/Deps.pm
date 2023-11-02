@@ -73,13 +73,13 @@ All the deps_* functions are exported by default.
 
 ($rel_p, $v_p) and ($rel_q, $v_q) express two dependencies as (relation,
 version). The relation variable can have the following values that are
-exported by Dpkg::Version: REL_EQ, REL_LT, REL_LE, REL_GT, REL_GT.
+exported by L<Dpkg::Version>: REL_EQ, REL_LT, REL_LE, REL_GT, REL_GT.
 
 This functions returns 1 if the "p" dependency implies the "q"
 dependency. It returns 0 if the "p" dependency implies that "q" is
 not satisfied. It returns undef when there's no implication.
 
-The $v_p and $v_q parameter should be Dpkg::Version objects.
+The $v_p and $v_q parameter should be L<Dpkg::Version> objects.
 
 =cut
 
@@ -178,7 +178,7 @@ sub deps_concat {
 =item $dep = deps_parse($line, %options)
 
 This function parses the dependency line and returns an object, either a
-Dpkg::Deps::AND or a Dpkg::Deps::Union. Various options can alter the
+L<Dpkg::Deps::AND> or a L<Dpkg::Deps::Union>. Various options can alter the
 behavior of that function.
 
 =over 4
@@ -232,8 +232,8 @@ them if set.
 
 =item union (defaults to 0)
 
-If set to 1, returns a Dpkg::Deps::Union instead of a Dpkg::Deps::AND. Use
-this when parsing non-dependency fields like Conflicts.
+If set to 1, returns a L<Dpkg::Deps::Union> instead of a L<Dpkg::Deps::AND>.
+Use this when parsing non-dependency fields like Conflicts.
 
 =item virtual (defaults to 0)
 
@@ -251,6 +251,9 @@ This should be set whenever working with build-deps.
 If set to 1, allow tests-specific package names in dependencies, that is
 "@" and "@builddeps@" (since dpkg 1.18.7). This should be set whenever
 working with dependency fields from F<debian/tests/control>.
+
+This option implicitly (and forcibly) enables C<build_dep> because test
+dependencies are based on build dependencies (since dpkg 1.22.1).
 
 =back
 
@@ -285,6 +288,9 @@ sub deps_parse {
     }
     if ($options{reduce_profiles}) {
         $options{build_profiles} //= [ get_build_profiles() ];
+    }
+    if ($options{tests_dep}) {
+        $options{build_dep} = 1;
     }
 
     # Options for Dpkg::Deps::Simple.
@@ -432,19 +438,19 @@ sub deps_compare {
 
 =head1 CLASSES - Dpkg::Deps::*
 
-There are several kind of dependencies. A Dpkg::Deps::Simple dependency
+There are several kind of dependencies. A L<Dpkg::Deps::Simple> dependency
 represents a single dependency statement (it relates to one package only).
-Dpkg::Deps::Multiple dependencies are built on top of this class
-and combine several dependencies in different manners. Dpkg::Deps::AND
-represents the logical "AND" between dependencies while Dpkg::Deps::OR
-represents the logical "OR". Dpkg::Deps::Multiple objects can contain
-Dpkg::Deps::Simple object as well as other Dpkg::Deps::Multiple objects.
+L<Dpkg::Deps::Multiple> dependencies are built on top of this class
+and combine several dependencies in different manners. L<Dpkg::Deps::AND>
+represents the logical "AND" between dependencies while L<Dpkg::Deps::OR>
+represents the logical "OR". L<Dpkg::Deps::Multiple> objects can contain
+L<Dpkg::Deps::Simple> object as well as other L<Dpkg::Deps::Multiple> objects.
 
 In practice, the code is only meant to handle the realistic cases which,
 given Debian's dependencies structure, imply those restrictions: AND can
 contain Simple or OR objects, OR can only contain Simple objects.
 
-Dpkg::Deps::KnownFacts is a special class that is used while evaluating
+L<Dpkg::Deps::KnownFacts> is a special class that is used while evaluating
 dependencies and while trying to simplify them. It represents a set of
 installed packages along with the virtual packages that they might
 provide.
@@ -453,28 +459,28 @@ provide.
 
 =head2 Version 1.07 (dpkg 1.20.0)
 
-New option: Add virtual option to Dpkg::Deps::deps_parse().
+New option: Add virtual option to deps_parse().
 
 =head2 Version 1.06 (dpkg 1.18.7; module version bumped on dpkg 1.18.24)
 
-New option: Add tests_dep option to Dpkg::Deps::deps_parse().
+New option: Add tests_dep option to deps_parse().
 
 =head2 Version 1.05 (dpkg 1.17.14)
 
-New function: Dpkg::Deps::deps_iterate().
+New function: deps_iterate().
 
 =head2 Version 1.04 (dpkg 1.17.10)
 
 New options: Add use_profiles, build_profiles, reduce_profiles and
-reduce_restrictions to Dpkg::Deps::deps_parse().
+reduce_restrictions to deps_parse().
 
 =head2 Version 1.03 (dpkg 1.17.0)
 
-New option: Add build_arch option to Dpkg::Deps::deps_parse().
+New option: Add build_arch option to deps_parse().
 
 =head2 Version 1.02 (dpkg 1.17.0)
 
-New function: Dpkg::Deps::deps_concat()
+New function: deps_concat()
 
 =head2 Version 1.01 (dpkg 1.16.1)
 

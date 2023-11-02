@@ -32,7 +32,7 @@ subtest '$x = Math::BigInt -> new("2.5");' => sub {
 # brsft()
 
 $x = Math::BigInt -> brsft(0, 7, 2);   # doesn't upgrade
-subtest '$x = Math::BigInt -> brsft(32, 0, 2);' => sub {
+subtest '$x = Math::BigInt -> brsft(0, 7, 2);' => sub {
     plan tests => 2;
     is(ref($x), 'Math::BigInt', '$x is a Math::BigInt');
     cmp_ok($x, "==", 0, '$x == 0');

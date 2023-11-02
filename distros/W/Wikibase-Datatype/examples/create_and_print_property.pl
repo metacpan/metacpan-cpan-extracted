@@ -14,7 +14,7 @@ use Wikibase::Datatype::Value::Monolingual;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Value::Time;
 
-# Object.
+# Statement.
 my $statement1 = Wikibase::Datatype::Statement->new(
         # instance of (P31) Wikidata property (Q18616576)
         'snak' => Wikibase::Datatype::Snak->new(

@@ -84,6 +84,7 @@ our @EXPORT = qw/silent
                  @quotes
                  string_to_tempfile
                  tmpcopy_if_writeable
+                 my_capture my_capture_merged my_tee_merged
                 /;
 our @EXPORT_OK = qw/$savepath $debug $silent $verbose %dvs dprint dprintf/;
 
@@ -99,6 +100,7 @@ unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
 use Cwd qw/getcwd abs_path/;
 use POSIX qw/INT_MAX/;
 use File::Basename qw/dirname/;
+use Capture::Tiny qw/capture capture_merged tee_merged/;
 use Env qw/@PATH @PERL5LIB/;  # ties @PATH, @PERL5LIB
 use Config;
 
@@ -268,6 +270,7 @@ sub run_perlscript(@) {
   }
 
   local $ENV{LC_ALL} = "C";
+  my $perlexe = $Config{perlpath}; # some say $^X is not reliable
 
   if ($debug) {
     my $msg = "%%% run_perlscript >";
@@ -275,11 +278,19 @@ sub run_perlscript(@) {
       next unless $k =~ /^(LC|LANG)/;
       $msg .= " $k='$ENV{$k}'"
     }
-    $msg .= " $^X";
+    $msg .= " $perlexe";
     $msg .= " '${_}'" foreach (@perlargs);
     print STDERR "$msg\n";
   }
-  my $wstat = system $^X, @perlargs;
+  my $wstat;
+  if ($^O eq "MSWin32") {
+    # This might avoid pseudo-forking
+    my $prochandle = system(1, $perlexe, @perlargs); # see man perlport
+    waitpid($prochandle, 0);
+    $wstat = $?;
+  } else {
+    $wstat = system $perlexe, @perlargs;
+  }
   print STDERR "%%%(returned from 'system', wstat=",sprintf("0x%04X",$wstat),")%%%\n" if $debug;
   $wstat
 }
@@ -575,8 +586,8 @@ sub mycheckeq_literal($$$) {
                           .($vposn > 0 ? "(line ".($vposn+1).")\n" : "\n")
         ." at line ", (caller(0))[2]."\n"
        ) ;
-  #goto &Carp::confess;
-  Carp::confess(@_);
+  goto &Carp::confess;
+  #Carp::confess(@_);
 }
 sub expect1($$) {
   @_ = ("", @_);
@@ -761,6 +772,29 @@ sub tmpcopy_if_writeable($) {
     return $tpath;
   }
   $path
+}
+
+sub clean_capture_output($) {
+  my $str = shift;
+  # For some reason I can not track down, tests on Windows in VirtualBox sometimes emit
+  # this message.  I think (unproven) that this occurs because the current directory
+  # is a VBox host-shared directory mounted read-only.   But nobody should be writing
+  # to the cwd!
+  $str =~ s/The media is write protected\S*\R//gs;
+  $str
+}
+
+sub my_capture(&) {
+  my ($out, $err, @results) = &capture($_[0]);
+  return( clean_capture_output($out), clean_capture_output($err), @results );
+}
+sub my_capture_merged(&) {
+  my ($merged, @results) = &capture_merged($_[0]);
+  return( clean_capture_output($merged), @results );
+}
+sub my_tee_merged(&) {
+  my ($merged, @results) = &tee_merged($_[0]);
+  return( clean_capture_output($merged), @results );
 }
 
 1;

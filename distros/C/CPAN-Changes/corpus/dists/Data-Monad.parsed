@@ -1,0 +1,84 @@
+{
+  "preamble" => "Revision history for Perl extension Data::Monad",
+  "raw_preamble" => "Revision history for Perl extension Data::Monad\n\n",
+  "releases" => [
+    {
+      "entries" => [],
+      "line" => 3,
+      "raw" => "{{\$NEXT}}\n\n",
+      "version" => "{{\$NEXT}}"
+    },
+    {
+      "date" => "2013-09-08T00:23:32Z",
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "        - Fix the bug which breaks Data::Monad::CondVar on perl 5.17.2\n\n",
+          "style" => "-",
+          "text" => "Fix the bug which breaks Data::Monad::CondVar on perl 5.17.2"
+        }
+      ],
+      "line" => 5,
+      "note" => "JST",
+      "raw" => "0.05  2013-09-08 00:23:32 JST\n",
+      "raw_date" => "2013-09-08 00:23:32",
+      "version" => "0.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 9,
+          "raw" => "        - Fix a bug related perl contexts. \n\n",
+          "style" => "-",
+          "text" => "Fix a bug related perl contexts."
+        }
+      ],
+      "line" => 8,
+      "note" => "Sat, 13 Oct 2012",
+      "raw" => "0.04    Sat, 13 Oct 2012 \n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 12,
+          "raw" => "        - Fix dependencies (reported by mschwern)\n\n",
+          "style" => "-",
+          "text" => "Fix dependencies (reported by mschwern)"
+        }
+      ],
+      "line" => 11,
+      "note" => "Tue, 26 Jun 2012",
+      "raw" => "0.03    Tue, 26 Jun 2012 \n",
+      "version" => "0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 15,
+          "raw" => "        - Add dependencies\n\n",
+          "style" => "-",
+          "text" => "Add dependencies"
+        }
+      ],
+      "line" => 14,
+      "note" => "Sun, 23 Oct 2011",
+      "raw" => "0.02    Sun, 23 Oct 2011\n",
+      "version" => "0.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 18,
+          "raw" => "        - original version\n",
+          "style" => "-",
+          "text" => "original version"
+        }
+      ],
+      "line" => 17,
+      "note" => "Wed, 12 Oct 2011",
+      "raw" => "0.01    Wed, 12 Oct 2011\n",
+      "version" => "0.01"
+    }
+  ]
+}

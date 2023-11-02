@@ -49,7 +49,7 @@ my $webhook_url = sprintf(
     join( '&',
         'channel=test', 'network=dummy',
         'use_color=0',  'pipeline_only_status=success',
-        'pipeline_only_status=failure' )
+        'pipeline_only_status=failed' )
 );
 
 sub webhook_post {
@@ -124,7 +124,7 @@ $resp = webhook_post(
         user        => { name => 'Test User' },
         project     => { name => 'test-rep', },
         object_attributes =>
-            { id => 43, status => 'failure' },
+            { id => 43, status => 'failed' },
     }
 );
 
@@ -136,7 +136,7 @@ TestBot->expect(
         'pipeline',
         'Test User',
         '43',
-        '* failure',
+        '* failed',
     )
 );
 

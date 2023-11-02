@@ -1,3 +1,38 @@
+1.59 (2023-10-30)
+  [ gregor herrmann ]
+  * t/76-webhook-pipeline.t: use status=failed instead of failure
+    to match Gitlab pipeline status (no functional change).
+
+  [ Martina Ferrari ]
+  * Update my name and email address.
+
+  [ Damyan Ivanov ]
+  * avoid warning in kgb-ci-report when a package is first tested by the CI
+    prev_status is undefined in such situations
+  * systemd: add Restart=on-failure
+    helps providing the service even after a crash
+
+1.58 (2020-11-03)
+  * fix tests to not hard-code merge commit messages
+
+1.57 (2020-07-24)
+  * Update tests to changed output in merge messages for Git 2.28.0+.
+    Thanks to Jonathan Nieder for the bug report. (Closes: #965350)
+
+1.56 (2020-03-22)
+  [ Iain Lane ]
+  * kgb-bot: Support globs in only_branches.
+    This will allow derivatives to maintain their packages on Salsa, but not
+    announce the changes to their branches to the Debian IRC channels.
+    (Closes: #945015)
+  * kgb-bot: Add only_tag parameter.
+    As with `only_branch`, this will make the bot only announce changes to
+    tags matching the given globs.
+
+  [ gregor herrmann ]
+  * Update copyright notices.
+  * Add new requirements to Build.PL.
+
 1.55 (2019-06-13)
   [ gregor herrmann ]
   * fix typo in test diag()
@@ -55,7 +90,7 @@
     simple existence test is enough (Closes: #900699)
 
 1.50 (2018-05-23)
-  [ Martín Ferrari ]
+  [ Martina Ferrari ]
   * Add merge request title to merge request notifications.
   * Stop using channel as a unique identifier.
     This is a big change, as most of the code was assuming a channel name is
@@ -143,7 +178,7 @@
   * improve commit squash handling
 
 1.42 (2018-02-26)
-  [ Martín Ferrari ]
+  [ Martina Ferrari ]
   * Speed-up KGB joining of channels and setup.
     Monkey-patch the delayed command dispatcher in PoCO::IRC to ignore
     flood-prevention measures for high-priority messages (JOIN, MODE, etc), now
@@ -261,7 +296,7 @@
     - add DBD::Pg as requirement in Build.PL
   * Fix some typos in the POD. Thanks to lintian.
 
-  [ Martín Ferrari ]
+  [ Martina Ferrari ]
   * App::KGB::Client::ServerRef:
     - More consistent verbose reporting of server communication.
     - Add --dry-run option for debugging.

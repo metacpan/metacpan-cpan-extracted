@@ -10,7 +10,8 @@ use TestFloat;
 use File::Temp qw(tempfile);
 use String::Binary::Interpolation;
 use Data::IEEE754 qw(pack_double_be);
-use Scalar::Type qw(bool_supported is_bool);
+use Scalar::Type qw(bool_supported);
+Scalar::Type->import('is_bool') if(bool_supported());
 
 use Data::CompactReadonly;
 

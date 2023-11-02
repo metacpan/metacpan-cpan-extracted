@@ -1,0 +1,629 @@
+{
+  "preamble" => "Revision history for Perl extension File::Tail.",
+  "raw_preamble" => "Revision history for Perl extension File::Tail.\n\n",
+  "releases" => [
+    {
+      "date" => "1997-11-28T09:44:06Z",
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "\t- original version; created by h2xs 1.18\n\n",
+          "style" => "-",
+          "text" => "original version; created by h2xs 1.18"
+        }
+      ],
+      "line" => 3,
+      "raw" => "0.01  Fri Nov 28 09:44:06 1997\n",
+      "raw_date" => "Fri Nov 28 09:44:06 1997",
+      "version" => "0.01"
+    },
+    {
+      "date" => "1997-11-28T12:25:13Z",
+      "entries" => [
+        {
+          "line" => 7,
+          "raw" => "\t- original version; created by matija.grabnar\@arnes.si\n\n",
+          "style" => "-",
+          "text" => "original version; created by matija.grabnar\@arnes.si"
+        }
+      ],
+      "line" => 6,
+      "raw" => "0.5   Fri Nov 28 12:25:13 MET 1997\n",
+      "raw_date" => "Fri Nov 28 12:25:13 MET 1997",
+      "version" => "0.5"
+    },
+    {
+      "date" => "1997-12-04T14:16:59Z",
+      "entries" => [
+        {
+          "line" => 10,
+          "raw" => "\t- assigning error values to \$! didn't work. Replaced with croaks.\n",
+          "style" => "-",
+          "text" => "assigning error values to \$! didn't work. Replaced with croaks."
+        },
+        {
+          "line" => 11,
+          "raw" => "\t- passing only the filename didn't work.\n\n",
+          "style" => "-",
+          "text" => "passing only the filename didn't work."
+        }
+      ],
+      "line" => 9,
+      "raw" => "0.6   Thu Dec  4 14:16:59 MET 1997\n",
+      "raw_date" => "Thu Dec  4 14:16:59 MET 1997",
+      "version" => "0.6"
+    },
+    {
+      "date" => "1998-06-01T17:23:23Z",
+      "entries" => [
+        {
+          "line" => 14,
+          "raw" => "        - implemented tied interface\n",
+          "style" => "-",
+          "text" => "implemented tied interface"
+        },
+        {
+          "line" => 15,
+          "raw" => "\t- implemented non-blocking read (against my better judgement)\n",
+          "style" => "-",
+          "text" => "implemented non-blocking read (against my better judgement)"
+        },
+        {
+          "line" => 16,
+          "raw" => "        - implemented more flexible error handling a-la Net::Telnet\n",
+          "style" => "-",
+          "text" => "implemented more flexible error handling a-la Net::Telnet"
+        },
+        {
+          "line" => 17,
+          "raw" => "        - implemented ignore_nonexistat\n\n",
+          "style" => "-",
+          "text" => "implemented ignore_nonexistat"
+        },
+        {
+          "line" => 19,
+          "raw" => "        Release of 0.7 was delayed because I wanted to see if Tied\n",
+          "style" => "",
+          "text" => "Release of 0.7 was delayed because I wanted to see if Tied"
+        },
+        {
+          "line" => 20,
+          "raw" => "        Handle handling will include select in 5.005. After two people\n",
+          "style" => "",
+          "text" => "Handle handling will include select in 5.005. After two people"
+        },
+        {
+          "line" => 21,
+          "raw" => "        sent me their tied interfaces, I figured maybe it was time to\n",
+          "style" => "",
+          "text" => "sent me their tied interfaces, I figured maybe it was time to"
+        },
+        {
+          "line" => 22,
+          "raw" => "        release it before implementing select :-)\n\n",
+          "style" => "",
+          "text" => "release it before implementing select :-)"
+        }
+      ],
+      "line" => 13,
+      "raw" => "0.7   Mon Jun  1 17:23:23 MET 1998\n",
+      "raw_date" => "Mon Jun  1 17:23:23 MET 1998",
+      "version" => "0.7"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 25,
+          "raw" => "\timplemented wantarray handling in READLINE\n",
+          "style" => "",
+          "text" => "implemented wantarray handling in READLINE"
+        },
+        {
+          "line" => 26,
+          "raw" => "\timplemented some tests for make test\n",
+          "style" => "",
+          "text" => "implemented some tests for make test"
+        },
+        {
+          "line" => 27,
+          "raw" => "        documented the tied interface in synopsis (Duh!)\n",
+          "style" => "",
+          "text" => "documented the tied interface in synopsis (Duh!)"
+        },
+        {
+          "line" => 28,
+          "raw" => "        - implemented tail -n functionality\n\n",
+          "style" => "-",
+          "text" => "implemented tail -n functionality"
+        }
+      ],
+      "line" => 24,
+      "note" => "Wed Oct 14 19:29:30 MET DST 1998",
+      "raw" => "0.8     Wed Oct 14 19:29:30 MET DST 1998\n",
+      "version" => "0.8"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 31,
+          "raw" => "\tThere was a bug in tail -n part, and the tail -n tests were missing\n           from the distribution\n\n",
+          "style" => "",
+          "text" => "There was a bug in tail -n part, and the tail -n tests were missing from the distribution"
+        }
+      ],
+      "line" => 30,
+      "note" => "Thu Oct 15 07:54:36 MET DST 1998",
+      "raw" => "0.81    Thu Oct 15 07:54:36 MET DST 1998\n",
+      "version" => "0.81"
+    },
+    {
+      "date" => "1998-10-28T15:44:47Z",
+      "entries" => [
+        {
+          "line" => 35,
+          "raw" => "\tThe introduction of tail -n broke the handling of files where \n",
+          "style" => "",
+          "text" => "The introduction of tail -n broke the handling of files where"
+        },
+        {
+          "line" => 36,
+          "raw" => "\ta line might be written incompletely (e.g. without the final \\n). OOps!\n\n",
+          "style" => "",
+          "text" => "a line might be written incompletely (e.g. without the final \\n). OOps!"
+        }
+      ],
+      "line" => 34,
+      "raw" => "0.85\tWed Oct 28 15:44:47 MET 1998\n",
+      "raw_date" => "Wed Oct 28 15:44:47 MET 1998",
+      "version" => "0.85"
+    },
+    {
+      "date" => "1998-11-10T11:02:35Z",
+      "entries" => [
+        {
+          "line" => 39,
+          "raw" => "\tfix for reset_tail (it couldn't be set to 0) from \n\t   Chris_Heller/PeopleSoft\@peoplesoft.com\n",
+          "style" => "",
+          "text" => "fix for reset_tail (it couldn't be set to 0) from Chris_Heller/PeopleSoft\@peoplesoft.com"
+        },
+        {
+          "line" => 41,
+          "raw" => "\tfixed some -> references which complained in Perl5.4 but not in 5.5\n",
+          "style" => "",
+          "text" => "fixed some -> references which complained in Perl5.4 but not in 5.5"
+        },
+        {
+          "line" => 42,
+          "raw" => "        moved debugging statement to a separate routine, logit\n",
+          "style" => "",
+          "text" => "moved debugging statement to a separate routine, logit"
+        },
+        {
+          "line" => 43,
+          "raw" => "        logit now outputs the name of the calling routine and the name of the\n           file the object refers to.\n",
+          "style" => "",
+          "text" => "logit now outputs the name of the calling routine and the name of the file the object refers to."
+        },
+        {
+          "line" => 45,
+          "raw" => "        select functionality added. \n\n",
+          "style" => "",
+          "text" => "select functionality added."
+        }
+      ],
+      "line" => 38,
+      "raw" => "0.90    Tue Nov 10 11:02:35 MET 1998\n",
+      "raw_date" => "Tue Nov 10 11:02:35 MET 1998",
+      "version" => "0.90"
+    },
+    {
+      "date" => "1999-02-02T17:14:27Z",
+      "entries" => [
+        {
+          "line" => 48,
+          "raw" => "\tanother ambigous reference (fixed thanks to Peter Wirdemo <edtpewo\@ratatosk.aom.ericsson.se>)\n",
+          "style" => "",
+          "text" => "another ambigous reference (fixed thanks to Peter Wirdemo <edtpewo\@ratatosk.aom.ericsson.se>)"
+        },
+        {
+          "line" => 49,
+          "raw" => "        nasty select bug discovered by \"Weeber, Steve\" <steve.weeber\@qwest.net>\n",
+          "style" => "",
+          "text" => "nasty select bug discovered by \"Weeber, Steve\" <steve.weeber\@qwest.net>"
+        },
+        {
+          "line" => 50,
+          "raw" => "        select can now also be called as File::Tail::select, as long as there \n         is at least one tail object given.\n\n",
+          "style" => "",
+          "text" => "select can now also be called as File::Tail::select, as long as there is at least one tail object given."
+        }
+      ],
+      "line" => 47,
+      "raw" => "0.91\tTue Feb  2 17:14:27 MET 1999\n",
+      "raw_date" => "Tue Feb  2 17:14:27 MET 1999",
+      "version" => "0.91"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 54,
+          "raw" => "\tBlair Zajac sent a patch to fix some problems when returning an empty \n",
+          "style" => "",
+          "text" => "Blair Zajac sent a patch to fix some problems when returning an empty"
+        },
+        {
+          "line" => 55,
+          "raw" => "        string when the request was for an array.\n",
+          "style" => "",
+          "text" => "string when the request was for an array."
+        },
+        {
+          "line" => 56,
+          "raw" => "        Gerben Wierda <Gerben_Wierda\@RnA.nl> sent a patch that should fix \n",
+          "style" => "",
+          "text" => "Gerben Wierda <Gerben_Wierda\@RnA.nl> sent a patch that should fix"
+        },
+        {
+          "line" => 57,
+          "raw" => "\tproblems with files that don't get updated for a while (a file could\n",
+          "style" => "",
+          "text" => "problems with files that don't get updated for a while (a file could"
+        },
+        {
+          "line" => 58,
+          "raw" => "\taccidentaly be read the whole way through again under some \n",
+          "style" => "",
+          "text" => "accidentaly be read the whole way through again under some"
+        },
+        {
+          "line" => 59,
+          "raw" => "\tcircumstances)\n\n",
+          "style" => "",
+          "text" => "circumstances)"
+        }
+      ],
+      "line" => 53,
+      "note" => "Thu Oct 21 11:28:57 MET DST 1999",
+      "raw" => "0.92\tThu Oct 21 11:28:57 MET DST 1999\n",
+      "version" => "0.92"
+    },
+    {
+      "date" => "1999-11-03T12:46:29Z",
+      "entries" => [
+        {
+          "line" => 62,
+          "raw" => "        Some changes in the way internal data caching is done - primarily \n           support for cases where you shouldn't keep all the pending lines in\n    \t   memory.\n",
+          "style" => "",
+          "text" => "Some changes in the way internal data caching is done - primarily support for cases where you shouldn't keep all the pending lines in memory."
+        },
+        {
+          "line" => 65,
+          "raw" => "        logit calls are now stripped by default before the module is installed.\n           If you want to patch File::Tail now, you must edit Tail.pm.debug,\n           the do a perl Makefile.PL which will create a Tail.pm\n",
+          "style" => "",
+          "text" => "logit calls are now stripped by default before the module is installed. If you want to patch File::Tail now, you must edit Tail.pm.debug, the do a perl Makefile.PL which will create a Tail.pm"
+        },
+        {
+          "line" => 68,
+          "raw" => "\tSelect returned ALL handles instead of just the ones with input ready.\n\n",
+          "style" => "",
+          "text" => "Select returned ALL handles instead of just the ones with input ready."
+        }
+      ],
+      "line" => 61,
+      "raw" => "0.94 \tWed Nov  3 12:46:29 MET 1999\n",
+      "raw_date" => "Wed Nov  3 12:46:29 MET 1999",
+      "version" => "0.94"
+    },
+    {
+      "date" => "1999-12-09T10:25:47Z",
+      "entries" => [
+        {
+          "line" => 71,
+          "raw" => "        I couldn't get Pause to recognise that 0.94 was newer than 0.91 for\n",
+          "style" => "",
+          "text" => "I couldn't get Pause to recognise that 0.94 was newer than 0.91 for"
+        },
+        {
+          "line" => 72,
+          "raw" => "\tsome reason. I added Tail.pm back into the manifest to see if that\n",
+          "style" => "",
+          "text" => "some reason. I added Tail.pm back into the manifest to see if that"
+        },
+        {
+          "line" => 73,
+          "raw" => "\twill help.\n\n",
+          "style" => "",
+          "text" => "will help."
+        }
+      ],
+      "line" => 70,
+      "raw" => "0.95\tThu Dec  9 10:25:47 MET 1999\n",
+      "raw_date" => "Thu Dec  9 10:25:47 MET 1999",
+      "version" => "0.95"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 76,
+          "raw" => "\tadded binmode to improve running on Microsoft platforms\n",
+          "style" => "",
+          "text" => "added binmode to improve running on Microsoft platforms"
+        },
+        {
+          "line" => 77,
+          "raw" => "        added a check in DESTROY to avoid a warning in Perl 5.6\n",
+          "style" => "",
+          "text" => "added a check in DESTROY to avoid a warning in Perl 5.6"
+        },
+        {
+          "line" => 78,
+          "raw" => "        fixed prerequisites in Makefile.PL\n\n",
+          "style" => "",
+          "text" => "fixed prerequisites in Makefile.PL"
+        }
+      ],
+      "line" => 75,
+      "note" => "Mon May 29 09:33:27 MET DST 2000",
+      "raw" => "0.96\tMon May 29 09:33:27 MET DST 2000\n",
+      "version" => "0.96"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 81,
+          "raw" => "        perhaps eliminated. Thanks elfchief\@lupine.org for making a script \n",
+          "style" => "",
+          "text" => "perhaps eliminated. Thanks elfchief\@lupine.org for making a script"
+        },
+        {
+          "line" => 82,
+          "raw" => "        that triggered the previously interminent problem every time.\n\n",
+          "style" => "",
+          "text" => "that triggered the previously interminent problem every time."
+        }
+      ],
+      "line" => 80,
+      "note" => "Persistent \"go wild after log rotation, but only sometimes\" bug",
+      "raw" => "0.97\tPersistent \"go wild after log rotation, but only sometimes\" bug\n",
+      "version" => "0.97"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 85,
+          "raw" => "        others for inefficiencies, or lack of clarity in documents)\n\n",
+          "style" => "",
+          "text" => "others for inefficiencies, or lack of clarity in documents)"
+        }
+      ],
+      "line" => 84,
+      "note" => "David Pfitzner release - David send me 6 patches (some for bugs,",
+      "raw" => "0.98    David Pfitzner release - David send me 6 patches (some for bugs,\n",
+      "version" => "0.98"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 88,
+          "raw" => "        where interval was set to a negative value\n",
+          "style" => "",
+          "text" => "where interval was set to a negative value"
+        },
+        {
+          "line" => 89,
+          "raw" => "        Joe Smith <Joe.Smith\@wcom.com> noted that one shouldn't declare\n",
+          "style" => "",
+          "text" => "Joe Smith <Joe.Smith\@wcom.com> noted that one shouldn't declare"
+        },
+        {
+          "line" => 90,
+          "raw" => "        \@ISA=qw(Autoloader) unless one is prepared to deal with it correctly.\n",
+          "style" => "",
+          "text" => "\@ISA=qw(Autoloader) unless one is prepared to deal with it correctly."
+        },
+        {
+          "line" => 91,
+          "raw" => "        Peter Allen <pgmppa\@ibi.com> undef warnings when starting up on a \n",
+          "style" => "",
+          "text" => "Peter Allen <pgmppa\@ibi.com> undef warnings when starting up on a"
+        },
+        {
+          "line" => 92,
+          "raw" => "        nonexistant file\n",
+          "style" => "",
+          "text" => "nonexistant file"
+        },
+        {
+          "line" => 93,
+          "raw" => "\tAlain Fauconnet <alain\@ait.ac.th> and Benjamin Zwittnig <beni\@arnes.si>\n",
+          "style" => "",
+          "text" => "Alain Fauconnet <alain\@ait.ac.th> and Benjamin Zwittnig <beni\@arnes.si>"
+        },
+        {
+          "line" => 94,
+          "raw" => "        provided test cases which helped me chase down another two cases where \n",
+          "style" => "",
+          "text" => "provided test cases which helped me chase down another two cases where"
+        },
+        {
+          "line" => 95,
+          "raw" => "        File::Tail would spontaneously read too much.\n\n",
+          "style" => "",
+          "text" => "File::Tail would spontaneously read too much."
+        }
+      ],
+      "line" => 87,
+      "note" => "\"Lyle D. Brooks\" <brooks\@deseret.com> reported there were instances",
+      "raw" => "0.99    \"Lyle D. Brooks\" <brooks\@deseret.com> reported there were instances \n",
+      "version" => "0.99"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 98,
+          "raw" => "        This should now be handled correctly.\n",
+          "style" => "",
+          "text" => "This should now be handled correctly."
+        },
+        {
+          "line" => 99,
+          "raw" => "        nowait can now be specified at object creation.\n",
+          "style" => "",
+          "text" => "nowait can now be specified at object creation."
+        },
+        {
+          "line" => 100,
+          "raw" => "        A callback is called on every file rotation, which can be used for\n",
+          "style" => "",
+          "text" => "A callback is called on every file rotation, which can be used for"
+        },
+        {
+          "line" => 101,
+          "raw" => "        files that change their names with time.\n\n",
+          "style" => "",
+          "text" => "files that change their names with time."
+        }
+      ],
+      "line" => 97,
+      "note" => "Some operating systems sometimes return 0 for sysread on busy files.",
+      "raw" => "0.99.2  Some operating systems sometimes return 0 for sysread on busy files.\n",
+      "version" => "0.99.2"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 104,
+          "raw" => "        a new version just for that. Life is ridiculous.\n\n",
+          "style" => "",
+          "text" => "a new version just for that. Life is ridiculous."
+        }
+      ],
+      "line" => 103,
+      "note" => "Firefox crashed while I attempted upload to PAUSE, so I had to make",
+      "raw" => "0.99.3  Firefox crashed while I attempted upload to PAUSE, so I had to make\n",
+      "version" => "0.99.3"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 107,
+          "raw" => "        longer see a point in not having a 1.0 version.\n\n",
+          "style" => "",
+          "text" => "longer see a point in not having a 1.0 version."
+        }
+      ],
+      "line" => 106,
+      "note" => "Actually just two minor bug fixes (one of them in a test), but I no",
+      "raw" => "1.0     Actually just two minor bug fixes (one of them in a test), but I no\n",
+      "version" => "1.0"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 110,
+          "raw" => "        Changed the use of the system's mv command to using File::Copy in the\n",
+          "style" => "",
+          "text" => "Changed the use of the system's mv command to using File::Copy in the"
+        },
+        {
+          "line" => 111,
+          "raw" => "        tests. (Steffen Mueller)\n",
+          "style" => "",
+          "text" => "tests. (Steffen Mueller)"
+        },
+        {
+          "line" => 112,
+          "raw" => "        Added machine-readable license statement to Makefile.PL and thus\n",
+          "style" => "",
+          "text" => "Added machine-readable license statement to Makefile.PL and thus"
+        },
+        {
+          "line" => 113,
+          "raw" => "        META.yml (Steffen Mueller)\n",
+          "style" => "",
+          "text" => "META.yml (Steffen Mueller)"
+        },
+        {
+          "line" => 114,
+          "raw" => "        The sixth test in 10/open.t is skipped on win32 because you can't just\n",
+          "style" => "",
+          "text" => "The sixth test in 10/open.t is skipped on win32 because you can't just"
+        },
+        {
+          "line" => 115,
+          "raw" => "        move files around that are opened. (Steffen Mueller)\n",
+          "style" => "",
+          "text" => "move files around that are opened. (Steffen Mueller)"
+        },
+        {
+          "line" => 116,
+          "raw" => "        Due to using sysread and friends, there were newline problems on win32.\n",
+          "style" => "",
+          "text" => "Due to using sysread and friends, there were newline problems on win32."
+        },
+        {
+          "line" => 117,
+          "raw" => "        That should be fixed now. (Steffen Mueller)\n\n",
+          "style" => "",
+          "text" => "That should be fixed now. (Steffen Mueller)"
+        }
+      ],
+      "line" => 109,
+      "note" => "Lee Duncan drew my attention to Stephan Muller's fixes for Windows compatibility",
+      "raw" => "1.1     Lee Duncan drew my attention to Stephan Muller's fixes for Windows compatibility\n",
+      "version" => "1.1"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 120,
+          "raw" => "        causes the attempt to fill the tail buffer to fill with the exact same\n",
+          "style" => "",
+          "text" => "causes the attempt to fill the tail buffer to fill with the exact same"
+        },
+        {
+          "line" => 121,
+          "raw" => "        or even smaller number of lines.\n\n",
+          "style" => "",
+          "text" => "or even smaller number of lines."
+        }
+      ],
+      "line" => 119,
+      "note" => "Break the infinite loop that can result when the average length of lines",
+      "raw" => "1.2     Break the infinite loop that can result when the average length of lines\n",
+      "version" => "1.2"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 124,
+          "raw" => "        Added a warning for use of debug in a non-debug version of File::Tail\n",
+          "style" => "",
+          "text" => "Added a warning for use of debug in a non-debug version of File::Tail"
+        },
+        {
+          "line" => 125,
+          "raw" => "        Shows a warning when maxbuf is set to a too-small value\n",
+          "style" => "",
+          "text" => "Shows a warning when maxbuf is set to a too-small value"
+        },
+        {
+          "line" => 126,
+          "raw" => "        Invoking name_changes callback changes the value of input attribute (sottile\@ix.netcom.com)\n",
+          "style" => "",
+          "text" => "Invoking name_changes callback changes the value of input attribute (sottile\@ix.netcom.com)"
+        },
+        {
+          "line" => 127,
+          "raw" => "        When deciding to reopen the file, check if the inode matches (that would mean it has not\n         been ranamed)\n        ",
+          "style" => "",
+          "text" => "When deciding to reopen the file, check if the inode matches (that would mean it has not been ranamed)"
+        }
+      ],
+      "line" => 123,
+      "note" => "Fix for a stupid bug in 1.2 (GFILATOV, Slaven_Rezic)",
+      "raw" => "1.3     Fix for a stupid bug in 1.2 (GFILATOV, Slaven_Rezic)\n",
+      "version" => "1.3"
+    }
+  ]
+}

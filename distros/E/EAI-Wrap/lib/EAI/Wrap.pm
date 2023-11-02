@@ -1,4 +1,4 @@
-package EAI::Wrap 1.4;
+package EAI::Wrap 1.5;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use Data::Dumper qw(Dumper); use File::Copy qw(copy move); use Cwd qw(chdir); use Archive::Extract ();
@@ -20,7 +20,7 @@ monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_
 newDBH beginWork commit rollback readFromDB readFromDBHash doInDB storeInDB deleteFromDB updateInDB getConn setConn
 readText readExcel readXML writeText writeExcel
 removeFilesOlderX fetchFiles putFile moveTempFile archiveFiles removeFiles login getHandle setHandle
-readConfigFile getSensInfo setupConfigMerge getOptions setupEAIWrap dumpFlat extractConfigs checkHash checkParam setupLogging checkStartingCond sendGeneralMail
+readConfigFile getSensInfo setupConfigMerge getOptions setupEAIWrap setErrSubject dumpFlat extractConfigs checkHash checkParam setupLogging checkStartingCond sendGeneralMail
 get_logger Dumper);
 
 # initialize module, reading all config files and setting basic execution variables
@@ -83,15 +83,19 @@ sub openDBConn ($) {
 		$DB->{user} = getSensInfo($DB->{prefix},"user");
 		$DB->{pwd} = getSensInfo($DB->{prefix},"pwd");
 	}
-	(!$DB->{user} && $DB->{DSN} =~ /\$DB->\{user\}/) and do {
-		$logger->error("specified DSN ('".$DB->{DSN}."') contains \$DB->{user}, which is neither set in \$DB->{user} nor in \$config{sensitive}{".$DB->{prefix}."}{user} !");
-		return 0;
-	};
 	my ($DSNeval, $newDSN);
 	$DSNeval = $DB->{DSN};
+	unless ($DSNeval) {
+		$logger->error("no DSN available in \$DB->{DSN}");
+		return 0;
+	}
+	(!$DB->{user} && $DSNeval =~ /\$DB->\{user\}/) and do {
+		$logger->error("specified DSN ('".$DSNeval."') contains \$DB->{user}, which is neither set in \$DB->{user} nor in \$config{sensitive}{".$DB->{prefix}."}{user} !");
+		return 0;
+	};
 	$newDSN = eval qq{"$DSNeval"};
 	if (!$newDSN) {
-		$logger->error("error parsing \$DB->{DSN}(".$DB->{DSN}.") (couldn't interpolate all values):".$DSNeval);
+		$logger->error("error parsing \$DB->{DSN}(".$DSNeval."), couldn't interpolate all values:".$@);
 		return 0;
 	}
 	EAI::DB::newDBH($DB,$newDSN) or do {
@@ -442,6 +446,7 @@ sub dumpDataIntoDB ($) {
 					if ($dopostdumpexec) {
 						for my $exec (@{$postDumpExec->{execs}}) {
 							if ($exec) { # only if defined (there could be an interpolation of perl variables, if these are contained in $exec. This is for setting $selectedDate in postDumpProcessing.
+								$logger->debug("pre eval execute: $exec");
 								# eval qq{"$exec"} doesn't evaluate $exec but the quoted string (to enforce interpolation where needed)
 								$exec = eval qq{"$exec"} if $exec =~ /$/; # only interpolate if perl scalars are contained
 								$logger->info("post execute: $exec");
@@ -801,7 +806,7 @@ sub moveFilesToHistory (;$) {
 			my $cutOffSpec = $archiveTimestamp;
 			if ($redoDir) {
 				my $redoSpec = $redoDir;
-				$redoSpec =~ s/\//_/g;
+				$redoSpec =~ s/[\/\\\*\|\?:<>"]/_/g;
 				$cutOffSpec = $archiveTimestamp.'_'.$redoSpec;
 			}
 			if (!$execute{alreadyMovedOrDeleted}{$_}) {
@@ -1518,6 +1523,10 @@ processing done in reading the first line of text files
 =item format_allowLinefeedInData
 
 line feeds in values don't create artificial new lines/records, only works for csv quoted data
+
+=item format_autoheader
+
+assumption: header exists in file and format_header should be derived from there. only for readText
 
 =item format_beforeHeader
 

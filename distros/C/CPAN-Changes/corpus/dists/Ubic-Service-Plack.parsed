@@ -1,0 +1,138 @@
+{
+  "preamble" => "Revision history for Ubic-Service-Plack",
+  "raw_preamble" => "Revision history for Ubic-Service-Plack\n\n",
+  "releases" => [
+    {
+      "entries" => [],
+      "line" => 3,
+      "raw" => "{{\$NEXT}}\n\n",
+      "version" => "{{\$NEXT}}"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "        * minor POD improvements\n",
+          "style" => "*",
+          "text" => "minor POD improvements"
+        },
+        {
+          "line" => 7,
+          "raw" => "        * don't package debian/ into CPAN distribution\n",
+          "style" => "*",
+          "text" => "don't package debian/ into CPAN distribution"
+        },
+        {
+          "line" => 8,
+          "raw" => "        * fix cwd test on OS X\n\n",
+          "style" => "*",
+          "text" => "fix cwd test on OS X"
+        }
+      ],
+      "line" => 5,
+      "note" => "Sun Oct 14, 2012",
+      "raw" => "1.15    Sun Oct 14, 2012\n",
+      "version" => "1.15"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 11,
+          "raw" => "        * group, env and cmd options\n",
+          "style" => "*",
+          "text" => "group, env and cmd options"
+        },
+        {
+          "line" => 12,
+          "raw" => "        * deprecate app_name option, derive pidfile from service's full_name\n",
+          "style" => "*",
+          "text" => "deprecate app_name option, derive pidfile from service's full_name"
+        },
+        {
+          "line" => 13,
+          "raw" => "        * improve and cleanup docs\n\n",
+          "style" => "*",
+          "text" => "improve and cleanup docs"
+        }
+      ],
+      "line" => 10,
+      "note" => "Tue Jan 10, 2012",
+      "raw" => "1.14    Tue Jan 10, 2012\n",
+      "version" => "1.14"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 16,
+          "raw" => "        * Compatible with new ubic 'default user' feature\n",
+          "style" => "*",
+          "text" => "Compatible with new ubic 'default user' feature"
+        },
+        {
+          "line" => 17,
+          "raw" => "        * Support arrayref values in server_args\n",
+          "style" => "*",
+          "text" => "Support arrayref values in server_args"
+        },
+        {
+          "line" => 18,
+          "raw" => "        * Support single-letter keys in server_args\n",
+          "style" => "*",
+          "text" => "Support single-letter keys in server_args"
+        },
+        {
+          "line" => 19,
+          "raw" => "        * bin() method, pidfile() method, refactor to use\n          Ubic::Service::Skeleton instead of Ubic::Service::Common\n\n",
+          "style" => "*",
+          "text" => "bin() method, pidfile() method, refactor to use Ubic::Service::Skeleton instead of Ubic::Service::Common"
+        }
+      ],
+      "line" => 15,
+      "note" => "Wed Jul 13, 2011",
+      "raw" => "1.13    Wed Jul 13, 2011\n",
+      "version" => "1.13"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 23,
+          "raw" => "        Pass 'port' option to plackup.\n\n",
+          "style" => "",
+          "text" => "Pass 'port' option to plackup."
+        }
+      ],
+      "line" => 22,
+      "note" => "Sun Nov 07, 2010",
+      "raw" => "1.12    Sun Nov 07, 2010\n",
+      "version" => "1.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 26,
+          "raw" => "        Add Plack into CPAN deps.\n\n",
+          "style" => "",
+          "text" => "Add Plack into CPAN deps."
+        }
+      ],
+      "line" => 25,
+      "note" => "Sat Jul 31, 2010",
+      "raw" => "1.11    Sat Jul 31, 2010\n",
+      "version" => "1.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 29,
+          "raw" => "        First opensource release.\n",
+          "style" => "",
+          "text" => "First opensource release."
+        }
+      ],
+      "line" => 28,
+      "note" => "Fri Jul 30, 2010",
+      "raw" => "1.10    Fri Jul 30, 2010\n",
+      "version" => "1.10"
+    }
+  ]
+}

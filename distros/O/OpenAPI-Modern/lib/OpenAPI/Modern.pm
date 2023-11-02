@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.047-11-g728a0bf
+package OpenAPI::Modern; # git description: v0.048-17-g1d1a674
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 use 5.020;
 use utf8;
@@ -535,22 +535,23 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
   # all deserialization follows the spec: https://spec.openapis.org/oas/v3.1.0#style-examples
   # We strip leading and trailing whitespace between fields, as per RFC9112§5.1-3
   my $data;
+  my @values = split /\s*,\s*/, $header_string;
   if (grep $_ eq 'array', @$types) {
     # style=simple, explode=false or true: "blue,black,brown" -> ["blue","black","brown"]
-    $data = [ split /\s*,\s*/, $header_string ];
+    $data = \@values;
   }
   elsif (grep $_ eq 'object', @$types) {
     if ($header_obj->{explode}//false) {
       # style=simple, explode=true: "R=100,G=200,B=150" -> { "R": 100, "G": 200, "B": 150 }
-      $data = +{ map m/^([^=]*)=?(.*)$/g, split(/\s*,\s*/, $header_string) };
+      $data = +{ map m/^([^=]*)=?(.*)$/g, @values };
     }
     else {
       # style=simple, explode=false: "R,100,G,200,B,150" -> { "R": 100, "G": 200, "B": 150 }
-      $data = +{ split /\s*,\s*/, $header_string };
+      $data = +{ @values, (@values % 2 ? '' : ()) };
     }
   }
   else {
-    $data = join(', ', split(/\s*,\s*/, $header_string));
+    $data = join ', ', @values;
   }
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1 };
@@ -682,7 +683,7 @@ sub _resolve_ref ($self, $entity_type, $ref, $state) {
     if $state->{depth}++ > $self->evaluator->max_traversal_depth;
 
   abort({ %$state, keyword => '$ref' }, 'EXCEPTION: bad $ref to %s: not a "%s"', $schema_info->{canonical_uri}, $entity_type)
-    if $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne $entity_type;
+    if ($schema_info->{document}->get_entity_at_location($schema_info->{document_path})//'') ne $entity_type;
 
   $state->{initial_schema_uri} = $schema_info->{canonical_uri};
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path}.jsonp('/$ref');
@@ -769,6 +770,15 @@ sub _convert_response ($response) {
   croak 'unknown type '.ref($response);
 }
 
+# callback hook for Sereal::Decoder
+sub THAW ($class, $serializer, $data) {
+  foreach my $attr (qw(openapi_document evaluator)) {
+    die "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
+      if not exists $class->{$attr};
+  }
+  bless($data, $class);
+}
+
 1;
 
 __END__
@@ -783,7 +793,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 
@@ -896,7 +906,7 @@ your application. The JSON Schema evaluator is fully specification-compliant; th
 aims to be but some features are not yet available. My belief is that missing features are better
 than features that seem to work but actually cut corners for simplicity.
 
-=for Pod::Coverage BUILDARGS
+=for Pod::Coverage BUILDARGS THAW
 
 =for stopwords schemas jsonSchemaDialect metaschema subschema perlish operationId
 

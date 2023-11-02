@@ -1,6 +1,6 @@
 package Text::ANSI::Printf;
 
-our $VERSION = "2.03";
+our $VERSION = "2.05";
 
 use v5.14;
 use warnings;
@@ -50,7 +50,7 @@ Text::ANSI::Printf - printf function for string with ANSI sequence
 
 =head1 VERSION
 
-Version 2.03
+Version 2.05
 
 =head1 SYNOPSIS
 
@@ -62,6 +62,8 @@ Version 2.03
     ansi_printf FORMAT, LIST
     ansi_sprintf FORMAT, LIST
 
+    $ ansiprintf format args ...
+
 =head1 DESCRIPTION
 
 B<Text::ANSI::Printf> is a almost-printf-compatible library with a
@@ -69,10 +71,11 @@ capability of handling:
 
     - ANSI terminal sequences
     - Multi-byte wide characters
+    - Combining characters
     - Backspaces
 
 You can give any string including these data as an argument for
-C<printf> and C<sprintf> funcitons.  Each field width is calculated
+C<printf> and C<sprintf> functions.  Each field width is calculated
 based on its visible appearance.
 
 For example,
@@ -88,9 +91,13 @@ However, if the arguments are colored by ANSI sequence,
     printf("| %-5s | %-5s | %-5s |\n",
            "\e[31mRed\e[m", "\e[32mGreen\e[m", "\e[34mBlue\e[m");
 
-this code produces undsirable result:
+this code produces undesirable result:
 
     | Red | Green | Blue |
+
+This is still better because it is readable, but if the result is
+shorter than the original string, for example, "%.3s", the result will
+be disastrous.
 
 C<ansi_printf> can be used to properly format colored text.
 
@@ -110,12 +117,16 @@ The original C<printf> function has the ability to specify the
 arguments to be targeted by the position specifier, but by default
 this module assumes that the arguments will appear in the given order,
 so you will not get the expected result. If you wish to use it, set
-the variable C<$REORDER> to 1.
+the package variable C<$REORDER> to 1.
 
-    $Text::ANSI::Printf::REORDER = 1;.
+    $Text::ANSI::Printf::REORDER = 1;
 
 By doing so, the order in which arguments appear can be changed and
 the same argument can be processed even if it appears more than once.
+
+If you want to enable this feature only in specific cases, create a
+wrapper function and declare C<$Text::ANSI::Printf::REORDER> as local
+in it.
 
 This behavior is experimental and may change in the future.
 
@@ -131,7 +142,7 @@ This behavior is experimental and may change in the future.
 
 =item ansi_sprintf FORMAT, LIST
 
-Use just like perl's I<printf> and I<sprintf> functions
+Use just like Perl's I<printf> and I<sprintf> functions
 except that I<printf> does not take FILEHANDLE.
 
 =back
@@ -141,7 +152,16 @@ except that I<printf> does not take FILEHANDLE.
 This module uses L<Text::Conceal> and L<Text::ANSI::Fold::Util>
 internally.
 
+=head1 CLI TOOLS
+
+This package contains the L<ansiprintf(1)> command as a wrapper for
+this module. By using this command from the command line interface,
+you can check the functionality of L<Text::ANSI::Printf>.  See
+L<ansiprintf(1)> or `perldoc ansiprintf`.
+
 =head1 SEE ALSO
+
+L<App::ansiprintf>
 
 L<Term::ANSIColor::Concise>,
 L<https://github.com/tecolicom/Term-ANSIColor-Concise>

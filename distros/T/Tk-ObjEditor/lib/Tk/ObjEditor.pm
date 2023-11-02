@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Tk::ObjEditor;
-$Tk::ObjEditor::VERSION = '2.009';
+$Tk::ObjEditor::VERSION = '2.010';
 use Carp;
 use Tk::Derived;
 use Tk::Frame;
@@ -98,14 +98,7 @@ sub modify_menu {
     my $ref = $cw->info( "data", $item )->{item_ref};
     my @children = $cw->infoChildren($item);
 
-    if ( not $cw->isPseudoHash($$ref)
-        and ( _isa( $$ref, 'ARRAY' ) or _isa( $$ref, 'HASH' ) ) ) {
-        $menu->add(
-            'command',
-            '-label'   => 'add element',
-            '-command' => sub { $cw->add_entry($item); } );
-    }
-    elsif ( not ref($$ref) ) {
+    if ( not ref($$ref) ) {
         $menu->add(
             'command',
             '-label'   => 'modify element',

@@ -4,7 +4,7 @@ Dancer2::Template::Mason - Mason wrapper for Dancer2
 
 # VERSION
 
-version 0.1.1
+version 0.1.2
 
 # SYNOPSIS
 
@@ -60,6 +60,63 @@ engines:
 
 If unspecified, `comp_root` defaults to the `views` configuration setting
 or, if it's undefined, to the `/views` subdirectory of the application.
+
+## Dancer2 Tokens and Mason Parameters
+
+As with other template adapters, Dancer2 passes the following to your
+templates automatically:
+
+- `perl_version`
+- `dancer_version`
+- `settings`
+- `request`
+- `params`
+- `vars`
+- `session`
+
+(see [Dancer2::Core::Role::Template](https://metacpan.org/pod/Dancer2%3A%3ACore%3A%3ARole%3A%3ATemplate) for more details)
+
+Content you pass via the `template` keyword creates another token, `content`.
+
+To access them in your Mason templates, you have options. To use these tokens
+in the most explicit way possible, declare `%args` in your Mason template as
+such:
+
+```
+<%args>
+$perl_version
+$dancer_version
+$settings
+$request
+$params
+$vars
+$session
+</%args>
+```
+
+You can then pass them explicitly to other components:
+
+```perl
+<& /components/topbar.m, title => $title, session => $session &>
+```
+
+For the lazy, all tokens are passed via Mason as `%ARGS`. You can reference
+them as keys of this hash:
+
+```perl
+% my $session = $ARGS{ session };
+<h1>Hello, <% $session->{ username } %>!</h1>
+```
+
+For the really lazy, rather than build a list of parameters to pass other
+components, you can simply pass the entire `%ARGS` hash:
+
+```
+<& /components/topbar.m, %ARGS &>
+```
+
+See [https://metacpan.org/dist/HTML-Mason/view/lib/HTML/Mason/Devel.pod#PASSING-PARAMETERS](https://metacpan.org/pod/the%20Mason%20Developer%27s%20Manual)
+for more information about passing parameters to components.
 
 ## Notes on Mason Caching and Performance
 
@@ -128,3 +185,11 @@ This software is copyright (c) 2023 by Yanick Champoux.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 116:
+
+    alternative text 'https://metacpan.org/dist/HTML-Mason/view/lib/HTML/Mason/Devel.pod#PASSING-PARAMETERS' contains non-escaped | or /

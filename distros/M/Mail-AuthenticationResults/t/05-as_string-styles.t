@@ -17,7 +17,8 @@ my $Input = [
   'x-google-dkim=none (no signatures found)',
   'dmarc=fail (p=none,d=none) header.from=marcbradshaw.net',
   'dmarc=fail (p=reject,d=reject) header.from=goestheweasel.com',
-  'dmarc=none (p=none,d=none) header.from=example.com'
+  'dmarc=none (p=none,d=none) header.from=example.com',
+  'x-url=http://example.com'
 ];
 
 my $InputARHeader = join( ";\n", 'test.example.com', @$Input );
@@ -25,7 +26,7 @@ my $InputARHeader = join( ";\n", 'test.example.com', @$Input );
 my $Parser = Mail::AuthenticationResults::Parser->new( $InputARHeader );
 my $Parsed = $Parser->parsed();
 
-my $None = 'test.example.com; iprev=fail policy.iprev=123.123.123.123 (NOT FOUND); x-ptr=fail x-ptr-helo=bad.name.google.com x-ptr-lookup=""; spf=fail smtp.mailfrom=test@goestheweasel.com smtp.helo=bad.name.google.com; dkim=none (no signatures found); x-google-dkim=none (no signatures found); dmarc=fail (p=none,d=none) header.from=marcbradshaw.net; dmarc=fail (p=reject,d=reject) header.from=goestheweasel.com; dmarc=none (p=none,d=none) header.from=example.com';
+my $None = 'test.example.com; iprev=fail policy.iprev=123.123.123.123 (NOT FOUND); x-ptr=fail x-ptr-helo=bad.name.google.com x-ptr-lookup=""; spf=fail smtp.mailfrom=test@goestheweasel.com smtp.helo=bad.name.google.com; dkim=none (no signatures found); x-google-dkim=none (no signatures found); dmarc=fail (p=none,d=none) header.from=marcbradshaw.net; dmarc=fail (p=reject,d=reject) header.from=goestheweasel.com; dmarc=none (p=none,d=none) header.from=example.com; x-url=http://example.com';
 
 my $Entry = 'test.example.com;
     iprev=fail policy.iprev=123.123.123.123 (NOT FOUND);
@@ -35,7 +36,8 @@ my $Entry = 'test.example.com;
     x-google-dkim=none (no signatures found);
     dmarc=fail (p=none,d=none) header.from=marcbradshaw.net;
     dmarc=fail (p=reject,d=reject) header.from=goestheweasel.com;
-    dmarc=none (p=none,d=none) header.from=example.com';
+    dmarc=none (p=none,d=none) header.from=example.com;
+    x-url=http://example.com';
 
 my $SubEntry = 'test.example.com;
     iprev=fail
@@ -53,7 +55,8 @@ my $SubEntry = 'test.example.com;
     dmarc=fail (p=reject,d=reject)
         header.from=goestheweasel.com;
     dmarc=none (p=none,d=none)
-        header.from=example.com';
+        header.from=example.com;
+    x-url=http://example.com';
 
 my $Full = 'test.example.com;
     iprev=fail
@@ -77,13 +80,40 @@ my $Full = 'test.example.com;
         header.from=goestheweasel.com;
     dmarc=none
         (p=none,d=none)
-        header.from=example.com';
+        header.from=example.com;
+    x-url=http://example.com';
 
+my $FullStrict = 'test.example.com;
+    iprev=fail
+        policy.iprev=123.123.123.123
+            (NOT FOUND);
+    x-ptr=fail
+        x-ptr-helo=bad.name.google.com
+        x-ptr-lookup="";
+    spf=fail
+        smtp.mailfrom="test@goestheweasel.com"
+        smtp.helo=bad.name.google.com;
+    dkim=none
+        (no signatures found);
+    x-google-dkim=none
+        (no signatures found);
+    dmarc=fail
+        (p=none,d=none)
+        header.from=marcbradshaw.net;
+    dmarc=fail
+        (p=reject,d=reject)
+        header.from=goestheweasel.com;
+    dmarc=none
+        (p=none,d=none)
+        header.from=example.com;
+    x-url="http://example.com"';
 
 is( $Parsed->set_indent_style( 'none' )->as_string(), $None, 'None stringifies correctly' );
 is( $Parsed->set_indent_style( 'entry' )->as_string(), $Entry, 'Entry stringifies correctly' );
 is( $Parsed->set_indent_style( 'subentry' )->as_string(), $SubEntry, 'SubEntry stringifies correctly' );
 is( $Parsed->set_indent_style( 'full' )->as_string(), $Full, 'Full stringifies correctly' );
+is( $Parsed->set_indent_style( 'full' )->set_strict_quotes(1)->as_string(), $FullStrict, 'Full Strict stringifies correctly' );
+
 dies_ok( sub{ $Parsed->set_indent_style( 'bogus_indent_style' ); }, 'invalid style dies' );
 
 done_testing();

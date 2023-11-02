@@ -34,10 +34,28 @@ typedef SV PADNAME;
 
 #if !HAVE_PERL_VERSION(5, 22, 0)
 #  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
+#  define newPADNAMEpvn(p,n)      S_newPADNAMEpvn(aTHX_ p,n)
+static PADNAME *S_newPADNAMEpvn(pTHX_ const char *pv, STRLEN n)
+{
+  PADNAME *pn = newSVpvn(pv, n);
+  /* PADNAMEs need to be at least SVt_PVNV in order to store the COP_SEQ_*
+   * fields */
+  sv_upgrade(pn, SVt_PVNV);
+  return pn;
+}
+#  define PadnameREFCNT_dec(pn)   SvREFCNT_dec(pn)
 #endif
 
 #ifndef av_count
 #  define av_count(av)           (AvFILL(av) + 1)
+#endif
+
+#ifndef av_fetch_simple
+#  define av_fetch_simple(av, idx, lval)  av_fetch(av, idx, lval)
+#endif
+
+#ifndef av_push_simple
+#  define av_push_simple(av, sv)  av_push(av, sv)
 #endif
 
 #ifndef av_top_index
@@ -80,6 +98,10 @@ typedef SV PADNAME;
 
 #ifndef OpSIBLING
 #  define OpSIBLING(op)  ((op)->op_sibling)
+#endif
+
+#ifndef OpHAS_SIBLING
+#  define OpHAS_SIBLING(op)  (cBOOL(OpSIBLING(op)))
 #endif
 
 #ifndef OpMORESIB_set
@@ -150,6 +172,59 @@ static PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, 
 #  define isIDCONT_utf8_safe(s, e)   (PERL_UNUSED_ARG(e), isIDCONT_utf8(s))
 #endif
 
+#ifndef CXp_EVALBLOCK
+/* before perl 5.34 this was called CXp_TRYBLOCK */
+#  define CXp_EVALBLOCK CXp_TRYBLOCK
+#endif
+
 #if !HAVE_PERL_VERSION(5, 26, 0)
 #  define sv_set_undef(sv)  sv_setsv(sv, &PL_sv_undef)
+#endif
+
+#ifndef newAVav
+#  define newAVav(av)  S_newAVav(aTHX_ av)
+static AV *S_newAVav(pTHX_ AV *av)
+{
+  AV *ret = newAV();
+  U32 count = av_count(av);
+  U32 i;
+  for(i = 0; i < count; i++)
+    av_push(ret, newSVsv(AvARRAY(av)[i]));
+  return ret;
+}
+#endif
+
+#if !defined(sv_derived_from_hv) && HAVE_PERL_VERSION(5, 16, 0)
+#  define sv_derived_from_hv(sv, hv)  MY_sv_derived_from_hv(aTHX_ sv, hv)
+static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
+{
+  char *hvname = HvNAME(hv);
+  if(!hvname)
+    return FALSE;
+
+  return sv_derived_from_pvn(sv, hvname, HvNAMELEN(hv), HvNAMEUTF8(hv) ? SVf_UTF8 : 0);
+}
+#endif
+
+#ifndef xV_FROM_REF
+#  ifdef PERL_USE_GCC_BRACE_GROUPS
+#    define xV_FROM_REF(XV, ref)  \
+  ({ SV *_ref = ref; assert(SvROK(_ref)); assert(SvTYPE(SvRV(_ref)) == SVt_PV ## XV); (XV *)(SvRV(_ref)); })
+#  else
+#    define xV_FROM_REF(XV, ref)  ((XV *)SvRV(ref))
+#  endif
+
+#  define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
+#  define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
+#  define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
+#endif
+
+#ifndef newPADxVOP
+#  define newPADxVOP(type, flags, padix)  S_newPADxVOP(aTHX_ type, flags, padix)
+static OP *S_newPADxVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
+{
+  OP *op = newOP(type, flags);
+  op->op_targ = padix;
+  return op;
+}
 #endif

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Commandable::Invocation;
 
@@ -65,6 +65,8 @@ BEGIN {
 my $MATCH_Future = USING_FUTURE_XS ? "SCALAR(UV)=Future" : "HASH(_NUM_)=Future";
 my $DETAIL       = USING_FUTURE_XS ? "UV=_NUM_"          : "_NUM_ values (use 'values' command to show)";
 
+my $MAGIC = USING_FUTURE_XS ? "\n  has ~ magic with object at SCALAR\(UV\)=Future at _ADDR_\n     with virtual table at _ADDR_" : "";
+
 # show command with added output
 #   Note: these tests are quite fragile as they depend on the exact output format of 'show'
 {
@@ -73,7 +75,7 @@ my $DETAIL       = USING_FUTURE_XS ? "UV=_NUM_"          : "_NUM_ values (use 'v
    } <<"EOF", 'output from "show" command on pending';
 $MATCH_Future at _ADDR_ with refcount 1
   size _NUM_ bytes
-  blessed as Future
+  blessed as Future$MAGIC
   Future state pending
   $DETAIL
 EOF
@@ -83,7 +85,7 @@ EOF
    } <<"EOF", 'output from "show" command on done';
 $MATCH_Future at _ADDR_ with refcount 1
   size _NUM_ bytes
-  blessed as Future
+  blessed as Future$MAGIC
   Future state done
   Future result: SCALAR(UV) at _ADDR_ = 1, ...
   $DETAIL
@@ -94,7 +96,7 @@ EOF
    } <<"EOF", 'output from "show" command on failed';
 $MATCH_Future at _ADDR_ with refcount 1
   size _NUM_ bytes
-  blessed as Future
+  blessed as Future$MAGIC
   Future state failed
   Future failure: "oops"
   $DETAIL
@@ -105,7 +107,7 @@ EOF
    } <<"EOF", 'output from "show" command on cancelled';
 $MATCH_Future at _ADDR_ with refcount 1
   size _NUM_ bytes
-  blessed as Future
+  blessed as Future$MAGIC
   Future state cancelled
   $DETAIL
 EOF

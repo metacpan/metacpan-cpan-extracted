@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.030000';
+$MetaCPAN::Client::VERSION = '2.031000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_arrayref is_hashref is_ref >;
@@ -448,7 +448,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.030000
+version 2.031000
 
 =head1 SYNOPSIS
 

@@ -31,6 +31,17 @@ our @parser = (
         $X->flush();
     }}],
 
+    # Append windows from other tag
+    [qr/tag_append\((\d+)\)/, sub ($arg) { return sub {
+        return unless $arg > 0;
+        my $screen = $focus->{screen};
+        my $tag = $screen->current_tag();
+        my $other = $screen->{tags}->[ $arg - 1 ];
+        $tag->append($other);
+        $screen->refresh();
+        $X->flush();
+    }}],
+
     # Window close or toggle floating / maximize / always_on
     [qr/win_(close|toggle_(?:floating|maximize|always_on))\(\)/, sub ($arg) { return sub {
         my $win = $focus->{window};
@@ -51,6 +62,8 @@ our @parser = (
     [qr/win_move_tag\((\d+)\)/, sub ($arg) { return sub {
         my $win = $focus->{window};
         return unless defined $win;
+
+        return if $win->{always_on};
 
         my $new_tag = $focus->{screen}->{tags}->[$arg - 1] or return;
         my $curr_tag = $focus->{screen}->current_tag();
@@ -85,8 +98,9 @@ our @parser = (
         return if $new_screen == $old_screen;
         return if $new_screen->current_tag->{max_window} and $win->{maximized};
 
+        my $always_on = $win->{always_on};
         $old_screen->win_remove($win);
-        $new_screen->win_add($win);
+        $new_screen->win_add($win, $always_on);
 
         # Follow focus
         $new_screen->{focus} = $win;

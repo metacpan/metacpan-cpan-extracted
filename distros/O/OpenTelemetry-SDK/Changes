@@ -1,0 +1,10 @@
+Revision history for OpenTelemetry-SDK
+
+0.011     2023-11-01 23:20:41+00:00 Europe/London
+
+    * Minor cosmetic fixes to documentation to solve some indexing
+      problems on CPAN
+
+0.010     2023-11-01 00:00:16+00:00 Europe/London
+
+        First version.

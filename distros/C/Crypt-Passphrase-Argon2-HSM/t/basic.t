@@ -15,7 +15,7 @@ plan skip_all => '' unless -e $path;
 
 my $provider = Crypt::HSM->load($path);
 my @slots = $provider->slots(1);
-my $session = $provider->open_session($slots[0]);
+my $session = $slots[0]->open_session;
 $session->login('user', $ENV{HSM_PIN}) if $ENV{HSM_PIN};
 
 my $old_key = $session->generate_key('aes-key-gen', { 'value-len' => 32, token => 0, label => 'apepper-1' });

@@ -561,6 +561,7 @@ sub new
 							unless (defined $streamHash{$stream}
 									|| ($self->{'secure'} && $stream !~ /^https/o)
 									|| $class > $self->{'quality'}) {
+$stream =~ s#hugh\.cdn\.rumble\.cloud\/video\/#sp\.rmbl\.ws\/#o;  #JWT:RANDOMLY GETTING THIS SITE THAT DOESN'T WORK?!
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}

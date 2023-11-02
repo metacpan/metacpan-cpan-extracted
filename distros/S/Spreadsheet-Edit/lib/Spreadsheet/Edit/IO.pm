@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-09-23'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-10-28'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -879,7 +879,7 @@ sub _convert_using_openlibre($$$) {
   # With 'allsheets' the resulting files must be renamed to conform to our
   # external API (namely SHEETNAME.csv).
   #
-  # ERROR DETECTION: As of LO 7.5 we always get zero exist status and the
+  # ERROR DETECTION: As of LO 7.5 we always get zero exit status and the
   # only way to detect errors is to notice that no files were written.
   # https://bugs.documentfoundation.org/show_bug.cgi?id=155415
   #
@@ -1158,6 +1158,8 @@ sub _process_args($;@) {
     $opts{inpath_sans_sheet} = path(
       ($key && $key eq 'inpath') ? $path_sans_sheet : $opts{inpath}
     );
+    croak qsh($opts{inpath_sans_sheet})," does not exist!\n"
+      unless $opts{inpath_sans_sheet}->exists;
   }
   # Input file basename sans any .suffix
   $opts{ifbase} = $opts{inpath_sans_sheet}->basename(qr/\.[^.]+/);

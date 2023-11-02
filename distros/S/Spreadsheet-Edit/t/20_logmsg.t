@@ -1,19 +1,21 @@
+use FindBin qw($Bin);
+use lib $Bin;
+use t_TestCommon qw/my_capture/; # also imports Test2::V0 etc.
+
 use strict; use warnings; use feature qw/say/;
 use open ':std', ':encoding(UTF-8)';
 use utf8;
 
 my $mypkg = __PACKAGE__;
 
-use Test2::V0;
 use Carp;
 use Data::Dumper::Interp qw/vis visq dvis dvisq u visnew/;
 
 use Spreadsheet::Edit qw/:all logmsg/;
 
-use Spreadsheet::Edit::Log ':btw=L=${lno} F=${fname} P=${pkg} ::';
+use Spreadsheet::Edit::Log ':btw=L=${lno} F=${fname} P=${pkg}';
 
 use File::Basename qw/basename/;
-use Capture::Tiny qw/capture/;
 
 die "oops" unless ! %Spreadsheet::Edit::pkg2currsheet;
 die "oops" unless ! defined $Spreadsheet::Edit::_inner_apply_sheet;
@@ -23,7 +25,7 @@ sub wrapper($@) {
   btwN $N,@_;
 }
 { my $baseline = __LINE__;
-  my ($out, $err, $exit) = capture {
+  my ($out, $err, $exit) = t_TestCommon::my_capture {
     { package Foo; main::btw "A1 btw from line ",$baseline+2; }
     btw "A2 btw from line ",$baseline+3;
     btwN 0,"BB btwN(0...) from line ",$baseline+4;
@@ -33,13 +35,13 @@ sub wrapper($@) {
   local $_ = $out.$err;  # don't care which it goes to
   #note "OUT:$out\nERR:$err";
   my $fname = basename(__FILE__);
-  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=Foo :: A1 .* from line (\1)/m,
+  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=Foo: A1 .* from line (\1)/m,
       "A1 btw with custom prefix");
-  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main :: A2 .* from line (\1)/m,
+  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main: A2 .* from line (\1)/m,
       "A2 btw with custom prefix");
-  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main :: BB btwN\(0...\) from line (\1)/m,
+  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main: BB btwN\(0...\) from line (\1)/m,
       "BB btwN(0,...) with custom prefix");
-  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main :: CC btwN\(1,...\) from line (\1)/m,
+  like($_, qr/^\s*L=(\d+) F=\Q$fname\E P=main: CC btwN\(1,...\) from line (\1)/m,
       "CC btwN(1,...) with custom prefix");
 }
 
@@ -64,6 +66,22 @@ my $sheet2 = new_sheet
     [ "BBB", 200 ],
   ] ;
 title_rx 0;
+
+package Other::Pkg;
+
+use Spreadsheet::Edit qw/:all/;
+
+our $op_ds = "OtherPkgSheet";
+our $op_sheet = new_sheet
+  data_source => $op_ds,
+  rows => [
+    [ "Slimy", "Salami"],
+    [ "RRR", 321 ],
+    [ "SSS", 654 ],
+  ] ;
+title_rx 0;
+
+package main;
 
 sheet $sheet1;
 
@@ -92,12 +110,14 @@ sub run_tests(@) {
   my $outerasheet = delete $opts{outerasheet};
   my $oas_tag     = delete $opts{oas_tag};
   my $oas_rx      = delete $opts{oas_rx};
+  my $package     = delete $opts{package};
   confess dvis 'Unknown %opts' if %opts;
   local $Data::Dumper::Interp::Useqq = "unicode"; # with '\n' for newline etc.
+  my @optarg = $package ? ({package => $package},) : ();
   foreach ([], ["Arg1"], ["Two\nlines"], ["Arg1","Two\nlines"]) {
     my @uargs = @$_;
     my $expmsg = join("", @uargs)."\n";
-    my $justargs = join(",", map{vis} @uargs);
+    my $justargs = join(",", map{vis} @optarg,@uargs);
     my $comargs = join(",", "", map{vis} @uargs); # with leading comma
     #diag dvis '### @uargs $expmsg\n';
     # First, test logmsg() with NO explicit 'focus' argument
@@ -114,39 +134,39 @@ sub run_tests(@) {
     if ($imp_sheet) {
       # diag "### asheet=", u($asheet), "  outerasheet=", u($outerasheet), "  curr_sheet=", u($curr_sheet), "  imp_sheet=", u($imp_sheet), "\n";
       if (defined $imp_rx) {
-        is( logmsg(@uargs),
+        is( logmsg(@optarg,@uargs),
             "(Row ".($imp_rx+1)." $imp_tag): $expmsg",
             "logmsg $justargs ($imp_desc implied)($tname, auto-newline)" );
-        is( logmsg(@uargs,"\n"),
+        is( logmsg(@optarg,@uargs,"\n"),
             "(Row ".($imp_rx+1)." $imp_tag): $expmsg",
             "logmsg $justargs ($imp_desc implied)($tname, final \\n-only arg)" );
         unless (@uargs == 0) {
-          is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"),
+          is( logmsg(@optarg,@uargs[0..($#uargs-1)],$uargs[-1]."\n"),
               "(Row ".($imp_rx+1)." $imp_tag): $expmsg",
               "logmsg $justargs\\n ($imp_desc implied)($tname, final newline in last arg)"
             );
         }
       } else {
-        is( logmsg(@uargs),
+        is( logmsg(@optarg,@uargs),
             "($imp_tag): $expmsg",
             "logmsg $justargs ($imp_desc implied, no rx)($tname, auto-newline)" );
-        is( logmsg(@uargs,"\n"),
+        is( logmsg(@optarg,@uargs,"\n"),
             "($imp_tag): $expmsg",
             "logmsg $justargs ($imp_desc implied, no rx)($tname, final \\n-only arg)" );
         unless (@uargs == 0) {
-          is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"),
+          is( logmsg(@optarg,@uargs[0..($#uargs-1)],$uargs[-1]."\n"),
               "($imp_tag): $expmsg",
               "logmsg $justargs\\n ($imp_desc implied, no rx)($tname, final newline in last arg)"
             );
         }
       }
     } else {
-      is( logmsg(@uargs), $expmsg,
+      is( logmsg(@optarg,@uargs), $expmsg,
           "logmsg $justargs (no relevant sheet)($tname, auto-newline)" );
-      is( logmsg(@uargs,"\n"), $expmsg,
+      is( logmsg(@optarg,@uargs,"\n"), $expmsg,
           "logmsg $justargs (no relevant sheet)($tname, final \\n-only arg)" );
       unless (@uargs == 0) {
-        is( logmsg(@uargs[0..($#uargs-1)],$uargs[-1]."\n"), $expmsg,
+        is( logmsg(@optarg,@uargs[0..($#uargs-1)],$uargs[-1]."\n"), $expmsg,
             "logmsg $comargs\\n (no relevant sheet)($tname, final newline in last arg)" );
       }
     }
@@ -217,6 +237,13 @@ apply_torx {
   run_tests tname => "in apply but curr changed",
             asheet => $sheet1, as_tag => $ds1, as_rx => $sheet1->rx(),
             curr_sheet => $sheet2, cs_tag => $ds2, cs_rx => undef;
+
+  run_tests tname => "in apply but passing package => Other::Pkg",
+            asheet => $sheet1, as_tag => $ds1, as_rx => $sheet1->rx(),
+            curr_sheet => $Other::Pkg::op_sheet, cs_tag => $Other::Pkg::op_ds, cs_rx => undef,
+            package => "Other::Pkg"
+            ;
+
   sheet($saved);
 } [2];
 

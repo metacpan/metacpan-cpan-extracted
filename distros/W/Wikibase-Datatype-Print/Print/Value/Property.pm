@@ -9,7 +9,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.13;
+our $VERSION = 0.16;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -24,8 +24,9 @@ sub print {
 
 	my $property;
 	if (exists $opts_hr->{'cb'}) {
-		$property = $opts_hr->{'cb'}->get('label', $obj->value) || $obj->value;
-	} else {
+		$property = $opts_hr->{'cb'}->get('label', $obj->value);
+	}
+	if (! defined $property) {
 		$property = $obj->value;
 	}
 
@@ -125,6 +126,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.16
 
 =cut

@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use utf8;
 
-=encoding utf-8
+=encoding utf8
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ WWW::Suffit - The Suffit core library
 
 =head1 VERSION
 
-Version 1.00
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 # . . . coming soon . . .
 

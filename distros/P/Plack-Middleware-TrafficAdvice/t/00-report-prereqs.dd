@@ -31,8 +31,7 @@ do { my $x = {
                                       'JSON::MaybeXS' => '1.004000',
                                       'Plack::Middleware' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.8.5',
-                                      'strict' => '0',
+                                      'perl' => 'v5.12.0',
                                       'warnings' => '0'
                                     }
                     },
@@ -47,9 +46,11 @@ do { my $x = {
                                    'Plack::Builder' => '0',
                                    'Plack::Middleware::ContentLength' => '0',
                                    'Plack::Test' => '0',
+                                   'Test2::Tools::Compare' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::Differences' => '0',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0',
+                                   'strict' => '0',
                                    'utf8' => '0'
                                  }
                  }

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use HTTP::Exception;
 use HTTP::Status qw/ :constants :is /;

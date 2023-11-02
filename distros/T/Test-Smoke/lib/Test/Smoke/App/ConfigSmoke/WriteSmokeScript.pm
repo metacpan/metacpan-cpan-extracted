@@ -2,6 +2,8 @@ package Test::Smoke::App::ConfigSmoke::WriteSmokeScript;
 use warnings;
 use strict;
 
+our $VERSION = '0.002';
+
 use Exporter 'import';
 our @EXPORT = qw/ write_smoke_script write_as_shell write_as_cmd /;
 
@@ -32,7 +34,7 @@ sub write_smoke_script {
     if ($^O eq 'MSWin32') {
         $self->{_smoke_script} = $self->prefix . '.cmd';
         $self->{_smoke_script_abs} = Cwd::abs_path($self->smoke_script);
-        $self->write_as_cmd();
+        $self->write_as_cmd($cronbin, $crontime);
     }
     elsif ($^O eq 'VMS') {
         $self->{_smoke_script} = $self->prefix . '.com';
@@ -58,7 +60,8 @@ sub write_as_shell {
 
     print "\n-- Write shell script --\n";
 
-    my $cronline = schedule_entry($self->smoke_script_abs, $cronbin, $crontime);
+    $crontime ||= '22:25';
+    my $cronline = $self->schedule_entry_crontab($cronbin, $crontime);
 
     my $p5env = '';
     for my $env (qw/ PERL5LIB PERL5OPT /) {
@@ -100,7 +103,7 @@ sub write_as_shell {
 # NOTE: Changes made in this file will be \*lost\*
 #       after rerunning %s
 #
-# %s
+# cron: %s
 %s
 cd %s
 CFGNAME=${CFGNAME:-%s}
@@ -145,6 +148,12 @@ Write the smoke-script as a MS-cmd script.
 
 sub write_as_cmd {
     my $self = shift;
+    my ($cronbin, $crontime) = @_;
+
+    $crontime ||= '22:25';
+    my $cronline = $cronbin =~ m/schtasks/
+        ? $self->query_entry_ms_schtasks($cronbin)
+        : $self->schedule_entry_ms_at($cronbin, $crontime);
 
     my $p5env = '';
     for my $env (qw/ PERL5LIB PERL5OPT /) {
@@ -159,11 +168,11 @@ sub write_as_cmd {
         strftime("%Y-%m-%dT%H:%M:%S%z", localtime),
         $self->dollar_0,
         $p5env,
-        # $atline,
+        $cronline,
         Cwd::abs_path(File::Spec->curdir),
         $self->configfile,
         $self->prefix. ".lck",
-        $FindBin::Bin,
+        File::Spec->canonpath($FindBin::Bin), $ENV{PATH},
         $^X, File::Spec->catfile($FindBin::Bin, 'tssmokeperl.pl'), $self->current_values->{lfile},
     );
 
@@ -181,7 +190,7 @@ REM the next line might fix it?
 REM set COPYCMD=/Y %%COPYCMD%%
 REM .
 %s
-REM $atline
+REM query scheduler: %s
 
 set WD=%s\
 REM Change drive-Letter, then directory
@@ -198,7 +207,7 @@ if NOT EXIST %%LOCKFILE%% goto START_SMOKE
 :START_SMOKE
     echo %%CFGNAME%% > %%LOCKFILE%%
     set OLD_PATH=%%PATH%%
-    set PATH=%s;%%PATH%%
+    set PATH=%s;%s
     %s %s -c "%%CFGNAME%%" %%* > "%s" 2>&1
     set PATH=%%OLD_PATH%%
 

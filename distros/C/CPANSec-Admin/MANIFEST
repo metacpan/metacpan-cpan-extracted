@@ -1,0 +1,19 @@
+Build.PL
+lib/CPANSEC/Admin.pm
+lib/CPANSEC/Admin/Command.pm
+lib/CPANSEC/Admin/Command/Amend.pm
+lib/CPANSEC/Admin/Command/CVEScan.pm
+lib/CPANSEC/Admin/Command/Help.pm
+lib/CPANSEC/Admin/Command/New.pm
+lib/CPANSEC/Admin/Command/Publish.pm
+lib/CPANSEC/Admin/Command/Revoke.pm
+lib/CPANSEC/Admin/Command/Triage.pm
+lib/CPANSEC/Admin/Util.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+script/cpansec-admin
+t/001-basic.t
+t/002-getopt.t
+t/003-publish.t
+META.yml
+META.json

@@ -3,13 +3,13 @@ use utf8;
 use v5.14;
 use warnings;
 
-use Test::More 1.302183;
-use Test::Exception 0.41;
-use Test::Warnings qw/ warning /;
+use Test2::V0;
+use Test2::Tools::Exception qw( lives );
+use Test2::Tools::Warnings qw( warning );
 
 use Encode qw/ encode_utf8 /;
 
-use_ok "Text::Minify::XS", "minify";
+use Text::Minify::XS "minify";
 
 is minify("") => "", "empty";
 
@@ -70,7 +70,7 @@ is minify(" £ simple") => "£ simple";
 
 }
 
-lives_and {
+ok lives {
 
     my $warning = warning {
         my $n = chr(160);
@@ -80,7 +80,7 @@ lives_and {
 
 };
 
-lives_and {
+ok lives {
 
     my $warning = warning {
         my $n = chr(160);
@@ -89,7 +89,7 @@ lives_and {
     like $warning, qr/Malformed UTF-8 character/;
 };
 
-lives_and {
+ok lives {
 
     my $n = eval { encode_utf8( chr(160) ) };
     is minify($n) => $n;

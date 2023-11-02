@@ -5,9 +5,9 @@ use warnings;
 use parent 'ColorThemeBase::Static';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2023-10-30'; # DATE
 our $DIST = 'Perinci-CmdLine-Classic'; # DIST
-our $VERSION = '1.817'; # VERSION
+our $VERSION = '1.818'; # VERSION
 
 our %THEME = (
     v => 2,
@@ -31,7 +31,7 @@ ColorTheme::Perinci::CmdLine::Classic::DefaultWhiteBG
 
 =head1 VERSION
 
-This document describes version 1.817 of ColorTheme::Perinci::CmdLine::Classic::DefaultWhiteBG (from Perl distribution Perinci-CmdLine-Classic), released on 2022-10-19.
+This document describes version 1.818 of ColorTheme::Perinci::CmdLine::Classic::DefaultWhiteBG (from Perl distribution Perinci-CmdLine-Classic), released on 2023-10-30.
 
 =head1 HOMEPAGE
 
@@ -65,7 +65,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

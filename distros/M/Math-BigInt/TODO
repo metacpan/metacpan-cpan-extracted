@@ -52,6 +52,14 @@ Math::BigInt:
 Given the fact that we are be able to plug-in a much faster core-lib, the
 following are pretty much ultra-low-priority:
 
+Math::BigRat:
+ * Make blog() handle exact cases correctly. E.g., (8/27) ** (2/3) = 4/9, so
+   Math::BigRat -> new("4/9") -> blog("8/27") should return 2/3.
+ * Rounding needs a new definiton: rounding to nearest fraction (see Knuth and
+   fixed-slash fractions)
+ * bmod(), bmodpow(), bmodinv() not fully/properly implemented yet.
+ * BigRat does not handle modify() yet or in a very incomplete manner.
+
 Math::BigInt::Calc:
  * look at div() for more speed (I have the hunch that the general _div()
    routine does way too much work for normal div (e.g. when we don't need

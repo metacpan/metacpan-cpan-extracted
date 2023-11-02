@@ -1,8 +1,11 @@
 package App::Oozie::Deploy::Validate::Oozie;
-$App::Oozie::Deploy::Validate::Oozie::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsExecutable );
@@ -29,7 +32,7 @@ has oozie_uri => (
 
 sub validate {
     my $self = shift;
-    my $oozie_xmlfile = shift || die "No xml specified!";
+    my $oozie_xmlfile = shift || die 'No xml specified!';
 
     if ( ! -e $oozie_xmlfile ) {
         die "Not a file: $oozie_xmlfile";
@@ -37,10 +40,13 @@ sub validate {
 
     my($validation_errors, $total_errors);
 
-    my $command;
-    $self->logger->info( "Oozie validate for $oozie_xmlfile" );
+    $self->logger->info(
+        sprintf 'Oozie validate for %s',
+                $oozie_xmlfile,
+    );
+
     my $oozie_uri = $self->oozie_uri;
-    $command = [
+    my $command   = [
         $self->oozie_cli,
         validate => $oozie_xmlfile,
     ];
@@ -93,7 +99,7 @@ App::Oozie::Deploy::Validate::Oozie
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

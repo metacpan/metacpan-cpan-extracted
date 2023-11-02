@@ -47,11 +47,11 @@
    "provides" : {
       "Crypt::Passphrase::HSM" : {
          "file" : "lib/Crypt/Passphrase/HSM.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "Crypt::Passphrase::Pepper::HSM" : {
          "file" : "lib/Crypt/Passphrase/Pepper/HSM.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -65,7 +65,7 @@
          "web" : "https://github.com/Leont/crypt-passphrase-hsm"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.16",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

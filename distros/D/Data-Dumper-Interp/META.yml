@@ -3,6 +3,7 @@ abstract: 'interpolate Data::Dumper output into strings for human consumption'
 author:
   - 'Jim Avera'
 build_requires:
+  Capture::Tiny: '0'
   Clone: '0'
   Cwd: '0'
   Data::Compare: '0'
@@ -71,7 +72,7 @@ resources:
   bugtracker: https://github.com/jimav/Data-Dumper-Interp/issues
   homepage: https://github.com/jimav/Data-Dumper-Interp
   repository: https://github.com/jimav/Data-Dumper-Interp.git
-version: '6.008'
+version: '6.010'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

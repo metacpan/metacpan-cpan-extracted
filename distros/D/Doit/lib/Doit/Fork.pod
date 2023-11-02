@@ -1,0 +1,46 @@
+=head1 NAME
+
+Doit::Fork - run code in another process
+
+=head1 SYNOPSIS
+
+    use Doit;
+    use Doit::Log;
+    sub run_test {
+        my(undef, $arg) = @_;
+        return "running in process $$ with arg $arg";
+    }
+    return 1 if caller;
+    my $doit = Doit->init;
+    $doit->add_component('fork');
+    my $fork = $doit->do_fork;
+    info $fork->call_with_runner('run_test', 'test argument');
+
+=head1 DESCRIPTION
+
+This component provides a function C<do_fork>, which forks a new
+process and returns a new Doit runner (like L<Doit/do_ssh_connect> or
+L<Doit/do_sudo>. This process is capable of running subroutines (using
+C<call_with_runner> or C<call>), or any other core Doit function.
+
+A possible use case is to have multiple separated processes, but with
+the ability (unlike with normal forked processes) to call subroutines
+in these processes with possibly complex arguments and return values.
+
+Note that all communication is still synchronous.
+
+=head1 AUTHOR
+
+Slaven Rezic <srezic@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2017,2023 Slaven Rezic. All rights reserved.
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Doit>, L<perlfunc/fork>
+
+=cut

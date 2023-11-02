@@ -23,35 +23,37 @@ sub new {
     my ( $class, $parent ) = @_;
 
     my $self = $class->SUPER::new( $parent, -1);
+    my $f_size =  95;
+    my $var_size = 105;
 
     $self->{'lbl'}{'x'} = Wx::StaticText->new( $self, -1, 'X :');
     $self->{'lbl'}{'y'} = Wx::StaticText->new( $self, -1, 'Y :');
     $self->{'lbl'}{'z'} = Wx::StaticText->new( $self, -1, 'Z :');
     $self->{'lbl'}{'r'} = Wx::StaticText->new( $self, -1, 'R :');
-    $self->{'x_function'} = Wx::ComboBox->new( $self, -1, 'cos', [-1,-1],[95, -1], [@function_names], &Wx::wxTE_READONLY);
-    $self->{'x_var'}    = Wx::ComboBox->new( $self, -1, 'x_time', [-1,-1],[95, -1], [@var_names], &Wx::wxTE_READONLY);
-    $self->{'y_function'} = Wx::ComboBox->new( $self, -1, 'sin', [-1,-1],[95, -1], [@function_names], &Wx::wxTE_READONLY);
-    $self->{'y_var'}    = Wx::ComboBox->new( $self, -1, 'y_time', [-1,-1],[95, -1], [@var_names], &Wx::wxTE_READONLY);
-    $self->{'zx_function'} = Wx::ComboBox->new( $self, -1, 'cos', [-1,-1],[95, -1], [@function_names], &Wx::wxTE_READONLY);
-    $self->{'zx_var'}    = Wx::ComboBox->new( $self, -1, 'z_time', [-1,-1],[95, -1], [@var_names], &Wx::wxTE_READONLY);
-    $self->{'zy_function'} = Wx::ComboBox->new( $self, -1, 'sin', [-1,-1],[95, -1], [@function_names], &Wx::wxTE_READONLY);
-    $self->{'zy_var'}    = Wx::ComboBox->new( $self, -1, 'z_time', [-1,-1],[95, -1], [@var_names], &Wx::wxTE_READONLY);
-    $self->{'r11_function'} = Wx::ComboBox->new( $self, -1, 'cos', [-1,-1],[95, -1], [@function_names], &Wx::wxTE_READONLY);
-    $self->{'r12_function'} = Wx::ComboBox->new( $self, -1, 'sin', [-1,-1],[95, -1], [@function_names], &Wx::wxTE_READONLY);
-    $self->{'r21_function'} = Wx::ComboBox->new( $self, -1, 'sin', [-1,-1],[95, -1], [@function_names], &Wx::wxTE_READONLY);
-    $self->{'r22_function'} = Wx::ComboBox->new( $self, -1, 'cos', [-1,-1],[95, -1], [@function_names], &Wx::wxTE_READONLY);
-    $self->{'r11_var'}    = Wx::ComboBox->new( $self, -1, 'r_time', [-1,-1],[95, -1], [@var_names], &Wx::wxTE_READONLY);
-    $self->{'r12_var'}    = Wx::ComboBox->new( $self, -1, 'r_time', [-1,-1],[95, -1], [@var_names], &Wx::wxTE_READONLY);
-    $self->{'r21_var'}    = Wx::ComboBox->new( $self, -1, 'r_time', [-1,-1],[95, -1], [@var_names], &Wx::wxTE_READONLY);
-    $self->{'r22_var'}    = Wx::ComboBox->new( $self, -1, 'r_time', [-1,-1],[95, -1], [@var_names], &Wx::wxTE_READONLY);
+    $self->{'x_function'} = Wx::ComboBox->new( $self, -1, 'cos',    [-1,-1],[$f_size, -1],   [@function_names], &Wx::wxTE_READONLY);
+    $self->{'x_var'}      = Wx::ComboBox->new( $self, -1, 'x_time', [-1,-1],[$var_size, -1], [@var_names], &Wx::wxTE_READONLY);
+    $self->{'y_function'} = Wx::ComboBox->new( $self, -1, 'sin',    [-1,-1],[$f_size, -1],   [@function_names], &Wx::wxTE_READONLY);
+    $self->{'y_var'}      = Wx::ComboBox->new( $self, -1, 'y_time', [-1,-1],[$var_size, -1], [@var_names], &Wx::wxTE_READONLY);
+    $self->{'zx_function'} = Wx::ComboBox->new( $self, -1, 'cos',   [-1,-1],[$f_size, -1],   [@function_names], &Wx::wxTE_READONLY);
+    $self->{'zx_var'}      = Wx::ComboBox->new( $self, -1, 'z_time',[-1,-1],[$var_size, -1], [@var_names], &Wx::wxTE_READONLY);
+    $self->{'zy_function'} = Wx::ComboBox->new( $self, -1, 'sin',   [-1,-1],[$f_size, -1],   [@function_names], &Wx::wxTE_READONLY);
+    $self->{'zy_var'}      = Wx::ComboBox->new( $self, -1, 'z_time',[-1,-1],[$var_size, -1], [@var_names], &Wx::wxTE_READONLY);
+    $self->{'r11_function'} = Wx::ComboBox->new( $self, -1, 'cos',  [-1,-1],[$f_size, -1],   [@function_names], &Wx::wxTE_READONLY);
+    $self->{'r12_function'} = Wx::ComboBox->new( $self, -1, 'sin',  [-1,-1],[$f_size, -1],   [@function_names], &Wx::wxTE_READONLY);
+    $self->{'r21_function'} = Wx::ComboBox->new( $self, -1, 'sin',  [-1,-1],[$f_size, -1],   [@function_names], &Wx::wxTE_READONLY);
+    $self->{'r22_function'} = Wx::ComboBox->new( $self, -1, 'cos',  [-1,-1],[$f_size, -1],   [@function_names], &Wx::wxTE_READONLY);
+    $self->{'r11_var'}    = Wx::ComboBox->new( $self, -1, 'r_time', [-1,-1],[$var_size, -1], [@var_names], &Wx::wxTE_READONLY);
+    $self->{'r12_var'}    = Wx::ComboBox->new( $self, -1, 'r_time', [-1,-1],[$var_size, -1], [@var_names], &Wx::wxTE_READONLY);
+    $self->{'r21_var'}    = Wx::ComboBox->new( $self, -1, 'r_time', [-1,-1],[$var_size, -1], [@var_names], &Wx::wxTE_READONLY);
+    $self->{'r22_var'}    = Wx::ComboBox->new( $self, -1, 'r_time', [-1,-1],[$var_size, -1], [@var_names], &Wx::wxTE_READONLY);
     $self->{'x_function'}->SetToolTip('function that computes pendulum X');
     $self->{'x_var'}->SetToolTip('variable on which the function of pendulum X is computed upon');
     $self->{'y_function'}->SetToolTip('function that computes pendulum Y');
     $self->{'y_var'}->SetToolTip('variable on which the function of pendulum Y is computed upon');
     $self->{'zx_function'}->SetToolTip('function that computes pendulum Z in x direction');
-    $self->{'zx_var'}->SetToolTip('variable on which the function of pendulum Z is computed upon');
-    $self->{'zy_function'}->SetToolTip('function that computes pendulum Z');
-    $self->{'zy_var'}->SetToolTip('variable on which the function of pendulum Z is computed upon');
+    $self->{'zx_var'}->SetToolTip('variable on which the function for x-direction of pendulum Z is computed upon');
+    $self->{'zy_function'}->SetToolTip('function that computes pendulum Z in y direction');
+    $self->{'zy_var'}->SetToolTip('variable on which the function for y-direction of pendulum Z is computed upon');
     $self->{'r11_function'}->SetToolTip('left upper function in rotation matrix of pendulum R');
     $self->{'r12_function'}->SetToolTip('right upper function in rotation matrix of pendulum R');
     $self->{'r21_function'}->SetToolTip('left lower function in rotation matrix of pendulum R');
@@ -63,9 +65,22 @@ sub new {
 
     $self->{'callback'} = sub {};
 
-
-    Wx::Event::EVT_COMBOBOX( $self, $self->{'x_function'},  sub {                $self->{'callback'}->() });
-    Wx::Event::EVT_COMBOBOX( $self, $self->{'y_function'},  sub {                $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'x_function'},   sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'y_function'},   sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'x_var'},        sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'y_var'},        sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'zx_function'},  sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'zy_function'},  sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'zx_var'},       sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'zy_var'},       sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'r11_function'}, sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'r12_function'}, sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'r21_function'}, sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'r22_function'}, sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'r11_var'},      sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'r12_var'},      sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'r21_var'},      sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'r22_var'},      sub { $self->{'callback'}->() });
 
     my $std_attr = &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_VERTICAL | &Wx::wxGROW;
     my $box_attr = $std_attr | &Wx::wxTOP | &Wx::wxBOTTOM;

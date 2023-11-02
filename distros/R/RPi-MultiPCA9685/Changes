@@ -1,5 +1,6 @@
 Revision history for Perl extension RPi::MultiPCA9685.
-
+0.02  Mon Oct 23 19:02:03 2023
+	- Perl requirement changed to Perl 5.006 to demand only the minimum 	requirements
 0.01  Sun Sep 24 19:03:26 2023
 	- original version; created by h2xs 1.23 with options
 		-AX --skip-exporter --use-new-tests -n RPi::MultiPCA9685

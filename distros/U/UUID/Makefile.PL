@@ -18,6 +18,7 @@ BEGIN {
 use constant DEBUG => $ENV{UUID_DEBUG}
     || ( $main::USE_DEBUG ? 1 : 0 )
     || ( $ENV{AUTOMATED_TESTING} && $main::DEV_VERSION )
+    || $main::DEV_VERSION   # <--- always debug dev versions
     || 0
 ;
 
@@ -30,7 +31,12 @@ select STDOUT; $|=1;
 # ARRRRR!.. there are _at_least_ 4 different UUID interfaces:
 # Free/NetBSD/MacOSX, Windows, e2fsprogs, and OSSP.
 # ... this is gonna suck!
-warn "#\n" if DEBUG;
+if ( DEBUG ) {
+    warn "#\n";
+    warn '# Devel::CheckLib::VERSION     = ', $Devel::CheckLib::VERSION,     "\n";
+    warn '# ExtUtils::MakeMaker::VERSION = ', $ExtUtils::MakeMaker::VERSION, "\n";
+    warn "#\n";
+}
 
 
 my @hfiles;
@@ -181,22 +187,27 @@ sub try_win {
         header   => [ $hdr, 'rpcdce.h' ],
         debug    => DEBUG,
         libpath  => '/lib64 /usr/lib64',
-        function => qq/
+        # this puts the typedef inside the main loop, but sometimes
+        # ya jus gotta wurk wit wat ya got!
+        function => join("\n", map { s/^\s+//; $_ } split("\n", q/
+            #ifndef RPC_CSTR
+            typedef unsigned char* RPC_CSTR;
+            #define UuidCreateSequential(x) UuidCreate(x)
+            #endif
             int i;
             UUID u,uu;
             RPC_CSTR cs;
             RPC_STATUS st;
-            unsigned char *s;
             i  = UuidCompare(&u,&uu,&st);
             st = UuidCreate(&u);
             st = UuidCreateNil(&uu);
             st = UuidCreateSequential(&uu);
             i  = UuidEqual(&u,&uu,&st);
-            st = UuidFromString(cs,&u);
+            st = UuidToString(&u,&cs);
             i  = UuidIsNil(&u,&st);
-            st = UuidToString(&u,&s);
+            st = UuidFromString(cs,&u);
             return 0;
-        /,
+        /)),
     )};
     if ($@) { my $L = length $@; warn "# ===> Err($L): \"$@\"\n" if DEBUG; return 0 }
     push @$defs, '-DPERL__UUID__WIN_INT';
@@ -241,6 +252,10 @@ push @$defs, $header;
 
 warn "# ===> Writing Makefile\n" if DEBUG;
 
+my $EUMM_version = '6.64';
+my $DCL_version  = '1.14';
+my $TM_version   = 0;
+
 WriteMakefile1(
     'NAME'               => 'UUID',
     'AUTHOR'             => 'Rick Myers <jrm@cpan.org>',
@@ -251,19 +266,22 @@ WriteMakefile1(
     'LIBS'               => $libs,
     'DEFINE'             => join(' ', @$defs), #$header,
     'INC'                => '',
+    'NO_MYMETA'          => 1,
     'PREREQ_PM'          => {},
     'CONFIGURE_REQUIRES' => {
-        'Devel::CheckLib' => '1.02',
+        'Devel::CheckLib'     => $DCL_version,
+        'ExtUtils::MakeMaker' => $EUMM_version,
+    },
+    'BUILD_REQUIRES' => {
+        'ExtUtils::MakeMaker' => $EUMM_version,
     },
     'TEST_REQUIRES' => {
-        'Test::More' => 0,
+        'Test::More' => $TM_version,
     },
     #'META_MERGE'       => {
     #    'resources' => {
     #        #repository => 'URL to repository here',
     #    },
-    #},
-    #BUILD_REQUIRES => {
     #},
 );
 
@@ -318,13 +336,27 @@ sub bail {
     exit 255; # same as die() which is suggested in CPAN::Authors FAQ
 }
 
-# stay calm. don't blink.
-# this is just for me :-)
-sub MY::postamble {
+
+package MY;
+
+sub postamble {
     return <<EOP;
-readme:
-	pod2text UUID.pm README
-	perl -i -pe's{\\*(\\S+)\\*}{\\1}g' README
+readme: create_distdir
+	\$(NOECHO) \$(ECHO) Generating README
+	\$(NOECHO) pod2text UUID.pm README_new
+	\$(NOECHO) \$(ABSPERLRUN) -i -pe's{\\*(\\S+)\\*}{\\1}g' README_new
+	-\$(NOECHO) \$(MV) README_new \$(DISTVNAME)/README
+
+distreadme: create_distdir readme
+	\$(NOECHO) cd \$(DISTVNAME) && \$(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{README};' \\
+	  -e 'eval { maniadd({q{README} => q{Module README (added by MakeMaker)}}) }' \\
+	  -e '    or die "Could not add README to MANIFEST: \$\${'\\''\@'\\''}"' --
 EOP
+}
+
+sub distdir {
+    my $t = shift->SUPER::distdir(@_);
+    $t =~ s{^(distdir :.*?)\s*$}{$1 distreadme}m;
+    $t;
 }
 

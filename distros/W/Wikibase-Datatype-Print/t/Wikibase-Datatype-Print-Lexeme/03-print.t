@@ -7,17 +7,7 @@ use Test::More 'tests' => 3;
 use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun;
 use Unicode::UTF8 qw(decode_utf8);
-use Wikibase::Datatype::Lexeme;
-use Wikibase::Datatype::Form;
 use Wikibase::Datatype::Print::Lexeme;
-use Wikibase::Datatype::Reference;
-use Wikibase::Datatype::Sense;
-use Wikibase::Datatype::Snak;
-use Wikibase::Datatype::Statement;
-use Wikibase::Datatype::Value::Item;
-use Wikibase::Datatype::Value::Monolingual;
-use Wikibase::Datatype::Value::String;
-use Wikibase::Datatype::Value::Time;
 
 # Test.
 my $obj = Test::Shared::Fixture::Wikibase::Datatype::Lexeme::Wikidata::DogCzechNoun->new;

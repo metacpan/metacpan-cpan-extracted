@@ -1,8 +1,10 @@
 package App::Oozie::Role::Fields::Common;
-$App::Oozie::Role::Fields::Common::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
 
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
@@ -34,7 +36,7 @@ option username => (
     isa     => IsUserName,
     short   => 'user',
     format  => 's',
-    doc     => "User name under which the job should be submitted. Not set by default and commands will be executed as the effective user",
+    doc     => 'User name under which the job should be submitted. Not set by default and commands will be executed as the effective user',
 );
 
 has execute_as_someone_else => (
@@ -91,7 +93,7 @@ App::Oozie::Role::Fields::Common
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

@@ -1,13 +1,16 @@
 package App::Oozie::Util::Misc;
-$App::Oozie::Util::Misc::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
 use parent qw( Exporter );
 
+our $VERSION = '0.015'; # VERSION
+
 our @EXPORT_OK = qw(
     remove_newline
     resolve_tmp_dir
+    trim_slashes
 );
 
 sub remove_newline {
@@ -26,6 +29,15 @@ sub resolve_tmp_dir {
     return $real;
 }
 
+sub trim_slashes {
+    my $s = shift;
+    return $s if ! $s;
+    # removing  both the leading and trailing path separators
+    $s =~ s{ \A [/]    }{}xms;
+    $s =~ s{    [/] \z }{}xms;
+    return $s;
+}
+
 1;
 
 __END__
@@ -40,7 +52,7 @@ App::Oozie::Util::Misc
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -59,6 +71,8 @@ App::Oozie::Util::Misc - Miscellaneous utility functions
 =head2 remove_newline
 
 =head2 resolve_tmp_dir
+
+=head2 trim_slashes
 
 =head1 SEE ALSO
 

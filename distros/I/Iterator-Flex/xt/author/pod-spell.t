@@ -18,6 +18,7 @@ Authoring
 Base
 Basics
 Cache
+Cat
 Caveats
 ClosedSelf
 Closure

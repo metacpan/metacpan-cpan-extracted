@@ -1,0 +1,155 @@
+/* Blog Cards */
+
+#blog {
+    background-color: #2d2d2d;
+    color: #ffffff;
+    padding: 40px 0;
+}
+
+.blog-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.blog-header h2 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.blog-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.blog-card {
+    position: relative; /* Needed for absolute positioning of the ribbon */
+    
+    width: calc(40% - 20px);
+    min-width: 350px; 
+    max-width: 420px !important;
+    
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    color: #333;
+    overflow: hidden; /* Hide overflowing ribbon */
+    margin: 0;
+    padding: 0;
+
+    cursor: pointer; /* Add pointer cursor for clickability */
+    transition: transform 0.2s, box-shadow 0.2s; /* Add transition for hover effect */
+}
+
+.blog-card p.post-excerpt {
+    font-style: italic;
+    font-size: 0.9em;
+    text-align: left;
+}
+
+/* Add a hover effect for the blog card */
+.blog-card:hover {
+    transform: scale(1.1); /* Apply a 10% zoom effect on hover */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Add a shadow effect on hover */
+}
+
+.blog-card img {
+    width: 100%;
+    height: 120px; /* Fixed height of 60px */
+    object-fit: cover; /* Maintain aspect ratio */
+    object-position: center; /* Center the image horizontally and vertically */
+}
+
+.blog-card p {
+    margin: 1em;
+    margin-bottom: 2em;
+}
+
+.blog-card h3 {
+    font-size: 20px;
+    margin: 1em;
+    color: #4d4d4d;
+}
+
+.blog-card .category-ribbon {
+    background-color: #f16522; /* Adjust color as needed */
+    color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+
+/* Add styles for the category container */
+.category-container {
+    position: absolute; /* Position within the .blog-card */
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%); /* Center the ribbon */
+}
+
+/* Add styles for the ribbon */
+.category-ribbon {
+    background-color: #f16522; /* Adjust color as needed */
+    color: #ffffff;
+    padding: 5px 20px; /* Adjust size as needed */
+    border-radius: 3px;
+    position: relative;
+    z-index: 1; /* Place the ribbon above content */
+    transform: translateX(40%) rotate(45deg); /* Adjust the translateX value as needed */
+    transform-origin: top right; /* Rotate around the top right corner */
+    top: 80px;
+    right: 85px;
+    width: 110px;
+
+    text-align: center;
+    font-size: 14px; /* Adjust font size as needed */
+    line-height: 1.2; /* Adjust line height as needed */
+}
+
+/* Ensure the ribbon text is readable */
+.category-ribbon::before {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: 0;
+    border-width: 5px 5px 0;
+    border-style: solid;
+    border-color: #f16522 transparent transparent transparent;
+}
+
+.blog-button {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.blog-button a {
+    background-color: #f16522; /* Adjust color as needed */
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+
+@media screen and (max-width: 768px) {
+    .blog-card {
+        width: calc(85% - 20px);
+        max-width: 420px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .blog-card {
+        width: 100%;
+        max-width: 420px;
+    }
+}
+

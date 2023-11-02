@@ -1,7 +1,7 @@
 # vim: ts=4:sw=4:et:ai:sts=4
 #
 # KGB - an IRC bot helping collaboration
-# Copyright © 2008 Martín Ferrari
+# Copyright © 2008 Martina Ferrari
 # Copyright © 2009 Damyan Ivanov
 #
 # This program is free software; you can redistribute it and/or modify it under
@@ -31,7 +31,7 @@ App::KGB - collaborative IRC helper
 
 =cut
 
-our $VERSION = '1.55';
+our $VERSION = '1.59';
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ daemon.
 
 =over
 
-=item Martin Ferrari L<tincho@debian.org>
+=item Martina Ferrari L<tina@debian.org>
 
 =item Damyan Ivanov L<dmn@debian.org>
 
@@ -85,7 +85,7 @@ daemon.
 
 =head1 LICENSE
 
-Copyright (C) 2008 Martín Ferrari
+Copyright (C) 2008 Martina Ferrari
 Copyright (C) 2008-2009 Damyan Ivanov
 
 This program is free software; you can redistribute it and/or modify it under

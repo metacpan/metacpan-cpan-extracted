@@ -1,27 +1,27 @@
---- #YAML:1.0
-name:               Data-TreeDumper
-version:            0.40
-abstract:           Improved replacement for Data::Dumper. Powerful filtering capability.
+---
+abstract: 'Improved replacement for Data::Dumper. Powerful filtering capability.'
 author:
-    - Khemir Nadim ibn Hamouda. <nadim@khemir.net>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Khemir Nadim ibn Hamouda. <nadim@khemir.net>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Check::ISA:       0
-    Class::ISA:       0
-    Devel::Size:      0.58
-    Sort::Naturally:  0
-    Term::Size:       0.2
-    Text::Wrap:       2001.0929
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-TreeDumper
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Check::ISA: '0'
+  Class::ISA: '0'
+  Sort::Naturally: '0'
+  Term::Size: '0.2'
+  Text::Wrap: '2001.0929'
+version: '0.41'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

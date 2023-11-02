@@ -27,7 +27,7 @@ Readonly::Hash our %DATA_TYPES => (
 	'wikibase-property' => 'Wikibase::Datatype::Value::Property',
 );
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 has aliases => (
 	default => [],
@@ -360,7 +360,7 @@ Returns string.
  use Wikibase::Datatype::Value::String;
  use Wikibase::Datatype::Value::Time;
 
- # Object.
+ # Statement.
  my $statement1 = Wikibase::Datatype::Statement->new(
          # instance of (P31) Wikidata property (Q18616576)
          'snak' => Wikibase::Datatype::Snak->new(
@@ -496,6 +496,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.33
 
 =cut

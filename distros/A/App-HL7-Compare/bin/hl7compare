@@ -11,10 +11,12 @@ use App::HL7::Compare;
 
 my $help = !!0;
 my $matching = !!0;
+my $msh = !!0;
 
 GetOptions(
 	'help|h' => \$help,
 	'matching|m' => \$matching,
+	'msh|M' => \$msh,
 );
 
 my $file1 = shift;
@@ -27,6 +29,9 @@ if ($help || !($file1 && $file2)) {
 my $comparer = App::HL7::Compare->new(
 	files => [$file1, $file2],
 	exclude_matching => !$matching,
+	message_opts => {
+		skip_MSH => !$msh,
+	},
 );
 
 print $comparer->compare_stringify;
@@ -49,6 +54,10 @@ hl7compare - Compare two HL7 v2 messages
 =item -m, --matching
 
 Include parts which are matching.
+
+=item -M, --msh
+
+Include the MSH segment in the comparisons.
 
 =item -h, --help
 

@@ -1,0 +1,54 @@
+=head1 Revision history for IUP
+
+=head2 XX/XX/2013 - 0.102
+
+ - XXX
+
+=head2 31/07/2013 - 0.101
+
+ - fixing broken links to examples
+
+=head2 06/02/2013 - 0.100
+
+ - updating callbacks newly added in iup 3.6/3.7
+ - starting new version line
+
+=head2 12/08/2012 - 0.006
+
+ - attribute accesors now handled via AUTOLOAD
+ - Callback.xs+Canvas.xs incorporated into IupLibrary.xs
+ - improved thread awareness of Idle callback
+ - preparing for iup-3.6
+
+=head2 19/08/2011 - 0.004
+
+ - forcing newer Alien::IUP (to make IUP install smoothly on cygwin)
+ - fixing cygwin build failures
+
+=head2 18/08/2011 - 0.003
+
+ - much better documentation
+ - many fixes for IUP::Canvas methods
+ - added: IUP::Canvas::(Palette|Pattern|Stipple|Bitmap) - canvas helper modules
+ - added: IUP::Canvas::(InternalState|InternalServerImage|InternalContext) - canvas helper modules (hidden)
+ - added: IUP::Canvas::FileBitmap
+ - added: IUP::Canvas::FileVector - replacement for IUP::Canvas::(SVG|EMF)
+ - added: IUP::ConfigData
+ - fix for callbacks: better handling of callbacks with no return value (fallback to IUP_DEFAULT)
+ - fix for callbacks: MULTITOUCH_CB, MULTISELECTION_CB, MULTIUNSELECTION_CB, NODEREMOVED_CB
+ - removing debug stuff 'use Data::Dump(er)'
+
+=head2 29/07/2011 - 0.002
+
+ - removing invalid accessors "0" and "1"
+ - fix for "Can't locate IUP/OleControl.pm"
+ - fixing documentation
+
+=head2 19/07/2011 - 0.001_01
+
+ - the first CPAN release
+
+=head2 15/09/2010 - 0.000
+
+ - initial proof-of-concept version uploaded to github
+ - https://github.com/kmx/perl-iup/commit/e8cb0bb10e4ce6e7a342f65a6b933bbd90c1fb6d

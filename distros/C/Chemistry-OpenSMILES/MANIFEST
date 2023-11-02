@@ -35,3 +35,4 @@ t/20_aromaticity.t
 t/21_stereo.t
 t/22_rings.t
 t/23_clean_chiral_centers.t
+t/24_square_planar_chirality.t

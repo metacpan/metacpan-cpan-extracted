@@ -5,7 +5,7 @@ use utf8;
 use v5.14;
 use warnings;
 
-use Test::Most;
+use Test2::V0;
 
 use File::Temp qw/ tempfile /;
 use HTTP::Request::Common;

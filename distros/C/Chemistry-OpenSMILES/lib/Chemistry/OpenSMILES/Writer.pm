@@ -10,10 +10,10 @@ use Chemistry::OpenSMILES qw(
 );
 use Chemistry::OpenSMILES::Parser;
 use Graph::Traversal::DFS;
-use List::Util qw( any uniq );
+use List::Util qw( all any uniq );
 
 # ABSTRACT: OpenSMILES format writer
-our $VERSION = '0.8.6'; # VERSION
+our $VERSION = '0.9.0'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -95,7 +95,7 @@ sub write_SMILES
 
         # Dealing with chirality
         for my $atom (@chiral) {
-            next unless $atom->{chirality} =~ /^@@?$/;
+            next unless $atom->{chirality} =~ /^@(@?|SP[123])$/;
 
             my @neighbours = $graph->neighbours($atom);
             if( scalar @neighbours < 3 || scalar @neighbours > 4 ) {
@@ -157,8 +157,14 @@ sub write_SMILES
                     }
                 }
 
-                if( join( '', _permutation_order( @order_new ) ) ne '0123' ) {
-                    $chirality_now = $chirality_now eq '@' ? '@@' : '@';
+                if( $atom->{chirality} =~ /^@@?$/ ) {
+                    # Tetragonal centers
+                    if( join( '', _permutation_order( @order_new ) ) ne '0123' ) {
+                        $chirality_now = $chirality_now eq '@' ? '@@' : '@';
+                    }
+                } else {
+                    # Square planar centers
+                    $chirality_now = _square_planar_chirality( @order_new, $chirality_now );
                 }
             }
 
@@ -297,6 +303,45 @@ sub _permutation_order
         @_[1..3] = ( @_[2..3], $_[1] );
     }
     return @_;
+}
+
+sub _square_planar_chirality
+{
+    my $chirality = pop @_;
+    my @source = 0..3;
+    my @target = @_;
+
+    if( join( ',', sort @_ ) ne '0,1,2,3' ) {
+        die '_square_planar_chirality() accepts only permutations of ' .
+            "numbers '0', '1', '2' and '3', unexpected input received";
+    }
+
+    # Rotations until 0 is first
+    while( $source[0] != $target[0] ) {
+        push @source, shift @source;
+        my %tab = ( '@SP1' => '@SP1', '@SP2' => '@SP3', '@SP3' => '@SP2' );
+        $chirality = $tab{$chirality};
+    }
+
+    if( $source[3] == $target[1] ) { # Swap the right side
+        ( $source[2], $source[3] ) = ( $source[3], $source[2] );
+        my %tab = ( '@SP1' => '@SP3', '@SP2' => '@SP2', '@SP3' => '@SP1' );
+        $chirality = $tab{$chirality};
+    }
+
+    if( $source[2] == $target[1] ) { # Swap the center
+        ( $source[1], $source[2] ) = ( $source[2], $source[1] );
+        my %tab = ( '@SP1' => '@SP2', '@SP2' => '@SP1', '@SP3' => '@SP3' );
+        $chirality = $tab{$chirality};
+    }
+
+    if( $source[3] == $target[2] ) { # Swap the right side
+        ( $source[2], $source[3] ) = ( $source[3], $source[2] );
+        my %tab = ( '@SP1' => '@SP3', '@SP2' => '@SP2', '@SP3' => '@SP1' );
+        $chirality = $tab{$chirality};
+    }
+
+    return $chirality;
 }
 
 sub _order

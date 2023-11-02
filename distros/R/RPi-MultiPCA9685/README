@@ -1,4 +1,4 @@
-RPi-MultiPCA9685 version 0.01
+RPi-MultiPCA9685 version 0.02
 =============================
 Control the PWM channels of several PCA9685 ICs in one go
 

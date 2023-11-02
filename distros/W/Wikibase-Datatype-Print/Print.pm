@@ -1,9 +1,49 @@
 package Wikibase::Datatype::Print;
 
+use base qw(Exporter);
 use strict;
 use warnings;
 
-our $VERSION = 0.13;
+use Error::Pure qw(err);
+use Readonly;
+use Wikibase::Datatype::Print::Item;
+use Wikibase::Datatype::Print::Lexeme;
+use Wikibase::Datatype::Print::Mediainfo;
+use Wikibase::Datatype::Print::Property;
+
+our $VERSION = 0.16;
+
+Readonly::Array our @EXPORT_OK => qw(print);
+
+sub print {
+	my ($obj, $opts_hr) = @_;
+
+	if (! defined $opts_hr) {
+		$opts_hr = {};
+	}
+
+	if (! exists $opts_hr->{'lang'}) {
+		$opts_hr->{'lang'} = 'en';
+	}
+
+	my @ret;
+	if ($obj->isa('Wikibase::Datatype::Item')) {
+		@ret = Wikibase::Datatype::Print::Item::print($obj, $opts_hr);
+	} elsif ($obj->isa('Wikibase::Datatype::Lexeme')) {
+		@ret = Wikibase::Datatype::Print::Lexeme::print($obj, $opts_hr);
+	} elsif ($obj->isa('Wikibase::Datatype::Mediainfo')) {
+		@ret = Wikibase::Datatype::Print::Mediainfo::print($obj, $opts_hr);
+	} elsif ($obj->isa('Wikibase::Datatype::Property')) {
+		@ret = Wikibase::Datatype::Print::Property::print($obj, $opts_hr);
+	} else {
+		my $ref = ref $obj;
+		err "Unsupported Wikibase::Datatype object.",
+			defined $ref ? ('Reference', $ref) : (),
+		;
+	}
+
+	return wantarray ? @ret : (join "\n", @ret);
+}
 
 1;
 
@@ -17,9 +57,36 @@ __END__
 
 Wikibase::Datatype::Print - Wikibase datatype print helpers.
 
+=head1 SYNOPSIS
+
+ use Wikibase::Datatype::Print::Item qw(print);
+
+ my $pretty_print_string = print($obj, $opts_hr);
+ my @pretty_print_lines = print($obj, $opts_hr);
+
 =head1 DESCRIPTION
 
 This distributions is set of print helpers for Wikibase::Datatype objects.
+
+=head1 SUBROUTINES
+
+=head2 C<print>
+
+ my $pretty_print_string = print($obj, $opts_hr);
+ my @pretty_print_lines = print($obj, $opts_hr);
+
+Construct pretty print output for main objects like L<Wikibase::Datatype::Item>,
+L<Wikibase::Datatype::Lexeme>, L<Wikibase::Datatype::Mediainfo> and
+L<Wikibase::Datatype::Property>.
+
+Returns string in scalar context.
+Returns list of lines in array context.
+
+=head1 ERRORS
+
+ print():
+         Unsupported Wikibase::Datatype object.
+                 Reference: %s
 
 =head1 SEE ALSO
 
@@ -89,6 +156,10 @@ Wikibase globe coordinate item pretty print helpers.
 
 Wikibase item value pretty print helpers.
 
+=item L<Wikibase::Datatype::Print::Value::Lexeme>
+
+Wikibase lexeme value pretty print helpers.
+
 =item L<Wikibase::Datatype::Print::Value::Monolingual>
 
 Wikibase monolingual value pretty print helpers.
@@ -110,6 +181,16 @@ Wikibase string value pretty print helpers.
 Wikibase time value pretty print helpers.
 
 =back
+
+=head1 DEPENDENCIES
+
+L<Error::Pure>,
+L<Exporter>,
+L<Readonly>,
+L<Wikibase::Datatype::Print::Item>,
+L<Wikibase::Datatype::Print::Lexeme>,
+L<Wikibase::Datatype::Print::Mediainfo>,
+L<Wikibase::Datatype::Print::Property>.
 
 =head1 SEE ALSO
 
@@ -147,6 +228,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.16
 
 =cut

@@ -8,9 +8,9 @@ use Log::ger;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-02'; # DATE
+our $DATE = '2023-10-28'; # DATE
 our $DIST = 'Perinci-Sub-Util'; # DIST
-our $VERSION = '0.471'; # VERSION
+our $VERSION = '0.472'; # VERSION
 
 our @EXPORT_OK = qw(
                        err
@@ -160,6 +160,11 @@ either qualified or not) or `base_code` (coderef) + `base_meta` (hash).
 
 _
     args => {
+        die => {
+            summary => 'Die upon failure',
+            schema => 'bool*',
+        },
+
         base_name => {
             summary => 'Subroutine name (either qualified or not)',
             schema => 'str*',
@@ -372,8 +377,13 @@ sub gen_modified_sub {
     if (!defined $args{output_name}) {
         $output_pkg  = $caller_pkg;
         $output_leaf = $base_leaf;
-        return [412, "Won't override $base_pkg\::$base_leaf"]
-            if $base_pkg eq $output_pkg;
+        if ($base_pkg eq $output_pkg) {
+            if ($args{die}) {
+                die "Won't override $base_pkg\::$base_leaf";
+            } else {
+                return [412, "Won't override $base_pkg\::$base_leaf"];
+            }
+        }
     } elsif ($args{output_name} =~ /(.+)::(.+)/) {
         ($output_pkg, $output_leaf) = ($1, $2);
     } else {
@@ -466,7 +476,8 @@ sub gen_curried_sub {
 
     my $base_sub = \&{"$base_pkg\::$base_leaf"};
 
-    my $res = gen_modified_sub(
+    gen_modified_sub(
+        die         => 1,
         base_name   => "$base_pkg\::$base_leaf",
         output_name => "$output_pkg\::$output_leaf",
         output_code => sub {
@@ -476,11 +487,6 @@ sub gen_curried_sub {
         remove_args => [keys %$set_args],
         install => 1,
     );
-
-    die "Can't generate curried sub: $res->[0] - $res->[1]"
-        unless $res->[0] == 200;
-
-    1;
 }
 
 1;
@@ -498,7 +504,7 @@ Perinci::Sub::Util - Helper when writing functions
 
 =head1 VERSION
 
-This document describes version 0.471 of Perinci::Sub::Util (from Perl distribution Perinci-Sub-Util), released on 2023-07-02.
+This document describes version 0.472 of Perinci::Sub::Util (from Perl distribution Perinci-Sub-Util), released on 2023-10-28.
 
 =head1 SYNOPSIS
 
@@ -667,6 +673,10 @@ Either C<base_name> or C<base_code> + C<base_meta> are required.
 =item * B<description> => I<str>
 
 Description for the mod subroutine.
+
+=item * B<die> => I<bool>
+
+Die upon failure.
 
 =item * B<install_sub> => I<bool> (default: 1)
 

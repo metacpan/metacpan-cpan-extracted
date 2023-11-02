@@ -1,0 +1,35 @@
+{
+  "preamble" => "Revision history for Mock::Person",
+  "raw_preamble" => "Revision history for Mock::Person\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "        First release.\n\n",
+          "style" => "",
+          "text" => "First release."
+        }
+      ],
+      "line" => 3,
+      "note" => "Tue Oct 26, 2010",
+      "raw" => "0.01    Tue Oct 26, 2010\n",
+      "version" => "0.01"
+    },
+    {
+      "date" => "2013-06-23",
+      "entries" => [
+        {
+          "line" => 7,
+          "raw" => "        * Switched to Dist::Zilla\n",
+          "style" => "*",
+          "text" => "Switched to Dist::Zilla"
+        }
+      ],
+      "line" => 6,
+      "raw" => "0.02    2013-06-23\n",
+      "raw_date" => "2013-06-23",
+      "version" => "0.02"
+    }
+  ]
+}

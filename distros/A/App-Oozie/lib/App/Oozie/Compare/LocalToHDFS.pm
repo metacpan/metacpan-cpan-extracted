@@ -1,8 +1,10 @@
 package App::Oozie::Compare::LocalToHDFS;
-$App::Oozie::Compare::LocalToHDFS::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
 
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
@@ -71,12 +73,16 @@ sub run {
     my $delete = $self->delete;
     my $logger = $self->logger;
 
-    $logger->info(sprintf "Comparing file://%s to hdfs://%s", $self->local_path, $self->hdfs_path );
+    $logger->info(
+        sprintf 'Comparing file://%s to hdfs://%s',
+                $self->local_path,
+                $self->hdfs_path,
+    );
 
     my($rm_files, $rm_dirs) = $self->compare_local_to_hdfs;
 
     if ( 0 == @{ $rm_files } + @{ $rm_dirs } ) {
-        $logger->info( "Nothing to delete" );
+        $logger->info( 'Nothing to delete' );
         return;
     }
 
@@ -84,7 +90,7 @@ sub run {
 
     if ( ! $delete ) {
         for my $path ( @hdfs_to_delete ) {
-            $logger->info( "Would have deleted $path" );
+            $logger->info( sprintf 'Would have deleted %s', $path );
         }
         return;
     }
@@ -92,13 +98,17 @@ sub run {
     my $hdfs = $self->hdfs;
 
     for my $path ( @hdfs_to_delete ) {
-        $logger->info( "Attempting to delete $path" );
+        $logger->info( sprintf 'Attempting to delete %s', $path );
         eval {
             $hdfs->delete( $path );
             1;
         } or do {
             my $eval_error = $@ || 'Zombie error';
-            $logger->warn( "Skipping. Failed to delete $path: $eval_error" );
+            $logger->warn(
+                sprintf 'Skipping. Failed to delete %s: %s',
+                        $path,
+                        $eval_error,
+            );
         };
     }
 
@@ -148,9 +158,10 @@ sub find_local_files {
     my(@local_dirs, @local_files);
     File::Find::find {
         wanted => sub {
-            (my $f = $_) =~ s{ \Q$local_path\E [/]? }{}xms;
+            my $name = $_;
+            (my $f = $name) =~ s{ \Q$local_path\E [/]? }{}xms;
             return if ! $f;
-            my $d = -d $_ ? \@local_dirs : \@local_files;
+            my $d = -d $name ? \@local_dirs : \@local_files;
             push @{ $d }, $f;
         },
         no_chdir => 1,
@@ -173,7 +184,7 @@ App::Oozie::Compare::LocalToHDFS
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

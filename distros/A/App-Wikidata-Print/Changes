@@ -1,3 +1,8 @@
+0.03 2023-11-02T20:05:39+01:00
+ - Add -r option for print with references. Change default to not print
+   references.
+ - Fix missing id for print.
+
 0.02 2023-06-22T10:29:53+02:00
  - Add tests.
  - Fix help printing.

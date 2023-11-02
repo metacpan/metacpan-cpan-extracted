@@ -1,10 +1,11 @@
 #!perl
 use strict;
 use warnings;
-use lib qw(lib);
+use lib qw(lib t/lib);
 
 use Test::More 0.88;
 use Test::Neo4j::Types;
+use Neo4j_Test::Simple;
 
 plan tests => 2;
 
@@ -22,12 +23,8 @@ done_testing;
 
 
 package Neo4j_Test::NodeExt;
-sub DOES { $_[1] eq 'Neo4j::Types::Node' }
+use parent -norequire, 'Neo4j_Test::Node';
 
-sub id { shift->[0] }
-sub labels { @{shift->[1]} }
-sub properties { shift->[2] }
-sub get { shift->properties->{+pop} }
 sub element_id {
 	my $self = shift;
 	return $self->[3] if defined $self->[3];
@@ -35,25 +32,15 @@ sub element_id {
 	return $self->id;
 }
 sub new {
-	my ($class, $params) = @_;
-	bless [
-		$params->{id},
-		$params->{labels} // [],
-		$params->{properties} // {},
-		$params->{element_id},
-	], $class;
+	my $self = shift->SUPER::new(@_);
+	push @$self, pop->{element_id};
+	return $self;
 }
 
 
 package Neo4j_Test::RelExt;
-sub DOES { $_[1] eq 'Neo4j::Types::Relationship' }
+use parent -norequire, 'Neo4j_Test::Rel';
 
-sub id { shift->[0] }
-sub start_id { shift->[1] }
-sub end_id { shift->[2] }
-sub type { shift->[3] }
-sub properties { shift->[4] }
-sub get { shift->properties->{+pop} }
 sub element_id {
 	my $self = shift;
 	return $self->[5] if defined $self->[5];
@@ -74,14 +61,11 @@ sub end_element_id {
 }
 sub new {
 	my ($class, $params) = @_;
-	bless [
-		$params->{id},
-		$params->{start_id},
-		$params->{end_id},
-		$params->{type},
-		$params->{properties} // {},
+	my $self = $class->SUPER::new($params);
+	push @$self, (
 		$params->{element_id},
 		$params->{start_element_id},
 		$params->{end_element_id},
-	], $class;
+	);
+	return $self;
 }

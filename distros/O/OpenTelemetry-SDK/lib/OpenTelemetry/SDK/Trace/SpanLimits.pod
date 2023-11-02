@@ -1,0 +1,147 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Trace::SpanLimits - A class that governs the configuration of spans
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+This module provides a class that encapsulates the configuration of limits
+for span attributes, events, and links. It can be configured either via
+environment variables as described in L<OpenTelemetry::SDK/CONFIGURATION>.
+
+=head1 METHODS
+
+=head2 new
+
+    $limits = OpenTelemetry::SDK::Trace::SpanLimits->new;
+
+Constructs a new OpenTelemetry::SDK::Trace::SpanLimits instance. The
+constructor takes no arguments, but it will read the following environment
+variables as described in L<OpenTelemetry::SDK/CONFIGURATION> and in the
+description of the accessors below.
+
+=head2 attribute_count_limit
+
+    $number = $limits->attribute_count_limit;
+
+Returns the maximum number of attributes allowed for a span. This value comes
+from
+L<OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT|OpenTelemetry::SDK/OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT>,
+or L<OTEL_ATTRIBUTE_COUNT_LIMIT|OpenTelemetry::SDK/OTEL_ATTRIBUTE_COUNT_LIMIT>
+if that is not set.
+
+If not defined, this limit will default to 128. Otherwise, the value must be
+a positive integer. If set to a value that does not meet this requirement, a
+warning will be logged and the default value will be used instead.
+
+=head2 event_attribute_count_limit
+
+    $number = $limits->event_attribute_count_limit;
+
+Returns the maximum number of attributes allowed for events in a span. This
+value comes from
+L<OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT|OpenTelemetry::SDK/OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT>,
+or L<OTEL_ATTRIBUTE_COUNT_LIMIT|OpenTelemetry::SDK/OTEL_ATTRIBUTE_COUNT_LIMIT>
+if that is not set.
+
+If not defined, this limit will default to 128. Otherwise, the value must be
+a positive integer. If set to a value that does not meet this requirement, a
+warning will be logged and the default value will be used instead.
+
+=head2 link_attribute_count_limit
+
+    $number = $limits->link_attribute_count_limit;
+
+Returns the maximum number of attributes allowed for links in a span. This
+value comes from
+L<OTEL_LINK_ATTRIBUTE_COUNT_LIMIT|OpenTelemetry::SDK/OTEL_LINK_ATTRIBUTE_COUNT_LIMIT>,
+or L<OTEL_ATTRIBUTE_COUNT_LIMIT|OpenTelemetry::SDK/OTEL_ATTRIBUTE_COUNT_LIMIT>
+if that is not set.
+
+If not defined, this limit will default to 128. Otherwise, the value must be
+a positive integer. If set to a value that does not meet this requirement, a
+warning will be logged and the default value will be used instead.
+
+=head2 attribute_length_limit
+
+    $number = $limits->attribute_length_limit;
+
+Returns the maximum length for the values of an attribute in a span. This
+value comes from
+L<OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT|OpenTelemetry::SDK/OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT>,
+or L<OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT|OpenTelemetry::SDK/OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT>
+if that is not set.
+
+This limit might be undefined, in which case no limit will be set. If a limit
+I<is> set, however, it must be at least 32. If set to a value lower than this
+a warning will be logged and the value will be ignored.
+
+=head2 event_attribute_length_limit
+
+    $number = $limits->event_attribute_length_limit;
+
+Returns the maximum length for the values of an event attribute in a span.
+This value comes from
+L<OTEL_EVENT_ATTRIBUTE_VALUE_LENGTH_LIMIT|OpenTelemetry::SDK/OTEL_EVENT_ATTRIBUTE_VALUE_LENGTH_LIMIT>,
+or L<OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT|OpenTelemetry::SDK/OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT>
+if that is not set.
+
+This limit might be undefined, in which case no limit will be set. If a limit
+I<is> set, however, it must be at least 32. If set to a value lower than this
+a warning will be logged and the value will be ignored.
+
+=head2 link_attribute_length_limit
+
+    $number = $limits->link_attribute_length_limit;
+
+Returns the maximum length for the values of a link attribute in a span.
+This value comes from
+L<OTEL_LINK_ATTRIBUTE_VALUE_LENGTH_LIMIT|OpenTelemetry::SDK/OTEL_LINK_ATTRIBUTE_VALUE_LENGTH_LIMIT>,
+or L<OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT|OpenTelemetry::SDK/OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT>
+if that is not set.
+
+This limit might be undefined, in which case no limit will be set. If a limit
+I<is> set, however, it must be at least 32. If set to a value lower than this
+a warning will be logged and the value will be ignored.
+
+=head2 event_count_limit
+
+    $number = $limits->event_count_limit;
+
+Returns the maximum number of events in a span. This value comes from
+L<OTEL_SPAN_EVENT_COUNT_LIMIT|OpenTelemetry::SDK/OTEL_SPAN_EVENT_COUNT_LIMIT>.
+
+If not defined, this limit will default to 128. Otherwise, the value must be
+a positive integer. If set to a value that does not meet this requirement, a
+warning will be logged and the default value will be used instead.
+
+=head2 link_count_limit
+
+    $number = $limits->link_count_limit;
+
+Returns the maximum number of links in a span. This value comes from
+L<OTEL_SPAN_LINK_COUNT_LIMIT|OpenTelemetry::SDK/OTEL_SPAN_LINK_COUNT_LIMIT>.
+
+If not defined, this limit will default to 128. Otherwise, the value must be
+a positive integer. If set to a value that does not meet this requirement, a
+warning will be logged and the default value will be used instead.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::SDK>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

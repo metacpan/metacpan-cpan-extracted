@@ -1,0 +1,47 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 2,
+          "raw" => "        - support unicode (patch by diegok)\n\n",
+          "style" => "-",
+          "text" => "support unicode (patch by diegok)"
+        }
+      ],
+      "line" => 1,
+      "note" => "14 December 2010",
+      "raw" => "0.04    14 December 2010\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 5,
+          "raw" => "        - use an in-memory sqlite database by default\n\n",
+          "style" => "-",
+          "text" => "use an in-memory sqlite database by default"
+        }
+      ],
+      "line" => 4,
+      "note" => "14 December 2010",
+      "raw" => "0.03    14 December 2010\n",
+      "version" => "0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 8,
+          "raw" => "        - first version, released upon an unsuspecting world\n\n",
+          "style" => "-",
+          "text" => "first version, released upon an unsuspecting world"
+        }
+      ],
+      "line" => 7,
+      "note" => "7 October 2007",
+      "raw" => "0.01    7 October 2007\n",
+      "version" => "0.01"
+    }
+  ]
+}

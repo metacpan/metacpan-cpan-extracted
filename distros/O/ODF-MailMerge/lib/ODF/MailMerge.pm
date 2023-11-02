@@ -17,8 +17,8 @@ package ODF::MailMerge;
 # ...but don't let CPAN or test harnes scanners see this as defining $VERSION
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 999.999; }
 
-our $VERSION = '1.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-10-14'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-10-31'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 our @CARP_NOT = ("ODF::lpOD_Helper", "ODF::lpOD");
@@ -238,7 +238,6 @@ sub _get_content_list($$$$) {
   croak ivisq 'Value for token $token is []'
     if ref($val) eq 'ARRAY' && @$val==0;
   my $content_list = _to_content_list($val);
-btw visnew->dvisq('CCC $val $content_list') if $debug;
   $content_list
 }
 

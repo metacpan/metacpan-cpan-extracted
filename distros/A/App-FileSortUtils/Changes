@@ -1,0 +1,36 @@
+0.005   2023-10-31  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add log statement so e.g. in commands like "mv `newest
+          --verbose -f ~/Downloads` .", the filename can be shown to
+          stderr.
+
+
+0.004   2023-10-30  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Return result with directory.
+
+
+0.003   2023-10-30  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix logic bug for newest/oldest/smallest.
+
+        - [bugfix] Temporarily chdir to target dir to be able to stat all
+          the files.
+
+
+0.002   2023-10-29  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+        - Add utilities: longest-name, shortest-name.
+
+        - Implement --num-ranks (-N).
+
+        - [cli foremost, hindmost] Add --ignore-case (-i) option.
+
+        - [doc] Fix doc.
+
+        - [doc] [cli newest] Add real-world example.
+
+
+0.001   2023-10-28  Released-By: PERLANCAR; Broken: yes
+
+        - First release.

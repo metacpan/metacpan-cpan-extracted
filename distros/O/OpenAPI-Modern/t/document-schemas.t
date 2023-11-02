@@ -7,16 +7,10 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use Test::Fatal;
+
 use lib 't/lib';
 use Helper;
-
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Fatal;
-use Test::Deep;
-use JSON::Schema::Modern;
-use JSON::Schema::Modern::Document::OpenAPI;
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
 
 my $preamble = {
   openapi => '3.1.0',
@@ -280,6 +274,7 @@ subtest recursive_get => sub {
               { '$ref' => '#/components/parameters/foo' },
               { '$ref' => '#/components/parameters/baz' },
               { '$ref' => '#/components/parameters/blip' },
+              { '$ref' => 'http://far_far_away/api2#/components/schemas/alpha' },
             ],
           },
         },
@@ -290,28 +285,51 @@ subtest recursive_get => sub {
   is($doc->errors, 0, 'no errors during traversal');
   $js->add_schema($doc);
 
+  my $doc2 = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://far_far_away/api2',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    evaluator => $js,
+    schema => {
+      %$preamble,
+      components => {
+        schemas => {
+          alpha => { type => 'integer' },
+        },
+      },
+    },
+  );
+
+  is($doc2->errors, 0, 'no errors during traversal');
+  $js->add_schema($doc2);
+
   like(
-    exception { $doc->recursive_get('/paths/~1foo/post/parameters/0') },
-    qr{^unable to find resource http://localhost:1234/api#/i_do_not_exist},
+    exception { $doc->recursive_get('#/paths/~1foo/post/parameters/0') },
+    qr'^unable to find resource http://localhost:1234/api#/i_do_not_exist',
     'failure to resolve $ref',
   );
 
   like(
-    exception { $doc->recursive_get('/paths/~1foo/post/parameters/1') },
+    exception { $doc->recursive_get('#/paths/~1foo/post/parameters/1') },
     qr{^maximum evaluation depth exceeded},
     'endless loop',
   );
 
   cmp_deeply(
-    [ $doc->recursive_get('/paths/~1foo/post/parameters/2') ],
+    [ $doc->recursive_get('#/paths/~1foo/post/parameters/2') ],
     [ { name => 'baz', in => 'query', schema => {} }, str('http://localhost:1234/api#/components/parameters/baz') ],
     'successful get through a $ref',
   );
 
   cmp_deeply(
-    [ $doc->recursive_get('/paths/~1foo/post/parameters/3') ],
-    [ { type => 'string'}, str('http://localhost:5678/api#/properties/foo') ],
+    [ $doc->recursive_get('#/paths/~1foo/post/parameters/3') ],
+    [ { type => 'string' }, str('http://localhost:5678/api#/properties/foo') ],
     'successful get through multiple $refs, with a change of base uri',
+  );
+
+  cmp_deeply(
+    [ $doc->recursive_get('#/paths/~1foo/post/parameters/4') ],
+    [ { type => 'integer' }, str('http://far_far_away/api2#/components/schemas/alpha') ],
+    'successful get through multiple $refs, with a change of document',
   );
 };
 

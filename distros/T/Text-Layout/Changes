@@ -1,5 +1,13 @@
 Revision history for Text::Layout
 
+0.032	2023-11-01
+
+	Pluggable elements extend parsing and rendering of elements.
+	A pluggable element is used to implement the <img> element, to
+	include images inline in text strings.
+	See tests/im1.pl and tests/im3.pl for examples.
+	Rise may now also take an 'em' or 'ex' value. 1em = 100%, 1ex = 50%.
+
 0.031	2023-05-29
 
 	Improve bounding box and line spacing determination by using the

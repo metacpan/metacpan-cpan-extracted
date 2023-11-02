@@ -1,0 +1,95 @@
+NAME
+    Wikibase::Datatype::Query - Query class on Wikibase item.
+
+SYNOPSIS
+     use Wikibase::Datatype::Query;
+
+     my $obj = Wikibase::Datatype::Query->new;
+     my $res = $obj->query($obj, $property);
+     my $res = $obj->query_item($item_obj, $property);
+
+METHODS
+  "new"
+     my $obj = Wikibase::Datatype::Query->new;
+
+    Constructor.
+
+    *   "deprecated"
+
+        Flag which controls query of deprecated values. Zero (0) means no
+        deprecated values in result.
+
+        Default value is 0.
+
+    Returns instance of object.
+
+  "query"
+     my $res = $obj->query($obj, $property);
+
+    Query Wikibase::Datatype object for value.
+
+    Returns value or undef.
+
+  "query_item"
+     my $res = $obj->query($item_obj, $property);
+
+    Query Wikibase::Datatype::Item item for value.
+
+    Returns value or undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     query():
+             Parameter 'item' is required.
+             Parameter 'item' must be a 'Wikibase::Datatype::Item' object.
+
+     query_item():
+             Parameter 'item' is required.
+             Parameter 'item' must be a 'Wikibase::Datatype::Item' object.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog;
+     use Wikibase::Datatype::Query;
+
+     my $obj = Wikibase::Datatype::Query->new;
+
+     my $item = Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog->new;
+
+     my $ret = $obj->query_item($item, 'P31');
+
+     print "Query for P31 property on Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog:\n";
+     print $ret."\n";
+
+     # Output like:
+     # Query for P31 property on Test::Shared::Fixture::Wikibase::Datatype::Item::Wikidata::Dog:
+     # Q55983715
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, Scalar::Util.
+
+SEE ALSO
+    Wikibase::Datatype
+        Wikibase datatypes.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Wikibase-Datatype-Query>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2022-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

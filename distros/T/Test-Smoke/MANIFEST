@@ -1,11 +1,12 @@
+AUTHORS
 Changes
 MANIFEST			This list of files
 MANIFEST.SKIP
 Makefile.PL
 README
+README2.md
 ReleaseNotes
 bin/chkbcfg.pl
-bin/configsmoke.pl
 bin/patchtree.pl
 bin/smokestatus.pl
 bin/sysinfo.pl
@@ -18,6 +19,7 @@ bin/tssmokeperl.pl
 bin/tssynctree.pl
 bin/tsconfigsmoke.pl
 bin/tsw32configure.pl
+lib/configsmoke.pod
 lib/Test/Smoke.pm
 lib/Test/Smoke/App/AppOption.pm
 lib/Test/Smoke/App/AppOptionCollection.pm
@@ -173,6 +175,7 @@ t/smoker.t
 t/syncer_copy.t
 t/syncer_ftp.t
 t/syncer_ftpclient.t
+t/syncer_git.t
 t/syncer_link.t
 t/syncer_rsync.t
 t/syncer_snap.t

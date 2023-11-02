@@ -3,7 +3,7 @@ package Crypt::Passphrase::Argon2::HSM;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 use parent 'Crypt::Passphrase::Argon2::Encrypted';
 use Crypt::Passphrase 0.010 -encoder;
@@ -18,9 +18,13 @@ sub new {
 	my $prefix = $args{prefix} // 'pepper-';
 
 	my $session = $args{session} // do {
-		my $provider = ref $args{provider} ? $args{provider} : Crypt::HSM->load(delete $args{provider});
-		my $slot = delete $args{slot} // ($provider->slots)[0];
-		$provider->open_session($slot);
+		if (ref $args{slot}) {
+			(delete $args{slot})->open_session;
+		} else {
+			my $provider = ref $args{provider} ? delete $args{provider} : Crypt::HSM->load(delete $args{provider});
+			my $slot = defined $args{slot} ? $provider->slot(delete $args{slot}) : ($provider->slots)[0];
+			$slot->open_session;
+		}
 	};
 	my $user_type = delete $args{user_type} // 'user';
 	$session->login($user_type, delete $args{pin}) if $args{pin};
@@ -115,7 +119,7 @@ The PIN that is used for logging in, if any.
 
 =item * user_type
 
-The type of user you're logging in with. This defaults to 'user', and you're unlikely to want to change that.
+The type of user you're logging in with. This defaults to C<'user'>, and you're unlikely to want to change that.
 
 =item * cipher
 

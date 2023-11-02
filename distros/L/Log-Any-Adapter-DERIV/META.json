@@ -100,7 +100,7 @@
    "provides" : {
       "Log::Any::Adapter::DERIV" : {
          "file" : "lib/Log/Any/Adapter/DERIV.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -115,13 +115,15 @@
          "web" : "https://github.com/binary-com/perl-Log-Any-Adapter-DERIV"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "aisha-deriv <aisha@deriv.com>",
       "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
       "chylli-deriv <chylli@binary.com>",
       "Tom Molesworth <tom@deriv.com>",
+      "aisha-deriv <116639606+aisha-deriv@users.noreply.github.com>",
+      "Kalaiselvan <kalaiselvan@deriv.com>",
       "sasikala-binary <76985137+sasikala-binary@users.noreply.github.com>"
    ],
    "x_generated_by_perl" : "v5.26.2",

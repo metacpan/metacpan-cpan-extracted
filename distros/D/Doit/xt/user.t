@@ -21,7 +21,7 @@ require TestUtil;
 my $doit = Doit->init;
 
 plan skip_all => "Creates user, should only run in test containers"
-    if !TestUtil::in_linux_container($doit) && !$ENV{TRAVIS} && !$ENV{DOIT_TEST_XT_USER};
+    if !TestUtil::in_linux_container($doit) && !$ENV{GITHUB_ACTIONS} && !$ENV{DOIT_TEST_XT_USER};
 
 plan 'no_plan';
 

@@ -24,10 +24,11 @@ Dpkg::Control::HashCore::Tie - ties a Dpkg::Control::Hash object
 
 This module provides a class that is used to tie a hash.
 It implements hash-like functions by normalizing the name of fields received
-in keys (using Dpkg::Control::Fields::field_capitalize).
+in keys (using Dpkg::Control::Fields::field_capitalize()).
 It also stores the order in which fields have been added in order to be able
 to dump them in the same order.
-But the order information is stored in a parent object of type Dpkg::Control.
+But the order information is stored in a parent object of type
+L<Dpkg::Control>.
 
 B<Note>: This is a private module, its API can change at any time.
 

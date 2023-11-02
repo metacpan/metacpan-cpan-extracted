@@ -1,8 +1,60 @@
+
+
+
+Add possibility for filters to return scalars
+
+
+
+
+add: FLUSH_TO => $handle
+	very large data output, ie DHTML, require too much memory. Write the data to the provided handle
+	rather than keep it in memory. in the DHTML case, the data is almost always written to a file.
+
 [12:03] <kent\n> nadim: $("ul").click(function(){ $(this).find("li").show() });  # theres a start
 
-options to show addresses and links only when references exist
-	needs two passes
-	could filter the output with a s/// to avoid two passes
+filter to list arrays without index
+
+wrap should handle colored text length
+      │  │  │     │  │  │     │  ├─ ./pbsfile_4/pbsfile_5/pbsfile_10/pbsfile_14/pbsfile_16/pbsfile_30/pbsfile_146/pbsfile_171/1023.c  [H7705]
+      │  │  │     │  │  │     │  ├─ ./pbsfile_4/pbsfile_5/pbsfile_10/pbsfile_14/pbsfile_16/pbsfile_30/pbsfile_146/pbsfile_171/1023.h  [H7706]
+ | | | | | | | ├─ | | | | | | | |
+/test/big/out_nadim/pbsfile_4/pbsfile_5/pbsfile_10/pbsfile_14/pbsfile_16/pbsfile_30/pbsfile_146/pbsfile_171/1023.o.dependencies [H7707]
+      │  │  │     │  │  │     │  ├─ /usr/include/_G_config.h  [H7708 -> H7]
+
+
+
+      │  │  │     │  │  │     │  ├─ ./pbsfile_4/pbsfile_5/pbsfile_10/pbsfile_14/pbsfile_16/pbsfile_30/pbsfile_146/pbsfile_171/1023.c  [H7705]
+      │  │  │     │  │  │     │  ├─ ./pbsfile_4/pbsfile_5/pbsfile_10/pbsfile_14/pbsfile_16/pbsfile_30/pbsfile_146/pbsfile_171/1023.h  [H7706]
+      │  │  │     │  │  │     │  ├─ /test/big/out_nadim/pbsfile_4/pbsfile_5/pbsfile_10/pbsfile_14/pbsfile_16/pbsfile_30/pbsfile_146/pbsfile_171/1023.o.
+      │  │  │     │  │  │     │  │  dependencies  [H7707]
+      │  │  │     │  │  │     │  ├─ /usr/include/_G_config.h  [H7708 -> H7]
+ 
+
+
+
+
+#error
+$output .= ta_wrap
+		(
+		$element_description,
+		$columns,
+		{
+			flindent => $tree_header, 
+			slindent => $tree_subsequent_header, 
+		}
+		) ;
+
+Undefined subroutine &Text::WideChar::Util::_get_indent_width called at /home/nadim/perl5/lib/perl5/Text/ANSI/BaseUtil.pm line 272.
+ 
+
+doc
+ta_wrap($text, $width, \%opts) => STR
+Options:
+flindent => STR
+First line indent. See Text::WideChar::Util for more details.
+
+
+#DISPLAY_VALUE => 0
 
 DTD::Flare instead for jquery
 

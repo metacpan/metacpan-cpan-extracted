@@ -4,9 +4,9 @@ use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-07'; # DATE
+our $DATE = '2023-11-01'; # DATE
 our $DIST = 'Dist-Zilla-PluginBundle-Author-PERLANCAR'; # DIST
-our $VERSION = '0.608'; # VERSION
+our $VERSION = '0.609'; # VERSION
 
 use Dist::Zilla::PluginBundle::Filter;
 
@@ -36,7 +36,7 @@ Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task - Dist::Zilla like P
 
 =head1 VERSION
 
-This document describes version 0.608 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-07-07.
+This document describes version 0.609 of Dist::Zilla::PluginBundle::Author::PERLANCAR::NonCPAN::Task (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-11-01.
 
 =head1 SYNOPSIS
 

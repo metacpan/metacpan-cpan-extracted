@@ -1,0 +1,101 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Trace::Sampler::Result - The result of a sampling decision
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+This object represents the result of a sampling decision made by a sampler
+created via L<OpenTelemetry::SDK::Trace::Sampler>. It encapsulates the actual
+decision, as well as additional information the sampler wants to pass down to
+the caller, including a L<OpenTelemetry::Propagation::TraceContext::TraceState>
+and a set of attributes.
+
+Users are unlikely to have to create an instance of this class. Most commonly,
+it will be used as the return value of a sampler's
+C<should_sample|OpenTelemetry::SDK::Trace::Sampler/should_sample> method. See
+that documentation for details.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::Attributes> role. Please consult
+that module's documentation for details on the behaviours it provides.
+
+=head2 new
+
+    $result = OpenTelemetry::SDK::Trace::Sampler::Result->new(
+        trace_state => $trace_state,
+        decision    => $decision,
+    );
+
+Constructs a new result instance. It takes a mandatory
+L<OpenTelemetry::Propagation::TraceContext::TraceState> object, and a value
+representing the decision. The decision is one of the values described in the
+L<CONSTANTS|/CONSTANTS> section below.
+
+=head2 sampled
+
+    $bool = $result->sampled;
+
+Returns true if this result indicates a span that should be sampled, or false
+otherwise.
+
+=head2 recording
+
+    $bool = $result->recording;
+
+Returns true if this result indicates a span that is recording, or false
+otherwise.
+
+=head2 trace_state
+
+    $trace_state = $result->trace_state;
+
+Returns the L<OpenTelemetry::Propagation::TraceContext::TraceState> object
+associated to this sampling result.
+
+=head1 CONSTANTS
+
+These represent the sampling decisions in this result.
+
+=over
+
+=item DROP
+
+Do not record events or sample.
+
+=item RECORD_ONLY
+
+Record events but don't sample.
+
+=item RECORD_AND_SAMPLE
+
+Record events and sample.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Attributes>
+
+=item L<OpenTelemetry::SDK::Trace::Sampler>
+
+=item L<OpenTelemetry::Propagation::TraceContext::TraceState>
+
+=item L<The specification for a sampler's C<should_sample> method|https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#shouldsample>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

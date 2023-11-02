@@ -1,5 +1,7 @@
 use strict;
 use warnings;
+use FindBin qw/$Bin/;
+use local::lib "$Bin/local";
 use Module::Build::Pluggable (
 	'CPANfile'
 );

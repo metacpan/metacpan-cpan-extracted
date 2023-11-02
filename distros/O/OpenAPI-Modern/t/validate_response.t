@@ -10,13 +10,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use utf8;
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More;
-use Test::Deep;
-use OpenAPI::Modern;
 use JSON::Schema::Modern::Utilities 'jsonp';
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
-use constant { true => JSON::PP::true, false => JSON::PP::false };
-use YAML::PP 0.005;
 
 use lib 't/lib';
 use Helper;

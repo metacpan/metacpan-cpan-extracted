@@ -1,0 +1,928 @@
+{
+  "preamble" => "History file for ack.  http://beyondgrep.com/",
+  "raw_preamble" => "History file for ack.  http://beyondgrep.com/\n\n",
+  "releases" => [
+    {
+      "date" => "2014-09-03T22:48:00Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 6,
+              "raw" => "The -s flag would fail to suppress certain warnings.  Thanks, Kassio\nBorges. (GitHub ticket #439)\n\n",
+              "style" => "",
+              "text" => "The -s flag would fail to suppress certain warnings.  Thanks, Kassio Borges. (GitHub ticket #439)"
+            },
+            {
+              "line" => 9,
+              "raw" => "The -w flag would fail to work properly with regex features such as\nalternation.  Thanks to Ed Avis for the report (GitHub ticket #443)\n\n",
+              "style" => "",
+              "text" => "The -w flag would fail to work properly with regex features such as alternation.  Thanks to Ed Avis for the report (GitHub ticket #443)"
+            },
+            {
+              "line" => 12,
+              "raw" => "The -g flag should now work faster on larger codebases.  Thanks to\nManuel Meurer for the report (GitHub ticket #458)\n\n",
+              "style" => "",
+              "text" => "The -g flag should now work faster on larger codebases.  Thanks to Manuel Meurer for the report (GitHub ticket #458)"
+            }
+          ],
+          "line" => 5,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 16,
+              "raw" => "ack now ignores JavaScript and CSS source maps.  Thanks, Chris\nRebert.\n\n",
+              "style" => "",
+              "text" => "ack now ignores JavaScript and CSS source maps.  Thanks, Chris Rebert."
+            },
+            {
+              "line" => 19,
+              "raw" => "ack now ships with customized shell completion scripts for bash and zsh.\n\n\n",
+              "style" => "",
+              "text" => "ack now ships with customized shell completion scripts for bash and zsh."
+            }
+          ],
+          "line" => 15,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        }
+      ],
+      "line" => 3,
+      "raw" => "2.14    Wed Sep  3 22:48:00 CDT 2014\n====================================\n",
+      "raw_date" => "Wed Sep  3 22:48:00 CDT 2014",
+      "version" => "2.14"
+    },
+    {
+      "date" => "2014-01-25T23:36:09Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 25,
+              "raw" => "More fixes for Windows tests.  Thanks to GitHub user \@ispedals.\n\n",
+              "style" => "",
+              "text" => "More fixes for Windows tests.  Thanks to GitHub user \@ispedals."
+            }
+          ],
+          "line" => 24,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 29,
+              "raw" => "Add docs for available colors in ack.\n\n",
+              "style" => "",
+              "text" => "Add docs for available colors in ack."
+            }
+          ],
+          "line" => 27,
+          "raw" => "[ENHANCEMENTS]\n\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        }
+      ],
+      "line" => 22,
+      "raw" => "2.13_06 Sat Jan 25 23:36:09 CST 2014\n====================================\n",
+      "raw_date" => "Sat Jan 25 23:36:09 CST 2014",
+      "version" => "2.13_06"
+    },
+    {
+      "date" => "2014-01-09T22:41:33Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 34,
+              "raw" => "More whack-a-mole with Windows failures.  This time, it's POSIX::mkfifo\ndying on Windows instead of returning undef like the docs implied,\nor at least that I inferred.\n\n",
+              "style" => "",
+              "text" => "More whack-a-mole with Windows failures.  This time, it's POSIX::mkfifo dying on Windows instead of returning undef like the docs implied, or at least that I inferred."
+            }
+          ],
+          "line" => 33,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 39,
+              "raw" => "--create-ackrc keeps the comments that describe each of the options,\nand it shows the ack version number.\n\n\n",
+              "style" => "",
+              "text" => "--create-ackrc keeps the comments that describe each of the options, and it shows the ack version number."
+            }
+          ],
+          "line" => 38,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        }
+      ],
+      "line" => 31,
+      "raw" => "2.13_05 Thu Jan  9 22:41:33 CST 2014\n====================================\n",
+      "raw_date" => "Thu Jan  9 22:41:33 CST 2014",
+      "version" => "2.13_05"
+    },
+    {
+      "date" => "2014-01-04T11:17:28Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 46,
+              "raw" => "Fixed incorrect deduping of config files under Windows.  Thanks,\nDenis Howe.\n\n\n",
+              "style" => "",
+              "text" => "Fixed incorrect deduping of config files under Windows.  Thanks, Denis Howe."
+            }
+          ],
+          "line" => 45,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        }
+      ],
+      "line" => 43,
+      "raw" => "2.13_04 Sat Jan  4 11:17:28 CST 2014\n====================================\n",
+      "raw_date" => "Sat Jan  4 11:17:28 CST 2014",
+      "version" => "2.13_04"
+    },
+    {
+      "date" => "2014-01-02T22:23:03Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 53,
+              "raw" => "More build fixes for Windows.  Windows config finder fixes from\nJames McCoy.\n\n",
+              "style" => "",
+              "text" => "More build fixes for Windows.  Windows config finder fixes from James McCoy."
+            },
+            {
+              "line" => 56,
+              "raw" => "t/ack-named-pipes.t uses POSIX::mkfifo instead of the external\ncommand, which should be more portable.  Thanks, Pete Krawczyk.\n\n",
+              "style" => "",
+              "text" => "t/ack-named-pipes.t uses POSIX::mkfifo instead of the external command, which should be more portable.  Thanks, Pete Krawczyk."
+            }
+          ],
+          "line" => 52,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 60,
+              "raw" => "Now ignores Cabal (Haskell) sandboxes.  Thanks, Fraser Tweedale.\n\n",
+              "style" => "",
+              "text" => "Now ignores Cabal (Haskell) sandboxes.  Thanks, Fraser Tweedale."
+            },
+            {
+              "line" => 62,
+              "raw" => "Added filetypes for Jade, Smarty and Stylus.  Thanks, Ra\303\272l Gund\303\255n.\n\n\n",
+              "style" => "",
+              "text" => "Added filetypes for Jade, Smarty and Stylus.  Thanks, Ra\303\272l Gund\303\255n."
+            }
+          ],
+          "line" => 59,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        }
+      ],
+      "line" => 50,
+      "raw" => "2.13_03 Thu Jan  2 22:23:03 CST 2014\n====================================\n",
+      "raw_date" => "Thu Jan  2 22:23:03 CST 2014",
+      "version" => "2.13_03"
+    },
+    {
+      "date" => "2013-12-27T12:54:27Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 68,
+              "raw" => "The building of ack-standalone relied on the output of `perldoc\n-l`, which I apparently can't rely on having been installed.  I've\nchanged the way that the squash program finds File::Next.\n\n\n",
+              "style" => "",
+              "text" => "The building of ack-standalone relied on the output of `perldoc -l`, which I apparently can't rely on having been installed.  I've changed the way that the squash program finds File::Next."
+            }
+          ],
+          "line" => 67,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        }
+      ],
+      "line" => 65,
+      "raw" => "2.13_02 Fri Dec 27 12:54:27 CST 2013\n====================================\n",
+      "raw_date" => "Fri Dec 27 12:54:27 CST 2013",
+      "version" => "2.13_02"
+    },
+    {
+      "date" => "2013-12-25T13:36:08Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 79,
+              "raw" => "   -- via Pete Krawczyk\n\n",
+              "style" => "--",
+              "text" => "via Pete Krawczyk"
+            }
+          ],
+          "line" => 75,
+          "raw" => "So this is Christmas\nAnd what have you done\nI'm sitting here hacking\nOn ack 2.13_01\n",
+          "style" => "",
+          "text" => "So this is Christmas And what have you done I'm sitting here hacking On ack 2.13_01"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 82,
+              "raw" => "Issue #313: ack would fail when trying to check files for readability\non some networked filesystems, or on Mac OS X with ACLs.  Now it\nuses the filetest pragma.  Thanks, Jonathan Perret.\n\n\n",
+              "style" => "",
+              "text" => "Issue #313: ack would fail when trying to check files for readability on some networked filesystems, or on Mac OS X with ACLs.  Now it uses the filetest pragma.  Thanks, Jonathan Perret."
+            }
+          ],
+          "line" => 81,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 88,
+              "raw" => "ack's entire test suite now runs under Perl's -T taint flag.  We'll\nbuild more security tests on top of this.\n\n",
+              "style" => "",
+              "text" => "ack's entire test suite now runs under Perl's -T taint flag.  We'll build more security tests on top of this."
+            },
+            {
+              "line" => 91,
+              "raw" => "Added some checks to the squash program that I hope will turn up\nerrors in the Windows builds.\n\n\n",
+              "style" => "",
+              "text" => "Added some checks to the squash program that I hope will turn up errors in the Windows builds."
+            }
+          ],
+          "line" => 87,
+          "raw" => "[INTERNALS]\n",
+          "style" => "[]",
+          "text" => "INTERNALS"
+        }
+      ],
+      "line" => 73,
+      "raw" => "2.13_01 Wed Dec 25 13:36:08 CST 2013\n====================================\n",
+      "raw_date" => "Wed Dec 25 13:36:08 CST 2013",
+      "version" => "2.13_01"
+    },
+    {
+      "date" => "2013-12-03T07:05:02Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 98,
+              "raw" => "This verison of ack prevents the --pager, --regex and --output\noptions from being used from project-level ackrc files.  It is\npossible to execute malicious code with these options, and we want\nto prevent the security risk of acking through a potentially malicious\ncodebase, such as one downloaded from an Internet site or checked\nout from a code repository.\n\n",
+              "style" => "",
+              "text" => "This verison of ack prevents the --pager, --regex and --output options from being used from project-level ackrc files.  It is possible to execute malicious code with these options, and we want to prevent the security risk of acking through a potentially malicious codebase, such as one downloaded from an Internet site or checked out from a code repository."
+            },
+            {
+              "line" => 105,
+              "raw" => "The --pager, --regex and --output options may still be used from\nthe global /etc/ackrc, your own private ~/.ackrc, the ACK_OPTIONS\nenvironment variable, and of course from the command line.\n\n",
+              "style" => "",
+              "text" => "The --pager, --regex and --output options may still be used from the global /etc/ackrc, your own private ~/.ackrc, the ACK_OPTIONS environment variable, and of course from the command line."
+            }
+          ],
+          "line" => 97,
+          "raw" => "[SECURITY FIXES]\n",
+          "style" => "[]",
+          "text" => "SECURITY FIXES"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 110,
+              "raw" => "Now ignores Eclipse .metadata directory.  Thanks, Steffen Jaeckel.\n\n",
+              "style" => "",
+              "text" => "Now ignores Eclipse .metadata directory.  Thanks, Steffen Jaeckel."
+            }
+          ],
+          "line" => 109,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 113,
+              "raw" => "Removed the Git revision tracking in the --version.\n\n\n",
+              "style" => "",
+              "text" => "Removed the Git revision tracking in the --version."
+            }
+          ],
+          "line" => 112,
+          "raw" => "[INTERNALS]\n",
+          "style" => "[]",
+          "text" => "INTERNALS"
+        }
+      ],
+      "line" => 95,
+      "raw" => "2.12    Tue Dec  3 07:05:02 CST 2013\n====================================\n",
+      "raw_date" => "Tue Dec  3 07:05:02 CST 2013",
+      "version" => "2.12"
+    },
+    {
+      "date" => "2013-10-06T12:39:21Z",
+      "entries" => [
+        {
+          "line" => 118,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        }
+      ],
+      "line" => 116,
+      "raw" => "2.11_02 Sun Oct  6 12:39:21 CDT 2013\n====================================\n",
+      "raw_date" => "Sun Oct  6 12:39:21 CDT 2013",
+      "version" => "2.11_02"
+    },
+    {
+      "entries" => [],
+      "line" => 119,
+      "note" => "was mispackaged.  This fixes that.",
+      "raw" => "2.11_01 was mispackaged.  This fixes that.\n\n\n",
+      "version" => "2.11_01"
+    },
+    {
+      "date" => "2013-09-29T13:15:41Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 125,
+              "raw" => "Fixed a race condition in t/file-permission.t that was causing\nfailures if tests were run in parallel.\n\n\n",
+              "style" => "",
+              "text" => "Fixed a race condition in t/file-permission.t that was causing failures if tests were run in parallel."
+            }
+          ],
+          "line" => 124,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        }
+      ],
+      "line" => 122,
+      "raw" => "2.11_01 Sun Sep 29 13:15:41 CDT 2013\n====================================\n",
+      "raw_date" => "Sun Sep 29 13:15:41 CDT 2013",
+      "version" => "2.11_01"
+    },
+    {
+      "date" => "2013-09-24T16:24:11Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 132,
+              "raw" => "Add --perltest for *.t files.\n\n",
+              "style" => "",
+              "text" => "Add --perltest for *.t files."
+            },
+            {
+              "line" => 134,
+              "raw" => "Added Matlab support.  Thanks, Zertrin.\n\n",
+              "style" => "",
+              "text" => "Added Matlab support.  Thanks, Zertrin."
+            }
+          ],
+          "line" => 131,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 137,
+              "raw" => "Fix the test suite for Win32.  Many thanks to Christian Walde for\nbringing the severity of this issue to our attention, as well as\nproviding a Win32 development environment for us to work with.\n\n",
+              "style" => "",
+              "text" => "Fix the test suite for Win32.  Many thanks to Christian Walde for bringing the severity of this issue to our attention, as well as providing a Win32 development environment for us to work with."
+            },
+            {
+              "line" => 141,
+              "raw" => "Fixed Win32-detection in the Makefile.PL.  Thanks, Michael Beijen\nand Alexandr Ciornii.\n\n",
+              "style" => "",
+              "text" => "Fixed Win32-detection in the Makefile.PL.  Thanks, Michael Beijen and Alexandr Ciornii."
+            },
+            {
+              "line" => 144,
+              "raw" => "More compatibility fixes for Perl 5.8.8.\n\n\n",
+              "style" => "",
+              "text" => "More compatibility fixes for Perl 5.8.8."
+            }
+          ],
+          "line" => 136,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        }
+      ],
+      "line" => 129,
+      "raw" => "2.10    Tue Sep 24 16:24:11 CDT 2013\n====================================\n",
+      "raw_date" => "Tue Sep 24 16:24:11 CDT 2013",
+      "version" => "2.10"
+    },
+    {
+      "date" => "2013-08-22T23:11:45Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 150,
+              "raw" => "ack now ignores CMake's build/cache directories by default.  Thanks,\nVolodymyr Medvid.\n\n",
+              "style" => "",
+              "text" => "ack now ignores CMake's build/cache directories by default.  Thanks, Volodymyr Medvid."
+            },
+            {
+              "line" => 153,
+              "raw" => "Add shebang matching for --lua files.\n\n",
+              "style" => "",
+              "text" => "Add shebang matching for --lua files."
+            },
+            {
+              "line" => 155,
+              "raw" => "Add documentation for --ackrc.\n\n",
+              "style" => "",
+              "text" => "Add documentation for --ackrc."
+            },
+            {
+              "line" => 157,
+              "raw" => "Add Elixir filetype.\n\n",
+              "style" => "",
+              "text" => "Add Elixir filetype."
+            },
+            {
+              "line" => 159,
+              "raw" => "Add --cathy option.  Thanks to Joe McMahon.\n\n",
+              "style" => "",
+              "text" => "Add --cathy option.  Thanks to Joe McMahon."
+            },
+            {
+              "line" => 161,
+              "raw" => "Add some helpful debugging tips when an invalid option is found.\nThanks to Charles Lee.\n\n",
+              "style" => "",
+              "text" => "Add some helpful debugging tips when an invalid option is found. Thanks to Charles Lee."
+            },
+            {
+              "line" => 164,
+              "raw" => "Ignore PDF files by default, because Perl will detect them as text.\n\n",
+              "style" => "",
+              "text" => "Ignore PDF files by default, because Perl will detect them as text."
+            },
+            {
+              "line" => 166,
+              "raw" => "Ignore .gif, .jpg, .jpeg and .png files.  They won't normally be\nselected, but this is an optimization so that ack doesn't have to\nopen them to know.\n\n",
+              "style" => "",
+              "text" => "Ignore .gif, .jpg, .jpeg and .png files.  They won't normally be selected, but this is an optimization so that ack doesn't have to open them to know."
+            }
+          ],
+          "line" => 149,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 171,
+              "raw" => "Ack's colorizing of output would get confused with multiple sets\nof parentheses.  This has been fixed.  (Issue #276)\n\n",
+              "style" => "",
+              "text" => "Ack's colorizing of output would get confused with multiple sets of parentheses.  This has been fixed.  (Issue #276)"
+            },
+            {
+              "line" => 174,
+              "raw" => "Ack would get confused when trying to colorize the output in\nDOS-format files.  This has been fixed.  (Issue #145)\n\n\n",
+              "style" => "",
+              "text" => "Ack would get confused when trying to colorize the output in DOS-format files.  This has been fixed.  (Issue #145)"
+            }
+          ],
+          "line" => 170,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        }
+      ],
+      "line" => 147,
+      "raw" => "2.08    Thu Aug 22 23:11:45 CDT 2013\n====================================\n",
+      "raw_date" => "Thu Aug 22 23:11:45 CDT 2013",
+      "version" => "2.08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 180,
+          "raw" => "This mistake of an upload lived for only about 15 minutes.\n\n\n\n",
+          "style" => "",
+          "text" => "This mistake of an upload lived for only about 15 minutes."
+        }
+      ],
+      "line" => 178,
+      "raw" => "2.06\n====================================\n",
+      "version" => "2.06"
+    },
+    {
+      "date" => "2013-05-28T10:12:04Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 187,
+              "raw" => "We now ignore the node_modules directories created by npm.  Thanks,\nKonrad Borowski.\n\n",
+              "style" => "",
+              "text" => "We now ignore the node_modules directories created by npm.  Thanks, Konrad Borowski."
+            },
+            {
+              "line" => 190,
+              "raw" => "--pager without an argument implies --pager=\$PAGER.\n\n",
+              "style" => "",
+              "text" => "--pager without an argument implies --pager=\$PAGER."
+            },
+            {
+              "line" => 192,
+              "raw" => "--perl now recognizes Plack-style .psgi files.  Thanks, Ron Savage.\n\n",
+              "style" => "",
+              "text" => "--perl now recognizes Plack-style .psgi files.  Thanks, Ron Savage."
+            },
+            {
+              "line" => 194,
+              "raw" => "Added filetypes for Coffescript, JSON, LESS, and Sass.\n\n",
+              "style" => "",
+              "text" => "Added filetypes for Coffescript, JSON, LESS, and Sass."
+            }
+          ],
+          "line" => 186,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 197,
+              "raw" => "Command-line options now override options set in ackrc files.\n\n",
+              "style" => "",
+              "text" => "Command-line options now override options set in ackrc files."
+            },
+            {
+              "line" => 199,
+              "raw" => "ACK_PAGER and ACK_PAGER_COLOR now work as advertised.\n\n",
+              "style" => "",
+              "text" => "ACK_PAGER and ACK_PAGER_COLOR now work as advertised."
+            },
+            {
+              "line" => 201,
+              "raw" => "Fix a bug resulting in uninitialized variable warnings when more\nthan one capture group was specified in the search pattern.\n\n",
+              "style" => "",
+              "text" => "Fix a bug resulting in uninitialized variable warnings when more than one capture group was specified in the search pattern."
+            },
+            {
+              "line" => 204,
+              "raw" => "Make sure ack is happy to build and test under cron and other\nconsole-less environments.\n\n",
+              "style" => "",
+              "text" => "Make sure ack is happy to build and test under cron and other console-less environments."
+            },
+            {
+              "line" => 207,
+              "raw" => "Colored output is now supported and on by default on Windows.\n\n",
+              "style" => "",
+              "text" => "Colored output is now supported and on by default on Windows."
+            }
+          ],
+          "line" => 196,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        }
+      ],
+      "line" => 184,
+      "raw" => "2.05_01 Tue May 28 10:12:04 CDT 2013\n====================================\n",
+      "raw_date" => "Tue May 28 10:12:04 CDT 2013",
+      "version" => "2.05_01"
+    },
+    {
+      "date" => "2013-04-26T22:47:55Z",
+      "entries" => [
+        {
+          "line" => 211,
+          "raw" => "ack now runs on a standard Perl 5.8.8 install with no module updates.\nThe minimum Perl requirement for ack is now explicitly 5.8.8.  Anything\nbefore 5.8.8 will not work, and we've added checks.  Thanks, Michael\nMcClimon.\n\n",
+          "style" => "",
+          "text" => "ack now runs on a standard Perl 5.8.8 install with no module updates. The minimum Perl requirement for ack is now explicitly 5.8.8.  Anything before 5.8.8 will not work, and we've added checks.  Thanks, Michael McClimon."
+        },
+        {
+          "entries" => [
+            {
+              "line" => 217,
+              "raw" => "ack was colorizing captured groups even if --nocolor was given.\nThanks, Dale Sedivic.\n\n",
+              "style" => "",
+              "text" => "ack was colorizing captured groups even if --nocolor was given. Thanks, Dale Sedivic."
+            }
+          ],
+          "line" => 216,
+          "raw" => "[FIXES]\n",
+          "style" => "[]",
+          "text" => "FIXES"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 221,
+              "raw" => "The --shell file type now recognizes the fish shell.\n\n",
+              "style" => "",
+              "text" => "The --shell file type now recognizes the fish shell."
+            },
+            {
+              "line" => 223,
+              "raw" => "We now ignore minified CSS or Javascript, in the form of either *.css.min\nor *.min.css, or *.js.min or *.min.js.\n\n",
+              "style" => "",
+              "text" => "We now ignore minified CSS or Javascript, in the form of either *.css.min or *.min.css, or *.js.min or *.min.js."
+            },
+            {
+              "line" => 226,
+              "raw" => "Added support for the Dart language.\n\n",
+              "style" => "",
+              "text" => "Added support for the Dart language."
+            },
+            {
+              "line" => 228,
+              "raw" => "ack 2.02 was much slower than ack 1.96, up to 8x slower in some cases.\nThese slowdowns have been mostly eliminated, and in some cases ack 2.04\nis now faster than 1.96.\n\n\n",
+              "style" => "",
+              "text" => "ack 2.02 was much slower than ack 1.96, up to 8x slower in some cases. These slowdowns have been mostly eliminated, and in some cases ack 2.04 is now faster than 1.96."
+            }
+          ],
+          "line" => 220,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        }
+      ],
+      "line" => 209,
+      "raw" => "2.04    Fri Apr 26 22:47:55 CDT 2013\n====================================\n",
+      "raw_date" => "Fri Apr 26 22:47:55 CDT 2013",
+      "version" => "2.04"
+    },
+    {
+      "date" => "2013-04-18T23:51:52Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 236,
+              "raw" => "The firstlinematch file type detection option now only searches the\nfirst 250 characters of the first line of the file.  Otherwise, ack\nwould read entire text files that were only one line long, such as\nminified JavaScript, and that would be slow.  Thanks, Michael\nMcClimon.\n\n",
+              "style" => "",
+              "text" => "The firstlinematch file type detection option now only searches the first 250 characters of the first line of the file.  Otherwise, ack would read entire text files that were only one line long, such as minified JavaScript, and that would be slow.  Thanks, Michael McClimon."
+            }
+          ],
+          "line" => 235,
+          "raw" => "[ENHANCEMENTS]\n",
+          "style" => "[]",
+          "text" => "ENHANCEMENTS"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 243,
+              "raw" => "Many clarifications and cleanups.  Thanks, Michael McClimon.\n\n\n",
+              "style" => "",
+              "text" => "Many clarifications and cleanups.  Thanks, Michael McClimon."
+            }
+          ],
+          "line" => 242,
+          "raw" => "[DOCUMENTATION]\n",
+          "style" => "[]",
+          "text" => "DOCUMENTATION"
+        }
+      ],
+      "line" => 233,
+      "raw" => "2.02    Thu Apr 18 23:51:52 CDT 2013\n====================================\n",
+      "raw_date" => "Thu Apr 18 23:51:52 CDT 2013",
+      "version" => "2.02"
+    },
+    {
+      "date" => "2013-04-17T22:49:41Z",
+      "entries" => [
+        {
+          "line" => 249,
+          "raw" => "The first version of ack 2.0.\n\n\n",
+          "style" => "",
+          "text" => "The first version of ack 2.0."
+        },
+        {
+          "line" => 252,
+          "raw" => "# Incompatibilities with ack 1.x\n\n",
+          "style" => "#",
+          "text" => "Incompatibilities with ack 1.x"
+        },
+        {
+          "line" => 254,
+          "raw" => "ack 2 makes some big changes in its behaviors that could trip up\nusers who are used to the idiosyncracies of ack 1.x.  These changes\ncould affect your searching happiness, so please read them.\n\n",
+          "style" => "",
+          "text" => "ack 2 makes some big changes in its behaviors that could trip up users who are used to the idiosyncracies of ack 1.x.  These changes could affect your searching happiness, so please read them."
+        },
+        {
+          "line" => 258,
+          "raw" => "* ack's default behavior is now to search all files that it identifies\nas being text.  ack 1.x would only search files that were of a file\ntype that it recognized.\n\n",
+          "style" => "*",
+          "text" => "ack's default behavior is now to search all files that it identifies as being text.  ack 1.x would only search files that were of a file type that it recognized."
+        },
+        {
+          "line" => 262,
+          "raw" => "* Removed the `-a` and `-u` options since the default is to search\nall text files.\n\n",
+          "style" => "*",
+          "text" => "Removed the `-a` and `-u` options since the default is to search all text files."
+        },
+        {
+          "line" => 265,
+          "raw" => "* Removed the `--binary` option.  ack 2.0 will not find and search\nthrough binary files.\n\n",
+          "style" => "*",
+          "text" => "Removed the `--binary` option.  ack 2.0 will not find and search through binary files."
+        },
+        {
+          "line" => 268,
+          "raw" => "* Removed the `--skipped` option.\n\n",
+          "style" => "*",
+          "text" => "Removed the `--skipped` option."
+        },
+        {
+          "entries" => [
+            {
+              "line" => 273,
+              "raw" => "    ack -g foo -v\n\n",
+              "style" => "",
+              "text" => "ack -g foo -v"
+            }
+          ],
+          "line" => 270,
+          "raw" => "* Removed the `--invert-file-match` option.  `-v` now works with\n`-g`.  To list files that do not match `/foo/`\n\n",
+          "style" => "*",
+          "text" => "Removed the `--invert-file-match` option.  `-v` now works with `-g`.  To list files that do not match `/foo/`"
+        },
+        {
+          "line" => 275,
+          "raw" => "* `-g` now obeys all regex options: `-i`, `-w`, `-Q`, `-v`\n\n",
+          "style" => "*",
+          "text" => "`-g` now obeys all regex options: `-i`, `-w`, `-Q`, `-v`"
+        },
+        {
+          "line" => 277,
+          "raw" => "* Removed the `-G` switch, because it was too confusing to have two\nregexes specified on the command line.  Now you use the `-x` switch\nto pipe filenames from one `ack` invocation into another.\n\n",
+          "style" => "*",
+          "text" => "Removed the `-G` switch, because it was too confusing to have two regexes specified on the command line.  Now you use the `-x` switch to pipe filenames from one `ack` invocation into another."
+        },
+        {
+          "entries" => [
+            {
+              "line" => 283,
+              "raw" => "    ack -g sales | ack -x foo\n\n",
+              "style" => "",
+              "text" => "ack -g sales | ack -x foo"
+            }
+          ],
+          "line" => 281,
+          "raw" => "To search files with filename matching \"sales\" for the string \"foo\":\n\n",
+          "style" => "",
+          "text" => "To search files with filename matching \"sales\" for the string \"foo\":"
+        },
+        {
+          "line" => 285,
+          "raw" => "# New features in ack 2.0\n\n",
+          "style" => "#",
+          "text" => "New features in ack 2.0"
+        },
+        {
+          "line" => 287,
+          "raw" => "ack 2.0 will:\n\n",
+          "style" => "",
+          "text" => "ack 2.0 will:"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 290,
+              "raw" => "    * We will no longer have a `-a` switch.\n\n",
+              "style" => "*",
+              "text" => "We will no longer have a `-a` switch."
+            }
+          ],
+          "line" => 289,
+          "raw" => "* By default searches all text files, as identified by Perl's `-T` operator\n",
+          "style" => "*",
+          "text" => "By default searches all text files, as identified by Perl's `-T` operator"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 293,
+              "raw" => "    * name equality (\$filename eq 'Makefile')\n",
+              "style" => "*",
+              "text" => "name equality (\$filename eq 'Makefile')"
+            },
+            {
+              "line" => 294,
+              "raw" => "    * glob-style matching (`*.pl` identifies a Perl file)\n",
+              "style" => "*",
+              "text" => "glob-style matching (`*.pl` identifies a Perl file)"
+            },
+            {
+              "line" => 295,
+              "raw" => "    * regex-style matching (`/\\.pl\$/i` identifies a Perl file)\n",
+              "style" => "*",
+              "text" => "regex-style matching (`/\\.pl\$/i` identifies a Perl file)"
+            },
+            {
+              "line" => 296,
+              "raw" => "    * shebang-line matching (shebang line matching `/usr/bin/perl/`\n    identifies a Perl file)\n\n",
+              "style" => "*",
+              "text" => "shebang-line matching (shebang line matching `/usr/bin/perl/` identifies a Perl file)"
+            }
+          ],
+          "line" => 292,
+          "raw" => "* improved flexibility in defining filetype selectors\n",
+          "style" => "*",
+          "text" => "improved flexibility in defining filetype selectors"
+        },
+        {
+          "entries" => [
+            {
+              "entries" => [
+                {
+                  "line" => 301,
+                  "raw" => "        * https://github.com/petdance/ack/issues/#issue/79\n",
+                  "style" => "*",
+                  "text" => "https://github.com/petdance/ack/issues/#issue/79"
+                }
+              ],
+              "line" => 300,
+              "raw" => "    * global ackrc (/etc/ackrc)\n",
+              "style" => "*",
+              "text" => "global ackrc (/etc/ackrc)"
+            },
+            {
+              "line" => 302,
+              "raw" => "    * user-specific ackrc (~/.ackrc)\n",
+              "style" => "*",
+              "text" => "user-specific ackrc (~/.ackrc)"
+            },
+            {
+              "line" => 303,
+              "raw" => "    * per-project ackrc files (~/myproject/.ackrc)\n\n",
+              "style" => "*",
+              "text" => "per-project ackrc files (~/myproject/.ackrc)"
+            }
+          ],
+          "line" => 299,
+          "raw" => "* support for multiple ackrc files\n",
+          "style" => "*",
+          "text" => "support for multiple ackrc files"
+        },
+        {
+          "line" => 305,
+          "raw" => "* you can use --dump to figure which options are set where\n\n",
+          "style" => "*",
+          "text" => "you can use --dump to figure which options are set where"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 308,
+              "raw" => "    * ack 2.0 has a set of definitions for filetypes, directories to\n      include or exclude, etc, *but* these are only included so you don't\n      need to ship an ackrc file to a new machine.  You may tell ack to\n      disregard these defaults if you like.\n\n",
+              "style" => "*",
+              "text" => "ack 2.0 has a set of definitions for filetypes, directories to include or exclude, etc, *but* these are only included so you don't need to ship an ackrc file to a new machine.  You may tell ack to disregard these defaults if you like."
+            }
+          ],
+          "line" => 307,
+          "raw" => "* all inclusion/exclusion rules will be in the ackrc files\n",
+          "style" => "*",
+          "text" => "all inclusion/exclusion rules will be in the ackrc files"
+        },
+        {
+          "line" => 313,
+          "raw" => "* In addition to the classic `--thpppt` option to draw Bill the\nCat, `ack --bar` will draw (of course) Admiral Ackbar.\n",
+          "style" => "*",
+          "text" => "In addition to the classic `--thpppt` option to draw Bill the Cat, `ack --bar` will draw (of course) Admiral Ackbar."
+        }
+      ],
+      "line" => 246,
+      "raw" => "2.00    Wed Apr 17 22:49:41 CDT 2013\n====================================\n\n",
+      "raw_date" => "Wed Apr 17 22:49:41 CDT 2013",
+      "version" => "2.00"
+    }
+  ]
+}

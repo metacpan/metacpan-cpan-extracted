@@ -1,0 +1,43 @@
+---
+abstract: 'Initialize a constant subroutine once.'
+author:
+  - 'Diab Jerius <djerius@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CXC-constant-setonce
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  CXC::constant::setonce:
+    file: lib/CXC/constant/setonce.pm
+    version: '0.01'
+requires:
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-constant-setonce
+  repository: https://gitlab.com/djerius/cxc-constant-setonce.git
+version: '0.01'
+x_generated_by_perl: v5.36.1
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: GPL-3.0-only

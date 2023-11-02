@@ -1,3 +1,7 @@
+0.1.1    2023-10-29
+
+- Minor doco update so that generated manpages are better
+
 0.1.0    2022-01-08
 
 - Float type renamed to Float64 in preparation for support for different length floats

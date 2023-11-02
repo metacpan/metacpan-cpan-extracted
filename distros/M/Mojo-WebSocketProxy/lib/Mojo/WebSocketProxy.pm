@@ -3,7 +3,7 @@ package Mojo::WebSocketProxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 1;
 
@@ -130,8 +130,8 @@ Alternate backends are selected by using the C<backend> action option.
 
 =head2 rpc_failure_cb
 
-A subroutine reference to call when the RPC call fails at the HTTP level.
-Called with C<< Mojolicious::Controller >> the rpc_response
+A subroutine reference to call when the RPC call fails at the HTTP level. 
+Called with C<< Mojolicious::Controller >> the rpc_response 
 and C<< $req_storage >>
 
 A default rpc_failure_cb could be provided in the startup sub routine

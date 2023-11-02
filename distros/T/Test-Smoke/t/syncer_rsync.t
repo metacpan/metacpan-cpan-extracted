@@ -6,6 +6,7 @@ use Data::Dumper;
 use Cwd qw/cwd abs_path/;
 use File::Spec;
 use File::Spec::Functions;
+use File::Temp qw/tempdir/;
 use Test::More;
 use TestLib;
 
@@ -21,6 +22,11 @@ my %df_rsync = (
     ),
 );
 
+{ # UNCify_path
+    my $path = 'c:\Program Files\Git\bin\git.exe';
+    my $unc = UNCify_path($path);
+    is($unc, '//localhost/c$/Program Files/Git/bin/git.exe', "UNCify_path");
+}
 {
     my $sync = eval { Test::Smoke::Syncer->new() };
     ok( !$@, "No error on no type" );
@@ -79,24 +85,26 @@ SKIP: {
 
     my $branchname = 'master'; # for compatibility with old and new git version
     my $cwd = abs_path();
+
     # Set up a basic git repository
     my $git = Test::Smoke::Util::Execute->new(command => $gitbin);
-    my $repopath = 't/tsgit';
-    $git->run('-c' => "init.defaultBranch=$branchname", init => "-q", $repopath);
-    unless (is($git->exitcode, 0, "git init $repopath")) {
+    my $repopath = tempdir(CLEANUP => 1);
+    my $diag = $git->run('-c' => "init.defaultBranch=$branchname", init => "-q", $repopath);
+    unless (is($git->exitcode, 0, "$gitbin init $repopath")) {
+        diag("git init: $diag");
         skip "git init failed! The tests require an empty/different repo";
     }
 
-
-    mkpath("$repopath/Porting");
     unless(chdir $repopath) {
         diag("chdir to '$repopath' failed with error: $!");
         ok(0, "chdir repopath");
         die "chdir failed! Can't run the other tests (wrong cwd)";
     }
+    ok(mkpath(catdir($repopath, "Porting")), "mkpath($repopath/Porting)");
+
     $git->run('config', 'user.name' => "syncer_rsync.t");
     is($git->exitcode, 0, "git config user.name");
-    $git->run('config', 'user.email' => "syncer_rsync.t\@test-smoke.org");
+    $git->run('config', 'user.email' => "syncer_rsync.t\@example.com");
     is($git->exitcode, 0, "git config user.email");
 
     (my $gitversion = $git->run('--version')) =~ s/git version (\S+).+/$1/si;
@@ -121,7 +129,7 @@ SKIP: {
 
     # make sure to include a space to check this gets split into 2 arguments
     my $options = '-az -v';
-    my $ddir = catdir($cwd, 't', 'smoketest');
+    my $ddir = tempdir(CLEANUP => 1);
 
     my $rsync = Test::Smoke::Syncer->new(
         rsync => (

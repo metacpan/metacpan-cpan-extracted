@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.38'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,19 +17,19 @@ name: Getopt-Alt
 provides:
   Getopt::Alt:
     file: lib/Getopt/Alt.pm
-    version: v0.5.4
+    version: v0.5.5
   Getopt::Alt::Command:
     file: lib/Getopt/Alt/Command.pm
-    version: v0.5.4
+    version: v0.5.5
   Getopt::Alt::Dynamic:
     file: lib/Getopt/Alt/Dynamic.pm
-    version: v0.5.4
+    version: v0.5.5
   Getopt::Alt::Exception:
     file: lib/Getopt/Alt/Exception.pm
-    version: v0.5.4
+    version: v0.5.5
   Getopt::Alt::Option:
     file: lib/Getopt/Alt/Option.pm
-    version: v0.5.4
+    version: v0.5.5
 recommends:
   Capture::Tiny: '0'
   JSON: '0'
@@ -59,5 +59,5 @@ resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Getopt-Alt
   license: http://dev.perl.org/licenses/
   repository: git://github.com/ivanwills/Getopt-Alt.git
-version: v0.5.4
+version: v0.5.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

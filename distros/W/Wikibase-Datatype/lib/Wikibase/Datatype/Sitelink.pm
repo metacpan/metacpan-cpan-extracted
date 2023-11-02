@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_required);
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 has badges => (
 	is => 'ro',
@@ -195,6 +195,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.33
 
 =cut

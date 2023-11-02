@@ -42,7 +42,7 @@ sub parsePage{	#displays a html page
 			$_ =~ s/<!--error-->/$error/g;	#replace the error message
 			$_ =~ s/<!--version-->/$VERSION/g;	#replace version number
 			$_ =~ s/<!--(\w+)-->/&replace($1)/eg;	#replace the placeholders in the template
-         $_ =~ s|</body>|<br><br>\n<div align="center"><font size="2">&copy; <a href="http://www.thedumbterminal.co.uk" target="_blank">Dumb Terminal Creations</a></font></div>\n</body>|;
+            $_ =~ s|</body>|<br><br>\n<div align="center"><font size="2">&copy; <a href="http://www.thedumbterminal.co.uk" target="_blank">Dumb Terminal Creations</a></font></div>\n</body>|;
 			print;
 		}
 		close(TEMPLATE);

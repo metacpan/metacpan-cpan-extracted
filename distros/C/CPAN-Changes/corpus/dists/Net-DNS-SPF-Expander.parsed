@@ -1,0 +1,112 @@
+{
+  "preamble" => "Revision history for {{\$dist->name}}",
+  "raw_preamble" => "Revision history for {{\$dist->name}}\n\n",
+  "releases" => [
+    {
+      "entries" => [],
+      "line" => 3,
+      "raw" => "{{\$NEXT}}\n\n",
+      "version" => "{{\$NEXT}}"
+    },
+    {
+      "date" => "2013-07-29",
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "    - Make sure we can run the script on\n      the same zonefile again without\n      creating nonsense.\n",
+          "style" => "-",
+          "text" => "Make sure we can run the script on the same zonefile again without creating nonsense."
+        },
+        {
+          "line" => 9,
+          "raw" => "    - Fix tests by not reading from the file,\n      but using a new return scalar value\n      from ->write. It used to return 1, now\n      it returns the string that will be\n      written out.\n\n",
+          "style" => "-",
+          "text" => "Fix tests by not reading from the file, but using a new return scalar value from ->write. It used to return 1, now it returns the string that will be written out."
+        }
+      ],
+      "line" => 5,
+      "raw" => "0.006     2013-07-29\n",
+      "raw_date" => "2013-07-29",
+      "version" => "0.006"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 16,
+          "raw" => "    - Make sure that our split spf records\n      contain the protocol, v=spf1.\n\n",
+          "style" => "-",
+          "text" => "Make sure that our split spf records contain the protocol, v=spf1."
+        }
+      ],
+      "line" => 15,
+      "raw" => "0.005\n",
+      "version" => "0.005"
+    },
+    {
+      "date" => "2013-07-26",
+      "entries" => [
+        {
+          "line" => 20,
+          "raw" => "    - Add documentation.\n\n",
+          "style" => "-",
+          "text" => "Add documentation."
+        }
+      ],
+      "line" => 19,
+      "raw" => "0.004   2013-07-26\n",
+      "raw_date" => "2013-07-26",
+      "version" => "0.004"
+    },
+    {
+      "date" => "2013-07-25",
+      "entries" => [
+        {
+          "line" => 23,
+          "raw" => "    - Make script be found and installed. \n\n",
+          "style" => "-",
+          "text" => "Make script be found and installed."
+        }
+      ],
+      "line" => 22,
+      "raw" => "0.003   2013-07-25\n",
+      "raw_date" => "2013-07-25",
+      "version" => "0.003"
+    },
+    {
+      "date" => "2013-07-25",
+      "entries" => [
+        {
+          "line" => 26,
+          "raw" => "    - Make module get opts, and\n",
+          "style" => "-",
+          "text" => "Make module get opts, and"
+        },
+        {
+          "line" => 27,
+          "raw" => "    - add script\n\n",
+          "style" => "-",
+          "text" => "add script"
+        }
+      ],
+      "line" => 25,
+      "raw" => "0.002   2013-07-25\n",
+      "raw_date" => "2013-07-25",
+      "version" => "0.002"
+    },
+    {
+      "date" => "2013-07-25",
+      "entries" => [
+        {
+          "line" => 30,
+          "raw" => "    - Initial release. Hello world!\n",
+          "style" => "-",
+          "text" => "Initial release. Hello world!"
+        }
+      ],
+      "line" => 29,
+      "raw" => "0.001   2013-07-25\n",
+      "raw_date" => "2013-07-25",
+      "version" => "0.001"
+    }
+  ]
+}

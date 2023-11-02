@@ -49,11 +49,12 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Monkey::Patch::Action" => "0.060",
     "Perinci::Examples" => "0.824",
+    "Perinci::Examples::Completion" => "0.824",
     "Test::Exception" => 0,
     "Test::More" => "0.98",
     "lib" => 0
   },
-  "VERSION" => "0.899",
+  "VERSION" => "0.900",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -77,6 +78,7 @@ my %FallbackPrereqs = (
   "Package::Util::Lite" => 0,
   "Perinci::Access::Base" => "0.31",
   "Perinci::Examples" => "0.824",
+  "Perinci::Examples::Completion" => "0.824",
   "Perinci::Object" => "0.311",
   "Perinci::Sub::Complete" => "0.944",
   "Perinci::Sub::GetArgs::Argv" => "0.846",

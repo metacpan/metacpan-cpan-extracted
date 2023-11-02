@@ -1,0 +1,104 @@
+Revision history for Archer
+
+{{$NEXT}}
+
+0.16 2013-07-25T06:32:29Z
+    - fix asset_dir resolving in ConfigLoader
+    - restore ShareDir missing in 0.14 and move asset/ to share/asset for Minilla friendly.
+    - add error message of Archer::Util.
+
+0.15 2013-06-18T02:20:51Z
+    - fix dependencies
+    - fix tests for perl5.17 or higher
+
+0.14 2013-06-17T12:06:02Z
+    - Switch to Minilla
+    - Fixup dependencies
+    - move script files to bin
+    - fix typo in documents
+
+0.13
+    - add 'ready' phase.
+    - appropriately handling when specified several values in --skip and --with.
+    - remove old descriptions.
+    - refactor tests.
+
+0.12
+    - add validate feature in Plugin::Exec::Local.
+    - depend to Test::More 0.98.
+
+0.11
+    - add install_script `archer`
+    - fix shebang in archer.pl and arher
+    - set default assets path to share_dir
+
+0.10
+
+    - hide from pause SVN::Agent
+
+0.09
+
+    - add feature to specify multi roles in config.yaml
+    - use IO::Prompt::Simple instead of IO::Prompt, because IO::Prompt doesn't work in perl-5.14 after.
+    - add feature to specify role in command line option
+    - role support in Archer::Schell
+
+0.08
+
+    commit 239829c5d2fd0a15abdbecbe593146c466905c3c
+    Author: Masayuki Matsuki <y.songmu@gmail.com>
+    Date:   Wed Dec 14 19:13:15 2011 +0900
+
+    stringify $rsync->out and $rsync->err for log.
+
+    File::Rsync::out and File::Rsync::err retruns array in array context,
+    and retruns array ref in scalar context.
+
+    lib/Archer/Plugin/Rsync.pm |    4 ++--
+    1 files changed, 2 insertions(+), 2 deletions(-)
+
+0.07
+
+    * b3ab89f re-packaging
+    * 5fbafad use_test_base sucks
+    * 08c7ad2  shellモードの {on,with} ... do ... 形式と !task {on,with} ...形式が動くよ うにした。 テストコードも追加。
+    * dd059b7 'role' should be here :p
+    * 97e332b ネストしたforループの罠にハマった
+    * 2dcb78c fixed log level.
+    * 2277280 added with option for do deploy with skip_default tasks.
+    * 9cc7ea9 added skip_default setting for none-always-need task.
+    * 7cc348c not $plugin but $args.
+    * 62d4b85 fixed indent.
+    * afbe53f added --log_level option for debuging setting.
+    * 6e6a6ef added only feature.
+    * 2fc1822 Added project filter for project only task. Tweaked info message.
+
+0.06
+
+    - added YAML::Syck support
+    - specify assets path in config.yaml
+
+0.05
+
+    - Plugin::Flock: added
+    - Plugin::Confirm: support timeout
+    - Plugin::Exec::Remote: do not use sudo when does not specify user name in configuration(by mizzy++)
+    - fixed some test problem.
+
+0.04
+
+    - fixed test script.
+    - no feature changes.
+
+0.03
+
+    - fixed test.
+    - no feature changes.
+
+0.02
+
+    - initial cpan release.
+
+0.01  Fri Oct  6 12:38:02 2006
+       Initial release.
+

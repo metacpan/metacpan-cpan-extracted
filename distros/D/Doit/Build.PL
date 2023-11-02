@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017,2018,2019,2020,2021,2022 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2019,2020,2021,2022,2023 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -22,7 +22,7 @@ use Digest::MD5 qw(md5_hex);
 use File::Basename;
 use Doit;
 use Doit::Log;
-use Doit::Util qw(in_directory);
+use Doit::Util qw(in_directory get_os_release);
 
 my $doit = Doit->init;
 
@@ -193,7 +193,7 @@ sub test_in_docker {
     my $more_testing = $ENV{XXX_MORE_TESTING}; # XXX this will be a proper option in future!
     Doit::Log::set_label("[$distro_spec" . ($more_testing ? " (more)" : "") . "]");
     for my $tool (qw(docker)) {
-	$doit->qx('which', $tool); # existence check
+	$doit->which($tool) or error "$tool is missing";
     }
     require File::Temp;
     my $dir = File::Temp::tempdir("Doit_test_in_docker_XXXXXXXX", TMPDIR => 1, CLEANUP => 1);
@@ -204,21 +204,26 @@ EOF
     if ($ENV{XXX_INVALIDATE_CACHE}) { # XXX this will be a proper option in future!
 	_add_Dockerfile_invalidate_cmd(\$dockerfile);
     }
+
     my $add_opts = {};
     $dockerfile .= _fix_Dockerfile_for_dist($distro_spec, $add_opts);
-    if ($distro_spec =~ m{^centos:}) {
+    _docker_add_distro_specific_files(dir => $dir, distro_spec => $distro_spec);
+    if (-e "$dir/.distro_support") {
+	$dockerfile .= <<'EOF';
+COPY .distro_support .distro_support
+RUN .distro_support/run.sh
+EOF
+    }
+
+    if ($distro_spec =~ m{^(centos|rockylinux|fedora):}) {
 	######################################################################
 	# CentOS
 	# From https://fedoraproject.org/wiki/EPEL/FAQ#How_can_I_install_the_packages_from_the_EPEL_software_repository.3F
-	if      ($distro_spec =~ m{:6$}) {
+	if      ($distro_spec eq 'centos:6') {
 	    $dockerfile .= <<"EOF";
-RUN rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+RUN rpm -Uvh https://dl.fedoraproject.org/pub/archive/epel/6/x86_64/epel-release-6-8.noarch.rpm
 EOF
-	} elsif ($distro_spec =~ m{:7$}) {
-	    $dockerfile .= <<"EOF";
-RUN yum -y install epel-release
-EOF
-	} elsif ($distro_spec =~ m{:8$}) {
+	} elsif ($distro_spec eq 'centos:7' || $distro_spec eq 'rockylinux:8') {
 	    $dockerfile .= <<"EOF";
 RUN yum -y install epel-release
 EOF
@@ -229,32 +234,44 @@ EOF
 RUN yum -y install \\
     sudo \\
     rsync \\
-    "perl(ExtUtils::MakeMaker)" \\
     "perl(Digest::MD5)" \\
+    "perl(ExtUtils::MakeMaker)" \\
+    "perl(FindBin)" \\
+    "perl(Hash::Util)" \\
+    "perl(Sys::Hostname)" \\
     "perl(Test::More)" \\
+    "perl(Tie::File)" \\
     make \\
     git
 
 EOF
-	if ($distro_spec =~ m{:8$}) {
+	if ($distro_spec eq 'centos:8') {
 	    # Requires also PowerTools repo additionally to EPEL
 	    $dockerfile .= <<"EOF";
 RUN dnf -y install 'dnf-command(config-manager)'
 RUN yum config-manager --set-enabled PowerTools
+EOF
+	} elsif ($distro_spec eq 'rockylinux:8') {
+	    $dockerfile .= <<"EOF";
+RUN dnf -y --enablerepo=powertools install perl-IPC-Run
+EOF
+	} elsif ($distro_spec eq 'rockylinux:9') {
+	    $dockerfile .= <<"EOF";
+RUN dnf -y --enablerepo=crb install perl-IPC-Run
 EOF
 	}
 	$dockerfile .= <<"EOF";
 RUN yum -y install \\
     "perl(IPC::Run)"
 EOF
-	if ($distro_spec !~ m{:8$}) {
-	    # Currently not available in CentOS8
+	if ($distro_spec ne 'centos:8' && $distro_spec ne 'rockylinux:8' && $distro_spec ne 'rockylinux:9') {
+	    # Currently not available in CentOS8 and Rocky
 	    $dockerfile .= <<"EOF";
 RUN yum -y install \\
     "perl(Net::OpenSSH)"
 EOF
 	}
-	if ($distro_spec =~ m{:6$}) {
+	if ($distro_spec eq 'centos:6') {
 	    $dockerfile .= <<"EOF";
 RUN curl -L https://cpanmin.us | perl - App::cpanminus
 
@@ -275,13 +292,14 @@ RUN yum -y install \\
     "perl(BSD::Resource)" \\
     "perl(CPAN::Meta::Validator)" \\
     "perl(LWP::UserAgent)" \\
+    "perl(Config::IniFiles)" \\
     file
 
-ENV TRAVIS 1
+ENV GITHUB_ACTIONS 1
 ENV DOIT_TEST_WITH_SUDO 1
 
 EOF
-	    if ($distro_spec =~ m{:6$}) {
+	    if ($distro_spec eq 'centos:6') {
 		$dockerfile .= <<"EOF";
 # Term::ANSIColor exists, but is too old (no colorstrip function)
 RUN cpanm --quiet --notest "Term::ANSIColor~>=2.01"
@@ -306,7 +324,7 @@ EOF
 	    $dockerfile .= <<"EOF";
 RUN apk add py3-pip
 
-#ENV TRAVIS 1
+#ENV GITHUB_ACTIONS 1
 ENV DOIT_TEST_WITH_SUDO 1
 
 EOF
@@ -323,6 +341,23 @@ EOF
 	    'git',
 	);
 	my $packages_spec = join(" \\\n", map { "    $_" } @packages);
+	my $more_packages_spec = '';
+	if ($more_testing) {
+	    my @more_packages = (
+		'libbsd-resource-perl',
+		'libcapture-tiny-perl',
+		'libconfig-inifiles-perl',
+		'libcpan-meta-perl',
+		'libdevel-hide-perl',
+		'libwww-perl',
+		'perl-modules',
+		'locales',
+		'file',
+		($distro_spec eq 'ubuntu:precise' ? () : 'python3-pip'),
+	    );
+	    $more_packages_spec = join(" \\\n", map { "    $_" } @more_packages);
+	}
+
 	if ($distro_spec =~ m{^(ubuntu:precise)$}) {
 	    # See https://gist.github.com/dergachev/f5da514802fcbbb441a1
 	    $dockerfile .= <<'EOF'
@@ -332,27 +367,14 @@ EOF
 	$dockerfile .= <<"EOF";
 ENV DEBIAN_FRONTEND noninteractive 
 
-RUN apt-get$add_opts->{apt_get_update_opts} update && apt-get install -y --no-install-recommends \\
-$packages_spec
+RUN apt-get$add_opts->{apt_get_update_opts} update && apt-get install -y --no-install-recommends$add_opts->{apt_get_install_opts} \\
+$packages_spec \\
+$more_packages_spec
 
 EOF
 	if ($more_testing) {
-	    my @more_packages = (
-		'libbsd-resource-perl',
-		'libcapture-tiny-perl',
-		'libcpan-meta-perl',
-		'libwww-perl',
-		'perl-modules',
-		'locales',
-		'file',
-		($distro_spec eq 'ubuntu:precise' ? () : 'python3-pip'),
-	    );
-	    my $more_packages_spec = join(" \\\n", map { "    $_" } @more_packages);
 	    $dockerfile .= <<"EOF";
-RUN apt-get install -y --no-install-recommends \\
-$more_packages_spec
-
-ENV TRAVIS 1
+ENV GITHUB_ACTIONS 1
 ENV DOIT_TEST_WITH_SUDO 1
 
 EOF
@@ -390,14 +412,36 @@ sub test_standard {
     $doit->system('./Build');
     $doit->system('./Build', 'test');
     Doit::Log::set_label(undef);
-    for my $distro_spec ('ubuntu:jammy', 'debian:bullseye', 'ubuntu:focal', 'debian:buster', 'ubuntu:bionic', 'centos:7', 'debian:stretch', 'debian:jessie', 'ubuntu:xenial', 'ubuntu:precise', 'centos:6', 'alpine:latest') {
+    my @results;
+    for my $distro_spec ('debian:bookworm', 'ubuntu:jammy', 'debian:bullseye', 'ubuntu:focal', 'debian:buster', 'ubuntu:bionic', 'centos:7', 'debian:stretch', 'debian:jessie', 'ubuntu:xenial', 'ubuntu:precise', 'centos:6', 'alpine:latest') {
 	local $ENV{DISTRO_SPEC} = $distro_spec;
 	for my $more_testing (0, 1) {
-	    next if $more_testing && $distro_spec eq 'centos:6'; # centos:6 is unmaintained since Nov 2020, and some yum operations don't work anymore. See also https://support.plesk.com/hc/en-us/articles/360017922619-After-November-30th-2020-updating-system-packages-on-Plesk-server-with-CentOS-6-fails-Cannot-find-a-valid-baseurl-for-repo-base
 	    local $ENV{XXX_MORE_TESTING} = $more_testing;
+	    my $t0 = time; # currently not hires, should be fine for now
 	    $doit->system('./Build', 'test_in_docker');
+	    my $t1 = time;
+	    push @results, { distro => $distro_spec, more_testing => $more_testing, result => 'pass', time => ($t1-$t0)."s" };
 	}
     }
+
+    my $report = "test_standard results\n";
+    my @cols = qw(distro more_testing result time);
+    my @col_widths;
+    for my $col (@cols) {
+	my $max_width;
+	for my $result (@results) {
+	    my $width = length $result->{$col};
+	    $max_width = $width if !defined $max_width || $max_width < $width;
+	}
+	push @col_widths, $max_width;
+    }
+    for my $result (@results) {
+	for my $col_i (0 .. $#cols) {
+	    $report .= sprintf "%-${col_widths[$col_i]}s ", $result->{$cols[$col_i]};
+	}
+	$report .= "\n";
+    }
+    info $report;
 }
 
 sub test_kwalitee (;$) {
@@ -445,15 +489,7 @@ EOF
 }
 
 sub git_checks {
-    $doit->add_component('git');
-
-    my $status = $doit->git_short_status;
-    if ($status eq '<<') {
-	error 'Working directory has uncomitted changes: ' . `git status`;
-    }
-    if ($status eq '*') {
-	error 'Working directory has files not under git control (and not in .gitignore or .git/info/exclude): ' . `git status`;
-    }
+    _check_clean_git();
 
     my $Doit_VERSION = _get_Doit_VERSION();
 
@@ -548,9 +584,10 @@ sub dist_install_and_test {
 	in_directory {
 	    $doit->system($^X, 'Build.PL');
 	    my @Build = $^O eq 'MSWin32' ? ($^X, 'Build') : ('./Build');
+	    my @sudo = $^O eq 'MSWin32' ? () : ('sudo');
 	    $doit->system(@Build);
 	    $doit->system(@Build, 'test');
-	    $doit->system(@Build, 'install');
+	    $doit->system(@sudo, @Build, 'install');
 	    $doit->system(@Build, 'test-installed');
 	} "Doit-$Doit_VERSION";
     } $dir;
@@ -798,8 +835,8 @@ sub debian_package {
 sub _debian_package {
     my(%opts) = @_;
 
-    for my $tool (qw(dh-make-perl)) { # XXX maybe add git here?
-	$doit->qx('which', $tool); # existence check
+    for my $tool (qw(dh-make-perl)) { # git is checked if needed
+	$doit->which($tool) or error "$tool is missing";
     }
 
     my $distdir = distdir(temporary => 1);
@@ -807,6 +844,7 @@ sub _debian_package {
     my $version = delete $opts{'--version'};
     my $add_distro_version = delete $opts{'--add-distro-version'};
     if (!defined $version) {
+	$doit->which('git') or error 'git is missing --- please install it or alternatively specify --version manually';
 	chomp(my $git_describe = eval { $doit->info_qx('git', 'describe') }); # XXX what if this fails? Optionally made fatal?
 	if (defined $git_describe) {
 	    if ($git_describe =~ m{^([0-9\._]+)$}) {
@@ -818,14 +856,18 @@ sub _debian_package {
 	    }
 	    $version =~ s{_}{-}; # replace "devel" version specifier
 	    if ($add_distro_version) {
-		chomp(my $dist_id = $doit->qx({quiet=>1}, 'lsb_release', '-si'));
-		chomp(my $rel     = $doit->qx({quiet=>1}, 'lsb_release', '-sr'));
-		if ($dist_id eq 'Debian') {
+		my $osr = get_os_release();
+		if (!$osr) {
+		    error 'Cannot read /etc/os-release --- please specify --version manually';
+		}
+		my $dist_id = $osr->{ID};
+		my $rel = $osr->{VERSION_ID};
+		if ($dist_id eq 'debian') {
 		    $rel =~ s{^(\d+).*}{$1};
 		    $version .= "+deb${rel}u${add_distro_version}";
-		} elsif ($dist_id eq 'LinuxMint') {
+		} elsif ($dist_id eq 'linuxmint') {
 		    $version .= "+linuxmint${rel}u${add_distro_version}";
-		} elsif ($dist_id eq 'Ubuntu') {
+		} elsif ($dist_id eq 'ubuntu') {
 		    $version .= "~ubuntu${rel}.${add_distro_version}";
 		} else {
 		    error "No distro version support for '$dist_id'";
@@ -856,7 +898,7 @@ sub debian_package_with_docker {
 	error "Please set DISTRO_SPEC environment variable to something like 'debian:jessie'";
     }
     for my $tool (qw(docker)) {
-	$doit->qx('which', $tool); # existence check
+	$doit->which($tool) or error "$tool is missing";
     }
 
     # Cannot access directories outside of /Users when working
@@ -895,13 +937,12 @@ EOF
 
 ENV DEBIAN_FRONTEND noninteractive 
 
-RUN apt-get$add_opts->{apt_get_update_opts} update && apt-get install -y --no-install-recommends \\
+RUN apt-get$add_opts->{apt_get_update_opts} update && apt-get$add_opts->{apt_get_install_opts} install -y --no-install-recommends \\
     dh-make-perl \\
-    lsb-release \\
     git
 
 # XXX This is depending on the current perl module and should be configurable
-RUN apt-get install -y --no-install-recommends \\
+RUN apt-get$add_opts->{apt_get_install_opts} install -y --no-install-recommends \\
     libipc-run-perl \\
     libnet-openssh-perl
 
@@ -972,6 +1013,19 @@ sub release {
     $doit->system('git', 'push', 'origin', 'master', $Doit_VERSION);
 }
 
+sub ci_precheck {
+    my @ci_systems = ('github-actions', 'appveyor');
+
+    _check_clean_git();
+
+    for my $ci_system (@ci_systems) {
+	$doit->system('git', 'push', 'origin', "+HEAD:XXX-${ci_system}");
+    }
+
+    # check-ci is available here: https://github.com/eserte/srezic-misc/blob/master/scripts/check-ci
+    $doit->system('check-ci', (map { "--$_" } @ci_systems));
+}
+
 sub _prove_path {
     my @directory_candidates = ($Config{bin}, dirname(realpath $^X));
     my @basename_candidates = ('prove', "prove$Config{version}");
@@ -1029,15 +1083,22 @@ EOF
 # apt_get_update_opts).
 sub _fix_Dockerfile_for_dist {
     my($distro_spec, $add_opts_ref) = @_;
-    if ($distro_spec =~ m{^debian:(wheezy|7)$}) {
+    if ($distro_spec =~ m{^debian:(wheezy|jessie|stretch|7|8|9)$}) {
+	my $codename = $1;
+	if    ($codename eq '7') { $codename = 'wheezy' }
+	elsif ($codename eq '8') { $codename = 'jessie' }
+	elsif ($codename eq '9') { $codename = 'stretch' }
 	# https://unix.stackexchange.com/questions/508724/failed-to-fetch-jessie-backports-repository
-	$add_opts_ref->{apt_get_update_opts} = ' -o Acquire::Check-Valid-Until=false'; # with leading space
+	$add_opts_ref->{apt_get_update_opts}  = ' -o Acquire::Check-Valid-Until=false';
+	# https://askubuntu.com/questions/74345/how-do-i-bypass-ignore-the-gpg-signature-checks-of-apt
+	$add_opts_ref->{apt_get_install_opts} = ' -o APT::Get::AllowUnauthenticated=true';
 	<<EOF;
-RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian wheezy main'                   >  /etc/apt/sources.list
-RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian-security/ wheezy/updates main' >> /etc/apt/sources.list
+RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian $codename main'                   >  /etc/apt/sources.list
+RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian-security/ $codename/updates main' >> /etc/apt/sources.list
 EOF
     } else {
 	$add_opts_ref->{apt_get_update_opts} = '';
+	$add_opts_ref->{apt_get_install_opts} = '';
 	'';
     }
 }
@@ -1050,6 +1111,110 @@ sub _add_Dockerfile_invalidate_cmd {
 # are executed at least once a day
 RUN echo @{[ POSIX::strftime("%F", localtime) ]}
 EOF
+}
+
+sub _docker_add_distro_specific_files {
+    my %opts = @_;
+    my $dir         = delete $opts{dir}         || die 'Please specify dir';
+    my $distro_spec = delete $opts{distro_spec} || die 'Please specify distro_spec';
+    die 'Unhandled options: ' . join(' ', %opts) if %opts;
+
+    if ($distro_spec eq 'centos:6') {
+	$doit->mkdir("$dir/.distro_support");
+	# Instructions from https://gcore.de/de/hilfe/linux/centos6-repo-nach-eol-anpassen.php
+	$doit->write_binary("$dir/.distro_support/CentOS.repo", <<'EOF');
+[base]
+name=CentOS-6.10 - Base
+baseurl=http://vault.centos.org/6.10/os/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=1
+metadata_expire=never
+
+#released updates
+[updates]
+name=CentOS-6.10 - Updates
+baseurl=http://vault.centos.org/6.10/updates/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=1
+metadata_expire=never
+
+# additional packages that may be useful
+[extras]
+name=CentOS-6.10 - Extras
+baseurl=http://vault.centos.org/6.10/extras/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=1
+metadata_expire=never
+
+# additional packages that extend functionality of existing packages
+[centosplus]
+name=CentOS-6.10 - CentOSPlus
+baseurl=http://vault.centos.org/6.10/centosplus/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=0
+metadata_expire=never
+
+#contrib - packages by Centos Users
+[contrib]
+name=CentOS-6.10 - Contrib
+baseurl=http://vault.centos.org/6.10/contrib/$basearch/
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-6
+enabled=0
+metadata_expire=never
+EOF
+	$doit->write_binary("$dir/.distro_support/epel.repo", <<'EOF');
+[epel]
+name=Extra Packages for Enterprise Linux 6 - $basearch
+baseurl=https://archives.fedoraproject.org/pub/archive/epel/6/$basearch
+enabled=1
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+metadata_expire=never
+
+[epel-debuginfo]
+name=Extra Packages for Enterprise Linux 6 - $basearch - Debug
+baseurl=https://archives.fedoraproject.org/pub/archive/epel/6/$basearch/debug
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+gpgcheck=1
+metadata_expire=never
+
+[epel-source]
+name=Extra Packages for Enterprise Linux 6 - $basearch - Source
+baseurl=https://archives.fedoraproject.org/pub/archive/epel/6/SRPMS
+enabled=0
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-6
+gpgcheck=1
+metadata_expire=never
+EOF
+	$doit->write_binary("$dir/.distro_support/run.sh", <<'EOF');
+#! /bin/sh
+set -ex
+rm -f /etc/yum.repos.d/CentOS*.repo
+rm -f /etc/yum.repos.d/epel.repo
+cp .distro_support/CentOS.repo /etc/yum.repos.d/
+cp .distro_support/epel.repo /etc/yum.repos.d/
+yum clean all
+EOF
+	$doit->chmod(0755, "$dir/.distro_support/run.sh");
+    }
+}
+
+sub _check_clean_git {
+    $doit->add_component('git');
+
+    my $status = $doit->git_short_status;
+    if ($status eq '<<') {
+	error 'Working directory has uncomitted changes: ' . `git status`;
+    }
+    if ($status eq '*') {
+	error 'Working directory has files not under git control (and not in .gitignore or .git/info/exclude): ' . `git status`;
+    }
 }
 
 # REPO BEGIN

@@ -1,0 +1,594 @@
+=pod
+
+=begin Instruction
+
+After editing, please do not forget to run:
+
+    pod2markdown lib/configsmoke.pod > README2.md
+
+=end Instruction
+
+=head1 NAME
+
+configsmoke - Explain the options during configuration.
+
+=head1 VERSION
+
+This is version: B<0.093>
+
+=head1 SYNOPSIS
+
+Software installed in C<~/perl5coresmoke/smoke>
+
+    $ cd ~/perl5coresmoke 
+    $ mkdir etc
+    $ cd etc
+    $ ../smoke/tsconfigsmoke.pl -c <prefix>
+
+or on MSWin32 (installed in C<%HOMEDRIVE%%HOMEPATH%\perl5coresmoke\smoke>):
+
+    %HOMEDRIVE%
+    cd %HOMEPATH%\perl5coresmoke
+    md etc
+    cd etc
+    ..\smoke\tsconfigsmoke.bat -c <prefix>
+
+=head1 OPTIONS
+
+    --config|-c <prefix> Set the prefix for all related files
+
+    --des                Use all default settings, no questions asked
+
+    --help|-h            The short help for options
+    --show-config        Show the current values for these options
+
+=head1 DESCRIPTION
+
+I<Welcome to the Perl5 core smoke suite.>
+
+B<Test::Smoke> is the symbolic name for a set of scripts and modules
+that try to run the perl core tests on as many configurations as possible
+and combine the results into an easy to read report.
+
+The main script is F<tssmokeperl.pl>, and this uses a configuration file
+that is created by this program (F<tsconfigsmoke.pl>).  There is no default
+configuration as some actions can be rather destructive, so you will need
+to create your own configuration by running this program!
+
+By default the configuration file created is called F<smokecurrent_config>,
+this can be changed by specifying the C<< -c <prefix> >> switch at the command
+line.
+
+    $ perl ../smoke/configsmoke.pl -c mysmoke
+
+will create F<mysmoke_config> (in the current directory) as the configuration
+file and use C<mysmoke> as prefix for related files.
+
+The configfile is written with L<Data::Dumper>, so it is a bit of Perl that
+will be put through C<eval()> when read back for use.
+
+After you are done configuring, a job command list (JCL) is written. For
+MSWin32 this is called F<< <prefix>.cmd >>, for VMS this is called F<<
+<prefix>.COM >>, otherwise this is called F<< <prefix>.sh >>.
+
+All output (stdout, stderr) from F<tssmokeperl.pl> and its sub-processes is
+redirected to a logfile called F<< <prefix>.log >> by the JCL.
+
+This is a new version of the configure script, SOME THINGS ARE DIFFERENT!
+
+You will be asked some questions in order to configure this smoke suite.
+Please make sure to read the documentation "perldoc configsmoke"
+in case you do not understand a question.
+
+  * Values in angled-brackets (<>) are alternatives (none other allowed)
+  * Values in square-brackets ([]) are default values (<Enter> confirms)
+  * Use single space to clear a value
+  * Answer '&-d' to continue with all default answers
+
+=head2 ddir
+
+C<ddir> is the destination directory. This is used to put the
+source-tree in and build perl. If a source-tree appears to be there
+you will need to confirm your choice.
+
+=head2 w32args
+
+For MSWin32 we need some extra information that is passed to
+L<Test::Smoke::Smoker> in order to compensate for the lack of
+B<Configure>.
+
+Items involved:
+
+=over
+
+=item
+
+B<w32cc>: This is the C<CCTYPE> (I<GCC|MSVC|BORLAND>)
+
+=item
+
+B<w32make>: This is the C<make> program (I<gmake|nmake>)
+
+=item
+
+B<w32args>: Arrayref with:
+
+=over 8
+
+=item
+
+B<--win32-cctype>, C<w32cc>
+
+=item
+
+B<--win32-maker>, C<w32make>
+
+=item
+
+C<osvers=$osvers>
+
+=item
+
+C<ccversarg>
+
+=back
+
+=back
+
+See also L<Test::Smoke::Util/"Configure_win32( )"> and L<tsw32configure.pl>
+
+=head2 sync_type
+
+We have dropped support for the sync_types: B<snapshot> and B<hardlink>.
+
+C<sync_type> can be one of three:
+
+=over 4
+
+=item B<git> (preferred)
+
+This will use the C<git> program to clone the master perl-source from GitHub
+into B<gitdir> (the master can be changed B<gitorigin>). For the actual smoking, yet
+another clone into B<ddir> is used.
+
+Items involved:
+
+=over 8
+
+=item
+
+B<gitbin>: Absolute location of the C<git> program.
+
+=item
+
+B<gitorigin>: The origin of the Perl5 source tree
+(I<https://github.com/Perl/perl5.git>).
+
+=item
+
+B<gitdir>: Absolute location for the main clone of B<gitorigin>
+(I<perl-from-git>).
+
+=item
+
+B<gitdfbranch>: The branch in the repository to smoke (I<blead>).
+
+=item
+
+B<gitbranchfile>: Absolute location of the file that can hold the name of the
+branch to actually smoke (I<< <prefix>.gitbranch >>).
+
+=back
+
+=item B<rsync>
+
+This will use the C<rsync> program to sync up with the repository.
+F<tsconfigsmoke.pl> checks to see if it can find B<rsync> in your path.
+
+The default switches (B<opts>) passed to B<rsync> are: S<< B<-az --delete> >>
+
+Items involved:
+
+=over 8
+
+=item
+
+B<rsync>: Absolute location of the C<rsync> program.
+
+=item
+
+B<opts>: Options to pass to B<rsync> (I<-az --delete>).
+
+=item
+
+B<source>: Hostname:port/directory of the source
+(I<rsync://dromedary.p5h.org:5872/perl-current/>)
+
+=back
+
+=item copy
+
+This will use B<File::Copy> and B<File::Find> to just copy from a
+local source directory (B<cdir>).
+
+Items involved:
+
+=over 8
+
+=item
+
+B<cdir>: Absolute location of the source tree on the local system.
+
+=back
+
+=back
+
+See also L<Test::Smoke::Syncer>
+
+=head2 make finetuning
+
+Two different config options to accomodate the same thing:
+I<parallel build> and I<serial testing>
+
+=over
+
+=item
+
+B<makeopt>: used by Test::Smoke::Smoker::_make()
+
+=item
+
+B<testmake>: Use a different binary for "make _test"
+
+=back
+
+=head2 harnessonly
+
+C<harnessonly> indicates that C<make test> is replaced by C<make
+test_harness>.
+
+=head2 harness3opts
+
+C<harness3opts> are passed to C<HARNESS_OPTIONS> for the C<make
+test_harness> step.
+
+=head2 force_c_locale
+
+C<force_c_locale> is passed as a switch to F<tsrunsmoke.pl> to indicate that
+C<$ENV{LC_ALL}> should be forced to "C" during B<make test>.
+
+=head2 defaultenv
+
+C<defaultenv>, when set will make F<tsrunsmoke.pl> remove $ENV{PERLIO} and
+only do a single pass C<< S<make test> >>.
+
+=head2 perlio_only
+
+C<perlio_only>, when set wil not run the tests with C<< $ENV{PERLIO}=stdio >>
+and only with C<< $ENV{PERLIO}=perlio >> (and with locale-setting if set).
+
+=head2 locale
+
+C<locale> and its value are passed to F<tsrunsmoke.pl> and its value is passed
+to F<tsreporter.pl>. F<tsrunsmoke.pl> will do an extra pass of B<make test> with
+C<< $ENV{LC_ALL} >> set to that locale (and C<< $ENV{PERL_UNICODE}=""; >>,
+C<< $ENV{PERLIO}=perlio >>). This feature should only be used with
+UTF8 locales, that is why this is checked (by regex only).
+
+B<If you know of a way to get the utf8 locales on your system, which is
+not covered here, please let me know!>
+
+=head2 skip_tests
+
+This is a MANIFEST-like file with the paths to tests that should be
+skipped for this smoke.
+
+The process involves on the fly modification of F<MANIFEST> for tests
+in F<lib/> and F<ext/> and renaming of core-tests in F<t/>.
+
+=head2 smokedb_url
+
+Instead of flooding a mailing list, reposts should be sent to the Perl5CoreSmokeDB.
+The option to mail yourself a copy of the report still exists. The Perl5CoreSmokeDB
+however offers a central point of view to the smoke results.
+
+Items involved:
+
+=over
+
+=item
+
+B<smokedb_url>: Where to post the report (I<https://perl5.test-smoke.org/report>).
+
+=item
+
+B<send_log>: Can be one of I<always|on_fail|never> (I<on_fail>).
+
+=item
+
+B<send_out>: Can be one of I<always|on_fail|never> (I<never>).
+
+=back
+
+=head2 mail
+
+The (boolean) option C<mail> is used to see if the report is send via mail.
+
+Items involved:
+
+=over
+
+=item
+
+B<mail_type>: Can be one of:
+I<sendmail|mail|mailx|sendemail|Mail::Sendmail|MIME::Lite> depending on which
+of these is available.
+
+See L<Test::Smoke::Mailer>.
+
+=item
+
+B<to>: Email address to send the report to.
+
+=item
+
+B<cc>: Email address to send a carbon copy of the report to.
+
+=item
+
+B<bcc>: Email address to send a blind carbon copy of the report to.
+
+=item
+
+B<ccp5p_onfail>: Boolean to indicate if this report should be send to the
+perl5porters mailing list, please don't do that (unless they ask for it).
+
+=item
+
+B<mailbin>: Absolute location of the C<mail> program is set as B<mailt_ype>.
+
+=item
+
+B<mailxbin>: Absolute location of the C<mailx> program if set as B<mail_type>.
+
+=over 8
+
+=item
+
+B<swcc>: C<mailx> command line switch for the CC email address (I<-c>).
+
+=item
+
+B<swbcc>: C<mailx> command line switch for the BCC email address (I<-b>).
+
+=back
+
+=item
+
+B<sendemailbin>: Absolute location of the C<sendemail> program if set as B<mail_type>.
+
+=over 8
+
+=item
+
+B<from>: Email address to use in FROM.
+
+=item
+
+B<mserver>: The hostname of the SMTP server to use (I<localhost>).
+
+=item
+
+B<msport>: The port on that host the SMTP servers uses (I<25>).
+
+=item
+
+B<msuser>: The username for authenticating with the SMTP server.
+
+=item
+
+B<mspass>: The password for authenticating with the SMTP server.
+
+=back
+
+=item
+
+B<sendmailbin>: Absolute location of the C<sendmail> program if set as B<mail_type>.
+
+Extra options: B<from>
+
+=item * mail_type: Mail::Sendmail
+
+Extra options: B<from|mserver|msport>
+
+=item * mail_type: MIME::Lite
+
+Extra options: B<from|mserver|msport|msuser|mspass>
+
+=back
+
+=head2 Various files/directories
+
+This section only handles the B<adir> option interactively, but more options are set.
+
+=over
+
+=item
+
+B<adir>: Absolute location to use as a base for the archive of reports and
+other files, leave empty for no archiving. We archive B<outfile>, B<rptfile>,
+B<jsnfile> and B<logfile>.
+
+=item
+
+B<outfile>: The file that holds all information to create the report (I<mktest.out>).
+
+=item
+
+B<rptfile>: The report that is generated at the end of the run (I<mktest.rpt>).
+
+=item
+
+B<jsnfile>: The json that will be send to the Perl5CoreSmokeDB (I<mktest.jsn>).
+
+=item
+
+B<lfile>: Absolute location of the logfile (I<< <prefix>.log >>).
+
+=back
+
+=head2 hostname
+
+By default we use the hostname reported by L<System::Info>, but this can be changed here.
+
+=head2 un_file
+
+One can add a usernote to the report, this usernote is kept in a file (I<<
+<prefix>.usernote >>).
+
+If the file does not exist, it will be created.
+
+=head2 un_position
+
+This is the position (I<top|bottom>) where the usernote is inserted into the
+report (I<bottom>).
+
+=head2 cronbin
+
+On unix-like systems we will check for the C<crontab> program, on MSWin32 we
+will check for either the C<schtasks.exe> or C<at.exe> program.
+
+=over
+
+=item B<crontab>
+
+For C<crontab> we read the current entries and if we find ourselfs (the JCL) we
+will comment that line out and add a new line.
+
+=item B<schtasks.exe>
+
+For C<schtasks> we query the scheduler to see if our TaskName is already in the
+schedule and if so we will add the C</F> command line switch to override the
+current entry.
+
+One can find the scheduled task by name: I<< P5Smoke-<prefix> >> or a general
+C<< schtasks /query | find "P5Smoke-" >>
+
+=item B<at.exe>
+
+Microsoft has removed C<at.exe> from Windows 10+ so we can no longer really
+maintain this feature and C<schtasks.exe> is preferred.
+
+=back
+
+=head2 crontime
+
+This is a C<HH::MM> formated time.
+
+=head2 v
+
+This option indicates the verbosity towards the logfile (B<lfile>) and can be
+set to: I<0|1|2>, the default is I<1>.
+
+=head2 smartsmoke
+
+C<smartsmoke> indicates that the smoke need not happen if the patchlevel (git
+commit sha) is the same after syncing the source-tree.
+
+=head2 killtime
+
+When C<< $Config{d_alarm} >> is found we can use C<alarm()> to abort
+long running smokes. Leave this value empty to keep the old behaviour.
+
+    07:30 => F<tssmokeperl.pl> is aborted at 7:30 localtime
+   +23:45 => F<tssmokeperl.pl> is aborted after 23 hours and 45 minutes
+
+Thank you Jarkko for donating this suggestion.
+
+=head2 umask
+
+C<umask> will be set in the shell-script that starts the smoke.
+
+=head2 renice
+
+C<renice> will add a line in the shell-script that starts the smoke.
+
+=head2 PERL5LIB
+
+If you have a value for PERL5LIB set in the config environment, you
+could have it transferred to the JCL. Do not bother
+asking if it is not there.
+
+=head2 PERL5OPT
+
+If you have a value for PERL5OPT set in the config environment, you
+could have it transferred tho the JCL. Do not bother
+asking if it is not there.
+
+=head2 cfg
+
+C<cfg> is the path to the file that holds the build-configurations.
+There are several build-cfg files provided with the distribution:
+
+=over 4
+
+=item
+
+F<perlcurrent.cfg>: for the blead-branch on unixy systems
+
+=item
+
+F<w32current.cfg>: for the blead-branch on MSWin32
+
+=item
+
+F<vmsperl.cfg>: for the blead-branch on OpenVMS
+
+=back
+
+One of these files is used as the default build configurations file, depending
+on the OS one is on.
+
+=begin GitHubSnapshots
+
+There is a way to get a snapshot from GitHub:
+
+    curl -L -o snapshot.tgz https://api.github.com/repos/Perl/perl5/tarball/<branch>
+
+In this tarball the prefix directory is: C<< Perl-perl5-<shortsha>/ >>.
+
+    prefix=$(tar -tzf snapshot.tgz | \
+        perl -anE '$. == 1 and do {($p = $F[-1]) =~ s{/$}{}; say $p}')
+
+gives that directory.
+
+    tar -s "/$prefix/<ddir>/" -xzvf snapshot.tgz
+
+Will extract the files to C<ddir>.
+
+NB: C<< <branch> >> can be a branch-name, tag or commit.
+
+=end GitHubSnapshots
+
+=head1 COPYRIGHT
+
+E<copy> MMII - MMXXIII Abe Timmerman <abeltje@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See:
+
+=over 4
+
+=item * L<http://www.perl.com/perl/misc/Artistic.html>
+
+=item * L<http://www.gnu.org/copyleft/gpl.html>
+
+=back
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+=cut

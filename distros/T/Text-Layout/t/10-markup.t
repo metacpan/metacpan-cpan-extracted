@@ -12,7 +12,7 @@ my $layout = Text::Layout::Testing->new;
 my $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick brown fox',
+     type => "text", text => 'The quick brown fox',
    },
   ];
 
@@ -22,13 +22,13 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick ',
+     type => "text", text => 'The quick ',
    },
    { font => 'Times-Bold(times,normal,bold,10)', size => 10,
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 
@@ -40,13 +40,13 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick ',
+     type => "text", text => 'The quick ',
    },
    { font => 'Times-Italic(times,italic,normal,10)', size => 10,
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 
@@ -58,13 +58,13 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick ',
+     type => "text", text => 'The quick ',
    },
    { font => 'Times-BoldItalic(times,italic,bold,10)', size => 10,
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 
@@ -76,16 +76,16 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The ',
+     type => "text", text => 'The ',
    },
    { font => 'Times-Italic(times,italic,normal,10)', size => 10,
-     text => 'quick ',
+     type => "text", text => 'quick ',
    },
    { font => 'Times-BoldItalic(times,italic,bold,10)', size => 10,
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 
@@ -95,16 +95,16 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The ',
+     type => "text", text => 'The ',
    },
    { font => 'Times-BoldItalic(times,italic,bold,10)', size => 10,
-     text => 'quick',
+     type => "text", text => 'quick',
    },
    { font => 'Times-Bold(times,normal,bold,10)', size => 10,
-     text => ' brown',
+     type => "text", text => ' brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 

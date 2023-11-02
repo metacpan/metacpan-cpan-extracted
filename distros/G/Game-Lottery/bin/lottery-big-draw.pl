@@ -44,7 +44,10 @@ if ( $opt->pick ) {
   my @picks = ();
   for ( my $i = 1; $i <= $opt->pick; $i++) {
     print sprintf('%-5s', $i);
-    push @picks, $lottery->BigDraw();
+    my $draw = $lottery->BigDraw();
+          say
+qq/${\ $draw->{game} } | ${\ do { join ' ', $draw->{whiteballs}->@* } } | ${\ do { join ' ', $draw->{redballs}->@* } }/;
+    push @picks, $draw;
   }
   if ( $opt->file ) {
     $lottery->SavePicks( $opt->file, \@picks);
@@ -77,7 +80,7 @@ lottery-big-drawl.pl
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 About
 

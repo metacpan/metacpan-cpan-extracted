@@ -1,3 +1,31 @@
+0.69  2023-10-31  lichtkind
+-------
+    * = cleanup release
+    * " see saved (settings) status in title
+    * ' POD fix in GUI part listing
+    * ! increment file name counter only if file is missing
+    * ! remove tests for removed dialogs
+
+0.68  2023-10-29  lichtkind
+-------
+    * = minor feature and cleanup release
+    * + extended draft retrigger to mod matrix and pen settings
+    * ~ greater color change dynamics range
+    * - remove unused dialogs (documentation only with POD)
+    * " reworked about dialog
+    * ' POD typo
+    * ? extended documentation
+
+0.67  2023-10-28  lichtkind
+-------
+    * = GUI tuning release
+    * " shorten tab label
+    * " put frequency settings above amplitude
+    * ~ insert .ini file ending on settings files when missing
+    * ~ insert selected image file ending when missing
+    * ? adapted documentation to GUI changes
+    * ? extended documentation
+
 0.66  2023-10-08  lichtkind
 -------
     * = mid feature release
@@ -7,12 +35,12 @@
 
 0.61  2023-09-30  lichtkind
 -------
-    * = bug fix
-    * adopt code to new GTC API
+    * = bug fix release
+    * ! adopt code to new GTC API
 
 0.60  2023-07-08  lichtkind
 -------
-    * = bug fix
+    * = bug fix release
     * ! using other trig function in mod matrix section does no more crash (div 0)
 
 0.59  2023-03-26  lichtkind
@@ -23,7 +51,7 @@
 
 0.58  2023-02-23  lichtkind
 -------
-    * = maintenance
+    * = maintenance release
     * " optimized GUI of panel section Pen LIne
     * ~ moved config to ~/.config/harmonograph
     * ! config parser had silent bug

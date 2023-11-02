@@ -55,7 +55,6 @@
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
             "Test::Pod::Coverage" : "1.08",
-            "Test::Pod::No404s" : "0",
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.12",
             "Test::Warnings" : "0"
@@ -185,7 +184,6 @@
             "Dist::Zilla::Plugin::Test::Kwalitee" : "2.10",
             "Dist::Zilla::Plugin::Test::MinimumVersion" : "2.000010",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0.08",
-            "Dist::Zilla::Plugin::Test::Pod::No404s" : "1.003",
             "Dist::Zilla::Plugin::Test::PodSpelling" : "2.006003",
             "Dist::Zilla::Plugin::Test::Portability" : "2.000007",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0.022",
@@ -201,7 +199,7 @@
    "provides" : {
       "Test::JSON::Schema::Acceptance" : {
          "file" : "lib/Test/JSON/Schema/Acceptance.pm",
-         "version" : "1.020"
+         "version" : "1.021"
       }
    },
    "release_status" : "stable",
@@ -216,10 +214,10 @@
          "web" : "https://github.com/karenetheridge/Test-JSON-Schema-Acceptance"
       }
    },
-   "version" : "1.020",
+   "version" : "1.021",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.039002"
+         "version" : "5.039004"
       },
       "plugins" : [
          {
@@ -537,11 +535,6 @@
             },
             "name" : "@Author::ETHER/Test::PodSpelling",
             "version" : "2.007005"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Test::Pod::No404s",
-            "name" : "@Author::ETHER/Test::Pod::No404s",
-            "version" : "1.004"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Kwalitee",
@@ -930,7 +923,7 @@
             "class" : "Dist::Zilla::Plugin::EnsureLatestPerl",
             "config" : {
                "Dist::Zilla::Plugin::EnsureLatestPerl" : {
-                  "Module::CoreList" : "5.20230820"
+                  "Module::CoreList" : "5.20231025"
                }
             },
             "name" : "@Author::ETHER/EnsureLatestPerl",
@@ -1148,7 +1141,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.020",
+                  "tag" : "v1.021",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },
@@ -1409,7 +1402,7 @@
       "Karen Etheridge <ether@cpan.org>",
       "Daniel Perrett <dp13@sanger.ac.uk>"
    ],
-   "x_generated_by_perl" : "v5.39.2",
+   "x_generated_by_perl" : "v5.39.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT",
    "x_static_install" : 0,

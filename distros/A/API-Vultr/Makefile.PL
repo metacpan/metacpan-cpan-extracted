@@ -1,4 +1,5 @@
-use 5.036;
+use strict;
+use warnings;
 
 use utf8;
 use ExtUtils::MakeMaker;
@@ -12,7 +13,7 @@ WriteMakefile(
         dynamic_config => 0,
         'meta-spec'    => { version   => 2 },
         no_index       => { directory => [ 'examples', 't' ] },
-        prereqs        => { runtime   => { requires => { perl => '5.008' } } },
+        prereqs        => { runtime   => { requires => { perl => 'v5.8.1' } } },
         resources      => {
             bugtracker =>
               { web => 'https://github.com/rawleyfowler/API-Vultr/issues' },
@@ -24,7 +25,7 @@ WriteMakefile(
             }
         },
     },
-    Prereq_PM => {
+    PREREQ_PM => {
         'LWP::UserAgent'       => '6.72',
         'URI'                  => '5.21',
         'Test::Simple'         => '1.302195',

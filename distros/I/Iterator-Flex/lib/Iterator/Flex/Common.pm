@@ -8,11 +8,15 @@ use warnings;
 
 use experimental ( 'postderef', 'signatures' );
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Exporter 'import';
 
-our @EXPORT_OK   = qw[ iterator iter iarray icycle icache igrep imap iproduct iseq ifreeze thaw ];
+our @EXPORT_OK = qw[
+  iterator iter iarray icycle icache
+  icat igrep imap iproduct iseq ifreeze thaw
+];
+
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 use Ref::Util             qw[ is_arrayref is_hashref is_ref is_globref ];
@@ -134,6 +138,45 @@ sub iarray ( $array, $pars = {} ) {
 sub icache ( $iterable, $pars = {} ) {
     require Iterator::Flex::Cache;
     Iterator::Flex::Cache->new( $iterable, $pars );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub icat ( @args ) {
+    require Iterator::Flex::Cat;
+    Iterator::Flex::Cat->new( @args );
 }
 
 
@@ -394,7 +437,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat
 
 =head1 NAME
 
@@ -402,7 +445,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -554,6 +597,38 @@ The returned iterator supports the following methods:
 =item current
 
 =item freeze
+
+=back
+
+=head2 icat
+
+  $iterator = icat( \@iterables, ?\%pars );
+
+Concatenate the iterables.  As each iterator is exhausted, the next
+one is queried for its values.  See L<Iterator::Flex::Cat> for more
+details.
+
+The returned iterator supports the following methods:
+
+=over
+
+=item reset
+
+If all of the iterables support it.
+
+=item rewind
+
+If all of the iterables support it.
+
+=item next
+
+=item prev
+
+=item current
+
+=item freeze
+
+If all of the iterables support it.
 
 =back
 

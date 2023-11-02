@@ -1,0 +1,79 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 2,
+          "raw" => "\t- Add full covered tests for Data::MPQ\n",
+          "style" => "-",
+          "text" => "Add full covered tests for Data::MPQ"
+        },
+        {
+          "line" => 3,
+          "raw" => "\t- Change repository name in META\n",
+          "style" => "-",
+          "text" => "Change repository name in META"
+        }
+      ],
+      "line" => 1,
+      "note" => "30 Oct 2011",
+      "raw" => "0.04 30 Oct 2011\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 5,
+          "raw" => "\t- Fix some critical bugs\n",
+          "style" => "-",
+          "text" => "Fix some critical bugs"
+        },
+        {
+          "line" => 6,
+          "raw" => "\t- Rename module to Data::MPQ::* (https://rt.cpan.org/Public/Bug/Display.html?id=71938)\n",
+          "style" => "-",
+          "text" => "Rename module to Data::MPQ::* (https://rt.cpan.org/Public/Bug/Display.html?id=71938)"
+        },
+        {
+          "line" => 7,
+          "raw" => "\t- Add a bit of Pod documentation\n",
+          "style" => "-",
+          "text" => "Add a bit of Pod documentation"
+        }
+      ],
+      "line" => 4,
+      "note" => "29 Oct 2011",
+      "raw" => "0.03 29 Oct 2011\n",
+      "version" => "0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 9,
+          "raw" => "\t- Fix bugs at 32bit platform\n",
+          "style" => "-",
+          "text" => "Fix bugs at 32bit platform"
+        }
+      ],
+      "line" => 8,
+      "note" => "26 Oct 2011",
+      "raw" => "0.02 26 Oct 2011\n",
+      "version" => "0.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 11,
+          "raw" => "\t- First version\n",
+          "style" => "-",
+          "text" => "First version"
+        }
+      ],
+      "line" => 10,
+      "note" => "23 Oct 2011",
+      "raw" => "0.01 23 Oct 2011\n",
+      "version" => "0.01"
+    }
+  ]
+}

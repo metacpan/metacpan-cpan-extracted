@@ -25,11 +25,33 @@ En utilisant l'option **--discrete**, une commande individuelle est appelée pou
 
 Il n'est pas nécessaire que les lignes de données d'entrée et de sortie soient identiques lorsque l'option **--discrete** est utilisée.
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     Lancez une nouvelle commande individuellement pour chaque pièce correspondante.
+
+- **--fillup**
+
+    Combine une séquence de lignes non vides en une seule ligne avant de les transmettre à la commande de filtrage. Les caractères de nouvelle ligne entre les caractères larges sont supprimés et les autres caractères de nouvelle ligne sont remplacés par des espaces.
+
+- **--blockmatch**
+
+    Normalement, la zone correspondant au modèle de recherche spécifié est envoyée à la commande externe. Si cette option est spécifiée, ce n'est pas la zone correspondant au motif de recherche qui sera traitée, mais l'ensemble du bloc qui la contient.
+
+    Par exemple, pour envoyer à la commande externe des lignes contenant le motif `foo`, vous devez spécifier le motif correspondant à la ligne entière :
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    Mais avec l'option **--blockmatch**, cela peut être fait aussi simplement que suit :
+
+        greple -Mtee cat -n -- foo
+
+    Avec l'option **--blockmatch**, ce module se comporte plus comme l'option **-g** de [teip(1)](http://man.he.net/man1/teip).
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ La commande suivante trouvera des blocs de texte dans le document de style [perl
 
 Vous pouvez les traduire par le service DeepL en exécutant la commande ci-dessus combinée avec le module **-Mtee** qui appelle la commande **deepl** comme ceci :
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-Comme **deepl** fonctionne mieux pour la saisie sur une seule ligne, vous pouvez modifier la partie de la commande comme ceci :
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 Le module dédié [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) est plus efficace dans ce but, cependant. En fait, l'indice d'implémentation du module **tee** vient du module **xlate**.
 
@@ -82,7 +100,24 @@ Vous pouvez reformater cette partie en utilisant le module **tee** avec la comma
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+L'utilisation de l'option `--discrete` prend du temps. Vous pouvez donc utiliser l'option `--separate '\r'` avec `ansifold` qui produit une seule ligne en utilisant le caractère CR au lieu de NL.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Ensuite, convertissez le caractère CR en NL à l'aide de la commande [tr(1)](http://man.he.net/man1/tr) ou d'une autre commande.
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+Considérons une situation dans laquelle vous souhaitez rechercher des chaînes de caractères dans des lignes autres que les lignes d'en-tête. Par exemple, vous pouvez rechercher des images à partir de la commande `docker image ls`, mais en laissant la ligne d'en-tête. Vous pouvez le faire en utilisant la commande suivante.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+L'option `-Mline -L 2:` récupère l'avant-dernière ligne et l'envoie à la commande `grep perl`. L'option `--discrete` est nécessaire, mais elle n'est appelée qu'une seule fois, de sorte qu'il n'y a pas d'inconvénient en termes de performances.
+
+Dans ce cas, `teip -l 2- -- grep` produit une erreur car le nombre de lignes en sortie est inférieur au nombre de lignes en entrée. Cependant, le résultat est tout à fait satisfaisant :)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ Vous pouvez reformater cette partie en utilisant le module **tee** avec la comma
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+# BUGS
+
+L'option `--fillup` peut ne pas fonctionner correctement pour le texte coréen.
 
 # AUTHOR
 

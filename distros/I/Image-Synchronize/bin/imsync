@@ -9,7 +9,7 @@ use lib "$FindBin::Bin/../lib";
 
 use Carp;
 use Getopt::Long qw(:config auto_version);
-use Image::Synchronize;
+use Image::Synchronize qw(normalize_options);
 use Path::Class qw(file);
 use Pod::Usage;
 
@@ -17,34 +17,36 @@ our $VERSION = $Image::Synchronize::VERSION;
 
 my %cmd_options = ( fastscan => 1, recurse => 1 );
 
+@ARGV = normalize_options(@ARGV);
+
 # option --version is added automatically because of the configuration
 # options on the "use Getopt::Long" statement
 GetOptions(
            \%cmd_options,
-           'cameraid|camera-id=s%',
-           'clearlog|clear-log',
-           'exportgpx|export-gpx:s',
-           'fastscan|fast-scan=i',
+           'cameraid=s%',
+           'clearlog',
+           'exportgpx:s',
+           'fastscan=i',
            'follow=s@',
            'force+',
            'help|?',
            'location=s%',
-           'logfile|log-file=s',
+           'logfile=s',
            'man',
            'modify!',
-           'offsetspath|offsets-path:s',
+           'offsetspath:s',
            'recurse!',
            'relativefiletime',
-           'removebackups|remove-backups',
-           'removeourtags|remove-our-tags',
-           'reportlevel|report-level:1',
-           'restoreoriginals|restore-originals',
+           'removebackups',
+           'removeourtags',
+           'reportlevel:1',
+           'restoreoriginals',
            'summertime=s',
            'time=s%',
            'unsafe',
            'verbose:1',
            'wintertime=s',
-           'workingdirectory|working-directory=s'
+           'workingdirectory=s'
 ) or pod2usage(2);
 
 if ( $cmd_options{help} or $cmd_options{man} ) {
@@ -113,50 +115,49 @@ file I<imsync.log>).
 
 =head1 OPTIONS
 
-  --cameraid FILE=ID  Specify the camera ID for a file.  Can also be
-                   written as --camera-id.
+Options start with two dashes C<-->.  Arbitrary C<_> and C<-> can be
+inserted into the option names after the initial dashes.  For example,
+option C<--cameraid> can also be written as C<--camera-id>,
+C<--camera_id>, or even C<--c_am--erai__d>.
+
+  --cameraid FILE=ID  Specify the camera ID for a file.
   --clearlog       Clear the progress log before writing to it.
   --exportgpx [FILE]  Export image geographical locations to this file.
                    If no file is specified, then uses export.gpx.
-                   Can also be written as --export-gpx.
   --fastscan N     Sets the speed of information extraction from
                    files, from 0 through 2.  Higher numbers mean
                    faster processing, but may miss some relevant
                    information.  Defaults to 1.  Is passed on to the
-                   Image::ExifTool backend.  Can also be written as
-                   --fast-scan.
+                   Image::ExifTool backend.
   --follow FILE    Be as verbose as possible for the indicated file.
   --force          Inject missing tags also when modification time is
                    already correct.
   --help, -?       Briefly explains how to use this application.
                    See also --man.
   --location TGT=LOC  Copy the GPS location LOC to target TGT.
-  --logfile FILE   File to log to.  Can also be written as --log-file.
+  --logfile FILE   File to log to.
   --man            Like --help but with more information.
   --modify         Modify files as needed.  The opposite (and default)
-                   is --no-modify, which reports but does not modify.
+                   is --nomodify, which reports but does not modify.
   --norecurse      Do not process subdirectories.  The opposite (and
                    default) is to recursively process subdirectories,
-                   too.  Can also be written as --no-recurse.
+                   too.
   --offsetspath FILE  File to read camera timezone offsets from and
                    write updated ones to.  Defaults to
                    .imsync-cameraoffsets.yaml in the current or home
-                   directories.  Can be written as --offsets-path.
+                   directories.
   --recurse        Process subdirectories, too.  This is the default.
-                   Use --no-recurse to not process subdirectories.
+                   Use --norecurse to not process subdirectories.
   --relativefiletime  Set file modification timestamps to the same
                    local clock times as in the (far-away) time zone
                    where the images were recorded, instead of setting
                    file modification timestamps to the same absolute
                    times.
-  --removebackups  Remove backup files.  Can also be written
-                   as --remove-backups.
+  --removebackups  Remove backup files.
   --removeourtags  Remove embedded tags that were added by this
-                   application.  Can be written as --remove-our-tags.
+                   application.
   --reportlevel N  Sets the level of detail of the final report.
-                   Can also be written as --report-level.
-  --restoreoriginals  Restore original files from backups.  Can also
-                   be written as --restore-originals.
+  --restoreoriginals  Restore original files from backups.
   --summertime FILE  The FILE's camera switched from Standard to
                    Daylight Savings Time just before that FILE.
   --time FILE=TIME  Specify the target time or offset for a file.
@@ -285,7 +286,6 @@ creation timestamp.
 =head2 --cameraid
 
   --cameraid FILE=ID
-  --camera-id FILE=ID
 
 Specifies the camera ID to associate with a target file C<FILE>, if
 the camera ID that imsync proposed is not appropriate somehow.
@@ -304,7 +304,6 @@ is embedded in it (with our own I<XMP:CameraID> tag).
 =head2 --clearlog
 
   --clearlog
-  --clear-log
 
 Says to clear the previous contents of the progress log, if any,
 before writing the first message to it.  If this option is not
@@ -326,7 +325,6 @@ application to see where the pictures were taken.
 =head2 --fastscan
 
   --fastscan N
-  --fast-scan N
 
 Sets the speed of information extraction from files, from 0 through 2.
 Higher numbers mean faster processing, but may miss some relevant
@@ -426,7 +424,6 @@ level must be prefixed by a dash C<->.
 =head2 --logfile
 
   --logfile FILE
-  --log-file FILE
 
 Specifies the file to write the log messages to (in addition to
 printing them to standard output).  If not set, then I<imsync.log>
@@ -450,7 +447,6 @@ reported but the files aren't modified.
 =head2 --norecurse
 
   --norecurse
-  --no-recurse
 
 Says to process the files in the specified directories (if any) but
 not those in any subdirectories of those specified directories.  The
@@ -460,7 +456,6 @@ process subdirectories, too.
 =head2 --offsetspath
 
   --offsetspath FILE
-  --offsets-path FILE
 
 Specifies the file for camera timezone offsets.  Such offsets are read
 from the file when the application begins, and updated ones are
@@ -489,7 +484,6 @@ system's time zone (when sorted by file modification time).
 =head2 --removebackups
 
   --removebackups
-  --remove-backups
 
 This application only modifies a file if a backup of it exists.  The
 backup has the same name, with I<_original> appended to it.  This
@@ -504,7 +498,6 @@ I<_original> suffix.  See also L</--restoreoriginals>.
 =head2 --removeourtags
 
   --removeourtags
-  --remove-our-tags
 
 Remove the embedded tags that were added by previous runs of this
 application.
@@ -523,7 +516,6 @@ previous run of this application.
 =head2 --reportlevel
 
   --reportlevel LEVEL
-  --report-level LEVEL
 
 Sets the detail level for the final report:
 
@@ -539,7 +531,6 @@ change is indicated.
 =head2 --restoreoriginals
 
   --restoreoriginals
-  --restore-originals
 
 Restores original files from backup files.
 
@@ -652,7 +643,6 @@ The opposite is L</--summertime>.
 
 =head2 --workingdirectory
 
-  --working-directory DIR
   --workingdirectory DIR
 
 Change the working directory to C<DIR> before starting processing.
@@ -1205,7 +1195,7 @@ remains.
 
 The L</--verbose> and L</--follow> command-line options determine how
 verbose the logging is, except for the final report which is governed
-by L</--reportlevel> insead.
+by L</--reportlevel> instead.
 
 With no C<--verbose>, or with C<--verbose 1>, summary information is
 printed.

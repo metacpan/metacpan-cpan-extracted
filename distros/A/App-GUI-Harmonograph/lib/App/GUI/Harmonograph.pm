@@ -6,7 +6,7 @@ use FindBin;
 
 package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.66';
+our $VERSION = '0.69';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -65,8 +65,8 @@ INI file for tweaking them later
 
 =back
 
-Please note that quick preview gets only triggered by the pendulum
-controls (section X, Y, Z and R).
+Please note that quick preview changes two PEN SETTINGS (last tab)
+to produce always something visible.
 
 After first use of the program, a config file will be created under
 I<~/.config/harmonograph> in your home directory. It contains mainly
@@ -130,14 +130,16 @@ Because when X goes right Y goes up and vice versa.
 But if we start one pendulum at the center and the other
 at the upmost position we get a circle.
 In other words: we added an offset of 90 degrees to Y (or X).
-Our third pendulum Z moves the paper and does exactly
-the already described circular movement without rotating around its center.
+Our third pendulum Z moves the paper in circulating manner and
+but not rotating the paper around its center.
 If both circular movements (of X, Y and Z) are concurrent -
-the pen just stays at one point over the paper, If both are countercurrent -
-we get a circle. Interesting things start to happen, if we alter
-the speed of of X, Y and Z. Than famous harmonic pattern appear.
+the pen just stays at one point over the paper.
+If both are countercurrent - we get a circle.
+Interesting things start to happen, if we alter the speed of of X, Y and Z.
+Than famous harmonic pattern appear.
 And for even more complex drawings I added R, which is not really
-a pendulum, but an additional rotary movement of Z around its center.
+a pendulum and not part of the original harmonograph,
+but an additional rotary movement of Z around its center.
 The pendula out of metal do of course fizzle out over time,
 which you can see in the drawing, in a spiraling movement toward the center.
 We emulate this with two damping factors: one for amplitude and one for
@@ -166,63 +168,69 @@ These are divided into four tabs - roughly devided in form (3) and decoration (l
 
 =item 3
 
-The lower left side contains buttons which trigger a few commands,
-mostly for mass productions of image files. All the other commands are
-only reachable in the main menu or by keyboard
-(key combinations are displayed in the menu).
+In the lower left corner are two rows of command buttons. All other
+commands are in the menu. The upper row is just for drawing and the lower
+for image mass production more under L</Commands>.
 
 =back
 
 Please mind the tool tips - short help texts which appear if the mouse
-stands still over a button or slider. Also helpful are messages in the
-status bar at the bottom - on bottom left regarding images and bottom
-right about settings.
-When brwosing the main menu, help texts about the highlighted item
+stands still over most widgets. Also helpful are messages in the
+status bar at the bottom - on bottom left regarding current state of the image
+and bottom right about state of the settings. Settings are all the
+parameters of the image, that are dialed in via widget in the tabs.
+Configuration are the general settings of this program, which are mostly
+saved colors and paths were to store images and settings.
+
+When browsing the main menu, help texts about the highlighted item
 also appears in the status bar. The Menu can be completely navigated with
 the keyboard. Just hold Alt and use the direction keys (up, down, left
 and right) or the highlighted letters. When holding the Alt key you can
 also see which Alt + letter combinations trigger which button.
 
+
 =head2 Pendulum
 
-The first tab contains the settings that define the properties of the
-lateral pendula (X and Y), which move along the x and y axis in a straight
-manner. On the second tab are identical controls for the pendula Z and R
-which together with X and Y determine the shape of the drawing.
-Z does a circling movement, R is a rotation (around Z's axis or origin).
+Each of the first two tabs contains the settings of two pendula.
+The first tab has the lateral pendula: X (left right movement) and
+Y (up and down). The second tab has Z (wobble - moving the center of the
+paper in rotating movement around the center of the space without rotating
+the paper) and R (actual rotation around center of the pater).
+Most settings can be changed with a combo-slider which allows input by
+typing, moving the slider or fine tuning the value by pushing the minus
+and plus buttons. The settings for each pendulum are identical and are as follow:
 
-All controls from top to bottom and left to right are:
-an on/off switch which activates the whole pendulum with all settings.
-After that follows the pendulum's amplitude (here called radius).
-This determines the size in the direction the pendulum moves.
-Below that follows amplitude damping, which reduces the amplitude over time,
-so that the drawing will spiral toward the center. Since this is all
-computed, time refers to the line length. Damping can take place in a steady
-(minus '-') or in a slowing, procentual manner ('*').
-The third row is labeled acceleration, which refers to an additional
-dynamic of the amplitude damping.
-
-The forth row lets you dial in the speed (frequency). This is the most
-fundamental to the shape. For instance 2 means that the pendulum swings
-back and fourth twice as fast. To the right you can choose an additional
-factor the frequency gets multiplied with. This can be a constant like
+Each pendulum section starts with the name of the pendulum, but in front
+of that (tothe right) is a checkbox to (de-)activate the entire pendulum.
+The first row lets you dial in the speed (frequency). This is most
+fundamental to the shape of the drawing. For instance 2 means that the
+pendulum swings back and fourth twice as fast. To the right you can choose
+an additional factor the frequency gets multiplied with. This can be a constant like
 Pi or Phi or the frequency of another pendulum or just simply one.
 This is especially handy when browsing the classic shapes
 with three pendula. For these the frequency of X and Y has to be the same -
 which will be ensured when you set the frequency factor of Y to X
-(or vice versa) and keep the frequency of Y to one.
+(or vice versa) and keep the frequency of the connected pendulum to one.
 The next combo control below adds decimals  to the frequency value
 for more complex rotating drawings. Behind that are two check boxes to
 invert the final frequency value to 1/x or to flip the direction of
-the pendulum. Below that follows a frequency damping, which works
+the pendulum. Below that follows a frequency damping, which will change
+the frequency over time. To the right of that value you can set the damping
+mode. Set it to minus for linear damping or to "*" for accelerated damping.
 the same as the second row only with slightly different optical results.
 
-The last row starts with a slider to fine tune the starting point of the
+The fourth row starts with a slider to fine tune the starting point of the
 pendulum. It can be chosen between zero and a quater rotation. This can
 have great effects on the shape. Because of the special desirability
 offsets of an half (180 degree) or quarter (90 degree) rotation can be
 activated by checkbox (to the right of the slider). The final offset is
-the sum of the checked.
+the sum of the checked with the slider value.
+
+The fifth row is the amplitude size, which simple allows to make the
+picture larger or smaller depending if the pendulum left the frame or
+doesn't move enough. As with reqency, also the amplitude can be damped
+over time and this damping can accelerated.
+
 
 =head2 Mod Matrix
 
@@ -230,14 +238,21 @@ the sum of the checked.
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/GUI3.png"    alt=""  width="630" height="410">
 </p>
 
-The third tab allows the deepest alterations to the drawing, which leave
+The third tab allows the deepest alterations to the drawing, which leaves
 the original concept of a Harmonograph. For instance the X - Pendulum
 is basically a little more than the a cosine function to the time variable.
-Here you can change that to sine, tangent or other trigonometric functions.
-Same goes for Y and Z. R is a function of an rotation matrix. Here you
-can change every of its four elements.
+The time variable represents the frequency since we simulate a double
+frequency by doubling the speed time passes for this pendulum.
+If you change the function from cosine (cos) to tangent or other
+trigonometric functions the shapes will change redically.
+Same goes for Y and Z which is computation wise just a combination of
+X and Y applied to a offset. R is different since its computed with a
+rotation matrix. But in same manner as X or Y you can change here for
+each cell of the matrix the variable and the function that computes
+on that variable. Please note the most beautiful examples were computed
+by changing the variable of just one cell of the rotation matrix.
 
-=head2 Line
+=head2 Pen Settings
 
 =for HTML <p>
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/GUI2.png"   alt=""  width="630" height="410">
@@ -255,8 +270,8 @@ but very airy.
 
 =head2 Colors
 
-Below that on the last tab are the options for colorization and this
-has in itself three parts.
+On the lower part of the pen settings tab are the are the options for
+colorization and this has in itself three parts.
 Topmost are the settings for the color change, which is set on default to I<no>.
 In that case only the upper I<start color> (below the color change section)
 will be used, and not the I<end color> (target - which is even below that).
@@ -281,24 +296,35 @@ with the I<start color> and the lower with the I<end color>.
 In the lower left corner are two rows of command buttons. All other
 commands are in the menu.
 
-The upper row has only one button for making a full drawing. This
-might take some time if line length and dot density are high.
-For that reason - only changes on the pendulum settings (first two tabs)
-produce an sketch drawing, helping the user understand the nature his
-changes. A sketch contains only the first five pendulum swings,
-so it can be drawn fast enough for almost immediate interactions.
-For a full drawing that takes all settings into account you need to push
-I<Draw> button or Press C<Ctrl + D>.
+The lower left part of the window contains buttons in two rows.
+The upper row is just for drawing the complete image. It has a progress
+bar and the draw button. If the progress bar is white, you see just a sketch
+drawing - a preview of the full image that can be computed fast enought
+to react to all setting changes. If you push the draw button (or <Ctrl>+<S>),
+you will get a full image and the progress bar has the color of the drawing
+and also can show you the color progression over time, so you can see,
+which are the early and the later parts of the drawing.
 
-The second row has commands to quickly save many files.
-First push I<Dir> to select the directory and then type directly into the
-second text field the file base name. The index in the next one
-is found automatically. Every time you now press I<Save> a file with the
-current image is saved under the path: dir + base name + index + ending
-(set in Menu: Image &gt; Format and saved in configs).
-The index automatically autoincrements when producing a file.
-Push button I<INI> next to it to also save the settings of the current
-state under same file name, but with the ending C<.ini>.
+The second button row is for easy mass production of drawings.
+The three text fields are combined the parts of the file path.
+The first text field is naturally the directory where the files get saved.
+You can change it by pushing the I<Dir> in front (left) of the text button
+and use the then opening  Dir-Dialog to select another directory.
+The second text field holds the base file name, which has to be inserted
+by clicking on in and typing. The third text field is the file number and
+is readonly. That counter increments automatically when a file is generated.
+The complete file path is <dir>+<base name>+'_'+<counter>+<file ending>.
+The file ending is I<.ini> for setting files and I<.jpg> or I<.png> or I<.svg>
+for image files. The exact ending depends on what is the current configuration
+set in the image > format menu. Lets say your directory is
+"/home/user/images/h" and the base file name is beauty. If there is already
+a file "/home/user/images/h/beauty_4.png" - the program will detect that
+and set the counter to 5. You can play with the settings and than (no matter
+if there is currently a complete drawing or not) push the I<Save> button
+to produce a complete drawing into "/home/user/images/h/beauty_5.png".
+If you push the I<INI> button you safe the current settings into
+"/home/user/images/h/beauty_5.ini". This file can later be loaded via
+settings menu to restore the current state of all buttons in the tabs.
 
 
 =head2 Menu
@@ -321,7 +347,8 @@ of the serially save images by the command buttons in the left lower corner.
 The preferred file format is also the first wild card in the save dialog.
 Above that is another submenu for setting the image size.
 
-The third menu has some dialogs with documentation and additional information.
+The third menu has only one item to oben the I<about> - dialog,
+where you can see which perl, Wx and other versions you are currently using.
 
 
 =head1 SEE ALSO
@@ -331,6 +358,8 @@ L<App::GUI::Cellgraph>
 L<App::GUI::Chaosgraph>
 
 L<App::GUI::Dynagraph>
+
+L<App::GUI::Juliagraph>
 
 L<App::GUI::Sierpingraph>
 

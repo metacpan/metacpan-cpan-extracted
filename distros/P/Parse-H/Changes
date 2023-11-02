@@ -1,5 +1,13 @@
 Revision history for Parse-H
 
+2023-10-23	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.21
+	  Quick fix for tests under Perl without taint support.
+	* lib/Parse/H.pm: Added a command-line, for rpmlint.
+	* t/*.t: Remove "-T" from the command line for Perl without taint
+	  support.
+
 2023-10-15	Bogdan Drozdowski <bogdro \at\ cpan . org>
 
 	* Version 0.20

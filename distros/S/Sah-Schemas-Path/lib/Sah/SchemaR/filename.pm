@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::filename;
 
-our $DATE = '2021-07-17'; # DATE
-our $VERSION = '0.016'; # VERSION
+our $DATE = '2023-10-29'; # DATE
+our $VERSION = '0.021'; # VERSION
 
-our $rschema = ["str",[{description=>"\nThis schema is basically string with some checks and prefilters. Why use this\nschema instead of plain ol' str? Mainly to give you the ability to change tilde\nto user's home directory, e.g. `~/foo.txt` into `/home/someuser/foo.txt`.\nNormally this expansion is done by a Unix shell, but sometimes your program\nreceives an unexpanded path, e.g. when you get it from some config file.\n\nSee also more OS-specific schemas like `filename::unix`, which adds some more\nchecks (e.g. filename cannot contain forward slash and each component cannot be\nlonger than 255 characters) and preprocessing (e.g. stripping extraneous slashes\nlike `foo//bar` into `foo/bar`.\n\nWhat's the difference between this schema and `dirname`? The default completion\nrule. This schema's completion by default only includes files and not\ndirectories.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem file name","x.completion"=>["filename"]}],["str"]];
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis schema is basically string with some checks and prefilters. Why use this\nschema instead of plain ol' str? Mainly to give you the ability to change tilde\nto user's home directory, e.g. `~/foo.txt` into `/home/someuser/foo.txt`.\nNormally this expansion is done by a Unix shell, but sometimes your program\nreceives an unexpanded path, e.g. when you get it from some config file.\n\nSee also more OS-specific schemas like `filename::unix`, which adds some more\nchecks (e.g. filename cannot contain forward slash and each component cannot be\nlonger than 255 characters) and preprocessing (e.g. stripping extraneous slashes\nlike `foo//bar` into `foo/bar`.\n\nWhat's the difference between this schema and `dirname`? The default completion\nrule. `dirname`'s completion only includes directories and not files.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem file name","x.completion"=>["filename"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Filesystem file name
@@ -20,7 +21,7 @@ Sah::SchemaR::filename - Filesystem file name
 
 =head1 VERSION
 
-This document describes version 0.016 of Sah::SchemaR::filename (from Perl distribution Sah-Schemas-Path), released on 2021-07-17.
+This document describes version 0.021 of Sah::SchemaR::filename (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Path>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Path>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

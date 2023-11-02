@@ -1,13 +1,12 @@
 #! /usr/bin/perl -w
 use strict;
 
-# $Id$
-
-use Test::More tests => 81;
+use Test::More;
 my $verbose = 0;
 
 my $findbin;
 use File::Basename;
+use File::Spec::Functions;
 BEGIN { $findbin = dirname $0; }
 use lib $findbin;
 use TestLib;
@@ -275,6 +274,28 @@ OUT
        q/-"Dusedevel" -"Dprefix=sys$login:[perl59x]"/,
        "check vms cmdline";
 }
+
+{
+    my %map = (
+        MSWin32 => 'w32current.cfg',
+        VMS     => 'vmsperl.cfg',
+        darwin  => 'perlcurrent.cfg',
+        linux   => 'perlcurrent.cfg',
+        openbsd => 'perlcurrent.cfg',
+    );
+
+    my $base_dir = dirname($INC{'Test/Smoke/BuildCFG.pm'});
+    for my $os (sort keys %map) {
+        my $config = catfile($base_dir, $map{$os});
+        open(my $fh, '<', $config) or die "Cannot open($config): $!";
+        my $from_file = do { local $/; <$fh> };
+        close($fh);
+        my $from_module = Test::Smoke::BuildCFG->os_default_buildcfg($os);
+        is($from_module, $from_file, "os_default_buildcfg($os)");
+    }
+}
+
+done_testing();
 
 package Test::BCFGTester;
 use strict;

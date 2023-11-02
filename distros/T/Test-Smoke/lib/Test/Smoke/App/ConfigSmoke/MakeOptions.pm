@@ -2,6 +2,8 @@ package Test::Smoke::App::ConfigSmoke::MakeOptions;
 use warnings;
 use strict;
 
+our $VERSION = '0.002';
+
 use Exporter 'import';
 our @EXPORT = qw/ config_make_options /;
 
@@ -43,6 +45,9 @@ sub config_make_options {
     $self->handle_option(Test::Smoke::App::Options->force_c_locale);
     if ( $^O ne 'MSWin32' ) {
         $self->handle_option(Test::Smoke::App::Options->defaultenv);
+        if (! $self->current_values->{defaultenv}) {
+            $self->handle_option(Test::Smoke::App::Options->perlio_only);
+        }
     }
     else {
         $self->current_values->{defaultenv} = 1;

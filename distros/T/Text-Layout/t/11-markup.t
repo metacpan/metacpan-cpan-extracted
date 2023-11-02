@@ -12,7 +12,7 @@ my $layout = Text::Layout::Testing->new;
 my $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick brown fox',
+     type => "text", text => 'The quick brown fox',
    },
   ];
 
@@ -22,13 +22,13 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick ',
+     type => "text", text => 'The quick ',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => '8.333',
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 
@@ -40,13 +40,13 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick ',
+     type => "text", text => 'The quick ',
    },
    { font => 'Helvetica(sans,normal,normal,11)', size => 11,
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 
@@ -57,13 +57,13 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick ',
+     type => "text", text => 'The quick ',
    },
    { font => 'Helvetica-BoldOblique(sans,italic,bold,10)', size => 10,
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 
@@ -73,21 +73,21 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The ',
+     type => "text", text => 'The ',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      underline => 'single',
-     text => 'quick',
+     type => "text", text => 'quick',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' ',
+     type => "text", text => ' ',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      underline => 'double', underline_color => 'blue',
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 
@@ -97,14 +97,14 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The ',
+     type => "text", text => 'The ',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      strikethrough => 1,
-     text => 'quick',
+     type => "text", text => 'quick',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' brown fox',
+     type => "text", text => ' brown fox',
    },
   ];
 
@@ -114,14 +114,14 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The ',
+     type => "text", text => 'The ',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      strikethrough => 1, strikethrough_color => 'yellow',
-     text => 'quick',
+     type => "text", text => 'quick',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' brown fox',
+     type => "text", text => ' brown fox',
    },
   ];
 
@@ -131,19 +131,19 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The ',
+     type => "text", text => 'The ',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      strikethrough => 1, strikethrough_color => 'yellow',
-     text => 'quick',
+     type => "text", text => 'quick',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      strikethrough_color => 'yellow',
-     text => ' brown ',
+     type => "text", text => ' brown ',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      strikethrough => 1, strikethrough_color => 'yellow',
-     text => 'fox',
+     type => "text", text => 'fox',
    },
   ];
 
@@ -153,14 +153,14 @@ is_deeply( $layout->_debug_text, $xp );
 $xp =
   [
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => 'The quick ',
+     type => "text", text => 'The quick ',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
      overline => 'double', overline_color => 'red',
-     text => 'brown',
+     type => "text", text => 'brown',
    },
    { font => 'Times-Roman(times,normal,normal,10)', size => 10,
-     text => ' fox',
+     type => "text", text => ' fox',
    },
   ];
 

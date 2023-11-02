@@ -1,0 +1,68 @@
+{
+  "preamble" => "######################################################################\nRevision history for Perl extension Module::Rename",
+  "raw_preamble" => "######################################################################\nRevision history for Perl extension Module::Rename\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 5,
+          "raw" => "   (ms) [rt.cpan.org #87172] Applied changes by Jim Cochrane to add a -g \n        switch, which uses \"git mv\" instead of mv. Added various fixes and \n        test cases.\n\n",
+          "style" => "",
+          "text" => "(ms) [rt.cpan.org #87172] Applied changes by Jim Cochrane to add a -g switch, which uses \"git mv\" instead of mv. Added various fixes and test cases."
+        }
+      ],
+      "line" => 4,
+      "note" => "(2013/07/27)",
+      "raw" => "0.04 (2013/07/27)\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 10,
+          "raw" => "   (ms) Added sandbox/eg to MANIFEST to fix installation problem\n\n",
+          "style" => "",
+          "text" => "(ms) Added sandbox/eg to MANIFEST to fix installation problem"
+        }
+      ],
+      "line" => 9,
+      "note" => "(2005/04/09)",
+      "raw" => "0.03 (2005/04/09)\n",
+      "version" => "0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 13,
+          "raw" => "   (ms) Replace \"Foo/Bar\" in files just like \"Foo::Bar\".\n",
+          "style" => "",
+          "text" => "(ms) Replace \"Foo/Bar\" in files just like \"Foo::Bar\"."
+        },
+        {
+          "line" => 14,
+          "raw" => "   (ms) Replace pm files outside the regular dir structure.\n\n",
+          "style" => "",
+          "text" => "(ms) Replace pm files outside the regular dir structure."
+        }
+      ],
+      "line" => 12,
+      "note" => "(2005/03/28)",
+      "raw" => "0.02 (2005/03/28)\n",
+      "version" => "0.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 17,
+          "raw" => "   (ms) Where it all began.\n",
+          "style" => "",
+          "text" => "(ms) Where it all began."
+        }
+      ],
+      "line" => 16,
+      "note" => "(2005/03/27)",
+      "raw" => "0.01 (2005/03/27)\n",
+      "version" => "0.01"
+    }
+  ]
+}

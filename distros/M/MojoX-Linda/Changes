@@ -1,0 +1,10 @@
+Revision history for MojoX::Linda
+
+1.02      2023-10-24 16:14:53-07:00 America/Los_Angeles
+        - Fix bug in loading conf from Config::App mojolicious/linda location
+
+1.01      2023-10-24 15:42:31-07:00 America/Los_Angeles
+        - Slightly improved test coverage (kinda)
+
+0.001     2023-10-24 15:28:33-07:00 America/Los_Angeles
+        - First version, released on an unsuspecting world.

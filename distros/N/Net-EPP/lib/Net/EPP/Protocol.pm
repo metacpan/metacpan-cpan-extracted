@@ -100,7 +100,6 @@ sub get_frame {
 			}
 
 			return $xml;
-
 		}
 	}
 }

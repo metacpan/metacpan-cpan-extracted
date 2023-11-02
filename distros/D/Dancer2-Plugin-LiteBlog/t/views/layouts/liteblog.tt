@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    [% IF page_title %]
+    
+    <title>[% page_title %] | [% title %]</title>
+   
+    [% IF feature.highlight %] 
+    <!-- Highlight JS Lib -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+    [% END %]
+
+    [% ELSE %]
+    
+    <title>[% title %]</title>
+    
+    [% END %]
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700|Lato:400,400i,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/liteblog.css">
+    [% FOREACH w IN widgets %]
+    <link rel="stylesheet" href="/css/liteblog/[% w.name %].css">
+    [% END %]
+    [% IF page_title %]
+    <!-- a page_title is defined, let's load the single-page css -->
+    <link rel="stylesheet" href="/css/liteblog/single-page.css">
+    [% END %]
+</head>
+<body>
+
+    <!-- This is the menu bar for small screens -->
+    <header id="mobile-header">
+    
+      <!-- the site logo -->
+      <div id="avatar-icon">
+        [% IF logo %]
+        <a href="/"><img src="[% logo %]" alt="[% title %] Logo"></a>
+        [% ELSE %]
+        <!-- Change the 'logo' setting (under the 'liteblog' config entry) to change this image -->
+        <a href="/"><img src="/images/liteblog.jpg" alt="LiteBlog Logo"></a>
+        [% END %]
+      </div> <!-- END site logo -->
+
+      <!-- the Site Title -->
+      <button id="site-title-button">
+        <a href="/">[% title %]</a>
+      </button>
+
+      [% IF navigation %]
+      <div id="mobile-menu-container">
+      <!-- the hamburger toggle button -->
+      <div id="menu-toggle" class="hamburger-menu">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div> <!-- END hamburger toggle button -->
+      </div>
+      [% END %]
+
+    [% IF navigation %]
+    <!-- the hamburger menu -->
+      <div id="mobile-navigation-menu" class="mobile-nav">
+      [% FOREACH nav IN navigation %]
+        [% IF nav.link %]
+        <a class="mobile-nav-item" href="[% nav.link %]">[% nav.label %]</a>
+        [% END %]
+      [% END %]
+      </div>
+    [% END %] <!-- END hamburger menu -->
+
+
+    </header> <!-- END mobile-header -->
+
+    
+    [% IF page_title %]
+    <!-- single-page layout -->
+    <div id="hero-banner" class="hero-banner">
+      <div class="hero-banner-wrapper">
+        <div class="site-title">[% title %]</div>
+        [% IF navigation %]
+        <nav>
+          [% FOREACH nav IN navigation %]
+            [% IF nav.link %]
+              <a href="[% nav.link %]">[% nav.label %]</a>
+            [% END %]
+          [% END %]
+        </nav>
+        [% END %]
+        [% IF logo %]
+        <a href="/"><img src="[% logo %]" alt="[% title %] Logo" class="avatar-logo"></a>
+        [% END %]
+      </div>
+    </div>
+    
+    [% ELSE %]
+    <!-- Home Landing Page -->
+    <section id="hero">
+        <div class="header-wrapper">
+            [% IF logo %]
+            <a href="/"><img src="[% logo %]" alt="[% title %] Logo" id="avatar"></a>
+            [% ELSE %]
+            <!-- Change the 'logo' setting (under the 'liteblog' config entry) to change this image -->
+            <a href="/"><img src="/images/liteblog.jpg" alt="LiteBlog Logo" id="avatar"></a>
+            [% END %]
+            <a href="/"><h1 class="site-title">[% title %]</h1></a>
+            [% IF baseline %]
+            <h3 class="site-baseline">[% baseline %]</h3>
+            [% END %]
+        </div>
+    </section>
+    [% END %]
+
+[% content %]
+
+[% IF page_title %]
+<!-- mobile header detection for the 'hero-banner' (small) single page -->
+<script type="text/javascript">
+window.addEventListener('scroll', function () {
+    var heroSection = document.getElementById('hero-banner');
+    var mobileHeader = document.getElementById('mobile-header');
+
+    if (window.scrollY > heroSection.clientHeight) {
+        mobileHeader.style.display = 'flex';
+    } else {
+        mobileHeader.style.display = 'none';
+    }
+});
+</script>
+[% ELSE %]
+<!-- mobile header detection for the 'hero' (big) landing page -->
+<script type="text/javascript">
+window.addEventListener('scroll', function () {
+    var heroSection = document.getElementById('hero');
+    var mobileHeader = document.getElementById('mobile-header');
+
+    if (window.scrollY > heroSection.clientHeight) {
+        mobileHeader.style.display = 'flex';
+    } else {
+        mobileHeader.style.display = 'none';
+    }
+});
+</script>
+[% END %]
+
+[% IF navigation %]
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Get the elements
+    const menuToggle = document.querySelector('#menu-toggle');
+    const mobileMenu = document.querySelector('#mobile-navigation-menu');
+
+    // Add event listener
+    menuToggle.addEventListener('click', function() {
+        // Toggle the .open class on the mobile menu
+        mobileMenu.classList.toggle('open');
+    });
+});
+</script>
+[% END %]
+
+[% IF feature.highlight %]
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', (event) => {
+    document.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightBlock(block);
+    });
+});
+</script>
+[% END %]
+
+    </body>
+</html>

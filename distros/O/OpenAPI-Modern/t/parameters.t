@@ -7,13 +7,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
-use OpenAPI::Modern;
 use URI;
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
-use constant { true => JSON::PP::true, false => JSON::PP::false };
 
 use lib 't/lib';
 use Helper;
@@ -55,6 +49,18 @@ subtest 'path parameters' => sub {
       ],
     },
     # encoded with media-type
+    {
+      param_obj => { name => 'missing_json_content', in => 'path', content => { 'application/json' => { schema => { type => 'integer' } } } },
+      path_captures => {},
+      content => undef,
+      errors => [
+        {
+          instanceLocation => '/request/path/missing_json_content',
+          keywordLocation => $schema_path.'/required',
+          error => 'missing path parameter: missing_json_content',
+        },
+      ],
+    },
     {
       param_obj => { name => 'json_content', in => 'path', content => { 'application/json' => { schema => { type => 'integer' } } } },
       path_captures => { json_content => '3' },
@@ -172,7 +178,7 @@ subtest 'path parameters' => sub {
     },
     {
       param_obj => { name => 'label_array_false', style => 'label', schema => { type => 'array' } },
-      path_captures => { label_array_false => '.blue.black.brown' },
+      path_captures => { label_array_false => '.blue,black,brown' },
       content => [ qw(blue black brown) ],
       todo => 'style=label, parse as array',
     },
@@ -184,7 +190,7 @@ subtest 'path parameters' => sub {
     },
     {
       param_obj => { name => 'label_object_false', style => 'label', schema => { type => 'object' } },
-      path_captures => { label_object_false => '.R.100.G.200.B.150' },
+      path_captures => { label_object_false => '.R,100,G,200,B,150' },
       content => { R => '100', G => '200', B => '150' },
       todo => 'style=label, parse as object',
     },
@@ -216,13 +222,13 @@ subtest 'path parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'path '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    );
+    ) or note 'got: ', explain($state->{errors});
 
     is_equal(
       $parameter_content,
       $test->{content},
       'path '.$name.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    );
+    ) or note 'got: ', explain($parameter_content);
   }
 };
 
@@ -259,9 +265,21 @@ subtest 'query parameters' => sub {
       todo => 'allowEmptyValue not yet supported',
     },
     {
-      param_obj => { name => 'data', in => 'query', content => { 'application/json' => { schema => { type => 'object' } } } },
+      param_obj => { name => 'missing_encoded_not_required', in => 'query', content => { 'application/json' => { schema => { type => 'object' } } } },
       queries => 'foo=1&bar=2',
       content => undef,
+    },
+    {
+      param_obj => { name => 'missing_encoded_required', in => 'query', required => true, content => { 'application/json' => { schema => { type => 'object' } } } },
+      queries => 'foo=1&bar=2',
+      content => undef,
+      errors => [
+        {
+          instanceLocation => '/request/query/missing_encoded_required',
+          keywordLocation => $schema_path.'/required',
+          error => 'missing query parameter: missing_encoded_required',
+        },
+      ],
     },
     {
       param_obj => { name => 'foo', in => 'query', content => { 'application/json' => { schema => { type => 'integer' } } } },
@@ -288,59 +306,56 @@ subtest 'query parameters' => sub {
     },
     {
       param_obj => { name => 'R', in => 'query', schema => { type => 'integer' } },
-      queries => 'R=100&G=200&B=150',
+      queries => 'color=blue&R=100&G=200&B=150',
       content => '100',
     },
     { # form, string, empty
       param_obj => { name => 'color', schema => { type => 'string' } },
-      queries => 'color=',
+      queries => 'color=&R=100&G=200&B=150',
       content => '',
     },
     { # form, string
       param_obj => { name => 'color', schema => { type => 'string' } },
-      queries => 'color=blue',
+      queries => 'color=blue&R=100&G=200&B=150',
       content => 'blue',
     },
     { # form, array, false
       param_obj => { name => 'color', explode => false, schema => { type => 'string' } },
-      queries => 'color=blue,black,brown',
+      queries => 'color=blue,black,brown&R=100&G=200&B=150',
       content => [ qw(blue black brown) ],
       todo => 'style=form, explode=false, parse as array',
     },
     { # form, array, true
       param_obj => { name => 'color', explode => true, schema => { type => 'array' } },
-      queries => 'color=blue&color=black&color=brown',
+      queries => 'color=blue&color=black&color=brown&R=100&G=200&B=150',
       content => [ qw(blue black brown) ],
       todo => 'style=form, explode=true, parse as array',
     },
     { # form, object, false
       param_obj => { name => 'color', explode => false, required => true, schema => { type => 'object' } },
-      queries => 'color=R,100,G,200,B,150',
+      queries => 'color=R,100,G,200,B,150&R=1&G=2&B=3',
       content => { R => '100', G => '200', B => '150' },
       todo => 'style=form, explode=false, parse as object',
     },
     { # form, object, true
       param_obj => { name => 'color', explode => true, required => true, schema => { type => 'object' } },
-      queries => 'R=100&G=200&B=150',
-      content => { R => '100', G => '200', B => '150' },
+      queries => 'color=blue&R=100&G=200&B=150',
+      content => { color => 'blue', R => '100', G => '200', B => '150' },
       todo => 'style=form, explode=true, parse as object',
     },
 
     # TODO:
     # spaceDelimited, string - not supported
+    # spaceDelimited, array/object, true - not supported
     # spaceDelimited, array, false
-    # spaceDelimited, array, true
     # spaceDelimited, object, false
-    # spaceDelimited, object, true
     # pipeDelimited, string - not supported
+    # pipeDelimited, array/object, true - not supported
     # pipeDelimited, array, false
-    # pipeDelimited, array, true
     # pipeDelimited, object, false
-    # pipeDelimited, object, true
     # deepObject, string - not supported
-    # deepObject, array, false - not supported
-    # deepObject, array, true - not supported
-    # deepObject, object, false
+    # deepObject, array - not supported
+    # deepObject, object, false - not supported
     # deepObject, object, true
   );
 
@@ -364,13 +379,13 @@ subtest 'query parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'query '.$name.' from '.$test->{queries}.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    );
+    ) or note 'got: ', explain($state->{errors});
 
     is_equal(
       $parameter_content,
       $test->{content},
       'query '.$name.' from '.$test->{queries}.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    );
+    ) or note 'got: ', explain($parameter_content);
   }
 };
 
@@ -484,16 +499,22 @@ subtest 'header parameters' => sub {
       content => [ 'foo', 'bar', 'baz' ],
     },
     {
-      name => 'ObjectExplodeFalse',
+      name => 'Object-Explode-False',
       header_obj => { explode => false, schema => { type => 'object' } },
       values => [ ' R, 100 ', ' B, 150,  G , 200 ' ],
       content => { R => '100', G => '200', B => '150' },
     },
     {
-      name => 'ObjectExplodeTrue',
+      name => 'Object-Explode-True',
       header_obj => { explode => true, schema => { type => 'object' } },
       values => [ ' R=100  , B=150 ', '  G=200 ' ],
       content => { R => '100', G => '200', B => '150' },
+    },
+    {
+      name => 'Odd-Headers-Object',
+      header_obj => { explode => false, schema => { type => 'object' } },
+      values => [ 'foo, bar, baz' ],
+      content => { foo => 'bar', baz => '' },
     },
   );
 
@@ -520,13 +541,13 @@ subtest 'header parameters' => sub {
       [ map $_->TO_JSON, $state->{errors}->@* ],
       $test->{errors}//[],
       'header '.$name.': '.(($test->{errors}//[])->@* ? 'the correct error was returned' : 'no errors occurred'),
-    );
+    ) or note 'got: ', explain($state->{errors});
 
     is_equal(
       $parameter_content,
       $test->{content},
       'header '.$name.': '.(defined $test->{content} ? 'the correct content was extracted' : 'no content was extracted'),
-    );
+    ) or note 'got: ', explain($parameter_content);
   }
 };
 

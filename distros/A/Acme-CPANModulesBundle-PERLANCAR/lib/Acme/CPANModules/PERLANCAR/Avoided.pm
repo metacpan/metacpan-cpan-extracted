@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-13'; # DATE
+our $DATE = '2023-11-01'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our $LIST = {
-    summary => "Modules I'm currently avoiding",
+    summary => "List of modules I'm currently avoiding",
     description => <<'_',
 
 This is a list of modules I'm currently avoiding to use in my code, for some
@@ -179,7 +179,7 @@ _
 };
 
 1;
-# ABSTRACT: Modules I'm currently avoiding
+# ABSTRACT: List of modules I'm currently avoiding
 
 __END__
 
@@ -189,11 +189,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::PERLANCAR::Avoided - Modules I'm currently avoiding
+Acme::CPANModules::PERLANCAR::Avoided - List of modules I'm currently avoiding
 
 =head1 VERSION
 
-This document describes version 0.010 of Acme::CPANModules::PERLANCAR::Avoided (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
+This document describes version 0.014 of Acme::CPANModules::PERLANCAR::Avoided (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2023-11-01.
 
 =head1 DESCRIPTION
 
@@ -209,7 +209,9 @@ modules listed here. (You should make your own blacklist though).
 
 =over
 
-=item * L<Log::Any> - Startup overhead
+=item L<Log::Any>
+
+Startup overhead.
 
 Author: L<PREACTION|https://metacpan.org/author/PREACTION>
 
@@ -219,7 +221,9 @@ alternative called L<Log::ger>.
 
 Alternate modules: L<Log::ger>
 
-=item * L<List::MoreUtils> - License confusion
+=item L<List::MoreUtils>
+
+License confusion.
 
 Author: L<REHSACK|https://metacpan.org/author/REHSACK>
 
@@ -232,13 +236,17 @@ L<List::MoreUtils>.
 
 Alternate modules: L<List::Util>, L<List::SomeUtils>, L<List::AllUtils>
 
-=item * L<Log::Any::IfLOG> - Retired workaround
+=item L<Log::Any::IfLOG>
+
+Retired workaround.
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 Alternate modules: L<Log::ger>
 
-=item * L<File::Flock> - Too many deps
+=item L<File::Flock>
+
+Too many deps.
 
 Author: L<MUIR|https://metacpan.org/author/MUIR>
 
@@ -250,7 +258,9 @@ use L<File::Flock::Retry>, or just plain C<flock()>.
 
 Alternate modules: L<File::Flock::Retry>
 
-=item * L<File::Slurp> - Not encoding-friendly
+=item L<File::Slurp>
+
+Not encoding-friendly.
 
 Author: L<CAPOEIRAB|https://metacpan.org/author/CAPOEIRAB>
 
@@ -262,7 +272,9 @@ or discussion on RT.
 
 Alternate modules: L<File::Slurper>
 
-=item * L<File::Slurp::Tiny> - Discouraged by the author
+=item L<File::Slurp::Tiny>
+
+Discouraged by the author.
 
 Author: L<LEONT|https://metacpan.org/author/LEONT>
 
@@ -272,7 +284,9 @@ module L<File::Slurper>.
 
 Alternate modules: L<File::Slurper>
 
-=item * L<Exporter::Lite> - Unnecessary, use Exporter instead
+=item L<Exporter::Lite>
+
+Unnecessary, use Exporter instead.
 
 Author: L<NEILB|https://metacpan.org/author/NEILB>
 
@@ -295,7 +309,9 @@ features. So there is absolutely no reason to use it.
 
 Alternate modules: L<Exporter>
 
-=item * L<JSON> - Somewhat broken
+=item L<JSON>
+
+Somewhat broken.
 
 Author: L<ISHIGAKI|https://metacpan.org/author/ISHIGAKI>
 
@@ -306,7 +322,9 @@ L<JSON::MaybeXS> or perhaps just L<JSON::PP>.
 
 Alternate modules: L<JSON::MaybeXS>, L<JSON::PP>, L<Cpanel::JSON::XS>
 
-=item * L<JSON::XS>
+=item L<JSON::XS>
+
+.
 
 Author: L<MLEHMANN|https://metacpan.org/author/MLEHMANN>
 
@@ -317,7 +335,9 @@ documentation of L<Cpanel::JSON::XS> for more details on those.
 
 Alternate modules: L<Cpanel::JSON::XS>
 
-=item * L<Module::Path>
+=item L<Module::Path>
+
+.
 
 Author: L<NEILB|https://metacpan.org/author/NEILB>
 
@@ -332,7 +352,7 @@ file, and find all matches instead of the first.
 
 Alternate modules: L<Module::Path::More>
 
-=item * L<String::Truncate> - a module for when strings are too long to be displayed in...
+=item L<String::Truncate>
 
 Author: L<RJBS|https://metacpan.org/author/RJBS>
 
@@ -341,7 +361,7 @@ Has non-core dependencies to L<Sub::Exporter> and L<Sub::Install>.
 
 Alternate modules: L<String::Elide::Tiny>
 
-=item * L<Module::AutoLoad>
+=item L<Module::AutoLoad>
 
 Contains remote exploit. Ref:
 L<https://news.perlfoundation.org/post/malicious-code-found-in-cpan-package> (Jul
@@ -422,13 +442,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

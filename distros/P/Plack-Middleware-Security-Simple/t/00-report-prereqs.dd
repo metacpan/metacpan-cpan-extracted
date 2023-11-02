@@ -52,6 +52,7 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Plack::Builder' => '0',
                                    'Plack::Test' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::More' => '0',
                                    'Test::Vars' => '0.015',
                                    'strict' => '0'

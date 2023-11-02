@@ -1,0 +1,833 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "date" => "2013-05-21T21:48:49Z",
+      "entries" => [
+        {
+          "line" => 2,
+          "raw" => "    * Replace Test::Soundex in tests with Class::Struct, since\n      Text::Soundex will not be in core in Perl 5.19 and up.\n",
+          "style" => "*",
+          "text" => "Replace Test::Soundex in tests with Class::Struct, since Text::Soundex will not be in core in Perl 5.19 and up."
+        },
+        {
+          "line" => 4,
+          "raw" => "    * Replace ExtUtils::MY_Metafile with META_MERGE in Makefile.PL.\n\n",
+          "style" => "*",
+          "text" => "Replace ExtUtils::MY_Metafile with META_MERGE in Makefile.PL."
+        }
+      ],
+      "line" => 1,
+      "raw" => "0.34  Tue May 21 21:48:49 CEST 2013\n",
+      "raw_date" => "Tue May 21 21:48:49 CEST 2013",
+      "version" => "0.34"
+    },
+    {
+      "date" => "2013-02-09T13:12:22Z",
+      "entries" => [
+        {
+          "line" => 7,
+          "raw" => "    * Fix tests under Perl 5.6.2 when some core modules have been\n      upgraded (patch by Andreas Koenig).\n\n",
+          "style" => "*",
+          "text" => "Fix tests under Perl 5.6.2 when some core modules have been upgraded (patch by Andreas Koenig)."
+        }
+      ],
+      "line" => 6,
+      "raw" => "0.33  Sat Feb  9 13:12:22 CET 2013\n",
+      "raw_date" => "Sat Feb  9 13:12:22 CET 2013",
+      "version" => "0.33"
+    },
+    {
+      "date" => "2010-09-08T23:15:13Z",
+      "entries" => [
+        {
+          "line" => 11,
+          "raw" => "    + Add archlib and privlib to the search path for core modules\n      (patch by Jonas B. Nielsen).\n\n",
+          "style" => "+",
+          "text" => "Add archlib and privlib to the search path for core modules (patch by Jonas B. Nielsen)."
+        }
+      ],
+      "line" => 10,
+      "raw" => "0.32  Wed Sep  8 23:15:13 CEST 2010\n",
+      "raw_date" => "Wed Sep  8 23:15:13 CEST 2010",
+      "version" => "0.32"
+    },
+    {
+      "date" => "2010-04-12T23:53:53Z",
+      "entries" => [
+        {
+          "line" => 15,
+          "raw" => "    * Many test fixes.\n\n",
+          "style" => "*",
+          "text" => "Many test fixes."
+        }
+      ],
+      "line" => 14,
+      "raw" => "0.31_01  Mon Apr 12 23:53:53 CEST 2010\n",
+      "raw_date" => "Mon Apr 12 23:53:53 CEST 2010",
+      "version" => "0.31_01"
+    },
+    {
+      "date" => "2007-05-28T21:40:10Z",
+      "entries" => [
+        {
+          "line" => 18,
+          "raw" => "    * Fixed tests in presence of version.pm 0.72 or newer.\n",
+          "style" => "*",
+          "text" => "Fixed tests in presence of version.pm 0.72 or newer."
+        },
+        {
+          "line" => 19,
+          "raw" => "    - Added -h option to module_info.\n\n",
+          "style" => "-",
+          "text" => "Added -h option to module_info."
+        }
+      ],
+      "line" => 17,
+      "raw" => "0.31  Mon May 28 21:40:10 CEST 2007\n",
+      "raw_date" => "Mon May 28 21:40:10 CEST 2007",
+      "version" => "0.31"
+    },
+    {
+      "date" => "2005-12-20T20:17:09Z",
+      "entries" => [
+        {
+          "line" => 22,
+          "raw" => "    * Renamed the forked B::Utils to B::BUtils to avoid clashes\n      until it is merged into the mainline.\n\n",
+          "style" => "*",
+          "text" => "Renamed the forked B::Utils to B::BUtils to avoid clashes until it is merged into the mainline."
+        }
+      ],
+      "line" => 21,
+      "raw" => "0.30  Tue Dec 20 20:17:09 CET 2005\n",
+      "raw_date" => "Tue Dec 20 20:17:09 CET 2005",
+      "version" => "0.30"
+    },
+    {
+      "date" => "2005-11-22T21:28:26Z",
+      "entries" => [
+        {
+          "line" => 26,
+          "raw" => "    * Fixed version() for complex expressions.\n",
+          "style" => "*",
+          "text" => "Fixed version() for complex expressions."
+        },
+        {
+          "line" => 27,
+          "raw" => "    - Corrected some POD errors in module_info.\n\n",
+          "style" => "-",
+          "text" => "Corrected some POD errors in module_info."
+        }
+      ],
+      "line" => 25,
+      "raw" => "0.29  Tue Nov 22 21:28:26 CET 2005\n",
+      "raw_date" => "Tue Nov 22 21:28:26 CET 2005",
+      "version" => "0.29"
+    },
+    {
+      "date" => "2005-07-10T21:48:19Z",
+      "entries" => [
+        {
+          "line" => 30,
+          "raw" => "    * Added support for version.pm (based upon a\n      patch by John Peacock).\n",
+          "style" => "*",
+          "text" => "Added support for version.pm (based upon a patch by John Peacock)."
+        },
+        {
+          "line" => 32,
+          "raw" => "    * Fixed the safe() attribute to be per-object instead\n      of global.\n\n",
+          "style" => "*",
+          "text" => "Fixed the safe() attribute to be per-object instead of global."
+        }
+      ],
+      "line" => 29,
+      "raw" => "0.28_50  Sun Jul 10 21:48:19 CEST 2005\n",
+      "raw_date" => "Sun Jul 10 21:48:19 CEST 2005",
+      "version" => "0.28_50"
+    },
+    {
+      "date" => "2005-04-17T17:10:33Z",
+      "entries" => [
+        {
+          "line" => 36,
+          "raw" => "    - Correct the attributions of the fixes in 0.27 (I swapped\n      authors' names).\n",
+          "style" => "-",
+          "text" => "Correct the attributions of the fixes in 0.27 (I swapped authors' names)."
+        },
+        {
+          "line" => 38,
+          "raw" => "    * Added Module::Build support as an alternative to\n      ExtUtils::MakeMaker.\n",
+          "style" => "*",
+          "text" => "Added Module::Build support as an alternative to ExtUtils::MakeMaker."
+        },
+        {
+          "line" => 40,
+          "raw" => "    * Added safe() option to forbid unsafe operations (currently\n      executes version() code in a Safe compartment and forbids most\n      other operations).\n",
+          "style" => "*",
+          "text" => "Added safe() option to forbid unsafe operations (currently executes version() code in a Safe compartment and forbids most other operations)."
+        },
+        {
+          "line" => 43,
+          "raw" => "    * Fixed compatibility down to Perl 5.004_04.\n\n",
+          "style" => "*",
+          "text" => "Fixed compatibility down to Perl 5.004_04."
+        }
+      ],
+      "line" => 35,
+      "raw" => "0.28  Sun Apr 17 17:10:33 CET 2005\n",
+      "raw_date" => "Sun Apr 17 17:10:33 CET 2005",
+      "version" => "0.28"
+    },
+    {
+      "date" => "2005-03-04T07:56:58Z",
+      "entries" => [
+        {
+          "line" => 46,
+          "raw" => "    - Added missing localization of \$_ in version().\n      (thanks to Johan Lodin)\n",
+          "style" => "-",
+          "text" => "Added missing localization of \$_ in version(). (thanks to Johan Lodin)"
+        },
+        {
+          "line" => 48,
+          "raw" => "    - Fixed new_from_loaded() to return nothing when the module\n      is in fact not loaded. (thanks to Boris Zentner)\n\n",
+          "style" => "-",
+          "text" => "Fixed new_from_loaded() to return nothing when the module is in fact not loaded. (thanks to Boris Zentner)"
+        }
+      ],
+      "line" => 45,
+      "raw" => "0.27  Fri Mar  4 07:56:58 CET 2005\n",
+      "raw_date" => "Fri Mar  4 07:56:58 CET 2005",
+      "version" => "0.27"
+    },
+    {
+      "date" => "2004-07-11T17:15:36Z",
+      "entries" => [
+        {
+          "line" => 52,
+          "raw" => "    - Fix tests for Perl 5.8.x and 5.6.x.\n\n",
+          "style" => "-",
+          "text" => "Fix tests for Perl 5.8.x and 5.6.x."
+        }
+      ],
+      "line" => 51,
+      "raw" => "0.26  Sun Jul 11 17:15:36 CEST 2004\n",
+      "raw_date" => "Sun Jul 11 17:15:36 CEST 2004",
+      "version" => "0.26"
+    },
+    {
+      "date" => "2004-07-11T16:36:11Z",
+      "entries" => [
+        {
+          "line" => 55,
+          "raw" => "    - Fix test to work around modules_required reporting\n      different version numbers (0.25 vs. 0.250) under bleadperl.\n",
+          "style" => "-",
+          "text" => "Fix test to work around modules_required reporting different version numbers (0.25 vs. 0.250) under bleadperl."
+        },
+        {
+          "line" => 57,
+          "raw" => "    * Report subroutine/method calls and modules required\n      inside anonymous subroutines.\n\n",
+          "style" => "*",
+          "text" => "Report subroutine/method calls and modules required inside anonymous subroutines."
+        }
+      ],
+      "line" => 54,
+      "raw" => "0.25  Sun Jul 11 16:36:11 CEST 2004\n",
+      "raw_date" => "Sun Jul 11 16:36:11 CEST 2004",
+      "version" => "0.25"
+    },
+    {
+      "date" => "2003-10-01T11:45:45Z",
+      "entries" => [
+        {
+          "line" => 61,
+          "raw" => "    - Fixed version reported by modules_required for bleadperl.\n\n",
+          "style" => "-",
+          "text" => "Fixed version reported by modules_required for bleadperl."
+        }
+      ],
+      "line" => 60,
+      "raw" => "0.24  Wed Oct  1 11:45:45 CEST 2003\n",
+      "raw_date" => "Wed Oct  1 11:45:45 CEST 2003",
+      "version" => "0.24"
+    },
+    {
+      "date" => "2003-09-04T17:44:52Z",
+      "entries" => [
+        {
+          "line" => 64,
+          "raw" => "    - Fixes for modules other than the one being examined\n      loaded from paths containing spaces.\n\n",
+          "style" => "-",
+          "text" => "Fixes for modules other than the one being examined loaded from paths containing spaces."
+        }
+      ],
+      "line" => 63,
+      "raw" => "0.23  Thu Sep  4 17:44:52 CEST 2003\n",
+      "raw_date" => "Thu Sep  4 17:44:52 CEST 2003",
+      "version" => "0.23"
+    },
+    {
+      "date" => "2003-08-18T14:44:23Z",
+      "entries" => [
+        {
+          "line" => 68,
+          "raw" => "    * Fixed reporting of static method calls in Perl 5.8.1 RC4\n",
+          "style" => "*",
+          "text" => "Fixed reporting of static method calls in Perl 5.8.1 RC4"
+        },
+        {
+          "line" => 69,
+          "raw" => "    - Fixed reporting of module versions in Perl 5.8.1 RC4 when\n      \"use Foo 1.2.3;\" is used\n\n",
+          "style" => "-",
+          "text" => "Fixed reporting of module versions in Perl 5.8.1 RC4 when \"use Foo 1.2.3;\" is used"
+        }
+      ],
+      "line" => 67,
+      "raw" => "0.22  Mon Aug 18 14:44:23 CEST 2003\n",
+      "raw_date" => "Mon Aug 18 14:44:23 CEST 2003",
+      "version" => "0.22"
+    },
+    {
+      "date" => "2003-08-15T18:48:53Z",
+      "entries" => [
+        {
+          "line" => 73,
+          "raw" => "    - Added licensing information to Module::Info POD\n",
+          "style" => "-",
+          "text" => "Added licensing information to Module::Info POD"
+        },
+        {
+          "line" => 74,
+          "raw" => "    * Added modules_required(). Original patch by Martyn J. Pearce,\n      adapted by me (Mattia Barbon)\n\n",
+          "style" => "*",
+          "text" => "Added modules_required(). Original patch by Martyn J. Pearce, adapted by me (Mattia Barbon)"
+        }
+      ],
+      "line" => 72,
+      "raw" => "0.21  Fri Aug 15 18:48:53 CEST 2003\n",
+      "raw_date" => "Fri Aug 15 18:48:53 CEST 2003",
+      "version" => "0.21"
+    },
+    {
+      "date" => "2003-05-22T10:30:31Z",
+      "entries" => [
+        {
+          "line" => 78,
+          "raw" => "    - Fixed a warning in module_info (thanks to Nathan Torkington)\n",
+          "style" => "-",
+          "text" => "Fixed a warning in module_info (thanks to Nathan Torkington)"
+        },
+        {
+          "line" => 79,
+          "raw" => "    - Corrected number of skipped tests for Perl versions earlier\n      than 5.6.1 (thanks to Mike Fragassi)\n",
+          "style" => "-",
+          "text" => "Corrected number of skipped tests for Perl versions earlier than 5.6.1 (thanks to Mike Fragassi)"
+        },
+        {
+          "line" => 81,
+          "raw" => "    - Fixed syntax error with Perl 5.004\n\n",
+          "style" => "-",
+          "text" => "Fixed syntax error with Perl 5.004"
+        }
+      ],
+      "line" => 77,
+      "raw" => "0.20  Thu May 22 10:30:31 CEST 2003\n",
+      "raw_date" => "Thu May 22 10:30:31 CEST 2003",
+      "version" => "0.20"
+    },
+    {
+      "date" => "2003-04-01T15:45:43Z",
+      "entries" => [
+        {
+          "line" => 84,
+          "raw" => "    * Added package_versions() (patch by Ken Williams)\n",
+          "style" => "*",
+          "text" => "Added package_versions() (patch by Ken Williams)"
+        },
+        {
+          "line" => 85,
+          "raw" => "    - Fixed handling of v-strings in use/require\n\n",
+          "style" => "-",
+          "text" => "Fixed handling of v-strings in use/require"
+        }
+      ],
+      "line" => 83,
+      "raw" => "0.19  Tue Apr  1 15:45:43 CEST 2003\n",
+      "raw_date" => "Tue Apr  1 15:45:43 CEST 2003",
+      "version" => "0.19"
+    },
+    {
+      "date" => "2003-03-08T17:44:24Z",
+      "entries" => [
+        {
+          "line" => 88,
+          "raw" => "    * Upgraded bundled B::Utils to 0.04 + Schwern patches\n",
+          "style" => "*",
+          "text" => "Upgraded bundled B::Utils to 0.04 + Schwern patches"
+        },
+        {
+          "line" => 89,
+          "raw" => "    - Fixed detection of require() statements in non-trivial BEGIN blocks\n\n",
+          "style" => "-",
+          "text" => "Fixed detection of require() statements in non-trivial BEGIN blocks"
+        }
+      ],
+      "line" => 87,
+      "raw" => "0.18  Sat Mar  8 17:44:24 CET 2003\n",
+      "raw_date" => "Sat Mar  8 17:44:24 CET 2003",
+      "version" => "0.18"
+    },
+    {
+      "date" => "2003-03-02T11:01:55Z",
+      "entries" => [
+        {
+          "line" => 92,
+          "raw" => "    + Added module_info\n",
+          "style" => "+",
+          "text" => "Added module_info"
+        },
+        {
+          "line" => 93,
+          "raw" => "    - Fixed a warning when enumerating packages\n\n",
+          "style" => "-",
+          "text" => "Fixed a warning when enumerating packages"
+        }
+      ],
+      "line" => 91,
+      "raw" => "0.17  Sun Mar  2 11:01:55 CET 2003\n",
+      "raw_date" => "Sun Mar  2 11:01:55 CET 2003",
+      "version" => "0.17"
+    },
+    {
+      "date" => "2003-01-01T21:21:31Z",
+      "entries" => [
+        {
+          "line" => 96,
+          "raw" => "    - Capture stderr output on MacOS Classic (thanks to Axel Rose for\n      the patch)\n\n",
+          "style" => "-",
+          "text" => "Capture stderr output on MacOS Classic (thanks to Axel Rose for the patch)"
+        }
+      ],
+      "line" => 95,
+      "raw" => "0.16  Wed Jan  1 21:21:31 CET 2003\n",
+      "raw_date" => "Wed Jan  1 21:21:31 CET 2003",
+      "version" => "0.16"
+    },
+    {
+      "date" => "2002-12-23T15:08:14Z",
+      "entries" => [
+        {
+          "line" => 100,
+          "raw" => "    * Added die_on_compilation_error() method.\n",
+          "style" => "*",
+          "text" => "Added die_on_compilation_error() method."
+        },
+        {
+          "line" => 101,
+          "raw" => "    * MacOS classic: fixed methods requiring loading.\n\n",
+          "style" => "*",
+          "text" => "MacOS classic: fixed methods requiring loading."
+        }
+      ],
+      "line" => 99,
+      "raw" => "0.15  Mon Dec 23 15:08:14 CET 2002\n",
+      "raw_date" => "Mon Dec 23 15:08:14 CET 2002",
+      "version" => "0.15"
+    },
+    {
+      "date" => "2002-12-08T11:42:11Z",
+      "entries" => [
+        {
+          "line" => 104,
+          "raw" => "    - Don't show modules loaded via \$ENV{PERL5OPT}\n",
+          "style" => "-",
+          "text" => "Don't show modules loaded via \$ENV{PERL5OPT}"
+        },
+        {
+          "line" => 105,
+          "raw" => "    - Fixed the case where an op may be NULL when searching for require\n\n",
+          "style" => "-",
+          "text" => "Fixed the case where an op may be NULL when searching for require"
+        }
+      ],
+      "line" => 103,
+      "raw" => "0.14  Sun Dec  8 11:42:11 CET 2002\n",
+      "raw_date" => "Sun Dec  8 11:42:11 CET 2002",
+      "version" => "0.14"
+    },
+    {
+      "date" => "2002-12-07T10:29:42Z",
+      "entries" => [
+        {
+          "line" => 108,
+          "raw" => "    - pfunc can now distinguish between class and object methods\n",
+          "style" => "-",
+          "text" => "pfunc can now distinguish between class and object methods"
+        },
+        {
+          "line" => 109,
+          "raw" => "    - B::Utils no longer loading Exporter to avoid loading a bunch of\n      modules\n",
+          "style" => "-",
+          "text" => "B::Utils no longer loading Exporter to avoid loading a bunch of modules"
+        },
+        {
+          "line" => 111,
+          "raw" => "    - B::Utils's fake carp/croak were broken\n",
+          "style" => "-",
+          "text" => "B::Utils's fake carp/croak were broken"
+        },
+        {
+          "line" => 112,
+          "raw" => "    - B::Utils::opgrep() was not finding ops properly\n",
+          "style" => "-",
+          "text" => "B::Utils::opgrep() was not finding ops properly"
+        },
+        {
+          "line" => 113,
+          "raw" => "    - Test made more polite for systems who's path_sep is not :\n",
+          "style" => "-",
+          "text" => "Test made more polite for systems who's path_sep is not :"
+        },
+        {
+          "line" => 114,
+          "raw" => "    - Fixing case where an op filter may encounter a NULL op when\n      checking for entersubs\n",
+          "style" => "-",
+          "text" => "Fixing case where an op filter may encounter a NULL op when checking for entersubs"
+        },
+        {
+          "line" => 116,
+          "raw" => "    - Quote filename in the call to B::Module::Info, allows\n      using directories with spaces\n",
+          "style" => "-",
+          "text" => "Quote filename in the call to B::Module::Info, allows using directories with spaces"
+        },
+        {
+          "line" => 118,
+          "raw" => "    - Fixed the case where a module does not have any BEGIN blocks\n",
+          "style" => "-",
+          "text" => "Fixed the case where a module does not have any BEGIN blocks"
+        },
+        {
+          "line" => 119,
+          "raw" => "    * Fixed non-bareword require in a BEGIN block\n",
+          "style" => "*",
+          "text" => "Fixed non-bareword require in a BEGIN block"
+        },
+        {
+          "line" => 120,
+          "raw" => "    * Fixed require \$foo\n",
+          "style" => "*",
+          "text" => "Fixed require \$foo"
+        },
+        {
+          "line" => 121,
+          "raw" => "    * Fixed BEGIN blocks not containing a require\n",
+          "style" => "*",
+          "text" => "Fixed BEGIN blocks not containing a require"
+        },
+        {
+          "line" => 122,
+          "raw" => "    * Scan subroutines when searching for required modules\n",
+          "style" => "*",
+          "text" => "Scan subroutines when searching for required modules"
+        },
+        {
+          "line" => 123,
+          "raw" => "    * Fixed various problems with perl 5.6.1 on Win32\n      (probably due to ithreads)\n",
+          "style" => "*",
+          "text" => "Fixed various problems with perl 5.6.1 on Win32 (probably due to ithreads)"
+        },
+        {
+          "line" => 125,
+          "raw" => "    - Use IPC::Open3 under Windows 95/98/ME, since 2>&1 does not work\n\n",
+          "style" => "-",
+          "text" => "Use IPC::Open3 under Windows 95/98/ME, since 2>&1 does not work"
+        }
+      ],
+      "line" => 107,
+      "raw" => "0.13  Sat Dec  7 10:29:42 CET 2002\n",
+      "raw_date" => "Sat Dec  7 10:29:42 CET 2002",
+      "version" => "0.13"
+    },
+    {
+      "date" => "2002-02-02T19:41:01Z",
+      "entries" => [
+        {
+          "line" => 128,
+          "raw" => "    * Added pfunc\n",
+          "style" => "*",
+          "text" => "Added pfunc"
+        },
+        {
+          "line" => 129,
+          "raw" => "    - Now tested back to 5.004\n",
+          "style" => "-",
+          "text" => "Now tested back to 5.004"
+        },
+        {
+          "line" => 130,
+          "raw" => "    * Fixed a bug where certain modules were being ignored\n",
+          "style" => "*",
+          "text" => "Fixed a bug where certain modules were being ignored"
+        },
+        {
+          "line" => 131,
+          "raw" => "    - Fixed a bug in subroutines_called() with EXPR->method()\n",
+          "style" => "-",
+          "text" => "Fixed a bug in subroutines_called() with EXPR->method()"
+        },
+        {
+          "line" => 132,
+          "raw" => "    - subroutines_called() now reports properly on function calls\n      with symbolic refs\n\n",
+          "style" => "-",
+          "text" => "subroutines_called() now reports properly on function calls with symbolic refs"
+        }
+      ],
+      "line" => 127,
+      "raw" => "0.12  Sat Feb  2 19:41:01 EST 2002\n",
+      "raw_date" => "Sat Feb  2 19:41:01 EST 2002",
+      "version" => "0.12"
+    },
+    {
+      "date" => "2002-02-02T16:54:23Z",
+      "entries" => [
+        {
+          "line" => 136,
+          "raw" => "    * Fixed B::Utils->kids\n",
+          "style" => "*",
+          "text" => "Fixed B::Utils->kids"
+        },
+        {
+          "line" => 137,
+          "raw" => "    * Added subroutines_called()\n",
+          "style" => "*",
+          "text" => "Added subroutines_called()"
+        },
+        {
+          "line" => 138,
+          "raw" => "    * Added superclasses()\n",
+          "style" => "*",
+          "text" => "Added superclasses()"
+        },
+        {
+          "line" => 139,
+          "raw" => "    * Added dynamic_method_calls()\n",
+          "style" => "*",
+          "text" => "Added dynamic_method_calls()"
+        },
+        {
+          "line" => 140,
+          "raw" => "    - Documented that it isn't just for modules.\n",
+          "style" => "-",
+          "text" => "Documented that it isn't just for modules."
+        },
+        {
+          "line" => 141,
+          "raw" => "    - name() can now be used to set\n",
+          "style" => "-",
+          "text" => "name() can now be used to set"
+        },
+        {
+          "line" => 142,
+          "raw" => "    - failures inside B::Module::Info now report their errors instead of\n      failing silently\n",
+          "style" => "-",
+          "text" => "failures inside B::Module::Info now report their errors instead of failing silently"
+        },
+        {
+          "line" => 144,
+          "raw" => "    * Added a THANKS section.\n\n",
+          "style" => "*",
+          "text" => "Added a THANKS section."
+        }
+      ],
+      "line" => 135,
+      "raw" => "0.11  Sat Feb  2 16:54:23 EST 2002\n",
+      "raw_date" => "Sat Feb  2 16:54:23 EST 2002",
+      "version" => "0.11"
+    },
+    {
+      "date" => "2001-12-12T05:40:14Z",
+      "entries" => [
+        {
+          "line" => 147,
+          "raw" => "    * Windows filenames would cause subroutines() and modules_used() to \n      choke. (Thanks to Alessandro Forghieri for the patch)\n\n",
+          "style" => "*",
+          "text" => "Windows filenames would cause subroutines() and modules_used() to choke. (Thanks to Alessandro Forghieri for the patch)"
+        }
+      ],
+      "line" => 146,
+      "raw" => "0.10  Wed Dec 12 05:40:14 EST 2001\n",
+      "raw_date" => "Wed Dec 12 05:40:14 EST 2001",
+      "version" => "0.10"
+    },
+    {
+      "date" => "2001-12-10T14:55:09Z",
+      "entries" => [
+        {
+          "line" => 151,
+          "raw" => "    - little bug in modules_used() and \"require 5.004\"\n\n",
+          "style" => "-",
+          "text" => "little bug in modules_used() and \"require 5.004\""
+        }
+      ],
+      "line" => 150,
+      "raw" => "0.09  Mon Dec 10 14:55:09 EST 2001\n",
+      "raw_date" => "Mon Dec 10 14:55:09 EST 2001",
+      "version" => "0.09"
+    },
+    {
+      "date" => "2001-12-10T14:24:56Z",
+      "entries" => [
+        {
+          "line" => 154,
+          "raw" => "    * Implemented modules_used()\n",
+          "style" => "*",
+          "text" => "Implemented modules_used()"
+        },
+        {
+          "line" => 155,
+          "raw" => "    - Fixed a little bug in walkoptree_filtered() and \$B::Utils::file/line\n\n",
+          "style" => "-",
+          "text" => "Fixed a little bug in walkoptree_filtered() and \$B::Utils::file/line"
+        }
+      ],
+      "line" => 153,
+      "raw" => "0.08  Mon Dec 10 14:24:56 EST 2001\n",
+      "raw_date" => "Mon Dec 10 14:24:56 EST 2001",
+      "version" => "0.08"
+    },
+    {
+      "date" => "2001-12-10T11:09:40Z",
+      "entries" => [
+        {
+          "line" => 158,
+          "raw" => "    * Implemented subroutines().  Need help getting modules_used() done.\n",
+          "style" => "*",
+          "text" => "Implemented subroutines().  Need help getting modules_used() done."
+        },
+        {
+          "line" => 159,
+          "raw" => "    - Fixed up \$B::Utils::file/line handling in B::Utils.\n",
+          "style" => "-",
+          "text" => "Fixed up \$B::Utils::file/line handling in B::Utils."
+        },
+        {
+          "line" => 160,
+          "raw" => "    - Fixed a little bug in is_core involving cannonical paths.\n      I forget who gave me the patch!\n    \n",
+          "style" => "-",
+          "text" => "Fixed a little bug in is_core involving cannonical paths. I forget who gave me the patch!"
+        }
+      ],
+      "line" => 157,
+      "raw" => "0.07  Mon Dec 10 11:09:40 EST 2001\n",
+      "raw_date" => "Mon Dec 10 11:09:40 EST 2001",
+      "version" => "0.07"
+    },
+    {
+      "date" => "2001-11-24T20:45:15Z",
+      "entries" => [
+        {
+          "line" => 164,
+          "raw" => "    * Implemented packages_inside().  Need help getting the rest done.\n",
+          "style" => "*",
+          "text" => "Implemented packages_inside().  Need help getting the rest done."
+        },
+        {
+          "line" => 165,
+          "raw" => "    - Distributing a hacked up version of B::Utils until the main\n      distribution gets fixed.\n\n",
+          "style" => "-",
+          "text" => "Distributing a hacked up version of B::Utils until the main distribution gets fixed."
+        }
+      ],
+      "line" => 163,
+      "raw" => "0.06  Sat Nov 24 20:45:15 EST 2001\n",
+      "raw_date" => "Sat Nov 24 20:45:15 EST 2001",
+      "version" => "0.06"
+    },
+    {
+      "date" => "2001-11-23T18:06:22Z",
+      "entries" => [
+        {
+          "line" => 169,
+          "raw" => "    - Rafael Garcia-Suarez noticed I forgot to deal with code refs in\n      \@INC.  The plan is to just skip them until someone notices.\n\n",
+          "style" => "-",
+          "text" => "Rafael Garcia-Suarez noticed I forgot to deal with code refs in \@INC.  The plan is to just skip them until someone notices."
+        }
+      ],
+      "line" => 168,
+      "raw" => "0.05  Fri Nov 23 18:06:22 EST 2001\n",
+      "raw_date" => "Fri Nov 23 18:06:22 EST 2001",
+      "version" => "0.05"
+    },
+    {
+      "date" => "2001-11-23T14:49:21Z",
+      "entries" => [
+        {
+          "line" => 173,
+          "raw" => "    - Tassilo von Parseval noted warnings.pm isn't backwards compat.\n      Replaced with \$^W.\n\n",
+          "style" => "-",
+          "text" => "Tassilo von Parseval noted warnings.pm isn't backwards compat. Replaced with \$^W."
+        }
+      ],
+      "line" => 172,
+      "raw" => "0.04  Fri Nov 23 14:49:21 EST 2001\n",
+      "raw_date" => "Fri Nov 23 14:49:21 EST 2001",
+      "version" => "0.04"
+    },
+    {
+      "date" => "2001-11-23T00:39:11Z",
+      "entries" => [
+        {
+          "line" => 177,
+          "raw" => "    - Testing all_installed()\n",
+          "style" => "-",
+          "text" => "Testing all_installed()"
+        },
+        {
+          "line" => 178,
+          "raw" => "    - Abe Timmerman fixed a little portability bug in the test.\n\n",
+          "style" => "-",
+          "text" => "Abe Timmerman fixed a little portability bug in the test."
+        }
+      ],
+      "line" => 176,
+      "raw" => "0.03  Fri Nov 23 00:39:11 EST 2001\n",
+      "raw_date" => "Fri Nov 23 00:39:11 EST 2001",
+      "version" => "0.03"
+    },
+    {
+      "date" => "2001-11-22T10:08:00Z",
+      "entries" => [
+        {
+          "line" => 181,
+          "raw" => "    * Added new_from_loaded()\n\n",
+          "style" => "*",
+          "text" => "Added new_from_loaded()"
+        }
+      ],
+      "line" => 180,
+      "raw" => "0.02  Thu Nov 22 10:08:00 EST 2001\n",
+      "raw_date" => "Thu Nov 22 10:08:00 EST 2001",
+      "version" => "0.02"
+    },
+    {
+      "date" => "2001-11-22T09:42:06Z",
+      "entries" => [
+        {
+          "line" => 184,
+          "raw" => "    * First working version\n",
+          "style" => "*",
+          "text" => "First working version"
+        },
+        {
+          "line" => 185,
+          "raw" => "    * From a discussion on p5p about ExtUtils::MM_Unix->parse_version\n      http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2001-11/msg01263.html\n",
+          "style" => "*",
+          "text" => "From a discussion on p5p about ExtUtils::MM_Unix->parse_version http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2001-11/msg01263.html"
+        }
+      ],
+      "line" => 183,
+      "raw" => "0.01  Thu Nov 22 09:42:06 EST 2001\n",
+      "raw_date" => "Thu Nov 22 09:42:06 EST 2001",
+      "version" => "0.01"
+    }
+  ]
+}

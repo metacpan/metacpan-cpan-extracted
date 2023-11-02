@@ -15,11 +15,6 @@ use feature 'lexical_subs';
 
 no warnings "experimental::lexical_subs";
 
-package  Data::Dumper::Interp;
-{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.008'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-10-15'; # DATE from Dist::Zilla::Plugin::OurDate
-
 package
   # newline so Dist::Zilla::Plugin::PkgVersion won't add $VERSION
         DB {
@@ -29,6 +24,10 @@ package
 }
 
 package Data::Dumper::Interp;
+
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
+our $VERSION = '6.010'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-10-31'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Moose;
 
@@ -175,8 +174,9 @@ sub AUTOLOAD {  # invoked on call to undefined *method*
 ############################################################################
 # Internal debug-message utilities
 
+sub u(_); # forward
 sub oops(@) { @_=("\n".(caller)." oops:\n",@_,"\n"); goto &Carp::confess }
-sub btwN($@) { my $N=shift; local $_=join("",@_); s/\n\z//s; printf "%4d: %s\n",(caller($N))[2],$_; }
+sub btwN($@) { my $N=shift; local $_=join("",map{u} @_); s/\n\z//s; printf "%4d: %s\n",(caller($N))[2],$_; }
 sub btw(@) { unshift @_,0; goto &btwN }
 
 sub _chop_ateval($) {  # remove "at (eval N) line..." from an exception message
@@ -383,45 +383,78 @@ sub addrvis_forget() {
 sub u(_) { $_[0] // "undef" }
 sub quotekey(_); # forward.  Implemented after regex declarations.
 
-sub __stringify($) {
+sub __stringify_if_overloaded($) {
   if (defined(my $class = blessed($_[0]))) {
     return "$_[0]" if overload::Method($class,'""');
   }
   $_[0]
 }
 
-use constant _SHELL_UNSAFE_REGEX =>
-  ($^O eq "MSWin32" ? qr/[^-=\w_:\.,\\]/ : qr/[^-=\w_\/:\.,]/);
-
-sub __forceqsh(_) {
+use constant _NIX_SHELL_UNSAFE_REGEX => qr/[^-=\w_\/:\.,]/a;
+sub __nix_forceqsh(_) {
   local $_ = shift;
   return "undef" if !defined;  # undef without quotes
   $_ = vis($_) if ref;
-  if ($^O eq "MSWin32") {
-    # Backslash usually need not be protected, except:
-    #  \" quotes the " whether inside "quoes" or bare (!)
-    #  \\ quotes the \ ONLY(?) if immediately followed by \"
-    s/\\(?=")/\\\\/g;
-    s/"/\\"/g;
-    return "\"${_}\"";  # 6/7/23: UNtested
+  # Prefer "double quoted" if no shell escapes would be needed.
+  if (/["\$`!\\\x{00}-\x{1F}\x{7F}]/) {
+    # Unlike Perl, /bin/sh does not recognize any backslash escapes in '...'
+    s/'/'\\''/g; # foo'bar => foo'\''bar
+    return "'${_}'";
   } else {
-    # Prefer "double quoted" if no shell escapes would be needed.
-    if (/["\$`!\\\x{00}-\x{1F}\x{7F}]/) {
-      # Unlike Perl, /bin/sh does not recognize any backslash escapes in '...'
-      s/'/'\\''/g; # foo'bar => foo'\''bar
-      return "'${_}'";
-    } else {
-      return "\"${_}\"";
-    }
+    return "\"${_}\"";
   }
 }
+
+use constant _WIN_CMD_UNSAFE_REGEX => qr/[^-\w=_:\.,\\]/a;
+sub __win_forceqsh(_) {
+  local $_ = shift;
+  return "undef" if !defined;  # undef without quotes
+  $_ = vis($_) if ref;
+  # This was intended to quote as would be needed to pass the word as a
+  # parameter to a command typed to cmd.com in Windows.
+  # However parameter parameter parsing is implemented within each command
+  # and there is no universal ruleset.   For example Strawberry perl
+  # appears to split parameters on white space only whereas (as I understand
+  # it) Windows commands, at least built-in ones, split words on any of
+  # space tab , ; or = and all those must be protected, see
+  #
+  #    https://ss64.com/nt/syntax-esc.html
+  #
+  # For the moment at least, qsh "quotes" words so they come through when
+  # passed as parameters to Strawberry perl when, in cmd.com, you type
+  #
+  #    perl \path\to\script.pl PARAM1 PARAM2 ...
+  #
+  # Here's what I *think* is true:
+  #  * "double quotes" escape word delimiters (space tab , ; =)
+  #  * ^ escapes : & \ < > ^ | when NOT in "quotes"
+  #    (but we always put them in "quotes")
+  #  * ^<newline> (outside of "quotes") is ignored
+  #    (there appears to be impossible to directly include a newline in a cmd
+  #     parameter.  It requires a helper program or interpolating
+  #     a %variable%, see https://superuser.com/a/1519790)
+  #  * \ outside "quotes" means \
+  #    \ inside "quotes" is literal _unless_ followed by "
+  # Backslash usually need not be protected, except:
+  #  * \ quotes " whether inside "quotes" or bare (!)
+  #  * \ quotes \ ONLY(?) if immediately followed by " or \"
+  #    otherwise it means two backslashes.
+  #FIXME TODO UNFINISHED
+  s/\\(?=")/\\\\/g;
+  s/"/\\"/g;
+  s/\\\z/\\\\/g; # because the closing " will follow
+  return "\"${_}\"";  # 6/7/23: UNtested
+}
+
 sub qsh(_) {
-  local $_ = __stringify(shift());
-  defined && !ref && ($_ !~ _SHELL_UNSAFE_REGEX)
-    && $_ ne "" && $_ ne "undef" ? $_ : __forceqsh
+  local $_ = __stringify_if_overloaded(shift());
+  $^O eq "MSWin32" ?
+    (defined && !ref && $_ ne "" && $_ ne "undef" && $_ !~ _WIN_CMD_UNSAFE_REGEX ? $_ : __win_forceqsh)
+    :
+    (defined && !ref && $_ ne "" && $_ ne "undef" && $_ !~ _NIX_SHELL_UNSAFE_REGEX ? $_ : __nix_forceqsh)
 }
 sub qshpath(_) {  # like qsh but does not quote initial ~ or ~username
-  local $_ = __stringify(shift());
+  local $_ = __stringify_if_overloaded(shift());
   return qsh($_) if !defined or ref;
   my ($tilde_prefix, $rest) = /^( (?:\~[^\/\\]*[\/\\]?+)? )(.*)/xs or die;
   $rest eq "" ? $tilde_prefix : $tilde_prefix.qsh($rest)
@@ -608,7 +641,7 @@ my  $my_maxdepth;
 our $my_visit_depth = 0;
 
 my ($maxstringwidth, $truncsuffix, $objects, $opt_refaddr, $listform, $debug);
-my ($sortkeys);
+my ($sortkeys, $show_overloaded_classname);
 
 sub _Do {
   oops unless @_ == 1;
@@ -623,6 +656,16 @@ sub _Do {
 
   $maxstringwidth = 0 if ($maxstringwidth //= 0) >= INT_MAX;
   $truncsuffix //= "...";
+  if (ref($objects) eq "HASH") {
+    for (qw/show_overloaded_classname objects/) {
+      croak "Objects value is a hashref but '${_}' key is missing\n"
+        unless exists $objects->{$_};
+    }
+    $show_overloaded_classname = $objects->{show_overloaded_classname};
+    $objects = $objects->{objects};
+  } else {
+    $show_overloaded_classname = 1;
+  }
   $objects = [ $objects ] unless ref($objects //= []) eq 'ARRAY';
 
   my @orig_values = $self->dd->Values;
@@ -739,13 +782,14 @@ btw '@@@repl obj is overloaded' if $debug;
         # overloaded package; should not happen in this case.
         warn("Recursive overloads on $item ?\n"),last
           if $overload_depth++ > 10;
+        my $cn = $show_overloaded_classname ? "($class)" : "";
         # Stringify objects which have the stringification operator
         if (overload::Method($class,'""')) {
           my $prefix = _show_as_number($item) ? _MAGIC_NOQUOTES_PFX : "";
 btw '@@@repl prefix="',$prefix,'"' if $debug;
           $item = $item.""; # stringify;
           if ($item !~ /^${class}=REF/) {
-            $item = "${prefix}($class)$item";
+            $item = "${prefix}${cn}$item";
           } else {
             # The "stringification" looks like Perl's default; don't prefix it
           }
@@ -754,33 +798,31 @@ btw '@@@repl stringified:',$item if $debug;
         }
         # Substitute the virtual value behind an overloaded deref operator
         # and prefix with (classname) to make clear what happened.
+        my sub _wrap_with_classname($) {
+          $cn ? [ _MAGIC_REFPFX.$cn, $_[0], _MAGIC_ELIDE_NEXT ] : $_[0]
+        }
         if (overload::Method($class,'@{}')) {
-          #$item = \@{ $item };
-          $item = [ _MAGIC_REFPFX."($class)", \@{ $item }, _MAGIC_ELIDE_NEXT ];
+          $item = _wrap_with_classname \@{ $item };
 btw '@@@repl (overload @{} --> ', $item,')' if $debug;
           redo CHECKObject;
         }
         if (overload::Method($class,'%{}')) {
-          #$item = \%{ $item };
-          $item = [ _MAGIC_REFPFX."($class)", \%{ $item }, _MAGIC_ELIDE_NEXT ];
+          $item = _wrap_with_classname \%{ $item };
 btw '@@@repl (overload %{} --> ', $item,')' if $debug;
           redo CHECKObject;
         }
         if (overload::Method($class,'${}')) {
-          #$item = \${ $item };
-          $item = [ _MAGIC_REFPFX."($class)", \${ $item }, _MAGIC_ELIDE_NEXT ];
+          $item = _wrap_with_classname \${ $item };
 btw '@@@repl (overload ${} --> ', $item,')' if $debug;
           redo CHECKObject;
         }
         if (overload::Method($class,'&{}')) {
-          #$item = \&{ $item };
-          $item = [ _MAGIC_REFPFX."($class)", \&{ $item }, _MAGIC_ELIDE_NEXT ];
+          $item = _wrap_with_classname \&{ $item };
 btw '@@@repl (overload &{} --> ', $item,')' if $debug;
           redo CHECKObject;
         }
         if (overload::Method($class,'*{}')) {
-          #$item = \*{ $item };
-          $item = [ _MAGIC_REFPFX."($class)", \*{ $item }, _MAGIC_ELIDE_NEXT ];
+          $item = _wrap_with_classname \*{ $item };
 btw '@@@repl (overload *{} --> ', $item,')' if $debug;
           redo CHECKObject;
         }
@@ -1316,7 +1358,7 @@ sub _postprocess_DD_result {
 
     if ($prepending) { $_ = $prepending . $_; $prepending = ""; }
 
-    btw "###atom",_mycallloc(), _dbrawstr($_),"($mode)"
+    btwN 1,"###atom",_mycallloc(), _dbrawstr($_),"($mode)"
       ,"\n context:",_dbvisnew($context)->Sortkeys(sub{[grep{exists $_[0]->{$_}} qw/O C tlen children CLOSE_AFTER_NEXT/]})->Dump()
       if $debug;
     if ($mode eq "prepend_to_next") {
@@ -1626,7 +1668,7 @@ sub _postprocess_DD_result {
     elsif (/\G${addrvis_re}/gsc)                 { atom($&, "prepend_to_next") }
 
     # With Deparse(1) the body has arbitrary Perl code, which we can't parse
-    elsif (/\Gsub\s*${curlies_re}/gc)            { atom($&) } # sub{...}
+    elsif (/\Gsub\s*(?:${parens_re}\s*)?${curlies_re}/gc) { atom($&) } # sub{...}
 
     # $VAR1->[ix] $VAR1->{key} or just $varname
     elsif (/\G(?:my\s+)?\$(?:${userident_re}|\s*->\s*|${balanced_re}+)++/gsc) { atom($&) }
@@ -1815,6 +1857,7 @@ sub _Interpolate {
       if ($meth eq 'p') {
         if ($str =~ /\\./) {
           $str =~ s/\$\\/\$\\\\/g;   # Assume the punct var $\ is not intended
+          $str =~ s/([()])/\\$1/g;
           $_->[1] = "qq(" . $str . ")";
           $_->[0] = 'e';
         }
@@ -1914,6 +1957,9 @@ sub DB_Vis_Eval($$) {
      ;
      ###??? FIXME why is DB_Vis_Evalwrapper needed?  Lexical scope?
      &DB_Vis_Evalwrapper;
+#Data::Dumper::Interp::btw("-------------\n\$@=",$@,"\n",
+#  "string_to_eval=",$Data::Dumper::Interp::string_to_eval,"\n",
+#  "result=",Data::Dumper::Interp::_dbavis(@Data::Dumper::Interp::result));
      @Data::Dumper::Interp::result
   };
   my $errmsg = $@;
@@ -2296,6 +2342,22 @@ the stringification ('""') operator,
 or array-, hash-, scalar-, or glob- deref operators;
 in that case the first overloaded operator found will be evaluated,
 the object replaced by the result, and the check repeated.
+
+By default, "(classname)" is prepended when an overloaded operator is
+evaluated to make clear what happened.
+
+=head2 Objects(I<< {objects => VALUE, show_overloaded_classname => BOOL} >>)
+
+This form, passing a hashref,
+allows control of whether "(classname)" is prepended to the result
+from an overloaded operator.
+
+If the I<show_overloaded_classname> value is false, then overload results
+will appear unadorned, i.e. they will look as if the overload result
+was the original value.
+
+The I<objects> value indicates whether and for which classes special
+object handling is enabled (false, "1", "classname" or [list of classnames]).
 
 =head2 Sortkeys(I<SUBREF>)
 

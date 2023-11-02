@@ -44,6 +44,10 @@ USE_LARGE_FILES	= define
 #CCHOME		= f:\msvc20
 CCHOME		= $(MSVCDIR)
 
+# Additional compiler flags can be specified here.
+#
+#BUILDOPT	= $(BUILDOPTEXTRA)
+
 # A new thing to build a 32bit perl on 64bit windows
 #WIN64		= undef
 

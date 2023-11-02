@@ -1,3 +1,8 @@
+0.472   2023-10-28  Released-By: PERLANCAR; Urgency: medium
+
+        - gen_modified_sub(): Add 'die' argument.
+
+
 0.471   2023-07-02  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] gen_curried_sub(), gen_modified_sub(): Make output_name

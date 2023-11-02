@@ -28,7 +28,7 @@ Dpkg::Deps::Union - list of unrelated dependencies
 =head1 DESCRIPTION
 
 This class represents a list of relationships.
-It inherits from Dpkg::Deps::Multiple.
+It inherits from L<Dpkg::Deps::Multiple>.
 
 =cut
 
@@ -45,7 +45,7 @@ use parent qw(Dpkg::Deps::Multiple);
 
 =item $dep->output([$fh])
 
-The output method uses ", " to join the list of relationships.
+The output() method uses ", " to join the list of relationships.
 
 =cut
 

@@ -46,6 +46,8 @@ __PACKAGE__->add_columns(
   { data_type => "boolean", is_nullable => 1 },
   "device_key",
   { data_type => "text", is_nullable => 1 },
+  "backend",
+  { data_type => "text", is_nullable => 1 },
 );
 
 
@@ -154,5 +156,13 @@ between the date stamp and time stamp. That is:
 =cut
 
 sub finished_stamp  { return (shift)->get_column('finished_stamp')  }
+
+=head2 duration
+
+Difference between started and finished.
+
+=cut
+
+sub duration  { return (shift)->get_column('duration')  }
 
 1;

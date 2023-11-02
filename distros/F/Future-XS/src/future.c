@@ -563,8 +563,6 @@ static void S_invoke_callback(pTHX_ struct FutureXS *self, SV *selfsv, struct Fu
         future_on_ready(f2, fseq);
       else if(flags & CB_CANCEL)
         future_cancel(fseq);
-
-      SvREFCNT_dec(f2);
     }
     else {
       struct FutureXS *f2self = get_future(f2);
@@ -574,6 +572,9 @@ static void S_invoke_callback(pTHX_ struct FutureXS *self, SV *selfsv, struct Fu
       };
       push_callback(f2self, &cb2);
     }
+
+    assert(SvREFCNT(f2) == 1);
+    SvREFCNT_dec(f2);
   }
   else {
     SV *code = CB_NONSEQ_CODE(cb);

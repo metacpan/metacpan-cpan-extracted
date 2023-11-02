@@ -25,11 +25,33 @@ Varsayılan olarak, komut tek bir işlem olarak yürütülür ve eşleşen tüm 
 
 **--discrete** seçeneği kullanıldığında giriş ve çıkış verilerinin satırları aynı olmak zorunda değildir.
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     Eşleşen her parça için ayrı ayrı yeni komut çağırın.
+
+- **--fillup**
+
+    Bir dizi boş olmayan satırı filtre komutuna geçirmeden önce tek bir satırda birleştirir. Geniş karakterler arasındaki yeni satır karakterleri silinir ve diğer yeni satır karakterleri boşluklarla değiştirilir.
+
+- **--blockmatch**
+
+    Normalde, belirtilen arama deseniyle eşleşen alan harici komuta gönderilir. Bu seçenek belirtilirse, eşleşen alan değil, onu içeren tüm blok işlenecektir.
+
+    Örneğin, `foo` kalıbını içeren satırları harici komuta göndermek için, tüm satırla eşleşen kalıbı belirtmeniz gerekir:
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    Ancak **--blockmatch** seçeneği ile bu işlem aşağıdaki kadar basit bir şekilde yapılabilir:
+
+        greple -Mtee cat -n -- foo
+
+    **--blockmatch** seçeneği ile bu modül daha çok [teip(1)](http://man.he.net/man1/teip)'in **-g** seçeneği gibi davranır.
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ Sonraki komut, Perl modül dosyasında bulunan [perlpod(1)](http://man.he.net/ma
 
 Yukarıdaki komutu **deepl** komutunu çağıran **-Mtee** modülü ile birlikte çalıştırarak DeepL servisi ile çevirebilirsiniz:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-**deepl** tek satırlık girdi için daha iyi çalıştığından, komut kısmını bu şekilde değiştirebilirsiniz:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 Yine de özel modül [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) bu amaç için daha etkilidir. Aslında, **tee** modülünün uygulama ipucu **xlate** modülünden gelmiştir.
 
@@ -82,7 +100,24 @@ Bu kısmı **tee** modülünü **ansifold** komutu ile kullanarak yeniden biçim
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+`--ayrık` seçeneğini kullanmak zaman alıcıdır. Bu nedenle, NL yerine CR karakteri kullanarak tek satır üreten `ansifold` ile `--separate '\r'` seçeneğini kullanabilirsiniz.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Daha sonra CR karakterini [tr(1)](http://man.he.net/man1/tr) komutu veya başka bir komutla NL'ye dönüştürün.
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+Başlık olmayan satırlardaki dizeler için grep yapmak istediğiniz bir durumu düşünün. Örneğin, `docker image ls` komutundaki resimleri aramak, ancak başlık satırını bırakmak isteyebilirsiniz. Bunu aşağıdaki komutla yapabilirsiniz.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+`-Mline -L 2:` seçeneği sondan ikinci satırları alır ve bunları `grep perl` komutuna gönderir. `--discrete` seçeneği gereklidir, ancak bu yalnızca bir kez çağrılır, bu nedenle performans dezavantajı yoktur.
+
+Bu durumda, `teip -l 2- -- grep` hata üretir çünkü çıktıdaki satır sayısı girdiden azdır. Ancak sonuç oldukça tatmin edicidir :)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ Bu kısmı **tee** modülünü **ansifold** komutu ile kullanarak yeniden biçim
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+# BUGS
+
+`--fillup` seçeneği Korece metin için doğru çalışmayabilir.
 
 # AUTHOR
 

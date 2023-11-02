@@ -1,0 +1,34 @@
+{
+  "preamble" => "Revision history for Dist-Zilla-App-Command-podpreview\n\n        * fixed use of smartmatch (warns as experimental in 5.18) (ether)",
+  "raw_preamble" => "Revision history for Dist-Zilla-App-Command-podpreview\n\n        * fixed use of smartmatch (warns as experimental in 5.18) (ether)\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "        * Fix error in pod\n\n",
+          "style" => "*",
+          "text" => "Fix error in pod"
+        }
+      ],
+      "line" => 5,
+      "note" => "01/04/2011",
+      "raw" => "0.002   01/04/2011\n",
+      "version" => "0.002"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 9,
+          "raw" => "        * Initial upload to CPAN\n",
+          "style" => "*",
+          "text" => "Initial upload to CPAN"
+        }
+      ],
+      "line" => 8,
+      "note" => "01/04/2011",
+      "raw" => "0.001   01/04/2011\n",
+      "version" => "0.001"
+    }
+  ]
+}

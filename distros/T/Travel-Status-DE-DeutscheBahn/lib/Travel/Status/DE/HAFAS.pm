@@ -22,7 +22,7 @@ use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.17';
+our $VERSION = '4.18';
 
 # {{{ Endpoint Definition
 
@@ -33,6 +33,7 @@ my %hafas_instance = (
 		name        => 'Deutsche Bahn',
 		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
 		salt        => 'bdI8UVj4' . '0K5fvxwf',
+		languages   => [qw[de en fr es]],
 		request     => {
 			client => {
 				id   => 'DB',
@@ -72,6 +73,7 @@ my %hafas_instance = (
 		stopfinder  => 'https://reiseauskunft.insa.de/bin/ajax-getstop.exe',
 		name        => 'Nahverkehrsservice Sachsen-Anhalt',
 		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
+		languages   => [qw[de en]],
 		request     => {
 			client => {
 				id   => 'NASA',
@@ -138,6 +140,7 @@ my %hafas_instance = (
 		stopfinder  => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
 		name        => 'Verkehrsverbund Berlin-Brandenburg',
 		productbits => [qw[s u tram bus ferry ice regio]],
+		languages   => [qw[de en]],
 		request     => {
 			client => {
 				id   => 'VBB',
@@ -161,6 +164,7 @@ my %hafas_instance = (
 		productbits => [qw[ice ice regio regio s bus ferry u tram ondemand]],
 		salt        => 'SP31mBu' . 'fSyCLmNxp',
 		micmac      => 1,
+		languages   => [qw[de en]],
 		request     => {
 			client => {
 				id   => 'VBN',
@@ -337,6 +341,10 @@ sub new {
 			],
 			%{ $hafas_instance{$service}{request} }
 		};
+	}
+
+	if ( $conf{language} ) {
+		$req->{lang} = $conf{language};
 	}
 
 	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
@@ -903,7 +911,7 @@ monitors
 
 =head1 VERSION
 
-version 4.17
+version 4.18
 
 =head1 DESCRIPTION
 
@@ -985,6 +993,12 @@ B<get_services> or B<get_service> to get the supported values.
 If this option is set, only the modes of transport appearing in I<mot1>,
 I<mot2>, ...  will be returned.  The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
+
+=item B<language> => I<language>
+
+Request text messages to be provided in I<language>. Supported languages depend
+on B<service>, use B<get_services> or B<get_service> to get the supported
+values. Providing an unsupported or invalid value may lead to garbage output.
 
 =item B<lookahead> => I<int> (station)
 

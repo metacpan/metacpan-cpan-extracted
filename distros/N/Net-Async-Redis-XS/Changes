@@ -1,5 +1,16 @@
 Revision history for Net-Async-Redis-XS
 
+0.014     2023-10-26 23:05:58+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - larger integers now handled properly (requires HAS_STRTOLL for best performance,
+    although will attempt to fall back to `long long` if that's not available)
+
+0.013     2023-10-26 11:42:25+08:00 Asia/Singapore
+    [New features]
+
+    - now sends host and port as fallback for single-node cluster connection
+
 0.012     2023-09-21 06:45:29+08:00 Asia/Singapore
     [Bugs fixed]
 

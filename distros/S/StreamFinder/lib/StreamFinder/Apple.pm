@@ -378,7 +378,7 @@ sub new
 
 	$self->{'id'} = '';
 	(my $url2fetch = $url);
-	if ($url2fetch =~ m#^https?\:\/\/podcasts\.apple\.#) {
+	if ($url2fetch =~ m#^https?\:\/\/(?:embed\.)?podcasts\.apple\.#) {
 #EXAMPLE1:my $url = 'https://podcasts.apple.com/us/podcast/wnbc-sec-shorts-josh-snead/id1440412195?i=1000448441439';
 #EXAMPLE2:my $url = 'https://podcasts.apple.com/us/podcast/good-bull-hunting-for-texas-a-m-fans/id1440412195';
 		$self->{'id'} = ($url =~ m#\/(?:id)?(\d+)(?:\?i\=(\d+))?\/?#) ? $1 : '';
@@ -404,6 +404,7 @@ sub new
 	my @epiTitles = ();
 	my @epiStreams = ();
 	my @epiGenres = ();
+	my $embedepisode = '';
 
 	if ($self->{'id'} !~ m#\/#) {   #PAGE (multiple episodes):
 		print STDERR "i:FETCHING PAGE URL ($url2fetch)...\n"  if ($DEBUG);
@@ -422,37 +423,65 @@ sub new
 		print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
 		return undef  unless ($html);
 
-		my $ep1id = $1  if ($html =~ m#\bdata\-episode\-id\=\"([^\"]+)#);
-		$ep1id ||= $1  if ($html =~ m#\btargetId\&quot\;\:\&quot\;(\d+)#);
-		return undef  unless ($ep1id);
+		if ($url2fetch =~ s#\/\/embed.podcast#\/\/podcast#) {  #HANDLE "EMBEDDED PODCAST URLS:
+			print STDERR "--2a: EMBEDDED PODCAST, take 5, then fetch podcast page ($url2fetch)...\n"  if ($DEBUG);
+			sleep 5;  #AVOID HITTING 'EM TOO QUICK IN SUCCESSION (AVOID DOS SUSPICION):
+			$response = $ua->get($url2fetch);
+			if ($response->is_success) {  #JETCH PODCAST PAGE:
+				$html = $response->decoded_content;
+			} else {
+				print STDERR $response->status_line  if ($DEBUG);
+				my $no_wget = system('wget','-V');
+				unless ($no_wget) {
+					print STDERR "\n..trying wget...\n"  if ($DEBUG);
+					$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
+				}
+			}
 
-		$url2fetch = 'https://podcasts.apple.com/podcast/id' . $self->{'id'}
-				. '?i=' . $ep1id;
-		$self->{'id'} .= '/' . $ep1id;
+			print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
+			return undef  unless ($html);
 
-		$self->{'articonurl'} = ($html =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
-		$self->{'articonurl'} = ($html =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : ''
-				if ($self->{'articonurl'} !~ /^http/);
+			$embedepisode = $url2fetch;
+			if ($html =~ m#${embedepisode}\?i\=(\d+)#s) {
+				$self->{'id'} = $1;
+				$url2fetch .= '?i=' . $1;
+				print STDERR "--3: EMBEDDED EPISODE FOUND (id=$1): URL=$url2fetch)!\n"  if ($DEBUG);
+			} else {
+				return undef;
+			}
+		} else {
+			my $ep1id = $1  if ($html =~ m#\bdata\-episode\-id\=\"([^\"]+)#);
+			$ep1id ||= $1  if ($html =~ m#\btargetId\&quot\;\:\&quot\;(\d+)#);
+			return undef  unless ($ep1id);
 
-		$html =~ s#^.+?\"episodes\\?\"\:\{##s;
-		while ($html =~ s#^(.+?)\"assetUrl\\?\"\:\\?\"([^\\\"]+)##so) {
-			my $pre = $1;
-			my $stream = $2;
-			next  if ($self->{'secure'} && $stream !~ /^https/o);
+			$url2fetch = 'https://podcasts.apple.com/podcast/id' . $self->{'id'}
+					. '?i=' . $ep1id;
+			$self->{'id'} .= '/' . $ep1id;
 
-			my $title = ($pre =~ s#\"(?:name|itunesTitle)\\?\"\:\\?\"(.+?)\\?\"\,##so) ? $1 : '';
-			next  unless ($title);
+			$self->{'articonurl'} = ($html =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
+			$self->{'articonurl'} = ($html =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : ''
+					if ($self->{'articonurl'} !~ /^http/);
 
-			$title =~ s#\\##g;
-			$title = HTML::Entities::decode_entities($title);
-			$title = uri_unescape($title);
-			$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
-			my $genre = ($pre =~ m#\"genreNames\\?\"\:\[\\?\"(.+?)\\?\"[\,\]]#so) ? $1 : '';
-			$genre =~ s#\\##g;
+			$html =~ s#^.+?\"episodes\\?\"\:\{##s;
+			while ($html =~ s#^(.+?)\"assetUrl\\?\"\:\\?\"([^\\\"]+)##so) {
+				my $pre = $1;
+				my $stream = $2;
+				next  if ($self->{'secure'} && $stream !~ /^https/o);
 
-			push @epiStreams, $stream;
-			push @epiTitles, $title;
-			push @epiGenres, $genre;
+				my $title = ($pre =~ s#\"(?:name|itunesTitle)\\?\"\:\\?\"(.+?)\\?\"\,##so) ? $1 : '';
+				next  unless ($title);
+
+				$title =~ s#\\##g;
+				$title = HTML::Entities::decode_entities($title);
+				$title = uri_unescape($title);
+				$title =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
+				my $genre = ($pre =~ m#\"genreNames\\?\"\:\[\\?\"(.+?)\\?\"[\,\]]#so) ? $1 : '';
+				$genre =~ s#\\##g;
+
+				push @epiStreams, $stream;
+				push @epiTitles, $title;
+				push @epiGenres, $genre;
+			}
 		}
  	}
 
@@ -474,6 +503,7 @@ sub new
 	print STDERR "-2: html=$html=\n"  if ($DEBUG > 1);
 	return undef  unless ($html);
 
+	$html =~ s/(?:\%|\\?u?00)([0-9A-Fa-f]{2})/chr(hex($1))/egs;
 	$self->{'iconurl'} = ($html =~ m#\<img\s+class\=\".*?src\=\"([^\"]+)#s) ? $1 : '';
 	if ($self->{'iconurl'} !~ /^http/) {
 		$self->{'iconurl'} = ($html =~ /\s+srcset\=\"([^\"\s]+)/s) ? $1 : '';

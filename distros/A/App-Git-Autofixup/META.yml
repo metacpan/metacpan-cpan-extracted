@@ -22,5 +22,5 @@ requires:
 resources:
   bugtracker: https://github.com/torbiak/git-autofixup/issues
   repository: https://github.com/torbiak/git-autofixup.git
-version: 0.004004
+version: 0.004005
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,8 @@
+---
+- name: "LinkedIn"
+  link: '#'
+  image: '/images/LiteBlog.jpg'
+  desc: "Checkout my LinkedIn profile. This is an example. Feel free to change it in <code>activities.yml</code>."
+- name: "GitHub"
+  link: "https://github.com/PerlDancer"
+  desc: "This is the Dancer GitHub Official account. It's a good time to Star the <a href=\"https://github.com/PerlDancer/Dancer2\">Dancer2</a> project!  This is an example. Feel free to change it in <code>activities.yml</code>."

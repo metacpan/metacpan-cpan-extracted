@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Future::XS 0.10;
+package Future::XS 0.11;
 
 use v5.14;
 use warnings;
@@ -77,27 +77,6 @@ cleanup code such as C<DESTROY> methods or C<defer> blocks often attempt to
 call this on existing instances.
 
 =cut
-
-sub import
-{
-   my $pkg = shift;
-   my $caller = caller;
-
-   my %syms = map { $_ => 1 } @_;
-
-   if( delete $syms{"-default"} ) {
-      require Future;
-
-      no warnings 'redefine';
-      foreach my $name (qw( new done fail )) {
-         no strict 'refs';
-         *{"Future::${name}"} = \&{__PACKAGE__."::${name}"};
-      }
-   }
-
-   croak "Unrecognised $pkg\->import symbols - " . join( ", ", sort keys %syms )
-      if %syms;
-}
 
 =head1 AUTHOR
 

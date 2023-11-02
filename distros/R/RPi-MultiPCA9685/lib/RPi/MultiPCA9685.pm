@@ -1,6 +1,6 @@
 package RPi::MultiPCA9685;
-use 5.034000;
-our $VERSION = '0.01';
+use 5.006;
+our $VERSION = '0.02';
 our @ISA = qw();
 use strict;
 use warnings;

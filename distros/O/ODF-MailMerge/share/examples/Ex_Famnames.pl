@@ -1,7 +1,10 @@
 #!/usr/bin/env perl
 use strict; use warnings; use feature qw/say/;
 STDOUT->autoflush; STDERR->autoflush;
-use open IO => ':locale';
+
+# define "console_in", "console_out", "locals_fs" encodings
+use Encode::Locale qw/decode_argv/;
+use Encode ();
 
 use FindBin qw($Bin);
 
@@ -23,6 +26,7 @@ sub commify_number($) {
 }
 
 my ($outpath, $also_pdf, $also_txt, $skelpath, $dbpath);
+decode_argv( Encode::FB_CROAK );
 GetOptions(
   'o|outpath=s'  => \$outpath,
   '--pdf'        => \$also_pdf,
@@ -179,7 +183,8 @@ if ($also_pdf) {
   system @cmd;
 }
 if ($also_txt) {
-  my @cmd = ("libreoffice", "--convert-to", "txt", $outpath);
+  # C.F. https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html
+  my @cmd = ("libreoffice", "--convert-to", "txt:Text (encoded):UTF8", $outpath);
   warn "> ", qshlist(@cmd),"\n";
   system @cmd;
 }

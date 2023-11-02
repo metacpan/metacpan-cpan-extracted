@@ -1,3 +1,9 @@
+0.054   2023-10-24  Released-By: PERLANCAR; Urgency: high
+
+        - [test] Skip node.js tests if Nodejs::Util or node.js is not available
+          (fix RT#144472).
+
+
 0.053   2022-09-22  Released-By: PERLANCAR; Urgency: medium
 
         - Add perl coerce rule for duration: From_str::hms.

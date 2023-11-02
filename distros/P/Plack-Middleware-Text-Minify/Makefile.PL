@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Plack::Middleware" => 0,
     "Ref::Util" => 0,
-    "Text::Minify::XS" => "0.6.2",
+    "Text::Minify::XS" => "0.7.0",
     "parent" => 0,
     "warnings" => 0
   },
@@ -33,13 +33,13 @@ my %WriteMakefileArgs = (
     "Plack::MIME" => 0,
     "Plack::Middleware::ContentLength" => 0,
     "Plack::Test" => 0,
+    "Test2::V0" => 0,
     "Test::Differences" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
     "strict" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.4.0",
+  "VERSION" => "v0.4.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,10 +58,10 @@ my %FallbackPrereqs = (
   "Plack::Middleware::ContentLength" => 0,
   "Plack::Test" => 0,
   "Ref::Util" => 0,
+  "Test2::V0" => 0,
   "Test::Differences" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
-  "Text::Minify::XS" => "0.6.2",
+  "Text::Minify::XS" => "0.7.0",
   "parent" => 0,
   "strict" => 0,
   "utf8" => 0,

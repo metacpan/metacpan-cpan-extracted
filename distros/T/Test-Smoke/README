@@ -143,7 +143,7 @@ run time of Test::Smoke.
 
 =item B<Distribution>
 
-    http://search.cpan.org/dist/Test-Smoke/
+    http://metacpan.org/pod/Test::Smoke/
 
     https://github.com/abeltje/Test-Smoke
 

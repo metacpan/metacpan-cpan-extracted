@@ -1,21 +1,24 @@
 package App::Oozie::Serializer::YAML;
-$App::Oozie::Serializer::YAML::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use YAML::XS ();
 use Moo;
 
 sub encode {
     my $self = shift;
     my $data = shift;
-    YAML::XS::Dump( $data );
+    return YAML::XS::Dump( $data );
 }
 
 sub decode {
     my $self = shift;
     my $data = shift;
-    YAML::XS::Load( $data );
+    return YAML::XS::Load( $data );
 }
 
 1;
@@ -32,7 +35,7 @@ App::Oozie::Serializer::YAML
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

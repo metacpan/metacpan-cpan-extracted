@@ -10,7 +10,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '4.001'; # VERSION
+our $VERSION = '4.002'; # VERSION
 
 =encoding utf8
 
@@ -167,7 +167,11 @@ async sub bootstrap {
             )
         );
         await $redis->connect;
-        await $self->apply_slots_from_instance($redis);
+        await $self->apply_slots_from_instance(
+            $redis,
+            host => $args{host},
+            port => $args{port}
+        );
     } finally {
         $redis->remove_from_parent if $redis;
     }
@@ -459,7 +463,11 @@ async sub register_moved_slot {
                 die 'Cluster status changed and cannot find a valid information source' unless $valid_connection;
                 # We'll let *all* our nodes try to tell us about slots, the operation
                 # should be atomic so whichever one(s) succeed are hopefully consistent
-                await $self->apply_slots_from_instance($valid_connection);
+                await $self->apply_slots_from_instance(
+                    $valid_connection,
+                    host => $host,
+                    port => $port,
+                );
             } catch {
                 $log->tracef("Node at %s was invalid", $node->primary);
             }
@@ -481,12 +489,16 @@ about the slots and their distribution.
 =cut
 
 async sub apply_slots_from_instance {
-    my ($self, $redis) = @_;
+    my ($self, $redis, %args) = @_;
     my ($slots) = await $redis->cluster_slots;
     $log->tracef('Have %d slots', 0 + @$slots);
 
     my @nodes;
     for my $slot_data (nsort_by { $_->[0] } $slots->@*) {
+        for my $primary ($slot_data->[2]) {
+            $primary->[0] = $args{host} unless length $primary->[0];
+            $primary->[1] = $args{port} unless length $primary->[1];
+        }
         my $node = $self->instantiate_node($slot_data);
         $log->tracef(
             'Node %s (%s) handles slots %d-%d and has %d replica(s) - %s',
@@ -533,7 +545,7 @@ async sub find_node_and_execute_command {
     my @slots = map { $self->hash_slot_for_key($_) } @keys;
     my %slots = map { $_ => 1 } @slots;
     die 'Multiple slots for command' if keys(%slots) > 1;
-    my $slot = shift(@slots);
+    my $slot = $cmd[0] =~ /^p?(?:un)?s?subscribe/i ? 0 : shift(@slots);
     $log->tracef('Look up hash slot for %s - %d', \@keys, $slot);
     my $redis = await $self->connection_for_slot($slot);
     # Some commands have modifiers around them for RESP2/3 transparent support

@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1000.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-09-23'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-10-28'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 
@@ -20,44 +20,84 @@ use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
+my $default_pfx = '$lno';
+
 sub _btwTN($$@) {
   local ($@, $_); # dont clobber callers variables
-  my $pfxexpr=shift; my $N=shift; local $_ = join("",@_);
+  my ($pfxexpr, $N, @strings) = @_;
+  local $_ = join("", @strings);
+#Carp::cluck "-----pfxexpr=$pfxexpr N=$N strings=@strings\n";
+  $pfxexpr = $default_pfx if $pfxexpr eq "__DEFAULT__";
   s/\n\z//s;
-  my ($package, $path, $lno) = caller($N);
-  (my $fname = $path) =~ s/.*[\\\/]//;
-  (my $pkg = $package) =~ s/.*:://;
-  my $s = eval "\"${pfxexpr}\"";
-  confess "ERROR IN btw prefix '$pfxexpr': $@" if $@;
-  printf "%s %s\n", $s, $_;
+  my @levels;
+  my $sep = ",";
+  if (ref($N) eq "") {
+    @levels = ($N);
+  }
+  elsif (ref($N) eq 'SCALAR' && defined($$N) && $$N >= 1) {
+    #@levels = reverse 0..($$N-1); # mini-traceback
+    @levels = 0..($$N-1); # mini-traceback
+    #$sep = "<";
+    #$sep = " ← ";
+    #$sep = " ⇽ ";
+    #$sep = " « "; # « exists in both Unicode and latin1
+    $sep = " ⇐ ";
+  }
+  elsif (ref($N) eq 'ARRAY' && !grep{! defined} @$N) {
+    @levels = @$N
+  }
+  else {
+    confess "Invalid N arg to btwN: $N"
+  }
+  my $pfx = "";
+  foreach my $n (@levels) {
+    my ($package, $path, $lno) = caller($n);
+    next unless defined $lno;
+    (my $fname = $path) =~ s/.*[\\\/]//;
+    $fname =~ s/\.pm$//;
+    (my $pkg = $package) =~ s/.*:://;
+    my $s = eval qq< qq<${pfxexpr}> >;
+    croak "ERROR IN btw prefix '$pfxexpr': $@" if $@;
+    $pfx .= $sep if $pfx;
+    $pfx .= $s;
+  }
+  print STDERR "${pfx}: $_\n";
 }
 
 sub _genbtw_funcs($$) {
-  my ($pkg, $pfx) = @_;
+  my ($pkg, $pfxexpr) = @_;
   no strict 'refs';
-  my $btwN  = eval{ sub($@) { unshift @_,$pfx; goto &_btwTN } } // die $@;
+  my $btwN  = eval{ sub($@) { unshift @_,$pfxexpr; goto &_btwTN } } // die $@;
   my $btw   = eval{ sub(@)  { unshift @_,0 ; goto &{"${pkg}::btwN"} } } // die $@;
   *{"${pkg}::btwN"} = \&$btwN;
   *{"${pkg}::btw"}  = \&$btw;
 }
 BEGIN {
-  _genbtw_funcs(__PACKAGE__,'$lno:');  # Generate versions used when imported the usual way
+  # Generate the functions used when imported the usual way.
+  # The special prefix "__DEFAULT__" shows just $lno if btw() has only
+  # been imported into a single package, otherwise it is more fully qualified.
+  _genbtw_funcs(__PACKAGE__,'__DEFAULT__');
 }
 
 sub import {
   my $class = shift;
   my $pkg = caller;
+  state $prev_pkg;
   my @remaining_args;
   foreach (@_) {
     local $_ = $_; # mutable copy
+    if (/btw/ && ($prev_pkg//=$pkg) ne $pkg) {
+      $default_pfx = '$pkg $lno'; # show package if imported from multiple
+    }
     # Generate customized version of btwN() (called by btw) which uses an
-    # arbitrary prefix expression.  The expression is eval'd each time, referencing
-    # variables $path $fname $lno $package .
-    if (/:btwN=(.*)/) {
-      warn ":btwN is deprecated,\njust use :btw=... and both btw() and btwN() will be generated\n";
+    # arbitrary prefix expression.  The expression is eval'd each time,
+    # referencing variables $path $fname $lno $package
+    # (it is eval'd multiple times if a [list of level numbers] is given).
+    if (/:btwN=(.*)\z/s) {
+      warn ":btwN is deprecated, just use :btw=... and both btw() and btwN() will be generated\n";
       $_ = ":btw=$1";
     }
-    if (/:btw=(.*)/) {
+    if (/:btw=(.*)\z/s) {
       _genbtw_funcs($pkg,$1);
     }
     else {
@@ -75,7 +115,15 @@ use Scalar::Util qw/reftype refaddr blessed weaken/;
 use List::Util qw/first any all/;
 use File::Basename qw/dirname basename/;
 
-sub oops(@) { @_=("\n".(caller)." oops:\n",@_,"\n"); goto &Carp::confess }
+sub oops(@) {
+  if (defined(&Spreadsheet::Edit::logmsg)) {
+    # Show current apply sheet & row if any.
+    @_=("\n".(caller)." oops:\n",&Spreadsheet::Edit::logmsg(@_),"\n");
+  } else {
+    @_=("\n".(caller)." oops:\n",@_,"\n");
+  }
+  goto &Carp::confess
+}
 
 use Data::Dumper::Interp qw/dvis vis visq avis hvis visnew addrvis u/;
 
@@ -445,39 +493,41 @@ B<our %SpreadsheetEdit_Log_Options = (...);> in your package
 will be used to override the built-in defaults (but are still
 overridden by C<{OPTIONS}> passed in individual calls).
 
-=head1 Debug Utilities
+=head1 DEBUG UTILITIES
 
-Z<>
 
-=head2 btw string,string,...
+=head2 btw STRING,STRING,...
 
-=head2 btwN numlevels,string,string,...
+=head2 btwN LEVELSBACK,STRING,STRING,...
 
-For internal debug messages (not related to the other functions).
+These print internal debug messages (not related to the log functions above).
 
 C<btw> prints a message to STDERR preceeded by "linenum:"
 giving the line number I<of the call to btw>.
-A newline is appended to the message unless the last string
-string already ends with a newline.
+A newline is appended to the message unless the last STRING already
+ends with a newline.
 
-This is like C<warn 'message'> when the message omits a final newline;
+This is like C<warn> when the message omits a final newline,
 but with a different presentation.
 
-C<btwN> displays the line number of the call <numlevels> earlier
-in the call stack.
+C<btwN> displays the line number of the call LEVELSBACK
+in the call stack (0 is the same as C<btw>, 1 for your caller's location etc.)
+
+LEVELSBACK may also be a scalar ref \MAXDEPTH to show multiple levels,
+i.e. a mini traceback.
 
 Not exported by default.
 
-By default messages show only the caller's line number.
-The special tags B<:btw=PFX> or B<:btwN=PFX> will import a customized function
-which prefixes messages with the string B<PFX>.  This string
-may contain
+By default, only the line numbers of calling locations are shown.
+If a tag B<:btw=PFX> is imported then customized C<btw()> and C<btwN()>
+functions will be imported which use an arbitrary prefix B<PFX> string,
+which may contain
 I<$lno> I<$path> I<$fname> I<$package> or I<$pkg>
 to interpolate respectively
 the calling line number, file path, file basename,
 package name, or S<abbreviated package name (*:: removed).>
 
-=head2 oops string,string,...
+=head2 oops STRING,STRING,...
 
 Prepends "\n<your package name> oops:\n" to the message and then
 chains to Carp::confess for backtrace and death.

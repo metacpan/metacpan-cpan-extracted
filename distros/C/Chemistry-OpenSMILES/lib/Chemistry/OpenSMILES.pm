@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.8.6'; # VERSION
+our $VERSION = '0.9.0'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -27,9 +27,10 @@ our @EXPORT_OK = qw(
 );
 
 use Graph::Traversal::BFS;
-use List::Util qw( any none );
+use List::Util qw( all any none );
 
 sub is_chiral($);
+sub is_chiral_planar($);
 sub is_chiral_tetrahedral($);
 sub mirror($);
 sub toggle_cistrans($);
@@ -64,10 +65,11 @@ our %bond_symbol_to_order = (
     '$' => 4,
 );
 
-# Removes chiral setting from tetrahedral chiral centers with less than
-# four distinct neighbours. Only tetrahedral chiral centers with four atoms
-# are affected, thus three-atom centers (implying lone pairs) are left
-# untouched. Returns the affected atoms.
+# Removes chiral setting from allenal, square planar or tetrahedral chiral centers if deemed unimportant.
+# For allenal and tetrahedral arrangements this means situations with less than four distinct neighbours.
+# For square planar arrangements this means situations when all neighbours are the same.
+# Only chiral centers with four atoms are affected, thus three-atom centers (implying lone pairs) are left untouched.
+# Returns the affected atoms.
 #
 # TODO: check other chiral centers
 sub clean_chiral_centers($$)
@@ -76,20 +78,39 @@ sub clean_chiral_centers($$)
 
     my @affected;
     for my $atom ($moiety->vertices) {
-        next unless is_chiral_tetrahedral( $atom );
-        # Anomers must not loose chirality settings
+        next unless is_chiral_allenal( $atom ) ||
+                    is_chiral_planar( $atom )  ||
+                    is_chiral_tetrahedral( $atom );
+        # Anomers must not loose chirality settings in any way
         next if is_ring_atom( $moiety, $atom, scalar $moiety->edges );
 
         my $hcount = exists $atom->{hcount} ? $atom->{hcount} : 0;
-        next if $moiety->degree($atom) + $hcount != 4;
+        my @neighbours = $moiety->neighbours( $atom );
+        if( is_chiral_allenal( $atom ) ) {
+            @neighbours = grep { $_ != $atom }
+                          map  { $moiety->neighbours( $_ ) }
+                               @neighbours;
+        }
 
-        my %colors = map { ($color_sub->( $_ ) => 1) }
-                         $moiety->neighbours($atom),
-                         ( { symbol => 'H' } ) x $hcount;
-        next if scalar keys %colors == 4;
+        next if @neighbours + $hcount != 4;
+
+        my %colors;
+        for (@neighbours, ( { symbol => 'H' } ) x $hcount) {
+            $colors{$color_sub->( $_ )}++;
+        }
+
+        if( is_chiral_planar( $atom ) ) {
+            # Chiral planar center markers make sense even if only two types of atoms are there.
+            next if scalar keys %colors  > 2;
+            next if scalar keys %colors == 2 && all { $_ == 2 } values %colors;
+        } else {
+            next if scalar keys %colors == 4;
+        }
+
         delete $atom->{chirality};
         push @affected, $atom;
     }
+
     return @affected;
 }
 
@@ -109,12 +130,32 @@ sub is_chiral($)
     }
 }
 
+sub is_chiral_allenal($)
+{
+    my( $what ) = @_;
+    if( ref $what eq 'HASH' ) { # Single atom
+        return $what->{chirality} && $what->{chirality} =~ /^\@AL[12]$/;
+    } else {                    # Graph representing moiety
+        return any { is_chiral_allenal( $_ ) } $what->vertices;
+    }
+}
+
+sub is_chiral_planar($)
+{
+    my( $what ) = @_;
+    if( ref $what eq 'HASH' ) { # Single atom
+        return $what->{chirality} && $what->{chirality} =~ /^\@SP[123]$/;
+    } else {                    # Graph representing moiety
+        return any { is_chiral_planar( $_ ) } $what->vertices;
+    }
+}
+
 sub is_chiral_tetrahedral($)
 {
     my( $what ) = @_;
     if( ref $what eq 'HASH' ) { # Single atom
         # CAVEAT: will fail for allenal configurations of @/@@ in raw mode
-        return $what->{chirality} && $what->{chirality} =~ /^@@?$/
+        return $what->{chirality} && $what->{chirality} =~ /^@@?$/;
     } else {                    # Graph representing moiety
         return any { is_chiral_tetrahedral( $_ ) } $what->vertices;
     }

@@ -2,10 +2,14 @@
 
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+
+# Ease the life of the CPAN testers.
+exit 0 if $ENV{AUTOMATED_TESTING} && $] < 5.026000;
+
+use ExtUtils::MakeMaker 7.24;
 
 my $master = 'lib/Text/Layout/Version.pm';
-my $version = "0.031";
+my $version = "0.032";
 $master =~ s;/Version;;;
 
 WriteMakefile(
@@ -16,14 +20,15 @@ WriteMakefile(
  LICENSE             => 'perl_5',
  PL_FILES            => {},
  DIR		     => [],
- MIN_PERL_VERSION    => '5.010001',
- PREREQ_PM => {
-     'ExtUtils::MakeMaker' => 6.46, # for META_MERGE, LICENSE
-     'Test::More' => 0,
- },
- TEST_REQUIRES  => {
-		    'PDF::API2'  => 2.036,
-		   },
+ MIN_PERL_VERSION    => '5.026000',
+ PREREQ_PM           => {
+			 'Object::Pad'                 => 0.78,
+			 'Test::More' => 0,
+			},
+ TEST_REQUIRES       => {
+			 'Object::Pad'                 => 0.78,
+			 'PDF::API2'  => 2.036,
+			},
  META_MERGE => {
    resources    => {
      repository => {
@@ -54,12 +59,14 @@ WriteMakefile(
    no_index => {
          file => [
 		  "lib/Text/Layout/Cairo.pm",
+		  "lib/Text/Layout/ElementRole.pm",
 		  "lib/Text/Layout/Markdown.pm",
 		  "lib/Text/Layout/Pango.pm",
 		  "lib/Text/Layout/PDFAPI2.pm",
 	 ],
        directory => [
-	  "tests",
+		  "lib/Text/Layout/PDFAPI2",
+		  "tests",
        ],
    },
  }

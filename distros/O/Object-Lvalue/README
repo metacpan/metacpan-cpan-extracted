@@ -1,0 +1,21 @@
+
+This is a lightweight, fast object class useful for high-speed
+processing, where a large number of objects may be created, if
+objects will benefit from having some attribute values in common,
+or where freezing and thawing (or Dump and Load) of the object
+values is helpful. 
+
+It stores the object values in an array with lvalue method 
+accessors. Derived classes can override the parent's attribute
+names with values stored further up the array. This leaves 
+base class attributes accessible via SUPER or using the class
+name (e.g., $obj->BASE::CLASS::verbose). 
+
+This approach leaves access to the attribute values faster than
+inside-out storage with a simpler process to save/reload objects
+and simpler cleanup on exit. 
+
+There is intentionally no introspection for finding the offsets
+of individual attributes for each class; use the methods. For
+anyone desiring an approach for testing look at attributes(),
+reverse the packages and remove the uniq.

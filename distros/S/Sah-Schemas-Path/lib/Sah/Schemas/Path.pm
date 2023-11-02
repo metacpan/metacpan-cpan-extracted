@@ -1,7 +1,11 @@
 package Sah::Schemas::Path;
 
-our $DATE = '2021-07-17'; # DATE
-our $VERSION = '0.016'; # VERSION
+use strict;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-10-29'; # DATE
+our $DIST = 'Sah-Schemas-Path'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to filesystem path
@@ -18,9 +22,36 @@ Sah::Schemas::Path - Schemas related to filesystem path
 
 =head1 VERSION
 
-This document describes version 0.016 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2021-07-17.
+This document describes version 0.021 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+
+=head1 DESCRIPTION
+
+This distribution includes several schemas you can use if you want to accept
+filename/dirname/pathname.
+
+Some general guidelines:
+
+C<pathname> should be your first choice. But if you only want to accept
+directory name, you can use C<dirname> instead. And if you only want to accept
+file name and not directory, you can use C<filename>.
+
+C<filename>, C<dirname>, C<pathname> are basically the same; they differ in the
+completion they provide, i.e. C<dirname> offers completion of only directory
+names.
+
+Use C<filename::unix>, C<dirname::unix>, C<pathname::unix> only if you want to
+accept Unix-style path. These schemas contain additional checks that are
+specific to Unix filesystem.
+
+Use C<filename::exists>, C<dirname::exists>, C<pathname::exists> if you want to
+accept an existing path. For example in a utility/routine to rename or process
+files. On the contrary, there are C<filename::not_exists>,
+C<dirhname::not_exists>, and C<pathname::not_exists> if you want to accept
+non-existing path, e.g. in a utility/routine to create a new file.
 
 =head1 SAH SCHEMAS
+
+The following schemas are included in this distribution:
 
 =over
 
@@ -43,6 +74,62 @@ What's the difference between this schema and C<filename>? The default completio
 rule. This schema's completion by default only includes directories.
 
 
+=item * L<dirname::default_curdir|Sah::Schema::dirname::default_curdir>
+
+Directory name, default to current directory.
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. a
+C<delete-files-in> script). It is safer to use this schema to perform a
+non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by
+default.
+
+
+=item * L<dirname::exists|Sah::Schema::dirname::exists>
+
+Directory name, must exist on filesystem.
+
+This is like the C<dirname> schema but with an extra check that the path must
+already exist.
+
+
+=item * L<dirname::not_exists|Sah::Schema::dirname::not_exists>
+
+Directory name, must not exist on filesystem.
+
+This is like the C<dirname> schema but with an extra check that the path must
+not already exist.
+
+
+=item * L<dirname::unix|Sah::Schema::dirname::unix>
+
+Filesystem directory name on a Unix system.
+
+This is like the C<dirname> schema but with extra checks relevant to the Unix,
+(e.g. a path element cannot be longer than 255 characters) and prefilters (e.g.
+multipile consecutive slashes C<//> will be normalized into a single one C</>).
+
+
+=item * L<dirname::unix::exists|Sah::Schema::dirname::unix::exists>
+
+Unix directory name, must exist on filesystem.
+
+This is like the C<dirname::unix> schema but with an extra check that the path
+must already exist.
+
+
+=item * L<dirname::unix::not_exists|Sah::Schema::dirname::unix::not_exists>
+
+Unix directory name, must exist on filesystem.
+
+This is like the C<dirname::unix> schema but with an extra check that the path
+must not already exist.
+
+
+=item * L<dirnames::exist|Sah::Schema::dirnames::exist>
+
+List of directory names, all must exist on filesystem.
+
 =item * L<filename|Sah::Schema::filename>
 
 Filesystem file name.
@@ -59,9 +146,60 @@ longer than 255 characters) and preprocessing (e.g. stripping extraneous slashes
 like C<foo//bar> into C<foo/bar>.
 
 What's the difference between this schema and C<dirname>? The default completion
-rule. This schema's completion by default only includes files and not
-directories.
+rule. C<dirname>'s completion only includes directories and not files.
 
+
+=item * L<filename::exists|Sah::Schema::filename::exists>
+
+File name, must exist on filesystem.
+
+This is like the C<filename> schema but with an extra check that the path must
+already exist.
+
+
+=item * L<filename::not_exists|Sah::Schema::filename::not_exists>
+
+File name, must not already exist on filesystem.
+
+This is like the C<filename> schema but with an extra check that the path must
+not already exist.
+
+
+=item * L<filename::unix|Sah::Schema::filename::unix>
+
+Filesystem file name on a Unix system.
+
+This is like the C<filename> schema but with extra checks relevant to the Unix,
+(e.g. a path element cannot be longer than 255 characters) and prefilters (e.g.
+multipile consecutive slashes C<//> will be normalized into a single one C</>).
+
+
+=item * L<filename::unix::exists|Sah::Schema::filename::unix::exists>
+
+Unix file name, must exist on filesystem.
+
+This is like the C<filename::unix> schema but with an extra check that the path
+must already exist.
+
+
+=item * L<filename::unix::not_exists|Sah::Schema::filename::unix::not_exists>
+
+Unix file name, must not already exist on filesystem.
+
+This is like the C<filename::unix> schema but with an extra check that the path
+must not already exist.
+
+
+=item * L<filenames|Sah::Schema::filenames>
+
+List of filesystem file names.
+
+Coerces from string by expanding the glob pattern in the string.
+
+
+=item * L<filenames::exist|Sah::Schema::filenames::exist>
+
+List of file names, all must exist on filesystem.
 
 =item * L<pathname|Sah::Schema::pathname>
 
@@ -80,7 +218,48 @@ like C<foo//bar> into C<foo/bar>.
 
 What's the difference between this schema and C<filename> and C<dirname>? The
 default completion rule. This schema's completion by default includes
-files as well as directories.
+files as well as directories, while C<dirname>'s only include directories.
+
+
+=item * L<pathname::exists|Sah::Schema::pathname::exists>
+
+Path name, must exist on filesystem.
+
+This is like the C<pathname> schema but with an extra check that the path must
+already exist.
+
+
+=item * L<pathname::not_exists|Sah::Schema::pathname::not_exists>
+
+Path name, must not already exist on filesystem.
+
+This is like the C<pathname> schema but with an extra check that the path must
+not already exist.
+
+
+=item * L<pathname::unix|Sah::Schema::pathname::unix>
+
+Filesystem path name on a Unix system.
+
+This is like the C<pathname> schema but with extra checks relevant to the Unix,
+(e.g. a path element cannot be longer than 255 characters) and prefilters (e.g.
+multipile consecutive slashes C<//> will be normalized into a single one C</>).
+
+
+=item * L<pathname::unix::exists|Sah::Schema::pathname::unix::exists>
+
+Unix path name, must exist on filesystem.
+
+This is like the C<pathname::unix> schema but with an extra check that the path
+must already exist.
+
+
+=item * L<pathname::unix::not_exists|Sah::Schema::pathname::unix::not_exists>
+
+Unix path name, must not already exist on filesystem.
+
+This is like the C<pathname::unix> schema but with an extra check that the path
+must not already exist.
 
 
 =item * L<pathnames|Sah::Schema::pathnames>
@@ -89,6 +268,10 @@ List of filesystem path names.
 
 Coerces from string by expanding the glob pattern in the string.
 
+
+=item * L<pathnames::exist|Sah::Schema::pathnames::exist>
+
+List of path names, all must exist on filesystem.
 
 =back
 
@@ -100,6 +283,47 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Path>.
 
+=head1 SEE ALSO
+
+L<Sah> - schema specification
+
+L<Data::Sah> - Perl implementation of Sah
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Gabor Szabo
+
+Gabor Szabo <gabor@szabgab.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2019, 2018, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Path>
@@ -107,22 +331,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<Sah> - specification
-
-L<Data::Sah>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2018, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

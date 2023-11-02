@@ -1,0 +1,89 @@
+{
+  "preamble" => "Revision history for Perl extension if.",
+  "raw_preamble" => "Revision history for Perl extension if.\n\n",
+  "releases" => [
+    {
+      "entries" => [],
+      "line" => 3,
+      "note" => "The version of 5.7.3.",
+      "raw" => "0.01\t\tThe version of 5.7.3.\n\n",
+      "version" => "0.01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "\t\ttest adopted for backward-compatibility\n\n",
+          "style" => "",
+          "text" => "test adopted for backward-compatibility"
+        }
+      ],
+      "line" => 5,
+      "note" => "`our' removed for backward-compatibility.",
+      "raw" => "0.010001\t`our' removed for backward-compatibility.\n",
+      "version" => "0.010001"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 9,
+          "raw" => "\t\tfix `require or die'.\n\n",
+          "style" => "",
+          "text" => "fix `require or die'."
+        }
+      ],
+      "line" => 8,
+      "note" => "support package names which are simultaneously keywords (open).",
+      "raw" => "0.04\t\tsupport package names which are simultaneously keywords (open).\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 12,
+          "raw" => "\t\tolder versions of Perl.\n\n",
+          "style" => "",
+          "text" => "older versions of Perl."
+        }
+      ],
+      "line" => 11,
+      "note" => "test was using a discipline for open.pm not supported with",
+      "raw" => "0.0401\t\ttest was using a discipline for open.pm not supported with\n",
+      "version" => "0.0401"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 15,
+          "raw" => "\t\t  Better error handling.\n",
+          "style" => "",
+          "text" => "Better error handling."
+        },
+        {
+          "line" => 16,
+          "raw" => "\t\t  Suggest significance of => in the docs.\n\n",
+          "style" => "",
+          "text" => "Suggest significance of => in the docs."
+        }
+      ],
+      "line" => 14,
+      "note" => "Sync with perl5.12.2:",
+      "raw" => "0.05\t\tSync with perl5.12.2:\n",
+      "version" => "0.05"
+    },
+    {
+      "entries" => [],
+      "line" => 18,
+      "note" => "Update email address.",
+      "raw" => "0.06\t\tUpdate email address.\n\n",
+      "version" => "0.06"
+    },
+    {
+      "entries" => [],
+      "line" => 20,
+      "note" => "The update of 0.0401 was lost during update to 0.05",
+      "raw" => "0.0601\t\tThe update of 0.0401 was lost during update to 0.05\n\n",
+      "version" => "0.0601"
+    }
+  ]
+}

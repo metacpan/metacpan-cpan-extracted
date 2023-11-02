@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017,2018,2019,2020,2022 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2019,2020,2022,2023 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -17,7 +17,7 @@ use warnings;
 
 {
     package Doit;
-    our $VERSION = '0.026';
+    our $VERSION = '0.027';
     $VERSION =~ s{_}{};
 
     use constant IS_WIN => $^O eq 'MSWin32';
@@ -163,7 +163,7 @@ use warnings;
 {
     package Doit::Util;
     use Exporter 'import';
-    our @EXPORT; BEGIN { @EXPORT = qw(in_directory new_scope_cleanup copy_stat get_sudo_cmd is_in_path) }
+    our @EXPORT; BEGIN { @EXPORT = qw(in_directory new_scope_cleanup copy_stat get_sudo_cmd is_in_path get_os_release) }
     $INC{'Doit/Util.pm'} = __FILE__; # XXX hack
     use Doit::Log;
 
@@ -281,6 +281,28 @@ use warnings;
 	    }
 	}
 	undef;
+    }
+
+    {
+	my %cached_os_release_per_file;
+	sub get_os_release {
+	    my(%opts) = @_;
+	    my $file = delete $opts{file} || '/etc/os-release';
+	    my $refresh = delete $opts{refresh} || 0;
+	    error 'Unhandled options: ' . join(' ', %opts) if %opts;
+	    if ($refresh || !$cached_os_release_per_file{$file}) {
+		if (open my $fh, '<', $file) {
+		    my %c;
+		    while(<$fh>) {
+			if (my($k,$v) = $_ =~ m{^(.*?)="?(.*?)"?$}) {
+			    $c{$k} = $v;
+			}
+		    }
+		    $cached_os_release_per_file{$file} = \%c;
+		}
+	    }
+	    $cached_os_release_per_file{$file};
+	}
     }
 }
 
@@ -841,7 +863,7 @@ use warnings;
 
 	my @commands;
 	push @commands, {
-			 ($info ? (rv => $code->(), code => sub {}) : (code => $code)),
+			 (code => $code, $info ? (run_always => 1) : ()),
 			 ($quiet ? () : (msg => "@args")),
 			};
 	Doit::Commands->new(@commands);
@@ -924,7 +946,7 @@ use warnings;
 
 	my @commands;
 	push @commands, {
-			 ($info ? (rv => $code->(), code => sub {}) : (code => $code)),
+			 (code => $code, $info ? (run_always => 1) : ()),
 			 ($quiet ? () : (msg => "@args")),
 			};
 	Doit::Commands->new(@commands);
@@ -971,7 +993,7 @@ use warnings;
 
 	my @commands;
 	push @commands, {
-			 ($info ? (rv => $code->(), code => sub {}) : (code => $code)),
+			 (code => $code, $info ? (run_always => 1) : ()),
 			 ($quiet ? () : (msg => "@args")),
 			};
 	Doit::Commands->new(@commands);
@@ -1083,18 +1105,11 @@ use warnings;
 
 	my @commands;
 	push @commands, {
-			 ($info
-			  ? (
-			     rv   => do { $code->(); 1 },
-			     code => sub {},
-			    )
-			  : (
-			     rv   => 1,
-			     code => $code,
-			    )
-			 ),
-			 ($quiet ? () : (msg  => "@args" . _show_cwd($show_cwd))),
-			};
+	    rv   => 1,
+	    code => $code,
+	    ($info ? (run_always => 1) : ()),
+	    ($quiet ? () : (msg  => "@args" . _show_cwd($show_cwd))),
+	};
 	Doit::Commands->new(@commands);
     }
 
@@ -1634,13 +1649,17 @@ use warnings;
 	my $rv;
 	for my $command ($self->commands) {
 	    if (exists $command->{msg}) {
-		Doit::Log::info($command->{msg} . " (dry-run)");
+		Doit::Log::info($command->{msg} . ($command->{run_always} ? "" : " (dry-run)"));
 	    }
 	    if (exists $command->{code}) {
+		my $this_rv;
+		if ($command->{run_always}) {
+		    $this_rv = $command->{code}->();
+		} # else $this_rv stays undefined
 		if (exists $command->{rv}) {
 		    $rv = $command->{rv};
 		} else {
-		    # Well, in dry-run mode we have no real return value...
+		    $rv = $this_rv;
 		}
 	    }
 	}
@@ -1785,6 +1804,14 @@ use warnings;
 	my($self, %opts) = @_;
 	my $sudo = Doit::Sudo->do_connect(dry_run => $self->is_dry_run, components => $self->{components}, %opts);
 	$sudo;
+    }
+
+    # XXX does this belong here?
+    sub do_fork {
+	my($self, %opts) = @_;
+	$self->add_component(qw(fork));
+	my $fork = Doit::Fork->do_connect(dry_run => $self->is_dry_run, %opts);
+	$fork;
     }
 }
 

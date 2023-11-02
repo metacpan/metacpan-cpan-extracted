@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 13;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigFloat;
@@ -11,6 +11,27 @@ use Math::BigFloat;
 my ($x, $y);
 
 note("as_rat() as a class method");
+
+$x = Math::BigFloat -> as_rat("Inf");
+subtest '$x = Math::BigFloat -> as_rat("Inf");' => sub {
+    plan tests => 2;
+    is(ref($x), 'Math::BigRat', '$x is a Math::BigRat');
+    cmp_ok($x, "==", "Inf", '$x == Inf');
+};
+
+$x = Math::BigFloat -> as_rat("-Inf");
+subtest '$x = Math::BigFloat -> as_rat("-Inf");' => sub {
+    plan tests => 2;
+    is(ref($x), 'Math::BigRat', '$x is a Math::BigRat');
+    cmp_ok($x, "==", "-Inf", '$x == -Inf');
+};
+
+$x = Math::BigFloat -> as_rat("NaN");
+subtest '$x = Math::BigFloat -> as_rat("NaN");' => sub {
+    plan tests => 2;
+    is(ref($x), 'Math::BigRat', '$x is a Math::BigRat');
+    is($x, "NaN", '$x is NaN');
+};
 
 $x = Math::BigFloat -> as_rat("2");
 subtest '$x = Math::BigFloat -> as_rat("2");' => sub {
@@ -27,6 +48,33 @@ subtest '$x = Math::BigFloat -> as_rat("2.5");' => sub {
 };
 
 note("as_rat() as an instance method");
+
+$x = Math::BigFloat -> new("Inf"); $y = $x -> as_rat();
+subtest '$x = Math::BigFloat -> new("Inf"); $y = $x -> as_rat();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($y), 'Math::BigRat', '$y is a Math::BigRat');
+    cmp_ok($y, "==", "Inf", '$y == Inf');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
+$x = Math::BigFloat -> new("-Inf"); $y = $x -> as_rat();
+subtest '$x = Math::BigFloat -> new("-Inf"); $y = $x -> as_rat();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($y), 'Math::BigRat', '$y is a Math::BigRat');
+    cmp_ok($y, "==", "-Inf", '$y == -Inf');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
+
+$x = Math::BigFloat -> new("NaN"); $y = $x -> as_rat();
+subtest '$x = Math::BigFloat -> new("NaN"); $y = $x -> as_rat();' => sub {
+    plan tests => 4;
+    is(ref($x), 'Math::BigFloat', '$x is a Math::BigFloat');
+    is(ref($y), 'Math::BigRat', '$y is a Math::BigRat');
+    is($y, "NaN", '$y is NaN');
+    isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
+};
 
 $x = Math::BigFloat -> new("2"); $y = $x -> as_rat();
 subtest '$x = Math::BigFloat -> new("2"); $y = $x -> as_rat();' => sub {

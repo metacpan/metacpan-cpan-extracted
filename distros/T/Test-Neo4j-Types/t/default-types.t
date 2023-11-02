@@ -26,7 +26,7 @@ neo4j_relationship_ok 'Neo4j_Test::RelDef', sub {
 	}, $class;
 };
 
-neo4j_path_ok 'Neo4j_Test::PathDef', sub { bless pop, shift };
+neo4j_path_ok 'Neo4j_Test::PathDef', sub { bless pop->{elements}, shift };
 
 neo4j_point_ok 'Neo4j_Test::PointDef', sub {
 	my ($class, $params) = @_;

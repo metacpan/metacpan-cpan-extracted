@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 4;
+use Test::More 'tests' => 5;
 use Test::NoWarnings;
 use Wikibase::Datatype::Print::Statement;
 use Wikibase::Datatype::Snak;
@@ -109,4 +109,17 @@ is_deeply(
 		'  }',
 	],
 	'Get printed value.',
+);
+
+# Test.
+@ret = Wikibase::Datatype::Print::Statement::print($obj, {
+	'no_print_references' => 1,
+});
+is_deeply(
+	\@ret,
+	[
+		'P11: 1.1 (normal)',
+		' P642: Q474741',
+	],
+	'Get printed value (without references).',
 );

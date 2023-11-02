@@ -1,0 +1,7 @@
+# Version/Revision history
+
+1.01 Sun 29 Oct 2023 20:02:47 MSK
+    * Added the config_pointer option to store the pointer
+
+1.00 Fri 27 Oct 2023 16:36:17 MSK
+    * Initial release

@@ -1,0 +1,24 @@
+# MANIFEST Fri 27 Oct 2023 16:38:14 MSK
+
+# General
+Changes                                  Changes list
+INSTALL.md                               Installation instructions
+LICENSE                                  License file
+Makefile.PL                              Makefile builder
+MANIFEST                                 This file
+README.md                                !!! README FIRST !!!
+TODO                                     TO DO
+
+# Libs
+lib/Mojolicious/Plugin/ConfigGeneral.pm  Main library
+
+# Tests
+t/00-fixme.t                             FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                      POD::Coverage testing
+t/00-pod.t                               Checking all POD documents
+t/00-trailingspace.t                     Style test: TrailingSpace
+t/01-use.t                               Test script
+t/02-config.t                            Config script
+t/test.conf                              Test data
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

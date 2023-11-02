@@ -3,7 +3,8 @@ use warnings;
 no warnings qw(portable);
 
 use File::Temp qw(tempfile);
-use Scalar::Type qw(bool_supported is_bool);
+use Scalar::Type qw(bool_supported);
+Scalar::Type->import('is_bool') if(bool_supported());
 use Test::More;
 use Test::Exception;
 use lib 't/lib';

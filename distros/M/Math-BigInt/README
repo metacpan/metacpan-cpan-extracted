@@ -1,7 +1,7 @@
 Math-BigInt
 
-Math::BigInt and Math::BigFloat are modules for arbitrary precision
-arithmetic.
+Math::BigInt, Math::BigFloat, and Math::BigRat are modules for arbitrary
+precision integers, floating point numbers, and rational numbers.
 
 INSTALLATION
 
@@ -20,6 +20,7 @@ perldoc command:
 
     perldoc Math::BigInt
     perldoc Math::BigFloat
+    perldoc Math::BigRat
 
 You can find documentation for the backend libraries with the following
 commands:
@@ -41,7 +42,7 @@ You can also look for information at:
     CPAN Testers Matrix
         http://matrix.cpantesters.org/?dist=Math-BigInt
 
-COPYRIGHT AND LICENCE
+COPYRIGHT
 
 Copyright 1996-2001 Mark Biggar, Ilya Zakharevich.
 
@@ -50,6 +51,8 @@ Copyright 2001-2008 Tels, http://bloodgate.com.
 Copyright 2010 Florian Ragwitz, flora@cpan.org.
 
 Copyright 2011- Peter John Acklam, pjacklam@gmail.com.
+
+LICENSE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

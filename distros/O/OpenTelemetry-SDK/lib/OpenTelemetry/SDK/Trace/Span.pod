@@ -1,0 +1,51 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Trace::Span - A single operation within a trace
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+An instance of this class represents a single operation within a trace.
+
+As with the API module, the only supported way to create a span is through
+L<OpenTelemetry::Trace::Tracer/create_span>. Refer to that method's
+documentation for more details.
+
+=head1 METHODS
+
+This class extends L<OpenTelemetry::Trace::Span>, which provides a no-op
+implementation of the span interface. This version implements the behaviours
+defined by the API.
+
+In addition to the methods described in its parent class, this one provides
+the following methods:
+
+=head2 snapshot
+
+    $readable = $span->snapshot;
+
+Provides a read-only snapshot of this span as an instance of
+L<OpenTelemetry::SDK::Trace::Span::Readable>. This will most commonly be used
+as the input to L<OpenTelemetry::Exporter/export>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Trace::Span>
+
+=item L<OpenTelemetry::Trace::Tracer>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

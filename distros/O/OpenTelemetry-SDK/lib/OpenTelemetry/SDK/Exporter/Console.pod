@@ -1,0 +1,59 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Exporter::Console - An OpenTelemetry span exporter that prints to the console
+
+=head1 SYNOPSIS
+
+    BEGIN { $ENV{OTEL_TRACES_EXPORTER} = 'console' }
+    use OpenTelemetry::SDK;
+
+    # Exported spans will be printed to the console
+
+    # Or set it manually
+    OpenTelemetry->tracer_provider->add_span_processor(
+        OpenTelemetry::SDK::Trace::Span::Processor::Simple->new(
+            OpenTelemetry::SDK::Exporter::Console->new
+        ),
+    );
+
+=head1 DESCRIPTION
+
+This module provide a L<span exporter|OpenTelemetry::Exporter> that prints
+exported spans to the console. It is unlikely this will be used in production
+environments, but it may be useful during development.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::Exporter> role. Please consult
+that module's documentation for details on the behaviours it provides.
+
+=head2 new
+
+    $exporter = OpenTelemetry::SDK::Exporter::Console->new(
+        handle => $handle // *STDERR,
+    );
+
+Create a new exporter. Takes an optional C<handle> parameter which will be
+used as the target for printing. By default, this will be set to standard
+error.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Exporter>
+
+=item L<OpenTelemetry::SDK>
+
+=item L<OpenTelemetry::SDK::Trace::Span::Processor::Simple>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

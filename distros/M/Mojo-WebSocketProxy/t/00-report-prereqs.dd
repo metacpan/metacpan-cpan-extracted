@@ -1,27 +1,24 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'perl' => '5.024'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '7.64'
+                                        'ExtUtils::MakeMaker' => '7.1101'
                                       }
                       },
        'develop' => {
                       'requires' => {
-                                      'Dist::Zilla' => '5',
-                                      'Dist::Zilla::Plugin::Encoding' => '0',
-                                      'Dist::Zilla::Plugin::PerlTidy' => '0',
-                                      'Dist::Zilla::Plugin::Test::Perl::Critic' => '0',
-                                      'Dist::Zilla::PluginBundle::Author::DERIV' => '0',
-                                      'Software::License::Perl_5' => '0',
-                                      'Test::CPAN::Changes' => '0.19',
-                                      'Test::CPAN::Meta' => '0',
-                                      'Test::EOL' => '0',
-                                      'Test::MinimumVersion' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
                                       'Test::Mojibake' => '0',
-                                      'Test::More' => '0.96',
-                                      'Test::NoTabs' => '0',
+                                      'Test::More' => '0',
                                       'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
-                                      'Test::Portability::Files' => '0',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Synopsis' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
@@ -30,30 +27,20 @@ do { my $x = {
                                       'Class::Method::Modifiers' => '0',
                                       'Data::UUID' => '0',
                                       'DataDog::DogStatsd::Helper' => '0.05',
-                                      'Encode' => '0',
                                       'Future' => '0.36',
                                       'Future::Mojo' => '0.004',
-                                      'Future::Utils' => '0',
                                       'IO::Async::Loop::Mojo' => '0',
                                       'JSON::MaybeUTF8' => '0',
                                       'Log::Any' => '0',
-                                      'Mojo::Base' => '0',
                                       'Mojo::Redis2' => '0',
-                                      'Mojo::Util' => '0',
                                       'MojoX::JSON::RPC' => '0',
-                                      'MojoX::JSON::RPC::Client' => '0',
                                       'Mojolicious' => '7.29',
                                       'Scalar::Util' => '0',
                                       'Syntax::Keyword::Try' => '0.04',
                                       'Unicode::Normalize' => '1.25',
-                                      'constant' => '0',
                                       'curry' => '1.001',
-                                      'feature' => '0',
                                       'indirect' => '0',
-                                      'parent' => '0',
-                                      'perl' => '5.024000',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'perl' => '5.024'
                                     }
                     },
        'test' => {
@@ -61,17 +48,10 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Exporter' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'Future' => '0.36',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'JSON::MaybeXS' => '0',
-                                   'Mojo::IOLoop' => '0',
-                                   'MojoX::JSON::RPC::Service' => '0',
-                                   'Mojolicious' => '7.29',
-                                   'Net::EmptyPort' => '0',
                                    'Path::Tiny' => '0',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Fatal' => '0',
@@ -81,9 +61,7 @@ do { my $x = {
                                    'Test::More' => '0.98',
                                    'Test::Simple' => '0.44',
                                    'Test::TCP' => '0',
-                                   'Test::Warnings' => '0',
-                                   'base' => '0',
-                                   'perl' => '5.024000'
+                                   'Test::Warnings' => '0'
                                  }
                  }
      };

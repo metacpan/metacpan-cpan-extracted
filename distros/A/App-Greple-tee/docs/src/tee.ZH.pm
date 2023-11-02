@@ -27,6 +27,10 @@ Greple的B<-Mtee>模块将匹配的文本部分发送到给定的过滤命令，
 
 使用B<--discrete>选项时，输入和输出数据的行数不一定相同。
 
+=head1 VERSION
+
+Version 0.9901
+
 =head1 OPTIONS
 
 =over 7
@@ -34,6 +38,24 @@ Greple的B<-Mtee>模块将匹配的文本部分发送到给定的过滤命令，
 =item B<--discrete>
 
 为每个匹配的零件单独调用新的命令。
+
+=item B<--fillup>
+
+将一连串的非空行合并为一行，然后再传递给过滤命令。宽字符之间的换行符被删除，其他换行符被替换成空格。
+
+=item B<--blockmatch>
+
+通常，与指定搜索模式匹配的区域将被发送到外部命令。如果指定了该选项，将处理的不是匹配区域，而是包含该区域的整个块。
+
+例如，要将包含C<foo>模式的行发送到外部命令，需要指定与整行匹配的模式：
+
+    greple -Mtee cat -n -- '^.*foo.*\n'
+
+但是使用B<--blockmatch>选项，可以简单地完成如下操作：
+
+    greple -Mtee cat -n -- foo
+
+使用B<-blockmatch>选项，该模块的行为更像L<teip(1)>的B<-g>选项。
 
 =back
 
@@ -53,11 +75,7 @@ Greple的B<-Mtee>模块将匹配的文本部分发送到给定的过滤命令，
 
 你可以通过DeepL，通过执行上述命令与B<-Mtee>模块相结合，调用B<deepl>命令，像这样翻译它们。
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-因为B<deepl>对单行输入效果更好，你可以把命令部分改成这样。
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 不过，专用模块L<App::Greple::xlate::deepl>对这个目的更有效。事实上，B<tee>模块的实现提示来自B<xlate>模块。
 
@@ -87,7 +105,25 @@ Greple的B<-Mtee>模块将匹配的文本部分发送到给定的过滤命令，
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+使用C<--discrete>选项是很耗时的。因此，你可以使用C<--separate '\r'>选项和C<ansifold>来产生单行，使用CR字符而不是NL。
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+然后通过L<tr(1)>命令或其他命令将CR字符转换成NL。
+
+    ... | tr '\r' '\n'
+
+=head1 EXAMPLE 3
+
+考虑一种情况，你想从非标题行中搜索字符串。例如，你可能想从C<docker image ls>命令中搜索图片，但留下标题行。你可以通过以下命令来实现。
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+选项C<-Mline -L 2:> 检索第二至最后一行，并将其发送到C<grep perl>命令。选项C<--discrete>是必需的，但它只被调用一次，所以在性能上没有什么缺陷。
+
+在这种情况下，C<teip -l 2- -- grep>会产生错误，因为输出的行数比输入的少。然而，结果是相当令人满意的:)
+
 =head1 INSTALL
 
 =head2 CPANMINUS
@@ -106,6 +142,10 @@ L<https://github.com/tecolicom/Greple>
 
 L<App::Greple::xlate>.
 
+=head1 BUGS
+
+C<--fillup>选项对韩文文本可能无法正确工作。
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -121,7 +161,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "0.03";
+our $VERSION = "0.9901";
 
 use v5.14;
 use warnings;
@@ -134,13 +174,13 @@ use Data::Dumper;
 our $command;
 our $blockmatch;
 our $discrete;
+our $fillup;
 
-my @jammed;
 my($mod, $argv);
 
 sub initialize {
     ($mod, $argv) = @_;
-    if (defined (my $i = first { $argv->[$_] eq '--' } 0 .. $#{$argv})) {
+    if (defined (my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
 	if (my @command = splice @$argv, 0, $i) {
 	    $command = \@command;
 	}
@@ -148,18 +188,30 @@ sub initialize {
     }
 }
 
+use Unicode::EastAsianWidth;
+
+sub fillup_paragraph {
+    (my $s1, local $_, my $s2) = $_[0] =~ /\A(\s*)(.*?)(\s*)\z/s or die;
+    s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
+    s/\s+/ /g;
+    $s1 . $_ . $s2;
+}
+
 sub call {
     my $data = shift;
     $command // return $data;
     state $exec = App::cdif::Command->new;
+    if ($fillup) {
+	$data =~ s/^.+(?:\n.+)*/fillup_paragraph(${^MATCH})/pmge;
+    }
     if (ref $command ne 'ARRAY') {
 	$command = [ shellwords $command ];
     }
-    $exec->command($command)->setstdin($data)->update->data;
+    $exec->command($command)->setstdin($data)->update->data // '';
 }
 
 sub jammed_call {
-    my @need_nl = grep { $_[$_] !~ /\n\z/ } 0 .. $#_;
+    my @need_nl = grep { $_[$_] !~ /\n\z/ } keys @_;
     my @from = @_;
     $from[$_] .= "\n" for @need_nl;
     my @lines = map { int tr/\n/\n/ } @from;
@@ -174,18 +226,20 @@ sub jammed_call {
     return @to;
 }
 
+my @jammed;
+
 sub postgrep {
     my $grep = shift;
-    @jammed = my @block = ();
     if ($blockmatch) {
 	$grep->{RESULT} = [
 	    [ [ 0, length ],
 	      map {
-		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback} ]
+		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback}->[0] ]
 	      } $grep->result
 	    ] ];
     }
     return if $discrete;
+    @jammed = my @block = ();
     for my $r ($grep->result) {
 	my($b, @match) = @$r;
 	for my $m (@match) {
@@ -210,6 +264,7 @@ __DATA__
 
 builtin --blockmatch $blockmatch
 builtin --discrete!  $discrete
+builtin --fillup!    $fillup
 
 option default \
 	--postgrep &__PACKAGE__::postgrep \

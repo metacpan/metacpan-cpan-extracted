@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 use 5.020;
 use Moo;
@@ -48,9 +48,6 @@ sub _traverse_keyword_discriminator ($self, $schema, $state) {
     }
   }
 
-  $valid = E($state, 'missing sibling keyword: one of oneOf, anyOf, allOf')
-    if not grep exists $schema->{$_}, qw(oneOf anyOf allOf);
-
   return 1;
 }
 
@@ -66,26 +63,30 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
 
   my $discriminator_value = $data->{$discriminator_key};
 
-  # if /components/$discriminator_value exists, that schema must validate
-  my $uri = Mojo::URL->new->fragment(jsonp('', qw(components schemas), $discriminator_value))
-    ->to_abs($state->{initial_schema_uri});
-  if (my $component_schema_info = $state->{evaluator}->_fetch_from_uri($uri)) {
-    $state = { %$state, _schema_path_suffix => 'propertyName' };
-  }
-  elsif (exists $schema->{discriminator}{mapping} and exists $schema->{discriminator}{mapping}{$discriminator_value}) {
+  if (exists $schema->{discriminator}{mapping} and exists $schema->{discriminator}{mapping}{$discriminator_value}) {
     # use 'mapping' to determine which schema to use.
-    $uri = Mojo::URL->new($schema->{discriminator}{mapping}{$discriminator_value});
-    $state = { %$state, _schema_path_suffix => [ 'mapping', $discriminator_value ] };
+    # Note that the spec uses an example that assumes that the mapping value can be appended to
+    # /components/schemas/, _as well as_ being treated as a uri-reference, but this is ambiguous.
+    # For now we will handle it by preprending '#/components/schemas' if it is not already a
+    # fragment-only uri reference.
+    my $mapping = $schema->{discriminator}{mapping}{$discriminator_value};
+
+    return $self->eval_subschema_at_uri($data, $schema,
+      { %$state, _schema_path_suffix => [ 'mapping', $discriminator_value ] },
+      Mojo::URL->new($mapping =~ /^#/ ? $mapping : '#/components/schemas/'.$mapping)->to_abs($state->{initial_schema_uri}),
+    );
+  }
+  elsif (($state->{document}->get_entity_at_location('/components/schemas/'.$discriminator_value)//'') eq 'schema') {
+    return $self->eval_subschema_at_uri($data, $schema, { %$state, _schema_path_suffix => 'propertyName' },
+      Mojo::URL->new->fragment(jsonp('/components/schemas', $discriminator_value))->to_abs($state->{initial_schema_uri}),
+    );
   }
   else {
     # If the discriminator value does not match an implicit or explicit mapping, no schema can be
     # determined and validation SHOULD fail.
-    return E($state, 'invalid %s: "%s"', $discriminator_key, $discriminator_value);
+    return E({ %$state, data_path => jsonp($state->{data_path}, $discriminator_key) },
+      'invalid %s: "%s"', $discriminator_key, $discriminator_value);
   }
-
-  return E($state, 'subschema for %s: %s is invalid', $discriminator_key, $discriminator_value)
-    if not $self->eval_subschema_at_uri($data, $schema, $state, $uri);
-  return 1;
 }
 
 sub _traverse_keyword_example { 1 }
@@ -118,7 +119,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 DESCRIPTION
 

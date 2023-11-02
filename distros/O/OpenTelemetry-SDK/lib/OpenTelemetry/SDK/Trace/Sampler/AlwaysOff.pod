@@ -1,0 +1,74 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Trace::Sampler::AlwaysOff - A sampler that will never sample
+
+=head1 SYNOPSIS
+
+    my $sampler = OpenTelemetry::SDK::Trace::Sampler::AlwaysOff->new;
+
+    my $result = $sampler->should_sample( ... );
+
+    if ( $result->sampled ) {
+        # this will never be reached :(
+    }
+
+=head1 DESCRIPTION
+
+This module provides a sampler whose
+L<should_sample|OpenTelemetry::SDK::Trace::Sampler/should_sample> method
+will always return a L<result|OpenTelemetry::SDK::Trace::Sampler::Result> that
+is neither sampled nor recording.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::SDK::Trace::Sampler> role.
+Please consult that module's documentation for details on the behaviours it
+provides.
+
+=head2 new
+
+    $sampler = OpenTelemetry::SDK::Trace::Sampler::AlwaysOff->new;
+
+Returns a new instance of this sampler. Takes no arguments.
+
+=head2 description
+
+    $string = $sampler->description;
+
+Returns the C<AlwaysOffSampler> string.
+
+=head2 should_sample
+
+    $result = $sampler->should_sample(
+        context    => $context,
+        trace_id   => $trace_id,
+        kind       => $span_kind,
+        name       => $span_name,
+        attributes => \%attributes,
+        links      => \@links,
+    );
+
+Returns a L<OpenTelemetry::SDK::Trace::Sampler::Result> that is neither
+sampled nor recording. The
+L<OpenTelemetry::Propagator::TraceContext::TraceState> in the result will be
+read from the context provided in the C<context> parameter, or from the
+current context if none is provided.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::SDK::Trace::Sampler>
+
+=item L<OpenTelemetry::SDK::Trace::Sampler::Result>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

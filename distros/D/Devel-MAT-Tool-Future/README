@@ -13,7 +13,7 @@ METHODS
 
  class_is_future
 
-       $ok = $tool->class_is_future( $pkg )
+       $ok = $tool->class_is_future( $pkg );
 
     Returns true if the given package is a Future class. $pkg may be either
     a Devel::MAT::SV instance referring to a stash, or a plain string.
@@ -24,27 +24,27 @@ SV METHODS
 
  is_future (SV)
 
-       $ok = $sv->is_future
+       $ok = $sv->is_future;
 
     Returns true if the Devel::MAT::SV instance represents a Future
     instance.
 
  future_state (SV)
 
-       $state = $sv->future_state
+       $state = $sv->future_state;
 
     Returns a string describing the state of the given Future instance; one
     of pending, done, failed or cancelled.
 
  future_result
 
-       @result = $sv->future_result
+       @result = $sv->future_result;
 
     Returns a list of SVs containing the result of a successful Future.
 
  future_failure
 
-       @failure = $sv->future_failure
+       @failure = $sv->future_failure;
 
     Returns a list of SVs containing the failure of a failed Future.
 

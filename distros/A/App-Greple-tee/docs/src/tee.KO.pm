@@ -27,6 +27,10 @@ B<-- 불연속> 옵션을 사용하면 일치하는 각 부분에 대해 개별 
 
 B<-- 불연속> 옵션과 함께 사용할 경우 입력 및 출력 데이터의 줄이 동일할 필요는 없습니다.
 
+=head1 VERSION
+
+Version 0.9901
+
 =head1 OPTIONS
 
 =over 7
@@ -34,6 +38,24 @@ B<-- 불연속> 옵션과 함께 사용할 경우 입력 및 출력 데이터의
 =item B<--discrete>
 
 일치하는 모든 부분에 대해 개별적으로 새 명령을 호출합니다.
+
+=item B<--fillup>
+
+필터 명령에 전달하기 전에 빈 줄이 아닌 일련의 줄을 한 줄로 결합합니다. 넓은 문자 사이의 개행 문자는 삭제되고 다른 개행 문자는 공백으로 바뀝니다.
+
+=item B<--blockmatch>
+
+일반적으로 지정된 검색 패턴과 일치하는 영역이 외부 명령으로 전송됩니다. 이 옵션을 지정하면 일치하는 영역이 아니라 해당 패턴이 포함된 전체 블록이 처리됩니다.
+
+예를 들어 C<foo> 패턴이 포함된 줄을 외부 명령으로 보내려면 전체 줄에 일치하는 패턴을 지정해야 합니다:
+
+    greple -Mtee cat -n -- '^.*foo.*\n'
+
+하지만 B<--blockmatch> 옵션을 사용하면 다음과 같이 간단하게 수행할 수 있습니다:
+
+    greple -Mtee cat -n -- foo
+
+B<--blockmatch> 옵션을 사용하면 이 모듈은 L<teip(1)>의 B<-g> 옵션과 비슷하게 동작합니다.
 
 =back
 
@@ -53,11 +75,7 @@ B<greple>은 문서 파일을 처리하도록 설계되었기 때문에 일치 �
 
 DeepL 서비스에서 위 명령어를 B<-Mtee> 모듈과 결합하여 실행하면 다음과 같이 B<deepl> 명령어를 호출합니다:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-B<deepl>은 한 줄 입력에 더 잘 동작하므로 명령어 부분을 다음과 같이 변경할 수 있습니다:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 하지만 이런 용도로는 전용 모듈인 L<App::Greple::xlate::deep>을 사용하는 것이 더 효과적입니다. 사실 B<tee> 모듈의 구현 힌트는 B<xlate> 모듈에서 따온 것입니다.
 
@@ -87,7 +105,25 @@ B<deepl>은 한 줄 입력에 더 잘 동작하므로 명령어 부분을 다음
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+C<--불연속> 옵션을 사용하면 시간이 많이 걸립니다. 따라서 NL 대신 CR 문자를 사용하여 한 줄을 생성하는 C<--별도 '\r'> 옵션을 C<ansifold>와 함께 사용할 수 있습니다.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+그런 다음 L<tr(1)> 명령 등으로 CR 문자를 NL로 변환합니다.
+
+    ... | tr '\r' '\n'
+
+=head1 EXAMPLE 3
+
+헤더가 아닌 줄에서 문자열을 찾으려는 상황을 생각해 봅시다. 예를 들어, 헤더 줄은 그대로 두고 C<docker image ls> 명령에서 이미지를 검색하고 싶을 수 있습니다. 다음 명령을 사용하면 됩니다.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+옵션 C<-Mline -L 2:>는 두 번째 줄부터 마지막 줄까지 검색하여 C<grep perl> 명령으로 보냅니다. 옵션 C<-- 불연속>이 필요하지만 이 옵션은 한 번만 호출되므로 성능 저하가 없습니다.
+
+이 경우 출력의 줄 수가 입력보다 적기 때문에 C<teip -l 2- -- grep>가 오류를 생성합니다. 하지만 결과는 꽤 만족스럽습니다.)
+
 =head1 INSTALL
 
 =head2 CPANMINUS
@@ -106,6 +142,10 @@ L<https://github.com/tecolicom/Greple>
 
 L<App::Greple::xlate>
 
+=head1 BUGS
+
+C<--fillup> 옵션은 한글 텍스트에 대해 제대로 작동하지 않을 수 있습니다.
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -121,7 +161,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "0.03";
+our $VERSION = "0.9901";
 
 use v5.14;
 use warnings;
@@ -134,13 +174,13 @@ use Data::Dumper;
 our $command;
 our $blockmatch;
 our $discrete;
+our $fillup;
 
-my @jammed;
 my($mod, $argv);
 
 sub initialize {
     ($mod, $argv) = @_;
-    if (defined (my $i = first { $argv->[$_] eq '--' } 0 .. $#{$argv})) {
+    if (defined (my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
 	if (my @command = splice @$argv, 0, $i) {
 	    $command = \@command;
 	}
@@ -148,18 +188,30 @@ sub initialize {
     }
 }
 
+use Unicode::EastAsianWidth;
+
+sub fillup_paragraph {
+    (my $s1, local $_, my $s2) = $_[0] =~ /\A(\s*)(.*?)(\s*)\z/s or die;
+    s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
+    s/\s+/ /g;
+    $s1 . $_ . $s2;
+}
+
 sub call {
     my $data = shift;
     $command // return $data;
     state $exec = App::cdif::Command->new;
+    if ($fillup) {
+	$data =~ s/^.+(?:\n.+)*/fillup_paragraph(${^MATCH})/pmge;
+    }
     if (ref $command ne 'ARRAY') {
 	$command = [ shellwords $command ];
     }
-    $exec->command($command)->setstdin($data)->update->data;
+    $exec->command($command)->setstdin($data)->update->data // '';
 }
 
 sub jammed_call {
-    my @need_nl = grep { $_[$_] !~ /\n\z/ } 0 .. $#_;
+    my @need_nl = grep { $_[$_] !~ /\n\z/ } keys @_;
     my @from = @_;
     $from[$_] .= "\n" for @need_nl;
     my @lines = map { int tr/\n/\n/ } @from;
@@ -174,18 +226,20 @@ sub jammed_call {
     return @to;
 }
 
+my @jammed;
+
 sub postgrep {
     my $grep = shift;
-    @jammed = my @block = ();
     if ($blockmatch) {
 	$grep->{RESULT} = [
 	    [ [ 0, length ],
 	      map {
-		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback} ]
+		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback}->[0] ]
 	      } $grep->result
 	    ] ];
     }
     return if $discrete;
+    @jammed = my @block = ();
     for my $r ($grep->result) {
 	my($b, @match) = @$r;
 	for my $m (@match) {
@@ -210,6 +264,7 @@ __DATA__
 
 builtin --blockmatch $blockmatch
 builtin --discrete!  $discrete
+builtin --fillup!    $fillup
 
 option default \
 	--postgrep &__PACKAGE__::postgrep \

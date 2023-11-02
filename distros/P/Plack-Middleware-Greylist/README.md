@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.5.0
+version v0.5.1
 
 # SYNOPSIS
 

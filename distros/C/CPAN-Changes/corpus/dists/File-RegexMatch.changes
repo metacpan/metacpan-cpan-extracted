@@ -1,0 +1,26 @@
+Revision history for Perl module File::RegexMatch
+
+0.1.2 Mon July 29 2013
+    - Renamed match() parameter from regex_pattern to match_pattern.
+    - Added functionality to ignore file names based on regular expression.
+
+0.1.1 Wed July 24 2013
+    - Updated documentation
+
+0.1 Tue July 23 2013
+    - Module pretty much re-written, old code was smelly.
+    - Instead of returning the path of each file, a File::RegexMatch::Object is returned.
+
+0.03 Thur Dec 29 2011
+    - Now checks hidden files for matches
+    - Updated documentation
+    - If the given base directory path is relative, the absolute path of the files found in the base directory are returned instead of the relative path
+    - Warnings added for chdir if verbose is enabled
+    - Support for hidden files added
+    - Cleanup of code
+
+0.02 Mon Dec 19 2011
+    - Was a problem when verbose was disabled, now fixed.
+
+0.01 Sat Dec 17 2011
+    - Original version; created by ExtUtils::ModuleMaker 0.51

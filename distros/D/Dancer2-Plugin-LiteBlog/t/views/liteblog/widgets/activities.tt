@@ -1,0 +1,26 @@
+<!-- Activity Cards -->
+<section id="activities">
+    [% FOREACH a IN widget.elements %]
+        [% IF a.link %]
+        <div class="activity-card clickable-div" id="activity-[% a.name %]">
+            [% IF a.image %]
+            <a href="[% a.link %]"><img width="300" height="300" src="[% a.image %]" alt="[% a.name %]"></a>
+            [% END %]
+        [% ELSE %]
+        <div class="activity-card" id="activity-[% a.name %]">
+            <img width="300" height="300" src="/images/[% a.name %].jpg" alt="[% a.name %]">
+        [% END %]
+            <h2>[% a.name %]</h2>
+            <p>[% a.desc %] </p>
+        </div> <!-- END activity-card -->
+
+        [% IF a.link %]
+        <script type="text/javascript">
+        // JavaScript code to make the blog-card clickable
+        document.getElementById('activity-[% a.name %]').addEventListener('click', function() {
+            window.location.href = '[% a.link %]';
+        });
+        </script>
+        [% END %]
+    [% END %]
+</section> <!-- END activities section -->

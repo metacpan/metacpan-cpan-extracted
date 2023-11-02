@@ -6,11 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Github.pm',
     'Net/Async/Github/Branch.pm',
+    'Net/Async/Github/Comment.pm',
     'Net/Async/Github/Common.pm',
     'Net/Async/Github/Plan.pm',
     'Net/Async/Github/PullRequest.pm',

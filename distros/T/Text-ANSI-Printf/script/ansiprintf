@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+
+use v5.14;
+use warnings;
+use App::ansiprintf;
+
+exit App::ansiprintf->new->run(splice @ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+ansiprintf - ANSI terminal sequence aware printf command
+
+=head1 SYNOPSIS
+
+ansiprintf format args ...
+
+=head1 VERSION
+
+Version 2.05
+
+=head1 DESCRIPTION
+
+This command is a simple wrapper command for L<Text::ANSI::Printf>
+library.  According to the format given in the first argument, it
+formats and outputs the remaining arguments.
+
+Even if the string given as an argument contains ANSI terminal
+sequences, the formatting is done based on the visible width on the
+screen.
+
+For example, next command
+
+    printf '|%-5s|%-5s|%-5s|\n' Red Green Blue
+
+will print
+
+    |Red  |Green|Blue |
+
+and
+
+    ansiprintf '|%-5s|%-5s|%-5s|\n' \
+        $'\e[31mRed\e[m' $'\e[32mGreen\e[m' $'\e[34mBlue\e[m'
+
+will produce same result with colored arguments.
+
+You can give colored arguments with L<ansiecho(1)> command:
+
+    ansiprintf '|%-5s|%-5s|%-5s|\n' $(ansiecho -cR Red -cG Green -cB Blue)
+
+but this can be done with just L<ansiecho(1)>:
+
+    ansiecho -f '|%-5s|%-5s|%-5s|' -cR Red -cG Green -cB Blue
+
+In addition to handling ANSI terminal sequences, L<ansisprintf> has
+the following features.
+
+=over 4
+
+=item WIDE and COMBINING CHARACTERS
+
+Asian wide characters are formatted according to the width displayed
+on the screen.  Combining characters in other languages are also
+handled correctly.
+
+=item UNICODE CHARACTERS
+
+You can give Unicode character in parameter strings by its name
+(C<"\N{ALARM CLOCK}">) or code (C<"\N{U+23F0}">).
+
+=item ARGUMENT REORDERING
+
+You can specify the argument by position specifier like C<%2$s %1ds>.
+Width, precision, vector string parameter also take position
+specifier.
+
+=back
+
+This command supports all other features provided by the Perl
+interpreter.  See L<perlfunc/sprintf> or `perldoc -f sprintf` for more
+information.
+
+=head1 SEE ALSO
+
+L<App::ansiecho>
+
+L<Text::ANSI::Printf>
+
+L<printf(1)>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+© 2023- Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

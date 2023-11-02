@@ -19,10 +19,11 @@ if ($OSNAME eq 'MSWin32') {
 	$script =~ s/\\/\//msg;
 }
 my $right_ret = <<"END";
-Usage: $script [-h] [-l lang] [-m mediawiki_site] [--version] wd_id
+Usage: $script [-h] [-l lang] [-m mediawiki_site] [-r] [--version] wd_id
 	-h			Print help.
 	-l lang			Language used (default is English = en).
 	-m mediawiki_site	MediaWiki site (default is www.wikidata.org).
+	-r			With references.
 	--version		Print version.
 	wd_id			Wikidata id (qid or pid or lid).
 END

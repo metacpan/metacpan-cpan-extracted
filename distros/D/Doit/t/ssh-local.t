@@ -39,15 +39,17 @@ plan 'no_plan';
 
 my $doit = Doit->init;
 
+my @common_ssh_opts = ((defined $ENV{USER} ? $ENV{USER}.'@' : '') . 'localhost', master_opts => [qw(-oPasswordAuthentication=no -oBatchMode=yes -oConnectTimeout=3)]);
+
 for my $test_type ('args', 'net-openssh-object') {
  SKIP: {
 	my $ssh;
 	if ($test_type eq 'args') {
-	    $ssh = eval { $doit->do_ssh_connect((defined $ENV{USER} ? $ENV{USER}.'@' : '') . 'localhost', debug => 0, master_opts => [qw(-oPasswordAuthentication=no -oBatchMode=yes)]) };
+	    $ssh = eval { $doit->do_ssh_connect(@common_ssh_opts, debug => 0) };
 	} elsif ($test_type eq 'net-openssh-object') {
 	    $ssh = eval {
 		require Net::OpenSSH;
-		my $net_openssh = Net::OpenSSH->new((defined $ENV{USER} ? $ENV{USER}.'@' : '') . 'localhost', master_opts => [qw(-oPasswordAuthentication=no -oBatchMode=yes)]);
+		my $net_openssh = Net::OpenSSH->new(@common_ssh_opts);
 		$net_openssh->error and die $net_openssh->error;
 		$ssh = $doit->do_ssh_connect($net_openssh, debug => 0);
 	    };
@@ -91,7 +93,7 @@ for my $test_type ('args', 'net-openssh-object') {
 use Doit;
 return 1 if caller;
 my $doit = Doit->init;
-my $ssh = $doit->do_ssh_connect((defined $ENV{USER} ? $ENV{USER}.'@' : '') . 'localhost', debug => 0, master_opts => [qw(-oPasswordAuthentication=no -oBatchMode=yes)]);
+my $ssh = $doit->do_ssh_connect((defined $ENV{USER} ? $ENV{USER}.'@' : '') . 'localhost', debug => 0, master_opts => [qw(-oPasswordAuthentication=no -oBatchMode=yes -oConnectTimeout=3)]);
 my $ret = $ssh->info_qx('perl', '-e', 'print "yes\n"');
 print $ret;
 EOF
@@ -112,7 +114,7 @@ sub fail_on_remote {
 }
 return 1 if caller;
 my $doit = Doit->init;
-my $ssh = $doit->do_ssh_connect((defined $ENV{USER} ? $ENV{USER}.'@' : '') . 'localhost', debug => 0, master_opts => [qw(-oPasswordAuthentication=no -oBatchMode=yes)]);
+my $ssh = $doit->do_ssh_connect((defined $ENV{USER} ? $ENV{USER}.'@' : '') . 'localhost', debug => 0, master_opts => [qw(-oPasswordAuthentication=no -oBatchMode=yes -oConnectTimeout=3)]);
 $ssh->call_with_runner("fail_on_remote");
 Doit::Log::warning("This should never be reached!");
 EOF

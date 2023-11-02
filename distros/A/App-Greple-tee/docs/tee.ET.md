@@ -25,11 +25,33 @@ Valiku **--diskreetne** abil kutsutakse iga sobitatud osa jaoks eraldi käsk. Er
 
 Sisend- ja väljundandmete read ei pea olema identsed, kui kasutatakse valikut **--diskreetne**.
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     Kutsuge uus käsk eraldi iga sobitatud osa jaoks.
+
+- **--fillup**
+
+    Kombineerib mittetühjad read üheks reaks enne nende edastamist käsule filter. Laiade tähemärkide vahel olevad read kustutatakse ja muud read asendatakse tühikutega.
+
+- **--blockmatch**
+
+    Tavaliselt saadetakse määratud otsingumustrile vastav ala välisele käsule. Kui see valik on määratud, ei töödelda mitte sobivat ala, vaid kogu seda sisaldavat plokki.
+
+    Näiteks, et saata väliskäsule mustrit `foo` sisaldavad read, tuleb määrata kogu reale vastav muster:
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    Kuid valikuga **--blockmatch** saab seda teha lihtsalt järgmiselt:
+
+        greple -Mtee cat -n -- foo
+
+    **--blockmatch** valikuga käitub see moodul rohkem nagu [teip(1)](http://man.he.net/man1/teip) valik **-g**.
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ Järgmine käsk leiab tekstiplokid Perli moodulifailis sisalduva [perlpod(1)](ht
 
 Saate neid tõlkida DeepL teenuse abil, kui täidate ülaltoodud käsu koos mooduliga **-Mtee**, mis kutsub käsu **deepl** järgmiselt:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-Kuna **deepl** töötab paremini ühe rea sisendi puhul, võite käsu osa muuta järgmiselt:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 Spetsiaalne moodul [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) on selleks otstarbeks siiski tõhusam. Tegelikult tuli **tee** mooduli implementatsiooni vihje **xlate** moodulist.
 
@@ -82,7 +100,24 @@ Seda osa saab ümber vormindada, kasutades **tee** moodulit koos **ansifold** k�
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+Valiku `--diskreet` kasutamine on aeganõudev. Seega võite kasutada `--separate '\r'` valikut koos `ansifold`, mis toodab ühe rea, kasutades CR-märki NL-i asemel.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Seejärel teisendage CR märk NL-ks pärast seda käsuga [tr(1)](http://man.he.net/man1/tr) või mõnega.
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+Mõelge olukorrale, kus te soovite grep'i abil leida stringid mitte-pealkirjaridadest. Näiteks võite soovida otsida pilte `docker image ls` käsust, kuid jätta pealkirjarida alles. Saate seda teha järgmise käsuga.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+Valik `-Mline -L 2:` otsib välja eelviimased read ja saadab need käsule `grep perl`. Vajalik on valik `--diskreet`, kuid seda kutsutakse ainult üks kord, nii et see ei kahjusta jõudlust.
+
+Sellisel juhul annab `teip -l 2- -- grep` vea, sest väljundis olevate ridade arv on väiksem kui sisend. Tulemus on siiski üsna rahuldav :)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ Seda osa saab ümber vormindada, kasutades **tee** moodulit koos **ansifold** k�
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+# BUGS
+
+Valik `--fillup` ei pruugi koreakeelse teksti puhul korrektselt töötada.
 
 # AUTHOR
 

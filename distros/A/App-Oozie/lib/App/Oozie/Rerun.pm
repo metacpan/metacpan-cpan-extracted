@@ -1,10 +1,20 @@
 package App::Oozie::Rerun;
-$App::Oozie::Rerun::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
+use App::Oozie::Constants       qw(
+    DEFAULT_OOZIE_MAX_JOBS
+    EMPTY_STRING
+    HOURS_IN_A_DAY
+    ONE_HOUR
+    RE_AT
+);
 use App::Oozie::Types::DateTime qw( IsDateStr );
 use App::Oozie::Types::States   qw( IsOozieStateRerunnable );
 use Date::Parse ();
@@ -29,6 +39,7 @@ USAGE
 with qw(
     App::Oozie::Role::Log
     App::Oozie::Role::Fields::Common
+    App::Oozie::Role::Info
 );
 
 option name => (
@@ -46,12 +57,12 @@ option hours => (
 );
 
 option maxjobs => (
-    is     => 'rw',
-    isa    => Int,
-    default => sub { 1_000 },
-    format => 'i',
-    short  => 'max',
-    doc    => 'Maximum number of failed tasks to check in one run (defaults to 1000)',
+    is      => 'rw',
+    isa     => Int,
+    default => sub { DEFAULT_OOZIE_MAX_JOBS },
+    format  => 'i',
+    short   => 'max',
+    doc     => 'Maximum number of failed tasks to check in one run (defaults to 1000)',
 );
 
 option resurrect_coord => (
@@ -85,7 +96,7 @@ has when => (
     default => sub {
         my $self = shift;
         $self->since ? Date::Parse::str2time $self->since
-                     : time - ( $self->hours || 24) * 3600
+                     : time - ( $self->hours || HOURS_IN_A_DAY) * ONE_HOUR
                      ;
     },
 );
@@ -93,20 +104,24 @@ has when => (
 sub BUILD {
     my ($self, $args) = @_;
     if ( exists $args->{hours} && exists $args->{since} ) {
-        die "--hours and --since are mutually exclusive";
+        die '--hours and --since are mutually exclusive';
     }
 }
 
 sub run {
-    my $self   = shift;
-    my $logger = $self->logger;
+    my $self = shift;
+
+    $self->log_versions if $self->verbose;
+
     my $reruns = $self->collect || do {
-        $logger->info( "No failed jobs matching your conditions" );
+        $self->logger->info( 'No failed jobs matching your conditions' );
         return;
     };
-    $self->execute ? $self->execute_reruns( $reruns )
-                   : $self->dump_for_shell( $reruns )
-                   ;
+
+    return $self->execute
+                ? $self->execute_reruns( $reruns )
+                : $self->dump_for_shell( $reruns )
+                ;
 }
 
 sub execute_reruns {
@@ -124,14 +139,14 @@ sub execute_reruns {
     for my $idx (sort keys %{ $reruns } ) {
         my $slot = $reruns->{ $idx };
         my @cmd = (
-            my @cmd_common,
+            @cmd_common,
             split( m{ \s+ }xms, $slot->{cmd} ),
             $slot->{coord_job_id},
             '-action',
             $slot->{action_number},
         );
         $logger->info(
-            sprintf "Rerunning %s action #%s: nominal time: %s last modified: %s",
+            sprintf 'Rerunning %s action #%s: nominal time: %s last modified: %s',
                         @{ $slot }{qw/
                             name
                             action_number
@@ -161,13 +176,15 @@ sub execute_reruns {
                         join "\n",
                             grep { $_ }
                             map { chomp; $_ }
-                            @rv >= 3 ? @rv[3..$#rv] : @rv;
+                            @rv >= 3 ? @rv[3..$#rv] : @rv; ## no critic (ProhibitMagicNumbers)
                     }
-                : ''
+                : EMPTY_STRING
                 ;
 
         $logger->info( 'Oozie said: ' . $msg );
     }
+
+    return;
 }
 
 sub dump_for_shell {
@@ -217,6 +234,8 @@ COMMAND
 : the lines starting with a colon like this one will be no-ops, so you can paste them too.
 
 MSG
+
+    return;
 }
 
 sub collect {
@@ -251,14 +270,14 @@ sub collect {
 
     my %is_status = map { $_ => 1 } @{ $self->status };
     my $reruns    = {};
-    $re_name      = qr/$re_name/ if $re_name;
+    $re_name      = qr{ $re_name }xms if $re_name;
 
     for my $fail ( @candidates ) {
 
         my $name = $fail->{appName};
         my $id   = $fail->{id};
         my $cid  = $fail->{parentId}
-                    ? ( split m{ [@] }xms, $fail->{parentId} )[0]
+                    ? ( split RE_AT, $fail->{parentId} )[0]
                     : undef
                     ;
 
@@ -298,7 +317,7 @@ sub collect {
             next;
         }
 
-        my $key = $job->{coordJobId} . "#" . $job->{actionNumber};
+        my $key = $job->{coordJobId} . q{#} . $job->{actionNumber};
 
         # keep them in a hash, we will sort the keys so the actions are in
         # asccending order for a coordinator when issuing the bash commands; only
@@ -309,20 +328,20 @@ sub collect {
         if (   ! $reruns->{$key}
             || $last_mtime > $reruns->{ $key }{last_mtime_epoch}
         ) {
-            my $cmd = $job->{status} =~ /susp/i
+            my $cmd = $job->{status} =~ m{ susp }xmsi
                     ? '-resume'
                     : '-refresh -rerun'
                     ;
 
             $reruns->{ $key } = {
-                action_number    => $job->{actionNumber}     || '',
+                action_number    => $job->{actionNumber}     || EMPTY_STRING,
                 cmd              => $cmd,
-                coord_job_id     => $job->{coordJobId}       || '',
-                id               => $id                      || '',
-                last_mtime       => $job->{lastModifiedTime} || '',
+                coord_job_id     => $job->{coordJobId}       || EMPTY_STRING,
+                id               => $id                      || EMPTY_STRING,
+                last_mtime       => $job->{lastModifiedTime} || EMPTY_STRING,
                 last_mtime_epoch => $last_mtime,
-                name             => $name                    || '',
-                nominal_time     => $job->{nominalTime}      || '',
+                name             => $name                    || EMPTY_STRING,
+                nominal_time     => $job->{nominalTime}      || EMPTY_STRING,
             };
         }
     }
@@ -346,7 +365,7 @@ App::Oozie::Rerun
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

@@ -15,15 +15,16 @@ sub new {
     $self->{'type'}    = Wx::ComboBox->new( $self, -1, 'linear', [-1,-1], [115, -1], [qw/no linear alternate circular/], &Wx::wxTE_READONLY );
     $self->{'type'}->SetToolTip("type of color flow: - linear - from start to end color \n  - alter(nate) - linearly between start and end color \n   - cicular - around the rainbow from start color visiting end color");
     $self->{'dynlabel'} = Wx::StaticText->new( $self, -1, 'Dynamics');
-    $self->{'dynamic'}  = Wx::ComboBox->new( $self, -1, 1, [-1,-1],[65, -1], [1,2,3,4,5,6,7,8, 9, 10], &Wx::wxTE_READONLY);
+    $self->{'dynamic'}  = Wx::ComboBox->new( $self, -1, 1, [-1,-1],[75, -1], [1,2,3,4,5,6,7,8, 9, 10, 11, 12, 13], &Wx::wxTE_READONLY);
     $self->{'dynamic'}->SetToolTip('dynamics of linear and alternating color change (1 = equal distanced colors change,\n larger = starting with slow color change becoming faster - or vice versa when dir activated)');
     $self->{'stepsize'}  = App::GUI::Harmonograph::Widget::SliderCombo->new( $self,  94, 'Step Size','after how many circles does color change', 1, 100, 1);
     $self->{'period'}    = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 100, 'Period','amount of steps from start to end color', 2, 50, 10);
     $self->{'direction'} = Wx::CheckBox->new( $self, -1, ' Dir.');
     $self->{'direction'}->SetToolTip('if on color change starts fast getting slower, if odd starting slow ...');
 
-    Wx::Event::EVT_COMBOBOX( $self, $self->{'type'},  \&update_enable);
-
+    Wx::Event::EVT_CHECKBOX( $self, $self->{'direction'}, sub { $self->{'callback'}->() });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'type'},      sub { $self->update_enable; $self->{'callback'}->()  });
+    Wx::Event::EVT_COMBOBOX( $self, $self->{'dynamic'},   sub { $self->{'callback'}->() });
 
     my $cf_attr = &Wx::wxLEFT|&Wx::wxALIGN_LEFT|&Wx::wxALIGN_CENTER_VERTICAL;
 
@@ -35,8 +36,8 @@ sub new {
 
     my $row2_sizer = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
     $row2_sizer->Add( $self->{'dynlabel'},   0, $cf_attr,  20);
-    $row2_sizer->Add( $self->{'dynamic'},    0, $cf_attr,  35);
-    $row2_sizer->Add( $self->{'direction'},  0, $cf_attr,  12);
+    $row2_sizer->Add( $self->{'dynamic'},    0, $cf_attr,  33);
+    $row2_sizer->Add( $self->{'direction'},  0, $cf_attr,   3);
     $row2_sizer->Add( $self->{'period'},     0, $cf_attr,  63);
     $row2_sizer->Add( 0, 0, &Wx::wxEXPAND);
 
@@ -47,6 +48,13 @@ sub new {
     $self->SetSizer($sizer);
     $self->init();
     $self;
+}
+
+sub SetCallBack {
+    my ( $self, $code) = @_;
+    return unless ref $code eq 'CODE';
+    $self->{'callback'} = $code;
+    $self->{ $_ }->SetCallBack( $code ) for qw /stepsize period/;
 }
 
 sub init {
@@ -75,6 +83,7 @@ sub set_data {
 
 sub update_enable {
     my ($self) = @_;
+    return unless defined $self->{'type'};
     my $type = $self->{'type'}->GetValue();
     $self->{'stepsize'}->Enable( $type ne 'no' );
     $self->{'dynlabel'}->Enable( $type eq 'alternate' or $type eq 'linear' );

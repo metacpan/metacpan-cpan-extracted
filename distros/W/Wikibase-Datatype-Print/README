@@ -1,9 +1,32 @@
 NAME
     Wikibase::Datatype::Print - Wikibase datatype print helpers.
 
+SYNOPSIS
+     use Wikibase::Datatype::Print::Item qw(print);
+
+     my $pretty_print_string = print($obj, $opts_hr);
+     my @pretty_print_lines = print($obj, $opts_hr);
+
 DESCRIPTION
     This distributions is set of print helpers for Wikibase::Datatype
     objects.
+
+SUBROUTINES
+  "print"
+     my $pretty_print_string = print($obj, $opts_hr);
+     my @pretty_print_lines = print($obj, $opts_hr);
+
+    Construct pretty print output for main objects like
+    Wikibase::Datatype::Item, Wikibase::Datatype::Lexeme,
+    Wikibase::Datatype::Mediainfo and Wikibase::Datatype::Property.
+
+    Returns string in scalar context. Returns list of lines in array
+    context.
+
+ERRORS
+     print():
+             Unsupported Wikibase::Datatype object.
+                     Reference: %s
 
 SEE ALSO
     Wikibase::Datatype::Print::Form
@@ -54,6 +77,9 @@ SEE ALSO
     Wikibase::Datatype::Print::Value::Item
         Wikibase item value pretty print helpers.
 
+    Wikibase::Datatype::Print::Value::Lexeme
+        Wikibase lexeme value pretty print helpers.
+
     Wikibase::Datatype::Print::Value::Monolingual
         Wikibase monolingual value pretty print helpers.
 
@@ -68,6 +94,11 @@ SEE ALSO
 
     Wikibase::Datatype::Print::Value::Time
         Wikibase time value pretty print helpers.
+
+DEPENDENCIES
+    Error::Pure, Exporter, Readonly, Wikibase::Datatype::Print::Item,
+    Wikibase::Datatype::Print::Lexeme, Wikibase::Datatype::Print::Mediainfo,
+    Wikibase::Datatype::Print::Property.
 
 SEE ALSO
     Wikibase::Datatype
@@ -93,5 +124,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.13
+    0.16
 

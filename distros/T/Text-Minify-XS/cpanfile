@@ -11,9 +11,10 @@ on 'test' => sub {
   requires "Encode" => "0";
   requires "File::Spec" => "0";
   requires "Module::Metadata" => "0";
-  requires "Test::Exception" => "0.41";
-  requires "Test::More" => "1.302183";
-  requires "Test::Warnings" => "0";
+  requires "Test2::Tools::Exception" => "0";
+  requires "Test2::Tools::Warnings" => "0";
+  requires "Test2::V0" => "0";
+  requires "Test::More" => "0";
   requires "utf8" => "0";
 };
 

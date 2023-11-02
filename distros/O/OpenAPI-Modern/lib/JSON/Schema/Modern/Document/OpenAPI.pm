@@ -5,7 +5,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.048';
+our $VERSION = '0.049';
 
 use 5.020;
 use Moo;
@@ -235,29 +235,30 @@ sub traverse ($self, $evaluator) {
       ()= E({ %$state, data_path => $path .'/operationId',
           initial_schema_uri => Mojo::URL->new(DEFAULT_METASCHEMA) },
         'duplicate of operationId at %s', $existing);
+      $state->{errors}[-1]->mode('evaluate');
     }
     else {
       $self->_add_operationId($operation_id => $path);
     }
   }
 
-  $_->mode('evaluate') foreach $state->{errors}->@*;
   return $state;
 }
 
-sub recursive_get ($self, $json_pointer) {
+sub recursive_get ($self, $uri_reference) {
   my $base = $self->canonical_uri;
-  my $uri = Mojo::URL->new->fragment($json_pointer);
+  my $ref = $uri_reference;
   my ($depth, $schema);
 
-  while ($uri) {
+  while ($ref) {
     die 'maximum evaluation depth exceeded' if $depth++ > $self->evaluator->max_traversal_depth;
-    $uri = Mojo::URL->new($uri)->to_abs($base);
+    my $uri = Mojo::URL->new($ref)->to_abs($base);
+
     my $schema_info = $self->evaluator->_fetch_from_uri($uri);
     die('unable to find resource ', $uri) if not $schema_info;
     $schema = $schema_info->{schema};
     $base = $schema_info->{canonical_uri};
-    $uri = $schema->{'$ref'};
+    $ref = $schema->{'$ref'};
   }
 
   $schema = dclone($schema);
@@ -307,10 +308,23 @@ sub _traverse_schema ($self, $schema, $state) {
     metaschema_uri => $self->json_schema_dialect,
   });
 
+  foreach my $error ($subschema_state->{errors}->@*) {
+    $error->mode('traverse') if not defined $error->mode;
+  }
+
   push $state->{errors}->@*, $subschema_state->{errors}->@*;
   return if $subschema_state->{errors}->@*;
 
   push $state->{identifiers}->@*, $subschema_state->{identifiers}->@*;
+}
+
+# callback hook for Sereal::Decoder
+sub THAW ($class, $serializer, $data) {
+  foreach my $attr (qw(schema evaluator entities)) {
+    die "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
+      if not exists $class->{$attr};
+  }
+  bless($data, $class);
 }
 
 1;
@@ -327,7 +341,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.048
+version 0.049
 
 =head1 SYNOPSIS
 
@@ -351,6 +365,8 @@ The provided document must be a valid OpenAPI document, as specified by the sche
 C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest document available)
 
 and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1.0>.
+
+=for Pod::Coverage THAW
 
 =head1 ATTRIBUTES
 
@@ -402,9 +418,23 @@ document.
 
 =head2 recursive_get
 
-Given a json pointer, get the schema at that location, resolving any C<$ref>s along the way.
-Returns the schema data in scalar context, or a tuple of the schema data and the canonical URI of
-the referenced location in list context.
+Given a uri or uri-reference, get the definition at that location, following any C<$ref>s along the
+way. Returns the data in scalar context, or a tuple of the data and the canonical URI of the
+referenced location in list context.
+
+If the provided location is relative, the current document is used as the base URI.
+If you have a local json pointer you want to resolve, you can turn it into a uri-reference by
+prepending C<#>.
+
+  # starts with a JSON::Schema::Modern::Document::OpenAPI object
+  $document->recursive_get('#/components/parameters/Content-Encoding');
+
+  # starts with an OpenAPI::Modern object
+  $openapi->openapi_document->recursive_get('#/components/parameters/Content-Encoding');
+
+  # starts with a JSON::Schema::Modern object (TODO)
+  $js->recursive_get('https:///openapi_doc.yaml#/components/schemas/my_object')
+  $js->recursive_get('https://localhost:1234/my_spec#/$defs/my_object')
 
 =head1 SEE ALSO
 

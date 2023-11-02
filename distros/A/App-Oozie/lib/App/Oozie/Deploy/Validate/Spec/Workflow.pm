@@ -1,9 +1,16 @@
 package App::Oozie::Deploy::Validate::Spec::Workflow;
-$App::Oozie::Deploy::Validate::Spec::Workflow::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
+
+use App::Oozie::Constants qw(
+    STAT_SIZE
+);
 
 use File::Basename;
 use Moo;
@@ -23,6 +30,7 @@ my @JOB_TYPES_NEEDING_QUEUE = qw(
 with qw(
     App::Oozie::Role::Log
     App::Oozie::Role::Fields::Generic
+    App::Oozie::Role::Validate::XML
 );
 
 has queue_conf_key_name => (
@@ -39,7 +47,8 @@ has file_size => (
     is      => 'ro',
     default => sub {
         my $file = shift->file;
-        my $wf_size = (stat $file )[7] || die "$file either has zero size or I've failed to locate it";
+        my $wf_size = (stat $file )[STAT_SIZE]
+                        || die "$file either has zero size or I've failed to locate it";
         $wf_size;
     }
 );
@@ -96,6 +105,8 @@ sub verify {
     my $max_wf_xml_length = $self->max_wf_xml_length;
     my $max_node_name_len = $self->max_node_name_len;
 
+    my $logger = $self->logger;
+
     my($validation_errors, $total_errors);
     if ( $wf_size > $max_wf_xml_length ) {
         my $msg = sprintf <<'ETOOFAT', basename( $file ), $wf_size, $max_wf_xml_length;
@@ -103,73 +114,130 @@ Your %s has a size above the limit ( %s > %s )
 please either modify it to reduce the size as
 your job will fail anyway if you push it as-is.
 ETOOFAT
-        $self->logger->warn( $msg );
+        $logger->warn( $msg );
         $validation_errors++;
         $total_errors++;
     }
-        # check any action contains root.default or root.mapred queue conf (spark,hive or shell)
-        
-	my $FH;
-	my $validation_queue_check = 0;
-        open $FH, '<', $file or die "Cannot open $file";
-        while(my $String = <$FH>)
-        {
-          if($String =~ /(root.default)$/ || $String =~ /(root.mapred)$/ )
-            {
-              $self->logger->error( "FIXME !!! queue configuration parameter in workflow.xml is set to default or mapred; you are not allowed to deploy workflows in root.mapred or root.default queue." );
-               $validation_errors++;
-               $total_errors++;
 
-            }
-          if($String=~ /(mapreduce.job.queuename)/ || $String =~ /(spark.yarn.queue)/ )
-            {
-              $validation_queue_check++;
-            }
+    my $validation_queue_check = 0;
+
+    # ====================================================================== #
+    # TODO: we already have the decoded XML. Get rid of this file read
+    #
+    # check any action contains root.default or root.mapred queue conf (spark,hive or shell)
+    open my $FH, '<', $file or die "Cannot open $file"; ## no critic (InputOutput::RequireBriefOpen)
+    while(my $String = <$FH>) {
+        if (
+                $String =~ m{ (root.default) \z }xms
+            ||  $String =~ m{ (root.mapred)  \z }xms
+        ) {
+            $logger->error(
+                'FIXME !!! queue configuration parameter in workflow.xml is set to default or mapred; you are not allowed to deploy workflows in root.mapred or root.default queue.'
+            );
+            $validation_errors++;
+            $total_errors++;
         }
-        if ( !$validation_queue_check )
-            {
-                $self->logger->error( "FIXME !!! queue configuration parameter in workflow.xml is not mentioned..Please set queue parameter either using --conf spark.yarn.queue or mapreduce.job.queuename. you are not allowed to deploy workflows in root.mapred or root.default queue." );
-                $validation_errors++;
-                $total_errors++;
-            }
 
-    my $prop        = $xml_in->{parameters} && $xml_in->{parameters}{property}
-                        ? $xml_in->{parameters}{property}
-                        : undef
+        if (
+                $String =~ m{ (mapreduce.job.queuename) }xms
+            ||  $String =~ m{ (spark.yarn.queue) }xms
+        ) {
+            $validation_queue_check++;
+        }
+    }
+    if ( ! close $FH ) {
+        $self->logger->warn(
+            sprintf 'Failed to close %s: %s',,
+                        $file,
+                        $!,
+        );
+    }
+    # ====================================================================== #
+
+    if ( !$validation_queue_check ) {
+        $logger->error( 'FIXME !!! queue configuration parameter in workflow.xml is not mentioned..Please set queue parameter either using --conf spark.yarn.queue or mapreduce.job.queuename. you are not allowed to deploy workflows in root.mapred or root.default queue.' );
+        $validation_errors++;
+        $total_errors++;
+    }
+
+    my $prop        = $xml_in->{parameters}
+                        && $xml_in->{parameters}{property}
+                    ? $xml_in->{parameters}{property}
+                    : undef
                     ;
     my $global_prop = $xml_in->{global}
                         && $xml_in->{global}{configuration}
                         && $xml_in->{global}{configuration}{property}
-                        ? $xml_in->{global}{configuration}{property}
-                        : undef
+                    ? $xml_in->{global}{configuration}{property}
+                    : undef
                     ;
 
-    $self->logger->info( "XML key validation for $file" );
+    $logger->info( sprintf 'XML key validation for %s', $file );
 
     # check some values in the XML files
     # in workflow.xml, check errorEmailTo, various params, and display a warning
 
-    my @contact_mail = map { $_->{value} } grep { $_->{name} eq 'errorEmailTo' } @$prop;
+
+    my $error_email_field_name = 'errorEmailTo';
+
+    my @contact_mail = $prop
+                        ? (
+                            map  { $_->{value} }
+                            grep { $_->{name} eq $error_email_field_name }
+                            @{ $prop }
+                            )
+                        : ()
+                        ;
 
      # check if global conf parameter contains mapred or default queue configuration
-        my @queue_array = map { $_->{value} } grep { $_->{name} =~ 'queuename' } @$global_prop;
-        foreach my $queue_value (@queue_array) {
-             if ($queue_value  =~ 'default' || $queue_value =~ 'mapred' ) {
-              $self->logger->error( "FIXME !!! mapreduce.job.queuename parameter in workflow.xml is set to default or mapred; you are not allowed to deploy workflows in root.mapred or root.default queue" );
-              $validation_errors++;
-              $total_errors++;
-          }
-       }
+    my @queue_array = $global_prop
+                    ? (
+                        map  { $_->{value} }
+                        grep { $_->{name} =~ m{ queuename }xms }
+                        @{ $global_prop }
+                        )
+                    : ()
+                    ;
+
+    $self->validate_xml_property(
+        \$validation_errors,
+        \$total_errors,
+        $prop
+    );
+
+    $self->validate_xml_property(
+        \$validation_errors,
+        \$total_errors,
+        $global_prop,
+        'global'
+    );
+
+    foreach my $queue_value (@queue_array) {
+        if ( $queue_value =~ 'default' || $queue_value =~ 'mapred' ) {
+            $logger->error(
+                'FIXME !!! mapreduce.job.queuename parameter in workflow.xml is set to default or mapred; you are not allowed to deploy workflows in root.mapred or root.default queue.'
+            );
+            $validation_errors++;
+            $total_errors++;
+        }
+    }
 
     if ( ! @contact_mail ) {
-        $self->logger->warn( "FIXME !!! no errorEmailTo parameter in workflow.xml; you will not get error emails" );
+        $logger->warn(
+            sprintf 'FIXME !!! no `%s` parameter in workflow.xml; you will not get error emails',
+                        $error_email_field_name,
+        );
         $validation_errors++;
         $total_errors++;
     }
     else {
         my $validator = $self->email_validator;
         if ( ! $validator->( $self, @contact_mail ) ) {
-            $self->logger->warn( sprintf "errorEmailTo=`%s` is invalid", @contact_mail );
+            $logger->warn(
+                sprintf '%s=`%s` is invalid',
+                        $error_email_field_name,
+                        @contact_mail
+            );
             $validation_errors++;
             $total_errors++;
         }
@@ -192,7 +260,7 @@ Oozie Java code (and its MySQL metastore).
 Plese rename it as your job will fail eventually at run time.
 
 LONG_ACTION_NAME
-            $self->logger->warn( $msg );
+            $logger->warn( $msg );
             $validation_errors++;
             $total_errors++;
         }
@@ -239,14 +307,14 @@ sub verify_queue_name {
     }
 
     foreach my $action_name (keys %{ $action } ) {
-        my $action = $action->{$action_name};
+        my $this_action = $action->{$action_name};
         foreach my $job_type (
-            grep { exists $action->{ $_ } }
+            grep { exists $this_action->{ $_ } }
                 @JOB_TYPES_NEEDING_QUEUE
         ) {
-            my $a_prop =  $action->{ $job_type }{configuration}
-                            && $action->{ $job_type }{configuration}{property}
-                        ? $action->{ $job_type }{configuration}{property}
+            my $a_prop =  $this_action->{ $job_type }{configuration}
+                            && $this_action->{ $job_type }{configuration}{property}
+                        ? $this_action->{ $job_type }{configuration}{property}
                         : undef
                         ;
             if (
@@ -293,7 +361,7 @@ App::Oozie::Deploy::Validate::Spec::Workflow
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

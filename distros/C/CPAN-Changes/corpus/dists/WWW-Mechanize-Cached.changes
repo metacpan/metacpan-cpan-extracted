@@ -1,0 +1,117 @@
+Revision history for Perl extension WWW::Mechanize::Cached
+
+1.42 2013-06-29
+    - Allow caching w/ Content-Encoding == chunked + no size header (Kent
+      Fredric)
+
+1.41 2012-06-27
+    - Account for content length when deciding whether to cache (Kent Fredric)
+
+1.40 2010-10-18
+    - Fixed file prefix in cache_key.t when run under Windows
+
+1.39 2010-10-09
+    - live tests now skip if we can't connect to the live URL
+    - Storable now has a specific version prerequisite
+
+1.38 2010-10-07
+    - cache_key test should now be portable to Windows
+    - Critic test removed as Dist::Zilla runs this test automatically
+    - POD tests should now only be run by author
+
+1.37 2010-08-30
+    - Removed TestCache from Makefile.  Had been automatically added
+      by Dist::Zilla
+
+1.36 2010-08-30
+    - Caching is now positive by default (was negative up to this point)
+    - Referring URLs are now, by defaut, not used when creating cache keys.
+      This reverses the behaviour of previous versions.  RT #56757
+    - Now using Moose and Dist::Zilla
+
+1.35 2009-11-20
+    - Changed test URL, which was causing a small percentage of installs to
+      fail
+    - Added latest HTTP::Headers to prerequisites in order to prevent some
+      failed installs
+
+1.34 2009-11-20
+    - Added first example script
+    - Expanded documentation re: custom caches
+    - Removed some outdated files from distro
+
+1.33 2009-07-13
+    - Now maintained by Olaf Alders.  Thanks to Andy Lester for offering
+      to let me take this on.
+    - Applied patch from RT http://rt.cpan.org/Public/Bug/Display.html?id=42693
+      This fixes the "Can't store CODE items" errors
+    - Now requires Test::Warn 0.11 (fixes errors in t/002-bad-custom-cache.t)
+    - Moved development to GitHub: http://github.com/oalders/www-mechanize-cached/tree/master
+    - Added Perl::Critic author tests
+
+1.32    Sun Apr 11 22:19:49 CDT 2004
+
+        [ENHANCEMENTS]
+        * Added the $mech->is_cached() method.
+
+        * Verified that reusing an existing cache gives you the pages back.
+
+        [INTERNAL]
+        * Now requires WWW::Mechanize 1.00, because previous versions
+          goofed up the HTTP headers on some requests.
+
+
+1.30    Sun Mar 14 02:51:19 CST 2004
+
+        No new features.
+
+        [FIXED]
+        * Fixed stupid configuration problem in t/bad-cache-test.t.
+          If you got 1.28 installed OK, you don't need 1.30.
+
+1.28    Sat Mar 13 22:05:26 CST 2004
+
+        [THINGS THAT WILL BREAK YOUR CODE]
+        * The C<cache> parm to the constructor is no longer a set
+          of parms to specify how the cache will be initialized.  It
+          must now be a fully-initialized cache object, probably in
+          the Cache::Cache hierarchy.
+
+        * Existing caches will not work, because I changed the
+          directory that they get written to.  It used to go into
+          /tmp/FileCache/WWW::Mechanize::Cached, but now will go into
+          /tmp/FileCache/www-mechanize-cached.  This is so the Windows
+          folks can use the module, too.
+
+          However, if you want to create your own cache object that
+          writes to /tmp/FileCache/WWW::Mechanize::Cached, for
+          compatibility, you can create it and pass it in.
+
+        [ENHANCEMENTS]
+        * You can now specify your own Cache::Cache object to pass
+          into the constructor.
+
+1.26    Sun Feb 29 23:59:48 CST 2004
+
+        [FIXES]
+        * Removed a duplicate $key.  Cleaned up some of the internal code,
+          and made the variable names more explicit.
+
+        * Added an autocheck=>1 to the t/cached.t test.  Also hits
+          time.gov instead of Iain's now-gone website.
+
+        * Removed the SIGNATURE, which I don't intend to maintain.
+
+1.24    Sun Jan 18 23:10:40 CST 2004
+
+        NO NEW FUNCTIONALITY.
+
+        On December 29th, 2003, Iain Truskett, the original author of
+        WWW::Mechanize::Cached passed away.  I've taken over maintenance
+        of the module.  If you're interested in carrying on Iain's work,
+        let me know.
+
+
+1.23    December 1, 2003
+        Initial version, released by Iain Truskett.
+

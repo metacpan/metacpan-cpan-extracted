@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 lib/Devel/MAT/Tool/Future.pm
@@ -6,6 +7,10 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+share/icons/future-cancelled.svg
+share/icons/future-done.svg
+share/icons/future-failed.svg
+share/icons/future-pending.svg
 t/00use.t
 t/01future.t
 t/10commands.t

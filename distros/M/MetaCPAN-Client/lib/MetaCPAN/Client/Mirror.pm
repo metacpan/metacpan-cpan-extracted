@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Mirror;
 # ABSTRACT: A Mirror data object
-$MetaCPAN::Client::Mirror::VERSION = '2.030000';
+$MetaCPAN::Client::Mirror::VERSION = '2.031000';
 use Moo;
 use Carp;
 
@@ -66,7 +66,7 @@ MetaCPAN::Client::Mirror - A Mirror data object
 
 =head1 VERSION
 
-version 2.030000
+version 2.031000
 
 =head1 SYNOPSIS
 

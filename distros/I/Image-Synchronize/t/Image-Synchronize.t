@@ -1,7 +1,8 @@
 # -*- perl -*-
 use Modern::Perl;
 
-use Image::Synchronize;
+use Carp;
+use Image::Synchronize qw(normalize_options);
 use Image::Synchronize::GroupedInfo;
 use Image::Synchronize::Logger;
 use Image::Synchronize::Timestamp;
@@ -72,6 +73,8 @@ sub giformat {
 # If a test fails then we want to see where the newlines in the dumped
 # YAML are
 sub shownl {
+  croak "shownl only works on single scalars"
+    if @_ > 1;
   my ($text) = @_;
   return $text =~ s/\n/<\n/gr;
 }
@@ -130,5 +133,32 @@ is(shownl($s->{gps_offsets}->stringify),
               }
              )),
    'second image -- offsets');
+
+# tests of normalize_options
+is(Dump([normalize_options('a', 'b', 'c')]),
+   Dump(['a', 'b', 'c']), 'normalize_options b');
+
+is(Dump([normalize_options('a', '-b', 'c')]),
+   Dump(['a', '-b', 'c']), 'normalize_options -b');
+
+is(Dump(normalize_options('--b')), Dump('--b'), 'normalize_options --b');
+
+is(Dump(normalize_options('---b')), Dump('---b'),
+   'normalize_options ---b');
+
+is(Dump(normalize_options('--b_o-O')), Dump('--boO'),
+   'normalize_options --b_o-O');
+
+is(Dump(normalize_options('--b_-O')), Dump('--bO'),
+   'normalize_options --b_-O');
+
+is(Dump(normalize_options('--b=f--o__O')), Dump('--b=f--o__O'),
+   'normalize_options --b=f--o__O');
+
+is(Dump(normalize_options('--b:f--o__O')), Dump('--b:f--o__O'),
+   'normalize_options --b:f--o__O');
+
+is(Dump(normalize_options('--b f--o__O')), Dump('--b f--o__O'),
+   'normalize_options --b f--o__O');
 
 done_testing();

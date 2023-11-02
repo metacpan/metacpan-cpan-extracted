@@ -10,7 +10,7 @@ WWW::Suffit::Util - The Suffit utilities
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -19,6 +19,24 @@ Version 1.00
 =head1 DESCRIPTION
 
 Exported utility functions
+
+=head3 dformat
+
+    $string = dformat( $mask, \%replacehash );
+    $string = dformat( $mask, %replacehash );
+
+Replace substrings "[...]" in mask and
+returns replaced result. Data for replacing get from \%replacehash
+
+For example:
+
+    # -> 01-foo-bar.baz.tgz
+    $string = dformat( "01-[NAME]-bar.[EXT].tgz", {
+        NAME => 'foo',
+        EXT  => 'baz',
+    });
+
+See also L<CTK::Util/dformat>
 
 =head2 fbytes
 
@@ -130,7 +148,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION @EXPORT_OK @EXPORT /;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use Carp;
 use POSIX qw/ ceil strftime /;
@@ -148,6 +166,7 @@ use base qw/Exporter/;
     /);
 @EXPORT_OK = (qw/
         fbytes fdate fdatetime fduration human2bytes
+        dformat
         md5sum
         json_load json_save
     /, @EXPORT);
@@ -277,6 +296,12 @@ sub json_load {
     # my $hash  = decode_json $bytes;
     my $data = decode_json( path($file)->slurp );
     return $data;
+}
+sub dformat {
+    my $f = shift;
+    my $d = @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {};
+    $f =~ s/\[([A-Z0-9_\-.]+?)\]/(defined($d->{$1}) ? $d->{$1} : "[$1]")/eg;
+    return $f;
 }
 
 1;

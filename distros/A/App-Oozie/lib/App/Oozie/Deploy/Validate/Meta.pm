@@ -1,8 +1,11 @@
 package App::Oozie::Deploy::Validate::Meta;
-$App::Oozie::Deploy::Validate::Meta::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Serializer;
@@ -10,7 +13,11 @@ use App::Oozie::Types::Workflow qw(
     WorkflowMeta
     WorkflowMetaOrDummy
 );
-use App::Oozie::Constants qw( DEFAULT_META_FILENAME );
+use App::Oozie::Constants qw(
+    DEFAULT_META_FILENAME
+    EMPTY_STRING
+);
+
 use Moo;
 use MooX::Options;
 use Types::Standard qw( InstanceOf Str );
@@ -106,7 +113,8 @@ sub maybe_decode {
         $logger->info(
             sprintf 'Meta file %s exists, but seems to be an invalid one. Ignoring%s.',
                         $meta_file,
-                        $self->verbose ? '' : ' (enable --verbose to see the validation errors)',
+                        $self->verbose ? EMPTY_STRING
+                                       : ' (enable --verbose to see the validation errors)',
         );
         if ( $self->verbose ) {
             for my $i ( 0..$#{ $reason } ) {
@@ -135,7 +143,7 @@ App::Oozie::Deploy::Validate::Meta
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

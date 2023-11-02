@@ -12,7 +12,7 @@ use Wikibase::Datatype::Print::Utils qw(print_references);
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.13;
+our $VERSION = 0.16;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -29,8 +29,10 @@ sub print {
 	}
 
 	# References.
-	push @ret, print_references($obj, $opts_hr,
-		\&Wikibase::Datatype::Print::Reference::print);
+	if (! exists $opts_hr->{'no_print_references'} || ! $opts_hr->{'no_print_references'}) {
+		push @ret, print_references($obj, $opts_hr,
+			\&Wikibase::Datatype::Print::Reference::print);
+	}
 
 	return wantarray ? @ret : (join "\n", @ret);
 }
@@ -286,7 +288,7 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.16
 
 =cut
 

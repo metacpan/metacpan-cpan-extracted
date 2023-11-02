@@ -1,7 +1,7 @@
 # Math-BigInt
 
-Math::BigInt and Math::BigFloat are modules for arbitrary precision
-arithmetic.
+Math::BigInt, Math::BigFloat, and Math::BigRat are modules for arbitrary
+precision integers, floating point numbers, and rational numbers.
 
 # INSTALLATION
 
@@ -20,6 +20,7 @@ perldoc command:
 
     perldoc Math::BigInt
     perldoc Math::BigFloat
+    perldoc Math::BigRat
 
 You can find documentation for the backend libraries with the following
 commands:

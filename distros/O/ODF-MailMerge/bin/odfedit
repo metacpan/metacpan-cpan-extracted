@@ -5,9 +5,9 @@
 # related or neighboring rights.  Attribution is requested but is not required.
 use strict; use warnings FATAL => 'all'; use 5.010;
 
-{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = "def"; }
-our $VERSION = "0.001"; # Future: V ERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-10-14'; # DATE from Dist::Zilla::Plugin::OurDate
+{ no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = "dev"; }
+our $VERSION = "0.002"; # Future: V ERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-10-31'; # DATE from Dist::Zilla::Plugin::OurDate
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
@@ -19,13 +19,15 @@ no warnings "experimental::lexical_subs";
 
 use open ':encoding(UTF-8)';
 { use open ':locale'; } # Encode messages for the user's console
+STDOUT->autoflush; STDERR->autoflush;
 
 use Carp; $Carp::MaxArgNums = 0;
-use Data::Dumper::Interp 6.007 qw/visnew dvis ivis dvisq visq qsh qshlist vis visq/;
+use Data::Dumper::Interp 6.009 qw/visnew dvis ivis dvisq visq qsh qshlist vis visq/;
 use Path::Tiny 0.144;
 use File::Spec::Functions qw(tmpdir);
 use Text::ParseWords 3.31 qw/parse_line shellwords/;
-use Encode qw(decode encode);
+use Encode qw(decode encode :fallback_all);
+use Encode::Locale qw/decode_argv/; # defines encs 'locale_fs' 'console_out'
 use FindBin qw/$Bin $Script/;
 use Guard qw(guard scope_guard);
 use List::Util qw/min max any first/;
@@ -39,7 +41,7 @@ use Pod::Usage qw/pod2usage/;
 use Spreadsheet::Edit 1000.006 qw(title2ident);
 use Spreadsheet::Edit::IO qw/convert_spreadsheet
              sheetname_from_spec filepath_from_spec form_spec_with_sheetname/;
-use Spreadsheet::Edit::Log 'oops', ':btw= ${lno}:';
+use Spreadsheet::Edit::Log qw/oops btw btwN/;
 
 use ODF::lpOD;
 use ODF::lpOD_Helper qw/:DEFAULT arraytostring/;
@@ -47,15 +49,15 @@ use ODF::MailMerge qw/replace_tokens MM_SUBST/;
 
 sub _eval_and_preen_exception(&) {
   # Run some code which may fail because of a user error (file not found etc.)
-  # Warnings and exceptions are suppressed, but $@ is set if an exception
-  # occurred, with " at /path/to/our/code.pm line xxx" stripped from $@
-  # so it is suitable to be shown to the user.
+  # Warnings are suppressed, but $@ is set if an exception occurred,
+  # with " at /path/to/our/code.pm line xxx" stripped from $@ so it
+  # is suitable to be shown to the user.
   state $FILE = __FILE__;
   local $SIG{__WARN__} = sub {};
   my ($r, @r);
   if (wantarray) { @r = eval{ $_[0]->() } } else { $r = eval{ $_[0]->() } };
   if ($@) {
-    $@ =~ s/\s* at \S*${FILE} line.*//; # strip reference to our code
+    $@ =~ s/\s* at \S*\Q${FILE}\E line.*//; # strip reference to our code
   }
   wantarray ? @r : $r
 }
@@ -103,12 +105,14 @@ sub run_command($@) {
   }
   warn "> ", qshlist($op, @args),"\n" if $verbose;
   if ($op eq 'print') {
+    local $^O = 'linux';  # Force quoting for /bin/sh, the style used by
+                          # our command scripts on all platforms.
     say qshlist(@args);
   }
   elsif ($op eq 'skeleton') {
     my $skelpath = $args[0] // mydie "No path specified";
     @args == 1 or mydie ivis 'Extraneous argument: @args[1..$#args]';
-    warn "Opening ",qsh($skelpath),"\n" unless $verbose;
+    warn "Opening ",qsh($skelpath),"\n" if $verbose;
     _eval_and_preen_exception {
       # Not certain whether this dies on error or just warns and returns undef
       $doc = odf_new_document_from_template($skelpath) // mydie $!;
@@ -157,100 +161,88 @@ sub run_command($@) {
     mydie "A skeleton must be read first" unless $body;
     my $engine = ODF::MailMerge::Engine->new(context => $body,
                                              proto_tag => $proto_tag);
-    # First open all the spreadsheets and install any aliases
-    my @sheets; #  [[keytoklist], sheet]
-    while (defined(local $_ = shift @args)) {
-      /^((?<keytoks> ( (?: [^,:\\]+ | \\. )*+ )  (?: ,(?-1))* ):)?(?<ss>.*)$/x
-        or oops;
-      my $ss = $+{ss};
-      my @keytoks = map{
-        my ($lhs, $rhs) = (/^([A-Za-z]\w*)=(.*)$/a);
-        if (!defined $rhs) { $lhs = $rhs = $_; }
-        [$lhs, $rhs]
-      } grep{defined() && $_ ne ""} parse_line(qr/[,:]/, 0, $+{keytoks});
-      my $sheet = Spreadsheet::Edit->new();
-      _eval_and_preen_exception { $sheet->read_spreadsheet($ss) };
-      mydie $@ if $@;
-      my %aliases;
-      Getopt::Long::Configure ("default", "require_order"); # stop after -a
-      GetOptionsFromArray(\@args, 'a=s' => \%aliases)
-       // mydie "Unknown option following SPREASHEET path";
-      while (my ($key,$val) = each %aliases) {
-        $sheet->alias($key => compile_if_regex($val));
-      }
-      btw dvis '$ss %aliases $sheet->colx()' if $debug;
-
-      my sub get_key_for_fieldvals($$) {
-        my ($sh, $colspecs) = @_;
-        my @parts;
-        foreach my $colspec (@$colspecs) {
-          my $val = $sh->{$colspec}
-            // mydie ivis '$colspec is not defined in $sh->data_source()';
-          push @parts, $val;
-        }
-        return arraytostring(\@parts);
-      }
-
-      my %key2rx;
-      if (@keytoks) {
-        mydie 'KEYTOKs may only be specified for secondary spreadsheets'
-          if @sheets==0;
-        my @secondary_keytoks = map{ $_->[1] } @keytoks;
-btw dvis '##CCC $#sheets @keytoks\n@secondary_keytoks';
-        $sheet->apply(sub{
-          my $key = get_key_for_fieldvals($sheet, \@secondary_keytoks);
-          if (exists $key2rx{$key}) {
-            mydie ivis '@secondary_keytoks are not unique in '
-                      .'$sheet->data_source() :\n'
-                      .'The same values @parts are in row ',
-                      ($key2rx{$key}+1)," and row ", ($sheet->rx()+1),")";
+    # Parse the remaining arguments, which are any number of sets of
+    #    -a aliasname=colspec ... -k COLUMN ... SPREADSHEET
+    # (COLUMNs only apply to secondary spreadsheets)
+    # Each spreadsheet is opened, aliases applied, and any COLUMNs verified.
+    my @sheets; #  [sheet, \%key2rx, [colspeclist]]
+    { Getopt::Long::Configure ("default", "permute");
+      my (@colspecs, %aliases);
+      GetOptionsFromArray( \@args,
+        'k=s' => \@colspecs,
+        'a=s' => \%aliases,
+        '<>'  => sub {
+          my $ss = $_[0];
+          my $sheet = Spreadsheet::Edit->new();
+          (_eval_and_preen_exception {$sheet->read_spreadsheet($ss)}) // mydie $@;
+          while (my ($key,$val) = each %aliases) {
+            $sheet->alias($key => compile_if_regex($val));
           }
-          $key2rx{$key} = $sheet->rx();
-        });
-      } else {
-        mydie ivis 'KEYTOKs must be specified for $sheet->data_source'
-          if @sheets > 0;
-      }
-      push @sheets, [\@keytoks, $sheet, \%key2rx];
+          btw dvis '$ss %aliases $sheet->colx()' if $debug;
+          push @sheets, [$sheet];
+          if (@colspecs) {
+            mydie "-k COLSPEC args are only applicable to secondary spreadsheets"
+              if @sheets == 1;
+            foreach (@colspecs) { $_ = compile_if_regex($_) }
+            my @cxlist = map{ (_eval_and_preen_exception { $sheet->spectocx($_) })
+                                // mydie ivis '$_ : ',$@ } @colspecs;
+            # Build index of [seconday's column values] => rx
+            my %key2rx;
+            $sheet->apply(sub{
+              my $rx = $sheet->rx;
+              my $row = $sheet->[$rx];
+              my @values = map{ $row->[$_] } @cxlist;
+              my $key = arraytostring(\@values);
+              mydie 'Key(s) ',avis(@colspecs),
+                    " do not uniquely identify a record in ",
+                    $sheet->data_source(),"\n  (same value(s) in row ",
+                    ($rx+1)," and ", ($key2rx{$key}+1),")"
+                if exists $key2rx{$key};
+              $key2rx{$key} = $rx;
+            });
+            push @{ $sheets[-1] }, \%key2rx, [@colspecs];
+          } else {
+            mydie '-k COLSPEC arg(s) must be specified for ',
+                  qsh($sheet->data_source()) if @sheets > 1;
+          }
+          @colspecs = ();
+          %aliases = ();
+        },
+      ) // mydie "Unknown option";
+      mydie "No spreadsheet specified" unless @sheets;
+      mydie "-a options must preceed the applicable SPREADSHEET" if keys %aliases;
+      mydie "-k options must preceed the applicable SPREADSHEET" if @colspecs;
     }
-    mydie "No spreadsheet specified" unless @sheets;
+
+    btw dvis '###AAA @sheets' if $debug;
 
     # Execute the mail-merge
-    my $mainsheet = $sheets[0][1];
+    my $mainsheet = $sheets[0][0];
     my $maincolx = $mainsheet->colx();
     $mainsheet->apply(sub{
       $engine->add_record({ '*' => sub{
+        # wildcard callback
         my ($tokname, $token) = @_;
-        if (exists $maincolx->{$tokname}) {
-btw ivis '$tokname found in primary' if $debug;
-          return(MM_SUBST,
-                 eval_if_styled_content($mainsheet->{$tokname} // oops));
-        }
-        my @row_stack = ($mainsheet->crow); # row being visited
-
-        for (my $ix = 1; $ix <= $#sheets; $ix++) {
-          my ($keytoks, $sh2, $key2rx) = @{ $sheets[$ix] };
-          my @primary_keytoks = map{ $_->[0] } @$keytoks;
-          my @parts;
-          KEYTOK:
-          foreach my $colspec (@primary_keytoks) {
-            for my $rowhash (reverse @row_stack) {
-              if (defined(my $val = $rowhash->{$colspec})) {
-                push @parts, $val;
-                next KEYTOK;
-              }
-            }
-            mydie ivis 'KEYTOK $colspec not found in previous spreadsheet(s)';
+        my @rowstack = ( $mainsheet->crow() ); # current row in apply
+        for (my $i = 1 ; ; $i++) {
+          my $row = $rowstack[-1];
+          if (exists $row->{$tokname}) {
+            return(MM_SUBST,
+                   eval_if_styled_content($row->{$tokname} // oops));
           }
-          my $key = arraytostring(\@parts);
-          my $rx2 = $key2rx->{$key} // oops;
-          if (defined (my $val = $sh2->[$rx2]{$tokname})) {
-btw ivis '$tokname found in secondary $ix' if $debug;
-            return(MM_SUBST, eval_if_styled_content($val // oops));
-          }
+          mydie ivis 'Spreadsheet column $tokname does not exist'
+            if $i > $#sheets;
+          # Locate a record in the next secondary spreadsheet
+          my ($sh2, $key2cx, $colspecs) = @{ $sheets[$i] };
+          my @primary_values = map{ $rowstack[-1]->[$sh2->spectocx($_)] }
+                                  @$colspecs;
+          my $key = arraytostring(\@primary_values);
+          my $sec_rx = $key2cx->{$key}
+            // mydie "No record in secondary has ",
+                     avis(map{ $_->[1] } @$colspecs), " with values ",
+                     avis(@primary_values);
+          push @rowstack, $sheets[$i][0]->[$sec_rx];
         }
-
-        mydie ivis 'No value for token $token';
       }#'*' wildcard callback
       }); #calling engine->add_record
     });#mainsheet apply
@@ -271,28 +263,36 @@ sub run_script($$) {
       $_ .= <$fh>;
     }
     chomp;
-    # Remove #comments only if not inside a 'quoted arg'.
 btw dvis 'LINE $_' if $debug;
-    # parse_line generates undef if string contains only delimiters!
-    # https://rt.cpan.org/Public/Bug/Display.html?id=50753
-    my @prelim = grep{defined} parse_line(qr/(\s+|\#)/, "delimiters", $_);
-btw dvis '     @prelim' if $debug;
-    if ((my $ix = firstidx{ /^#/ } @prelim) >= 0) {
-      splice @prelim, $ix;
-      $_ = join "",@prelim;
-btw dvis '#COM REMOVED $_ $ix @prelim' if $debug;
+    # Split ;-seprated commands and #tail comments
+    #   N.B. parse_line generates undef if string contains only delimiters!
+    #   https://rt.cpan.org/Public/Bug/Display.html?id=50753
+    # This preserves all quotes, backslashes and delimiters but
+    # isolates delimiters into separate words -- in this case including # and ;
+    my @parts = grep{defined} parse_line(qr/(\s+|[\#;])/, "delimiters", $_);
+    if ((my $ix = firstidx{ $_ eq '#' } @parts) >= 0) {
+btw dvis 'CHOPPING OFF #COMMENT at $ix in @parts' if $debug;
+      splice @parts, $ix;
     }
-    while (/\G( ([^;\\]+ | \\.)*+  )/xsgc) {
-      my @words = shellwords($1);
-btw 'CMD pos=',vis(pos),dvis ' @words' if $debug;
-      #####################
-      run_command("$sourcename line $.", @words)
-        if @words;
-      #####################
-      /\G;/sgc && next;
-      /\G./sgc && mydie "Parser bug: pos=",vis(pos),
-                        " : ",vis(substr($_,(pos//0),20));
-      last;
+btw dvis '@parts' if $debug;
+    my @cmds;
+    while ((my $len = firstidx{ $_ eq ';' } @parts) >= 0) {
+      push @cmds, [ @parts[0..$len-1] ];
+      splice @parts, 0, $len+1;
+    }
+    push @cmds, \@parts;
+    foreach (@cmds) {
+      # Re-parse to eliminate quotes, backslashes, etc. to get final data words
+      my $cmdstr = join("", @$_);
+      my @words = grep{defined} shellwords($cmdstr);
+      if (@words) {
+        #####################
+        run_command("$sourcename line $.", @words)
+        #####################
+      } else {
+        mydie ivis 'Syntax error in $cmdstr\n(probably incorrect quoting)'
+          if $cmdstr =~ /\S/;
+      }
     }
   }
 }
@@ -306,6 +306,7 @@ sub badargs_exit(@) { pod2usage(-output => \*STDERR, -exitval => 2, @_) }
 
 my $script;
 Getopt::Long::Configure ("default", "gnu_getopt", "auto_version");
+decode_argv(Encode::FB_CROAK); # @ARGV now contains *characters*
 GetOptions(
    "d|debug"                   => \$debug,
    "v|verbose"                 => \$verbose,
@@ -329,12 +330,17 @@ if (!defined($script) && @ARGV==0) {
   run_script(*STDIN, "<stdin>");
 } else {
   if (defined $script) {
-    #btw dvis '### $script';
-    open my $fh, "<", \$script or die "Bug! $! ";
+    btw dvis '### $script' if $debug;
+    # $script contains decoded characters due to decode_argv() call above;
+    # un-do this so the script can be read as a file
+    $script = encode("utf8", $script);
+    open my $fh, "<", \$script or oops $!;
+    binmode($fh, ":utf8") or oops $!;
     run_script($fh, "-e");
   }
   foreach (@ARGV) {
-    open my $fh, "<", $_ or die "$_ : $!\n";
+    my $encoded_path = encode("locale_fs", $_, FB_CROAK|LEAVE_SRC);
+    open my $fh, "<", $encoded_path or die "$encoded_path : $!\n";
     run_script($fh, $_);
   }
 }
@@ -390,7 +396,7 @@ long lines and semicolon (;) to separate commands on the same line.
 
 =back
 
-=head1 Definitions
+=head1 DEFINITIONS
 
 Any B<TOKEN> argument has brackets added to form "{TOKEN}"
 unless the argument already contains the { and }.
@@ -439,9 +445,9 @@ However if VALUE looks like a "[Styled content]" specifier as described in
 L<ODF::MailMerge> then it is evaluated as such and may
 specify format overrides.
 
-=head2 mailmerge I<PROTO-TOKEN> I<SPREADSHEET>
+=head2 mail-merge I<PROTO-TOKEN> I<SPREADSHEET>
 
-=head2 mailmerge I<PROTO-TOKEN> I<SPREADSHEET> B<-a> I<aliasname=COLSPEC> ...
+=head2 mail-merge I<PROTO-TOKEN> B<-a> I<aliasname=COLSPEC> ... <SPREADSHEET>
 
 First, a prototype Table is located which contains "{PROTO-TOKEN}"
 somewhere within it.  The "{PROTO-TOKEN}" string is used only to
@@ -455,34 +461,33 @@ brackets) as a COLSPEC to identify which column value to use from the record.
 
 =over
 
-If B<-a> option(s) are specified, then each I<aliasname> is associated with
-the indicated I<COLSPEC>, and may be used instead of the
-column title
-(for example the prototype table may contain "{aliasname}" instaed
-of "{The Actual Column Title}").
-I<aliasname> must be an identifier (i.e. must start with a letter and contain
-only letters, digits, and underscores.)
+If B<-a> option(s) are specified, then each I<aliasname> becomes an
+alternate COLSPEC for the indicated column.
+For example the prototype table may contain "{aliasname}" instaed
+of "{The Actual Column Title}".
+I<aliasname> must be an identifier, i.e. must start with a letter and contain
+only letters, digits, and underscores.
 
 =back
 
 An error occurs if a "token" does not indicate any column in the spreadsheet.
 
-=head2 mailmerge I<PROTO-TOKEN> I<SPREADSHEET> I<KEYTOK>,I<KEYTOK>,...:I<SPREADSHEET2> ...
+=head2 mail-merge I<PROTO-TOKEN> I<SPREADSHEET> B<-k> I<COLSPEC> ... I<SPREADSHEET2>
 
-(Although not shown, each SPREADSHEET* arg may be followed by B<-a> options
-to define column aliases.)
+(Although not shown, each SPREADSHEET* arg may also be preceeded
+by B<-a> options to define column aliases.)
 
-In this form, some {token} values may be found in a record from a
-secondary spreadsheet selected using value(s) from the primary record.
+In this form, some {token} values may be found in a specific record from a
+secondary spreadsheet; that record is selected using the values in
+the primary sheet's record of columns indicated by the I<COLSPEC>s.
 
-For example, a company directory of department contacts for Payroll,
-Personnel, etc. might use a prototype table containing
-{Dept}, {Name}, {Email} and {Phone} tokens to be interpolated.
+For example, to produce a company directory of department contacts for
+Payroll, Personnel, etc., the prototype table might contain tokens
+{Dept}, {Name}, {Email} and {Phone}.
 
 However the primary spreadsheet could contain only "Dept" and "Name" columns,
 with "Email" and "Phone" values looked up in a secondary spreadsheet
-using the value of "Name" as the key.
-Here is how it works:
+using the value of "Name" as the key.  Here is how it works:
 
   For each record (i.e. row) in the primary spreadsheet:
     For each {token} in the prototype table:
@@ -490,21 +495,22 @@ Here is how it works:
         Substitute the value
       Else:
         Locate the record in the secondary spreadsheet which has values
-        in columns indicated by KEYTOKs which match the corresponding
-        values in the primary record ("Name" in the example).
-        An error occurs unless exactly one record is found.
+        in the indicated COLSPECs ("Name" in the example) which match the
+        corresponding values in the primary record.  An error occurs unless
+        exactly one matching record is found.
 
         If "token" indicates a column in the selected secondary record
         then substitute the value, otherwise fail with an error.
 
-KEYTOK may have the form "P=S" in which case P specifies the column
-in the primary spreadsheet and S specifies the corresponding column in
-the secondary spreadsheet (allows using different column names).
+Note that B<-a> options may be used to alias uniquely-named columns
+so that the I<COLSPEC>s given with B<-k> options will work to match
+the appropriate column in either spreadsheet.
 
 Tertiary, etc. spreadsheets may be specified in additional command arguments;
 if "token" is not found in a secondary record, then the record in the
-next spreadsheet is used which has KEYTOK values matching those in the current
-secondary spreadsheet or, if not present, a predecessor spreadsheet.
+next spreadsheet is selected which has values in columns indicated
+by (the next spreadsheet's) -k COLSPEC arguments which match those in
+the current secondary spreadsheet or, if not present, a predecessor spreadsheet.
 
 =head2 print [I<argument>s...]
 

@@ -1,13 +1,21 @@
 package App::Oozie::Deploy::Template;
-$App::Oozie::Deploy::Template::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsDir );
 use App::Oozie::Util::Misc qw( resolve_tmp_dir );
-use App::Oozie::Constants qw( TEMPLATE_DEFINE_VAR );
+use App::Oozie::Constants qw(
+    DEFAULT_FILE_MODE
+    EMPTY_STRING
+    LAST_ELEM
+    TEMPLATE_DEFINE_VAR
+);
 
 use Config::Properties;
 use Data::Dumper ();
@@ -79,7 +87,7 @@ has possible_readme_file_names => (
     is      => 'ro',
     isa     => ArrayRef[Str],
     default => sub {
-        [
+        return [
             qw(
                 README
                 README.md
@@ -101,7 +109,7 @@ has process_coord_directive_varname => (
             my $name = shift;
             return $name;
         },
-    }
+    },
 );
 
 sub get_job_conf {
@@ -116,9 +124,17 @@ sub get_job_conf {
     # doing the expansion.
     #
     my $p = Config::Properties->new();
-    my $FH;
-    open $FH, '<', $file or die "Cannot open $file";
+
+    open my $FH, '<', $file or die "Cannot open $file";
     $p->load($FH);
+    if ( ! close $FH ) {
+        $self->logger->warn(
+            sprintf 'Failed to close %s: %s',,
+                        $file,
+                        $!,
+        );
+    }
+
     my %c = $p->properties;
     for my $key ( keys %c ) {
         my $val = $c{ $key };
@@ -132,7 +148,7 @@ sub get_job_conf {
             );
         }
         $val =~ s{ [^\\][#] .* \z }{}xms;
-        $job_conf{ "JOBCONF_" . $key } = trim $val;
+        $job_conf{ 'JOBCONF_' . $key } = trim $val;
     }
 
     return %job_conf;
@@ -155,7 +171,7 @@ sub compile {
     my $deploy_temp_lib_dir = File::Spec->catfile( $dest, $self->ttlib_dynamic_base_dir_name );
 
     $logger->info(
-        sprintf "Processing `%s` with the application name `%s` into `%s`",
+        sprintf 'Processing `%s` with the application name `%s` into `%s`',
                     $workflow,
                     $appname,
                     $dest,
@@ -171,7 +187,7 @@ sub compile {
     make_path   $dest,
                 ( $self->write_ownership_to_workflow_xml ? ( $deploy_temp_lib_dir ) : () ), # we can just use this as the base is $dest but keep hem separate just in case
                 {
-                    mask => oct(755),
+                    mask => oct( DEFAULT_FILE_MODE ),
                 };
 
     my $tt_conf_file = $self->_pre_process_ttconfig_into_tempfile({
@@ -190,11 +206,11 @@ sub compile {
         '--verbose',
     );
 
-    for my $prop ( keys %$config ) {
+    for my $prop ( keys %{ $config } ) {
         if ( !defined $config->{$prop} ) {
             $logger->warn( "Conf error: $prop has no value defined!" )
                 if $prop ne
-                "has_sla";    # dmorel 2015-03-09: skip the error for the sla key (change later?)
+                'has_sla';    # dmorel 2015-03-09: skip the error for the sla key (change later?)
             next;
         }
         push @command,
@@ -351,10 +367,14 @@ sub _probe_readme {
 
     if ( ! $has_readme ) {
         $logger->error(
-            "A README file is missing in workflow folder $workflow. ",
-            "This file must be present and it must contain a short explanation of what the workflow is for. ",
-            sprintf( "Please add a file named %s and try redeploying the workflow.",
-                        join( q{ or }, @{ $self->possible_readme_file_names } ),
+            sprintf(
+                'A README file is missing in workflow folder %s. ',
+                    $workflow,
+            ),
+            'This file must be present and it must contain a short explanation of what the workflow is for. ',
+            sprintf(
+                'Please add a file named %s and try redeploying the workflow.',
+                    join( q{ or }, @{ $self->possible_readme_file_names } ),
             ),
         );
         ${ $validation_errors_ref }++;
@@ -380,18 +400,18 @@ sub _create_meta_includes {
         return;
     }
 
-    die "Options need to be a hashref!" if ! $opt || ! is_hashref $opt;
+    die 'Options need to be a hashref!' if ! $opt || ! is_hashref $opt;
 
     my $source_dir = $opt->{source_dir};
     my $meta_file  = $opt->{source_file};
     my $dest_dir   = $opt->{dest_dir};
 
     if ( ! -d $source_dir ) {
-        die "source_dir=$source_dir is not a directory!";
+        die sprintf 'source_dir=%s is not a directory!', $source_dir;
     }
 
     if ( ! -d $dest_dir ) {
-        die "dest_dir=$dest_dir is not a directory!";
+        die sprintf 'dest_dir=%s is not a directory!', $dest_dir;
     }
 
     $logger->info(
@@ -451,7 +471,7 @@ sub _create_wf_directive {
         my $var  = [
             map {
                 +{
-                    key   => $key_prefix . '.' . $_,
+                    key   => $key_prefix . q{.} . $_,
                     value => $self->_xml_escape( $flat->{ $_ } ),
                 }
             }
@@ -496,7 +516,13 @@ TMPL
 
     open my $FH, '>', $var_file or die "Can't write to $var_file: $!";
     print $FH "$buf\n";
-    close $FH;
+    if ( ! close $FH ) {
+        $self->logger->warn(
+            sprintf 'Failed to close %s: %s',,
+                        $var_file,
+                        $!,
+        );
+    }
 
     $self->logger->debug( sprintf 'meta file created as: %s', $var_file )
         if $self->verbose;
@@ -509,20 +535,35 @@ sub _pre_process_ttconfig_into_tempfile {
     my $opt    = shift || {};
     my $logger = $self->logger;
 
-    my($fh_tmp_cfg, $tmp_cfg_file) = File::Temp::tempfile( undef, DIR => resolve_tmp_dir() );
+    my($fh_tmp_cfg, $tmp_cfg_file) = File::Temp::tempfile(
+                                        EMPTY_STRING,
+                                        DIR => resolve_tmp_dir(),
+                                    );
 
     my $file = File::Spec->catfile( $self->ttlib_base_dir, 'ttree.cfg' );
-    open my $FH, '<', $file or die "Failed to read $file: $!";
 
-    while ( <$FH> ) {
-        if ( /^copy/ ) {
+    my $maybe_log_line = sub {
+        my $config_line = shift || return;
+        if ( $config_line =~ m{ \A copy }xms ) {
             $logger->info(
-                sprintf "Files matching this pattern will be copied as-is: /%s/",
-                            trim +(split m{ [=] }xms, $_, 2)[-1]
+                sprintf 'Files matching this pattern will be copied as-is: /%s/',
+                            trim +(split m{ [=] }xms, $config_line, 2)[LAST_ELEM]
             );
         }
+        return;
+    };
 
+    open my $FH, '<', $file or die "Failed to read $file: $!";
+    while ( <$FH> ) {
+        $maybe_log_line->( $_ );
         print $fh_tmp_cfg $_;
+    }
+    if ( ! close $FH ) {
+        $self->logger->warn(
+            sprintf 'Failed to close %s: %s',,
+                        $file,
+                        $!,
+        );
     }
 
     # Attach the correct lib dir to the conf
@@ -532,8 +573,6 @@ sub _pre_process_ttconfig_into_tempfile {
     if ( $opt->{temp_lib} && -d $opt->{temp_lib} && -r _ ) {
         printf $fh_tmp_cfg "\nlib = %s\n", $opt->{temp_lib};
     }
-
-    close $FH;
 
     $logger->debug( sprintf 'TT conf file created as %s', $tmp_cfg_file )
         if $self->verbose;
@@ -555,7 +594,7 @@ App::Oozie::Deploy::Template
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

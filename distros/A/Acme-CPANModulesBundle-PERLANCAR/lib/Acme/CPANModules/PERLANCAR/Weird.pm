@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-13'; # DATE
+our $DATE = '2023-11-01'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our $LIST = {
-    summary => 'Weird modules',
+    summary => 'List of weird modules',
     description => <<'_',
 
 List of modules I find weird (non-pejoratively speaking) in one way or another,
@@ -31,7 +31,7 @@ _
 };
 
 1;
-# ABSTRACT: Weird modules
+# ABSTRACT: List of weird modules
 
 __END__
 
@@ -41,11 +41,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::PERLANCAR::Weird - Weird modules
+Acme::CPANModules::PERLANCAR::Weird - List of weird modules
 
 =head1 VERSION
 
-This document describes version 0.010 of Acme::CPANModules::PERLANCAR::Weird (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
+This document describes version 0.014 of Acme::CPANModules::PERLANCAR::Weird (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2023-11-01.
 
 =head1 DESCRIPTION
 
@@ -56,7 +56,7 @@ e.g. peculiar API, name.
 
 =over
 
-=item * L<String::Tools> - Various tools for manipulating strings.
+=item L<String::Tools>
 
 Author: L<BOBK|https://metacpan.org/author/BOBK>
 
@@ -133,13 +133,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

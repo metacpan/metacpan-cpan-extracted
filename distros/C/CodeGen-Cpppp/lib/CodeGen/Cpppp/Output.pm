@@ -1,6 +1,6 @@
 package CodeGen::Cpppp::Output;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 # ABSTRACT: Collect text output into named sections
 
 use v5.20;
@@ -9,6 +9,7 @@ use experimental 'signatures', 'postderef';
 use Carp;
 use Scalar::Util 'looks_like_number';
 use List::Util 'max';
+use overload '""' => sub { $_[0]->get };
 
 
 our %standard_sections= (
@@ -115,7 +116,7 @@ CodeGen::Cpppp::Output - Collect text output into named sections
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

@@ -25,11 +25,33 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 
 使用**--discrete**选项时，输入和输出数据的行数不一定相同。
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     为每个匹配的零件单独调用新的命令。
+
+- **--fillup**
+
+    将一连串的非空行合并为一行，然后再传递给过滤命令。宽字符之间的换行符被删除，其他换行符被替换成空格。
+
+- **--blockmatch**
+
+    通常，与指定搜索模式匹配的区域将被发送到外部命令。如果指定了该选项，将处理的不是匹配区域，而是包含该区域的整个块。
+
+    例如，要将包含`foo`模式的行发送到外部命令，需要指定与整行匹配的模式：
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    但是使用**--blockmatch**选项，可以简单地完成如下操作：
+
+        greple -Mtee cat -n -- foo
+
+    使用**-blockmatch**选项，该模块的行为更像[teip(1)](http://man.he.net/man1/teip)的**-g**选项。
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 
 你可以通过DeepL，通过执行上述命令与**-Mtee**模块相结合，调用**deepl**命令，像这样翻译它们。
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-因为**deepl**对单行输入效果更好，你可以把命令部分改成这样。
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 不过，专用模块[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)对这个目的更有效。事实上，**tee**模块的实现提示来自**xlate**模块。
 
@@ -82,7 +100,24 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+使用`--discrete`选项是很耗时的。因此，你可以使用`--separate '\r'`选项和`ansifold`来产生单行，使用CR字符而不是NL。
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+然后通过[tr(1)](http://man.he.net/man1/tr)命令或其他命令将CR字符转换成NL。
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+考虑一种情况，你想从非标题行中搜索字符串。例如，你可能想从`docker image ls`命令中搜索图片，但留下标题行。你可以通过以下命令来实现。
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+选项`-Mline -L 2:` 检索第二至最后一行，并将其发送到`grep perl`命令。选项`--discrete`是必需的，但它只被调用一次，所以在性能上没有什么缺陷。
+
+在这种情况下，`teip -l 2- -- grep`会产生错误，因为输出的行数比输入的少。然而，结果是相当令人满意的:)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ Greple的**-Mtee**模块将匹配的文本部分发送到给定的过滤命令�
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate).
+
+# BUGS
+
+`--fillup`选项对韩文文本可能无法正确工作。
 
 # AUTHOR
 

@@ -1,4 +1,11 @@
 # Version/Revision history
 
+1.02 Mon 30 Oct 2023 10:33:09 MSK
+    * Added the dformat utility function
+
+1.01 Fri 27 Oct 2023 21:34:21 MSK
+    * Added :DIR constants to Const module
+    * Added WWW::Suffit::RefUtil module
+
 1.00 Fri 21 Jul 2023 12:18:52 MSK
     * Initial release

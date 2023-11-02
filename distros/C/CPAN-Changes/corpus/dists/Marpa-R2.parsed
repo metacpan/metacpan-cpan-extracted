@@ -1,0 +1,765 @@
+{
+  "preamble" => "# Copyright 2013 Jeffrey Kegler\n# This file is part of Marpa::R2.  Marpa::R2 is free software: you can\n# redistribute it and/or modify it under the terms of the GNU Lesser\n# General Public License as published by the Free Software Foundation,\n# either version 3 of the License, or (at your option) any later version.\n#\n# Marpa::R2 is distributed in the hope that it will be useful,\n# but WITHOUT ANY WARRANTY; without even the implied warranty of\n# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n# Lesser General Public License for more details.\n#\n# You should have received a copy of the GNU Lesser\n# General Public License along with Marpa::R2.  If not, see\n# http://www.gnu.org/licenses/.\n\nRevision history for Marpa::R2",
+  "raw_preamble" => "# Copyright 2013 Jeffrey Kegler\n# This file is part of Marpa::R2.  Marpa::R2 is free software: you can\n# redistribute it and/or modify it under the terms of the GNU Lesser\n# General Public License as published by the Free Software Foundation,\n# either version 3 of the License, or (at your option) any later version.\n#\n# Marpa::R2 is distributed in the hope that it will be useful,\n# but WITHOUT ANY WARRANTY; without even the implied warranty of\n# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n# Lesser General Public License for more details.\n#\n# You should have received a copy of the GNU Lesser\n# General Public License along with Marpa::R2.  If not, see\n# http://www.gnu.org/licenses/.\n\nRevision history for Marpa::R2\n\n",
+  "releases" => [
+    {
+      "date" => "2013-12-25T08:38:49Z",
+      "entries" => [
+        {
+          "line" => 20,
+          "raw" => "   * Allow Unicode in SLIF DSL source\n\n",
+          "style" => "*",
+          "text" => "Allow Unicode in SLIF DSL source"
+        },
+        {
+          "line" => 22,
+          "raw" => "   * New high-level ASF interface -- still alpha\n\n",
+          "style" => "*",
+          "text" => "New high-level ASF interface -- still alpha"
+        }
+      ],
+      "line" => 18,
+      "raw" => "2.078000 Wed Dec 25 08:38:49 PST 2013\n\n",
+      "raw_date" => "Wed Dec 25 08:38:49 PST 2013",
+      "version" => "2.078000"
+    },
+    {
+      "date" => "2013-11-20T16:22:56Z",
+      "entries" => [
+        {
+          "line" => 26,
+          "raw" => "   * SLIF start rule is now optional.\n\n",
+          "style" => "*",
+          "text" => "SLIF start rule is now optional."
+        },
+        {
+          "line" => 28,
+          "raw" => "   * SLIF character classes and strings\n     can be case-insensitive.\n\n",
+          "style" => "*",
+          "text" => "SLIF character classes and strings can be case-insensitive."
+        },
+        {
+          "line" => 31,
+          "raw" => "   * ASF's documented and ready for trial, but\n     only by adventurous users.\n\n",
+          "style" => "*",
+          "text" => "ASF's documented and ready for trial, but only by adventurous users."
+        }
+      ],
+      "line" => 24,
+      "raw" => "2.076000 Wed Nov 20 16:22:56 PST 2013\n\n",
+      "raw_date" => "Wed Nov 20 16:22:56 PST 2013",
+      "version" => "2.076000"
+    },
+    {
+      "date" => "2013-10-29T20:21:57Z",
+      "entries" => [
+        {
+          "line" => 36,
+          "raw" => "   * Minor Bug fixes in SLIF\n\n",
+          "style" => "*",
+          "text" => "Minor Bug fixes in SLIF"
+        }
+      ],
+      "line" => 34,
+      "raw" => "2.074000 Tue Oct 29 20:21:57 PDT 2013\n\n",
+      "raw_date" => "Tue Oct 29 20:21:57 PDT 2013",
+      "version" => "2.074000"
+    },
+    {
+      "date" => "2013-10-23T17:26:49Z",
+      "entries" => [
+        {
+          "line" => 40,
+          "raw" => "   * Minor fix to error messages\n\n",
+          "style" => "*",
+          "text" => "Minor fix to error messages"
+        }
+      ],
+      "line" => 38,
+      "raw" => "2.072000 Wed Oct 23 17:26:49 PDT 2013\n\n",
+      "raw_date" => "Wed Oct 23 17:26:49 PDT 2013",
+      "version" => "2.072000"
+    },
+    {
+      "date" => "2013-09-08T17:52:17Z",
+      "entries" => [
+        {
+          "line" => 44,
+          "raw" => "   * Semantics docs updated for SLIF.  It is now possible to become a Marpa::R2\n     expert without learning anything about its original interface, the NAIF.\n\n",
+          "style" => "*",
+          "text" => "Semantics docs updated for SLIF.  It is now possible to become a Marpa::R2 expert without learning anything about its original interface, the NAIF."
+        },
+        {
+          "line" => 47,
+          "raw" => "   * Per-parse arg can now be specified explicitly as arg\n     of \$slr->value().\n\n",
+          "style" => "*",
+          "text" => "Per-parse arg can now be specified explicitly as arg of \$slr->value()."
+        },
+        {
+          "line" => 50,
+          "raw" => "   * Added semantics_package named argument to SLIF recognizer.\n\n",
+          "style" => "*",
+          "text" => "Added semantics_package named argument to SLIF recognizer."
+        },
+        {
+          "line" => 52,
+          "raw" => "   * Fix bug: unproductive symbol in G0 sequence was causing SEGV\n     instead of diagnostic.\n\n",
+          "style" => "*",
+          "text" => "Fix bug: unproductive symbol in G0 sequence was causing SEGV instead of diagnostic."
+        },
+        {
+          "line" => 55,
+          "raw" => "   * Fix SLIF bug when using default action with null parse --\n     default action was not being called, it now is.\n\n",
+          "style" => "*",
+          "text" => "Fix SLIF bug when using default action with null parse -- default action was not being called, it now is."
+        }
+      ],
+      "line" => 42,
+      "raw" => "2.070000 Sun Sep  8 17:52:17 PDT 2013\n\n",
+      "raw_date" => "Sun Sep  8 17:52:17 PDT 2013",
+      "version" => "2.070000"
+    },
+    {
+      "date" => "2013-08-22T19:13:34Z",
+      "entries" => [
+        {
+          "line" => 60,
+          "raw" => "   * Better debugging and tracing for SLIF,\n     and better documentation for it.\n\n",
+          "style" => "*",
+          "text" => "Better debugging and tracing for SLIF, and better documentation for it."
+        },
+        {
+          "line" => 63,
+          "raw" => "   * Fix bug discovered by Jean-Damien Durand --\n     discarding lexemes should take precedence over rejecting\n     them.\n\n",
+          "style" => "*",
+          "text" => "Fix bug discovered by Jean-Damien Durand -- discarding lexemes should take precedence over rejecting them."
+        },
+        {
+          "line" => 67,
+          "raw" => "   * Various documentaion fixes\n\n",
+          "style" => "*",
+          "text" => "Various documentaion fixes"
+        }
+      ],
+      "line" => 58,
+      "raw" => "2.068000 Thu Aug 22 19:13:34 PDT 2013\n\n",
+      "raw_date" => "Thu Aug 22 19:13:34 PDT 2013",
+      "version" => "2.068000"
+    },
+    {
+      "date" => "2013-08-02T17:34:47Z",
+      "entries" => [
+        {
+          "line" => 71,
+          "raw" => "   * Fix SLIF memory leak; fix for Perl 5.19.3\n\n",
+          "style" => "*",
+          "text" => "Fix SLIF memory leak; fix for Perl 5.19.3"
+        }
+      ],
+      "line" => 69,
+      "raw" => "2.066000 Fri Aug  2 17:34:47 PDT 2013\n\n",
+      "raw_date" => "Fri Aug  2 17:34:47 PDT 2013",
+      "version" => "2.066000"
+    },
+    {
+      "date" => "2013-07-11T09:10:54Z",
+      "entries" => [
+        {
+          "line" => 75,
+          "raw" => "   * Fix bug in return value of lexeme_read();\n     Fix SEGV when terminal symbol is unused.\n\n",
+          "style" => "*",
+          "text" => "Fix bug in return value of lexeme_read(); Fix SEGV when terminal symbol is unused."
+        }
+      ],
+      "line" => 73,
+      "raw" => "2.064000 Thu Jul 11 09:10:54 PDT 2013\n\n",
+      "raw_date" => "Thu Jul 11 09:10:54 PDT 2013",
+      "version" => "2.064000"
+    },
+    {
+      "date" => "2013-07-02T08:23:53Z",
+      "entries" => [
+        {
+          "line" => 80,
+          "raw" => "   * Added SLIF expected_terminals(), events() methods;\n     Lexemes pauses can be now be named events, and\n     as named events can be deactivated and reactivated\n\n",
+          "style" => "*",
+          "text" => "Added SLIF expected_terminals(), events() methods; Lexemes pauses can be now be named events, and as named events can be deactivated and reactivated"
+        }
+      ],
+      "line" => 78,
+      "raw" => "2.062000 Tue Jul  2 08:23:53 PDT 2013\n\n",
+      "raw_date" => "Tue Jul  2 08:23:53 PDT 2013",
+      "version" => "2.062000"
+    },
+    {
+      "date" => "2013-06-22T17:56:20Z",
+      "entries" => [
+        {
+          "line" => 86,
+          "raw" => "   * Fix bug in SLIF lexing\n\n",
+          "style" => "*",
+          "text" => "Fix bug in SLIF lexing"
+        }
+      ],
+      "line" => 84,
+      "raw" => "2.060000 Sat Jun 22 17:56:20 PDT 2013\n\n",
+      "raw_date" => "Sat Jun 22 17:56:20 PDT 2013",
+      "version" => "2.060000"
+    },
+    {
+      "date" => "2013-06-11T18:31:57Z",
+      "entries" => [
+        {
+          "line" => 90,
+          "raw" => "   * Added nulled and predicted events;\n\n",
+          "style" => "*",
+          "text" => "Added nulled and predicted events;"
+        },
+        {
+          "line" => 92,
+          "raw" => "   * Added event deactivation and reactivation.\n\n",
+          "style" => "*",
+          "text" => "Added event deactivation and reactivation."
+        }
+      ],
+      "line" => 88,
+      "raw" => "2.058000 Tue Jun 11 18:31:57 PDT 2013\n\n",
+      "raw_date" => "Tue Jun 11 18:31:57 PDT 2013",
+      "version" => "2.058000"
+    },
+    {
+      "date" => "2013-05-22T17:38:03Z",
+      "entries" => [
+        {
+          "line" => 96,
+          "raw" => "   * Rearrange POD to make SLIF primary interface\n\n",
+          "style" => "*",
+          "text" => "Rearrange POD to make SLIF primary interface"
+        },
+        {
+          "line" => 98,
+          "raw" => "   * Added accessors to Scanless::R\n\n",
+          "style" => "*",
+          "text" => "Added accessors to Scanless::R"
+        },
+        {
+          "line" => 100,
+          "raw" => "   * Fix bug found by Jean-Damien: combining\n     ambiguity and SLIF external scanning caused\n     segment violation.\n     \n",
+          "style" => "*",
+          "text" => "Fix bug found by Jean-Damien: combining ambiguity and SLIF external scanning caused segment violation."
+        }
+      ],
+      "line" => 94,
+      "raw" => "2.056000 Wed May 22 17:38:03 PDT 2013\n\n",
+      "raw_date" => "Wed May 22 17:38:03 PDT 2013",
+      "version" => "2.056000"
+    },
+    {
+      "date" => "2013-05-15T12:54:00Z",
+      "entries" => [
+        {
+          "line" => 106,
+          "raw" => "   * Added completion events\n\n",
+          "style" => "*",
+          "text" => "Added completion events"
+        }
+      ],
+      "line" => 104,
+      "raw" => "2.054000 Wed May 15 12:54:00 PDT 2013\n\n",
+      "raw_date" => "Wed May 15 12:54:00 PDT 2013",
+      "version" => "2.054000"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 110,
+          "raw" => "    * Add rank adverb, external scanning to SLIF\n\n",
+          "style" => "*",
+          "text" => "Add rank adverb, external scanning to SLIF"
+        }
+      ],
+      "line" => 108,
+      "raw" => "2.052000\n\n",
+      "version" => "2.052000"
+    },
+    {
+      "date" => "2013-03-18T08:59:04Z",
+      "entries" => [
+        {
+          "line" => 114,
+          "raw" => "     * Optimizations\n\n",
+          "style" => "*",
+          "text" => "Optimizations"
+        }
+      ],
+      "line" => 112,
+      "raw" => "2.050000 Mon Mar 18 08:59:04 PDT 2013\n \n",
+      "raw_date" => "Mon Mar 18 08:59:04 PDT 2013",
+      "version" => "2.050000"
+    },
+    {
+      "date" => "2013-03-10T17:59:11Z",
+      "entries" => [
+        {
+          "line" => 118,
+          "raw" => "     * New options (blessed arrays) allow direct generation\n       of AST's from SLIF\n\n",
+          "style" => "*",
+          "text" => "New options (blessed arrays) allow direct generation of AST's from SLIF"
+        },
+        {
+          "line" => 121,
+          "raw" => "     * Optimization of valuator and SLIF\n\n",
+          "style" => "*",
+          "text" => "Optimization of valuator and SLIF"
+        }
+      ],
+      "line" => 116,
+      "raw" => "2.048000 Sun Mar 10 17:59:11 PDT 2013\n\n",
+      "raw_date" => "Sun Mar 10 17:59:11 PDT 2013",
+      "version" => "2.048000"
+    },
+    {
+      "date" => "2013-02-06T08:24:05Z",
+      "entries" => [
+        {
+          "line" => 125,
+          "raw" => "     * Core logic of Scanless recognizer converted to C --\n       it is now more than 10 times faster.\n\n",
+          "style" => "*",
+          "text" => "Core logic of Scanless recognizer converted to C -- it is now more than 10 times faster."
+        }
+      ],
+      "line" => 123,
+      "raw" => "2.046000 Wed Feb  6 08:24:05 PST 2013\n\n",
+      "raw_date" => "Wed Feb  6 08:24:05 PST 2013",
+      "version" => "2.046000"
+    },
+    {
+      "date" => "2013-01-28T19:42:06Z",
+      "entries" => [
+        {
+          "line" => 130,
+          "raw" => "      * Fix 64-bit Windows failures.\n\n",
+          "style" => "*",
+          "text" => "Fix 64-bit Windows failures."
+        }
+      ],
+      "line" => 128,
+      "raw" => "2.044000 Mon Jan 28 19:42:06 PST 2013\n\n",
+      "raw_date" => "Mon Jan 28 19:42:06 PST 2013",
+      "version" => "2.044000"
+    },
+    {
+      "date" => "2013-01-22T17:15:50Z",
+      "entries" => [
+        {
+          "line" => 134,
+          "raw" => "      * Scanless interface now supports Unicode.\n\n",
+          "style" => "*",
+          "text" => "Scanless interface now supports Unicode."
+        }
+      ],
+      "line" => 132,
+      "raw" => "2.042000 Tue Jan 22 17:15:50 PST 2013\n\n",
+      "raw_date" => "Tue Jan 22 17:15:50 PST 2013",
+      "version" => "2.042000"
+    },
+    {
+      "date" => "2013-01-05T08:33:52Z",
+      "entries" => [
+        {
+          "line" => 138,
+          "raw" => "     * Fixed two cases in the Scanless interface.  In\n       one case, parse exhaustion at the G1 level was\n       treated as an error.  In the other, the G0 level\n       assumed there would be at least one :discard rule,\n       and had problems if there were none.\n\n",
+          "style" => "*",
+          "text" => "Fixed two cases in the Scanless interface.  In one case, parse exhaustion at the G1 level was treated as an error.  In the other, the G0 level assumed there would be at least one :discard rule, and had problems if there were none."
+        }
+      ],
+      "line" => 136,
+      "raw" => "2.040000 Sat Jan  5 08:33:52 PST 2013\n\n",
+      "raw_date" => "Sat Jan  5 08:33:52 PST 2013",
+      "version" => "2.040000"
+    },
+    {
+      "date" => "2013-01-02T09:14:38Z",
+      "entries" => [
+        {
+          "line" => 146,
+          "raw" => "     * The Scanless G0 rule order depended\n       indirectly on the order of\n       keys in a Perl hash.  Fixed that.\n\n",
+          "style" => "*",
+          "text" => "The Scanless G0 rule order depended indirectly on the order of keys in a Perl hash.  Fixed that."
+        }
+      ],
+      "line" => 144,
+      "raw" => "2.038000 Wed Jan  2 09:14:38 PST 2013\n\n",
+      "raw_date" => "Wed Jan  2 09:14:38 PST 2013",
+      "version" => "2.038000"
+    },
+    {
+      "date" => "2013-01-01T00:54:36Z",
+      "entries" => [
+        {
+          "line" => 152,
+          "raw" => "     * Documentation for the Stuifzand (BNF) and\n       Scanless interfaces is complete.  They are\n       now in full release.\n\n",
+          "style" => "*",
+          "text" => "Documentation for the Stuifzand (BNF) and Scanless interfaces is complete.  They are now in full release."
+        }
+      ],
+      "line" => 150,
+      "raw" => "2.036000 Tue Jan  1 00:54:36 PST 2013\n \n",
+      "raw_date" => "Tue Jan  1 00:54:36 PST 2013",
+      "version" => "2.036000"
+    },
+    {
+      "date" => "2012-12-26T08:44:16Z",
+      "entries" => [
+        {
+          "line" => 158,
+          "raw" => "     * Fix problem with negative rule ranks.\n\n",
+          "style" => "*",
+          "text" => "Fix problem with negative rule ranks."
+        },
+        {
+          "line" => 160,
+          "raw" => "     * Stuifzand and Scanless interfaces are complete\n       and tested.  Only lack of documentation prevented\n       them from being taken out of beta.\n\n",
+          "style" => "*",
+          "text" => "Stuifzand and Scanless interfaces are complete and tested.  Only lack of documentation prevented them from being taken out of beta."
+        }
+      ],
+      "line" => 156,
+      "raw" => "2.034000 Wed Dec 26 08:44:16 PST 2012\n\n",
+      "raw_date" => "Wed Dec 26 08:44:16 PST 2012",
+      "version" => "2.034000"
+    },
+    {
+      "date" => "2012-12-09T10:19:50Z",
+      "entries" => [
+        {
+          "line" => 166,
+          "raw" => "      * Speed up precomputation of large grammars.\n\n",
+          "style" => "*",
+          "text" => "Speed up precomputation of large grammars."
+        }
+      ],
+      "line" => 164,
+      "raw" => "2.032000 Sun Dec  9 10:19:50 PST 2012\n\n",
+      "raw_date" => "Sun Dec  9 10:19:50 PST 2012",
+      "version" => "2.032000"
+    },
+    {
+      "date" => "2012-12-04T18:01:55Z",
+      "entries" => [
+        {
+          "line" => 170,
+          "raw" => "      * Use Config::AutoConf to install on Sun's,\n        OpenBSD.\n",
+          "style" => "*",
+          "text" => "Use Config::AutoConf to install on Sun's, OpenBSD."
+        },
+        {
+          "line" => 172,
+          "raw" => "      * Use legacy File::Path::mkpath() for portability\n\n",
+          "style" => "*",
+          "text" => "Use legacy File::Path::mkpath() for portability"
+        }
+      ],
+      "line" => 168,
+      "raw" => "2.030000 Tue Dec  4 18:01:55 PST 2012\n\n",
+      "raw_date" => "Tue Dec  4 18:01:55 PST 2012",
+      "version" => "2.030000"
+    },
+    {
+      "date" => "2012-11-23T08:04:02Z",
+      "entries" => [
+        {
+          "line" => 176,
+          "raw" => "      * Now installs in  Windows,\n        using Config::AutoConf\n\n",
+          "style" => "*",
+          "text" => "Now installs in  Windows, using Config::AutoConf"
+        }
+      ],
+      "line" => 174,
+      "raw" => "2.026000 Fri Nov 23 08:04:02 PST 2012\n\n",
+      "raw_date" => "Fri Nov 23 08:04:02 PST 2012",
+      "version" => "2.026000"
+    },
+    {
+      "date" => "2012-11-08T08:19:21Z",
+      "entries" => [
+        {
+          "line" => 181,
+          "raw" => "      * Changing Marpa::R2, Libmarpa and\n        Marpa::R2::Thin to full release.\n\n",
+          "style" => "*",
+          "text" => "Changing Marpa::R2, Libmarpa and Marpa::R2::Thin to full release."
+        }
+      ],
+      "line" => 179,
+      "raw" => "2.024000 Thu Nov  8 08:19:21 PST 2012\n\n",
+      "raw_date" => "Thu Nov  8 08:19:21 PST 2012",
+      "version" => "2.024000"
+    },
+    {
+      "date" => "2012-10-19T18:27:16Z",
+      "entries" => [
+        {
+          "line" => 186,
+          "raw" => "      * Extensive revisions to internals of\n        Marpa::R2::HTML; now requires only\n        HTML::Parser, not HTML::PullParser;\n        'pseudoclass' argspec of descendants()\n        method removed from documentation.\n\n",
+          "style" => "*",
+          "text" => "Extensive revisions to internals of Marpa::R2::HTML; now requires only HTML::Parser, not HTML::PullParser; 'pseudoclass' argspec of descendants() method removed from documentation."
+        },
+        {
+          "line" => 192,
+          "raw" => "      * Make HTML::Parser a required\n        dependency.\n\n",
+          "style" => "*",
+          "text" => "Make HTML::Parser a required dependency."
+        }
+      ],
+      "line" => 184,
+      "raw" => "2.022000 Fri Oct 19 18:27:16 PDT 2012\n\n",
+      "raw_date" => "Fri Oct 19 18:27:16 PDT 2012",
+      "version" => "2.022000"
+    },
+    {
+      "date" => "2012-09-12T20:44:46Z",
+      "entries" => [
+        {
+          "line" => 197,
+          "raw" => "      * Make Marpa::R2::HTML a fully visible part\n        of the distribution.\n\n",
+          "style" => "*",
+          "text" => "Make Marpa::R2::HTML a fully visible part of the distribution."
+        },
+        {
+          "line" => 200,
+          "raw" => "      * Documentation changes and fixes\n\n",
+          "style" => "*",
+          "text" => "Documentation changes and fixes"
+        }
+      ],
+      "line" => 195,
+      "raw" => "2.020000 Wed Sep 12 20:44:46 PDT 2012\n\n",
+      "raw_date" => "Wed Sep 12 20:44:46 PDT 2012",
+      "version" => "2.020000"
+    },
+    {
+      "date" => "2012-08-22T20:46:44Z",
+      "entries" => [
+        {
+          "line" => 204,
+          "raw" => "      * Libmarpa docs now shipped with Marpa::R2\n\n",
+          "style" => "*",
+          "text" => "Libmarpa docs now shipped with Marpa::R2"
+        },
+        {
+          "line" => 206,
+          "raw" => "      * Changed Marpa::R2 to beta.  Libmarpa and\n        Marpa::R2::Thin remain alpha.\n\n",
+          "style" => "*",
+          "text" => "Changed Marpa::R2 to beta.  Libmarpa and Marpa::R2::Thin remain alpha."
+        }
+      ],
+      "line" => 202,
+      "raw" => "2.018000 Wed Aug 22 20:46:44 PDT 2012\n\n",
+      "raw_date" => "Wed Aug 22 20:46:44 PDT 2012",
+      "version" => "2.018000"
+    },
+    {
+      "date" => "2012-08-05T17:20:13Z",
+      "entries" => [
+        {
+          "line" => 211,
+          "raw" => "      * Documentation fixes\n\n",
+          "style" => "*",
+          "text" => "Documentation fixes"
+        },
+        {
+          "line" => 213,
+          "raw" => "      * Added marpa_r_expected_symbol_event_set() to Libmarpa\n\n",
+          "style" => "*",
+          "text" => "Added marpa_r_expected_symbol_event_set() to Libmarpa"
+        },
+        {
+          "line" => 215,
+          "raw" => "      * Added Marpa::R2::Recognizer::expected_symbol_event_set(),\n        Marpa::R2::Recognizer::events(), and 'event_if_expected'\n        recognizer named argument to Marpa::R2\n\n",
+          "style" => "*",
+          "text" => "Added Marpa::R2::Recognizer::expected_symbol_event_set(), Marpa::R2::Recognizer::events(), and 'event_if_expected' recognizer named argument to Marpa::R2"
+        }
+      ],
+      "line" => 209,
+      "raw" => "2.016000 Sun Aug  5 17:20:13 PDT 2012\n\n",
+      "raw_date" => "Sun Aug  5 17:20:13 PDT 2012",
+      "version" => "2.016000"
+    },
+    {
+      "date" => "2012-07-21T18:18:52Z",
+      "entries" => [
+        {
+          "line" => 221,
+          "raw" => "      * Added \$v->location() to thin interface\n\n",
+          "style" => "*",
+          "text" => "Added \$v->location() to thin interface"
+        },
+        {
+          "line" => 223,
+          "raw" => "      * Added location step accessors to Libmarpa\n\n",
+          "style" => "*",
+          "text" => "Added location step accessors to Libmarpa"
+        }
+      ],
+      "line" => 219,
+      "raw" => "2.014000 Sat Jul 21 18:18:52 PDT 2012\n\n",
+      "raw_date" => "Sat Jul 21 18:18:52 PDT 2012",
+      "version" => "2.014000"
+    },
+    {
+      "date" => "2012-07-15T17:43:59Z",
+      "entries" => [
+        {
+          "line" => 227,
+          "raw" => "      * Added marpa_o_rank() to Libmarpa interface\n\n",
+          "style" => "*",
+          "text" => "Added marpa_o_rank() to Libmarpa interface"
+        },
+        {
+          "line" => 229,
+          "raw" => "      * Added \"if\" arg to Marpa::R2::Thin::G->new()\n\n",
+          "style" => "*",
+          "text" => "Added \"if\" arg to Marpa::R2::Thin::G->new()"
+        }
+      ],
+      "line" => 225,
+      "raw" => "2.012000 Sun Jul 15 17:43:59 PDT 2012\n\n",
+      "raw_date" => "Sun Jul 15 17:43:59 PDT 2012",
+      "version" => "2.012000"
+    },
+    {
+      "date" => "2012-07-05T20:44:07Z",
+      "entries" => [
+        {
+          "line" => 233,
+          "raw" => "      * Documented Libmarpa API and Marpa::R2::Thin.\n\n",
+          "style" => "*",
+          "text" => "Documented Libmarpa API and Marpa::R2::Thin."
+        },
+        {
+          "line" => 235,
+          "raw" => "      * Added context variables\n\n",
+          "style" => "*",
+          "text" => "Added context variables"
+        }
+      ],
+      "line" => 231,
+      "raw" => "2.010000 Thu Jul  5 20:44:07 PDT 2012\n\n",
+      "raw_date" => "Thu Jul  5 20:44:07 PDT 2012",
+      "version" => "2.010000"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 239,
+          "raw" => "       * Documented \$recce->progress()\n\n",
+          "style" => "*",
+          "text" => "Documented \$recce->progress()"
+        },
+        {
+          "line" => 241,
+          "raw" => "       * Clean up libmarpa build\n\n",
+          "style" => "*",
+          "text" => "Clean up libmarpa build"
+        }
+      ],
+      "line" => 237,
+      "note" => "14-Jun-2012 10:42",
+      "raw" => "2.008000 14-Jun-2012 10:42\n\n",
+      "version" => "2.008000"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 245,
+          "raw" => "        * Convert progress reports to C\n\n",
+          "style" => "*",
+          "text" => "Convert progress reports to C"
+        },
+        {
+          "line" => 247,
+          "raw" => "        * Cleanup logic of valued/unvalued symbols\n\n",
+          "style" => "*",
+          "text" => "Cleanup logic of valued/unvalued symbols"
+        },
+        {
+          "line" => 249,
+          "raw" => "        * Cleanup ranking of symbols/rules\n\n",
+          "style" => "*",
+          "text" => "Cleanup ranking of symbols/rules"
+        },
+        {
+          "line" => 251,
+          "raw" => "        * LHS of rule no longer implicitly used\n          as action name.\n\n",
+          "style" => "*",
+          "text" => "LHS of rule no longer implicitly used as action name."
+        }
+      ],
+      "line" => 243,
+      "note" => "8-Jun-2012 08:18",
+      "raw" => "2.006000 8-Jun-2012 08:18\n\n",
+      "version" => "2.006000"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 256,
+          "raw" => "        * Fix action resolution issue; cleanup\n          memory allocation.\n\n",
+          "style" => "*",
+          "text" => "Fix action resolution issue; cleanup memory allocation."
+        },
+        {
+          "line" => 259,
+          "raw" => "        * Large bump in version number is to sync\n          version numbers with libmarpa.\n\n",
+          "style" => "*",
+          "text" => "Large bump in version number is to sync version numbers with libmarpa."
+        }
+      ],
+      "line" => 254,
+      "note" => "01-Jun-2012 08:20",
+      "raw" => "2.004000 01-Jun-2012 08:20\n\n",
+      "version" => "2.004000"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 264,
+          "raw" => "       * First official (\"indexed\") release\n\n",
+          "style" => "*",
+          "text" => "First official (\"indexed\") release"
+        },
+        {
+          "line" => 266,
+          "raw" => "       * Changes incompatible with Marpa::XS are described\n         in Marpa::R2::Changes POD doc\n\n",
+          "style" => "*",
+          "text" => "Changes incompatible with Marpa::XS are described in Marpa::R2::Changes POD doc"
+        }
+      ],
+      "line" => 262,
+      "note" => "26-May-2012 08:56",
+      "raw" => "0.002000 26-May-2012 08:56\n\n",
+      "version" => "0.002000"
+    },
+    {
+      "date" => "2011-10-21T20:57:44Z",
+      "entries" => [
+        {
+          "line" => 271,
+          "raw" => "        * Marpa::R2 forked from Marpa::XS 0.019_002\n\n",
+          "style" => "*",
+          "text" => "Marpa::R2 forked from Marpa::XS 0.019_002"
+        },
+        {
+          "line" => 273,
+          "raw" => "# vim: set expandtab shiftwidth=4:\n",
+          "style" => "#",
+          "text" => "vim: set expandtab shiftwidth=4:"
+        }
+      ],
+      "line" => 269,
+      "raw" => "0.001_000 Fri Oct 21 20:57:44 PDT 2011\n\n",
+      "raw_date" => "Fri Oct 21 20:57:44 PDT 2011",
+      "version" => "0.001_000"
+    }
+  ]
+}

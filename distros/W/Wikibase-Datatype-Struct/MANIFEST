@@ -80,6 +80,7 @@ Struct/Utils.pm
 Struct/Value.pm
 Struct/Value/Globecoordinate.pm
 Struct/Value/Item.pm
+Struct/Value/Lexeme.pm
 Struct/Value/Monolingual.pm
 Struct/Value/Property.pm
 Struct/Value/Quantity.pm
@@ -148,6 +149,10 @@ t/Wikibase-Datatype-Struct-Value-Item/01-use.t
 t/Wikibase-Datatype-Struct-Value-Item/02-version.t
 t/Wikibase-Datatype-Struct-Value-Item/03-obj2struct.t
 t/Wikibase-Datatype-Struct-Value-Item/04-struct2obj.t
+t/Wikibase-Datatype-Struct-Value-Lexeme/01-use.t
+t/Wikibase-Datatype-Struct-Value-Lexeme/02-version.t
+t/Wikibase-Datatype-Struct-Value-Lexeme/03-obj2struct.t
+t/Wikibase-Datatype-Struct-Value-Lexeme/04-struct2obj.t
 t/Wikibase-Datatype-Struct-Value-Monolingual/01-use.t
 t/Wikibase-Datatype-Struct-Value-Monolingual/02-version.t
 t/Wikibase-Datatype-Struct-Value-Monolingual/03-obj2struct.t
@@ -210,6 +215,8 @@ xt/Wikibase-Datatype-Struct-Value-Globecoordinate/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Value-Globecoordinate/02-pod.t
 xt/Wikibase-Datatype-Struct-Value-Item/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Value-Item/02-pod.t
+xt/Wikibase-Datatype-Struct-Value-Lexeme/01-pod_coverage.t
+xt/Wikibase-Datatype-Struct-Value-Lexeme/02-pod.t
 xt/Wikibase-Datatype-Struct-Value-Monolingual/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Value-Monolingual/02-pod.t
 xt/Wikibase-Datatype-Struct-Value-Property/01-pod_coverage.t

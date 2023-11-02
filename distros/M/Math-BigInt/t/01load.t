@@ -3,15 +3,17 @@
 use strict;             # restrict unsafe constructs
 use warnings;           # enable optional warnings
 
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 BEGIN {
     use_ok('Math::BigInt');
     use_ok('Math::BigFloat');
+    use_ok('Math::BigRat');
 };
 
 my @mods = ('Math::BigInt',
             'Math::BigFloat',
+            'Math::BigRat',
             'Math::BigInt::Lib',
             'Math::BigInt::Calc',
             );

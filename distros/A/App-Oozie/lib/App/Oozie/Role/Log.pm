@@ -1,8 +1,11 @@
 package App::Oozie::Role::Log;
-$App::Oozie::Role::Log::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Util::Log4perl;
@@ -41,7 +44,7 @@ App::Oozie::Role::Log
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

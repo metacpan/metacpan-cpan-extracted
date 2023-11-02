@@ -1,4 +1,4 @@
-# Copyrights 2007-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,11 +8,12 @@
 
 package Dancer2::Plugin::LogReport;
 use vars '$VERSION';
-$VERSION = '1.34';
+$VERSION = '1.36';
 
 
 use warnings;
 use strict;
+use version;
 
 BEGIN { use Log::Report () }  # require very early   XXX MO: useless?
 
@@ -31,14 +32,14 @@ my $_settings;
 sub import
 {   my $class = shift;
 
-     # Import Log::Report into the caller. Import options get passed through
-     my $level = $Dancer2::Plugin::VERSION > 0.166001 ? '+1' : '+2';
-     Log::Report->import($level, @_, syntax => 'LONG');
+    # Import Log::Report into the caller. Import options get passed through
+    my $level = version->parse($Dancer2::Plugin::VERSION) > 0.166001 ? '+1' : '+2';
+    Log::Report->import($level, @_, syntax => 'LONG');
  
-     # Ensure the overridden import method is called (from Exporter::Tiny)
-     # note this does not (currently) pass options through.
-     my $caller = caller;
-     $class->SUPER::import( {into => $caller} );
+    # Ensure the overridden import method is called (from Exporter::Tiny)
+    # note this does not (currently) pass options through.
+    my $caller = caller;
+    $class->SUPER::import( {into => $caller} );
 }
 
 my %session_messages;
@@ -141,6 +142,7 @@ on_plugin_import
 
 sub process($$)
 {   my ($dsl, $coderef) = @_;
+    ref $coderef eq 'CODE' or report PANIC => "plugin process() requires a CODE";
     try { $coderef->() } hide => 'ALL', on_die => 'PANIC';
 	my $e = $@;  # fragile
     $e->reportAll(is_fatal => 0);

@@ -128,7 +128,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.162';
+our $VERSION = '0.163';
 our @EXPORT_OK = qw{
     shell
 
@@ -154,6 +154,7 @@ use HTTP::Request;
 use HTTP::Response;
 use HTTP::Status qw{
     HTTP_PAYMENT_REQUIRED
+    HTTP_BAD_REQUEST
     HTTP_NOT_FOUND
     HTTP_I_AM_A_TEAPOT
     HTTP_INTERNAL_SERVER_ERROR
@@ -1525,12 +1526,29 @@ sub _celestrak_repack_iridium {
 
     sub _celestrak_response_check {
 	my ($self, $resp, $source, $name, @args) = @_;
-	unless ($resp->is_success) {
+
+	$DB::single = 1;
+	# As of 2023-10-17, celestrak( 'fubar' ) gives 200 OK, with
+	# content
+	# Invalid query: "GROUP=fubar&FORMAT=TLE" (GROUP=fubar not found)
+
+	unless ( $resp->is_success() ) {
 	    $resp->code == HTTP_NOT_FOUND
 		and return $self->_no_such_catalog(
 		$source => $name, @args);
 	    return $resp;
 	}
+
+	my $content = $resp->decoded_content();
+
+	if ( $content =~ m/ \A Invalid \s+ query: /smx ) {
+	    $content =~ m/ \b GROUP=\Q$name\E \s not \s found \b /smx
+		and return $self->_no_such_catalog(
+		$source => $name, @args);
+	    $resp->code( HTTP_BAD_REQUEST );
+	    return $resp;
+	}
+
 	if (my $loc = $resp->header('Content-Location')) {
 	    if ($loc =~ m/ redirect [.] htm [?] ( \d{3} ) ; /smx) {
 		my $msg = "redirected $1";
@@ -1660,7 +1678,7 @@ If the response object B<is> provided, you can call this as a static
 method (i.e. as Astro::SpaceTrack->content_type($response)).
 
 For the format of the magnitude data, see
-L<https://www.prismnet.com/~mmccants/tles/index.html>.
+L<https://www.mmccants.org//tles/index.html>.
 
 =cut
 
@@ -5077,11 +5095,11 @@ sub _check_cookie_generic {
     my %deprecate = (
 	celestrak => {
 #	    sts	=> 3,
-	    '--descending'	=> 1,
-	    '--end_epoch'	=> 1,
-	    '--last5'		=> 1,
-	    '--sort'		=> 1,
-	    '--start_epoch'	=> 1,
+	    '--descending'	=> 2,
+	    '--end_epoch'	=> 2,
+	    '--last5'		=> 2,
+	    '--sort'		=> 2,
+	    '--start_epoch'	=> 2,
 	},
 	attribute	=> {
 	    url_iridium_status_mccants	=> 3,

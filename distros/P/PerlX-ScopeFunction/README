@@ -111,10 +111,30 @@ Importable keywords / methods / symbols.
             ...
         }
 
+ $do
+
+    $do is a method that can be used as a call on any objects. It takes a
+    CodeRef, evaluates the CodeRef on the context of the object being
+    called on, and returns the result.
+
+    Syntax-wise, $do is used like this:
+
+        EXPR -> $do(sub BLOCK)
+
+    For example, the following code would take an object and compute a sha1
+    digest:
+
+        my $digest = $o->$do(sub {
+            sha1($_->header->title . $_->body->content)
+        });
+
+    Inside the CodeRef BLOCK, both $_ and $_[0] are an alias to the object
+    being called on.
+
  $tap, and $also
 
-    $tap is a scalar with CodeRef inside that can be inserted of into a
-    chain of method calls, do some side actions, then resume.
+    $tap is a method that takes a CodeRef can be inserted of into a chain
+    of method calls, do some side actions, then resume.
 
     $also is an alternative name of $tap. They are completely identical.
     Import and use which ever that is more comprehensible to you.

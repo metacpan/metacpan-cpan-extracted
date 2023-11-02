@@ -1,7 +1,7 @@
 package PerlX::ScopeFunction;
 use v5.36;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Package::Stash;
 use Const::Fast qw( const );
@@ -10,6 +10,7 @@ use PPR;
 
 our %STASH = ();
 
+const our $do => \&__do;
 const our $also => \&__also;
 const our $tap => \&__also;
 
@@ -58,6 +59,10 @@ sub import ($class, @args) {
             sub { __import_scalar_symbol(\\&__also, $_[0], $_[1]) },
             sub { __unimport_scalar_symbol($_[0], $_[1]) },
         ],
+        '$do' => [
+            sub { __import_scalar_symbol(\\&__do, $_[0], $_[1]) },
+            sub { __unimport_scalar_symbol($_[0], $_[1]) },
+        ],
     );
 
     my %import_as = do {
@@ -83,8 +88,15 @@ sub unimport ($class) {
     }
 }
 
+sub __do {
+    my ($self, $code) = @_;
+    local $_ = $self;
+    return $self->$code();
+}
+
 sub __also {
     my ($self, $code) = @_;
+    local $_ = $self;
     $self->$code();
     return $self;
 }
@@ -323,9 +335,29 @@ Array and Hash can also be created:
         ...
     }
 
+=head2 C<$do>
+
+C<$do> is a method that can be used as a call on any objects. It takes
+a CodeRef, evaluates the CodeRef on the context of the object being
+called on, and returns the result.
+
+Syntax-wise, C<$do> is used like this:
+
+    EXPR -> $do(sub BLOCK)
+
+For example, the following code would take an object
+and compute a sha1 digest:
+
+    my $digest = $o->$do(sub {
+        sha1($_->header->title . $_->body->content)
+    });
+
+Inside the CodeRef BLOCK, both C<$_> and C<$_[0]> are an alias to the
+object being called on.
+
 =head2 C<$tap>, and C<$also>
 
-C<$tap> is a scalar with CodeRef inside that can be inserted of into a
+C<$tap> is a method that takes a CodeRef can be inserted of into a
 chain of method calls, do some side actions, then resume.
 
 C<$also> is an alternative name of C<$tap>. They are completely

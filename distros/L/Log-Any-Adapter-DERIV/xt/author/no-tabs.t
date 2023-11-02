@@ -14,6 +14,7 @@ my @files = (
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
+    't/01-log_context.t',
     't/02-collapse_future_stack.t',
     't/05-filter_stack.t',
     't/10-misc.t',

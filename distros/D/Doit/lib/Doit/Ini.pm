@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2022 Slaven Rezic. All rights reserved.
+# Copyright (C) 2022,2023 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,7 +15,7 @@ package Doit::Ini;
 
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use File::Temp ();
 
@@ -25,7 +25,7 @@ my @try_implementations = qw(Config::IOD::INI Config::IniFiles Config::IniMan);
 my %allowed_implementation = map { ($_,1) } @try_implementations;
 
 sub new { bless {}, shift }
-sub functions { qw(ini_change ini_set_implementation ini_adapter_class) }
+sub functions { qw(ini_change ini_info_as_HoH ini_set_implementation ini_adapter_class) }
 
 sub ini_set_implementation {
     my(undef, @new_implementations) = @_;
@@ -38,12 +38,19 @@ sub ini_set_implementation {
 }
 
 sub ini_adapter_class {
-    my(undef) = @_;
+    my(undef, %opts) = @_;
+    my $fail = delete $opts{fail} || 0;
+    die 'Unhandled options: ' . join(' ', %opts) if %opts;
+
     for my $impl (@try_implementations) {
 	my $adapter_class = "Doit::Ini::$impl";
 	if ($adapter_class->available) {
 	    return $adapter_class;
 	}
+    }
+
+    if ($fail) {
+	error "No usable ini implementation found, tried: @try_implementations";
     }
     undef;
 }
@@ -70,16 +77,21 @@ sub ini_change {
 	};
     }
 
-    my $use_adapter_class = $doit->ini_adapter_class;
-    if (!$use_adapter_class) {
-	error "No usable ini implementation found, tried: @try_implementations";
-    }
-
+    my $use_adapter_class = $doit->ini_adapter_class(fail => 1);
     my $o = $use_adapter_class->new;
     $o->read_file($filename);
     $code->($o, @changes);
     my $new_ini = $o->dump_ini;
     return $doit->write_binary($filename, $new_ini);
+}
+
+sub ini_info_as_HoH {
+    my($doit, $filename) = @_;
+
+    my $use_adapter_class = $doit->ini_adapter_class(fail => 1);
+    my $o = $use_adapter_class->new;
+    $o->read_file($filename);
+    $o->as_HoH;
 }
 
 {
@@ -106,6 +118,10 @@ sub ini_change {
 	my($self) = @_;
 	$self->confobj->as_string;
     }
+    sub as_HoH {
+	my($self) = @_;
+	$self->confobj->dump;
+    }
 }
 
 {
@@ -116,7 +132,7 @@ sub ini_change {
     sub new { bless { }, shift }
     sub read_file {
 	my($self, $filename) = @_;
-	$self->{c} = $self->{o} = Config::IniFiles->new(-file => $filename);
+	$self->{c} = $self->{o} = Config::IniFiles->new(-file => $filename, -fallback => 'GLOBAL');
 	$self->{o}->ReadConfig(-file => $filename);
     }
     sub set_value {
@@ -130,6 +146,17 @@ sub ini_change {
 	binmode $fh;
 	$self->{o}->WriteConfig($fh);
 	$ini;
+    }
+    sub as_HoH {
+	my($self) = @_;
+	my $o = $self->{o};
+	my %ret;
+	for my $section ($o->Sections) {
+	    for my $parameter ($o->Parameters($section)) {
+		$ret{$section}{$parameter} = $o->val($section, $parameter);
+	    }
+	}
+	\%ret;
     }
 }
 

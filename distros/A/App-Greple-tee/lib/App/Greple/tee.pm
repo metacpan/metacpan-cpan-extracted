@@ -40,6 +40,10 @@ matched part.  You can tell the difference by following commands.
 Lines of input and output data do not have to be identical when used
 with B<--discrete> option.
 
+=head1 VERSION
+
+Version 0.9901
+
 =head1 OPTIONS
 
 =over 7
@@ -54,6 +58,26 @@ Combine a sequence of non-blank lines into a single line before
 passing them to the filter command.  Newline characters between wide
 characters are deleted, and other newline characters are replaced with
 spaces.
+
+=item B<--blockmatch>
+
+Normally, the area matching the specified search pattern is sent to the 
+external command. If this option is specified, not the matched area but 
+the entire block containing it will be processed.
+
+For example, to send lines containing the pattern C<foo> to the
+external command, you need to specify the pattern which matches to
+entire line:
+
+    greple -Mtee cat -n -- '^.*foo.*\n'
+
+But with the B<--blockmatch> option, it can be done as simply as
+follows:
+
+    greple -Mtee cat -n -- foo
+
+With B<--blockmatch> option, this module behave more like L<teip(1)>'s
+B<-g> option.
 
 =back
 
@@ -178,7 +202,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "0.99";
+our $VERSION = "0.9901";
 
 use v5.14;
 use warnings;
@@ -197,22 +221,12 @@ my($mod, $argv);
 
 sub initialize {
     ($mod, $argv) = @_;
-    if (defined (my $i = first { $argv->[$_] eq '--' } 0 .. $#{$argv})) {
+    if (defined (my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
 	if (my @command = splice @$argv, 0, $i) {
 	    $command = \@command;
 	}
 	shift @$argv;
     }
-}
-
-sub call {
-    my $data = shift;
-    $command // return $data;
-    state $exec = App::cdif::Command->new;
-    if (ref $command ne 'ARRAY') {
-	$command = [ shellwords $command ];
-    }
-    $exec->command($command)->setstdin($data)->update->data // '';
 }
 
 use Unicode::EastAsianWidth;
@@ -224,16 +238,22 @@ sub fillup_paragraph {
     $s1 . $_ . $s2;
 }
 
-sub jammed_call {
-    my @need_nl = grep { $_[$_] !~ /\n\z/ } 0 .. $#_;
-    my @from = @_;
+sub call {
+    my $data = shift;
+    $command // return $data;
+    state $exec = App::cdif::Command->new;
     if ($fillup) {
-	for (@from) {
-	    s{^.+(?:\n.+)*}{
-		fillup_paragraph ${^MATCH}
-	    }pmge;
-	}
+	$data =~ s/^.+(?:\n.+)*/fillup_paragraph(${^MATCH})/pmge;
     }
+    if (ref $command ne 'ARRAY') {
+	$command = [ shellwords $command ];
+    }
+    $exec->command($command)->setstdin($data)->update->data // '';
+}
+
+sub jammed_call {
+    my @need_nl = grep { $_[$_] !~ /\n\z/ } keys @_;
+    my @from = @_;
     $from[$_] .= "\n" for @need_nl;
     my @lines = map { int tr/\n/\n/ } @from;
     my $from = join '', @from;

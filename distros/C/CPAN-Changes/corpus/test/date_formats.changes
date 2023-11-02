@@ -1,0 +1,21 @@
+Various date formats
+
+0.01 Mon Jul 20 12:26:55 2015 WANT:2015-07-20T12:26:55Z
+  - a change
+
+0.02 Jul Mon 20 12:26:55 EST 2015 WANT:2015-07-20T12:26:55Z
+  - a change
+
+0.03 Mon, 20 Jul 2015 12:26:55 +0600 WANT:2015-07-20T12:26:55+06:00
+  - a change
+
+0.04 2015-07-20 12:26:55 America/New_York WANT:2015-07-20T12:26:55Z
+  - a change
+
+0.05 2015-07-20T12:26:55.00-16:20:15 WANT:2015-07-20T12:26:55.00-16:20:15
+  - a change
+
+0.06 Development Release WANT:Development Release
+  - a change
+
+0.07 Not Parsable WANT:undef

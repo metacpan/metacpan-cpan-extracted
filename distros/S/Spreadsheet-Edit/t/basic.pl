@@ -11,7 +11,6 @@ use t_TestCommon  # Test2::V0 etc.
             arrays_eq hash_subset
             @quotes/;
 use t_SSUtils;
-use Capture::Tiny qw/capture_merged tee_merged/;
 
 use Spreadsheet::Edit qw/fmt_sheet cx2let let2cx sheet/;
 use Test::Deep::NoTest qw/eq_deeply/;
@@ -53,6 +52,9 @@ package Other {
 # continuing in package main ...
 
 use Spreadsheet::Edit ':all';
+
+# Use to not prefix rows with "(Spreadsheet::Edit::Magicrow)"
+my $myvisobj = visnew->Objects({objects => 1, show_overloaded_classname => 0});
 
 my ($testdata, $inpath) = create_testdata(
     name => "in1",
@@ -422,7 +424,7 @@ die dvis '$expected_rx' unless $expected_rx == 7;
 # Can't auto-detect because it would skip the title row due to the empty title
 title_rx 1;
 
-{ my $s=sheet(); dprint dvis('After reading $inpath->stringify\n   $$s->{rows}\n   $$s->{colx_desc}\n'); }
+{ my $s=sheet(); dprint $myvisobj->dvis('After reading $inpath->stringify\n   $$s->{rows}\n   $$s->{colx_desc}\n'); }
 
 
 alias Aalias => '^';

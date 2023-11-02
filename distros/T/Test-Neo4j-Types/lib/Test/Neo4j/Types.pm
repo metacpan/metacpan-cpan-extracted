@@ -4,7 +4,7 @@ use warnings;
 
 package Test::Neo4j::Types;
 # ABSTRACT: Tools for testing Neo4j type modules
-$Test::Neo4j::Types::VERSION = '0.03';
+$Test::Neo4j::Types::VERSION = '0.06';
 
 use Test::More 0.94;
 use Test::Exception;
@@ -18,14 +18,40 @@ BEGIN { our @EXPORT = qw(
 	neo4j_point_ok
 	neo4j_datetime_ok
 	neo4j_duration_ok
+	neo4j_bytearray_ok
 )}
 
 {
-	# This happens within new versions of Neo4j/Types.pm,
-	# but we can't be sure the version is new enough:
+	# This happens within Neo4j/Types.pm version 1.08 and newer,
+	# but we can't be sure the installed version is that new:
 	package # local
 	        Neo4j::Types;
 	use warnings::register;
+}
+
+
+sub _load_module_ok {
+	my ($name, $package) = @_;
+	
+	# We want the test to fail if the module hasn't been loaded, but the
+	# error message you get normally isn't very helpful. So this sub will
+	# check if the module is loaded and return true if that's the case.
+	# Otherwise, it will try to load the module. No eval means that if
+	# loading fails, users get the original error message. If loading
+	# succeeds, we fail the test anyway because the user is supposed to
+	# load the module (checking for this can detect bugs where the
+	# user expects their code to load the module, but it actually
+	# doesn't get loaded).
+	{
+		# Look for entries in the package's symbol table
+		no strict 'refs';
+		return 1 if keys %{"${package}::"};
+	}
+	diag "$package is not loaded";
+	$package =~ s<::></>g;
+	require "$package.pm";
+	fail $name;
+	return 0;
 }
 
 
@@ -41,7 +67,6 @@ sub _element_id_test {
 		dies_ok  { $both->element_id } 'optional op element_id' if ! $both->can('element_id');
 		SKIP: {
 			skip 'optional op element_id unimplemented', 2+3 unless $class->can('element_id');
-			no strict 'refs';
 			my ($element_id, $id) = map { "$prefix$_" } qw( element_id id );
 			
 			# When both IDs are present, id() MAY warn
@@ -53,7 +78,7 @@ sub _element_id_test {
 			ok @w_eid, "no $element_id warns";
 			warn @w_eid if @w_eid > 1;
 			no warnings 'Neo4j::Types';
-			is warnings { $id_only->$element_id() }, @w_eid - 1, "no $element_id warn cat is Neo4j::Types";
+			ok 1 + warnings { $id_only->$element_id() } == @w_eid, "no $element_id warn cat is Neo4j::Types";
 		};
 	};
 }
@@ -92,7 +117,7 @@ sub _node_test {
 	});
 	is $n->id(), 0, 'id 0';
 	is ref($n->get('0')), 'ARRAY', 'get 0 ref';
-	is scalar(@{$n->get('0')}), 0, 'get 0 empty';
+	lives_and { is scalar(@{$n->get('0')}), 0 } 'get 0 empty';
 	$p = $n->properties;
 	is_deeply $p, {0=>[]}, 'props deeply';
 	is_deeply [$n->properties], [{0=>[]}], 'props list context';
@@ -118,7 +143,8 @@ sub _node_test {
 
 sub neo4j_node_ok {
 	my ($class, $new, $name) = @_;
-	$name //= "neo4j_node_ok '$class'";
+	$name = "neo4j_node_ok '$class'" unless defined $name;
+	_load_module_ok($name, $class) and
 	subtest $name, sub { _node_test($class, $new) };
 }
 
@@ -156,7 +182,7 @@ sub _relationship_test {
 	});
 	is $r->id(), 0, 'id 0';
 	is ref($r->get('0')), 'ARRAY', 'get 0 ref';
-	is scalar(@{$r->get('0')}), 0, 'get 0 empty';
+	lives_and { is scalar(@{$r->get('0')}), 0 } 'get 0 empty';
 	$p = $r->properties;
 	is_deeply $p, {0=>[]}, 'props deeply';
 	is_deeply [$r->properties], [{0=>[]}], 'props list context';
@@ -188,7 +214,8 @@ sub _relationship_test {
 
 sub neo4j_relationship_ok {
 	my ($class, $new, $name) = @_;
-	$name //= "neo4j_relationship_ok '$class'";
+	$name = "neo4j_relationship_ok '$class'" unless defined $name;
+	_load_module_ok($name, $class) and
 	subtest $name, sub { _relationship_test($class, $new) };
 }
 
@@ -206,7 +233,7 @@ sub _path_test {
 	};
 	
 	@p = $new_path->( \6, \7, \8 );
-	$p = $new->($path_class, \@p);
+	$p = $new->($path_class, { elements => \@p });
 	@e = $p->elements;
 	is_deeply [@e], [@p], 'deeply elements 3';
 	@e = $p->nodes;
@@ -215,7 +242,7 @@ sub _path_test {
 	is_deeply [@e], [$p[1]], 'deeply rel 1';
 	
 	@p = $new_path->( \9 );
-	$p = $new->($path_class, \@p);
+	$p = $new->($path_class, { elements => \@p });
 	@e = $p->elements;
 	is_deeply [@e], [@p], 'deeply elements 1';
 	@e = $p->nodes;
@@ -224,7 +251,7 @@ sub _path_test {
 	is_deeply [@e], [], 'deeply rel 0';
 	
 	@p = $new_path->( \1, \2, \3, \4, \5 );
-	$p = $new->($path_class, \@p);
+	$p = $new->($path_class, { elements => \@p });
 	@e = $p->elements;
 	is_deeply [@e], [@p], 'deeply elements 5';
 	lives_and { is scalar($p->elements), 5 } 'scalar context elements';
@@ -235,7 +262,7 @@ sub _path_test {
 	is_deeply [@e], [$p[1],$p[3]], 'deeply rel 2';
 	lives_and { is scalar($p->relationships), 2 } 'scalar context relationships';
 	
-	$p = $new->($path_class, []);
+	$p = $new->($path_class, { elements => [] });
 	@e = $p->elements;
 	is scalar(@e), 0, 'no elements gigo';
 	lives_and { is scalar($p->elements), 0 } 'scalar context no elements';
@@ -252,7 +279,8 @@ sub _path_test {
 
 sub neo4j_path_ok {
 	my ($class, $new, $name) = @_;
-	$name //= "neo4j_path_ok '$class'";
+	$name = "neo4j_path_ok '$class'" unless defined $name;
+	_load_module_ok($name, $class) and
 	subtest $name, sub { _path_test($class, $new) };
 }
 
@@ -316,7 +344,8 @@ sub _point_test {
 
 sub neo4j_point_ok {
 	my ($class, $new, $name) = @_;
-	$name //= "neo4j_point_ok '$class'";
+	$name = "neo4j_point_ok '$class'" unless defined $name;
+	_load_module_ok($name, $class) and
 	subtest $name, sub { _point_test($class, $new) };
 }
 
@@ -324,7 +353,7 @@ sub neo4j_point_ok {
 sub _datetime_test {
 	my ($datetime_class, $new) = @_;
 	
-	plan tests => 8 * 7 + 1;
+	plan tests => 9 * 7 + 1;
 	
 	my ($dt, $p, $type);
 	
@@ -418,7 +447,7 @@ sub _datetime_test {
 	is $dt->nanoseconds, 0, 'zoned datetime (zero offset): nanoseconds';
 	is $dt->seconds, 0, 'zoned datetime (zero offset): seconds';
 	is $dt->type, $type, 'zoned datetime (zero offset): type';
-	is $dt->tz_name, 'Etc/GMT', 'zoned datetime (zero offset): tz_name';
+	like $dt->tz_name, qr<^Etc/GMT(?:[-+]0)?$>, 'zoned datetime (zero offset): tz_name';
 	is $dt->tz_offset, 0, 'zoned datetime (zero offset): tz_offset';
 	
 	$dt = $new->($datetime_class, $p = {
@@ -426,13 +455,26 @@ sub _datetime_test {
 		seconds     => 0,
 		tz_offset   => 86400,  # Zone Etc/GMT-24 doesn't exist
 	});
-	is $dt->days, 0, 'zoned datetime (large offset): days';
-	is $dt->epoch, 0, 'zoned datetime (large offset): epoch';
-	is $dt->nanoseconds, 0, 'zoned datetime (large offset): nanoseconds';
-	is $dt->seconds, 0, 'zoned datetime (large offset): seconds';
-	is $dt->type, $type, 'zoned datetime (large offset): type';
-	is $dt->tz_name, undef, 'zoned datetime (large offset): no tz_name';
-	is $dt->tz_offset, 86400, 'zoned datetime (large offset): tz_offset';
+	is $dt->days, 0, 'zoned datetime (too high offset): days';
+	is $dt->epoch, 0, 'zoned datetime (too high offset): epoch';
+	is $dt->nanoseconds, 0, 'zoned datetime (too high offset): nanoseconds';
+	is $dt->seconds, 0, 'zoned datetime (too high offset): seconds';
+	is $dt->type, $type, 'zoned datetime (too high offset): type';
+	is $dt->tz_name, undef, 'zoned datetime (too high offset): no tz_name';
+	is $dt->tz_offset, 86400, 'zoned datetime (too high offset): tz_offset';
+	
+	$dt = $new->($datetime_class, $p = {
+		days        => 0,
+		nanoseconds => 0,
+		tz_offset   => -72000,  # Zone Etc/GMT+20 doesn't exist
+	});
+	is $dt->days, 0, 'zoned datetime (too low offset): days';
+	is $dt->epoch, 0, 'zoned datetime (too low offset): epoch';
+	is $dt->nanoseconds, 0, 'zoned datetime (too low offset): nanoseconds';
+	is $dt->seconds, 0, 'zoned datetime (too low offset): seconds';
+	is $dt->type, $type, 'zoned datetime (too low offset): type';
+	is $dt->tz_name, undef, 'zoned datetime (too low offset): no tz_name';
+	is $dt->tz_offset, -72000, 'zoned datetime (too low offset): tz_offset';
 	
 	ok $dt->DOES('Neo4j::Types::DateTime'), 'does role';
 }
@@ -440,7 +482,8 @@ sub _datetime_test {
 
 sub neo4j_datetime_ok {
 	my ($class, $new, $name) = @_;
-	$name //= "neo4j_datetime_ok '$class'";
+	$name = "neo4j_datetime_ok '$class'" unless defined $name;
+	_load_module_ok($name, $class) and
 	subtest $name, sub { _datetime_test($class, $new) };
 }
 
@@ -452,23 +495,31 @@ sub _duration_test {
 	
 	my $d;
 	
+	# Whether ISO 8601 allows negative quantities isn't entirely clear.
+	# But it does seem to make sense to allow them.
+	# However, the Neo4j server may have bugs related to this;
+	# e. g. in Neo4j 5.6, duration({months: 1, days: -1}) yields P29D,
+	# which is definitely wrong: A month must not be assumed to have a
+	# length of any particular number of days, therefore subtracting
+	# one day from a duration never changes the months count.
+	
 	$d = $new->($duration_class, {
 		months => 18,
-		seconds => 172800,
+		seconds => -172800,
 	});
 	is $d->months, 18, 'months';
 	is $d->days, 0, 'no days yields zero';
-	is $d->seconds, 172800, 'seconds';
+	is $d->seconds, -172800, 'seconds';
 	is $d->nanoseconds, 0, 'no nanoseconds yields zero';
 	
 	$d = $new->($duration_class, {
 		days => -42,
-		nanoseconds => -2000,
+		nanoseconds => 2000,
 	});
 	is $d->months, 0, 'no months yields zero';
 	is $d->days, -42, 'days';
 	is $d->seconds, 0, 'no seconds yields zero';
-	is $d->nanoseconds, -2000, 'nanoseconds';
+	is $d->nanoseconds, 2000, 'nanoseconds';
 	
 	ok $d->DOES('Neo4j::Types::Duration'), 'does role';
 }
@@ -476,18 +527,49 @@ sub _duration_test {
 
 sub neo4j_duration_ok {
 	my ($class, $new, $name) = @_;
-	$name //= "neo4j_duration_ok '$class'";
+	$name = "neo4j_duration_ok '$class'" unless defined $name;
+	_load_module_ok($name, $class) and
 	subtest $name, sub { _duration_test($class, $new) };
 }
 
 
-package # private
-        Test::Neo4j::Types::PathNode;
+sub _bytearray_test {
+	my ($bytearray_class, $new) = @_;
+	
+	plan tests => 1 + 2 + 1;
+	
+	my $d;
+	
+	$d = $new->($bytearray_class, {
+		as_string => 'foo',
+	});
+	is $d->as_string, 'foo', 'bytes "foo"';
+	
+	$d = $new->($bytearray_class, {
+		as_string => "\x{100}",
+	});
+	ok ! utf8::is_utf8($d->as_string), 'wide char bytearray: UTF8 off';
+	ok length($d->as_string) > 1, 'wide char bytearray: multiple bytes';
+	
+	ok $d->DOES('Neo4j::Types::ByteArray'), 'does role';
+}
+
+
+sub neo4j_bytearray_ok {
+	my ($class, $new, $name) = @_;
+	$name //= "neo4j_bytearray_ok '$class'";
+	_load_module_ok($name, $class) and
+	subtest $name, sub { _bytearray_test($class, $new) };
+}
+
+
+package Test::Neo4j::Types::PathNode;
+$Test::Neo4j::Types::PathNode::VERSION = '0.06';
 sub DOES { $_[1] eq 'Neo4j::Types::Node' }
 
 
-package # private
-        Test::Neo4j::Types::PathRel;
+package Test::Neo4j::Types::PathRel;
+$Test::Neo4j::Types::PathRel::VERSION = '0.06';
 sub DOES { $_[1] eq 'Neo4j::Types::Relationship' }
 
 

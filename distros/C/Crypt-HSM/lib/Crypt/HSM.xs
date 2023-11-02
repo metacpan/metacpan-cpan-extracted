@@ -1513,28 +1513,35 @@ static int provider_free(pTHX_ SV* sv, MAGIC* magic) {
 
 static const MGVTBL Crypt__HSM__Provider_magic = { NULL, NULL, NULL, NULL, provider_free, NULL, provider_dup, NULL };
 
-static int provider_ptr_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
-	PERL_UNUSED_VAR(params);
-	provider_refcount_increment(*(struct Provider**)magic->mg_ptr);
-	return 0;
-}
-
-static int provider_ptr_free(pTHX_ SV* sv, MAGIC* magic) {
-	PERL_UNUSED_VAR(sv);
-	provider_refcount_decrement(*(struct Provider**)magic->mg_ptr);
-	return 0;
-}
-
 struct Slot {
+	Refcount refcount;
 	struct Provider* provider;
 	CK_SLOT_ID slot;
 };
 typedef struct Slot* Crypt__HSM__Slot;
 
-static const MGVTBL Crypt__HSM__Slot_magic = { NULL, NULL, NULL, NULL, provider_ptr_free, NULL, provider_ptr_dup, NULL };
+static int slot_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
+	PERL_UNUSED_VAR(params);
+	struct Slot* slot = (struct Slot*) magic->mg_ptr;
+	refcount_inc(&slot->refcount);
+	return 0;
+}
+
+static int slot_free(pTHX_ SV* sv, MAGIC* magic) {
+	PERL_UNUSED_VAR(sv);
+	struct Slot* slot = (struct Slot*) magic->mg_ptr;
+	if (refcount_dec(&slot->refcount) == 1) {
+		provider_refcount_decrement(slot->provider);
+		PerlMemShared_free(slot);
+	}
+	return 0;
+}
+
+static const MGVTBL Crypt__HSM__Slot_magic = { NULL, NULL, NULL, NULL, slot_free, NULL, slot_dup, NULL };
 
 static SV* S_new_slot(pTHX_ struct Provider* provider, CK_SLOT_ID slot) {
-	struct Slot* entry = PerlMemShared_calloc(1, sizeof(struct Slot*));
+	struct Slot* entry = PerlMemShared_calloc(1, sizeof(struct Slot));
+	refcount_init(&entry->refcount, 1);
 	entry->slot = slot;
 	entry->provider = provider_refcount_increment(provider);
 	SV* object = newSV(0);
@@ -1545,6 +1552,7 @@ static SV* S_new_slot(pTHX_ struct Provider* provider, CK_SLOT_ID slot) {
 #define new_slot(provider, slot) S_new_slot(aTHX_ provider, slot)
 
 struct Mechanism {
+	Refcount refcount;
 	struct Provider* provider;
 	CK_SLOT_ID slot;
 	CK_MECHANISM_TYPE mechanism;
@@ -1553,10 +1561,27 @@ struct Mechanism {
 };
 typedef struct Mechanism* Crypt__HSM__Mechanism;
 
-static const MGVTBL Crypt__HSM__Mechanism_magic = { NULL, NULL, NULL, NULL, provider_ptr_free, NULL, provider_ptr_dup, NULL };
+static int mechanism_dup(pTHX_ MAGIC* magic, CLONE_PARAMS* params) {
+	PERL_UNUSED_VAR(params);
+	struct Mechanism* mechanism = (struct Mechanism*) magic->mg_ptr;
+	refcount_inc(&mechanism->refcount);
+	return 0;
+}
+
+static int mechanism_free(pTHX_ SV* sv, MAGIC* magic) {
+	PERL_UNUSED_VAR(sv);
+	struct Mechanism* mechanism = (struct Mechanism*) magic->mg_ptr;
+	if (refcount_dec(&mechanism->refcount) == 1) {
+		provider_refcount_decrement(mechanism->provider);
+		PerlMemShared_free(mechanism);
+	}
+	return 0;
+}
+static const MGVTBL Crypt__HSM__Mechanism_magic = { NULL, NULL, NULL, NULL, mechanism_free, NULL, mechanism_dup, NULL };
 
 static SV* S_new_mechanism(pTHX_ struct Provider* provider, CK_SLOT_ID slot, CK_MECHANISM_TYPE mechanism) {
-	struct Mechanism* entry = PerlMemShared_calloc(1, sizeof(struct Mechanism*));
+	struct Mechanism* entry = PerlMemShared_calloc(1, sizeof(struct Mechanism));
+	refcount_init(&entry->refcount, 1);
 	entry->mechanism = mechanism;
 	entry->slot = slot;
 	entry->provider = provider_refcount_increment(provider);

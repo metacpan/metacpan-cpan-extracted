@@ -1,5 +1,10 @@
 Revision history for Getopt-Alt
 
+0.5.5   2023-10-29
+        Updating for release of version 0.5.5
+        Updated (Ivan Wills)
+        Stopping errors loading configs breaking runs (Ivan Wills)
+
 0.5.4   2020-08-03
         Updating for release of version 0.5.4
         Updated date (Ivan Wills)

@@ -1,5 +1,26 @@
 Revision history for App-Oozie
 
+0.015     2023-11-02 14:09:50+01:00 Europe/Brussels
+- Revert back to PodWeaver in build tooling.
+
+0.014     2023-11-02 13:45:55+01:00 Europe/Brussels
+- perlcritic policy + test.
+- Build tooling.
+- Startup messages now include the name and version of the tooling.
+
+0.013     2023-10-25 21:09:29+02:00 Europe/Brussels
+- Silence File::Temp warning.
+
+0.012     2023-10-25 20:32:27+02:00 Europe/Brussels
+- Actually use destination_path().
+- Set the default for workflowsBaseDir.
+
+0.011     2023-10-25 19:04:28+02:00 Europe/Brussels
+- More logging.
+- Validate XML variables for empty values.
+- CLI override: resource_manager
+- Enable jobXML in the sample, with a reference.
+
 0.010     2023-10-19 04:16:22+02:00 Europe/Brussels
 - perl 5.14.0 is now required for the "/r" modifier.
 

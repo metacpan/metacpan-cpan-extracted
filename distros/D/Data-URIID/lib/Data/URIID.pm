@@ -20,7 +20,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %names = (
     service => {
@@ -270,7 +270,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -416,6 +416,10 @@ Returns whether or not a string is a valid ISE.
     my $service = $extractor->service( $service );
 
 This method will return a L<Data::URIID::Service> for the given name or ISE if successful or C<die> otherwise.
+
+=head1 KNOWN/SUPPORTED SERVICES
+
+For a list of known/supported services see L<Data::URIID::Service/"KNOWN/SUPPORTED SERVICES">.
 
 =head1 AUTHOR
 

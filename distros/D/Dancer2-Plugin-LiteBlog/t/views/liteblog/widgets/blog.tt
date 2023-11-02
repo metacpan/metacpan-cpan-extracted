@@ -1,0 +1,7 @@
+<!-- Blog Cards -->
+<section id="blog">
+    <div class="blog-header">
+        <h2>[% widget.title %]</h2>
+    </div>
+[% INCLUDE 'liteblog/widgets/blog-cards.tt' %]
+</section>

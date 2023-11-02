@@ -19,7 +19,7 @@ name: Music-Chord-Note
 provides:
   Music::Chord::Note:
     file: lib/Music/Chord/Note.pm
-    version: '0.13'
+    version: '0.14'
 requires:
   Carp: '0'
   perl: '5.012005'
@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/bayashi/Music-Chord-Note/issues
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/bayashi/Music-Chord-Note
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

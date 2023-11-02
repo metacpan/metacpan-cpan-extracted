@@ -1,5 +1,5 @@
 package App::HL7::Compare::Parser::Role::Partible;
-$App::HL7::Compare::Parser::Role::Partible::VERSION = '0.002';
+$App::HL7::Compare::Parser::Role::Partible::VERSION = '0.003';
 use v5.10;
 use strict;
 use warnings;

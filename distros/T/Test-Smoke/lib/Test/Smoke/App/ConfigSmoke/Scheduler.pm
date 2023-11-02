@@ -2,8 +2,16 @@ package Test::Smoke::App::ConfigSmoke::Scheduler;
 use warnings;
 use strict;
 
+our $VERSION = '0.002';
+
 use Exporter 'import';
-our @EXPORT = qw/ config_scheduler schedule_entry_ms_at schedule_entry_crontab /;
+our @EXPORT = qw/
+    config_scheduler
+    schedule_entry_ms_schtasks
+    schedule_entry_ms_at
+    schedule_entry_crontab
+    query_entry_ms_schtasks
+/;
 
 use Test::Smoke::App::Options;
 use Test::Smoke::Util::FindHelpers 'whereis';
@@ -18,7 +26,7 @@ These methods will be added to the L<Test::Smoke::App::ConfigSmoke> class.
 
 =head2 config_scheduler
 
-Configure options C<hostname>, C<usernote> and C<usernote_pos>
+Configure options C<crontime>, C<add2cron> (and temporarily C<cronbin> and C<docron>).
 
 =cut
 
@@ -36,18 +44,27 @@ sub config_scheduler {
     }
 
     $self->current_values->{cronbin} = $cronbin;
-    my $docron = $self->handle_option(docron_option($cronbin));
+    my $has_crontime = $self->default_for_option(crontime_option());
+    my $docron = $self->handle_option(docron_option($cronbin, $has_crontime));
     return unless $docron;
 
     my $crontime = $self->handle_option(crontime_option());
 
     my @current_cron;
     if ($^O eq 'MSWin32') {
-        $self->{_jcl} = $self->prefix . '.cmd';
-        $self->{_jcl_abs} = Cwd::abs_path($self->jcl);
+        $self->{_smoke_script} = $self->prefix . '.cmd';
+        $self->{_smoke_script_abs} = Cwd::abs_path($self->smoke_script);
         if ($cronbin =~ m{schtasks}i) {
+            my $task_name = sprintf("P5Smoke-%s", $self->prefix);
+            my @old_schedule = qx{"$cronbin" /nh /tn "$task_name" 2>&1};
+            my ($curr_shedule) = grep { m{\Q$task_name\E} } @old_schedule;
 
-            my $new_entry = $self->schedule_entry_ms_at($cronbin, $crontime);
+            my $new_entry = $self->schedule_entry_ms_schtasks($cronbin, $crontime);
+            if ($curr_shedule) {
+                printf "\n!!! I see you already have:\n\t%s\n", $curr_shedule;
+                $new_entry .= " /F";
+            }
+
             my $add2cron = $self->handle_option(add2cron_option($new_entry));
 
             system $new_entry if $add2cron;
@@ -69,8 +86,8 @@ sub config_scheduler {
         }
     }
     else {
-        my $jcl = $self->{_jcl} = $self->prefix . '.sh';
-        $self->{_jcl_abs} = Cwd::abs_path($self->jcl);
+        my $jcl = $self->{_smoke_script} = $self->prefix . '.sh';
+        $self->{_smoke_script_abs} = Cwd::abs_path($self->smoke_script);
         if (open(my $crontab, "$cronbin -l |")) {
             @current_cron = <$crontab>;
             close($crontab) or warn "Error reading schedule: $!\n";
@@ -107,7 +124,7 @@ sub config_scheduler {
 
 =head2 get_avail_scheduler
 
-Looks for F<at.exe> on C<MSWin32> or F<cron(tab)> on other systems.
+Looks for F<at.exe> or F<schtasks.exe> on C<MSWin32> or F<cron(tab)> on other systems.
 
 =cut
 
@@ -126,33 +143,48 @@ sub get_avail_scheduler {
 
 =head2 schedule_entry_ms_schtasks
 
-Return an etry for MS-C<SchTasks>
+Return the command to create a new entry for a MS-C<SchTasks> task.
 
 =cut
 
 sub schedule_entry_ms_schtasks {
     my $self = shift;
     my ($cron, $crontime) = @_;
-    my $script = $self->jcl_abs;
+    my $script = $self->smoke_script_abs;
 
     return '' unless $crontime;
 
+    my $tn = "P5Smoke-" . $self->prefix;
     return sprintf(
-        qq[%s /Create /SC DAILY /ST %s /TN P5SmokeRun /TR "%s"],
-        $cron, $crontime, $script
+        qq[%s /Create /SC DAILY /ST %s /TN %s /TR "%s"],
+        $cron, $crontime, $tn, $script
     );
+}
+
+=head2 query_entry_ms_schtasks {
+
+Return the command to query the scheduler.
+
+=cut
+
+sub query_entry_ms_schtasks {
+    my $self = shift;
+    my ($cronbin) = @_;
+    my $tn = "P5Smoke-" . $self->prefix;
+
+    return sprintf(qq<"%s" /Query /TN %s /V /FO list>, $cronbin, $tn);
 }
 
 =head2 schedule_entry_ms_at
 
-Return an entry for MS-C<AT>.
+Return the command to create a new entry for MS-C<AT>.
 
 =cut
 
 sub schedule_entry_ms_at {
     my $self = shift;
     my ($cron, $crontime) = @_;
-    my $script = $self->jcl;
+    my $script = $self->smoke_script_abs;
 
     return '' unless $crontime;
     my ($hour, $min) = $crontime =~ /(\d+):(\d+)/;
@@ -160,7 +192,7 @@ sub schedule_entry_ms_at {
 
     return sprintf(
         qq[$cron %02d:%02d /EVERY:M,T,W,Th,F,S,Su "%s"],
-        $hour, $min, $self->jcl_abs
+        $hour, $min, $script
     );
 }
 
@@ -177,7 +209,7 @@ sub schedule_entry_crontab {
     return '' unless $crontime;
     my ($hour, $min) = $crontime =~ /(\d+):(\d+)/;
 
-    return sprintf(qq[%02d %02d * * * '%s'], $min, $hour, $self->jcl_abs);
+    return sprintf(qq[%02d %02d * * * '%s'], $min, $hour, $self->smoke_script_abs);
 }
 
 =head2 docron_option
@@ -188,7 +220,7 @@ on the scheduler path.
 =cut
 
 sub docron_option {
-    my ($scheduler) = @_;
+    my ($scheduler, $schedule_time) = @_;
     return Test::Smoke::App::AppOption->new(
         name       => 'docron',
         allow      => undef,
@@ -197,7 +229,7 @@ sub docron_option {
         configtext => 'Should the smoke be scheduled?',
         configtype => 'prompt_yn',
         configalt  => sub { [qw/ N y /] },
-        configdft  => sub {'N'},
+        configdft  => sub { defined($schedule_time) ? 'Y' : 'N' },
     );
 }
 
@@ -224,12 +256,18 @@ This option C<add2cron> will not be in the config-file.
 
 sub add2cron_option {
     my ($new_entry) = @_;
+    my $df = $new_entry =~ m{schtasks}i
+        ? $new_entry =~ m{/F$}
+            ? 'N'
+            : 'Y'
+        : 'Y';
+    my %ndf = ( N => 'y', Y => 'n' );
     return Test::Smoke::App::AppOption->new(
         name => 'add2cron',
         configtext => "Add this line to your schedule?\n\t$new_entry\n",
         configtype => 'prompt_yn',
-        configalt => sub { [qw/ Y n /] },
-        configdft => sub { 'Y' },
+        configalt => sub { [ $df, $ndf{$df}] },
+        configdft => sub { $df },
     );
 }
 

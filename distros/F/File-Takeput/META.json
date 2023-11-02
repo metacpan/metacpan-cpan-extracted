@@ -1,0 +1,68 @@
+{
+   "abstract" : "Slurp style file IO with locking.",
+   "author" : [
+      "Bjoern Hee <github@spredehagl.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "File-Takeput",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "Scalar::Util" : "0",
+            "Time::HiRes" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "File::Takeput" : {
+         "file" : "lib/File/Takeput.pm",
+         "version" : "0.3"
+      },
+      "File::Takeput::Unix" : {
+         "file" : "lib/File/Takeput/Unix.pm"
+      },
+      "File::Takeput::Win32" : {
+         "file" : "lib/File/Takeput/Win32.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/spragl/Takeput/issues"
+      },
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/spragl/Takeput"
+      }
+   },
+   "version" : "0.3",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

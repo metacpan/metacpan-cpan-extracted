@@ -1,5 +1,5 @@
 This archive contains the distribution Util-H2O-More,
-version 0.3.2:
+version 0.3.3:
 
   Provides C<baptise>, a drop-in replacement C<bless> that creates accessors for you.
 

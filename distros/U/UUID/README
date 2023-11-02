@@ -149,7 +149,7 @@ TODO
     Need more tests and sanity checks.
 
 COPYRIGHT AND LICENSE
-    This software is Copyright (c) 2014-2016 by Rick Myers.
+    This software is Copyright (c) 2014-2023 by Rick Myers.
 
     This is free software, licensed under:
 
@@ -180,6 +180,8 @@ CONTRIBUTORS
     gregor herrmann
 
     Slaven Rezic
+
+    twata
 
 SEE ALSO
     uuid(3), uuid_clear(3), uuid_compare(3), uuid_copy(3), uuid_generate(3),

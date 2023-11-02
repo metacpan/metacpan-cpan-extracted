@@ -12,6 +12,7 @@ TODO                                     TO DO
 # Libs
 lib/WWW/Suffit.pm                        Main library
 lib/WWW/Suffit/Const.pm                  Constants
+lib/WWW/Suffit/RefUtil.pm                Reference Utilities
 lib/WWW/Suffit/RSA.pm                    RSA cryptography class
 lib/WWW/Suffit/Util.pm                   Utilities
 
@@ -23,5 +24,6 @@ t/00-trailingspace.t                     Style test: TrailingSpace
 t/01-use.t                               Test script
 t/02-util.t                              Utilities
 t/03-rsa.t                               RSA test
+t/04-refutil.t                           RefUtil test
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

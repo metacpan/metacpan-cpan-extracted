@@ -1,0 +1,134 @@
+{
+  "preamble" => "Revision history for Perl module File::RegexMatch",
+  "raw_preamble" => "Revision history for Perl module File::RegexMatch\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "    - Renamed match() parameter from regex_pattern to match_pattern.\n",
+          "style" => "-",
+          "text" => "Renamed match() parameter from regex_pattern to match_pattern."
+        },
+        {
+          "line" => 5,
+          "raw" => "    - Added functionality to ignore file names based on regular expression.\n\n",
+          "style" => "-",
+          "text" => "Added functionality to ignore file names based on regular expression."
+        }
+      ],
+      "line" => 3,
+      "note" => "Mon July 29 2013",
+      "raw" => "0.1.2 Mon July 29 2013\n",
+      "version" => "0.1.2"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 8,
+          "raw" => "    - Updated documentation\n\n",
+          "style" => "-",
+          "text" => "Updated documentation"
+        }
+      ],
+      "line" => 7,
+      "note" => "Wed July 24 2013",
+      "raw" => "0.1.1 Wed July 24 2013\n",
+      "version" => "0.1.1"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 11,
+          "raw" => "    - Module pretty much re-written, old code was smelly.\n",
+          "style" => "-",
+          "text" => "Module pretty much re-written, old code was smelly."
+        },
+        {
+          "line" => 12,
+          "raw" => "    - Instead of returning the path of each file, a File::RegexMatch::Object is returned.\n\n",
+          "style" => "-",
+          "text" => "Instead of returning the path of each file, a File::RegexMatch::Object is returned."
+        }
+      ],
+      "line" => 10,
+      "note" => "Tue July 23 2013",
+      "raw" => "0.1 Tue July 23 2013\n",
+      "version" => "0.1"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 15,
+          "raw" => "    - Now checks hidden files for matches\n",
+          "style" => "-",
+          "text" => "Now checks hidden files for matches"
+        },
+        {
+          "line" => 16,
+          "raw" => "    - Updated documentation\n",
+          "style" => "-",
+          "text" => "Updated documentation"
+        },
+        {
+          "line" => 17,
+          "raw" => "    - If the given base directory path is relative, the absolute path of the files found in the base directory are returned instead of the relative path\n",
+          "style" => "-",
+          "text" => "If the given base directory path is relative, the absolute path of the files found in the base directory are returned instead of the relative path"
+        },
+        {
+          "line" => 18,
+          "raw" => "    - Warnings added for chdir if verbose is enabled\n",
+          "style" => "-",
+          "text" => "Warnings added for chdir if verbose is enabled"
+        },
+        {
+          "line" => 19,
+          "raw" => "    - Support for hidden files added\n",
+          "style" => "-",
+          "text" => "Support for hidden files added"
+        },
+        {
+          "line" => 20,
+          "raw" => "    - Cleanup of code\n\n",
+          "style" => "-",
+          "text" => "Cleanup of code"
+        }
+      ],
+      "line" => 14,
+      "note" => "Thur Dec 29 2011",
+      "raw" => "0.03 Thur Dec 29 2011\n",
+      "version" => "0.03"
+    },
+    {
+      "date" => "2011-12-19",
+      "entries" => [
+        {
+          "line" => 23,
+          "raw" => "    - Was a problem when verbose was disabled, now fixed.\n\n",
+          "style" => "-",
+          "text" => "Was a problem when verbose was disabled, now fixed."
+        }
+      ],
+      "line" => 22,
+      "raw" => "0.02 Mon Dec 19 2011\n",
+      "raw_date" => "Mon Dec 19 2011",
+      "version" => "0.02"
+    },
+    {
+      "date" => "2011-12-17",
+      "entries" => [
+        {
+          "line" => 26,
+          "raw" => "    - Original version; created by ExtUtils::ModuleMaker 0.51\n",
+          "style" => "-",
+          "text" => "Original version; created by ExtUtils::ModuleMaker 0.51"
+        }
+      ],
+      "line" => 25,
+      "raw" => "0.01 Sat Dec 17 2011\n",
+      "raw_date" => "Sat Dec 17 2011",
+      "version" => "0.01"
+    }
+  ]
+}

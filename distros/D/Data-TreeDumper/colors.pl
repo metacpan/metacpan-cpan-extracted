@@ -7,7 +7,7 @@ use Carp ;
 use Data::TreeDumper ;
 
 our $s ;
-do "s" ;
+do "./s" ;
 
 $Data::TreeDumper::Useascii = 1 ;
 

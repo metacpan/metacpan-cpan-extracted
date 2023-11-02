@@ -26,9 +26,9 @@ on 'test' => sub {
   requires "Plack::Middleware::ReverseProxy" => "0";
   requires "Plack::Response" => "0";
   requires "Plack::Test" => "0";
+  requires "Test2::V0" => "0";
   requires "Test::Differences" => "0";
   requires "Test::More" => "0";
-  requires "Test::Most" => "0";
   requires "strict" => "0";
 };
 

@@ -106,8 +106,8 @@ EOF
 
     my $t_dir = File::Spec->catdir(getcwd, 't');
     my $dirs = $ENV{PERL5LIB};
-    if ($dir) { $dirs .= ":$t_dir" }
-    else      { $dirs = $t_dir }
+    if ($dirs) { $dirs .= ":$t_dir" }
+    else       { $dirs = $t_dir }
     $ENV{PERL5LIB} = $dirs;
 
     system( $bot_script,

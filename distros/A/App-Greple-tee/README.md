@@ -39,6 +39,10 @@ matched part.  You can tell the difference by following commands.
 Lines of input and output data do not have to be identical when used
 with **--discrete** option.
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
@@ -51,6 +55,26 @@ with **--discrete** option.
     passing them to the filter command.  Newline characters between wide
     characters are deleted, and other newline characters are replaced with
     spaces.
+
+- **--blockmatch**
+
+    Normally, the area matching the specified search pattern is sent to the 
+    external command. If this option is specified, not the matched area but 
+    the entire block containing it will be processed.
+
+    For example, to send lines containing the pattern `foo` to the
+    external command, you need to specify the pattern which matches to
+    entire line:
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    But with the **--blockmatch** option, it can be done as simply as
+    follows:
+
+        greple -Mtee cat -n -- foo
+
+    With **--blockmatch** option, this module behave more like [teip(1)](http://man.he.net/man1/teip)'s
+    **-g** option.
 
 # WHY DO NOT USE TEIP
 

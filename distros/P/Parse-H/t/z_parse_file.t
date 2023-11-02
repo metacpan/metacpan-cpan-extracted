@@ -1,4 +1,4 @@
-#!/usr/bin/perl -T -w
+#!perl -w
 # A test for Parse::H - A parser module for C header files.
 #
 #	Copyright (C) 2022-2023 Bogdan 'bogdro' Drozdowski,

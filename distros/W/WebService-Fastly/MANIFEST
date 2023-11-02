@@ -147,6 +147,8 @@ docs/Historical.md
 docs/HistoricalAggregateResponse.md
 docs/HistoricalAggregateResponseAllOf.md
 docs/HistoricalApi.md
+docs/HistoricalDdos.md
+docs/HistoricalDdosMeta.md
 docs/HistoricalDomains.md
 docs/HistoricalDomainsData.md
 docs/HistoricalDomainsMeta.md
@@ -372,6 +374,10 @@ docs/PaginationCursorMeta.md
 docs/PaginationLinks.md
 docs/PaginationMeta.md
 docs/Permission.md
+docs/PlatformDdosDataItems.md
+docs/PlatformDdosEntry.md
+docs/PlatformDdosResponse.md
+docs/PlatformDdosResponseAllOf.md
 docs/PoolAdditional.md
 docs/PoolApi.md
 docs/PoolResponse.md
@@ -514,6 +520,7 @@ docs/Results.md
 docs/RoleUser.md
 docs/SchemasContactResponse.md
 docs/SchemasSnippetResponse.md
+docs/SchemasSnippetResponseCommon.md
 docs/SchemasUserResponse.md
 docs/SchemasUserResponseReadOnly.md
 docs/SchemasVclResponse.md
@@ -569,9 +576,15 @@ docs/SettingsApi.md
 docs/SettingsResponse.md
 docs/SigningKey.md
 docs/Snippet.md
+docs/SnippetAllOf.md
 docs/SnippetApi.md
+docs/SnippetCommon.md
 docs/SnippetResponse.md
-docs/SnippetResponseAllOf.md
+docs/SnippetResponseCommon.md
+docs/SnippetResponseCommonAllOf.md
+docs/SnippetResponsePost.md
+docs/SnippetWithDynamicNumber.md
+docs/SnippetWithDynamicNumberAllOf.md
 docs/Star.md
 docs/StarApi.md
 docs/StarData.md
@@ -702,6 +715,7 @@ docs/ValidatorResultData.md
 docs/ValidatorResultDataAttributes.md
 docs/ValidatorResultDataAttributesMessages.md
 docs/Values.md
+docs/ValuesDdos.md
 docs/Vcl.md
 docs/VclApi.md
 docs/VclDiff.md
@@ -785,6 +799,7 @@ docs/WafTagsApi.md
 docs/WafTagsResponse.md
 docs/WafTagsResponseAllOf.md
 docs/WafTagsResponseDataItem.md
+docs/WholePlatformDdosHistoricalApi.md
 docs/WsMessageFormat.md
 lib/WebService/Fastly.pm
 lib/WebService/Fastly/AclApi.pm
@@ -982,6 +997,8 @@ lib/WebService/Fastly/Object/HealthcheckResponse.pm
 lib/WebService/Fastly/Object/Historical.pm
 lib/WebService/Fastly/Object/HistoricalAggregateResponse.pm
 lib/WebService/Fastly/Object/HistoricalAggregateResponseAllOf.pm
+lib/WebService/Fastly/Object/HistoricalDdos.pm
+lib/WebService/Fastly/Object/HistoricalDdosMeta.pm
 lib/WebService/Fastly/Object/HistoricalDomains.pm
 lib/WebService/Fastly/Object/HistoricalDomainsData.pm
 lib/WebService/Fastly/Object/HistoricalDomainsMeta.pm
@@ -1215,6 +1232,10 @@ lib/WebService/Fastly/Object/PaginationCursorMeta.pm
 lib/WebService/Fastly/Object/PaginationLinks.pm
 lib/WebService/Fastly/Object/PaginationMeta.pm
 lib/WebService/Fastly/Object/Permission.pm
+lib/WebService/Fastly/Object/PlatformDdosDataItems.pm
+lib/WebService/Fastly/Object/PlatformDdosEntry.pm
+lib/WebService/Fastly/Object/PlatformDdosResponse.pm
+lib/WebService/Fastly/Object/PlatformDdosResponseAllOf.pm
 lib/WebService/Fastly/Object/Pool.pm
 lib/WebService/Fastly/Object/PoolAdditional.pm
 lib/WebService/Fastly/Object/PoolAllOf.pm
@@ -1354,6 +1375,7 @@ lib/WebService/Fastly/Object/Results.pm
 lib/WebService/Fastly/Object/RoleUser.pm
 lib/WebService/Fastly/Object/SchemasContactResponse.pm
 lib/WebService/Fastly/Object/SchemasSnippetResponse.pm
+lib/WebService/Fastly/Object/SchemasSnippetResponseCommon.pm
 lib/WebService/Fastly/Object/SchemasUserResponse.pm
 lib/WebService/Fastly/Object/SchemasUserResponseReadOnly.pm
 lib/WebService/Fastly/Object/SchemasVclResponse.pm
@@ -1403,8 +1425,15 @@ lib/WebService/Fastly/Object/Settings.pm
 lib/WebService/Fastly/Object/SettingsResponse.pm
 lib/WebService/Fastly/Object/SigningKey.pm
 lib/WebService/Fastly/Object/Snippet.pm
+lib/WebService/Fastly/Object/SnippetAllOf.pm
+lib/WebService/Fastly/Object/SnippetCommon.pm
 lib/WebService/Fastly/Object/SnippetResponse.pm
 lib/WebService/Fastly/Object/SnippetResponseAllOf.pm
+lib/WebService/Fastly/Object/SnippetResponseCommon.pm
+lib/WebService/Fastly/Object/SnippetResponseCommonAllOf.pm
+lib/WebService/Fastly/Object/SnippetResponsePost.pm
+lib/WebService/Fastly/Object/SnippetWithDynamicNumber.pm
+lib/WebService/Fastly/Object/SnippetWithDynamicNumberAllOf.pm
 lib/WebService/Fastly/Object/Star.pm
 lib/WebService/Fastly/Object/StarData.pm
 lib/WebService/Fastly/Object/StarResponse.pm
@@ -1534,6 +1563,7 @@ lib/WebService/Fastly/Object/ValidatorResultDataAttributes.pm
 lib/WebService/Fastly/Object/ValidatorResultDataAttributesMessages.pm
 lib/WebService/Fastly/Object/ValidatorResultMessages.pm
 lib/WebService/Fastly/Object/Values.pm
+lib/WebService/Fastly/Object/ValuesDdos.pm
 lib/WebService/Fastly/Object/Vcl.pm
 lib/WebService/Fastly/Object/VclDiff.pm
 lib/WebService/Fastly/Object/VclResponse.pm
@@ -1655,4 +1685,5 @@ lib/WebService/Fastly/WafFirewallsApi.pm
 lib/WebService/Fastly/WafRuleRevisionsApi.pm
 lib/WebService/Fastly/WafRulesApi.pm
 lib/WebService/Fastly/WafTagsApi.pm
+lib/WebService/Fastly/WholePlatformDdosHistoricalApi.pm
 sig.json

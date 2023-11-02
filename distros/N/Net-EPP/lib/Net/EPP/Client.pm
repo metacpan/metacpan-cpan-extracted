@@ -1,6 +1,7 @@
 package Net::EPP::Client;
 use bytes;
 use Net::EPP::Protocol;
+use Net::EPP::Parser;
 use Carp;
 use IO::Socket;
 use IO::Socket::SSL;
@@ -388,7 +389,7 @@ sub disconnect {
 
 sub parser {
 	my $self = shift;
-	$self->{'parser'} = XML::LibXML->new if (!$self->{'parser'});
+	$self->{'parser'} = Net::EPP::Parser->new if (!$self->{'parser'});
 	return $self->{'parser'};
 }
 

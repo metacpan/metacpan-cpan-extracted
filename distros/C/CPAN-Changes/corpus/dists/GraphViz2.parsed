@@ -1,0 +1,1368 @@
+{
+  "preamble" => "Revision history for Perl extension GraphViz2.",
+  "raw_preamble" => "Revision history for Perl extension GraphViz2.\n\n",
+  "releases" => [
+    {
+      "date" => "2014-02-11T13:40:00Z",
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "\t- Stop using bare word file handles (again).\n",
+          "style" => "-",
+          "text" => "Stop using bare word file handles (again)."
+        },
+        {
+          "line" => 5,
+          "raw" => "\t- Change sub BUILD() in all sub-classes to check whether or not a 'graph' parameter was supplied to new().\n\t\tIf so, use it rather than instantiating a new GraphViz2 object.\n\t\tThis fixes a problem with those script/*.pl demos which use this feature.\n",
+          "style" => "-",
+          "text" => "Change sub BUILD() in all sub-classes to check whether or not a 'graph' parameter was supplied to new(). If so, use it rather than instantiating a new GraphViz2 object. This fixes a problem with those script/*.pl demos which use this feature."
+        },
+        {
+          "line" => 8,
+          "raw" => "\t- Fiddle t/sample.recdescent.1.dat, since the original test data happened to look like HTML,\n\t\tand that stopped GraphViz2.stringify_attributes() adding double-quotes to protect the label.\n\t\tThat in turn caused dot to issue a syntax error when the generated DOT data was read.\n\n",
+          "style" => "-",
+          "text" => "Fiddle t/sample.recdescent.1.dat, since the original test data happened to look like HTML, and that stopped GraphViz2.stringify_attributes() adding double-quotes to protect the label. That in turn caused dot to issue a syntax error when the generated DOT data was read."
+        }
+      ],
+      "line" => 3,
+      "raw" => "2.27  Tue Feb 11 13:40:00 2014\n",
+      "raw_date" => "Tue Feb 11 13:40:00 2014",
+      "version" => "2.27"
+    },
+    {
+      "date" => "2014-01-30T12:44:00Z",
+      "entries" => [
+        {
+          "line" => 13,
+          "raw" => "\t- Stop using bare word file handles.\n",
+          "style" => "-",
+          "text" => "Stop using bare word file handles."
+        },
+        {
+          "line" => 14,
+          "raw" => "\t- Remove these lines from GraphViz2.pm (because utf8 is global and the others are not needed):\n\t\tuse utf8;\n\t\tuse open      qw(:std :utf8);    # Undeclared streams in UTF-8.\n\t\tuse charnames qw(:full :short);  # Unneeded in v5.16.\n\n",
+          "style" => "-",
+          "text" => "Remove these lines from GraphViz2.pm (because utf8 is global and the others are not needed): use utf8; use open      qw(:std :utf8);    # Undeclared streams in UTF-8. use charnames qw(:full :short);  # Unneeded in v5.16."
+        }
+      ],
+      "line" => 12,
+      "raw" => "2.26  Thu Jan 30 12:44:00 2014\n",
+      "raw_date" => "Thu Jan 30 12:44:00 2014",
+      "version" => "2.26"
+    },
+    {
+      "date" => "2014-01-06T17:06:00Z",
+      "entries" => [
+        {
+          "line" => 20,
+          "raw" => "\t- Remove debug printing of the output of 'dot -T?' (a list of valid output formats).\n",
+          "style" => "-",
+          "text" => "Remove debug printing of the output of 'dot -T?' (a list of valid output formats)."
+        },
+        {
+          "line" => 21,
+          "raw" => "\t- Fix typos in output names in rank.sub.graph.1.pl and rank.sub.graph.2.pl.\n\t\trank.sub.graph.1.pl was outputting to html/rank.sub.graph.2.svg and visa versa.\n\n",
+          "style" => "-",
+          "text" => "Fix typos in output names in rank.sub.graph.1.pl and rank.sub.graph.2.pl. rank.sub.graph.1.pl was outputting to html/rank.sub.graph.2.svg and visa versa."
+        }
+      ],
+      "line" => 19,
+      "raw" => "2.25  Mon Jan  6 17:06:00 2014\n",
+      "raw_date" => "Mon Jan  6 17:06:00 2014",
+      "version" => "2.25"
+    },
+    {
+      "date" => "2013-12-02T09:30:00Z",
+      "entries" => [
+        {
+          "line" => 25,
+          "raw" => "\t- Rewrite scripts/extract.output.formats.pl, which used to download a page of documentation from graphviz.org,\n\t\tand parse it to build a list of output formats. The problems are:\n\t\t(1) Forgetting to run the script; (2) the on-line docs being out-of-date.\n\t\tSo, as of this version, I now parse the output of 'dot -T?', which will not just be more accurate,\n\t\tbut will also include the formats supported by locally-installed plugins. It's a win-win result.\n",
+          "style" => "-",
+          "text" => "Rewrite scripts/extract.output.formats.pl, which used to download a page of documentation from graphviz.org, and parse it to build a list of output formats. The problems are: (1) Forgetting to run the script; (2) the on-line docs being out-of-date. So, as of this version, I now parse the output of 'dot -T?', which will not just be more accurate, but will also include the formats supported by locally-installed plugins. It's a win-win result."
+        },
+        {
+          "line" => 30,
+          "raw" => "\t- Put that new logic into GraphViz2's load_valid_attributes() method.\n",
+          "style" => "-",
+          "text" => "Put that new logic into GraphViz2's load_valid_attributes() method."
+        },
+        {
+          "line" => 31,
+          "raw" => "\t- Expand the FAQ to discuss the above operation.\n\n",
+          "style" => "-",
+          "text" => "Expand the FAQ to discuss the above operation."
+        }
+      ],
+      "line" => 24,
+      "raw" => "2.24  Mon Dec  2 09:30:00 2013\n",
+      "raw_date" => "Mon Dec  2 09:30:00 2013",
+      "version" => "2.24"
+    },
+    {
+      "date" => "2013-12-01T09:42:00Z",
+      "entries" => [
+        {
+          "line" => 34,
+          "raw" => "\t- Update lists of valid attibutes by running scripts/extract.*.pl, and incorporating the changes into\n\t\tthe source code of GraphViz2.pm (at the end). I use Data::Section::Simple to read this data.\n\t\tThese lists now correspond to Graphviz V 2.34. Changes:\n\t\to Remove 'aspect' as an attribute 'graph'.\n\t\to Add 'inputscale' as an attribute of 'graph'.\n\t\to Add 'overlap_shrink' as an attribute of 'graph'.\n\t\to Add 'star' as an attribute of 'node shape'.\n\t\to Add 'underline' as an attribute of 'node shape'.\n\t\to Add 'xdot1.2' as an attribute of 'output format'.\n\t\to Add 'xdot1.4' as an attribute of 'output format'.\n\t\tSee RT#91073. Many thanx for Kent Fredric for bringing this to my attention.\n",
+          "style" => "-",
+          "text" => "Update lists of valid attibutes by running scripts/extract.*.pl, and incorporating the changes into the source code of GraphViz2.pm (at the end). I use Data::Section::Simple to read this data. These lists now correspond to Graphviz V 2.34. Changes: o Remove 'aspect' as an attribute 'graph'. o Add 'inputscale' as an attribute of 'graph'. o Add 'overlap_shrink' as an attribute of 'graph'. o Add 'star' as an attribute of 'node shape'. o Add 'underline' as an attribute of 'node shape'. o Add 'xdot1.2' as an attribute of 'output format'. o Add 'xdot1.4' as an attribute of 'output format'. See RT#91073. Many thanx for Kent Fredric for bringing this to my attention."
+        },
+        {
+          "line" => 45,
+          "raw" => "\t- Add t/version.t, which uses Test::Version.\n",
+          "style" => "-",
+          "text" => "Add t/version.t, which uses Test::Version."
+        },
+        {
+          "line" => 46,
+          "raw" => "\t- Update pre-reqs.\n",
+          "style" => "-",
+          "text" => "Update pre-reqs."
+        },
+        {
+          "line" => 47,
+          "raw" => "\t- Add use strict/warnings to Build.PL and Makefile.PL.\n\n",
+          "style" => "-",
+          "text" => "Add use strict/warnings to Build.PL and Makefile.PL."
+        }
+      ],
+      "line" => 33,
+      "raw" => "2.23  Sun Dec  1 09:42:00 2013\n",
+      "raw_date" => "Sun Dec  1 09:42:00 2013",
+      "version" => "2.23"
+    },
+    {
+      "date" => "2013-09-06T16:03:00Z",
+      "entries" => [
+        {
+          "line" => 50,
+          "raw" => "\t- Fix handling of graph attributes which are for clusters but not for subgraphs.\n\t\tSee scripts/sub.graph.frames.pl for sample code.\n\t\tSee the demo page for the output of that script.\n\t\tSee the new FAQ item 'How do I specify attributes for clusters?' for details.\n\t\tMany thanx to Bill Hollingsworth (private email) for prompting me to investigate this bug.\n",
+          "style" => "-",
+          "text" => "Fix handling of graph attributes which are for clusters but not for subgraphs. See scripts/sub.graph.frames.pl for sample code. See the demo page for the output of that script. See the new FAQ item 'How do I specify attributes for clusters?' for details. Many thanx to Bill Hollingsworth (private email) for prompting me to investigate this bug."
+        },
+        {
+          "line" => 55,
+          "raw" => "\t- Document method default_subgraph().\n\n",
+          "style" => "-",
+          "text" => "Document method default_subgraph()."
+        }
+      ],
+      "line" => 49,
+      "raw" => "2.22  Fri Sep  6 16:03:00 2013\n",
+      "raw_date" => "Fri Sep  6 16:03:00 2013",
+      "version" => "2.22"
+    },
+    {
+      "date" => "2013-09-06T13:00:00Z",
+      "entries" => [
+        {
+          "line" => 58,
+          "raw" => "\t- Replace Path::Tiny with File::Spec, because the former's list of dependencies is soooo long :-(.\n\t\tChanged files: GraphViz2::Config, scripts/copy.config.pl, scripts/find.config.pl, Build.PL and Makefile.PL.\n\t\tSee: RT#88435 (for Tree::DAG_Node) for an explanation.\n\n",
+          "style" => "-",
+          "text" => "Replace Path::Tiny with File::Spec, because the former's list of dependencies is soooo long :-(. Changed files: GraphViz2::Config, scripts/copy.config.pl, scripts/find.config.pl, Build.PL and Makefile.PL. See: RT#88435 (for Tree::DAG_Node) for an explanation."
+        }
+      ],
+      "line" => 57,
+      "raw" => "2.21  Fri Sep  6 13:00:00 2013\n",
+      "raw_date" => "Fri Sep  6 13:00:00 2013",
+      "version" => "2.21"
+    },
+    {
+      "date" => "2013-08-27T16:22:00Z",
+      "entries" => [
+        {
+          "line" => 63,
+          "raw" => "\t- In sub stringify_attributes(), remove leading and trailing whitespace from HTML tables like so:\n\t\ts/^\\s+(<)/\$1/ and s/(>)\\s+\$/\$1/. This is formatting sugar, but it also affects the next regexp.\n",
+          "style" => "-",
+          "text" => "In sub stringify_attributes(), remove leading and trailing whitespace from HTML tables like so: s/^\\s+(<)/\$1/ and s/(>)\\s+\$/\$1/. This is formatting sugar, but it also affects the next regexp."
+        },
+        {
+          "line" => 65,
+          "raw" => "\t- In the same sub, change a regexp from /^<.+>\$/ to /^<.+>\$/s. Note trailing 's'.\n\t\tThis allows '.' to match newlines within HTML lables. This fixes a bug (not yet reported :-).\n",
+          "style" => "-",
+          "text" => "In the same sub, change a regexp from /^<.+>\$/ to /^<.+>\$/s. Note trailing 's'. This allows '.' to match newlines within HTML lables. This fixes a bug (not yet reported :-)."
+        },
+        {
+          "line" => 67,
+          "raw" => "\t- Both these changes allow HTML labels to be more nicely formatted in the source code of the module\n\t\twhich uses GraphViz2 (such as MarpaX::Grammar::GraphViz2).\n",
+          "style" => "-",
+          "text" => "Both these changes allow HTML labels to be more nicely formatted in the source code of the module which uses GraphViz2 (such as MarpaX::Grammar::GraphViz2)."
+        },
+        {
+          "line" => 69,
+          "raw" => "\t- Split scripts/html.labels.pl into scripts/html.labels.1.pl and scripts/html.labels.2.pl.\n\t\tThese demonstrate the 2 types of HTML labels.\n",
+          "style" => "-",
+          "text" => "Split scripts/html.labels.pl into scripts/html.labels.1.pl and scripts/html.labels.2.pl. These demonstrate the 2 types of HTML labels."
+        },
+        {
+          "line" => 71,
+          "raw" => "\t- Document sub escape_some_chars().\n",
+          "style" => "-",
+          "text" => "Document sub escape_some_chars()."
+        },
+        {
+          "line" => 72,
+          "raw" => "\t- Add an FAQ item on using whitespace in HTML labels.\n\n",
+          "style" => "-",
+          "text" => "Add an FAQ item on using whitespace in HTML labels."
+        }
+      ],
+      "line" => 62,
+      "raw" => "2.20  Tue Aug 27 16:22:00 2013\n",
+      "raw_date" => "Tue Aug 27 16:22:00 2013",
+      "version" => "2.20"
+    },
+    {
+      "date" => "2013-08-20T10:44:00Z",
+      "entries" => [
+        {
+          "line" => 75,
+          "raw" => "\t- Remove the global graph attribute 'record_orientation', as forewarned in V 2.10, in June.\n",
+          "style" => "-",
+          "text" => "Remove the global graph attribute 'record_orientation', as forewarned in V 2.10, in June."
+        },
+        {
+          "line" => 76,
+          "raw" => "\t- Fix handling of some global attributes.\n\t\tPreviously, some options mentioned in the call to new(...) were not set by that call.\n\t\tThe options affected were: 'driver', 'format', 'strict', 'subgraph' and 'timeout'.\n\t\tThe options 'driver', 'format', and 'timeout' could be set in the call to run(...),\n\t\tbut in new(...), the value of 'format' was ignored, and the value of 'subgraph' generated an error\n\t\treferring to '... not a valid attribute ...'.\n\t\tThanx to Larry Knibb for reporting this problem, for 'driver'.\n",
+          "style" => "-",
+          "text" => "Fix handling of some global attributes. Previously, some options mentioned in the call to new(...) were not set by that call. The options affected were: 'driver', 'format', 'strict', 'subgraph' and 'timeout'. The options 'driver', 'format', and 'timeout' could be set in the call to run(...), but in new(...), the value of 'format' was ignored, and the value of 'subgraph' generated an error referring to '... not a valid attribute ...'. Thanx to Larry Knibb for reporting this problem, for 'driver'."
+        },
+        {
+          "line" => 83,
+          "raw" => "\t- Remove reference to GraphViz2::Parse::Marpa from scripts/pod2html.sh. See comment below for V 2.15.\n\t\tThis module has been replaced by MarpaX::Grammar::GraphViz2, which depends on MarpaX::Grammar::Parser.\n\n",
+          "style" => "-",
+          "text" => "Remove reference to GraphViz2::Parse::Marpa from scripts/pod2html.sh. See comment below for V 2.15. This module has been replaced by MarpaX::Grammar::GraphViz2, which depends on MarpaX::Grammar::Parser."
+        }
+      ],
+      "line" => 74,
+      "raw" => "2.19  Tue Aug 20 10:44:00 2013\n",
+      "raw_date" => "Tue Aug 20 10:44:00 2013",
+      "version" => "2.19"
+    },
+    {
+      "date" => "2013-08-07T09:22:00Z",
+      "entries" => [
+        {
+          "line" => 87,
+          "raw" => "\t- Remove print from sub BUILD() left over from debugging.\n",
+          "style" => "-",
+          "text" => "Remove print from sub BUILD() left over from debugging."
+        },
+        {
+          "line" => 88,
+          "raw" => "\t- Update Build.PL and Makefile.PL to include bugtracker and license items.\n\t\tAlso replace the Perl version checking code with a simple 'require 5.014.002; # For the utf8 stuff.'.\n\n",
+          "style" => "-",
+          "text" => "Update Build.PL and Makefile.PL to include bugtracker and license items. Also replace the Perl version checking code with a simple 'require 5.014.002; # For the utf8 stuff.'."
+        }
+      ],
+      "line" => 86,
+      "raw" => "2.18  Wed Aug  7 09:22:00 2013\n",
+      "raw_date" => "Wed Aug  7 09:22:00 2013",
+      "version" => "2.18"
+    },
+    {
+      "date" => "2013-08-03T08:58:00Z",
+      "entries" => [
+        {
+          "line" => 92,
+          "raw" => "\t- Fix handling of record shapes. E.g. label => [] ignored global default shape 'Mrecord'.\n\t\tThanx to Kent Fredric for this report. See RT#87560.\n",
+          "style" => "-",
+          "text" => "Fix handling of record shapes. E.g. label => [] ignored global default shape 'Mrecord'. Thanx to Kent Fredric for this report. See RT#87560."
+        },
+        {
+          "line" => 94,
+          "raw" => "\t- Fix handling of the graph's default name. This is used in 'digraph \$name {...}'.\n\t\tPreviously, names like '' or '0' were ignored, and such values defaulted to 'Perl'.\n",
+          "style" => "-",
+          "text" => "Fix handling of the graph's default name. This is used in 'digraph \$name {...}'. Previously, names like '' or '0' were ignored, and such values defaulted to 'Perl'."
+        },
+        {
+          "line" => 96,
+          "raw" => "\t- Add scripts/record.4.pl to demonstrate setting record-style node attributes.\n",
+          "style" => "-",
+          "text" => "Add scripts/record.4.pl to demonstrate setting record-style node attributes."
+        },
+        {
+          "line" => 97,
+          "raw" => "\t- Fix names of html/utf8*.svg and png files, as output by scripts/utf8*.pl.\n",
+          "style" => "-",
+          "text" => "Fix names of html/utf8*.svg and png files, as output by scripts/utf8*.pl."
+        },
+        {
+          "line" => 98,
+          "raw" => "\t- Fix scripts/generate.sh.pl which generates scripts/generate.(png,svg).sh.\n\n",
+          "style" => "-",
+          "text" => "Fix scripts/generate.sh.pl which generates scripts/generate.(png,svg).sh."
+        }
+      ],
+      "line" => 91,
+      "raw" => "2.17  Sat Aug  3 08:58:00 2013\n",
+      "raw_date" => "Sat Aug  3 08:58:00 2013",
+      "version" => "2.17"
+    },
+    {
+      "date" => "2013-08-02T10:54:00Z",
+      "entries" => [
+        {
+          "line" => 101,
+          "raw" => "\t- Patch GraphViz2.pm to handle both SVG and (eg) PNG output. I failed to test this properly.\n\t\tThanx to Kent Fredric for this report. See RT#87525.\n",
+          "style" => "-",
+          "text" => "Patch GraphViz2.pm to handle both SVG and (eg) PNG output. I failed to test this properly. Thanx to Kent Fredric for this report. See RT#87525."
+        },
+        {
+          "line" => 103,
+          "raw" => "\t- Patch scripts/Heawood.pl to use font ArialMT instead of Arial when running under Darwin (OSX). Grrrr.\n\t\tThanx to David Jack Olrik for this report. See RT#87478.\n",
+          "style" => "-",
+          "text" => "Patch scripts/Heawood.pl to use font ArialMT instead of Arial when running under Darwin (OSX). Grrrr. Thanx to David Jack Olrik for this report. See RT#87478."
+        },
+        {
+          "line" => 105,
+          "raw" => "\t- Remove special case code in scripts/jointed.edges.pl. It used png:gd instead of png, to work round\n\t\tan unknown Graphviz problem. Let's hope /your/ version of Graphviz is up-to-date.\n",
+          "style" => "-",
+          "text" => "Remove special case code in scripts/jointed.edges.pl. It used png:gd instead of png, to work round an unknown Graphviz problem. Let's hope /your/ version of Graphviz is up-to-date."
+        },
+        {
+          "line" => 107,
+          "raw" => "\t- Patch scripts/circo.pl: Add comment searched for by t/test.t, which is used to label html/index.html.\n",
+          "style" => "-",
+          "text" => "Patch scripts/circo.pl: Add comment searched for by t/test.t, which is used to label html/index.html."
+        },
+        {
+          "line" => 108,
+          "raw" => "\t- Add scripts/generate.sh.pl to generate scripts/generate.png.sh and scripts/generate.svg.sh.\n\t\tThis adds 2 tests, and 2 images to the demo page, and fixes various typos in those *.sh files.\n",
+          "style" => "-",
+          "text" => "Add scripts/generate.sh.pl to generate scripts/generate.png.sh and scripts/generate.svg.sh. This adds 2 tests, and 2 images to the demo page, and fixes various typos in those *.sh files."
+        },
+        {
+          "line" => 110,
+          "raw" => "\t- Switch from Hash::FieldHash to Moo.\n",
+          "style" => "-",
+          "text" => "Switch from Hash::FieldHash to Moo."
+        },
+        {
+          "line" => 111,
+          "raw" => "\t- Add config/.htgraphviz2 to help the author generate the demo.\n",
+          "style" => "-",
+          "text" => "Add config/.htgraphviz2 to help the author generate the demo."
+        },
+        {
+          "line" => 112,
+          "raw" => "\t- Add GraphViz2::Config.pm, and split GraphViz2::Filer off from GraphViz2::Utils, which also helps\n\t\tgenerate the demo.\n",
+          "style" => "-",
+          "text" => "Add GraphViz2::Config.pm, and split GraphViz2::Filer off from GraphViz2::Utils, which also helps generate the demo."
+        },
+        {
+          "line" => 114,
+          "raw" => "\t- Switch from Hash::FieldHash to Moo.\n",
+          "style" => "-",
+          "text" => "Switch from Hash::FieldHash to Moo."
+        },
+        {
+          "line" => 115,
+          "raw" => "\t- Use File::Slurp except where I need Perl6::Slurp's utf8 option. I needed File::Slurp's write_file for\n\t\tthe new script scripts/generate.sh.pl, so I decided to use it in most places.\n",
+          "style" => "-",
+          "text" => "Use File::Slurp except where I need Perl6::Slurp's utf8 option. I needed File::Slurp's write_file for the new script scripts/generate.sh.pl, so I decided to use it in most places."
+        },
+        {
+          "line" => 117,
+          "raw" => "\t- Rename scripts/utf8.pl to scripts/utf8.1.pl.\n",
+          "style" => "-",
+          "text" => "Rename scripts/utf8.pl to scripts/utf8.1.pl."
+        },
+        {
+          "line" => 118,
+          "raw" => "\t- Rename scripts/utf8.test.pl to scripts/utf8.2.pl.\n",
+          "style" => "-",
+          "text" => "Rename scripts/utf8.test.pl to scripts/utf8.2.pl."
+        },
+        {
+          "line" => 119,
+          "raw" => "\t- Rename html/utf8.svg to html/utf8.1.svg.\n",
+          "style" => "-",
+          "text" => "Rename html/utf8.svg to html/utf8.1.svg."
+        },
+        {
+          "line" => 120,
+          "raw" => "\t- Rename html/utf8.test.svg to html/utf8.2.svg.\n\n",
+          "style" => "-",
+          "text" => "Rename html/utf8.test.svg to html/utf8.2.svg."
+        }
+      ],
+      "line" => 100,
+      "raw" => "2.16  Fri Aug  2 10:54:00 2013\n",
+      "raw_date" => "Fri Aug  2 10:54:00 2013",
+      "version" => "2.16"
+    },
+    {
+      "date" => "2013-07-29T14:42:00Z",
+      "entries" => [
+        {
+          "line" => 123,
+          "raw" => "\t- Remove GraphViz2::Parse::Marpa, until it's re-written to use Jeffrey Kegler's code to dump a grammar.\n",
+          "style" => "-",
+          "text" => "Remove GraphViz2::Parse::Marpa, until it's re-written to use Jeffrey Kegler's code to dump a grammar."
+        },
+        {
+          "line" => 124,
+          "raw" => "\t- Add scripts/circo.pl and it's output html/circo.svg.\n",
+          "style" => "-",
+          "text" => "Add scripts/circo.pl and it's output html/circo.svg."
+        },
+        {
+          "line" => 125,
+          "raw" => "\t- For non-HTML labels, escape double-quotes if they are not already escaped.\n\t\tThis allows pathological labels such as '\\\"'.\n",
+          "style" => "-",
+          "text" => "For non-HTML labels, escape double-quotes if they are not already escaped. This allows pathological labels such as '\\\"'."
+        },
+        {
+          "line" => 127,
+          "raw" => "\t- For all labels, escape '[' and ']' if they are not already escaped.\n\t\tThe rationale for this is shrouded in the mists of time :-(.\n",
+          "style" => "-",
+          "text" => "For all labels, escape '[' and ']' if they are not already escaped. The rationale for this is shrouded in the mists of time :-(."
+        },
+        {
+          "line" => 129,
+          "raw" => "\t- Put author tests in xt/author.\n",
+          "style" => "-",
+          "text" => "Put author tests in xt/author."
+        },
+        {
+          "line" => 130,
+          "raw" => "\t- Add Algorithm::Dependency::Source::HoA V 1.110 to the pre-reqs to keep my home-grown Build.PL and\n\t\tMakefile.PL checker a bit quieter.\n",
+          "style" => "-",
+          "text" => "Add Algorithm::Dependency::Source::HoA V 1.110 to the pre-reqs to keep my home-grown Build.PL and Makefile.PL checker a bit quieter."
+        },
+        {
+          "line" => 132,
+          "raw" => "\t- Add Config V 0, channames V 0 and open V 0 to the pre-reqs.\n",
+          "style" => "-",
+          "text" => "Add Config V 0, channames V 0 and open V 0 to the pre-reqs."
+        },
+        {
+          "line" => 133,
+          "raw" => "\t- Move t/pod.t to xt/author/.\n",
+          "style" => "-",
+          "text" => "Move t/pod.t to xt/author/."
+        },
+        {
+          "line" => 134,
+          "raw" => "\t- Switch from IPC::Run to IPC::Run3. This after a discussion with Larry Knibb re the fact that his code is\n\t\thanging under Apache (mod_cgi) on Windows. He suggested using qx//, but I've gone for IPC::Run3.\n\t\tThe other reason to switch is the overly-long bug list for IPC::Run, including Larry's report RT#87397.\n\t\tI went thru the same issues with Lee when switching from system() to IPC::Run for V 2.02. See RT#76459.\n\t\tIPC::Run3 has the advantage of letting me set binmode on various file handles.\n",
+          "style" => "-",
+          "text" => "Switch from IPC::Run to IPC::Run3. This after a discussion with Larry Knibb re the fact that his code is hanging under Apache (mod_cgi) on Windows. He suggested using qx//, but I've gone for IPC::Run3. The other reason to switch is the overly-long bug list for IPC::Run, including Larry's report RT#87397. I went thru the same issues with Lee when switching from system() to IPC::Run for V 2.02. See RT#76459. IPC::Run3 has the advantage of letting me set binmode on various file handles."
+        },
+        {
+          "line" => 139,
+          "raw" => "\t- For all modules and some scripts, convert:\n\t\t\tuse strict;\n\t\t\tuse warnings;\n\t\tinto:\n\t\t\tuse strict;\n\t\t\tuse utf8;\n\t\t\tuse warnings;\n\t\t\tuse warnings  qw(FATAL utf8);    # Fatalize encoding glitches.\n\t\t\tuse open      qw(:std :utf8);    # Undeclared streams in UTF-8.\n\t\t\tuse charnames qw(:full :short);  # Unneeded in v5.16.\n\n",
+          "style" => "-",
+          "text" => "For all modules and some scripts, convert: use strict; use warnings; into: use strict; use utf8; use warnings; use warnings  qw(FATAL utf8);    # Fatalize encoding glitches. use open      qw(:std :utf8);    # Undeclared streams in UTF-8. use charnames qw(:full :short);  # Unneeded in v5.16."
+        }
+      ],
+      "line" => 122,
+      "raw" => "2.15  Mon Jul 29 14:42:00 2013\n",
+      "raw_date" => "Mon Jul 29 14:42:00 2013",
+      "version" => "2.15"
+    },
+    {
+      "date" => "2013-07-01T10:09:00Z",
+      "entries" => [
+        {
+          "line" => 151,
+          "raw" => "\t- Patch push_subgraph() to correctly handle the case of an unnamed subgraph.\n\t\tThe code was outputting 'subgraph \"\" {...}'. The extra \"\" are now suppressed.\n\t\tThe code also handles the case of the name being undef.\n\t\tThere are no doc changes because the docs described precisely what should have happened, thusly:\n\t\t\tSo, without \$name, 'subgraph {' is written to the output stream.\n\t\t\tWith \$name, 'subgraph \"\$name\" {' is written to the output stream.\n\t\tMany thanx (again) to Larry Marso for reporting this, with sample code.\n",
+          "style" => "-",
+          "text" => "Patch push_subgraph() to correctly handle the case of an unnamed subgraph. The code was outputting 'subgraph \"\" {...}'. The extra \"\" are now suppressed. The code also handles the case of the name being undef. There are no doc changes because the docs described precisely what should have happened, thusly: So, without \$name, 'subgraph {' is written to the output stream. With \$name, 'subgraph \"\$name\" {' is written to the output stream. Many thanx (again) to Larry Marso for reporting this, with sample code."
+        },
+        {
+          "line" => 158,
+          "raw" => "\t- Add scripts/unnamed.sub.graph.pl.\n\n",
+          "style" => "-",
+          "text" => "Add scripts/unnamed.sub.graph.pl."
+        }
+      ],
+      "line" => 150,
+      "raw" => "2.14  Mon Jul  1 10:09:00 2013\n",
+      "raw_date" => "Mon Jul  1 10:09:00 2013",
+      "version" => "2.14"
+    },
+    {
+      "date" => "2013-06-28T12:02:00Z",
+      "entries" => [
+        {
+          "line" => 161,
+          "raw" => "\t- Oops - Patch scripts/record.1.pl as was allegedly done for V 2.11.\n\n",
+          "style" => "-",
+          "text" => "Oops - Patch scripts/record.1.pl as was allegedly done for V 2.11."
+        }
+      ],
+      "line" => 160,
+      "raw" => "2.13  Fri Jun 28 12:02:00 2013\n",
+      "raw_date" => "Fri Jun 28 12:02:00 2013",
+      "version" => "2.13"
+    },
+    {
+      "date" => "2013-06-27T14:40:00Z",
+      "entries" => [
+        {
+          "line" => 164,
+          "raw" => "\t- Add scripts/plaintext.pl, which generates a 'Use of uninitialized value...' error under V 2.11 and,\n\t\tafter the fix, does not do so under V 2.12. Many thanx to Larry Marso for the (private email) report.\n\n",
+          "style" => "-",
+          "text" => "Add scripts/plaintext.pl, which generates a 'Use of uninitialized value...' error under V 2.11 and, after the fix, does not do so under V 2.12. Many thanx to Larry Marso for the (private email) report."
+        }
+      ],
+      "line" => 163,
+      "raw" => "2.12  Thu Jun 27 14:40:00 2013\n",
+      "raw_date" => "Thu Jun 27 14:40:00 2013",
+      "version" => "2.12"
+    },
+    {
+      "date" => "2013-06-27T09:21:00Z",
+      "entries" => [
+        {
+          "line" => 168,
+          "raw" => "\t- Correct spelling of Kent Fredric's name below, with apologies.\n",
+          "style" => "-",
+          "text" => "Correct spelling of Kent Fredric's name below, with apologies."
+        },
+        {
+          "line" => 169,
+          "raw" => "\t- Patch scripts/record.1.pl and scripts/record.2.pl to use '\\\\n' to get a literal '\\n' in the output dot\n\t\tfile. The original works my Debian machine, but needs fixing in case there's someone out there not\n\t\tusing Debian :-).\n",
+          "style" => "-",
+          "text" => "Patch scripts/record.1.pl and scripts/record.2.pl to use '\\\\n' to get a literal '\\n' in the output dot file. The original works my Debian machine, but needs fixing in case there's someone out there not using Debian :-)."
+        },
+        {
+          "line" => 172,
+          "raw" => "\t- Remove debug log message from add_edge().\n\n",
+          "style" => "-",
+          "text" => "Remove debug log message from add_edge()."
+        }
+      ],
+      "line" => 167,
+      "raw" => "2.11  Thu Jun 27 09:21:00 2013\n",
+      "raw_date" => "Thu Jun 27 09:21:00 2013",
+      "version" => "2.11"
+    },
+    {
+      "date" => "2013-06-24T11:05:00Z",
+      "entries" => [
+        {
+          "line" => 175,
+          "raw" => "\t- Overview: Re-work the label and port handing code.\n",
+          "style" => "-",
+          "text" => "Overview: Re-work the label and port handing code."
+        },
+        {
+          "line" => 176,
+          "raw" => "\t- Note: the global graph attribute 'record_orientation' no longer does anything. The new label syntax,\n\t\t(next, and in detail in the FAQ (https://metacpan.org/module/GraphViz2#How-labels-interact-with-ports) ),\n\t\tis now the recommended way of using labels to specify both ports and orientation.\n\t\tUsing 'record_orientation' will not cause parameter validation to fail, it just won't have any effect.\n\t\tThe attribute will be removed in a future version, so prepare now by deleting it from your code.\n",
+          "style" => "-",
+          "text" => "Note: the global graph attribute 'record_orientation' no longer does anything. The new label syntax, (next, and in detail in the FAQ (https://metacpan.org/module/GraphViz2#How-labels-interact-with-ports) ), is now the recommended way of using labels to specify both ports and orientation. Using 'record_orientation' will not cause parameter validation to fail, it just won't have any effect. The attribute will be removed in a future version, so prepare now by deleting it from your code."
+        },
+        {
+          "line" => 181,
+          "raw" => "\t- Labels can be a string, an arrayref of strings, or an arrayref of hashrefs. The latter alternative\n\t\tis new. The keys to the hashrefs are 'text' and 'port', with the latter being optional.\n\t\tSee the FAQ topic mentioned above. See scripts/record.2.pl for sample code.\n\t\tMany thanx to Kent Fredric for the report (RT#85976), and the list of suggestions.\n",
+          "style" => "-",
+          "text" => "Labels can be a string, an arrayref of strings, or an arrayref of hashrefs. The latter alternative is new. The keys to the hashrefs are 'text' and 'port', with the latter being optional. See the FAQ topic mentioned above. See scripts/record.2.pl for sample code. Many thanx to Kent Fredric for the report (RT#85976), and the list of suggestions."
+        },
+        {
+          "line" => 185,
+          "raw" => "\t- Add scripts/record.3.pl and add it to the demo generating code scripts/generate.*.sh.\n\t\tIt demonstrates deeply nested record structures using a string as a label. The same effect could be\n\t\tachieved by using an arrayref of hashrefs, of course. scripts/record.2.pl shows how.\n",
+          "style" => "-",
+          "text" => "Add scripts/record.3.pl and add it to the demo generating code scripts/generate.*.sh. It demonstrates deeply nested record structures using a string as a label. The same effect could be achieved by using an arrayref of hashrefs, of course. scripts/record.2.pl shows how."
+        },
+        {
+          "line" => 188,
+          "raw" => "\t- Stop escaping the 2 label characters { and }, since they are used to orient fields within records.\n\t\tOn the demo page http://savage.net.au/Perl-modules/html/graphviz2/, see scripts/record.*.pl.\n\t\tExpand the FAQ discussion of escaping to cover this issue.\n",
+          "style" => "-",
+          "text" => "Stop escaping the 2 label characters { and }, since they are used to orient fields within records. On the demo page http://savage.net.au/Perl-modules/html/graphviz2/, see scripts/record.*.pl. Expand the FAQ discussion of escaping to cover this issue."
+        },
+        {
+          "line" => 191,
+          "raw" => "\t- Remove restriction that port names in calls to add_edge() had to start with 'port'.\n\t\tThis was due to my misreading of the Graphviz docs, where all examples used a 'port' prefix.\n\t\tThe code also now checks for '*::*', in case the program is using Perl classes for node names,\n\t\tin which case we don't want the first ':' to be taken as the introduction for a port name.\n",
+          "style" => "-",
+          "text" => "Remove restriction that port names in calls to add_edge() had to start with 'port'. This was due to my misreading of the Graphviz docs, where all examples used a 'port' prefix. The code also now checks for '*::*', in case the program is using Perl classes for node names, in which case we don't want the first ':' to be taken as the introduction for a port name."
+        },
+        {
+          "line" => 195,
+          "raw" => "\t- Update words/tokens (arrow shapes etc) stored within the source code, by running scripts/extract.*.pl\n\t\tand storing the output in lib/GraphViz2.pm after the __DATA__ token. Yes, I know this is hard-coding.\n\t\tSee the amazing module Data::Section::Simple for details.\n\t\tThe set of words/tokens matches Graphviz 2.30.1, as of today, 2013-06-24.\n",
+          "style" => "-",
+          "text" => "Update words/tokens (arrow shapes etc) stored within the source code, by running scripts/extract.*.pl and storing the output in lib/GraphViz2.pm after the __DATA__ token. Yes, I know this is hard-coding. See the amazing module Data::Section::Simple for details. The set of words/tokens matches Graphviz 2.30.1, as of today, 2013-06-24."
+        },
+        {
+          "line" => 199,
+          "raw" => "\t- Rename CHANGES to Changes as per CPAN::Changes::SPEC.\n",
+          "style" => "-",
+          "text" => "Rename CHANGES to Changes as per CPAN::Changes::SPEC."
+        },
+        {
+          "line" => 200,
+          "raw" => "\t- Reformat the POD in lib/GraphViz2.pm slightly.\n",
+          "style" => "-",
+          "text" => "Reformat the POD in lib/GraphViz2.pm slightly."
+        },
+        {
+          "line" => 201,
+          "raw" => "\t- Remove scripts/parse.marpa.pl and t/sample.marpa.1.dat, as a step in removing all Marpa-related material,\n\t\tbecause it uses the deprecated NAIF interface. All new Marpa work should use the scanless interface (SCIF).\n",
+          "style" => "-",
+          "text" => "Remove scripts/parse.marpa.pl and t/sample.marpa.1.dat, as a step in removing all Marpa-related material, because it uses the deprecated NAIF interface. All new Marpa work should use the scanless interface (SCIF)."
+        },
+        {
+          "line" => 203,
+          "raw" => "\t- Change Build.PL and Makefile.PL to check for Perl being at least V 5.14.0. If you are using an earlier\n\t\tversion, you can forgo utf8 support by editing the files to relax this restriction.\n\t\tSome tests (utf8.pl, utf8.test.pl) will presumably fail as a consequence.\n\t\tLastly, my attention has been drawn to Unicode::Semantics::up(), but I've chosen not to use it.\n\n",
+          "style" => "-",
+          "text" => "Change Build.PL and Makefile.PL to check for Perl being at least V 5.14.0. If you are using an earlier version, you can forgo utf8 support by editing the files to relax this restriction. Some tests (utf8.pl, utf8.test.pl) will presumably fail as a consequence. Lastly, my attention has been drawn to Unicode::Semantics::up(), but I've chosen not to use it."
+        }
+      ],
+      "line" => 174,
+      "raw" => "2.10  Mon Jun 24 11:05:00 2013\n",
+      "raw_date" => "Mon Jun 24 11:05:00 2013",
+      "version" => "2.10"
+    },
+    {
+      "date" => "2013-05-31T09:57:00Z",
+      "entries" => [
+        {
+          "line" => 209,
+          "raw" => "\t- Re-write the code in Build.PL and Makefile.PL which checks for Graphviz (dot) being installed,\n\t\tsince the previous code, using a pipe, was failing on some versions of Windows.\n",
+          "style" => "-",
+          "text" => "Re-write the code in Build.PL and Makefile.PL which checks for Graphviz (dot) being installed, since the previous code, using a pipe, was failing on some versions of Windows."
+        },
+        {
+          "line" => 211,
+          "raw" => "\t- Assume Config.pm is installed, and hence remove it from the pre-reqs.\n\t\tThis also stops a warning message generated because Config's version # is undef.\n",
+          "style" => "-",
+          "text" => "Assume Config.pm is installed, and hence remove it from the pre-reqs. This also stops a warning message generated because Config's version # is undef."
+        },
+        {
+          "line" => 213,
+          "raw" => "\t- Likewise assume File::Spec and File::Temp are installed, and 'recent enough'.\n\t\tThis is because the new code uses these 3 modules before specifying the pre-reqs.\n",
+          "style" => "-",
+          "text" => "Likewise assume File::Spec and File::Temp are installed, and 'recent enough'. This is because the new code uses these 3 modules before specifying the pre-reqs."
+        },
+        {
+          "line" => 215,
+          "raw" => "\t- Bump the pre-req for Perl from 5.10.0 to 5.14, since we 'use feature qw/unicode_strings/.\n",
+          "style" => "-",
+          "text" => "Bump the pre-req for Perl from 5.10.0 to 5.14, since we 'use feature qw/unicode_strings/."
+        },
+        {
+          "line" => 216,
+          "raw" => "\t- Re-write the code in Build.PL and Makefile.PL which checks for Perl being 'recent enough',\n\t\tsince the previous code, using a pre-req of \"perl => '5.10.0'\" generates a warning message\n\t\twhen using Makefile.PL (for my current Perl V 5.14.2). Now we analyze \$Config{version}.\n",
+          "style" => "-",
+          "text" => "Re-write the code in Build.PL and Makefile.PL which checks for Perl being 'recent enough', since the previous code, using a pre-req of \"perl => '5.10.0'\" generates a warning message when using Makefile.PL (for my current Perl V 5.14.2). Now we analyze \$Config{version}."
+        },
+        {
+          "line" => 219,
+          "raw" => "\t- One CPAN Tester found tests failing even though Graphviz was installed.\n\t\tThe problem was that the Times font was missing. The new code should fail during 'perl Build.PL',\n\t\tor 'perl Makefile.PL', rather than during testing, which is good.\n\n",
+          "style" => "-",
+          "text" => "One CPAN Tester found tests failing even though Graphviz was installed. The problem was that the Times font was missing. The new code should fail during 'perl Build.PL', or 'perl Makefile.PL', rather than during testing, which is good."
+        }
+      ],
+      "line" => 208,
+      "raw" => "2.09  Fri May 31 09:57:00 2013\n",
+      "raw_date" => "Fri May 31 09:57:00 2013",
+      "version" => "2.09"
+    },
+    {
+      "date" => "2013-03-21T13:16:00Z",
+      "entries" => [
+        {
+          "line" => 224,
+          "raw" => "\t- Add \$ENV{DBI_SCHEMA} to scripts/dbi.schema.pl.\n",
+          "style" => "-",
+          "text" => "Add \$ENV{DBI_SCHEMA} to scripts/dbi.schema.pl."
+        },
+        {
+          "line" => 225,
+          "raw" => "\t- For the MusicBrainz database, use DBI_SCHEMA=musicbrainz,cover_art_archive,report,statistics.\n\t\tSee http://musicbrainz.org/doc/MusicBrainz_Database for details.\n\t\tUsers of cpanm will want 'cpanm Carton' instead of 'sudo cpan Carton' in Perl dependencies.\n\t\tSee https://github.com/metabrainz/musicbrainz-server/blob/master/INSTALL.md for details.\n\n",
+          "style" => "-",
+          "text" => "For the MusicBrainz database, use DBI_SCHEMA=musicbrainz,cover_art_archive,report,statistics. See http://musicbrainz.org/doc/MusicBrainz_Database for details. Users of cpanm will want 'cpanm Carton' instead of 'sudo cpan Carton' in Perl dependencies. See https://github.com/metabrainz/musicbrainz-server/blob/master/INSTALL.md for details."
+        }
+      ],
+      "line" => 223,
+      "raw" => "2.08  Thu Mar 21 13:16:00 2013\n",
+      "raw_date" => "Thu Mar 21 13:16:00 2013",
+      "version" => "2.08"
+    },
+    {
+      "date" => "2013-03-13T13:24:00Z",
+      "entries" => [
+        {
+          "line" => 231,
+          "raw" => "\t- Extend GraphViz2::DBI to handle SQLite using pragma foreign_key_list(\$table_name).\n",
+          "style" => "-",
+          "text" => "Extend GraphViz2::DBI to handle SQLite using pragma foreign_key_list(\$table_name)."
+        },
+        {
+          "line" => 232,
+          "raw" => "\t- Add scripts/sqlite.foreign.keys.pl to help analyze that pragma's output.\n",
+          "style" => "-",
+          "text" => "Add scripts/sqlite.foreign.keys.pl to help analyze that pragma's output."
+        },
+        {
+          "line" => 233,
+          "raw" => "\t- Remove the string 'App-Office-CMS' from scripts/dbi.schema.pl. That is, the create() method is\n\t\tcalled as \$g -> create(name => ''). This has the effect of removing the global node from the\n\t\tresultant graph. All tables were descendents of this node, but with schemas of dozens or hundreds\n\t\tof tables, it became confusing.\n",
+          "style" => "-",
+          "text" => "Remove the string 'App-Office-CMS' from scripts/dbi.schema.pl. That is, the create() method is called as \$g -> create(name => ''). This has the effect of removing the global node from the resultant graph. All tables were descendents of this node, but with schemas of dozens or hundreds of tables, it became confusing."
+        },
+        {
+          "line" => 237,
+          "raw" => "\t- Patch dbi.schema.pl to set the DBI connect attr sqlite_unicode and foreign_keys pragma if using SQLite.\n\n",
+          "style" => "-",
+          "text" => "Patch dbi.schema.pl to set the DBI connect attr sqlite_unicode and foreign_keys pragma if using SQLite."
+        }
+      ],
+      "line" => 230,
+      "raw" => "2.07  Wed Mar 13 13:24:00 2013\n",
+      "raw_date" => "Wed Mar 13 13:24:00 2013",
+      "version" => "2.07"
+    },
+    {
+      "date" => "2012-11-08T12:38:00Z",
+      "entries" => [
+        {
+          "line" => 240,
+          "raw" => "\t- No code changes.\n",
+          "style" => "-",
+          "text" => "No code changes."
+        },
+        {
+          "line" => 241,
+          "raw" => "\t- For pre-reqs such as strict, warnings, etc, which ship with Perl, set the version # to 0.\n\t\tReported as RT#80663 by Father Chrysostomos for Tree::DAG_Node.\n\n",
+          "style" => "-",
+          "text" => "For pre-reqs such as strict, warnings, etc, which ship with Perl, set the version # to 0. Reported as RT#80663 by Father Chrysostomos for Tree::DAG_Node."
+        }
+      ],
+      "line" => 239,
+      "raw" => "2.06  Thu Nov  8 12:38:00 2012\n",
+      "raw_date" => "Thu Nov  8 12:38:00 2012",
+      "version" => "2.06"
+    },
+    {
+      "date" => "2012-10-02T10:20:00Z",
+      "entries" => [
+        {
+          "line" => 245,
+          "raw" => "\t- No fundamental code changes, so no need to upgrade, unless you need the following new features.\n",
+          "style" => "-",
+          "text" => "No fundamental code changes, so no need to upgrade, unless you need the following new features."
+        },
+        {
+          "line" => 246,
+          "raw" => "\t- After a request from Jack Maney, author of the Perl module Hypatia:\n\t\to Document the mutator node_hash(), which returns a hashref keyed by node name.\n\t\t\tUse this to get a list of all nodes and their attributes.\n\t\to Add a new mutator, edge_hash(), which also returns a hashref keyed by node name.\n\t\t\tThe node is the one at the arrow/tail/ end of the edge, i.e. where the edge starts from.\n\t\t\tUse this to learn all sorts of things about the edge.\n\t\to Add scripts/report.nodes.and.edges.pl (a version of scripts/html.labels.pl) to demonstrate\n\t\t\thow to access this data.\n\t\to Update to POD to match.\n\n",
+          "style" => "-",
+          "text" => "After a request from Jack Maney, author of the Perl module Hypatia: o Document the mutator node_hash(), which returns a hashref keyed by node name. Use this to get a list of all nodes and their attributes. o Add a new mutator, edge_hash(), which also returns a hashref keyed by node name. The node is the one at the arrow/tail/ end of the edge, i.e. where the edge starts from. Use this to learn all sorts of things about the edge. o Add scripts/report.nodes.and.edges.pl (a version of scripts/html.labels.pl) to demonstrate how to access this data. o Update to POD to match."
+        }
+      ],
+      "line" => 244,
+      "raw" => "2.05  Tue Oct  2 10:20:00 2012\n",
+      "raw_date" => "Tue Oct  2 10:20:00 2012",
+      "version" => "2.05"
+    },
+    {
+      "date" => "2012-08-17T10:48:00Z",
+      "entries" => [
+        {
+          "line" => 257,
+          "raw" => "\t- Add Perl V 5.14.2 to the pre-reqs, for the utf8 stuff.\n",
+          "style" => "-",
+          "text" => "Add Perl V 5.14.2 to the pre-reqs, for the utf8 stuff."
+        },
+        {
+          "line" => 258,
+          "raw" => "\t- Re-write the subgraph handling code, which was broken up to V 2.03.\n\t\tAdd samples, script/rank.sub.graph.[1234].pl, to demonstrate subgraph name effects and node rankings.\n\t\tscript/rank.sub.graph.[12].pl use subgraphs to force a set of nodes to be horizontally aligned.\n\t\tscript/rank.sub.graph.[34].pl show the effects of subgraph name changes on the same data.\n\n",
+          "style" => "-",
+          "text" => "Re-write the subgraph handling code, which was broken up to V 2.03. Add samples, script/rank.sub.graph.[1234].pl, to demonstrate subgraph name effects and node rankings. script/rank.sub.graph.[12].pl use subgraphs to force a set of nodes to be horizontally aligned. script/rank.sub.graph.[34].pl show the effects of subgraph name changes on the same data."
+        }
+      ],
+      "line" => 256,
+      "raw" => "2.04  Fri Aug 17 10:48:00 2012\n",
+      "raw_date" => "Fri Aug 17 10:48:00 2012",
+      "version" => "2.04"
+    },
+    {
+      "date" => "2012-06-18T9:47:00Z",
+      "entries" => [
+        {
+          "line" => 264,
+          "raw" => "\t- Switch from double to single quotes in line 22 of GraphViz2::Parse::Regexp, so the resultant string,\n\t\ttreated as Perl code, runs on Windows. Reported by Max Maischein as RT#77869.\n",
+          "style" => "-",
+          "text" => "Switch from double to single quotes in line 22 of GraphViz2::Parse::Regexp, so the resultant string, treated as Perl code, runs on Windows. Reported by Max Maischein as RT#77869."
+        },
+        {
+          "line" => 266,
+          "raw" => "\t- Also, slightly reformat line 39 of that module.\n\n",
+          "style" => "-",
+          "text" => "Also, slightly reformat line 39 of that module."
+        }
+      ],
+      "line" => 263,
+      "raw" => "2.03  Mon Jun 18  9:47:00 2012\n",
+      "raw_date" => "Mon Jun 18  9:47:00 2012",
+      "version" => "2.03"
+    },
+    {
+      "date" => "2012-04-19T11:51:00Z",
+      "entries" => [
+        {
+          "line" => 269,
+          "raw" => "\t- Accept patch from Lee as in RT#76459, to replace the code which writes the dot input file to\n\t\ta file with binmode, and just pass the data to dot via IPC::Run.\n\t\tHappily, this allows me to eliminate 'use open qw/:encoding(UTF-8) :std/;' in t/test.t.\n",
+          "style" => "-",
+          "text" => "Accept patch from Lee as in RT#76459, to replace the code which writes the dot input file to a file with binmode, and just pass the data to dot via IPC::Run. Happily, this allows me to eliminate 'use open qw/:encoding(UTF-8) :std/;' in t/test.t."
+        },
+        {
+          "line" => 272,
+          "raw" => "\t- Update the pre-reqs in Build.PL and Makefile.PL.\n",
+          "style" => "-",
+          "text" => "Update the pre-reqs in Build.PL and Makefile.PL."
+        },
+        {
+          "line" => 273,
+          "raw" => "\t- Add scripts/utf8.test.pl to the list of scripts shipped with this module.\n",
+          "style" => "-",
+          "text" => "Add scripts/utf8.test.pl to the list of scripts shipped with this module."
+        },
+        {
+          "line" => 274,
+          "raw" => "\t- Add scripts/utf8* to scripts/generate.*.sh.\n",
+          "style" => "-",
+          "text" => "Add scripts/utf8* to scripts/generate.*.sh."
+        },
+        {
+          "line" => 275,
+          "raw" => "\t- Make scripts/generate.*.sh emit a warning when DBI_DSN is not set.\n\n",
+          "style" => "-",
+          "text" => "Make scripts/generate.*.sh emit a warning when DBI_DSN is not set."
+        }
+      ],
+      "line" => 268,
+      "raw" => "2.02  Thu Apr 19 11:51:00 2012\n",
+      "raw_date" => "Thu Apr 19 11:51:00 2012",
+      "version" => "2.02"
+    },
+    {
+      "date" => "2012-03-07T08:50:00Z",
+      "entries" => [
+        {
+          "line" => 278,
+          "raw" => "\t  - I only tested V 2.00 by outputting to SVG (a text format), but outputting to a binary format such as PNG was broken.\n\t  \tSo, remove the 'use open qw/:encoding(UTF-8) :std/;', and restore binmode, in GraphViz2.pm.\n",
+          "style" => "-",
+          "text" => "I only tested V 2.00 by outputting to SVG (a text format), but outputting to a binary format such as PNG was broken. So, remove the 'use open qw/:encoding(UTF-8) :std/;', and restore binmode, in GraphViz2.pm."
+        },
+        {
+          "line" => 280,
+          "raw" => "\t  - Remove log to screen in utf8.pl, since Log::Handler doesn't accept utf8 as a logger option.\n",
+          "style" => "-",
+          "text" => "Remove log to screen in utf8.pl, since Log::Handler doesn't accept utf8 as a logger option."
+        },
+        {
+          "line" => 281,
+          "raw" => "\t  - Copy scripts/utf8.pl to scripts/utf8.test.pl and edit to display just 5 delta characters. See html/utf8.test.svg. PNG is ok too.\n\t\tThis demonstrates (hopefully) we can get the correct output on a binary format despite the 'Wide character in print...' message.\n",
+          "style" => "-",
+          "text" => "Copy scripts/utf8.pl to scripts/utf8.test.pl and edit to display just 5 delta characters. See html/utf8.test.svg. PNG is ok too. This demonstrates (hopefully) we can get the correct output on a binary format despite the 'Wide character in print...' message."
+        },
+        {
+          "line" => 283,
+          "raw" => "\t  - Add FAQ topic regarding this 'Wide character in print...' problem.\n\n",
+          "style" => "-",
+          "text" => "Add FAQ topic regarding this 'Wide character in print...' problem."
+        }
+      ],
+      "line" => 277,
+      "raw" => "2.01  Wed Mar  7 08:50:00 2012\n",
+      "raw_date" => "Wed Mar  7 08:50:00 2012",
+      "version" => "2.01"
+    },
+    {
+      "date" => "2012-03-06T16:02:00Z",
+      "entries" => [
+        {
+          "line" => 286,
+          "raw" => "\t  - Support utf8 in labels. This required changes to GraphViz2.pm. See scripts/utf8.pl and html/utf8.svg. I'm using Perl V 5.14.2.\n\t  \tSample output is online at http://savage.net.au/Perl-modules/html/graphviz2/utf8.svg.\n",
+          "style" => "-",
+          "text" => "Support utf8 in labels. This required changes to GraphViz2.pm. See scripts/utf8.pl and html/utf8.svg. I'm using Perl V 5.14.2. Sample output is online at http://savage.net.au/Perl-modules/html/graphviz2/utf8.svg."
+        },
+        {
+          "line" => 288,
+          "raw" => "\t  - Add an item to the FAQ about how to write scripts using utf8.\n",
+          "style" => "-",
+          "text" => "Add an item to the FAQ about how to write scripts using utf8."
+        },
+        {
+          "line" => 289,
+          "raw" => "\t  - Re-write GraphViz2::Parse::ISA to draw multiple class hierarchies on 1 graph. This means the API for that class has changed.\n\t  \tSpecifically, create() no longer exists. Call add() 1 or more times instead. Then, call generate_graph(). See the docs for details.\n\t\tSample output is online at http://savage.net.au/Perl-modules/html/graphviz2/parse.isa.svg.\n\n",
+          "style" => "-",
+          "text" => "Re-write GraphViz2::Parse::ISA to draw multiple class hierarchies on 1 graph. This means the API for that class has changed. Specifically, create() no longer exists. Call add() 1 or more times instead. Then, call generate_graph(). See the docs for details. Sample output is online at http://savage.net.au/Perl-modules/html/graphviz2/parse.isa.svg."
+        }
+      ],
+      "line" => 285,
+      "raw" => "2.00  Tue Mar  6 16:02:00 2012\n",
+      "raw_date" => "Tue Mar  6 16:02:00 2012",
+      "version" => "2.00"
+    },
+    {
+      "date" => "2011-12-25T10:33:00Z",
+      "entries" => [
+        {
+          "line" => 294,
+          "raw" => "\t  - Change <img...> to <object...> in the demo creation code, to keep poor old FireFox happy.\n",
+          "style" => "-",
+          "text" => "Change <img...> to <object...> in the demo creation code, to keep poor old FireFox happy."
+        },
+        {
+          "line" => 295,
+          "raw" => "\t  - Change various things in html/graphviz2.index.tx to we validate as XHTML 1.0 Strict.\n",
+          "style" => "-",
+          "text" => "Change various things in html/graphviz2.index.tx to we validate as XHTML 1.0 Strict."
+        },
+        {
+          "line" => 296,
+          "raw" => "\t  - Unreleased.\n\n",
+          "style" => "-",
+          "text" => "Unreleased."
+        }
+      ],
+      "line" => 293,
+      "raw" => "1.13  Sun Dec 25 10:33:00 2011\n",
+      "raw_date" => "Sun Dec 25 10:33:00 2011",
+      "version" => "1.13"
+    },
+    {
+      "date" => "2011-12-14T11:22:00Z",
+      "entries" => [
+        {
+          "line" => 299,
+          "raw" => "\t  - Add 5 scripts, scripts/macro.*.pl, to demonstrate using a Perl sub as a macro to generate both cluster and non-cluster sub-graphs.\n",
+          "style" => "-",
+          "text" => "Add 5 scripts, scripts/macro.*.pl, to demonstrate using a Perl sub as a macro to generate both cluster and non-cluster sub-graphs."
+        },
+        {
+          "line" => 300,
+          "raw" => "\t  - Update the TODO in GraphViz2.pm, since it erroneously gave the impression the current code did not handle compound clusters.\n",
+          "style" => "-",
+          "text" => "Update the TODO in GraphViz2.pm, since it erroneously gave the impression the current code did not handle compound clusters."
+        },
+        {
+          "line" => 301,
+          "raw" => "\t  - Re-generate the demo. See: http://savage.net.au/Perl-modules/html/graphviz2/.\n",
+          "style" => "-",
+          "text" => "Re-generate the demo. See: http://savage.net.au/Perl-modules/html/graphviz2/."
+        },
+        {
+          "line" => 302,
+          "raw" => "\t  - Adopt Flavio Poletti's suggestion of trying to pipe to dot, in Build.PL/Makefile.PL, rather than using File::Which,\n\t  \tto see if dot (Graphviz) is installed. This (hopefully) solves the problem of using File::Which on systems where it is\n\t\tnot installed, before Build.PL/Makefile.PL has a chance to tell the user that File::Which is required. See: RT#73077.\n",
+          "style" => "-",
+          "text" => "Adopt Flavio Poletti's suggestion of trying to pipe to dot, in Build.PL/Makefile.PL, rather than using File::Which, to see if dot (Graphviz) is installed. This (hopefully) solves the problem of using File::Which on systems where it is not installed, before Build.PL/Makefile.PL has a chance to tell the user that File::Which is required. See: RT#73077."
+        },
+        {
+          "line" => 305,
+          "raw" => "\t  - No code changes in *.pm files.\n\n",
+          "style" => "-",
+          "text" => "No code changes in *.pm files."
+        }
+      ],
+      "line" => 298,
+      "raw" => "1.12  Wed Dec 14 11:22:00 2011\n",
+      "raw_date" => "Wed Dec 14 11:22:00 2011",
+      "version" => "1.12"
+    },
+    {
+      "date" => "2011-11-08T10:21:00Z",
+      "entries" => [
+        {
+          "line" => 308,
+          "raw" => "\t  - Fix bug where double quotes in HTML labels were being escaped and should not have been.\n\t  \tMany thanx to Fitz Elliott for the report and initial patch. See https://rt.cpan.org/Ticket/Display.html?id=72259.\n",
+          "style" => "-",
+          "text" => "Fix bug where double quotes in HTML labels were being escaped and should not have been. Many thanx to Fitz Elliott for the report and initial patch. See https://rt.cpan.org/Ticket/Display.html?id=72259."
+        },
+        {
+          "line" => 310,
+          "raw" => "\t  - Patched scripts/html.labels.pl as per Fitz's suggested test code.\n",
+          "style" => "-",
+          "text" => "Patched scripts/html.labels.pl as per Fitz's suggested test code."
+        },
+        {
+          "line" => 311,
+          "raw" => "\t  - Rename t/lib/Parent.pm to t/lib/Adult.pm to avoid a reported problem with \"use parent 'Parent';\" under Windows.\n\t  \tThis affect various files. See https://rt.cpan.org/Public/Bug/Display.html?id=69076.\n\n",
+          "style" => "-",
+          "text" => "Rename t/lib/Parent.pm to t/lib/Adult.pm to avoid a reported problem with \"use parent 'Parent';\" under Windows. This affect various files. See https://rt.cpan.org/Public/Bug/Display.html?id=69076."
+        }
+      ],
+      "line" => 307,
+      "raw" => "1.11  Tue Nov  8 10:21:00 2011\n",
+      "raw_date" => "Tue Nov  8 10:21:00 2011",
+      "version" => "1.11"
+    },
+    {
+      "date" => "2011-09-01T10:45:00Z",
+      "entries" => [
+        {
+          "line" => 315,
+          "raw" => "\t  - Fix bug in GraphViz in handling of nodes whose shape is none or plaintext, and whose label is HTML.\n",
+          "style" => "-",
+          "text" => "Fix bug in GraphViz in handling of nodes whose shape is none or plaintext, and whose label is HTML."
+        },
+        {
+          "line" => 316,
+          "raw" => "\t  - Fix bug in scripts/generate.png.sh to add png parameter to 'perl -Ilib scripts/generate.demo.pl png'.\n",
+          "style" => "-",
+          "text" => "Fix bug in scripts/generate.png.sh to add png parameter to 'perl -Ilib scripts/generate.demo.pl png'."
+        },
+        {
+          "line" => 317,
+          "raw" => "\t  - HTML labels work without any code changes, so references to them not working have been removed from the docs.\n",
+          "style" => "-",
+          "text" => "HTML labels work without any code changes, so references to them not working have been removed from the docs."
+        },
+        {
+          "line" => 318,
+          "raw" => "\t  - GraphViz2 is called by the now-released Graph::Easy::Marpa, so remove that item from the TODO list.\n",
+          "style" => "-",
+          "text" => "GraphViz2 is called by the now-released Graph::Easy::Marpa, so remove that item from the TODO list."
+        },
+        {
+          "line" => 319,
+          "raw" => "\t  - Fix doc referring to scripts/generate.index.pl. It now refers to scripts/generate.demo.pl.\n",
+          "style" => "-",
+          "text" => "Fix doc referring to scripts/generate.index.pl. It now refers to scripts/generate.demo.pl."
+        },
+        {
+          "line" => 320,
+          "raw" => "\t  - Add DOCTYPE and Content-type to html/graphviz.index.tx. Output by scripts/generate.demo.pl, html/index.html, now handles UTF-8 properly.\n",
+          "style" => "-",
+          "text" => "Add DOCTYPE and Content-type to html/graphviz.index.tx. Output by scripts/generate.demo.pl, html/index.html, now handles UTF-8 properly."
+        },
+        {
+          "line" => 321,
+          "raw" => "\t  - Add alt to the <img ...> tags output by scripts/generate.demo.pl.\n",
+          "style" => "-",
+          "text" => "Add alt to the <img ...> tags output by scripts/generate.demo.pl."
+        },
+        {
+          "line" => 322,
+          "raw" => "\t  - Add scripts/html.labels.pl. This code includes a demo of using ports.\n",
+          "style" => "-",
+          "text" => "Add scripts/html.labels.pl. This code includes a demo of using ports."
+        },
+        {
+          "line" => 323,
+          "raw" => "\t  - Reorder methods in GraphViz2::Utils to be in alphabetical order.\n\n",
+          "style" => "-",
+          "text" => "Reorder methods in GraphViz2::Utils to be in alphabetical order."
+        }
+      ],
+      "line" => 314,
+      "raw" => "1.10  Thu Sep  1 10:45:00 2011\n",
+      "raw_date" => "Thu Sep  1 10:45:00 2011",
+      "version" => "1.10"
+    },
+    {
+      "date" => "2011-07-21T14:13:00Z",
+      "entries" => [
+        {
+          "line" => 326,
+          "raw" => "\t  - Patch parameter validation to allow for output image types such as png:gd etc.\n\t  \tOnly the prefix before the first ':' is validated.\n\n",
+          "style" => "-",
+          "text" => "Patch parameter validation to allow for output image types such as png:gd etc. Only the prefix before the first ':' is validated."
+        }
+      ],
+      "line" => 325,
+      "raw" => "1.09  Thu Jul 21 14:13:00 2011\n",
+      "raw_date" => "Thu Jul 21 14:13:00 2011",
+      "version" => "1.09"
+    },
+    {
+      "date" => "2011-07-21T11:53:00Z",
+      "entries" => [
+        {
+          "line" => 330,
+          "raw" => "\t  - Change the behaviour of sub log() in GraphViz.pm. Now if called with \$level eq 'error', it dies with \$message.\n",
+          "style" => "-",
+          "text" => "Change the behaviour of sub log() in GraphViz.pm. Now if called with \$level eq 'error', it dies with \$message."
+        },
+        {
+          "line" => 331,
+          "raw" => "\t  - Change references to the color darkblue to blue, so it's compatible with both the X11 and SVG color schemes.\n",
+          "style" => "-",
+          "text" => "Change references to the color darkblue to blue, so it's compatible with both the X11 and SVG color schemes."
+        },
+        {
+          "line" => 332,
+          "raw" => "\t  - Likewise change chartreuse to lawngreen.\n",
+          "style" => "-",
+          "text" => "Likewise change chartreuse to lawngreen."
+        },
+        {
+          "line" => 333,
+          "raw" => "\t  - Rename scripts/generate.index.pl to scripts/generate.demo.pl, as a more meaningful name.\n",
+          "style" => "-",
+          "text" => "Rename scripts/generate.index.pl to scripts/generate.demo.pl, as a more meaningful name."
+        },
+        {
+          "line" => 334,
+          "raw" => "\t  - Patch scripts/generate.demo.pl to accept the output image type as a command line parameter.\n",
+          "style" => "-",
+          "text" => "Patch scripts/generate.demo.pl to accept the output image type as a command line parameter."
+        },
+        {
+          "line" => 335,
+          "raw" => "\t  - Use this new feature to generate png files, and upload them to the demo site\n\t  \thttp://savage.net.au/Perl-modules/html/graphviz2/ even though png is often uglier than svg.\n\t\tI did this because Iceweasel (Firefox) V 3.5.16 was not displaying svgs within the index file,\n\t\teven though they are fine when displayed directly.\n",
+          "style" => "-",
+          "text" => "Use this new feature to generate png files, and upload them to the demo site http://savage.net.au/Perl-modules/html/graphviz2/ even though png is often uglier than svg. I did this because Iceweasel (Firefox) V 3.5.16 was not displaying svgs within the index file, even though they are fine when displayed directly."
+        },
+        {
+          "line" => 339,
+          "raw" => "\t  - Add scripts/generate.png.sh.\n",
+          "style" => "-",
+          "text" => "Add scripts/generate.png.sh."
+        },
+        {
+          "line" => 340,
+          "raw" => "\t  - Note: scripts/jointed.edges.pl must call dot with -Tpng:gd and not -Tpng, for unknown reasons.\n",
+          "style" => "-",
+          "text" => "Note: scripts/jointed.edges.pl must call dot with -Tpng:gd and not -Tpng, for unknown reasons."
+        },
+        {
+          "line" => 341,
+          "raw" => "\t  - Make both scripts/generate.png.sh and scripts/generate.svg.sh redirect their log files to /tmp,\n\t  \tso that we don't have to ship the logs, and also so they don't keep changing and hence need checking in.\n",
+          "style" => "-",
+          "text" => "Make both scripts/generate.png.sh and scripts/generate.svg.sh redirect their log files to /tmp, so that we don't have to ship the logs, and also so they don't keep changing and hence need checking in."
+        },
+        {
+          "line" => 343,
+          "raw" => "\t  - Remove ./dbi.schema.log from the distro.\n\n",
+          "style" => "-",
+          "text" => "Remove ./dbi.schema.log from the distro."
+        }
+      ],
+      "line" => 329,
+      "raw" => "1.08  Thu Jul 21 11:53:00 2011\n",
+      "raw_date" => "Thu Jul 21 11:53:00 2011",
+      "version" => "1.08"
+    },
+    {
+      "date" => "2011-07-04T15:46:00Z",
+      "entries" => [
+        {
+          "line" => 346,
+          "raw" => "\t  - Use Date::Format to add a date stamp at the end of html/index.html, as output by generate.index.pl.\n\n",
+          "style" => "-",
+          "text" => "Use Date::Format to add a date stamp at the end of html/index.html, as output by generate.index.pl."
+        }
+      ],
+      "line" => 345,
+      "raw" => "1.07  Mon Jul  4 15:46:00 2011\n",
+      "raw_date" => "Mon Jul  4 15:46:00 2011",
+      "version" => "1.07"
+    },
+    {
+      "date" => "2011-06-28T11:10:00Z",
+      "entries" => [
+        {
+          "line" => 349,
+          "raw" => "\t  - Change usage of File::Temp -> newdir to fix problems testing on BSD-based systems.\n",
+          "style" => "-",
+          "text" => "Change usage of File::Temp -> newdir to fix problems testing on BSD-based systems."
+        },
+        {
+          "line" => 350,
+          "raw" => "\t  - Add scripts/jointed.edges.pl.\n\t  \tThis demo - in Graph::Easy syntax - ships with Graph::Easy::Marpa.\n",
+          "style" => "-",
+          "text" => "Add scripts/jointed.edges.pl. This demo - in Graph::Easy syntax - ships with Graph::Easy::Marpa."
+        },
+        {
+          "line" => 352,
+          "raw" => "\t  - Re-write generate.index.pl to put all demo data (where available) and images on 1 page.\n",
+          "style" => "-",
+          "text" => "Re-write generate.index.pl to put all demo data (where available) and images on 1 page."
+        },
+        {
+          "line" => 353,
+          "raw" => "\t  - Upload demo to (new location) http://savage.net.au/Perl-modules/html/graphviz2/index.html.\n\n",
+          "style" => "-",
+          "text" => "Upload demo to (new location) http://savage.net.au/Perl-modules/html/graphviz2/index.html."
+        }
+      ],
+      "line" => 348,
+      "raw" => "1.06  Tue Jun 28 11:10:00 2011\n",
+      "raw_date" => "Tue Jun 28 11:10:00 2011",
+      "version" => "1.06"
+    },
+    {
+      "date" => "2011-06-24T12:40:00Z",
+      "entries" => [
+        {
+          "line" => 356,
+          "raw" => "\t  - Implement GraphViz2::Parse::Marpa, along with scripts/parse.marpa.pl and t/sample.marpa.1.dat.\n\t  \tThe output is html/parse.marpa.svg.\n",
+          "style" => "-",
+          "text" => "Implement GraphViz2::Parse::Marpa, along with scripts/parse.marpa.pl and t/sample.marpa.1.dat. The output is html/parse.marpa.svg."
+        },
+        {
+          "line" => 358,
+          "raw" => "\t  - Implement GraphViz2::Parse::STT, along with scripts/parse.stt.pl and t/sample.stt.1.dat.\n\t  \tThe output is html/parse.stt.svg.\n",
+          "style" => "-",
+          "text" => "Implement GraphViz2::Parse::STT, along with scripts/parse.stt.pl and t/sample.stt.1.dat. The output is html/parse.stt.svg."
+        },
+        {
+          "line" => 360,
+          "raw" => "\t  - Add use File::Spec to t/test.t\n\n",
+          "style" => "-",
+          "text" => "Add use File::Spec to t/test.t"
+        }
+      ],
+      "line" => 355,
+      "raw" => "1.05  Fri Jun 24 12:40:00 2011\n",
+      "raw_date" => "Fri Jun 24 12:40:00 2011",
+      "version" => "1.05"
+    },
+    {
+      "date" => "2011-06-22T9:36:00Z",
+      "entries" => [
+        {
+          "line" => 363,
+          "raw" => "\t  - Reduce required version of File::Basename to 2.77, which came with Perl 5.10.1.\n",
+          "style" => "-",
+          "text" => "Reduce required version of File::Basename to 2.77, which came with Perl 5.10.1."
+        },
+        {
+          "line" => 364,
+          "raw" => "\t  - Stop trying to write to t/html/, and use File::Temp for a directory instead.\n\t  \tThat way, it doesn't matter who owns t/html/, nor whether or not it's writable.\n\n",
+          "style" => "-",
+          "text" => "Stop trying to write to t/html/, and use File::Temp for a directory instead. That way, it doesn't matter who owns t/html/, nor whether or not it's writable."
+        }
+      ],
+      "line" => 362,
+      "raw" => "1.04  Wed Jun 22  9:36:00 2011\n",
+      "raw_date" => "Wed Jun 22  9:36:00 2011",
+      "version" => "1.04"
+    },
+    {
+      "date" => "2011-06-19T16:27:00Z",
+      "entries" => [
+        {
+          "line" => 368,
+          "raw" => "\t  - Tweak File::Temp -> new to be File::Temp ->new(EXLOCK => 0) for BSD-based systems.\n\n",
+          "style" => "-",
+          "text" => "Tweak File::Temp -> new to be File::Temp ->new(EXLOCK => 0) for BSD-based systems."
+        }
+      ],
+      "line" => 367,
+      "raw" => "1.03  Sun Jun 19 16:27:00 2011\n",
+      "raw_date" => "Sun Jun 19 16:27:00 2011",
+      "version" => "1.03"
+    },
+    {
+      "date" => "2011-06-17T8:36:00Z",
+      "entries" => [
+        {
+          "line" => 371,
+          "raw" => "\t  - Add the pre-requisite Log::Handler to Build.PL and Makefile.PL.\n",
+          "style" => "-",
+          "text" => "Add the pre-requisite Log::Handler to Build.PL and Makefile.PL."
+        },
+        {
+          "line" => 372,
+          "raw" => "\t  - Release HTML::Entities::Interpolate V 1.04 and Set::Array V 0.23 to CPAN.\n",
+          "style" => "-",
+          "text" => "Release HTML::Entities::Interpolate V 1.04 and Set::Array V 0.23 to CPAN."
+        },
+        {
+          "line" => 373,
+          "raw" => "\t  - Add README file.\n",
+          "style" => "-",
+          "text" => "Add README file."
+        },
+        {
+          "line" => 374,
+          "raw" => "\t  - Clean up TODO list.\n\n",
+          "style" => "-",
+          "text" => "Clean up TODO list."
+        }
+      ],
+      "line" => 370,
+      "raw" => "1.02  Fri Jun 17  8:36:00 2011\n",
+      "raw_date" => "Fri Jun 17  8:36:00 2011",
+      "version" => "1.02"
+    },
+    {
+      "date" => "2011-06-15T15:00:00Z",
+      "entries" => [
+        {
+          "line" => 377,
+          "raw" => "\t  - Quote cluster/subgraph names so they may contain weird characters.\n",
+          "style" => "-",
+          "text" => "Quote cluster/subgraph names so they may contain weird characters."
+        },
+        {
+          "line" => 378,
+          "raw" => "\t  - Add method dependency(data => \$depend) to GraphViz2.pm, which accepts an object of type\n\t  \tAlgorithm::Dependency. See scripts/dependency.pl and html/dependency.svg.\n",
+          "style" => "-",
+          "text" => "Add method dependency(data => \$depend) to GraphViz2.pm, which accepts an object of type Algorithm::Dependency. See scripts/dependency.pl and html/dependency.svg."
+        },
+        {
+          "line" => 380,
+          "raw" => "\t  - Add GraphViz2::Parse::ISA, and scripts/parse.isa.pl, and the t/lib/Parent hierarchy.\n\n",
+          "style" => "-",
+          "text" => "Add GraphViz2::Parse::ISA, and scripts/parse.isa.pl, and the t/lib/Parent hierarchy."
+        }
+      ],
+      "line" => 376,
+      "raw" => "1.01  Wed Jun 15 15:00:00 2011\n",
+      "raw_date" => "Wed Jun 15 15:00:00 2011",
+      "version" => "1.01"
+    },
+    {
+      "date" => "2011-06-15T14:26:00Z",
+      "entries" => [
+        {
+          "line" => 383,
+          "raw" => "\t  - This is a re-write of GraphViz. The method parameter lists are incompatible.\n\t  \tSorry, but it now supports all options and attributes in Graphviz V 2.23.6.\n",
+          "style" => "-",
+          "text" => "This is a re-write of GraphViz. The method parameter lists are incompatible. Sorry, but it now supports all options and attributes in Graphviz V 2.23.6."
+        },
+        {
+          "line" => 385,
+          "raw" => "\t  - Rewrite GraphViz, GraphViz::Data::Grapher, GraphViz::Parse::RecDescent, GraphViz::Parse::Yacc and GraphViz::Parse::Yapp.\n\t  \tThe core code of *::RecDescent, *::Yacc and *::Yapp has been copied from GraphViz, with tiny changes.\n",
+          "style" => "-",
+          "text" => "Rewrite GraphViz, GraphViz::Data::Grapher, GraphViz::Parse::RecDescent, GraphViz::Parse::Yacc and GraphViz::Parse::Yapp. The core code of *::RecDescent, *::Yacc and *::Yapp has been copied from GraphViz, with tiny changes."
+        },
+        {
+          "line" => 387,
+          "raw" => "\t  - GraphViz2::Data::Grapher uses Tree::DAG_Node to hold information, before calling external plotting programs.\n\t  \tThe tree is available for you to process whether or not you actually plot the graph.\n",
+          "style" => "-",
+          "text" => "GraphViz2::Data::Grapher uses Tree::DAG_Node to hold information, before calling external plotting programs. The tree is available for you to process whether or not you actually plot the graph."
+        },
+        {
+          "line" => 389,
+          "raw" => "\t  - GraphViz::Regex renamed GraphViz2::Parse::Regexp.\n",
+          "style" => "-",
+          "text" => "GraphViz::Regex renamed GraphViz2::Parse::Regexp."
+        },
+        {
+          "line" => 390,
+          "raw" => "\t  - GraphViz::XML renamed GraphViz2::Parse::XML. And it uses XML::Tiny by default.\n\t  \tOne demo shows how to use XML::Bare instead.\n",
+          "style" => "-",
+          "text" => "GraphViz::XML renamed GraphViz2::Parse::XML. And it uses XML::Tiny by default. One demo shows how to use XML::Bare instead."
+        },
+        {
+          "line" => 392,
+          "raw" => "\t  - All new documentation.\n",
+          "style" => "-",
+          "text" => "All new documentation."
+        },
+        {
+          "line" => 393,
+          "raw" => "\t  - All new demos, in scripts/*.pl. These are documented in GraphViz's POD.\n",
+          "style" => "-",
+          "text" => "All new demos, in scripts/*.pl. These are documented in GraphViz's POD."
+        },
+        {
+          "line" => 394,
+          "raw" => "\t  - All demo output included, in html/*.html and html/*.svg.\n",
+          "style" => "-",
+          "text" => "All demo output included, in html/*.html and html/*.svg."
+        }
+      ],
+      "line" => 382,
+      "raw" => "1.00  Wed Jun 15 14:26:00 2011\n",
+      "raw_date" => "Wed Jun 15 14:26:00 2011",
+      "version" => "1.00"
+    }
+  ]
+}

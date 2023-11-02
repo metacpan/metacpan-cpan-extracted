@@ -1,18 +1,16 @@
 #!/usr/bin/env perl
 use FindBin qw($Bin);
 use lib $Bin;
-use t_Common qw/oops/; # strict, warnings, Carp
+use t_Common qw/oops btw btwN/; # strict, warnings, Carp
 use t_TestCommon #':silent', # Test2::V0 etc.
-                 qw/:DEFAULT run_perlscript verif_no_internals_mentioned
+                 qw/:DEFAULT run_perlscript my_capture verif_no_internals_mentioned
                     $verbose $debug $savepath/;
 use IO::Uncompress::Gunzip qw/gunzip $GunzipError/;
 use Encode qw/decode/;
 
-use Spreadsheet::Edit ();
+use Spreadsheet::Edit 1000.011 (); # In 1000.011 btw writes to stderr
 use ODF::lpOD;
 use ODF::lpOD_Helper;
-
-use Capture::Tiny qw/capture/;
 
 #diag "WARNING: :silent temp disabled";
 
@@ -36,9 +34,15 @@ my $Addrspath = path($Bin)->child("../tlib/Addrlist.csv");
 
 my $skel_text = get_body_text($Skelpath);
 
+{ my $spath = path($Bin)->child("../bin/tt");
+  my ($out, $err, $wstat) = my_capture {
+    #system "perl", "-Ilib", $spath->canonpath, "foo";
+    run_perlscript($spath->canonpath);
+  };
+}
 
 ################################## TEST COMMAND PARSER ################
-{ my ($out, $err, $wstat) = capture {
+{ my ($out, $err, $wstat) = my_capture {
     run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<'EOF');
       print
       print 	;
@@ -54,7 +58,13 @@ my $skel_text = get_body_text($Skelpath);
       #print "F F" ' G G '#; print C DDD; print E
 EOF
   };
+  $out =~ s/\R/\n/sg;  # change Windows CRLF to LF
+  $err =~ s/\R/\n/sg;  # change Windows CRLF to LF
   note "script parser test\n$err" if $verbose;
+  # On Windows, the 'print' command shows a lone backslash unquoted
+  #   (because Data::Dumper::Interp::qsh('\\') tries to quote for cmd.com
+  #    on Windows)
+  #diag dvisq '$out';
   like ($out, qr/\A\n
                  \n
                  \n
@@ -73,11 +83,11 @@ EOF
 
 ####################### null edit ################
 {
-  my ($out, $err, $wstat) = capture {
-    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<EOF);
+  my ($out, $err, $wstat) = my_capture {
+    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<QQEOF);
       skeleton '${\$Skelpath->canonpath()}'
       save '${\$odt_outpath->canonpath()}'
-EOF
+QQEOF
   };
   note "null edit test\n$err" if $verbose;
   is($out, "") if $out ne "";
@@ -89,13 +99,13 @@ EOF
 }
 ####################### save overwrite without -f ################
 {
-  my ($out, $err, $wstat) = capture {
-    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<EOF);
+  my ($out, $err, $wstat) = my_capture {
+    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<QQEOF);
       skeleton '${\$Skelpath->canonpath()}'
       _eval_perlcode 'foreach (\$body->cut_children) { \$_->delete }'
       _eval_perlcode 'die "BUGGO" if \$body->children_count != 0;'
       save '${\$odt_outpath->canonpath()}'
-EOF
+QQEOF
   };
   note "save overwrite without -f\n$err" if $verbose;
   is($out, "") if $out ne "";
@@ -107,13 +117,13 @@ EOF
 }
 ####################### save overwrite with -f ################
 {
-  my ($out, $err, $wstat) = capture {
-    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<EOF);
+  my ($out, $err, $wstat) = my_capture {
+    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<QQEOF);
       skeleton '${\$Skelpath->canonpath()}'
       _eval_perlcode 'foreach (\$body->cut_children) { \$_->delete }'
       _eval_perlcode 'die "BUGGO" if \$body->children_count != 0;'
       save -f '${\$odt_outpath->canonpath()}'
-EOF
+QQEOF
   };
   note "save overwrite with -f\n$err" if $verbose;
   is($out, "") if $out ne "";
@@ -125,12 +135,12 @@ EOF
 
 ####################### subst-value ################
 {
-  my ($out, $err, $wstat) = capture {
-    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<EOF);
+  my ($out, $err, $wstat) = my_capture {
+    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<QQEOF);
       skeleton '${\$Skelpath->canonpath()}'
       subst-value "DatabaseManager" "FAKE-DB-MGR" "LAST NAME" FAKE-LN
       save -f '${\$odt_outpath->canonpath()}'
-EOF
+QQEOF
   };
   note "subst-value test\n$err" if $verbose;
   is($wstat, 0, "out:$out\nerr:$err") if $wstat;
@@ -142,6 +152,7 @@ EOF
   my $after_text = get_body_text($odt_outpath);
   is ($after_text, $exp, "subst-value");
 }
+
 ##################### mail-merge ################
 {
   # Make a "primary" spreadsheet which only contains names, which will be used
@@ -150,36 +161,50 @@ EOF
   my $exp_re = "";
   { my $ptext = "PRI-FIRST-NAME,PRI-LAST-NAME\n";
     my $as = Spreadsheet::Edit->new()->read_spreadsheet($Addrspath->canonpath);
+    # In the combined Virtual Text, the row texts are concatenated without
+    # nothing inbetween (not even a newline).
+    # N.B. After {LAST_NAME},{FIRST_NAME} there is a tab and then *** in
+    # in the Skeleton.
     $as->apply(sub{
-      $exp_re .= '.*'.$as->{LAST_NAME}.", ".$as->{FIRST_NAME}
-                .'.*'.$as->{Address1}
-                .'.*'.$as->{Address2}
-                .'.*'.$as->{CITY}.', '.$as->{STATE}.' *'.$as->{ZIP};
+      $exp_re .= $as->{LAST_NAME}.", ".$as->{FIRST_NAME}."\t\\*\\*\\*"
+                .$as->{Address1}
+                .$as->{Address2}
+                .$as->{CITY}.', '.$as->{STATE}.' *'.$as->{ZIP};
       $ptext .= $as->{FIRST_NAME}.",".$as->{LAST_NAME}."\n";
     });
-    $exp_re =~ s/ /[ \\N{NO-BREAK SPACE}]/g;
     $exp_re = qr/${exp_re}/;
-    note dvis '$ptext';
+    note dvis '$ptext\n$exp_re' if $debug;
     $primaryss->spew_utf8($ptext);
-   }
-  my ($out, $err, $wstat) = capture {
+  }
+
+  my $script = <<QQEOF;
+    skeleton ${\visq($Skelpath->canonpath())}
+
+    mail-merge 'PROTO-TAG' \\
+      -a 'FIRST_NAME=/PRI.*FIRST.*NAME/' -a 'LAST_NAME=PRI-LAST-NAME' \\
+        ${\visq($primaryss->canonpath())} \\
+      -k FIRST_NAME -k LAST_NAME \\
+        ${\visq($Addrspath->canonpath())} \\
+
+    save -f ${\visq($odt_outpath->canonpath())}
+QQEOF
+
+  my ($out, $err, $wstat) = my_capture {
+    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", $script);
   };
-    run_perlscript($scriptpath->canonpath, @dash_dv, "-e", <<EOF);
-      skeleton '${\$Skelpath->canonpath()}'
-      mail-merge 'PROTO-TAG' \\
-        '${\$primaryss->canonpath()}' \\
-                -a 'FIRST_NAME=/PRI.*FIRST.*NAME/' -a 'LAST_NAME=PRI-LAST-NAME' -a xyzzx=PRI-LAST-NAME \\
-        'FIRST_NAME,PRI_LAST_NAME=ADDR_LN_ALIAS:${\$Addrspath->canonpath()}' \\
-                -a 'ADDR_LN_ALIAS=LAST_NAME'
-      save -f '${\$odt_outpath->canonpath()}'
-EOF
-  note "mail-merge test\n$err" if $verbose;
-  is($wstat, 0, "out:$out\nerr:$err") if $wstat;
+
   is($out, "") if $out ne "";
+  if ($verbose || $debug) {
+    diag dvis 'stderr:$err';
+  } else {
+    is($err,"",$err);
+  }
   ok($odt_outpath->exists, "$odt_outpath exists");
   my $after_text = get_body_text($odt_outpath);
-  if ($debug) { warn "SAVING RESULT AS /tmp/j.odt\n"; $odt_outpath->copy("/tmp/j.odt"); }
-  like($after_text, $exp_re, "subst-value");
+  #if ($debug) { warn "SAVING RESULT AS /tmp/j.odt\n"; $odt_outpath->copy("/tmp/j.odt"); }
+  $after_text =~ s/\N{NO-BREAK SPACE}/ /g; # Be insensitive to :nb modifiers
+btw dvis '$after_text' if $debug;
+  like($after_text, $exp_re, "text after mail-merge");
 }
 
 done_testing;

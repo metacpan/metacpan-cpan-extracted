@@ -1,3 +1,21 @@
+0.16 2023-11-02T19:59:25+01:00
+ - Add Wikibase::Datatype::Print::print() for all top objects like
+   Item/Lexeme/Mediainfo and Property.
+ - Add link to Value::Lexeme to Wikibase::Datatype::Print.
+ - Add option 'no_print_references'.
+ - Fix modules used in tests for Wikibase::Datatype::Print::Lexeme.
+
+0.15 2023-10-29T16:44:43+01:00
+ - Fix test dependencies.
+ - Simplify code for Wikibase::Datatype::Print::Value::Item.
+ - Simplify code for Wikibase::Datatype::Print::Value::Lexeme.
+ - Simplify code for Wikibase::Datatype::Print::Value::Property.
+ - Simplify code for Wikibase::Datatype::Print::Value::Quantity.
+
+0.14 2023-10-27T23:09:31+02:00
+ - Add Wikibase::Datatype::Print::Lexeme.
+ - Update Module::Install to 1.21 version.
+
 0.13 2023-05-02T09:29:21+02:00
  - Add doc for Wikibase::Datatype::Print::Mediainfo.
  - Add doc for Wikibase::Datatype::Print::Property.

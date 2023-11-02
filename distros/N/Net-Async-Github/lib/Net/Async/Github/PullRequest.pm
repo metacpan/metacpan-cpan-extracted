@@ -3,7 +3,7 @@ package Net::Async::Github::PullRequest;
 use strict;
 use warnings;
 
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 use parent qw(Net::Async::Github::Common);
 

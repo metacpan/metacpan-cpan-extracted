@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 6c895ea5ae64061188497c5892afa4c09b8966a7fdf2672788749080d24fbc91 CONCEPT
+SHA256 1dda9bf0ff3aa58f137581f6964b3ba84bc9bbb0b8d1bf20343d16c40a21b4c0 Changes
+SHA256 3727bc3bbcf36663be73907e4adff191693e7f292a2f298932e50068e5f63c27 CitaceMonografie.pm
+SHA256 b14bcec31179c927d11204beb067a3e17e3257d24eef6acf75a355f66f5e1c71 INFO
+SHA256 c740ffe5b28fc0e1dfefa9877c1653b1b77631fbd70685304f27408a3449eb4a LICENSE
+SHA256 3324383965f00d05308ad918f393ec9687aa4fae322093ac34e0908bb977e818 MANIFEST
+SHA256 0115b1909c1e5789e1eabbdc33dfb05ea4d8712c2ce55ff43297c701a5f7dd09 META.yml
+SHA256 0e189cefa7f5e853a2e16f7f23e5f38afd696353d35d1ac18acca0da081ae537 Makefile.PL
+SHA256 90bd258584d43d9e1ad827d9ba4ec908a3e8cdbc7a5ab62ef1ed094aa2e019e5 README
+SHA256 d4dad4c67c893036c89d76373c6596971bdc364ecc4b56ee1353cc2a6d055da2 bin/wd-citace-monografie
+SHA256 59faeaeea04a7c04d30ace1fa2bdf3bf722f1a7986404f4f22ee6d8a64234d24 examples/print_q79324593_in_czech.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 63ec8405523ae67c33823dcf4b136a46f0711fb17a8b58b49ddd922ed6b69611 inc/Module/Install/Scripts.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 1a70ee9a224b4508f384d8c707e8eb110c5bd6bd3bd3a8e02cdc0ed5c5d416b0 t/App-Wikidata-Template-CS-CitaceMonografie/01-use.t
+SHA256 a89f861e8d9d66559e89f0195e355c717c373e4e7b0597345fc7e542cf099e30 t/App-Wikidata-Template-CS-CitaceMonografie/02-version.t
+SHA256 25e4547b5c1221bc8cf4ebe293b9005fe5e218a422822706b41a8134f5affd3b xt/App-Wikidata-Template-CS-CitaceMonografie/01-pod_coverage.t
+SHA256 7baf61213c1f7d7f595d3fc6e69147cfe7071c946c7de8a96a9412928124f9db xt/App-Wikidata-Template-CS-CitaceMonografie/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmU7/3cACgkQojV9Rpe/
+B8vXbA//dkSDbJOnpOwACl951eD6V2ILi9SFy/79g21774R9nD/1Jff/eiqYQI64
+9PHPUXpv7E8LI3wQ9Q3gdOzn6xC4+3i4GYsN4T/wXTnFvXwtGi4GD/mQq+XYKz4T
+0dlNW8auHbdDVeNGV4qGL8EDimCaoutfrw09b0WJXmbNSe75DwGQa9RISzsyS10R
+2JKqcmOecqwqqSsQnXespx+kR/82qjF0mY5WQchR2BnkSCg5Dx+jbQP5s+LltmHQ
+1D/vUbr7vy9KxmdUcrNqZqVOnY4SEmzPgT3BvqVavUj1ql1yK7pDYVnsEMgDei7q
+6LuxXyeuQJ6a7fTPvn0+dKKPqxIPuSKJNC2bfAemPfU8YqMKm5/8lDik1+UebzPg
+9Fp3Hbdl+7lom7JRlkYeL7fQGWmZ5yT35Gi8QLZqE14W0mQFVg4VHodhQIiwi6jl
+0mRzKEPqmVAjYrHGgD8BN0PAxTXX8YwW7C+OrMktL+9zRO2GAh6+QDrAMdk1hIr1
+NV88I3mtyuqFuvoUVQ2PFyy+NnPq0ePhadGWzjoaiQn6PnXV+Co2cLTte7MjF9Q4
+XhwdLTYdtzWHItEV89bfubewxwUl1X2AmZpqCpLlaqT/biirAjIZuZw0QAlqPsGF
+roRg8XUcJQqEZCyak/P4M9XgsGEWnJFZwhQmeFQN/YkOXpF3cHc=
+=lTxs
+-----END PGP SIGNATURE-----

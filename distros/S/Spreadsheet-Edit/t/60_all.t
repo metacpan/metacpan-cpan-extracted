@@ -3,7 +3,8 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp
 use t_TestCommon # Test2::V0 etc.
-  qw/$silent $verbose $debug run_perlscript verif_no_internals_mentioned/;
+  qw/$silent $verbose $debug
+     run_perlscript verif_no_internals_mentioned my_capture_merged my_tee_merged/;
 
 use Test2::Tools::Subtest qw/subtest_buffered subtest_streamed/;
 
@@ -20,13 +21,10 @@ use Test2::Tools::Subtest qw/subtest_buffered subtest_streamed/;
 #  with event mis-odering -- something I don't understand).
 #
 
-use Capture::Tiny qw/capture_merged tee_merged/;
-
 sub run_subtest(@) {
   my (@perlargs) = @_;
   my $wstat = run_perlscript(@perlargs);
-  say "ERROR: @perlargs\n",
-      sprintf("  exited with WAIT STATUS 0x%04X\n", $wstat)
+  printf("ERROR: @perlargs\n  exited with WAIT STATUS %d = 0x%04X\n", $wstat, $wstat)
     if $wstat != 0;
   $wstat;
 }
@@ -57,9 +55,9 @@ SKIP: {
   skip $silent_skip_msg if $silent_skip_msg;
   for my $st (@subtests) {
     subtest_buffered with_silent => sub {
-      my ($soutput, $swstat) = tee_merged { run_subtest($st, '--silent') };
-      ok($swstat == 0, "zero exit status from $st",
-         "$soutput\nNon-zero exit status from subtest '$st' --silent"
+      my ($soutput, $swstat) = my_tee_merged { run_subtest($st, '--silent') };
+      is($swstat, 0, "zero exit status from $st",
+         "OUTPUT:$soutput<end OUTPUT>\nNon-zero exit status from subtest '$st' --silent"
         ) || return;
       like($soutput,
            # If a subtest uses Test2 it will output the usual messages. Otherwise
@@ -85,7 +83,7 @@ SKIP: {
   for my $st (@subtests) {
     subtest_buffered with_debug => sub {
       my @cmd = ($st, @vdopts);
-      my ($doutput, $dwstat) = capture_merged { run_subtest(@cmd) };
+      my ($doutput, $dwstat) = my_capture_merged { run_subtest(@cmd) };
       is($dwstat, 0, "zero subtest exit stat","output:\n$doutput");
       if (! eval { verif_no_internals_mentioned($doutput) }) {
         die "\n==================\n$doutput\n",

@@ -22,6 +22,7 @@ sub new($class, $screen) {
         max_window => undef,
         windows_float => [],
         windows_tiled => [],
+        windows_appended => [],
     }, $class;
 }
 
@@ -41,7 +42,7 @@ sub destroy($self, $new_screen) {
 
 sub hide($self) {
     # Remove layout and hide on panel if we're hiding an empty tag
-    unless ($self->first_window()) {
+    unless ($self->first_window(1)) {
         $self->{layout} = undef;
         $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1, 0) if $cfg->{hide_empty_tags};
     }
@@ -58,13 +59,13 @@ sub show($self) {
     # Map all windows from the tag
     my ($w, $h, $x, $y) = @{ $self->{screen} }{qw( w h x y )};
     if (defined $self->{max_window}) {
-        # if we have maximized window, just place it over the screen
+        # If we have maximized window, just place it over the screen
         # I believe there is no need to process focus here, right?
         $self->{max_window}->resize_and_move(@{ $self->{screen} }{qw( x y w h )}, 0);
         $self->{max_window}->show();
     } else {
         $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1, 1) if $cfg->{hide_empty_tags};
-        for my $win (grep defined,
+        for my $win (reverse grep defined,
             @{ $self->{screen}->{always_on} },
             @{ $self->{windows_float} },
             @{ $self->{windows_tiled} }) {
@@ -74,8 +75,10 @@ sub show($self) {
         $h -= $cfg->{panel_height};
         $y += $cfg->{panel_height};
         $self->{layout}->arrange_windows($self->{windows_tiled}, $w, $h, $x, $y);
-        # Raise floating all the time
-        $X->configure_window($_->{id}, CONFIG_WINDOW_STACK_MODE, STACK_MODE_ABOVE) for @{ $self->{windows_float} };
+
+        # XXX There should be no need to restack windows here.
+        # The only case: if the window stack order was changed on another tag. Fix if any bugs found
+
         $X->flush();
     }
 
@@ -107,6 +110,7 @@ sub win_add($self, $win) {
     unshift @{ $arr }, $win unless first { $_ == $win } @{ $arr };
 }
 
+# XXX this function is also used for appended windows
 sub win_remove($self, $win, $norefresh = undef) {
     delete $win->{on_tags}->{$self};
     delete $self->{urgent_windows}->{$win};
@@ -116,6 +120,10 @@ sub win_remove($self, $win, $norefresh = undef) {
     for my $arr (map { $self->{$_} } qw( windows_float windows_tiled )) {
         splice @{ $arr }, $_, 1 for reverse grep { $arr->[$_] == $win } 0..$#{ $arr };
     }
+
+    # Update panel if tag becomes empty
+    $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1, 0)
+        if $cfg->{hide_empty_tags} and not $self->first_window();
 
     # If this tag is visible, call screen refresh
     $self->{screen}->refresh() if not $norefresh and $self == $self->{screen}->current_tag();
@@ -131,10 +139,9 @@ sub win_float($self, $win, $floating=undef) {
 }
 
 # Select some window, if any
-sub first_window($self) {
-    return $self->{max_window}      ? $self->{max_window}           :
-        $self->{windows_float}->[0] ? $self->{windows_float}->[0]   :
-        $self->{windows_tiled}->[0];
+sub first_window($self, $only_tag = undef) {
+    return $self->{max_window} || $self->{windows_float}->[0] || $self->{windows_tiled}->[0] ||
+        ($only_tag ? () : $self->{screen}->{always_on}->[0]);
 }
 
 # Select next window
@@ -147,8 +154,11 @@ sub next_window($self, $backward = undef) {
 
     # Prepare list for search
     my ($idx, $found) = $backward ? -1 : 0;
-    my @win_float = @{ $self->{windows_float} };
+    my @win_float = (@{ $self->{windows_float} }, @{ $self->{screen}->{always_on} });
     my @win_tiled = @{ $self->{windows_tiled} };
+
+    # If win_curr belongs to other tag, we need any window from the current one
+    $found = 1 unless $win_curr->{on_tags}->{$self} or $win_curr->{always_on};
 
     # Reverse them if searching backward
     if ($backward) {
@@ -161,6 +171,52 @@ sub next_window($self, $backward = undef) {
         return $win if $found;
         $found = 1 if $win == $win_curr;
     }
+
+    # To avoid ''
+    undef;
+}
+
+# Append windows from $other tag to $self
+sub append($self, $other) {
+    # Obvious check
+    return if $self == $other;
+
+    # Prevent adding tags with maximized windows
+    return if $other->{max_window};
+
+    # Skip empty
+    return unless $other->first_window(1);
+
+    for my $win (map { @{ $other->{$_} } } qw( windows_float windows_tiled )) {
+        # Add $win to $self manually, bypassing on_tags modification
+        my $arr = $win->{floating} ? $self->{windows_float} : $self->{windows_tiled};
+        unless (first { $_ == $win } @{ $arr }) {
+            unshift @{ $arr }, $win;
+
+            # The window was really added, save it for later use
+            unshift @{ $self->{windows_appended} }, $win;
+
+            # Save $self to window
+            $win->{also_tags}->{$self} = $self;
+        }
+    }
+
+    $self->{screen}->{panel}->ws_add_append($other->{idx});
+}
+
+# Remove all the windows from appends
+sub drop_appends($self) {
+    return unless @{ $self->{windows_appended} };
+
+    for my $win (@{ $self->{windows_appended} }) {
+        $self->win_remove($win, 1);
+        delete $win->{also_tags}->{$self};
+        $win->hide();
+    }
+
+    $self->{screen}->{panel}->ws_drop_appends();
+
+    $self->{windows_appended} = [];
 }
 
 1;

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use HTTP::Status qw/ :constants :is /;
 use HTTP::Request::Common;
@@ -52,7 +52,7 @@ test_psgi
         ok is_success( $res->code ), join( " ", $req->method, $req->uri );
         is $res->code, HTTP_OK, "HTTP_OK";
 
-        is_deeply \@events, [], 'nothing logged';
+        is \@events, [], 'nothing logged';
 
     };
 
@@ -63,7 +63,7 @@ test_psgi
         ok is_error( $res->code ), join( " ", $req->method, $req->uri );
         is $res->code, HTTP_BAD_REQUEST, "HTTP_BAD_REQUEST";
 
-        is_deeply \@events,
+        is \@events,
           [
             {
                 level => 'warn',

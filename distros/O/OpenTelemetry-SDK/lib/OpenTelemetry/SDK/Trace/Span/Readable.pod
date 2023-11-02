@@ -1,0 +1,215 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Trace::Span::Readable - A readable snapshot of an OpenTelemetry span
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry;
+
+    # Spans record data, but offer only limited options to read it
+    my $span = OpenTelemetry->tracer_provider->tracer->create_span(
+        name       => $name,
+        attributes => \%attributes,
+        ...
+    );
+
+    # The readable span gives access to a readable snapshot of a span
+    my $readable = $span->snapshot;
+
+=head1 DESCRIPTION
+
+While L<OpenTelemetry::Trace::Span> (and L<OpenTelemetry::SDK::Trace::Span>,
+provided by the L<OpenTelemetry::SDK> distribution) can be used to record data
+about a logical part of a trace, with what is mostly a write-only interface,
+this class provides a read-only interface into the span. It is used to
+propagate the state of the span to the parts of the system that need to read
+the data that it has recorded, in particular to classes that implement the
+L<OpenTelemetry::Trace::Span::Processor> role and need to be able to export
+the span data to external collectors.
+
+The only supported way to create a readable span is through
+L<OpenTelemetry::SDK::Trace::Span/snapshot>. Please refer to that
+method's documentation for details.
+
+=head1 METHODS
+
+=head2 dropped_events
+
+    $count = $readable->dropped_events;
+
+Returns the number of events that could not be recorded on this span because
+they would have exceeded the maximum number of events, as set by
+L<OpenTelemetry::SDK::Trace::SpanLimits/event_count_limit>.
+
+=head2 dropped_links
+
+    $count = $readable->dropped_links;
+
+Returns the number of links that could not be recorded on this span because
+they would have exceeded the maximum number of events, as set by
+L<OpenTelemetry::SDK::Trace::SpanLimits/link_count_limit>.
+
+=head2 end_timestamp
+
+    $timestamp = $readable->end_timestamp;
+
+Returns the end timestamp of this span.
+
+=head2 events
+
+    @events = $readable->events;
+
+Returns the list of events recorded in this span. Elements will be instances of
+L<OpenTelemetry::Trace::Event>.
+
+=head2 hex_parent_span_id
+
+    $string = $readable->hex_parent_span_id;
+
+Returns the ID of the parent of this span as a lowercase hexadecimal string,
+as returned by L</parent_span_id>.
+
+=head2 hex_span_id
+
+    $string = $readable->hex_span_id;
+
+Returns an hexadecimal string representation of the ID of this span as
+returned by L</span_id>.
+
+=head2 hex_trace_id
+
+    $string = $readable->hex_trace_id;
+
+Returns an hexadecimal string representation of the trace ID of this span as
+returned by L</trace_id>.
+
+=head2 instrumentation_scope
+
+    $scope = $readable->instrumentation_scope;
+
+Returns the scope of this span. The scope will be an instance of
+L<OpenTelemetry::SDK::InstrumentationScope>. The scope will be the one that
+was associated by the L<OpenTelemetry::Trace::TracerProvider> to the
+L<OpenTelemetry::Trace::Tracer> that created this span.
+
+=head2 kind
+
+    $kind = $readable->kind;
+
+Returns the kind of this span. The value will be one of
+L<OpenTelemetry::Constants/Span Kinds>.
+
+=head2 links
+
+    @links = $readable->links;
+
+Returns the list of links recorded in this span. Elements will be instances of
+L<OpenTelemetry::Trace::Link>.
+
+=head2 name
+
+    $name = $readable->name;
+
+Returns the name that was given to this span either at creation time, when
+L<OpenTelemetry::Trace::Tracer/create_span> was called; or at a later point in
+time with L<OpenTelemetry::Trace::Span/set_name>.
+
+=head2 parent_span_id
+
+    $id = $readable->parent_span_id;
+
+Returns the binary ID of the parent span of this span. If this span is a root
+span, without a parent, this will return
+L<OpenTelemetry::Constants/INVALID_SPAN_ID>.
+
+=head2 resource
+
+    $resource = $readable->resource;
+
+Returns the resource of this span. The resource will be an instance of
+L<OpenTelemetry::SDK::Resource>. The resource will be the one that
+was associated by the L<OpenTelemetry::Trace::TracerProvider> to the
+L<OpenTelemetry::Trace::Tracer> that created this span.
+
+=head2 span_id
+
+    $id = $readable->span_id;
+
+Returns the binary ID of this span.
+
+=head2 start_timestamp
+
+    $timestamp = $readable->start_timestamp;
+
+Returns the start timestamp of this span.
+
+=head2 status
+
+    $status = $readable->status;
+
+Returns the status of this span as an instance of
+L<OpenTelemetry::Trace::Span::Status>. The value will represent what was set
+by L<OpenTelemetry::Trace::Span/set_status>.
+
+=head2 trace_flags
+
+    $flags = $readable->trace_flags;
+
+Returns the trace flags of this span as an instance of
+L<OpenTelemetry::Propagator::TraceContext::TraceFlags>.
+
+=head2 trace_id
+
+    $id = $readable->trace_id;
+
+Returns the binary trace ID of this span.
+
+=head2 trace_state
+
+    $state = $readable->trace_state;
+
+Returns the trace state of this span as an instance of
+L<OpenTelemetry::Propagator::TraceContext::TraceState>.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Propagator::TraceContext::TraceState>
+
+=item L<OpenTelemetry::Propagator::TraceContext::TraceFlags>
+
+=item L<OpenTelemetry::SDK>
+
+=item L<OpenTelemetry::SDK::InstrumentationScope>
+
+=item L<OpenTelemetry::SDK::Resource>
+
+=item L<OpenTelemetry::SDK::Trace::Span>
+
+=item L<OpenTelemetry::SDK::Trace::SpanLimits>
+
+=item L<OpenTelemetry::SDK::Trace::Span::Processor>
+
+=item L<OpenTelemetry::Trace::Event>
+
+=item L<OpenTelemetry::Trace::Link>
+
+=item L<OpenTelemetry::Trace::Span>
+
+=item L<OpenTelemetry::Trace::Span::Status>
+
+=item L<OpenTelemetry::Trace::Tracer>
+
+=item L<OpenTelemetry::Trace::TracerProvider>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

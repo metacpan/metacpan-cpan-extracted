@@ -1,5 +1,9 @@
 Revision history for App::PP::Autolink
 
+2.12 20231028
+  - Stop adding ./lib to @INC before scanning.
+    It was causing substantial slowdowns on Windows.
+
 2.11 20230517
   - Handle absolute paths under Strawberry Perl 5.36. GH#19
 

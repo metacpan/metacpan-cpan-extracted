@@ -27,13 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.986",
+            "SPVM" : "0.989033",
             "SPVM::Resource::RE2" : "0.01"
          }
       },
       "runtime" : {
          "requires" : {
-            "SPVM" : "0.986",
+            "SPVM" : "0.989033",
             "SPVM::Resource::RE2" : "0.01"
          }
       },
@@ -49,6 +49,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Regex"
       }
    },
-   "version" : "0.242001",
+   "version" : "0.243001",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

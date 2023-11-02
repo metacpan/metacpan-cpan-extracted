@@ -1,3 +1,4 @@
+#!perl
 # Parse::H - A parser for C header files that calls the given
 #  subroutines when a symbol of a specified type is encountered.
 #
@@ -26,11 +27,11 @@ Parse::H - A parser for C header files that calls the given subroutines when a s
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 DESCRIPTION
 

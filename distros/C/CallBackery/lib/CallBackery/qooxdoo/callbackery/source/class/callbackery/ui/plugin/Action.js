@@ -303,7 +303,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         + 'mmButton';
                     this.addOwnedQxObject(mmButton, mmBtnId);
                 }
-                let action = function () {
+                var action = function () {
                     var that = this;
                     if (!button.isEnabled()) {
                         return;
@@ -460,14 +460,22 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         default:
                             this.debug('Invalid execute action:' + btCfg.action);
                     }
-                }; // action_code
-                // wrap action such that it executes only after the event loop is free again
-                //var action = () => setTimeout(action_code.bind(this),0);
+                }; // var action = function() { ... };
 
                 if (btCfg.defaultAction) {
                     this._defaultAction = action;
                 }
                 if (button) {
+                    // in ios/android buttons do not necessarily get focus when clicked
+                    // so we need to do it manually, since this happens on different
+                    // browsers, chances are this is not a bug but by design :)
+
+                    // once https://github.com/qooxdoo/qooxdoo/pull/10632 is released
+                    // this here can go away
+                    button.addListenerOnce('appear',() => {
+                      let el = button.getContentElement().getDomElement();
+                      button.addListener('touchstart', () => { el.focus(); }, this);
+                    });
                     button.addListener('execute', action, this);
                     if (btCfg.addToMenu) {
                         menues[btCfg.addToMenu].add(button);

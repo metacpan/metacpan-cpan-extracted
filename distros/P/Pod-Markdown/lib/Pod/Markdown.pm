@@ -12,11 +12,11 @@ use strict;
 use warnings;
 
 package Pod::Markdown;
-# git description: v3.200-4-gd31d626
+# git description: v3.300-3-gb01c18d
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Convert POD to Markdown
-$Pod::Markdown::VERSION = '3.300';
+$Pod::Markdown::VERSION = '3.400';
 use Pod::Simple 3.27 (); # detected_encoding and keep_encoding bug fix
 use parent qw(Pod::Simple::Methody);
 use Encode ();
@@ -1199,8 +1199,8 @@ __END__
 
 =for :stopwords Marcel Gruenauer Victor Moral Ryan C. Thompson <rct at thompsonclan d0t
 org> Aristotle Pagaltzis Randy Stauner ACKNOWLEDGEMENTS html cpan
-testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto
-metadata placeholders metacpan
+testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata
+placeholders metacpan
 
 =head1 NAME
 
@@ -1208,7 +1208,7 @@ Pod::Markdown - Convert POD to Markdown
 
 =head1 VERSION
 
-version 3.300
+version 3.400
 
 =for test_synopsis my ($pod_string);
 
@@ -1641,7 +1641,7 @@ Randy Stauner <rwstauner@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Aristotle Pagaltzis Cindy Wang (CindyLinz) Graham Ollis Mike Covington motemen moznion Peter Vereshagin Ryan C. Thompson Yasutaka ATARASHI
+=for stopwords Aristotle Pagaltzis Cindy Wang (CindyLinz) Graham Ollis Johannes Schauer Marin Rodrigues Mike Covington motemen moznion Peter Vereshagin Ryan C. Thompson Yasutaka ATARASHI
 
 =over 4
 
@@ -1656,6 +1656,10 @@ Cindy Wang (CindyLinz) <cindylinz@gmail.com>
 =item *
 
 Graham Ollis <plicease@cpan.org>
+
+=item *
+
+Johannes Schauer Marin Rodrigues <josch@mister-muffin.de>
 
 =item *
 

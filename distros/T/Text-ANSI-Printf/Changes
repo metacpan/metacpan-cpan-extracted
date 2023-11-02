@@ -1,5 +1,14 @@
 Revision history for Perl extension Text-ANSI-Printf
 
+2.05 2023-10-25T10:50:47Z
+
+    - Simplify warning message of script/ansiprintf.
+    - Improve documents.
+
+2.04 2023-10-24T13:01:32Z
+
+    - Include script/ansiprintf command in the distribution
+
 2.03 2023-10-22T08:03:39Z
 
     - Introduce $Text::ANSI::Printf::REORDER variable to enable argument reordering.

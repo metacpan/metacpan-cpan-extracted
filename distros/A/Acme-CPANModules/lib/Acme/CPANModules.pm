@@ -3,12 +3,12 @@
 package Acme::CPANModules;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-04'; # DATE
+our $DATE = '2023-11-01'; # DATE
 our $DIST = 'Acme-CPANModules'; # DIST
-our $VERSION = '0.1.10'; # VERSION
+our $VERSION = '0.1.12'; # VERSION
 
 1;
-# ABSTRACT: Categorizing CPAN modules
+# ABSTRACT: List of CPAN modules
 
 __END__
 
@@ -18,7 +18,7 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules - Categorizing CPAN modules
+Acme::CPANModules - List of CPAN modules
 
 =head1 SPECIFICATION VERSION
 
@@ -26,7 +26,7 @@ Acme::CPANModules - Categorizing CPAN modules
 
 =head1 VERSION
 
-This document describes version 0.1.10 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2022-02-04.
+This document describes version 0.1.12 of Acme::CPANModules (from Perl distribution Acme-CPANModules), released on 2023-11-01.
 
 =head1 DESCRIPTION
 
@@ -233,6 +233,43 @@ Some non-preferred examples:
 
 Should only be used for personal lists.
 
+=head2 module bundle name
+
+A distribution that contains several C<Acme::CPANModules::*> modules should be
+named C<Acme-CPANModulesBundle-*>.
+
+In general, an C<Acme::CPANModulesBundle::> module should be named like an
+C<Acme::CPANModules::*> module. See recommendations in L</"module name">.
+
+=head2 module bundle abstract
+
+An C<Acme::CPANModulesBundle::> module should have abstract that begins with
+"Bundle of ...".
+
+=head2 other modules
+
+Other suggested namespaces:
+
+=over
+
+=item * C<Acme::CPANModulesUtil::>,
+
+Utility modules that do not contain lists of modules themselves.
+
+=item * C<Acme::CPANModulesUtilBundle::>,
+
+For distribution that contains several C<Acme::CPANModulesUtil::*> modules.
+
+=item * C<Acme::CPANModulesRole::>
+
+For role related to C<Acme::CPANModules>.
+
+=item * C<Acme::CPANModulesRoleBundle::>
+
+For distribution that contains several C<Acme::CPANModulesRole::> modules.
+
+=back
+
 =head1 USING ACME::CPANMODULES MODULES
 
 You can install the L<cpanmodules> CLI script (from the L<App::cpanmodules>
@@ -286,13 +323,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2019, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

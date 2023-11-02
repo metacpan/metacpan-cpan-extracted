@@ -1,5 +1,5 @@
 package App::HL7::Compare;
-$App::HL7::Compare::VERSION = '0.002';
+$App::HL7::Compare::VERSION = '0.003';
 use v5.10;
 use strict;
 use warnings;
@@ -7,7 +7,7 @@ use warnings;
 use Moo;
 use Mooish::AttributeBuilder -standard;
 use App::HL7::Compare::Parser;
-use Types::Standard qw(Tuple Str ScalarRef InstanceOf Bool);
+use Types::Standard qw(Tuple Str ScalarRef InstanceOf Bool HashRef);
 use List::Util qw(max);
 
 has param 'files' => (
@@ -17,6 +17,11 @@ has param 'files' => (
 has param 'exclude_matching' => (
 	isa => Bool,
 	default => sub { 1 },
+);
+
+has param 'message_opts' => (
+	isa => HashRef,
+	default => sub { {} },
 );
 
 has field 'parser' => (
@@ -118,14 +123,23 @@ sub _compare_messages
 		segments => [],
 	);
 
-	my $message_num = 0;
+	my @parts;
 	foreach my $message ($message1, $message2) {
-		my $parts = $self->_gather_recursive($message, 4);
-		foreach my $part (@{$parts}) {
+		push @parts, $self->_gather_recursive($message, 4);
+	}
+
+	while ('processing messages simultaneously') {
+		my $got_parts = 0;
+
+		foreach my $message_num (0 .. $#parts) {
+			my $part = shift @{$parts[$message_num]};
+			next unless defined $part;
+
+			$got_parts = 1;
 			$self->_compare_line(@{$part}, $message_num, \%comps);
 		}
 
-		$message_num += 1;
+		last unless $got_parts;
 	}
 
 	return $self->_build_comparison(\%comps);
@@ -186,7 +200,9 @@ sub compare
 {
 	my ($self) = @_;
 
-	my $compared = $self->_compare_messages(map { $self->parser->parse($_) } $self->_get_files);
+	my $compared = $self->_compare_messages(map {
+		$self->parser->parse($_, %{$self->message_opts})
+		} $self->_get_files);
 	$self->_remove_matching($compared);
 
 	return $compared;

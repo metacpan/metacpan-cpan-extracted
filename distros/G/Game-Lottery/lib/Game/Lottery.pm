@@ -9,7 +9,7 @@ Game::Lottery
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ use 5.038;
 use experimental qw/class/;
 
 class Game::Lottery;
-our $VERSION="1.02";
+our $VERSION="1.03";
 use Math::Random::Secure;
 use Path::Tiny;
 # use Data::Dumper;
@@ -60,6 +60,7 @@ field $wb;     # White Balls
 field $rb;     # Red Balls
 field $wbd;    # White Balls to Draw
 field $rbd;    # Red Balls to Draw
+field %coll;   # collision prevention
 
 ADJUST {
   if ( $game =~ /^power/i ) {
@@ -123,6 +124,13 @@ Returns the Game.
 
 =cut
 
+method _NoCollision ( $balls1, $balls2=[] ) {
+  my $key = join '', ($balls1->@*, $balls2->@*);
+  if ( defined $coll{$key }) { return 0 }
+  $coll{$key } = 1 ;
+  return 1;
+}
+
 method Game {
   return $game;
 }
@@ -136,7 +144,12 @@ Returns an Array Reference of balls picked. Applicable to a large number of Draw
 =cut
 
 method BasicDraw ( $BallLastNum, $BallsDrawn ) {
-  _DrawBalls( $BallLastNum, $BallsDrawn );
+  my $balls = undef;
+  until (defined $balls) {
+    $balls = _DrawBalls( $BallLastNum, $BallsDrawn );
+    $balls = undef unless $self->_NoCollision( $balls );
+  }
+  $balls;
 }
 
 =head2 BigDraw
@@ -176,14 +189,16 @@ method CustomBigDrawSetup (%balls) {
 }
 
 method BigDraw {
-  my $draw = {
-    'game'       => $game,
-    'whiteballs' => _DrawBalls( $wb, $wbd ),
-    'redballs'   => _DrawBalls( $rb, $rbd )
-  };
-  say
-qq/${\ $draw->{game} } | ${\ do { join ' ', $draw->{whiteballs}->@* } } | ${\ do { join ' ', $draw->{redballs}->@* } }/;
-  return $draw;
+  while (1) {
+    my $draw = {
+      'game'       => $game,
+      'whiteballs' => _DrawBalls( $wb, $wbd ),
+      'redballs'   => _DrawBalls( $rb, $rbd )
+    };
+    if ( $self->_NoCollision( $draw->{whiteballs}, $draw->{redballs} ) ) {
+      return $draw;
+    }
+  }
 }
 
 sub _round_val ($val) { sprintf( "%.2f", $val ) }

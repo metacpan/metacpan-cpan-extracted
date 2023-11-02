@@ -1,0 +1,256 @@
+/* Our common colors for the Liteblog theme */
+:root {
+    --primary-color: #007BFF;
+    --primary-hover: #0056b3;
+    --text-color: #333;
+    --background-color: #f4f4f4;
+    --header-bg-color: #2d2d2d;
+    --link-color: #007BFF;
+    --link-hover-color: #0056b3;
+}
+
+body {
+    font-family: 'Roboto', 'Arial', sans-serif;
+    background-color: var(--background-color);
+
+    margin: 0;
+    padding: 0;
+
+    font-size: 16px;
+    line-height: 1.3;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600; /* slightly bold but not too heavy */
+}
+h1 {
+    font-size: 2.5rem;
+}
+h2 {
+    font-size: 2rem;
+}
+h3 {
+    font-size: 1.75rem;
+}
+
+h1.site-title {
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+a {
+    color: var(--link-color);
+    text-decoration: none; /* Remove underline */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+a:hover {
+    color: var(--link-hover-color);
+}
+
+button, .btn {
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+button:hover, .btn:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Accessibility rules */
+a:focus, button:focus, .btn:focus {
+    outline: 3px solid rgba(0, 123, 255, 0.5);
+    outline-offset: 2px;
+}
+
+/* Header Menu */
+/* CSS for the mobile header */
+#mobile-menu-container {
+    position: relative; /* to hold the popup menu */
+}
+
+#mobile-header {
+    display: none;
+    background-color: #2d2d2d;
+    color: #ffffff;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10; /* Adjust z-index as needed */
+    align-items: center; /* Center vertically */
+    justify-content: space-between; /* space out the logo, title, and menu */
+    flex-direction: row; /* Default flex-direction */
+    padding: 5px;
+}
+
+#menu-toggle {
+	margin-left: auto;
+	margin-right: 20px;
+    flex: none;
+}
+
+.site-title {
+    margin: 0;
+    flex-grow: 1; /* allows the title to take available space */
+    text-align: left; /* align the site name to the left */
+    padding: 0 10px; /* spacing around the site title */
+}
+
+.hamburger-menu {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 24px; /* adjust height of the whole menu */
+}
+
+.hamburger-menu .bar {
+    background-color: #ccc; /* color of the bar */
+    height: 4px; /* thickness of each bar */
+    width: 32px; /* width of each bar */
+    border-radius: 2px; /* rounded edges */
+}
+
+/* The Hamburger Menu */
+#mobile-navigation-menu {
+    z-index: 9999; /* on top of other content */
+    display: flex;
+    flex-direction: column;
+    background-color: #f5f5f5; 
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    
+    /* display: none; */
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.2s linear;
+}
+
+#mobile-navigation-menu.open {
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s; /* apply the transition immediately when opening */
+}
+
+.mobile-nav a {
+    padding: 10px 20px;
+    text-decoration: none;
+    text-align: center;
+    color: #333;
+    border-bottom: 1px solid #ddd; /* separator between items */
+}
+
+.mobile-nav a:last-child {
+    border-bottom: none; /* remove separator for the last item */
+}
+
+.mobile-nav a:hover {
+    background-color: #ddd; /* change hover color as desired */
+}
+
+#avatar-icon {
+    display: inline-block;
+    margin-left: 5px; 
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 10px;
+}
+
+#avatar-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+#site-title-button a {
+    color: #ccc;
+}
+
+#site-title-button {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    margin: auto;
+    flex: 1; /* Expand to fill available space */
+    text-align: center; /* Center text horizontally */
+}
+
+/* Home Page Layout */
+
+#hero {
+    background-color: #2d2d2d;
+    text-align: center;
+    padding: 50px 0;
+    padding-bottom: 1.5rem;
+}
+
+#avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #ffffff;
+    margin: 0;
+}
+
+h3.site-baseline {
+    margin: 0;
+    margin-top: 1rem;
+    padding: 0;
+    color: #777;
+    font-weight: normal;
+}
+
+
+/* make an element clickable with a zoom-in effect */
+.clickable-div {
+    /* Effect on mouse over */
+    cursor: pointer; /* Add pointer cursor for clickability */
+    transition: transform 0.2s, box-shadow 0.2s; /* Add transition for hover effect */
+}
+
+.clickable-div:hover {
+    transform: scale(1.1); /* Apply a 10% zoom effect on hover */
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2); /* Add a shadow effect on hover */
+}
+
+#hero a {
+    text-decoration: none;
+} 
+
+/* For the default content when the website is empty */
+section#main-page {
+    width: 80%;
+    max-width: 800px;
+    margin: auto;
+}
+
+/* For mobile responsiveness */
+
+@media screen and (max-width: 768px) {
+    
+    body {
+        font-size: 14px;
+    }
+    h1, h2, h3 {
+        line-height: 1.4;
+    }
+
+    img {
+        max-width: 100%;
+        margin: auto;
+    }
+}

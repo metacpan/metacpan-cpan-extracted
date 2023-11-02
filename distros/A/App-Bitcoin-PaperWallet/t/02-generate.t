@@ -12,11 +12,30 @@ subtest 'should generate mnemonic from fixed entropy' => sub {
 
 	# those addresses take password into account
 	is $hash->{addresses}[0], '3QUyruDJ9oce8KNJELPWAxfcvcvESuGrds', 'compat address ok';
-	is $hash->{addresses}[1], 'bc1qngdesm3ljdfyxsskvsxz4034vlyk9cjm7r6k5p', 'native address 1 ok';
-	is $hash->{addresses}[2], 'bc1qp67k9ztxp5gycvt3pc8cxm0ssha226sqe338q8', 'native address 2 ok';
-	is $hash->{addresses}[3], 'bc1qlz5an57pfxr4aewes8shhk8p8uglhs0x7czwuj', 'native address 3 ok';
+	is $hash->{addresses}[1], 'bc1qm2s2u6rp8u40kwht7fm8nnfgew0vt4t7hftmf9', 'native address 1 ok';
+	is $hash->{addresses}[2], 'bc1qngdesm3ljdfyxsskvsxz4034vlyk9cjm7r6k5p', 'native address 2 ok';
+	is $hash->{addresses}[3], 'bc1qp67k9ztxp5gycvt3pc8cxm0ssha226sqe338q8', 'native address 3 ok';
 
 	is scalar @{$hash->{addresses}}, 4, 'address count ok';
+
+	# test data generated using https://iancoleman.io/bip39/
+};
+
+subtest 'should generate shorter mnemonic from fixed entropy and no compat addresses' => sub {
+	my $hash = App::Bitcoin::PaperWallet->generate('silly entropy that should never be used in a real wallet', 'sillypass', {
+		compat_addresses => 0,
+		entropy_length => 160,
+	});
+
+	# seed should be 76f30b114cb9165116a9b0a9e214e3ea4cfa9923
+	is $hash->{mnemonic}, 'ivory obscure session offer multiply chuckle follow current prepare awful decline stand soul erode misery', 'mnemonic ok';
+
+	# those addresses take password into account
+	is $hash->{addresses}[0], 'bc1qqns5u7ek4dhsg0x3q6dfrsdqqdy5gtgnrzplar', 'native address 1 ok';
+	is $hash->{addresses}[1], 'bc1qvpkk52g7fm64l482eln3unf659epqhtpcqt3hm', 'native address 2 ok';
+	is $hash->{addresses}[2], 'bc1qyq9sanwvrd300erymsln58myar55fr2cldmcgx', 'native address 3 ok';
+
+	is scalar @{$hash->{addresses}}, 3, 'address count ok';
 
 	# test data generated using https://iancoleman.io/bip39/
 };

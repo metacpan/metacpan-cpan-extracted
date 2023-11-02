@@ -1,0 +1,104 @@
+{
+  "preamble" => "Revision history for Perl extension Crypt::SaltedHash.",
+  "raw_preamble" => "Revision history for Perl extension Crypt::SaltedHash.\r\n\r\n",
+  "releases" => [
+    {
+      "date" => "2010-02-28T01:55:22Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 5,
+              "raw" => "\t- add returns now \$self\r\n\r\n",
+              "style" => "-",
+              "text" => "add returns now \$self"
+            }
+          ],
+          "line" => 4,
+          "raw" => "    - added clear method\r\n",
+          "style" => "-",
+          "text" => "added clear method"
+        }
+      ],
+      "line" => 3,
+      "raw" => "0.06  Sun Feb 28 01:55:22 2010\r\n",
+      "raw_date" => "Sun Feb 28 01:55:22 2010",
+      "version" => "0.06"
+    },
+    {
+      "date" => "2006-08-10T03:04:33Z",
+      "entries" => [
+        {
+          "line" => 8,
+          "raw" => "    - switched to Module::Build\r\n\r\n",
+          "style" => "-",
+          "text" => "switched to Module::Build"
+        }
+      ],
+      "line" => 7,
+      "raw" => "0.05  Thu Aug 10 03:04:33 2006\r\n",
+      "raw_date" => "Thu Aug 10 03:04:33 2006",
+      "version" => "0.05"
+    },
+    {
+      "date" => "2006-01-26T04:56:56Z",
+      "entries" => [
+        {
+          "line" => 11,
+          "raw" => "\t- algorithm recognition fixed\r\n\r\n",
+          "style" => "-",
+          "text" => "algorithm recognition fixed"
+        }
+      ],
+      "line" => 10,
+      "raw" => "0.04  Thu Jan 26 04:56:56 2006\r\n",
+      "raw_date" => "Thu Jan 26 04:56:56 2006",
+      "version" => "0.04"
+    },
+    {
+      "date" => "2005-11-14T23:59:59Z",
+      "entries" => [
+        {
+          "line" => 14,
+          "raw" => "\t- spelling fixed\r\n\r\n",
+          "style" => "-",
+          "text" => "spelling fixed"
+        }
+      ],
+      "line" => 13,
+      "raw" => "0.03  Mon Nov 14 23:59:59 2005\r\n",
+      "raw_date" => "Mon Nov 14 23:59:59 2005",
+      "version" => "0.03"
+    },
+    {
+      "date" => "2005-11-14T17:54:00Z",
+      "entries" => [
+        {
+          "line" => 17,
+          "raw" => "    - fixed some bugs; added tests and documentation\r\n\r\n",
+          "style" => "-",
+          "text" => "fixed some bugs; added tests and documentation"
+        }
+      ],
+      "line" => 16,
+      "raw" => "0.02  Mon Nov 14 17:54:00 2005\r\n",
+      "raw_date" => "Mon Nov 14 17:54:00 2005",
+      "version" => "0.02"
+    },
+    {
+      "date" => "2005-11-13T05:41:23Z",
+      "entries" => [
+        {
+          "line" => 20,
+          "raw" => "    - original version; created by h2xs 1.23 with options\r\n\t\t-XA -n Crypt::SaltedHash\r\n\r\n",
+          "style" => "-",
+          "text" => "original version; created by h2xs 1.23 with options -XA -n Crypt::SaltedHash"
+        }
+      ],
+      "line" => 19,
+      "raw" => "0.01  Sun Nov 13 05:41:23 2005\r\n",
+      "raw_date" => "Sun Nov 13 05:41:23 2005",
+      "version" => "0.01"
+    }
+  ]
+}

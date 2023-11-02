@@ -1,11 +1,11 @@
-Results using Test::JSON::Schema::Acceptance 1.020
+Results using Test::JSON::Schema::Acceptance 1.021
 specification version: draft2020-12
 using custom test directory: t/oas-vocabulary
 optional tests included: no
 
 filename                                  pass  todo-fail  fail
 ---------------------------------------------------------------
-discriminator.json                          12          0     0
+discriminator.json                          11          1     0
 formats.json                                37          0     0
 ---------------------------------------------------------------
-TOTAL                                       49          0     0
+TOTAL                                       48          1     0

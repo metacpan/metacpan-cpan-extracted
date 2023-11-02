@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Role::BasicKey;
-$Bitcoin::Crypto::Role::BasicKey::VERSION = '2.002';
+$Bitcoin::Crypto::Role::BasicKey::VERSION = '2.003';
 use v5.10;
 use strict;
 use warnings;

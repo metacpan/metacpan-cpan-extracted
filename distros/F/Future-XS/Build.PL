@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -17,7 +18,7 @@ my $build = Module::Build->new(
       'Future' => '0.48_001', # for Future::_base
    },
    test_requires => {
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

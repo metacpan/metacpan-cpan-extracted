@@ -1,0 +1,141 @@
+NAME
+    Acme::CPANModules::NumberRange - List of modules that handle number
+    ranges
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::NumberRange
+    (from Perl distribution Acme-CPANModules-NumberRange), released on
+    2023-03-04.
+
+DESCRIPTION
+    Checking membership, formatting
+
+    Array::IntSpan Array::RealSpan Number::Range Number::RangeTracker
+    Range::Object::Serial Set::IntSpan Set::IntSpan::Fast
+    Set::IntSpan::Fast::XS Set::IntSpan::Island Tie::Array::IntSpan
+
+    Partitioning
+
+    Aray::IntSpan::Partition
+
+    Formatting
+
+    Number::Continuation Set::IntSpan::Util
+
+ACME::CPANMODULES ENTRIES
+    Array::IntSpan
+        Author: DDUMONT <https://metacpan.org/author/DDUMONT>
+
+    Array::RealSpan
+        Author: GENE <https://metacpan.org/author/GENE>
+
+    Number::Range
+        Author: LARRYSH <https://metacpan.org/author/LARRYSH>
+
+    Number::RangeTracker
+        Author: COVINGTON <https://metacpan.org/author/COVINGTON>
+
+    Range::Object::Serial
+        Author: TOKAREV <https://metacpan.org/author/TOKAREV>
+
+    Set::IntSpan
+        Author: SWMCD <https://metacpan.org/author/SWMCD>
+
+    Set::IntSpan::Fast
+        Author: ANDYA <https://metacpan.org/author/ANDYA>
+
+    Set::IntSpan::Fast::XS
+        Author: ANDYA <https://metacpan.org/author/ANDYA>
+
+    Set::IntSpan::Island
+        Author: MARTINK <https://metacpan.org/author/MARTINK>
+
+    Tie::Array::IntSpan
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Aray::IntSpan::Partition
+    Number::Continuation
+        Author: SCHUBIGER <https://metacpan.org/author/SCHUBIGER>
+
+    Set::IntSpan::Util
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n NumberRange
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries NumberRange | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=NumberRange -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::NumberRange -E'say $_->{module} for @{ $Acme::CPANModules::NumberRange::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-NumberRange>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-NumberRange>.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Numb
+    erRange>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

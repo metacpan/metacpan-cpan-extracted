@@ -1,0 +1,87 @@
+{
+   "abstract" : "surfing by internet",
+   "author" : [
+      "Yaroslav O. Kosmina LL<mailto:dart@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.22",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Aion-Surf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Liveman" : "1.0",
+            "Minilla" : "v3.1.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Aion::Format" : "v0.0.2",
+            "HTTP::Cookies" : "0",
+            "LWP::UserAgent" : "6.72",
+            "List::Util" : "0",
+            "common::sense" : "0",
+            "perl" : "v5.22.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Aion::Surf" : {
+         "file" : "lib/Aion/Surf.pm",
+         "version" : "v0.0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/darviarush/perl-aion-surf/issues"
+      },
+      "homepage" : "https://github.com/darviarush/perl-aion-surf",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/darviarush/perl-aion-surf.git",
+         "web" : "https://github.com/darviarush/perl-aion-surf"
+      }
+   },
+   "version" : "0.0.3",
+   "x_authority" : "cpan:DART",
+   "x_contributors" : [
+      "Yaroslav O. Kosmina <dart@cpan.org>",
+      "Yaroslav O. Kosmina <darviarush@mail.ru>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

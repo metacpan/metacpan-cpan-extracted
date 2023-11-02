@@ -1,3 +1,19 @@
+0.1.12  2023-11-01  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible change] Change recommendation of abstract for
+          Acme::CPANModulesBundle::* module, from 'Lists of ...' prefix to
+          'Bundle of ...' prefix.
+
+
+0.1.11  2023-11-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak Abstract.
+
+        - Add suggested namespaces.
+
+        - Add recommendations for Acme::CPANModulesBundle::*.
+
+
 0.1.10  2022-02-04  Released-By: PERLANCAR; Urgency: low
 
         - No spec changes.

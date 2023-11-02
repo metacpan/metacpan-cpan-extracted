@@ -52,6 +52,7 @@ test_requires 'Wikibase::Datatype::Snak' => 0;
 test_requires 'Wikibase::Datatype::Statement' => 0;
 test_requires 'Wikibase::Datatype::Value::Globecoordinate' => 0;
 test_requires 'Wikibase::Datatype::Value::Item' => 0;
+test_requires 'Wikibase::Datatype::Value::Lexeme' => 0;
 test_requires 'Wikibase::Datatype::Value::Monolingual' => 0;
 test_requires 'Wikibase::Datatype::Value::Property' => 0;
 test_requires 'Wikibase::Datatype::Value::Quantity' => 0;
@@ -59,7 +60,7 @@ test_requires 'Wikibase::Datatype::Value::Sense' => 0.29;
 test_requires 'Wikibase::Datatype::Value::String' => 0;
 test_requires 'Wikibase::Datatype::Value::Time' => 0;
 tests_recursive;
-version '0.13';
+version '0.16';
 
 # Run.
 WriteAll();

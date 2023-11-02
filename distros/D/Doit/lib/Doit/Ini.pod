@@ -16,6 +16,8 @@ Doit::Ini - commands for changing ini files
         $self->confobj->setval('section', 'key', 'newval');
     });
 
+    my $HoH = $doit->ini_info_as_HoH('/path/to/file.ini');
+
 =head1 DESCRIPTION
 
 B<Doit::Ini> is a L<Doit> component providing methods for changing
@@ -36,6 +38,10 @@ This module is also available as a Debian or Ubuntu package:
 C<libconfig-inifiles-perl>.
 
 =back
+
+Non-ini files (e.g. shell config files) can also be handled with some
+restrictions (see L</BUGS>). A pseudo section "GLOBAL" is used for
+section-less key-values.
 
 =head2 DOIT COMMANDS
 
@@ -69,6 +75,13 @@ or delete existing ones. To make sure that a specific ini
 implementation module is used, call L</ini_set_implementation> with a
 single module.
 
+=head3 ini_info_as_HoH
+
+    my $HoH = $doit->ini_info_as_HoH('/path/to/file.ini');
+
+Return a hash-of-hash reference of the ini contents. First hash level
+is the ini sections, second hash level is the ini parameters.
+
 =head3 ini_set_implementation
 
     $doit->ini_set_implementation(qw(Config::IOD::INI Config::IniFiles));
@@ -96,6 +109,9 @@ whitespace may be lost when using C<Config::IniFiles>.
 Currently Unix newlines are used when writing files, even on Windows
 systems. This may change in future (i.e. preserving original line
 endings).
+
+C<Config::IOD::INI> and C<Config::IniFiles> handle quotes in values
+differently: the former strips quotation marks, the latter keeps it.
 
 =head1 AUTHOR
 

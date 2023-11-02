@@ -152,7 +152,7 @@ sub _find_virtual_packages {
 
 =item $facts->evaluate_simple_dep()
 
-This method is private and should not be used except from within Dpkg::Deps.
+This method is private and should not be used except from within L<Dpkg::Deps>.
 
 =cut
 
@@ -201,10 +201,10 @@ Remove method: $facts->check_package().
 
 =head2 Version 1.01 (dpkg 1.16.1)
 
-New option: Dpkg::Deps::KnownFacts->add_installed_package() now accepts 2
+New option: $facts->add_installed_package() now accepts 2
 supplementary parameters ($arch and $multiarch).
 
-Deprecated method: Dpkg::Deps::KnownFacts->check_package() is obsolete,
+Deprecated method: $facts->check_package() is obsolete,
 it should not have been part of the public API.
 
 =head2 Version 1.00 (dpkg 1.15.6)

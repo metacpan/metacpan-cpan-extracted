@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Input;
-$Bitcoin::Crypto::Transaction::Input::VERSION = '2.002';
+$Bitcoin::Crypto::Transaction::Input::VERSION = '2.003';
 use v5.10;
 use strict;
 use warnings;
@@ -244,7 +244,7 @@ sub dump
 	my ($self, $params) = @_;
 
 	my $type = $self->utxo->output->locking_script->type // 'Custom';
-	my $address = $self->utxo->output->locking_script->get_address;
+	my $address = $self->utxo->output->locking_script->get_address // '';
 	$address = " from $address" if $address;
 
 	my @result;

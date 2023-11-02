@@ -1233,11 +1233,13 @@ MYSQL *mysql_dr_connect(
         if ((svp = hv_fetch(hv, "mysql_compression", 17, FALSE))  &&
             *svp && SvTRUE(*svp))
         {
+          char* calg = SvPV(*svp, lna);
+          if (strncmp(calg,"1",1) == 0) calg="zlib";
           if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
             PerlIO_printf(DBIc_LOGPIO(imp_xxh),
                           "imp_dbh->mysql_dr_connect: Enabling" \
-                          " compression.\n");
-          mysql_options(sock, MYSQL_OPT_COMPRESS, NULL);
+                          " compression algorithms: %s\n", calg);
+          mysql_options(sock, MYSQL_OPT_COMPRESSION_ALGORITHMS, calg);
         }
         if ((svp = hv_fetch(hv, "mysql_connect_timeout", 21, FALSE))
             &&  *svp  &&  SvTRUE(*svp))
@@ -1388,6 +1390,7 @@ MYSQL *mysql_dr_connect(
 
         if ((svp = hv_fetch(hv, "mysql_enable_utf8mb4", 20, FALSE)) && *svp && SvTRUE(*svp)) {
           mysql_options(sock, MYSQL_SET_CHARSET_NAME, "utf8mb4");
+          imp_dbh->enable_utf8mb4 = TRUE;
         }
         else if ((svp = hv_fetch(hv, "mysql_enable_utf8", 17, FALSE)) && *svp) {
           /* Do not touch imp_dbh->enable_utf8 as we are called earlier
@@ -2031,7 +2034,7 @@ signed_my_ulonglong2str(my_ulonglong val, char *buf, STRLEN *len)
 }
 #endif
 
-static SV*
+SV*
 my_ulonglong2sv(pTHX_ my_ulonglong val)
 {
 #if IVSIZE >= 8

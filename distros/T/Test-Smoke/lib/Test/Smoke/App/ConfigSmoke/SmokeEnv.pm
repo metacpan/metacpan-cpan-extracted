@@ -2,6 +2,8 @@ package Test::Smoke::App::ConfigSmoke::SmokeEnv;
 use warnings;
 use strict;
 
+our $VERSION = '0.002';
+
 use Exporter 'import';
 our @EXPORT = qw/
     config_smoke_env
@@ -69,7 +71,7 @@ sub check_build_configs_file {
         $cfg = Test::Smoke::BuildCFG->new($buildcfg_file);
     }
     else {
-        my $dft_config = Test::Smoke::BuildCFG->default_buildcfg;
+        my $dft_config = Test::Smoke::BuildCFG->os_default_buildcfg($^O);
         $cfg = Test::Smoke::BuildCFG->new(\$dft_config);
     }
 

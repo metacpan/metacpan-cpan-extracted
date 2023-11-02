@@ -193,6 +193,8 @@ X<SQL Commands>
        fields => [ col1_alias, col2_alias, ... ],
        or
        fields => [ col1_alias, { col2_alias => newalias }, ... ],
+	   or
+	   fields => "*"
 
        # where clause
 
@@ -269,11 +271,15 @@ X<SQL Commands>
        cursor_info = array_ref | hash_ref | scalar_ref>,	# (no defaults)
        ...
        cursor_command =>					# (default: TOP)
-          SQL_SIMPLE_CURSOS_TOP | 
+          SQL_SIMPLE_CURSOR_TOP | 
           SQL_SIMPLE_CURSOR_BACK |
-		  SQL_SIMPLE_CURSOR_NEXT |
+          SQL_SIMPLE_CURSOR_NEXT |
           SQL_SIMPLE_CURSOR_RELOAD |
-		  SQL_SIMPLE_CURSOR_LAST,
+          SQL_SIMPLE_CURSOR_LAST,
+       ...
+       cursor_order =>						# (default: no defaults)
+          SQL_SIMPLE_ORDER_ASC |
+          SQL_SIMPLE_ORDER_DESC
        ...
        limit =>							# (default: no defaults)
     );
@@ -807,7 +813,7 @@ The following SQL Command will be executed:
 
   SELECT * FROM table1 WHERE id IN (SELECT my_tb2_id FROM table2 WHERE [ .... ] );
 
-The reults will be written into the arrayref (for this example).
+The results will be written into the arrayref (for this example).
 
 B<NOTE:> This example is not a real use case, it is simple sample for references.
 
@@ -874,6 +880,12 @@ Results:
   SELECT * FROM table_for_users;
 
 B<NOTE:> The '*' option will not assign alias names in the SQL Command.
+
+B<NOTE:> <NOTE:> You can mix your C<select> with C<Alias Table Fields> and non-Alias entries. but I must remember this:
+C<select> in tables without the C<fields> option will be limited to the definition of C<alias table>, 
+in this case, to obtain all fields you must impose C<fields => "*">:
+
+  SQL::SimpleOps->Select ( ... fields => "*", ... );
 
 =head2 Escape or Backslash
 X<Escape or Backslash>
@@ -1744,7 +1756,7 @@ B<Example5:> Extract with distinct columns
 
 B<NOTE:> Distinct by "col1".
 
-B<Example5:> Extract with functions
+B<Example6:> Extract with functions
 
   SQL::SimpleOps->Select
   (
@@ -1754,7 +1766,7 @@ B<Example5:> Extract with functions
 
 B<NOTE:> The column must be single field.
 
-B<Example5:> Extract with functions
+B<Example7:> Extract with functions
 
   SQL::SimpleOps->Select
   (
@@ -1764,7 +1776,7 @@ B<Example5:> Extract with functions
 
 B<NOTE:> The column must be single field.
 
-B<Example6:> Escaping field, no validation will be.
+B<Example8:> Escaping field, no validation will be.
 
   SQL::SimpleOps->Select
   (
@@ -1774,7 +1786,7 @@ B<Example6:> Escaping field, no validation will be.
 
 B<NOTE:> The '\' (backslash) will escape all validations.
 
-B<Example7:> Assigning alias field for specific select command.
+B<Example9:> Assigning alias field for specific select command.
 
   SQL::SimpleOps->Select
   (
@@ -1784,13 +1796,13 @@ B<Example7:> Assigning alias field for specific select command.
 
 B<NOTE:> Use 'alias1' as buffer reference to get field1 data.
 
-B<Example8:> Requesting all fields from table with L<Aliases Table> definition
+B<Example10:> Requesting all fields from table with L<Aliases Table> definition
 
   SQL::SimpleOps->Select( fields => "*", ... );
 
 B<NOTE:> If you omitted the C<fieldlist> the module shown only defined fields of your C<Aliases Table>
 
-B<Exampl9:> Requesting all fields from table without L<Aliases Table> definition
+B<Example11:> Requesting all fields from table without L<Aliases Table> definition
 
   SQL::SimpleOps->Select( ... );
 
@@ -1802,7 +1814,8 @@ X<SelectCursor>
 This method is the "Select Method" and was created to scan tables based on key and cursor on.
 For this case, some options must be specified and controls returned, items to create pagination concepts.
 
-The C<where> and C<order_by> are not required. The method will insert the conditions based on C<cursor_key> and C<cusor_info> information. 
+The C<where> and C<order_by> are not required. The method will insert the conditions based on C<cursor_key> and C<cusor_info> information,
+however, you can use additional conditions for this items.
 
   SQL::SimpleOps->SelectCursor
   (
@@ -1821,6 +1834,10 @@ The C<where> and C<order_by> are not required. The method will insert the condit
      cursor_key => [ col1, col2, ... ],
      ...
      cursor_info => %cursor_info | @cursor_info | $cursor_info,
+     ...
+     cursor_order =>
+         SQL_SIMPLE_ORDER_ASC |		# buffer using enforced order_by ASC
+         SQL_SIMPLE_ORDER_DESC          # buffer using enforced order_by DESC
      ...
      limit => no_lines,
   );
@@ -1894,7 +1911,7 @@ At the end of each retrieve, the cursor of page will be saved in C<cursor_info> 
 The paging process will use the first and last keys and scan the table using these values as starting pointer.
 The scanning depends on the command that to be executed.
 
-You doni't need make any changes in your retrieved C<cursor_info>,
+You don't need make any changes in your retrieved C<cursor_info>,
 just save it and use as an arguments in your next C<SelectCursor> call.
 
 Defaults: no defaults, if omitted this information must be obtained by the C<getLastCursor> method.
@@ -1905,18 +1922,19 @@ The buffer reference can be C<hash_ref>, C<array_ref> or C<scalar_ref>, for each
 
 =item B<hash_ref:>
 
-  hash_ref => { lines => no_lines, first => first_key, last => last_key, rc => rc };
+  hash_ref => { lines => no_lines, first => first_key, last => last_key, rc => rc, previouscmd => cmd };
   or
-  hash_ref => { lines => no_lines, first => [last_arrayref], last => [last_arrayref], rc => rc };
+  hash_ref => { lines => no_lines, first => [last_arrayref], last => [last_arrayref], rc => rc, previouscmd => cmd };
 
 B<Example1:> Using single key:
 
   %buffer_info =
   {
-     rc => value,				# Single value
-     lines => value,				# Single value
-     first => value-first-key,			# Single value
-     last => value-last-key,			# Single value
+     rc => value,			# Single value
+     lines => value,			# Single value
+     first => value-first-key,		# Single value
+     last => value-last-key,		# Single value
+     previouscmd => value-cmd		# Single value
   };
 
 B<Example2:> Using multiple keys:
@@ -1927,59 +1945,64 @@ B<Example2:> Using multiple keys:
      lines => value,				# Single value
      first => [ first1, ..., firstN, ],		# Array
      last => [ first1, ..., firstN, ],		# Array
+     previouscmd => value,			# Single value
   };
 
 =item B<array_ref:>
 
-  array_ref => [ rc, no_lines, first_key, last_key ];
+  array_ref => [ rc, no_lines, first_key, last_key, previouscmd ];
   or
-  array_ref => [ rc, no_lines, [first_last_arrayref], [last_last_arrayref] ];
+  array_ref => [ rc, no_lines, [first_last_arrayref], [last_last_arrayref], previouscmd];
 
 B<Example1:> Using single key:
 
   @buffer_info =
   [
-     value,				# RC value, indexed by #0
-     value,				# Lines value, indexed by #4
-     value-first-key,			# First value, indexed by #1
-     value-last-key,			# Last value, indexed by #3
+     value,		# RC value, indexed by #0
+     value,		# Lines value, indexed by #1
+     value-first-key,	# First value, indexed by #2
+     value-last-key,	# Last value, indexed by #3
+     value-last-cmd,	# Last Command, indexed by #4
   ];
 
 B<Example2:> Using multiple keys:
 
   @buffer_info =
   [
-     value,				# RC value, indexed by #0
-     value,				# Lines value, indexed by #1
-     [ first1, ..., firstN, ],		# First Array values, indexed by #2
-     [ first1, ..., firstN, ],		# Last Array values, indexed by #3
+     value,			# RC value, indexed by #0
+     value,			# Lines value, indexed by #1
+     [ first1, ..., firstN, ],	# First Array values, indexed by #2
+     [ first1, ..., firstN, ],	# Last Array values, indexed by #3
+     value,			# Last Command, indexed by #4
   ];
 
 =item B<scalar_ref:>
 
-  scalar_ref => "[rc] [no_lines] [first_key] [last_key]"
+  scalar_ref => "[rc] [no_lines] [first_key] [last_key] [previouscmd]"
   or
-  scalar_ref => "[rc] [no_lines] [first_key1] [first_key2] ... [last_key1] [last_key2] ..."
+  scalar_ref => "[rc] [no_lines] [first_key1] [first_key2] ... [last_key1] [last_key2] ... [previouscmd]"
 
 B<Example1:> Using single key:
 
-  $buffer_info = "value value value value"	# separeted by spaces
+  $buffer_info = "value value value value value"	# separeted by spaces
 
-     # RC value, first word
-     # Lines value, second word
-     # First value, third word
-     # Last value, fourth word
+  # RC value, first word
+  # Lines value, second word
+  # First value, third word
+  # Last value, fourth word
+  # Previous Command value, fifth word
 
 B<BEWARE:> This type of returns is not recommended for keys that have spaces or null values.
 
 B<Example2:> Using multiple keys:
 
-  $buffer_info = "value value first1 ... firstN last1 ... lastN"
+  $buffer_info = "value value first1 ... firstN last1 ... lastN prevCmd"
 
-     # RC value, first word
-     # Lines value, second word
-     # First value, depends on the number of keys
-     # Last value, depends on the number of keys
+  # RC value, first word
+  # Lines value, second word
+  # First value, depends on the number of keys
+  # Last value, depends on the number of keys
+  # Previous Command value, fifth word
 
 B<NOTE:> The number of C<first_keyX> and C<last_keyX> depends of number of keys in the C<cursor_key>.
 
@@ -2007,6 +2030,122 @@ Consists the first key value.
 
 Consists the last key value.
 
+=item B<previouscmd:>
+
+Consists the last executed command,
+used with C<RELOAD> command to define which command to reuse
+(if omitted, it will be used 'if it were C<NEXT> command with the option C<first>').
+
+=back
+
+=item B<cursor_order>:
+
+The C<cursor_order> was created to enforced how to the data will be ordered in the C<buffer>.
+The affected option depends on the type of C<buffer> in use (C<arrayref> or C<hashref>).
+
+=over
+
+Using C<buffer=arrayref> the option C<buffer> will be ordered.
+
+Using C<buffer=hashref> the option C<buffer_hashindex> will be ordered (if option in use).
+
+=back
+
+The option C<buffer_info> will not be affected.
+
+B<NOTE:> The C<buffer_info> is a reserved area where it is not recommended to make changes.
+
+By default the following ordered rules will be applied:
+
+ SQL_SIMPLE_COMMAND_TOP		ascending
+ SQL_SIMPLE_COMMAND_BACK	descending
+ SQL_SIMPLE_COMMAND_NEXT	ascending
+ SQL_SIMPLE_COMMAND_LAST	descending
+ SQL_SIMPLE_COMMAND_RELOAD	ascending
+
+In this case the first and last rows in the buffer will not be aligned with the cursor keys (C<cursor_info>).
+
+i.e, explemplifying: Supose the list of rows and reads using C<limit=10> and C<arrayref> as C<buffer>
+
+  #   col1
+  1:  k01
+ ..
+ 10:  k10
+ 11:  k11
+ ..
+ 20:  k20
+ ..
+ ..
+ 90:  k90
+ ..
+ 99:  k99
+
+The list has the value C<col1=k01> as the first line and the last line as the value C<col=k99>.
+The following scan was executed (using C<limmit=10>):
+
+ a) read the top of rows, page1
+ b) read forwarding, page2
+ c) read backwarding, page1
+ d) read the last of rows, page9
+
+The results will be:
+
+=over
+
+Step 'a': The C<buffer> contains the value C<k01> and C<k09> as first and last buffered data.
+The C<cursor_info> contains the first as C<k01> and last as C<k09>.
+
+Step 'b': The C<buffer> contains the value C<k11> and C<k19> as first and last buffered data.
+The C<cursor_info> contains the first as C<k11> and last as C<k19>.
+
+Step 'c': The C<buffer> contains the value C<k10> and C<k01> as first and last buffered data.
+The C<cursor_info> contains the first as C<k01> and last as C<k10>.
+
+Step 'd': The C<buffer> contains the value C<k99> and C<k91> as first and last buffered data.
+The C<cursor_info> contains the first as C<k91> and last as C<k99>.
+
+=back
+
+The C<cursor_order> was created to enforce order in the buffer without making any changes to C<cursor_info>.
+
+Now we will apply the option C<cursor_order=ASC> where the results will be:
+
+=over
+
+Step 'a': The C<buffer> contains the value C<k01> and C<k09> as first and last buffered data.
+The C<cursor_info> contains the first as C<k01> and last as C<k09>.
+
+Step 'b': The C<buffer> contains the value C<k11> and C<k19> as first and last buffered data.
+The C<cursor_info> contains the first as C<k11> and last as C<k19>.
+Now changes in the buffer sequence and the cursor is unchanged.
+
+Step 'c': The C<buffer> contains the value C<k01> and C<k10> as first and last buffered data.
+The C<cursor_info> contains the first as C<k01> and last as C<k10>.
+
+Step 'd': The C<buffer> contains the value C<k91> and C<k99> as first and last buffered data.
+The C<cursor_info> contains the first as C<k91> and last as C<k99>.
+See changes in the buffer sequence and the cursor is unchanged.
+
+=back
+
+And, applying the option C<cursor_order=DESC> where the results will be:
+
+=over
+
+Step 'a': The C<buffer> contains the value C<k10> and C<k01> as first and last buffered data.
+The C<cursor_info> contains the first as C<k01> and last as C<k09>.
+
+Step 'b': The C<buffer> contains the value C<k20> and C<k10> as first and last buffered data.
+The C<cursor_info> contains the first as C<k11> and last as C<k19>.
+See changes in the buffer sequence and the cursor is unchanged.
+
+Step 'c': The C<buffer> contains the value C<k10> and C<k01> as first and last buffered data.
+The C<cursor_info> contains the first as C<k01> and last as C<k10>.
+
+Step 'd': The C<buffer> contains the value C<k99> and C<k91> as first and last buffered data.
+The C<cursor_info> contains the first as C<k91> and last as C<k99>.
+See changes in the buffer sequence and the cursor is unchanged.
+
 =back
 
 =item B<limit:>
@@ -2016,6 +2155,12 @@ The option must be specified.
 Use '0' (zero) for unlimited lines.
 
 =back
+
+=over
+
+=item Examples:
+
+=over
 
 B<Example1:> This example we have four stage of retrieve.
 The 1st go to the first page on the table.
@@ -2082,6 +2227,10 @@ B<NOTE:> The number of page is limited by C<limit> option.
      buffer => array_ref,
      limit => number_of_lines,
   );
+
+=back
+
+=back
 
 =head2 SelectSubQuery
 X<SelectSubQuery>
@@ -2187,11 +2336,11 @@ B<NOTE:> This method can be used on B<PLUGINS> to translate the aliases names.
 
 The options define I<where> the field will be used and must be:
 
-  SQL_SIMPLE_ALIAS_INSERT - used as: INSERT INTO ... (field) ...
-  SQL_SIMPLE_ALIAS_UPDATE - used as: UPDATE ... SET field = ...
-  SQL_SIMPLE_ALIAS_DELETE - not applied
-  SQL_SIMPLE_ALIAS_SELECT - used as: SELECT field .... FROM ....
-  SQL_SIMPLE_ALIAS_WHERE - used as: ... WHERE field ....
+  SQL_SIMPLE_ALIAS_INSERT  - used as: INSERT INTO ... (field) ...
+  SQL_SIMPLE_ALIAS_UPDATE  - used as: UPDATE ... SET field = ...
+  SQL_SIMPLE_ALIAS_DELETE  - not used
+  SQL_SIMPLE_ALIAS_SELECT  - used as: SELECT field .... FROM ....
+  SQL_SIMPLE_ALIAS_WHERE   - used as: ... WHERE field ....
   SQL_SIMPLE_ALIAS_ORDERBY - used as: ... ORDER BY field ...
   SQL_SIMPLE_ALIAS_GROUPBY - used as: ... GROUP BY fild ...
 
@@ -2483,7 +2632,7 @@ B<BEWARE:> In this case, you must validade the I<Number of Rows> (C<getRows> met
 
 =item Command Alias Process
 
-This values are used with L<getAliasCols> to define how to translate the name to a real name, 
+This values are used with C<getAliasCols> to define how to translate the name to a real name, 
 where the translation depends on the action in question in the command,
 some parts of command the aliases is allowed and an others not.
 
@@ -4942,7 +5091,7 @@ B<Command:> Select and SelectCursor
 =back
 
 =head2 047E Buffer arrayref Off not allowed for multiple field list
-X<046E>
+X<047E>
 
 =over
 
@@ -4953,6 +5102,25 @@ B<Error:> The C<buffer_arrayref> only supports single fields in the selection.
 =item *
 
 B<Action:> Check the list of fields in selection.
+
+=item *
+
+B<Command:> Select and SelectCursor
+
+=back
+
+=head2 048E Buffer hashindex must be arrayref
+X<048E>
+
+=over
+
+=item *
+
+B<Error:> The C<buffer_hashindex> is not arrayref format.
+
+=item *
+
+B<Action:> Check the list of value in selection.
 
 =item *
 

@@ -23,6 +23,7 @@ on 'test' => sub {
   requires "Module::Metadata" => "0";
   requires "Plack::Builder" => "0";
   requires "Plack::Test" => "0";
+  requires "Test2::V0" => "0";
   requires "Test::More" => "0";
   requires "Test::Vars" => "0.015";
   requires "strict" => "0";

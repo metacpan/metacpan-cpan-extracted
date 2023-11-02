@@ -101,47 +101,47 @@
    "provides" : {
       "Net::Async::Redis" : {
          "file" : "lib/Net/Async/Redis.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Cluster" : {
          "file" : "lib/Net/Async/Redis/Cluster.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Cluster::Node" : {
          "file" : "lib/Net/Async/Redis/Cluster/Node.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Commands" : {
          "file" : "lib/Net/Async/Redis/Commands.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Multi" : {
          "file" : "lib/Net/Async/Redis/Multi.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Protocol" : {
          "file" : "lib/Net/Async/Redis/Protocol.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Server" : {
          "file" : "lib/Net/Async/Redis/Server.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Server::Connection" : {
          "file" : "lib/Net/Async/Redis/Server/Connection.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Server::Database" : {
          "file" : "lib/Net/Async/Redis/Server/Database.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Subscription" : {
          "file" : "lib/Net/Async/Redis/Subscription.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       },
       "Net::Async::Redis::Subscription::Message" : {
          "file" : "lib/Net/Async/Redis/Subscription/Message.pm",
-         "version" : "4.001"
+         "version" : "4.002"
       }
    },
    "release_status" : "stable",
@@ -156,11 +156,12 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Redis"
       }
    },
-   "version" : "4.001",
+   "version" : "4.002",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Eyad Arnabeh <eyadof@gmail.com>",
       "Paul \"LeoNerd\" Evans <leonerd@leonerd.org.uk>",
+      "Tom Molesworth <tom@deriv.com>",
       "tm604 <tom@perlsite.co.uk>",
       "Marc Frank <mfrank@sipxpert.de>",
       "Michael Mueller <michael.mueller@binary.com>",

@@ -1,6 +1,9 @@
+.perl-version
 app.psgi
 Build.PL
 cpanfile
+cpanfile.snapshot
+how_to_release.md
 lib/Plack/App/WebMySQL.pm
 lib/Plack/App/WebMySQL/General.pm
 lib/Plack/App/WebMySQL/Key.pm

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Iterator::Flex::Utils qw( STATE THROW EXHAUSTION :IterAttrs :IterStates );
 use Iterator::Flex::Factory;
@@ -123,7 +123,7 @@ Iterator::Flex::Map - Map Iterator Class
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 METHODS
 

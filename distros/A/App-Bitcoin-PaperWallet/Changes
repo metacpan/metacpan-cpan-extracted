@@ -1,5 +1,12 @@
 Revision history for Perl extension App::Bitcoin::PaperWallet.
 
+1.12  Sat Oct 28 2023
+	- new option in paper-wallet: -w, --words - choose the number of words
+	- new option in paper-wallet: -c, --compat_addrs - choose the number of compat addresses
+	- new option in paper-wallet: -s, --segwit_addrs - choose the number of segwit addresses
+	- changed the way the main generator method handles optional arguments
+	- added a warning if the entered entropy is very short
+
 1.11  Sun Oct 15 2023
 	- adjusted to work with Bitcoin::Crypto 2.000 without deprecation warnings
 

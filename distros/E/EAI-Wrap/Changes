@@ -26,3 +26,5 @@
 	- removed timing test in Wrap.t (causes problems on sime CPAN testsites), added %templine in EAI::File, changed first looking up log.config from $ENV{EAI_WRAP_CONFIG_PATH}/$execute{envraw} to $ENV{EAI_WRAP_CONFIG_PATH}/$execute{env}, enhanced setDebugLevel.pl to switch between $ENV{EAI_WRAP_CONFIG_PATH}/$execute{env}/log.config and $ENV{EAI_WRAP_CONFIG_PATH}/log.config.
 1.4  Thu Oct 19 22:00:00 2023
 	- amended logfile naming to same principles as in config lookup keys (scriptname + addToScriptName suffix), restore @ARGV after commandline parsing to allow for own commandline parsing, improved suppressing error messages in EAI::FTP::fetchFiles, improved error handling for empty files.
+1.5  Thu Oct 26 13:00:00 2023
+	- error checking for EAI::Wrap::openDBConn parameters, added possibility to have enumerated differentiation of log checks, added format_autoheader to automatically created header information from source files, improved arg checking in EAI::DB::readFromDBHash and doInDB, improved (empty) arg checking in EAI::DateUtil

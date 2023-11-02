@@ -22,37 +22,37 @@ name: Crypt-HSM
 provides:
   Crypt::HSM:
     file: lib/Crypt/HSM.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Decrypt:
     file: lib/Crypt/HSM/Decrypt.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Digest:
     file: lib/Crypt/HSM/Digest.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Encrypt:
     file: lib/Crypt/HSM/Encrypt.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Mechanism:
     file: lib/Crypt/HSM/Mechanism.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Provider:
     file: lib/Crypt/HSM/Provider.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Session:
     file: lib/Crypt/HSM/Session.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Sign:
     file: lib/Crypt/HSM/Sign.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Slot:
     file: lib/Crypt/HSM/Slot.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Stream:
     file: lib/Crypt/HSM/Stream.pm
-    version: '0.014'
+    version: '0.015'
   Crypt::HSM::Verify:
     file: lib/Crypt/HSM/Verify.pm
-    version: '0.014'
+    version: '0.015'
 requires:
   XSLoader: '0'
   perl: '5.006'
@@ -61,7 +61,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/crypt-hsm/issues
   repository: git://github.com/Leont/crypt-hsm.git
-version: '0.014'
+version: '0.015'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

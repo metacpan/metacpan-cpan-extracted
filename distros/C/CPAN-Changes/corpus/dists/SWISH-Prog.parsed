@@ -1,0 +1,1581 @@
+{
+  "preamble" => "Revision history for Perl extension Prog.",
+  "raw_preamble" => "Revision history for Perl extension Prog.\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 5,
+              "raw" => "   * remove --lucy_highlightable and replace with -I (--Indexer_opts)\n",
+              "style" => "*",
+              "text" => "remove --lucy_highlightable and replace with -I (--Indexer_opts)"
+            },
+            {
+              "line" => 6,
+              "raw" => "   * rename --aggregator_opts to --Aggregator_opts\n \n",
+              "style" => "*",
+              "text" => "rename --aggregator_opts to --Aggregator_opts"
+            }
+          ],
+          "line" => 4,
+          "raw" => " - 3.1.0 release of swish3 cli:\n",
+          "style" => "-",
+          "text" => "3.1.0 release of swish3 cli:"
+        }
+      ],
+      "line" => 3,
+      "note" => "11 Dec 2013",
+      "raw" => "0.75 11 Dec 2013\n",
+      "version" => "0.75"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 9,
+          "raw" => " - packaaging clean up only\n\n",
+          "style" => "-",
+          "text" => "packaaging clean up only"
+        }
+      ],
+      "line" => 8,
+      "note" => "01 Oct 2013",
+      "raw" => "0.74 01 Oct 2013\n",
+      "version" => "0.74"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 12,
+          "raw" => " - turn off Pod tests unless RELEASE_TESTING env var set. Pod::Coverage\n   failures were because optional dependencies were not present but module\n   load was attempted in order to walk symbol tree for pod tests.\n\n",
+          "style" => "-",
+          "text" => "turn off Pod tests unless RELEASE_TESTING env var set. Pod::Coverage failures were because optional dependencies were not present but module load was attempted in order to walk symbol tree for pod tests."
+        }
+      ],
+      "line" => 11,
+      "note" => "12 Sept 2013",
+      "raw" => "0.73 12 Sept 2013\n",
+      "version" => "0.73"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 17,
+          "raw" => " - add TRACE_ALL to pod-coverage test to discover why it suddenly started\n   epic fail\n",
+          "style" => "-",
+          "text" => "add TRACE_ALL to pod-coverage test to discover why it suddenly started epic fail"
+        },
+        {
+          "line" => 19,
+          "raw" => " - add explicit port to t/17-spider-server, running on 5002\n\n",
+          "style" => "-",
+          "text" => "add explicit port to t/17-spider-server, running on 5002"
+        }
+      ],
+      "line" => 16,
+      "note" => "10 Sept 2013",
+      "raw" => "0.72 10 Sept 2013\n",
+      "version" => "0.72"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 22,
+          "raw" => " - add --null_term feature to swish3 example\n",
+          "style" => "-",
+          "text" => "add --null_term feature to swish3 example"
+        },
+        {
+          "line" => 23,
+          "raw" => " - add sitemap support to Spider\n",
+          "style" => "-",
+          "text" => "add sitemap support to Spider"
+        },
+        {
+          "line" => 24,
+          "raw" => " - swish3 -W <n> sets SWISH_PARSER_WARNINGS env var\n\n",
+          "style" => "-",
+          "text" => "swish3 -W <n> sets SWISH_PARSER_WARNINGS env var"
+        }
+      ],
+      "line" => 21,
+      "note" => "1 Aug 2013",
+      "raw" => "0.71 1 Aug 2013\n",
+      "version" => "0.71"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 27,
+          "raw" => " - add tests for Utils class.\n",
+          "style" => "-",
+          "text" => "add tests for Utils class."
+        },
+        {
+          "line" => 28,
+          "raw" => " - Utils extension regex now matches \\w+ rather than hardcoded document\n   extensions.\n\n",
+          "style" => "-",
+          "text" => "Utils extension regex now matches \\w+ rather than hardcoded document extensions."
+        }
+      ],
+      "line" => 26,
+      "note" => "10 Feb 2013",
+      "raw" => "0.70 10 Feb 2013\n",
+      "version" => "0.70"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 32,
+          "raw" => " - fix documentation for SWISH::Prog::InvIndex::Meta, add data() accessor\n   method.\n\n",
+          "style" => "-",
+          "text" => "fix documentation for SWISH::Prog::InvIndex::Meta, add data() accessor method."
+        }
+      ],
+      "line" => 31,
+      "note" => "05 Feb 2013",
+      "raw" => "0.69 05 Feb 2013\n",
+      "version" => "0.69"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 36,
+          "raw" => " - fix failing test t/17-spider-server with 'use base' vs '\@ISA'\n",
+          "style" => "-",
+          "text" => "fix failing test t/17-spider-server with 'use base' vs '\@ISA'"
+        },
+        {
+          "line" => 37,
+          "raw" => " - force URI objects to stringify when passing in/out of cache\n\n",
+          "style" => "-",
+          "text" => "force URI objects to stringify when passing in/out of cache"
+        }
+      ],
+      "line" => 35,
+      "note" => "23 Jan 2013",
+      "raw" => "0.68 23 Jan 2013\n",
+      "version" => "0.68"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 40,
+          "raw" => " - Spider now uses LWP::RobotUA to respect robots.txt. Dependency on\n   WWW::Mechanize is removed.\n",
+          "style" => "-",
+          "text" => "Spider now uses LWP::RobotUA to respect robots.txt. Dependency on WWW::Mechanize is removed."
+        },
+        {
+          "line" => 42,
+          "raw" => " - Spider authorization features now work. Added bona fide test suite for\n   spidering.\n",
+          "style" => "-",
+          "text" => "Spider authorization features now work. Added bona fide test suite for spidering."
+        },
+        {
+          "line" => 44,
+          "raw" => " - expand Queue API to add remove() and clean() and internal locking on\n   get()\n",
+          "style" => "-",
+          "text" => "expand Queue API to add remove() and clean() and internal locking on get()"
+        },
+        {
+          "line" => 46,
+          "raw" => " - Spider->modified_since feature to allow for incremental crawls\n",
+          "style" => "-",
+          "text" => "Spider->modified_since feature to allow for incremental crawls"
+        },
+        {
+          "line" => 47,
+          "raw" => " - Added new class SWISH::Prog::Aggregator::Spider::Response, refactoring\n   appropriate UA methods into Response class since WWW::Mechanize was\n   intentionally blurring the logical distinction.\n",
+          "style" => "-",
+          "text" => "Added new class SWISH::Prog::Aggregator::Spider::Response, refactoring appropriate UA methods into Response class since WWW::Mechanize was intentionally blurring the logical distinction."
+        },
+        {
+          "line" => 50,
+          "raw" => " - Spider->file_rules (new feature) follows same code path as\n   Aggregator::FS.\n",
+          "style" => "-",
+          "text" => "Spider->file_rules (new feature) follows same code path as Aggregator::FS."
+        },
+        {
+          "line" => 52,
+          "raw" => " - added Utils::write_log and ::write_log_line methods for standardizing\n   debug output\n\n",
+          "style" => "-",
+          "text" => "added Utils::write_log and ::write_log_line methods for standardizing debug output"
+        }
+      ],
+      "line" => 39,
+      "note" => "19 Jan 2013",
+      "raw" => "0.67 19 Jan 2013\n",
+      "version" => "0.67"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 56,
+          "raw" => " - yanked redundant test t/09 as it is now part of Search::Tools\n",
+          "style" => "-",
+          "text" => "yanked redundant test t/09 as it is now part of Search::Tools"
+        },
+        {
+          "line" => 57,
+          "raw" => " - fix t/05 spider to warn on correct missing module; fix spider count\n\n",
+          "style" => "-",
+          "text" => "fix t/05 spider to warn on correct missing module; fix spider count"
+        }
+      ],
+      "line" => 55,
+      "note" => "8 Dec 2012",
+      "raw" => "0.66 8 Dec 2012\n",
+      "version" => "0.66"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 60,
+          "raw" => " - add more tests for MailFS aggregator\n",
+          "style" => "-",
+          "text" => "add more tests for MailFS aggregator"
+        },
+        {
+          "line" => 61,
+          "raw" => " - all Aggregators now set content-type to valid MIME instead of custom\n   Swish types\n",
+          "style" => "-",
+          "text" => "all Aggregators now set content-type to valid MIME instead of custom Swish types"
+        },
+        {
+          "line" => 63,
+          "raw" => " - Aggregator->set_parser_from_type() will now not override a defined\n   Doc->parser() value \n\n",
+          "style" => "-",
+          "text" => "Aggregator->set_parser_from_type() will now not override a defined Doc->parser() value"
+        }
+      ],
+      "line" => 59,
+      "note" => "5 Nov 2012",
+      "raw" => "0.65 5 Nov 2012\n",
+      "version" => "0.65"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 67,
+          "raw" => " - add --aggregator_opts to swish3 and SWISH::Prog\n",
+          "style" => "-",
+          "text" => "add --aggregator_opts to swish3 and SWISH::Prog"
+        },
+        {
+          "line" => 68,
+          "raw" => " - add looks_like_feed() to Spider, and add dependency on XML::Feed\n",
+          "style" => "-",
+          "text" => "add looks_like_feed() to Spider, and add dependency on XML::Feed"
+        },
+        {
+          "line" => 69,
+          "raw" => " - switch Spider::UA parent class to WWW::Mechanize::GZip\n\n",
+          "style" => "-",
+          "text" => "switch Spider::UA parent class to WWW::Mechanize::GZip"
+        }
+      ],
+      "line" => 66,
+      "note" => "12 Oct 2012",
+      "raw" => "0.64 12 Oct 2012\n",
+      "version" => "0.64"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 72,
+          "raw" => " - add TagAlias support to Config. TagAlias is a Swish3 feature.\n",
+          "style" => "-",
+          "text" => "add TagAlias support to Config. TagAlias is a Swish3 feature."
+        },
+        {
+          "line" => 73,
+          "raw" => " - improve SWISH::Prog documentation\n",
+          "style" => "-",
+          "text" => "improve SWISH::Prog documentation"
+        },
+        {
+          "line" => 74,
+          "raw" => " - add --doc_filter to swish3, to allow for set_filter to work from an\n   external Perl file.\n\n",
+          "style" => "-",
+          "text" => "add --doc_filter to swish3, to allow for set_filter to work from an external Perl file."
+        }
+      ],
+      "line" => 71,
+      "note" => "11 Sept 2012",
+      "raw" => "0.63 11 Sept 2012\n",
+      "version" => "0.63"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 78,
+          "raw" => " - support subclassing of Indexer in start() sanity check introduced in\n   0.61\n",
+          "style" => "-",
+          "text" => "support subclassing of Indexer in start() sanity check introduced in 0.61"
+        },
+        {
+          "line" => 80,
+          "raw" => " - add InvIndex->meta_file method and avoid referring to swish.xml directly\n\n",
+          "style" => "-",
+          "text" => "add InvIndex->meta_file method and avoid referring to swish.xml directly"
+        }
+      ],
+      "line" => 77,
+      "note" => "3 Sept 2012",
+      "raw" => "0.62 3 Sept 2012\n",
+      "version" => "0.62"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 83,
+          "raw" => " - swish3 now catches exceptions and re-throws errors\n",
+          "style" => "-",
+          "text" => "swish3 now catches exceptions and re-throws errors"
+        },
+        {
+          "line" => 84,
+          "raw" => " - swish3 now passes --debug flag into Searcher->new\n",
+          "style" => "-",
+          "text" => "swish3 now passes --debug flag into Searcher->new"
+        },
+        {
+          "line" => 85,
+          "raw" => " - base Indexer now performs check on existing indexes to verify that you\n   aren't trying to run one format's Indexer against a different format's\n   index.\n",
+          "style" => "-",
+          "text" => "base Indexer now performs check on existing indexes to verify that you aren't trying to run one format's Indexer against a different format's index."
+        },
+        {
+          "line" => 88,
+          "raw" => " - swish_last_start file now created by base Indexer class, not swish3 cli.\n\n",
+          "style" => "-",
+          "text" => "swish_last_start file now created by base Indexer class, not swish3 cli."
+        }
+      ],
+      "line" => 82,
+      "note" => "23 Aug 2012",
+      "raw" => "0.61 23 Aug 2012\n",
+      "version" => "0.61"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 91,
+          "raw" => " - add *_property methods to InvIndex::Meta\n",
+          "style" => "-",
+          "text" => "add *_property methods to InvIndex::Meta"
+        },
+        {
+          "line" => 92,
+          "raw" => " - SWISH::3 now required dependency\n",
+          "style" => "-",
+          "text" => "SWISH::3 now required dependency"
+        },
+        {
+          "line" => 93,
+          "raw" => " - added use_quotes and quote_char features to Aggregator::DBI, inspired by\n   patch from Miko O'Sullivan.\n\n",
+          "style" => "-",
+          "text" => "added use_quotes and quote_char features to Aggregator::DBI, inspired by patch from Miko O'Sullivan."
+        }
+      ],
+      "line" => 90,
+      "note" => "28 July 2012",
+      "raw" => "0.60 28 July 2012\n",
+      "version" => "0.60"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 97,
+          "raw" => " - add FollowXInclude support for Swish3\n\n",
+          "style" => "-",
+          "text" => "add FollowXInclude support for Swish3"
+        }
+      ],
+      "line" => 96,
+      "note" => "26 July 2012",
+      "raw" => "0.59 26 July 2012\n",
+      "version" => "0.59"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 100,
+          "raw" => " - fix Config class for FuzzyIndexingMode conversion to XML (ver3)\n\n",
+          "style" => "-",
+          "text" => "fix Config class for FuzzyIndexingMode conversion to XML (ver3)"
+        }
+      ],
+      "line" => 99,
+      "note" => "26 June 2012",
+      "raw" => "0.58 26 June 2012\n",
+      "version" => "0.58"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 103,
+          "raw" => " - change default max_depth in Spider to 1 (makes it actually work by\n   default)\n\n",
+          "style" => "-",
+          "text" => "change default max_depth in Spider to 1 (makes it actually work by default)"
+        }
+      ],
+      "line" => 102,
+      "note" => "7 May 2012",
+      "raw" => "0.57 7 May 2012\n",
+      "version" => "0.57"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 107,
+          "raw" => " - make swish3 stdin/stdout utf8 safe\n\n",
+          "style" => "-",
+          "text" => "make swish3 stdin/stdout utf8 safe"
+        }
+      ],
+      "line" => 106,
+      "note" => "2 Apr 2012",
+      "raw" => "0.56 2 Apr 2012\n",
+      "version" => "0.56"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 110,
+          "raw" => " - fix skip test count in t/15\n\n",
+          "style" => "-",
+          "text" => "fix skip test count in t/15"
+        }
+      ],
+      "line" => 109,
+      "note" => "6 Nov 2011",
+      "raw" => "0.55 6 Nov 2011\n",
+      "version" => "0.55"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 113,
+          "raw" => " - \$SWISH::Prog::Utils::DefaultExtension now let's you configure default\n   file extension\n",
+          "style" => "-",
+          "text" => "\$SWISH::Prog::Utils::DefaultExtension now let's you configure default file extension"
+        },
+        {
+          "line" => 115,
+          "raw" => " - fix SWISH::Prog::Config->new() to support perldoc's claims of passing in\n   a hashref or named attribute pairs.\n\n",
+          "style" => "-",
+          "text" => "fix SWISH::Prog::Config->new() to support perldoc's claims of passing in a hashref or named attribute pairs."
+        }
+      ],
+      "line" => 112,
+      "note" => "14 Oct 2011",
+      "raw" => "0.54 14 Oct 2011\n",
+      "version" => "0.54"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 119,
+          "raw" => " - fix DBI Aggregator to make code support docs for swishtitle and\n   swishdescription. Bug reported by Logan Bell.\n",
+          "style" => "-",
+          "text" => "fix DBI Aggregator to make code support docs for swishtitle and swishdescription. Bug reported by Logan Bell."
+        },
+        {
+          "line" => 121,
+          "raw" => " - fix FS Aggregator behavior to work like 2.x and not skip files with no\n   extension.\n",
+          "style" => "-",
+          "text" => "fix FS Aggregator behavior to work like 2.x and not skip files with no extension."
+        },
+        {
+          "line" => 123,
+          "raw" => " - fix bug in swish3 where index dir is not created before swish_last_start\n   is touched.\n",
+          "style" => "-",
+          "text" => "fix bug in swish3 where index dir is not created before swish_last_start is touched."
+        },
+        {
+          "line" => 125,
+          "raw" => " - confess() when swish.xml does not exist\n",
+          "style" => "-",
+          "text" => "confess() when swish.xml does not exist"
+        },
+        {
+          "line" => 126,
+          "raw" => " - base Aggregator class no longer requires an indexer in new().\n\n",
+          "style" => "-",
+          "text" => "base Aggregator class no longer requires an indexer in new()."
+        }
+      ],
+      "line" => 118,
+      "note" => "09 Oct 2011",
+      "raw" => "0.53 09 Oct 2011\n",
+      "version" => "0.53"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 129,
+          "raw" => " - add support for IndexFile config option\n",
+          "style" => "-",
+          "text" => "add support for IndexFile config option"
+        },
+        {
+          "line" => 130,
+          "raw" => " - add --lucy_highlightable option to swish3\n",
+          "style" => "-",
+          "text" => "add --lucy_highlightable option to swish3"
+        },
+        {
+          "line" => 131,
+          "raw" => " - new class SWISH::Prog::ReplaceRules for backcompat\n",
+          "style" => "-",
+          "text" => "new class SWISH::Prog::ReplaceRules for backcompat"
+        },
+        {
+          "line" => 132,
+          "raw" => " - add get_stemmer_lang() method to Config class for Snowball stemmer\n   forward-compat.\n\n",
+          "style" => "-",
+          "text" => "add get_stemmer_lang() method to Config class for Snowball stemmer forward-compat."
+        }
+      ],
+      "line" => 128,
+      "note" => "26 Sept 2011",
+      "raw" => "0.52 26 Sept 2011\n",
+      "version" => "0.52"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 136,
+          "raw" => " - add 'Lucy' backend\n\n",
+          "style" => "-",
+          "text" => "add 'Lucy' backend"
+        }
+      ],
+      "line" => 135,
+      "note" => "28 June 2011",
+      "raw" => "0.51 28 June 2011\n",
+      "version" => "0.51"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 139,
+          "raw" => " - make swish3 -N flag argument optional, defaulting to\n   indexdir/swish_last_start\n",
+          "style" => "-",
+          "text" => "make swish3 -N flag argument optional, defaulting to indexdir/swish_last_start"
+        },
+        {
+          "line" => 141,
+          "raw" => " - error check in base Indexer for valid invindex param\n",
+          "style" => "-",
+          "text" => "error check in base Indexer for valid invindex param"
+        },
+        {
+          "line" => 142,
+          "raw" => " - misc doc fixes\n\n",
+          "style" => "-",
+          "text" => "misc doc fixes"
+        }
+      ],
+      "line" => 138,
+      "note" => "22 Feb 2011",
+      "raw" => "0.50 22 Feb 2011\n",
+      "version" => "0.50"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 145,
+          "raw" => " - refactor FileRules feature into File::Rules module\n\n",
+          "style" => "-",
+          "text" => "refactor FileRules feature into File::Rules module"
+        }
+      ],
+      "line" => 144,
+      "note" => "07 Jan 2011",
+      "raw" => "0.49 07 Jan 2011\n",
+      "version" => "0.49"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 148,
+          "raw" => " - added progress() feature to Aggregator classes, and 'expected' param to\n   swish3.\n",
+          "style" => "-",
+          "text" => "added progress() feature to Aggregator classes, and 'expected' param to swish3."
+        },
+        {
+          "line" => 150,
+          "raw" => " - add CascadeMetaContext config option for Swish3 compatibility\n",
+          "style" => "-",
+          "text" => "add CascadeMetaContext config option for Swish3 compatibility"
+        },
+        {
+          "line" => 151,
+          "raw" => " - bump SWISH::3 (optional) dependency to 0.09\n",
+          "style" => "-",
+          "text" => "bump SWISH::3 (optional) dependency to 0.09"
+        },
+        {
+          "line" => 152,
+          "raw" => " - fix MailFS aggregator to preserve filesystem paths as Doc url\n\n",
+          "style" => "-",
+          "text" => "fix MailFS aggregator to preserve filesystem paths as Doc url"
+        }
+      ],
+      "line" => 147,
+      "note" => "03 Nov 2010",
+      "raw" => "0.48 03 Nov 2010\n",
+      "version" => "0.48"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 155,
+          "raw" => " - add Search time to swish3 (3.0.7)\n",
+          "style" => "-",
+          "text" => "add Search time to swish3 (3.0.7)"
+        },
+        {
+          "line" => 156,
+          "raw" => " - fix bug in Native::Searcher affecting fieldtypes\n\n",
+          "style" => "-",
+          "text" => "fix bug in Native::Searcher affecting fieldtypes"
+        }
+      ],
+      "line" => 154,
+      "note" => "25 July 2010",
+      "raw" => "0.47 25 July 2010\n",
+      "version" => "0.47"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 159,
+          "raw" => " - add dep on Search::Query\n",
+          "style" => "-",
+          "text" => "add dep on Search::Query"
+        },
+        {
+          "line" => 160,
+          "raw" => " - add default_boolop feature to Native::Searcher\n",
+          "style" => "-",
+          "text" => "add default_boolop feature to Native::Searcher"
+        },
+        {
+          "line" => 161,
+          "raw" => " - fix IncludeConfigFile recursionin Config->ver2_to_ver()\n\n",
+          "style" => "-",
+          "text" => "fix IncludeConfigFile recursionin Config->ver2_to_ver()"
+        }
+      ],
+      "line" => 158,
+      "note" => "22 June 2010",
+      "raw" => "0.46 22 June 2010\n",
+      "version" => "0.46"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 164,
+          "raw" => " - fix swish3 to allow \"swishrank\" as -x option\n",
+          "style" => "-",
+          "text" => "fix swish3 to allow \"swishrank\" as -x option"
+        },
+        {
+          "line" => 165,
+          "raw" => " - enable -H option in swish3\n",
+          "style" => "-",
+          "text" => "enable -H option in swish3"
+        },
+        {
+          "line" => 166,
+          "raw" => " - SWISH::3->slurp optimization now uses transparent gunzip feature.\n   Requires SWISH::3 >= 0.06.\n",
+          "style" => "-",
+          "text" => "SWISH::3->slurp optimization now uses transparent gunzip feature. Requires SWISH::3 >= 0.06."
+        },
+        {
+          "line" => 168,
+          "raw" => " - fix backcompat for DefaultContents config in Config->ver2_to_ver3()\n\n",
+          "style" => "-",
+          "text" => "fix backcompat for DefaultContents config in Config->ver2_to_ver3()"
+        }
+      ],
+      "line" => 163,
+      "note" => "08 May 2010",
+      "raw" => "0.45 08 May 2010\n",
+      "version" => "0.45"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 171,
+          "raw" => " - register MailFS aggregator as 'mailfs' for use with swish3 -S\n\n",
+          "style" => "-",
+          "text" => "register MailFS aggregator as 'mailfs' for use with swish3 -S"
+        }
+      ],
+      "line" => 170,
+      "note" => "19 Mar 2010",
+      "raw" => "0.44 19 Mar 2010\n",
+      "version" => "0.44"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 174,
+          "raw" => " - remove docs and method for 'sort_order' in abstract Searcher class. No\n   subclass uses it, deferring to 'order' in the search() method opts.\n",
+          "style" => "-",
+          "text" => "remove docs and method for 'sort_order' in abstract Searcher class. No subclass uses it, deferring to 'order' in the search() method opts."
+        },
+        {
+          "line" => 176,
+          "raw" => " - FS->crawl now returns count\n",
+          "style" => "-",
+          "text" => "FS->crawl now returns count"
+        },
+        {
+          "line" => 177,
+          "raw" => " - add MailFS aggregator class\n\n",
+          "style" => "-",
+          "text" => "add MailFS aggregator class"
+        }
+      ],
+      "line" => 173,
+      "note" => "19 Mar 2010",
+      "raw" => "0.43 19 Mar 2010\n",
+      "version" => "0.43"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 180,
+          "raw" => " - add invindex format to search output headers in swish3\n",
+          "style" => "-",
+          "text" => "add invindex format to search output headers in swish3"
+        },
+        {
+          "line" => 181,
+          "raw" => " - add parsed query to search output headers in swish3; add query() method\n   to base Results class.\n",
+          "style" => "-",
+          "text" => "add parsed query to search output headers in swish3; add query() method to base Results class."
+        },
+        {
+          "line" => 183,
+          "raw" => " - add progress_size to Aggregator and implement in FS.\n\n",
+          "style" => "-",
+          "text" => "add progress_size to Aggregator and implement in FS."
+        }
+      ],
+      "line" => 179,
+      "note" => "27 Feb 2010",
+      "raw" => "0.42 27 Feb 2010\n",
+      "version" => "0.42"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 186,
+          "raw" => " - fix the check_swish() feature in Native::Indexer to only return the\n   version number, not the whole output of swish-e -V (fixes the -D fix in\n   0.40).\n\n",
+          "style" => "-",
+          "text" => "fix the check_swish() feature in Native::Indexer to only return the version number, not the whole output of swish-e -V (fixes the -D fix in 0.40)."
+        }
+      ],
+      "line" => 185,
+      "note" => "10 Feb 2010",
+      "raw" => "0.41 10 Feb 2010\n",
+      "version" => "0.41"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 191,
+          "raw" => " - make -D '\\x03' optional in Native::Indexer based on which version of\n   swish-e is available. The -D feature is only in 2.4.8 or newer.\n\n",
+          "style" => "-",
+          "text" => "make -D '\\x03' optional in Native::Indexer based on which version of swish-e is available. The -D feature is only in 2.4.8 or newer."
+        }
+      ],
+      "line" => 190,
+      "note" => "09 Feb 2010",
+      "raw" => "0.40 09 Feb 2010\n",
+      "version" => "0.40"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 195,
+          "raw" => " - add fix for systems using Swish-e 2.6, which doesn't create a\n   index.swish-e file.\n",
+          "style" => "-",
+          "text" => "add fix for systems using Swish-e 2.6, which doesn't create a index.swish-e file."
+        },
+        {
+          "line" => 197,
+          "raw" => " - remove the requires_external_bin from Makefile.PL since KSx and Xapian\n   do not require swish-e but do require SWISH::Prog. Fix tests (which also\n   check for swish-e) to SKIP the correct number of tests.\n\n",
+          "style" => "-",
+          "text" => "remove the requires_external_bin from Makefile.PL since KSx and Xapian do not require swish-e but do require SWISH::Prog. Fix tests (which also check for swish-e) to SKIP the correct number of tests."
+        }
+      ],
+      "line" => 194,
+      "note" => "07 Feb 2010",
+      "raw" => "0.39 07 Feb 2010\n",
+      "version" => "0.39"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 202,
+          "raw" => " - add support for 'order', 'limit', 'start', 'max' and 'rank_scheme' in\n   Native::Searcher.\n",
+          "style" => "-",
+          "text" => "add support for 'order', 'limit', 'start', 'max' and 'rank_scheme' in Native::Searcher."
+        },
+        {
+          "line" => 204,
+          "raw" => " - Utils->perl_to_xml() moved to Search::Tools::XML (where it really\n   belonged).\n",
+          "style" => "-",
+          "text" => "Utils->perl_to_xml() moved to Search::Tools::XML (where it really belonged)."
+        },
+        {
+          "line" => 206,
+          "raw" => " - enable more options to swish3\n\n",
+          "style" => "-",
+          "text" => "enable more options to swish3"
+        }
+      ],
+      "line" => 201,
+      "note" => "05 Feb 2010",
+      "raw" => "0.38 05 Feb 2010\n",
+      "version" => "0.38"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 209,
+          "raw" => " - add -D '\\x03' to the Native::Indexer exec command. This mimics\n   libswish3.\n",
+          "style" => "-",
+          "text" => "add -D '\\x03' to the Native::Indexer exec command. This mimics libswish3."
+        },
+        {
+          "line" => 211,
+          "raw" => " - examples/swish3 now installed by default with usual make install.\n",
+          "style" => "-",
+          "text" => "examples/swish3 now installed by default with usual make install."
+        },
+        {
+          "line" => 212,
+          "raw" => " - added -N option to swish3, along with ok_if_newer_than feature in\n   Aggregator.\n",
+          "style" => "-",
+          "text" => "added -N option to swish3, along with ok_if_newer_than feature in Aggregator."
+        },
+        {
+          "line" => 214,
+          "raw" => " - added dependency on Rose::DateTime.\n",
+          "style" => "-",
+          "text" => "added dependency on Rose::DateTime."
+        },
+        {
+          "line" => 215,
+          "raw" => " - Native Indexer can now merge() and add().\n",
+          "style" => "-",
+          "text" => "Native Indexer can now merge() and add()."
+        },
+        {
+          "line" => 216,
+          "raw" => " - -l and -M options now supported in swish3\n",
+          "style" => "-",
+          "text" => "-l and -M options now supported in swish3"
+        },
+        {
+          "line" => 217,
+          "raw" => " - yank Query.pm and QueryParser.pm. They weren't used and the idea is now\n   fleshed out in Search::Query if we ever need it.\n",
+          "style" => "-",
+          "text" => "yank Query.pm and QueryParser.pm. They weren't used and the idea is now fleshed out in Search::Query if we ever need it."
+        },
+        {
+          "line" => 219,
+          "raw" => " - Searcher may now take an array of invindex values, and always returns an\n   array ref of values.\n\n",
+          "style" => "-",
+          "text" => "Searcher may now take an array of invindex values, and always returns an array ref of values."
+        }
+      ],
+      "line" => 208,
+      "note" => "01 Feb 2010",
+      "raw" => "0.37 01 Feb 2010\n",
+      "version" => "0.37"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 223,
+          "raw" => " - fix Config bug where StoreDescription was ignored in ver2_to_ver3()\n",
+          "style" => "-",
+          "text" => "fix Config bug where StoreDescription was ignored in ver2_to_ver3()"
+        },
+        {
+          "line" => 224,
+          "raw" => " - switch to Module::Install \n",
+          "style" => "-",
+          "text" => "switch to Module::Install"
+        },
+        {
+          "line" => 225,
+          "raw" => " - updates to example/swish3\n",
+          "style" => "-",
+          "text" => "updates to example/swish3"
+        },
+        {
+          "line" => 226,
+          "raw" => " - fix t/03_object.t to test for JSON not YAML::Syck (see RT#53275)\n\n",
+          "style" => "-",
+          "text" => "fix t/03_object.t to test for JSON not YAML::Syck (see RT#53275)"
+        }
+      ],
+      "line" => 222,
+      "note" => "12 Jan 2009",
+      "raw" => "0.36 12 Jan 2009\n",
+      "version" => "0.36"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 229,
+          "raw" => " - fix bug in Config where \$append flag was being interpreted as a\n   MetaName/Property\n",
+          "style" => "-",
+          "text" => "fix bug in Config where \$append flag was being interpreted as a MetaName/Property"
+        },
+        {
+          "line" => 231,
+          "raw" => " - fix bug in Config where ver2_to_ver3 was calling \$self->new instead of\n   \$class->new when passed a filename.\n",
+          "style" => "-",
+          "text" => "fix bug in Config where ver2_to_ver3 was calling \$self->new instead of \$class->new when passed a filename."
+        },
+        {
+          "line" => 233,
+          "raw" => " - fix bug in Spider where filter was not being passed correctly.\n\n",
+          "style" => "-",
+          "text" => "fix bug in Spider where filter was not being passed correctly."
+        }
+      ],
+      "line" => 228,
+      "note" => "09 Jan 2009",
+      "raw" => "0.35 09 Jan 2009\n",
+      "version" => "0.35"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 236,
+          "raw" => " - fix mem leak test to include only those outside our control.\n",
+          "style" => "-",
+          "text" => "fix mem leak test to include only those outside our control."
+        },
+        {
+          "line" => 237,
+          "raw" => " - add version() to SWISH::Prog::Doc to pick header style per instance.\n\n",
+          "style" => "-",
+          "text" => "add version() to SWISH::Prog::Doc to pick header style per instance."
+        }
+      ],
+      "line" => 235,
+      "note" => "07 Jan 2009",
+      "raw" => "0.34 07 Jan 2009\n",
+      "version" => "0.34"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 240,
+          "raw" => " - fix bug where SWISH::3->slurp was being called with out binmode flag and\n   .gz files were getting their NUL bytes stripped.\n",
+          "style" => "-",
+          "text" => "fix bug where SWISH::3->slurp was being called with out binmode flag and .gz files were getting their NUL bytes stripped."
+        },
+        {
+          "line" => 242,
+          "raw" => " - add test_mode feature (set with SWISH_TEST env var)\n",
+          "style" => "-",
+          "text" => "add test_mode feature (set with SWISH_TEST env var)"
+        },
+        {
+          "line" => 243,
+          "raw" => " - fix some memory leaks\n",
+          "style" => "-",
+          "text" => "fix some memory leaks"
+        },
+        {
+          "line" => 244,
+          "raw" => " - fix JSON::XS dependency (JSON required, not JSON::XS).\n\n",
+          "style" => "-",
+          "text" => "fix JSON::XS dependency (JSON required, not JSON::XS)."
+        }
+      ],
+      "line" => 239,
+      "note" => "02 Jan 2010",
+      "raw" => "0.33 02 Jan 2010\n",
+      "version" => "0.33"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 247,
+          "raw" => " - Config->ver2_to_ver3() method now supported.\n",
+          "style" => "-",
+          "text" => "Config->ver2_to_ver3() method now supported."
+        },
+        {
+          "line" => 248,
+          "raw" => " - fix bug in Prog.pm to allow Config passed in aggregator and Indexer\n   passed in aggregator\n",
+          "style" => "-",
+          "text" => "fix bug in Prog.pm to allow Config passed in aggregator and Indexer passed in aggregator"
+        },
+        {
+          "line" => 250,
+          "raw" => " - removed dependency on Class::Accessor for Config.pm\n",
+          "style" => "-",
+          "text" => "removed dependency on Class::Accessor for Config.pm"
+        },
+        {
+          "line" => 251,
+          "raw" => " - refactor internal handling of Config object so there is only ever one\n   per Prog instance\n",
+          "style" => "-",
+          "text" => "refactor internal handling of Config object so there is only ever one per Prog instance"
+        },
+        {
+          "line" => 253,
+          "raw" => " - refactor internal handling of Config to support SWISH::3::Config\n",
+          "style" => "-",
+          "text" => "refactor internal handling of Config to support SWISH::3::Config"
+        },
+        {
+          "line" => 254,
+          "raw" => " - FileRules support now in Aggregator::FS\n\n",
+          "style" => "-",
+          "text" => "FileRules support now in Aggregator::FS"
+        }
+      ],
+      "line" => 246,
+      "note" => "12 Dec 2009",
+      "raw" => "0.32 12 Dec 2009\n",
+      "version" => "0.32"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 257,
+          "raw" => " - POD fixes\n\n",
+          "style" => "-",
+          "text" => "POD fixes"
+        }
+      ],
+      "line" => 256,
+      "note" => "1  Dec 2009",
+      "raw" => "0.31 1  Dec 2009\n",
+      "version" => "0.31"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 260,
+          "raw" => " - change KinoSearch to KSx in implementation registry\n",
+          "style" => "-",
+          "text" => "change KinoSearch to KSx in implementation registry"
+        },
+        {
+          "line" => 261,
+          "raw" => " - fix bug in base Searcher where InvIndex class was not loaded.\n\n",
+          "style" => "-",
+          "text" => "fix bug in base Searcher where InvIndex class was not loaded."
+        }
+      ],
+      "line" => 259,
+      "note" => "29 Nov 2009",
+      "raw" => "0.30 29 Nov 2009\n",
+      "version" => "0.30"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 264,
+          "raw" => " - add strip_plural option to Utils->perl_to_xml()\n",
+          "style" => "-",
+          "text" => "add strip_plural option to Utils->perl_to_xml()"
+        },
+        {
+          "line" => 265,
+          "raw" => " - add count attribute to arrayref values of hashrefs in perl_to_xml()\n",
+          "style" => "-",
+          "text" => "add count attribute to arrayref values of hashrefs in perl_to_xml()"
+        },
+        {
+          "line" => 266,
+          "raw" => " - fix method/param name strictness bug revealed by Rose::ObjectX::CAF\n   0.03.  This mostly required internal param name changes to official\n   method names.\n\n",
+          "style" => "-",
+          "text" => "fix method/param name strictness bug revealed by Rose::ObjectX::CAF 0.03.  This mostly required internal param name changes to official method names."
+        }
+      ],
+      "line" => 263,
+      "note" => "8 Nov 2009",
+      "raw" => "0.29 8 Nov 2009\n",
+      "version" => "0.29"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 271,
+          "raw" => " - add some missing calls to SUPER::init()\n\n",
+          "style" => "-",
+          "text" => "add some missing calls to SUPER::init()"
+        }
+      ],
+      "line" => 270,
+      "note" => "30 Sept 2009",
+      "raw" => "0.28 30 Sept 2009\n",
+      "version" => "0.28"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 274,
+          "raw" => " - make QueryParser and Query part of the official install, even though\n   there are still TODO items\n",
+          "style" => "-",
+          "text" => "make QueryParser and Query part of the official install, even though there are still TODO items"
+        },
+        {
+          "line" => 276,
+          "raw" => " - add all_metanames() method to Config\n",
+          "style" => "-",
+          "text" => "add all_metanames() method to Config"
+        },
+        {
+          "line" => 277,
+          "raw" => " - refactor to use Search::Tools and Rose::ObjectX::CAF instead of\n   Class::Accessor::Fast\n\n",
+          "style" => "-",
+          "text" => "refactor to use Search::Tools and Rose::ObjectX::CAF instead of Class::Accessor::Fast"
+        }
+      ],
+      "line" => 273,
+      "note" => "28 Sep 2009",
+      "raw" => "0.27 28 Sep 2009\n",
+      "version" => "0.27"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 281,
+          "raw" => " - fix off-by-one error in skip test count in t/03-object.t\n\n",
+          "style" => "-",
+          "text" => "fix off-by-one error in skip test count in t/03-object.t"
+        }
+      ],
+      "line" => 280,
+      "note" => "26 Feb 2009",
+      "raw" => "0.26 26 Feb 2009\n",
+      "version" => "0.26"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 284,
+          "raw" => " - added more features to example/swish3\n",
+          "style" => "-",
+          "text" => "added more features to example/swish3"
+        },
+        {
+          "line" => 285,
+          "raw" => " - add missing test file to MANIFEST\n",
+          "style" => "-",
+          "text" => "add missing test file to MANIFEST"
+        },
+        {
+          "line" => 286,
+          "raw" => " - tests clean up after themselves wrt swish.xml header files\n\n",
+          "style" => "-",
+          "text" => "tests clean up after themselves wrt swish.xml header files"
+        }
+      ],
+      "line" => 283,
+      "note" => "26 Jan 2009",
+      "raw" => "0.25 26 Jan 2009\n",
+      "version" => "0.25"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 289,
+          "raw" => " - add base Searcher, Results and Result classes\n",
+          "style" => "-",
+          "text" => "add base Searcher, Results and Result classes"
+        },
+        {
+          "line" => 290,
+          "raw" => " - refactor QueryParser to use Search::QueryParser::SQL\n",
+          "style" => "-",
+          "text" => "refactor QueryParser to use Search::QueryParser::SQL"
+        },
+        {
+          "line" => 291,
+          "raw" => " - flesh out the InvIndex::Meta class, adding XML::Simple dependency\n",
+          "style" => "-",
+          "text" => "flesh out the InvIndex::Meta class, adding XML::Simple dependency"
+        },
+        {
+          "line" => 292,
+          "raw" => " - IMPORTANT: rename Native classes to match naming convention\n\n",
+          "style" => "-",
+          "text" => "IMPORTANT: rename Native classes to match naming convention"
+        }
+      ],
+      "line" => 288,
+      "note" => "20 Jan 2009  (Happy Obama Day!)",
+      "raw" => "0.24 20 Jan 2009  (Happy Obama Day!)\n",
+      "version" => "0.24"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 295,
+          "raw" => " - properly clean up temp Config files\n\n",
+          "style" => "-",
+          "text" => "properly clean up temp Config files"
+        }
+      ],
+      "line" => 294,
+      "note" => "11 Dec 2008",
+      "raw" => "0.23 11 Dec 2008\n",
+      "version" => "0.23"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 298,
+          "raw" => " - added support for SWISH::Prog::DBI\n",
+          "style" => "-",
+          "text" => "added support for SWISH::Prog::DBI"
+        },
+        {
+          "line" => 299,
+          "raw" => " - use SWISH::3 for slurping files, if available.\n",
+          "style" => "-",
+          "text" => "use SWISH::3 for slurping files, if available."
+        },
+        {
+          "line" => 300,
+          "raw" => " - fix bug in SWISH::Prog::Utils->perl_to_xml where hash refs were not\n   getting tagged.\n\n",
+          "style" => "-",
+          "text" => "fix bug in SWISH::Prog::Utils->perl_to_xml where hash refs were not getting tagged."
+        }
+      ],
+      "line" => 297,
+      "note" => "10 Dec 2008",
+      "raw" => "0.22 10 Dec 2008\n",
+      "version" => "0.22"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 304,
+          "raw" => " - fix tests to skip correct numbers if swish-e not installed\n",
+          "style" => "-",
+          "text" => "fix tests to skip correct numbers if swish-e not installed"
+        },
+        {
+          "line" => 305,
+          "raw" => " - change to JSON::XS and make json default format in Aggregator::Object\n",
+          "style" => "-",
+          "text" => "change to JSON::XS and make json default format in Aggregator::Object"
+        },
+        {
+          "line" => 306,
+          "raw" => " - add perl_to_xml() in Utils\n",
+          "style" => "-",
+          "text" => "add perl_to_xml() in Utils"
+        },
+        {
+          "line" => 307,
+          "raw" => " - change t/04 to manually create dirs at test time\n\n",
+          "style" => "-",
+          "text" => "change t/04 to manually create dirs at test time"
+        }
+      ],
+      "line" => 303,
+      "note" => "31 Oct 2008",
+      "raw" => "0.21 31 Oct 2008\n",
+      "version" => "0.21"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 310,
+          "raw" => " - complete rewrite of the API for Swish3 development\n\n",
+          "style" => "-",
+          "text" => "complete rewrite of the API for Swish3 development"
+        }
+      ],
+      "line" => 309,
+      "note" => "23 April 2008",
+      "raw" => "0.20 23 April 2008\n",
+      "version" => "0.20"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 313,
+          "raw" => " - added S::P::Mail class and example swishmail.pl script\n",
+          "style" => "-",
+          "text" => "added S::P::Mail class and example swishmail.pl script"
+        },
+        {
+          "line" => 314,
+          "raw" => " - sync all \$VERSION vars to same value\n",
+          "style" => "-",
+          "text" => "sync all \$VERSION vars to same value"
+        },
+        {
+          "line" => 315,
+          "raw" => " - allow for non-standard docclass names\n\n",
+          "style" => "-",
+          "text" => "allow for non-standard docclass names"
+        }
+      ],
+      "line" => 312,
+      "note" => "22 Nov 2007",
+      "raw" => "0.08 22 Nov 2007\n",
+      "version" => "0.08"
+    },
+    {
+      "entries" => [],
+      "line" => 317,
+      "note" => "S::P::Object iterator now uses more idiomatic while/next algorithm.",
+      "raw" => "0.07 * S::P::Object iterator now uses more idiomatic while/next algorithm.\n\n",
+      "version" => "0.07"
+    },
+    {
+      "entries" => [],
+      "line" => 319,
+      "note" => "S::P::Object now defers to explicit 'config' passed in new().",
+      "raw" => "0.06 * S::P::Object now defers to explicit 'config' passed in new().\n\n",
+      "version" => "0.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 322,
+          "raw" => " - This change is sync'd with SWISH::API::Object 0.0.6\n\n",
+          "style" => "-",
+          "text" => "This change is sync'd with SWISH::API::Object 0.0.6"
+        }
+      ],
+      "line" => 321,
+      "note" => "S::P::Object now uses JSON or YAML to serialize values instead of Data::Dump",
+      "raw" => "0.05 * S::P::Object now uses JSON or YAML to serialize values instead of Data::Dump\n",
+      "version" => "0.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 325,
+          "raw" => " - fixed bug with auto-defining metanames\n",
+          "style" => "-",
+          "text" => "fixed bug with auto-defining metanames"
+        },
+        {
+          "line" => 326,
+          "raw" => " - S::P::Config always returns arrayref on directive method calls\n",
+          "style" => "-",
+          "text" => "S::P::Config always returns arrayref on directive method calls"
+        },
+        {
+          "line" => 327,
+          "raw" => " - use MIME::Types instead of File::Type\n",
+          "style" => "-",
+          "text" => "use MIME::Types instead of File::Type"
+        },
+        {
+          "line" => 328,
+          "raw" => " - S::P::Find now uses File::Find instead of Path::Class::Iterator\n",
+          "style" => "-",
+          "text" => "S::P::Find now uses File::Find instead of Path::Class::Iterator"
+        },
+        {
+          "line" => 329,
+          "raw" => " - S::P::Object obj_filter() must return an object of some kind\n",
+          "style" => "-",
+          "text" => "S::P::Object obj_filter() must return an object of some kind"
+        },
+        {
+          "line" => 330,
+          "raw" => " - S::P::Object will not dump() scalar strings, thus avoiding extra quotes\n",
+          "style" => "-",
+          "text" => "S::P::Object will not dump() scalar strings, thus avoiding extra quotes"
+        },
+        {
+          "line" => 331,
+          "raw" => " - S::P::Config added stringify() method and reverted from IO::All to\n   File::Slurp\n",
+          "style" => "-",
+          "text" => "S::P::Config added stringify() method and reverted from IO::All to File::Slurp"
+        },
+        {
+          "line" => 333,
+          "raw" => " - S::Prog added elapsed() method\n",
+          "style" => "-",
+          "text" => "S::Prog added elapsed() method"
+        },
+        {
+          "line" => 334,
+          "raw" => " - S::Prog new() verbose now defaults to 1\n\n",
+          "style" => "-",
+          "text" => "S::Prog new() verbose now defaults to 1"
+        }
+      ],
+      "line" => 324,
+      "note" => "S::P::DBI no longer calls disconnect() on db handle in DESTROY",
+      "raw" => "0.04 * S::P::DBI no longer calls disconnect() on db handle in DESTROY\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 337,
+          "raw" => " - test indexes are removed as part of 'make clean'\n",
+          "style" => "-",
+          "text" => "test indexes are removed as part of 'make clean'"
+        },
+        {
+          "line" => 338,
+          "raw" => " - switched from Data::Dumper to Data::Dump\n",
+          "style" => "-",
+          "text" => "switched from Data::Dumper to Data::Dump"
+        },
+        {
+          "line" => 339,
+          "raw" => " - added new SWISH::Prog::Object example\n",
+          "style" => "-",
+          "text" => "added new SWISH::Prog::Object example"
+        },
+        {
+          "line" => 340,
+          "raw" => " - fixed bug in SWISH::Prog::Headers to test defined()\t   rather than\n   simply eval true/false\n",
+          "style" => "-",
+          "text" => "fixed bug in SWISH::Prog::Headers to test defined()\t   rather than simply eval true/false"
+        },
+        {
+          "line" => 342,
+          "raw" => " - fixed bug in SWISH::Prog::DBI with accepting DBI handle in init()\n",
+          "style" => "-",
+          "text" => "fixed bug in SWISH::Prog::DBI with accepting DBI handle in init()"
+        },
+        {
+          "line" => 343,
+          "raw" => " - changed to using IO::All instead of File::stat and File::Slurp for\n   better UTF8 support\n",
+          "style" => "-",
+          "text" => "changed to using IO::All instead of File::stat and File::Slurp for better UTF8 support"
+        },
+        {
+          "line" => 345,
+          "raw" => " - changed default order of init() and init_indexer() to work more\n   intuitively. Fixed S::P::DBI accordingly. To prevent an indexer from\n   being init'd (as in 0.02) simply override init_indexer() and don't call\n   SUPER::init_indexer().\n",
+          "style" => "-",
+          "text" => "changed default order of init() and init_indexer() to work more intuitively. Fixed S::P::DBI accordingly. To prevent an indexer from being init'd (as in 0.02) simply override init_indexer() and don't call SUPER::init_indexer()."
+        },
+        {
+          "line" => 349,
+          "raw" => " - new feature: SWISH::Prog::Find\n",
+          "style" => "-",
+          "text" => "new feature: SWISH::Prog::Find"
+        },
+        {
+          "line" => 350,
+          "raw" => " - renamed meta() to table_meta() in SWISH::Prog::DBI for clarity.\n",
+          "style" => "-",
+          "text" => "renamed meta() to table_meta() in SWISH::Prog::DBI for clarity."
+        },
+        {
+          "line" => 351,
+          "raw" => " - S::P::Config now always handles config params as arrays\n",
+          "style" => "-",
+          "text" => "S::P::Config now always handles config params as arrays"
+        },
+        {
+          "line" => 352,
+          "raw" => " - Config metanames() propertynames() and propertynamesnostripchars()  are\n   no longer available \n",
+          "style" => "-",
+          "text" => "Config metanames() propertynames() and propertynamesnostripchars()  are no longer available"
+        },
+        {
+          "line" => 354,
+          "raw" => " - S::P::Config now requires IO::All and Config::General; added read2()\n   method.\n",
+          "style" => "-",
+          "text" => "S::P::Config now requires IO::All and Config::General; added read2() method."
+        },
+        {
+          "line" => 356,
+          "raw" => " - new feature placeholder: SWISH::Prog::Spider\n\n",
+          "style" => "-",
+          "text" => "new feature placeholder: SWISH::Prog::Spider"
+        }
+      ],
+      "line" => 336,
+      "note" => "removed all mentions of SWISH3",
+      "raw" => "0.03 * removed all mentions of SWISH3\n",
+      "version" => "0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 359,
+          "raw" => " - added merge() add() and mv() methods to S::P::Index and t/3merge.t and\n   t/4add.t\n",
+          "style" => "-",
+          "text" => "added merge() add() and mv() methods to S::P::Index and t/3merge.t and t/4add.t"
+        },
+        {
+          "line" => 361,
+          "raw" => " - added 2 more test docs\n",
+          "style" => "-",
+          "text" => "added 2 more test docs"
+        },
+        {
+          "line" => 362,
+          "raw" => " - added format() accessor to S::P::Index\n",
+          "style" => "-",
+          "text" => "added format() accessor to S::P::Index"
+        },
+        {
+          "line" => 363,
+          "raw" => " - changed S::P::I to use Class::Accessor::Fast since we don't need to\n   override get/set\n",
+          "style" => "-",
+          "text" => "changed S::P::I to use Class::Accessor::Fast since we don't need to override get/set"
+        },
+        {
+          "line" => 365,
+          "raw" => " - S::P now always inits an indexer even if fh=>0\n",
+          "style" => "-",
+          "text" => "S::P now always inits an indexer even if fh=>0"
+        },
+        {
+          "line" => 366,
+          "raw" => " - added private _index_methods to S::P\n\n",
+          "style" => "-",
+          "text" => "added private _index_methods to S::P"
+        }
+      ],
+      "line" => 358,
+      "note" => "POD fixes",
+      "raw" => "0.02 POD fixes\n",
+      "version" => "0.02"
+    },
+    {
+      "date" => "2005-11-22T21:54:37Z",
+      "entries" => [
+        {
+          "line" => 369,
+          "raw" => " - original version; created by h2xs 1.22 with options -XA -n Prog\n\n",
+          "style" => "-",
+          "text" => "original version; created by h2xs 1.22 with options -XA -n Prog"
+        }
+      ],
+      "line" => 368,
+      "raw" => "0.01 2005-11-22T21:54:37Z\n",
+      "raw_date" => "2005-11-22T21:54:37Z",
+      "version" => "0.01"
+    }
+  ]
+}

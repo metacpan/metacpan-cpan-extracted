@@ -1,0 +1,1204 @@
+{
+  "preamble" => "Revision history for Perl extension YAML-Tiny",
+  "raw_preamble" => "Revision history for Perl extension YAML-Tiny\n\n",
+  "releases" => [
+    {
+      "date" => "2013-08-20",
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "        - really fixed metadata\n\n",
+          "style" => "-",
+          "text" => "really fixed metadata"
+        }
+      ],
+      "line" => 3,
+      "raw" => "1.53   2013-08-20\n",
+      "raw_date" => "2013-08-20",
+      "version" => "1.53"
+    },
+    {
+      "date" => "2013-08-20",
+      "entries" => [
+        {
+          "line" => 7,
+          "raw" => "        - updated repository metadata to reflect move to github\n\n",
+          "style" => "-",
+          "text" => "updated repository metadata to reflect move to github"
+        }
+      ],
+      "line" => 6,
+      "raw" => "1.52   2013-08-20\n",
+      "raw_date" => "2013-08-20",
+      "version" => "1.52"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 10,
+          "raw" => "\t- The fix described in 1.48 was incorrect. Removing an additional\n\t  if \$\@ to fix it properly.\n",
+          "style" => "-",
+          "text" => "The fix described in 1.48 was incorrect. Removing an additional if \$\@ to fix it properly."
+        },
+        {
+          "line" => 12,
+          "raw" => "\t- Make the Scalar::Util version check resistant to bugs caused by\n\t  development versions.\n\n",
+          "style" => "-",
+          "text" => "Make the Scalar::Util version check resistant to bugs caused by development versions."
+        }
+      ],
+      "line" => 9,
+      "note" => "Sun 11 Mar 2012",
+      "raw" => "1.51 Sun 11 Mar 2012\n",
+      "version" => "1.51"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 16,
+          "raw" => "\t- Major bug fix, all code that writes arbitrary data should upgrade.\n",
+          "style" => "-",
+          "text" => "Major bug fix, all code that writes arbitrary data should upgrade."
+        },
+        {
+          "line" => 17,
+          "raw" => "\t- Simple scalars with no whitespace but ending in a colon like ABC: were\n\t  not being quoted, which results in the parser confusing it with a\n\t  mapping key and crashing.\n\n",
+          "style" => "-",
+          "text" => "Simple scalars with no whitespace but ending in a colon like ABC: were not being quoted, which results in the parser confusing it with a mapping key and crashing."
+        }
+      ],
+      "line" => 15,
+      "note" => "Thu 23 Jun 2011",
+      "raw" => "1.50 Thu 23 Jun 2011\n",
+      "version" => "1.50"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 22,
+          "raw" => "\t- No functional changes.\n",
+          "style" => "-",
+          "text" => "No functional changes."
+        },
+        {
+          "line" => 23,
+          "raw" => "\t- Don't depend on the YAML modules in RELEASE_TESTING, as it can\n\t  pollute the advisory META.yml.\n\n",
+          "style" => "-",
+          "text" => "Don't depend on the YAML modules in RELEASE_TESTING, as it can pollute the advisory META.yml."
+        }
+      ],
+      "line" => 21,
+      "note" => "Tue 8 Mar 2011",
+      "raw" => "1.49 Tue 8 Mar 2011\n",
+      "version" => "1.49"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 27,
+          "raw" => "\t- Fix to the refaddr compatibility where Scalar::Util is installed\n\t  but is older than 1.18.\n\n",
+          "style" => "-",
+          "text" => "Fix to the refaddr compatibility where Scalar::Util is installed but is older than 1.18."
+        }
+      ],
+      "line" => 26,
+      "note" => "Tue 1 Feb 2011",
+      "raw" => "1.48 Tue 1 Feb 2011\n",
+      "version" => "1.48"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 31,
+          "raw" => "\t- No functional changes\n",
+          "style" => "-",
+          "text" => "No functional changes"
+        },
+        {
+          "line" => 32,
+          "raw" => "\t- Only depend on the YAML implementations when we are release testing\n\n",
+          "style" => "-",
+          "text" => "Only depend on the YAML implementations when we are release testing"
+        }
+      ],
+      "line" => 30,
+      "note" => "Mon 31 Jan 2011",
+      "raw" => "1.47 Mon 31 Jan 2011\n",
+      "version" => "1.47"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 35,
+          "raw" => "\t- No functional changes\n",
+          "style" => "-",
+          "text" => "No functional changes"
+        },
+        {
+          "line" => 36,
+          "raw" => "\t- Moving to a production release now CPAN Testers is green again\n\n",
+          "style" => "-",
+          "text" => "Moving to a production release now CPAN Testers is green again"
+        }
+      ],
+      "line" => 34,
+      "note" => "Thu 16 Dec 2010",
+      "raw" => "1.46 Thu 16 Dec 2010\n",
+      "version" => "1.46"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 39,
+          "raw" => "\t- Adding experimental support for exception->errstr conversion\n",
+          "style" => "-",
+          "text" => "Adding experimental support for exception->errstr conversion"
+        },
+        {
+          "line" => 40,
+          "raw" => "\t- Updating test suite yaml_error to not expect exceptions\n\n",
+          "style" => "-",
+          "text" => "Updating test suite yaml_error to not expect exceptions"
+        }
+      ],
+      "line" => 38,
+      "note" => "Tue 7 Dec 2010",
+      "raw" => "1.45_02 Tue 7 Dec 2010\n",
+      "version" => "1.45_02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 43,
+          "raw" => "\t- Added support for trailing line comments (INGY)\n",
+          "style" => "-",
+          "text" => "Added support for trailing line comments (INGY)"
+        },
+        {
+          "line" => 44,
+          "raw" => "\t- Added checks for some characters that are illegal or reserved\n\t  in plain scalars (INGY)\n",
+          "style" => "-",
+          "text" => "Added checks for some characters that are illegal or reserved in plain scalars (INGY)"
+        },
+        {
+          "line" => 46,
+          "raw" => "\t- Minor cleaning up of some out of date POD (ADAMK)\n",
+          "style" => "-",
+          "text" => "Minor cleaning up of some out of date POD (ADAMK)"
+        },
+        {
+          "line" => 47,
+          "raw" => "\t- Updated AUTOMATED_TESTING dependencies to new versions (ADAMK)\n\n",
+          "style" => "-",
+          "text" => "Updated AUTOMATED_TESTING dependencies to new versions (ADAMK)"
+        }
+      ],
+      "line" => 42,
+      "note" => "Tue 7 Dec 2010",
+      "raw" => "1.45_01 Tue 7 Dec 2010\n",
+      "version" => "1.45_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 50,
+          "raw" => "\t- No functional changes, upgrading is not required\n",
+          "style" => "-",
+          "text" => "No functional changes, upgrading is not required"
+        },
+        {
+          "line" => 51,
+          "raw" => "\t- Minor tweaks to Makefile.PL\n",
+          "style" => "-",
+          "text" => "Minor tweaks to Makefile.PL"
+        },
+        {
+          "line" => 52,
+          "raw" => "\t- Minor cleanup around the refaddr emulation code\n\n",
+          "style" => "-",
+          "text" => "Minor cleanup around the refaddr emulation code"
+        }
+      ],
+      "line" => 49,
+      "note" => "Sun  8 Aug 2010",
+      "raw" => "1.44 Sun  8 Aug 2010\n",
+      "version" => "1.44"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 55,
+          "raw" => "\t- No functional changes, upgrading is not required\n",
+          "style" => "-",
+          "text" => "No functional changes, upgrading is not required"
+        },
+        {
+          "line" => 56,
+          "raw" => "\t- Don't import Carp 'croak' any more, saving a few K\n\n",
+          "style" => "-",
+          "text" => "Don't import Carp 'croak' any more, saving a few K"
+        }
+      ],
+      "line" => 54,
+      "note" => "Sat 10 Jul 2010",
+      "raw" => "1.43 Sat 10 Jul 2010\n",
+      "version" => "1.43"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 59,
+          "raw" => "\t- No functional changes, upgrading is not required\n",
+          "style" => "-",
+          "text" => "No functional changes, upgrading is not required"
+        },
+        {
+          "line" => 60,
+          "raw" => "\t- Clarified documation to explain that YAML::Tiny escapes \"bool\"\n\t  keywords when it writes them as strings so that YAML parsers in\n\t  other languages won't get confused, but this does not mean that\n\t  YAML::Tiny actually supports boolean types itself.\n",
+          "style" => "-",
+          "text" => "Clarified documation to explain that YAML::Tiny escapes \"bool\" keywords when it writes them as strings so that YAML parsers in other languages won't get confused, but this does not mean that YAML::Tiny actually supports boolean types itself."
+        },
+        {
+          "line" => 64,
+          "raw" => "\t- Added an extra test case for boolean keyword escaping.\n",
+          "style" => "-",
+          "text" => "Added an extra test case for boolean keyword escaping."
+        },
+        {
+          "line" => 65,
+          "raw" => "\t- YAML::Perl comparison tests were loading the file back in with\n\t  YAML.pm by mistake. Corrected this and added an additional case\n\t  that YAML::Perl doesn't support that I wasn't catching.\n",
+          "style" => "-",
+          "text" => "YAML::Perl comparison tests were loading the file back in with YAML.pm by mistake. Corrected this and added an additional case that YAML::Perl doesn't support that I wasn't catching."
+        },
+        {
+          "line" => 68,
+          "raw" => "\t- Author tests updated and moved into xt/\n",
+          "style" => "-",
+          "text" => "Author tests updated and moved into xt/"
+        },
+        {
+          "line" => 69,
+          "raw" => "\t- Updated the versions of the other YAML parsers we test ourselves\n\t  against to the most recent versions of each.\n\n",
+          "style" => "-",
+          "text" => "Updated the versions of the other YAML parsers we test ourselves against to the most recent versions of each."
+        }
+      ],
+      "line" => 58,
+      "note" => "Fri 25 Jun 2010",
+      "raw" => "1.42 Fri 25 Jun 2010\n",
+      "version" => "1.42"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 73,
+          "raw" => "\t- Fixes a performance bug reported by Apocalypse.\n\t  Single line double-quoted strings longer than 32,000ish characters\n\t  resulted in the regular expression engine crashing due to\n\t  excessive recursion. Changed to a different regex that will most\n\t  likely only crash after 32,000 ESCAPED characters. If I could use\n\t  negative look-behind assertions (I can't because I need 5.004)\n\t  this whole issue would be MUCH simpler to fix.\n\n",
+          "style" => "-",
+          "text" => "Fixes a performance bug reported by Apocalypse. Single line double-quoted strings longer than 32,000ish characters resulted in the regular expression engine crashing due to excessive recursion. Changed to a different regex that will most likely only crash after 32,000 ESCAPED characters. If I could use negative look-behind assertions (I can't because I need 5.004) this whole issue would be MUCH simpler to fix."
+        }
+      ],
+      "line" => 72,
+      "note" => "Fri 11 Dec 2009",
+      "raw" => "1.41 Fri 11 Dec 2009\n",
+      "version" => "1.41"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 82,
+          "raw" => "\t- Dear Ruby Community.\n\t  Thank you so much for your bug report to the \"Ruby Talk\" mailing list\n\t  regarding the lack of true/false support in Perl YAML modules.\n\t  http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/169943\n\t  This flaw has now been resolved, around 2 hours after we\n\t  were made aware of it. Next time, we recommend you report these bugs\n\t  to the people who can actually fix your problem.\n\n",
+          "style" => "-",
+          "text" => "Dear Ruby Community. Thank you so much for your bug report to the \"Ruby Talk\" mailing list regarding the lack of true/false support in Perl YAML modules. http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/169943 This flaw has now been resolved, around 2 hours after we were made aware of it. Next time, we recommend you report these bugs to the people who can actually fix your problem."
+        }
+      ],
+      "line" => 81,
+      "note" => "Fri 31 Jul 2009",
+      "raw" => "1.40 Fri 31 Jul 2009\n",
+      "version" => "1.40"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 91,
+          "raw" => "\t- Even though utf8 starts at 5.7+ there's no is_utf till\n\t  5.8.1 so skip in the tests if needed (ADAMK)\n\n",
+          "style" => "-",
+          "text" => "Even though utf8 starts at 5.7+ there's no is_utf till 5.8.1 so skip in the tests if needed (ADAMK)"
+        }
+      ],
+      "line" => 90,
+      "note" => "Thu 21 May 2009",
+      "raw" => "1.39 Thu 21 May 2009\n",
+      "version" => "1.39"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 95,
+          "raw" => "\t- Moving the test suite style closer to Parse::CPAN::Meta\n",
+          "style" => "-",
+          "text" => "Moving the test suite style closer to Parse::CPAN::Meta"
+        },
+        {
+          "line" => 96,
+          "raw" => "\t- Changed exceptions closer to Parse::CPAN::Meta\n",
+          "style" => "-",
+          "text" => "Changed exceptions closer to Parse::CPAN::Meta"
+        },
+        {
+          "line" => 97,
+          "raw" => "\t- Fixed Changes file date for 1.37 :)\n\n",
+          "style" => "-",
+          "text" => "Fixed Changes file date for 1.37 :)"
+        }
+      ],
+      "line" => 94,
+      "note" => "Sat 16 May 2009",
+      "raw" => "1.38 Sat 16 May 2009\n",
+      "version" => "1.38"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 100,
+          "raw" => "\t- Call \$self->_error instead of \$class->_error when we can\n",
+          "style" => "-",
+          "text" => "Call \$self->_error instead of \$class->_error when we can"
+        },
+        {
+          "line" => 101,
+          "raw" => "\t- Refactoring away some of the code other people have been\n\t  contributing lately that most certainly NOT ::Tiny style.\n",
+          "style" => "-",
+          "text" => "Refactoring away some of the code other people have been contributing lately that most certainly NOT ::Tiny style."
+        },
+        {
+          "line" => 103,
+          "raw" => "\t- Avoid the need to do '' escaping by moving it to \"'\"\n",
+          "style" => "-",
+          "text" => "Avoid the need to do '' escaping by moving it to \"'\""
+        },
+        {
+          "line" => 104,
+          "raw" => "\t- Added comparative testing with YAML::Perl\n\n",
+          "style" => "-",
+          "text" => "Added comparative testing with YAML::Perl"
+        }
+      ],
+      "line" => 99,
+      "note" => "Sat 16 May 2009",
+      "raw" => "1.37 Sat 16 May 2009\n",
+      "version" => "1.37"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 107,
+          "raw" => "\t- Fixing missing feature reported by H.Merijn Brand\n\n",
+          "style" => "-",
+          "text" => "Fixing missing feature reported by H.Merijn Brand"
+        }
+      ],
+      "line" => 106,
+      "note" => "Wed  7 Jan 2009",
+      "raw" => "1.36 Wed  7 Jan 2009\n",
+      "version" => "1.36"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 110,
+          "raw" => "\t- Production release for changes in 1.34_01\n",
+          "style" => "-",
+          "text" => "Production release for changes in 1.34_01"
+        },
+        {
+          "line" => 111,
+          "raw" => "\t- No other changes\n\n",
+          "style" => "-",
+          "text" => "No other changes"
+        }
+      ],
+      "line" => 109,
+      "note" => "Wed 17 Dec 2008",
+      "raw" => "1.35 Wed 17 Dec 2008\n",
+      "version" => "1.35"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 114,
+          "raw" => "\t- Improving sub-classability by passing the indent level through\n\t  to the ->_write_scalar method.\n\n",
+          "style" => "-",
+          "text" => "Improving sub-classability by passing the indent level through to the ->_write_scalar method."
+        }
+      ],
+      "line" => 113,
+      "note" => "Wed 19 Nov 2008",
+      "raw" => "1.34_01 Wed 19 Nov 2008\n",
+      "version" => "1.34_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 118,
+          "raw" => "\t- Export Load and Dump functions by default.\n\n",
+          "style" => "-",
+          "text" => "Export Load and Dump functions by default."
+        }
+      ],
+      "line" => 117,
+      "note" => "Thu 24 Jul 2008",
+      "raw" => "1.33  Thu 24 Jul 2008\n",
+      "version" => "1.33"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 121,
+          "raw" => "\t- Adding a test to check for correct exceptions\n",
+          "style" => "-",
+          "text" => "Adding a test to check for correct exceptions"
+        },
+        {
+          "line" => 122,
+          "raw" => "\t- ONLY do comparative tests when the modules to compare to are current.\n\t  (Prevents false failures in some cases)\n\n",
+          "style" => "-",
+          "text" => "ONLY do comparative tests when the modules to compare to are current. (Prevents false failures in some cases)"
+        }
+      ],
+      "line" => 120,
+      "note" => "Wed 14 May 2008",
+      "raw" => "1.32  Wed 14 May 2008\n",
+      "version" => "1.32"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 126,
+          "raw" => "\t- Emergency bugfix release\n\n",
+          "style" => "-",
+          "text" => "Emergency bugfix release"
+        }
+      ],
+      "line" => 125,
+      "note" => "Thu  8 May 2008",
+      "raw" => "1.31  Thu  8 May 2008\n",
+      "version" => "1.31"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 129,
+          "raw" => "\t- Better error reporting of unsupported features\n",
+          "style" => "-",
+          "text" => "Better error reporting of unsupported features"
+        },
+        {
+          "line" => 130,
+          "raw" => "\t- Heavily bump automated testing deps to remove false errors\n\n",
+          "style" => "-",
+          "text" => "Heavily bump automated testing deps to remove false errors"
+        }
+      ],
+      "line" => 128,
+      "note" => "Sun  4 May 2008",
+      "raw" => "1.30  Sun  4 May 2008\n",
+      "version" => "1.30"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 133,
+          "raw" => "\t- CPAN Testers passes ok, moving to production version\n\n",
+          "style" => "-",
+          "text" => "CPAN Testers passes ok, moving to production version"
+        }
+      ],
+      "line" => 132,
+      "note" => "Sat 12 Apr 2008",
+      "raw" => "1.29  Sat 12 Apr 2008\n",
+      "version" => "1.29"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 136,
+          "raw" => "\t- Adding support for document terminators\n\t  (To support YAML embedded in TAP streams)\n\n",
+          "style" => "-",
+          "text" => "Adding support for document terminators (To support YAML embedded in TAP streams)"
+        }
+      ],
+      "line" => 135,
+      "note" => "Sat  5 Apr 2008",
+      "raw" => "1.28_01 Sat  5 Apr 2008\n",
+      "version" => "1.28_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 140,
+          "raw" => "\t- Skip 04_scalar.t if no YAML.pm\n",
+          "style" => "-",
+          "text" => "Skip 04_scalar.t if no YAML.pm"
+        },
+        {
+          "line" => 141,
+          "raw" => "\t- Implement YAML compatibility + tests for LoadFile\n",
+          "style" => "-",
+          "text" => "Implement YAML compatibility + tests for LoadFile"
+        },
+        {
+          "line" => 142,
+          "raw" => "\t- Remove the LICENSE key from Makefile.PL\n\t  (Which failed on some CPAN Testers setups)\n\n",
+          "style" => "-",
+          "text" => "Remove the LICENSE key from Makefile.PL (Which failed on some CPAN Testers setups)"
+        }
+      ],
+      "line" => 139,
+      "note" => "Mon 31 Mar 2008",
+      "raw" => "1.27  Mon 31 Mar 2008\n",
+      "version" => "1.27"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 146,
+          "raw" => "\t- Added extra test cases to validate RT bugs that were fixed\n\t  previous, but not closed at the time.\n",
+          "style" => "-",
+          "text" => "Added extra test cases to validate RT bugs that were fixed previous, but not closed at the time."
+        },
+        {
+          "line" => 148,
+          "raw" => "\t- Always quote when serialising anything that starts with a non-word\n",
+          "style" => "-",
+          "text" => "Always quote when serialising anything that starts with a non-word"
+        },
+        {
+          "line" => 149,
+          "raw" => "\t- YAML::Tiny::Load is now fully compatible with YAML.pm in scalar\n\t  context (returns the LAST parsed document).\n\n",
+          "style" => "-",
+          "text" => "YAML::Tiny::Load is now fully compatible with YAML.pm in scalar context (returns the LAST parsed document)."
+        }
+      ],
+      "line" => 145,
+      "note" => "Thu 20 Mar 2008",
+      "raw" => "1.26  Thu 20 Mar 2008\n",
+      "version" => "1.26"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 153,
+          "raw" => "\t- Wrote the specification section\n\n",
+          "style" => "-",
+          "text" => "Wrote the specification section"
+        }
+      ],
+      "line" => 152,
+      "note" => "Mon 14 Jan 2008",
+      "raw" => "1.25  Mon 14 Jan 2008\n",
+      "version" => "1.25"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 156,
+          "raw" => "\t- Adding additional test cases\n",
+          "style" => "-",
+          "text" => "Adding additional test cases"
+        },
+        {
+          "line" => 157,
+          "raw" => "\t- Adding support for YAML header for META.yml\n",
+          "style" => "-",
+          "text" => "Adding support for YAML header for META.yml"
+        },
+        {
+          "line" => 158,
+          "raw" => "\t- Adding support for YAML header for YAML 1.0\n",
+          "style" => "-",
+          "text" => "Adding support for YAML header for YAML 1.0"
+        },
+        {
+          "line" => 159,
+          "raw" => "\t- Adding support for YAML header for YAML 1.1\n\n",
+          "style" => "-",
+          "text" => "Adding support for YAML header for YAML 1.1"
+        }
+      ],
+      "line" => 155,
+      "note" => "Fri 11 Jan 2008",
+      "raw" => "1.24_01  Fri 11 Jan 2008\n",
+      "version" => "1.24_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 162,
+          "raw" => "\t- Identical to 1.22_01\n",
+          "style" => "-",
+          "text" => "Identical to 1.22_01"
+        },
+        {
+          "line" => 163,
+          "raw" => "\t- CPAN Testers results positive, pushing to production version\n\n",
+          "style" => "-",
+          "text" => "CPAN Testers results positive, pushing to production version"
+        }
+      ],
+      "line" => 161,
+      "note" => "Thu 10 Jan 2008",
+      "raw" => "1.23  Thu 10 Jan 2008\n",
+      "version" => "1.23"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 166,
+          "raw" => "\t- Correcting handling of single quote escaping\n",
+          "style" => "-",
+          "text" => "Correcting handling of single quote escaping"
+        },
+        {
+          "line" => 167,
+          "raw" => "\t- Adding protection for infinite loops caused by circular\n\t  references during serializing.\n",
+          "style" => "-",
+          "text" => "Adding protection for infinite loops caused by circular references during serializing."
+        },
+        {
+          "line" => 169,
+          "raw" => "\t- Confirmed support for toolbar.yml sample\n\n",
+          "style" => "-",
+          "text" => "Confirmed support for toolbar.yml sample"
+        }
+      ],
+      "line" => 165,
+      "note" => "Wed  9 Jan 2008",
+      "raw" => "1.22_01 Wed  9 Jan 2008\n",
+      "version" => "1.22_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 172,
+          "raw" => "\t- Fixing support for unprintable characters\n\n",
+          "style" => "-",
+          "text" => "Fixing support for unprintable characters"
+        }
+      ],
+      "line" => 171,
+      "note" => "Thu  6 Dec 2007",
+      "raw" => "1.21  Thu  6 Dec 2007\n",
+      "version" => "1.21"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 175,
+          "raw" => "\t- Correcting class name in \@EXPORT_OK declaration\n\t  (Demetrios Biskinis)\n\n",
+          "style" => "-",
+          "text" => "Correcting class name in \@EXPORT_OK declaration (Demetrios Biskinis)"
+        }
+      ],
+      "line" => 174,
+      "note" => "Mon 19 Nov 2007",
+      "raw" => "1.20  Mon 19 Nov 2007\n",
+      "version" => "1.20"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 179,
+          "raw" => "\t- Removing the invalid perl dep\n\n",
+          "style" => "-",
+          "text" => "Removing the invalid perl dep"
+        }
+      ],
+      "line" => 178,
+      "note" => "Fri 16 Nov 2007",
+      "raw" => "1.19  Fri 16 Nov 2007\n",
+      "version" => "1.19"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 182,
+          "raw" => "\t- Adding a new test file\n\n",
+          "style" => "-",
+          "text" => "Adding a new test file"
+        }
+      ],
+      "line" => 181,
+      "note" => "Mon  5 Nov 2007",
+      "raw" => "1.18  Mon  5 Nov 2007\n",
+      "version" => "1.18"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 185,
+          "raw" => "\t- Updating from Module::Install to the tinier ExtUtils::MakeMaker\n\n",
+          "style" => "-",
+          "text" => "Updating from Module::Install to the tinier ExtUtils::MakeMaker"
+        }
+      ],
+      "line" => 184,
+      "note" => "Thu  1 Nov 2007",
+      "raw" => "1.17  Thu  1 Nov 2007\n",
+      "version" => "1.17"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 188,
+          "raw" => "\t- Updating to newer AUTOMATED_TESTING tests\n\n",
+          "style" => "-",
+          "text" => "Updating to newer AUTOMATED_TESTING tests"
+        }
+      ],
+      "line" => 187,
+      "note" => "Mon 22 Oct 2007",
+      "raw" => "1.16  Mon 22 Oct 2007\n",
+      "version" => "1.16"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 191,
+          "raw" => "\t- Incremental release to include an updated version of 99_author.t\n",
+          "style" => "-",
+          "text" => "Incremental release to include an updated version of 99_author.t"
+        },
+        {
+          "line" => 192,
+          "raw" => "\t- Replace a few CODE INCOMPLETE errors with real errors\n\t  (those parts of the module are now complete)\n\n",
+          "style" => "-",
+          "text" => "Replace a few CODE INCOMPLETE errors with real errors (those parts of the module are now complete)"
+        }
+      ],
+      "line" => 190,
+      "note" => "Sat 25 Aug 2007",
+      "raw" => "1.15  Sat 25 Aug 2007\n",
+      "version" => "1.15"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 196,
+          "raw" => "\t- Adding support for empty reference documents\n\n",
+          "style" => "-",
+          "text" => "Adding support for empty reference documents"
+        }
+      ],
+      "line" => 195,
+      "note" => "Thu 16 Aug 2007",
+      "raw" => "1.14  Thu 16 Aug 2007\n",
+      "version" => "1.14"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 199,
+          "raw" => "\t- Adding a test case for support of multi-byte characters\n\n",
+          "style" => "-",
+          "text" => "Adding a test case for support of multi-byte characters"
+        }
+      ],
+      "line" => 198,
+      "note" => "Mon  9 Jul 2007",
+      "raw" => "1.13  Mon  9 Jul 2007\n",
+      "version" => "1.13"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 202,
+          "raw" => "\t- Adding support for open hash/array at EOF\n\n",
+          "style" => "-",
+          "text" => "Adding support for open hash/array at EOF"
+        }
+      ],
+      "line" => 201,
+      "note" => "Tue  5 Jun 2007",
+      "raw" => "1.12  Tue  5 Jun 2007\n",
+      "version" => "1.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 205,
+          "raw" => "\t- Forgot to string trailing whitespace in a few cases\n",
+          "style" => "-",
+          "text" => "Forgot to string trailing whitespace in a few cases"
+        },
+        {
+          "line" => 206,
+          "raw" => "\t- 'hashkey: This was mistaken as a hash entry, not a string'\n",
+          "style" => "-",
+          "text" => "'hashkey: This was mistaken as a hash entry, not a string'"
+        },
+        {
+          "line" => 207,
+          "raw" => "\t- Adding explicit tests from #yaml for single quote escaping\n\n",
+          "style" => "-",
+          "text" => "Adding explicit tests from #yaml for single quote escaping"
+        }
+      ],
+      "line" => 204,
+      "note" => "Tue  5 Jun 2007",
+      "raw" => "1.11  Tue  5 Jun 2007\n",
+      "version" => "1.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 210,
+          "raw" => "        - Adding support for null hash/arrays\n\n",
+          "style" => "-",
+          "text" => "Adding support for null hash/arrays"
+        }
+      ],
+      "line" => 209,
+      "note" => "Tue  5 Jun 2007",
+      "raw" => "1.10  Tue  5 Jun 2007\n",
+      "version" => "1.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 213,
+          "raw" => "\t- Fixing a bug in the trivial scalar case\n\n",
+          "style" => "-",
+          "text" => "Fixing a bug in the trivial scalar case"
+        }
+      ],
+      "line" => 212,
+      "note" => "Mon 21 May 2007",
+      "raw" => "1.09  Mon 21 May 2007\n",
+      "version" => "1.09"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 216,
+          "raw" => "        - Adding support for |- trimming multiline scalars\n\n",
+          "style" => "-",
+          "text" => "Adding support for |- trimming multiline scalars"
+        }
+      ],
+      "line" => 215,
+      "note" => "Wed 16 May 2007",
+      "raw" => "1.08  Wed 16 May 2007\n",
+      "version" => "1.08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 219,
+          "raw" => "\t- Adding support for whitespace after document headers\n\n",
+          "style" => "-",
+          "text" => "Adding support for whitespace after document headers"
+        }
+      ],
+      "line" => 218,
+      "note" => "Tue 15 May 2007",
+      "raw" => "1.07  Tue 15 May 2007\n",
+      "version" => "1.07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 222,
+          "raw" => "\t- Bug fix to support an additional variant of null hashes\n\n",
+          "style" => "-",
+          "text" => "Bug fix to support an additional variant of null hashes"
+        }
+      ],
+      "line" => 221,
+      "note" => "Mon 14 May 2007",
+      "raw" => "1.06  Mon 14 May 2007\n",
+      "version" => "1.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 225,
+          "raw" => "\t- Bug fix to allow support for keys with spaces\n",
+          "style" => "-",
+          "text" => "Bug fix to allow support for keys with spaces"
+        },
+        {
+          "line" => 226,
+          "raw" => "\t- Bug fix to allow empty comments\n\n",
+          "style" => "-",
+          "text" => "Bug fix to allow empty comments"
+        }
+      ],
+      "line" => 224,
+      "note" => "Wed  2 May 2007",
+      "raw" => "1.05  Wed  2 May 2007\n",
+      "version" => "1.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 229,
+          "raw" => "\t- Adding support for LoadFile, DumpFile, freeze and thaw\n\n",
+          "style" => "-",
+          "text" => "Adding support for LoadFile, DumpFile, freeze and thaw"
+        }
+      ],
+      "line" => 228,
+      "note" => "Wed 21 Feb 2007",
+      "raw" => "1.04  Wed 21 Feb 2007\n",
+      "version" => "1.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 232,
+          "raw" => "\t- Removing the forward-looking part of the preamble\n\n",
+          "style" => "-",
+          "text" => "Removing the forward-looking part of the preamble"
+        }
+      ],
+      "line" => 231,
+      "note" => "Sun 14 Jan 2007",
+      "raw" => "1.03  Sun 14 Jan 2007\n",
+      "version" => "1.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 235,
+          "raw" => "\t- Fixing exporting\n\n",
+          "style" => "-",
+          "text" => "Fixing exporting"
+        }
+      ],
+      "line" => 234,
+      "note" => "Sun 14 Jan 2007",
+      "raw" => "1.02  Sun 14 Jan 2007\n",
+      "version" => "1.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 238,
+          "raw" => "\t- Removed the ugly bold warning\n\n",
+          "style" => "-",
+          "text" => "Removed the ugly bold warning"
+        }
+      ],
+      "line" => 237,
+      "note" => "Sun 14 Jan 2007",
+      "raw" => "1.01  Sun 14 Jan 2007\n",
+      "version" => "1.01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 241,
+          "raw" => "\t- What the hell, I'm as close as is needed I think\n\n",
+          "style" => "-",
+          "text" => "What the hell, I'm as close as is needed I think"
+        }
+      ],
+      "line" => 240,
+      "note" => "Sun 14 Jan 2007",
+      "raw" => "1.00  Sun 14 Jan 2007\n",
+      "version" => "1.00"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 244,
+          "raw" => "\t- Adding support for inline multi-lines\n\n",
+          "style" => "-",
+          "text" => "Adding support for inline multi-lines"
+        }
+      ],
+      "line" => 243,
+      "note" => "Sat 13 Jan 2007",
+      "raw" => "0.90  Sat 13 Jan 2007\n",
+      "version" => "0.90"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 247,
+          "raw" => "\t- Fixed bug in regex that detects unheadered ARRAY|HASH\n\n",
+          "style" => "-",
+          "text" => "Fixed bug in regex that detects unheadered ARRAY|HASH"
+        }
+      ],
+      "line" => 246,
+      "note" => "Mon 25 Sep 2006",
+      "raw" => "0.11  Mon 25 Sep 2006\n",
+      "version" => "0.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 250,
+          "raw" => "\t- Added double-quote support, making YAML::Tiny a lot more usable\n",
+          "style" => "-",
+          "text" => "Added double-quote support, making YAML::Tiny a lot more usable"
+        },
+        {
+          "line" => 251,
+          "raw" => "\t- Added Load and Dump for YAML.pm compatibility\n",
+          "style" => "-",
+          "text" => "Added Load and Dump for YAML.pm compatibility"
+        },
+        {
+          "line" => 252,
+          "raw" => "\t- Added tests for verifying compatibility with YAML::Syck\n\n",
+          "style" => "-",
+          "text" => "Added tests for verifying compatibility with YAML::Syck"
+        }
+      ],
+      "line" => 249,
+      "note" => "Thu 24 Aug 2006",
+      "raw" => "0.10  Thu 24 Aug 2006\n",
+      "version" => "0.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 255,
+          "raw" => "\t- Added more tests\n\n",
+          "style" => "-",
+          "text" => "Added more tests"
+        }
+      ],
+      "line" => 254,
+      "note" => "Sun  9 Jul 2006",
+      "raw" => "0.06  Sun  9 Jul 2006\n",
+      "version" => "0.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 258,
+          "raw" => "\t- Added support for nested inline hashes (parse only)\n",
+          "style" => "-",
+          "text" => "Added support for nested inline hashes (parse only)"
+        },
+        {
+          "line" => 259,
+          "raw" => "\t- Added support for naked undef array and hash entries\n",
+          "style" => "-",
+          "text" => "Added support for naked undef array and hash entries"
+        },
+        {
+          "line" => 260,
+          "raw" => "\t- Can now handle sample Plagger configs from Miyagawa-san's talk\n",
+          "style" => "-",
+          "text" => "Can now handle sample Plagger configs from Miyagawa-san's talk"
+        },
+        {
+          "line" => 261,
+          "raw" => "\t- Can now handle vanilla.yml from Perl::Dist::Vanilla\n\n",
+          "style" => "-",
+          "text" => "Can now handle vanilla.yml from Perl::Dist::Vanilla"
+        }
+      ],
+      "line" => 257,
+      "note" => "Sat  8 Jul 2006",
+      "raw" => "0.05  Sat  8 Jul 2006\n",
+      "version" => "0.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 264,
+          "raw" => "\t- Added support for implicit document start for array/hash types\n",
+          "style" => "-",
+          "text" => "Added support for implicit document start for array/hash types"
+        },
+        {
+          "line" => 265,
+          "raw" => "\t- Added support for colons in hash keys\n",
+          "style" => "-",
+          "text" => "Added support for colons in hash keys"
+        },
+        {
+          "line" => 266,
+          "raw" => "\t- Added support for simple single quotes\n",
+          "style" => "-",
+          "text" => "Added support for simple single quotes"
+        },
+        {
+          "line" => 267,
+          "raw" => "\t- Can now handle our own META.yml file\n\n",
+          "style" => "-",
+          "text" => "Can now handle our own META.yml file"
+        }
+      ],
+      "line" => 263,
+      "note" => "Sat  8 Jul 2006",
+      "raw" => "0.04  Sat  8 Jul 2006\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 270,
+          "raw" => "\t- Got all of the trivial test cases to pass\n",
+          "style" => "-",
+          "text" => "Got all of the trivial test cases to pass"
+        },
+        {
+          "line" => 271,
+          "raw" => "\t- Good enough for an initial usable release, but still expected to fail a lot\n\n",
+          "style" => "-",
+          "text" => "Good enough for an initial usable release, but still expected to fail a lot"
+        }
+      ],
+      "line" => 269,
+      "note" => "Sat  8 Jul 2006",
+      "raw" => "0.03  Sat  8 Jul 2006\n",
+      "version" => "0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 274,
+          "raw" => "\t- Added support for a single root-level hash\n",
+          "style" => "-",
+          "text" => "Added support for a single root-level hash"
+        },
+        {
+          "line" => 275,
+          "raw" => "\t- Correcting POD bugs\n\n",
+          "style" => "-",
+          "text" => "Correcting POD bugs"
+        }
+      ],
+      "line" => 273,
+      "note" => "Thu 26 Apr 2006",
+      "raw" => "0.02  Thu 26 Apr 2006\n",
+      "version" => "0.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 278,
+          "raw" => "\t- Initial version\n",
+          "style" => "-",
+          "text" => "Initial version"
+        },
+        {
+          "line" => 279,
+          "raw" => "\t- Handles only document headers and non-wrapping scalar documents\n",
+          "style" => "-",
+          "text" => "Handles only document headers and non-wrapping scalar documents"
+        }
+      ],
+      "line" => 277,
+      "note" => "Wed 26 Apr 2006",
+      "raw" => "0.01  Wed 26 Apr 2006\n",
+      "version" => "0.01"
+    }
+  ]
+}

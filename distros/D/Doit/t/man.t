@@ -48,7 +48,7 @@ SKIP: {
 sub get_filetype {
     my($file) = @_;
     chomp(my($filetype) = $doit->info_qx({quiet => 1}, $file_prg, $file));
-    if ($filetype =~ /ReStructuredText file, ASCII text/) {
+    if ($filetype =~ /ReStructuredText file, (UTF-8 Unicode|ASCII) text/) {
 	skip "Mis-detection of file type in debian:bullseye and ubuntu:20.04, see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=949878", 1;
     }
     $filetype;

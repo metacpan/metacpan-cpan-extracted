@@ -13,11 +13,11 @@ SQL::Inserter - Efficient buffered DBI inserter and fast INSERT SQL builder
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 our @EXPORT_OK = qw(simple_insert multi_insert_sql);
 
@@ -72,6 +72,10 @@ similar to C<SQL::Abstract::insert>, but much faster.
 
 C<INSERT IGNORE> and C<ON DUPLICATE KEY UPDATE> variants supported for MySQL/MariaDB.
 
+Although it is developed for use in our production MySQL/MariaDB, its main functions
+will work on DBs with similar C<INSERT INTO> multi-row syntax like PostgreSQL.
+From v0.03, Oracle Database is also supported.
+
 =head1 EXPORTS
 
 On request: C<simple_insert> C<multi_insert_sql>.
@@ -86,7 +90,8 @@ On request: C<simple_insert> C<multi_insert_sql>.
     cols       => \@column_names?,
     buffer     => 100?,
     duplicates => $ignore_or_update?,
-    null_undef => $convert_undef_to_NULL?
+    null_undef => $convert_undef_to_NULL?,
+    oracle     => $oracle_format?
   );
 
 Creates an object to insert data to a specific table. Buffering is enabled by default
@@ -127,6 +132,13 @@ The default behaviour will leave an undef as the bind variable, which may either
 create an empty string in the db or give an error depending on your column type and
 db settings.
 
+=item * C<oracle> : This is automatically set to true when an Oracle driver is
+detected (using C<$dbh-E<gt>{Driver}-E<gt>{Name}>) and the module will produce the
+Oracle C<INSERT ALL> format. Specifying it manually in the constructor will override
+the automatic detection - a false value will force the MySQL compatible multi-row
+C<INSERT INTO> syntax (which should work on Oracle 23c or newer), while a true value
+will generate the "classic" Oracle syntax even without an Oracle driver detected.
+
 =back
 
 =cut
@@ -144,6 +156,13 @@ sub new {
     $self->{buffer} = $args{buffer} || 100;
     $self->{dupes}  = $args{duplicates};
     $self->{null}   = $args{null_undef};
+    $self->{oracle} = $args{oracle};
+    $self->{oracle} = 1
+        if !defined $self->{oracle}
+        && $self->{dbh}->{Driver}->{Name}
+        && $self->{dbh}->{Driver}->{Name} =~ /oracle/i;
+
+    $self->{dupes} = 'oracle' if $self->{oracle};
     if ($self->{dupes}) {
         $self->{ignore} = 1 if $self->{dupes} eq "ignore";
         $self->{update} = 1 if $self->{dupes} eq "update";
@@ -160,10 +179,10 @@ sub new {
   # Fastest array method. Only bind data is passed.
   my $ret = $sql->insert(@column_data_array);
 
-  # Alternative, allows SQL code as values in addition to bind variables
+  # Alternative allows SQL code as values in addition to bind variables.
   my $ret = $sql->insert(\%row_data);
 
-  # No parameters will force emtying of buffer (db write)
+  # No parameters will force emptying of buffer (db write).
   my $ret = $sql->insert();
 
 The main insert method. Returns the return value of the last C<execute> statement
@@ -213,35 +232,34 @@ sub insert {
 
     return $self->_hash_insert(@_) if $_[0] and ref($_[0]);
 
+    # Empty the buffer with no argument
+    return $self->{buffer_counter} ? $self->_empty_buffer() : 0 unless @_;
+
+    croak("Calling insert without a hash requires cols defined in constructor")
+        unless $self->{cols};
+
+    croak("Insert arguments must be multiple of cols")
+        if scalar(@_) % scalar @{$self->{cols}};
+
+    croak("Insert was previously called with hash argument (still in buffer)")
+        if $self->{hash_buffer};
+
     my $ret = 0;
-    if (@_) {
+    while (@_) {
+        my $rows = scalar(@_) / scalar @{$self->{cols}};
+        my $left = $self->{buffer} - $self->{buffer_counter}; # Space left in buffer
 
-        croak("Calling insert without a hash requires cols defined in constructor")
-            unless $self->{cols};
-    
-        croak("Insert arguments must be multiple of cols")
-            if scalar(@_) % scalar @{$self->{cols}};
-
-        croak("Insert was previously called with hash argument (still in buffer)")
-            if $self->{hash_buffer};
-
-        while (@_) {
-            my $rows = scalar(@_) / scalar @{$self->{cols}};
-            my $left = $self->{buffer} - $self->{buffer_counter}; # Space left in buffer
-
-            if ($rows > $left) { # Can't fit buffer
-                my $max = $left * scalar @{$self->{cols}};
-                push @{$self->{bind}}, splice(@_,0,$max);
-                $self->{buffer_counter} = $self->{buffer};
-            } else {
-                push @{$self->{bind}}, splice(@_);
-                $self->{buffer_counter} += $rows;
-            }
-            $ret = $self->_write_full_buffer() if $self->{buffer_counter} == $self->{buffer};
+        if ($rows > $left) { # Can't fit buffer
+            my $max = $left * scalar @{$self->{cols}};
+            push @{$self->{bind}}, splice(@_,0,$max);
+            $self->{buffer_counter} = $self->{buffer};
+        } else {
+            push @{$self->{bind}}, splice(@_);
+            $self->{buffer_counter} += $rows;
         }
-    } elsif ($self->{buffer_counter}) { # Empty the buffer
-        $ret = $self->_empty_buffer();
+        $ret = $self->_write_full_buffer() if $self->{buffer_counter} == $self->{buffer};
     }
+
     return $ret;
 }
 
@@ -307,6 +325,9 @@ give an error depending on your column type and db settings.
 C<INSERT IGNORE> or C<ON DUPLICATE KEY UPDATE> query respectively. See L</"NOTES">
 for details on the latter.
 
+=item * C<oracle> : Will generate the Oracle C<INSERT ALL> syntax (required for
+pre-23c Oracle Databases).
+
 =back
 
 =cut
@@ -315,34 +336,39 @@ sub simple_insert {
     my $table  = shift;
     my $fields = shift;
     my $opt    = shift;
+    my $join   = $opt->{oracle} ? "\n" : ",\n";
 
     my ($placeh, @bind, @cols);
     if (ref($fields) eq 'ARRAY') {
         @cols = keys %{$fields->[0]};
+        my $head = $opt->{oracle} ? _oracle_into_head($table, \@cols) : "";
         my @rows;
         foreach my $f (@$fields) {
-            my ($row, @b) = _row_placeholders($f, \@cols, $opt->{null_undef});
+            my ($row, @b) = _row_placeholders($f, \@cols, $opt->{null_undef}, $head);
             push @rows, $row;
             push @bind, @b;
         }
-        $placeh = join(",\n", @rows);
+        $placeh = join($join, @rows);
     } else {
         @cols = keys %$fields;
-        ($placeh, @bind) = _row_placeholders($fields, \@cols, $opt->{null_undef});
+        my $head = $opt->{oracle} ? _oracle_into_head($table, \@cols) : "";
+        ($placeh, @bind) = _row_placeholders($fields, \@cols, $opt->{null_undef}, $head);
     }
 
     return _create_insert_sql(
         $table, \@cols, $placeh, $opt->{duplicates}
-    ), @bind;
+    ), @bind unless $opt->{oracle};
+
+    return _oracle_create_insert_sql($placeh), @bind;
 }
 
 =head2 multi_insert_sql
 
  my $sql = multi_insert_sql(
      $table,
-     \@columns,         # names of table columns
-     $num_of_rows?,     # default = 1
-     $duplicates?       # can be set as ignore/update in case of duplicate key (MySQL)
+     \@columns,      # names of table columns
+     $num_of_rows?,  # default = 1
+     $variant?       # can be set as 'ignore'/'update' on duplicate key (MySQL) or 'oracle'
  );
 
 Builds bulk insert query (single insert is possible too), with ability for
@@ -359,9 +385,10 @@ Optional parameters:
 for a single row. You can define any number of rows to use with multi-row bind
 variable arrays.
 
-=item * C<$duplicate> : For MySQL, passing C<'ignore'> as the 4th argument returns
+=item * C<$variant> : For MySQL, passing C<'ignore'> as the 4th argument returns
 an C<INSERT IGNORE> query. Passing C<'update'> as the argument returns a query
 containing an `ON DUPLICATE KEY UPDATE` clause (see L</"NOTES"> for further details).
+Passing C<'oracle'> will create the C<INSERT ALL> syntax for pre-23c Oracle DBs.
 
 =back
 
@@ -371,17 +398,29 @@ sub multi_insert_sql {
     my $table    = shift;
     my $columns  = shift;
     my $num_rows = shift || 1;
-    my $dupe     = shift;
+    my $variant  = shift;
 
     return unless $table && $columns && @$columns;
+    return _oracle_create_insert_sql(
+        _oracle_insert_into($table, $columns) x $num_rows
+    )
+        if $variant && $variant eq 'oracle';
 
     my $placeholders =
         join(",\n", ('(' . join(',', ('?') x @$columns) . ')') x $num_rows);
 
-    return _create_insert_sql($table, $columns, $placeholders, $dupe);
+    return _create_insert_sql($table, $columns, $placeholders, $variant)
 }
 
 ## Private methods
+
+sub _set_head {
+    my $self = shift;
+    $self->{row_head} =
+        $self->{oracle}
+        ? _oracle_into_head($self->{table}, $self->{cols})
+        : "";
+}
 
 sub _hash_insert {
     my $self   = shift;
@@ -393,7 +432,9 @@ sub _hash_insert {
 
     $self->{buffer_counter}++;
     $self->{cols} = [keys %$fields] if !defined($self->{cols});
-    my ($row, @bind) = _row_placeholders($fields, $self->{cols}, $self->{null});
+    $self->_set_head unless defined $self->{row_head};
+
+    my ($row, @bind) = _row_placeholders($fields, $self->{cols}, $self->{null}, $self->{row_head});
     push @{$self->{hash_buffer}}, $row;
     push @{$self->{bind}}, @bind;
 
@@ -442,13 +483,13 @@ sub _empty_buffer {
 }
 
 sub _write_hash_buffer {
-    my $self = shift;
-
-    my $placeh = join(",\n", @{$self->{hash_buffer}});
-    my $sth    = $self->{dbh}->prepare(
-        _create_insert_sql(
-            $self->{table}, $self->{cols}, $placeh, $self->{dupes}
-        )
+    my $self   = shift;
+    my $join   = $self->{oracle} ? "\n" : ",\n";
+    my $placeh = join($join, @{$self->{hash_buffer}});
+    my $sth = $self->{dbh}->prepare(
+        $self->{oracle}
+        ? _oracle_create_insert_sql($placeh)
+        : _create_insert_sql($self->{table}, $self->{cols}, $placeh, $self->{dupes})
     );
     $self->_execute($sth);
     $self->_cleanup();
@@ -480,17 +521,36 @@ sub DESTROY {
 
 ## Private functions
 
+sub _oracle_into_head {
+    my $table = shift;
+    my $cols  = shift;
+    return "INTO $table(".join(",", @$cols).") VALUES";
+}
+
+sub _oracle_insert_into {
+    my $table = shift;
+    my $cols  = shift;
+    return _oracle_into_head($table, $cols)."(".join(',', ('?') x @$cols).")\n";
+}
+
+sub _oracle_create_insert_sql {
+    my $placeh = shift;
+    chomp($placeh);
+
+    return "INSERT ALL\n$placeh\nSELECT 1 FROM dual";
+}
+
 sub _create_insert_sql {
     my $table   = shift;
     my $columns = shift;
     my $placeh  = shift;
-    my $dupe    = shift || "";
+    my $variant = shift || "";
 
-    my $ignore = ($dupe eq 'ignore') ? ' IGNORE' : '';
+    my $ignore = ($variant eq 'ignore') ? ' IGNORE' : '';
     my $cols   = join(',', @$columns);
     my $sql    = "INSERT$ignore INTO $table ($cols)\nVALUES $placeh";
 
-    $sql .= _on_duplicate_key_update($columns) if $dupe eq 'update';
+    $sql .= _on_duplicate_key_update($columns) if $variant eq 'update';
 
     return $sql;
 }
@@ -499,9 +559,9 @@ sub _row_placeholders {
     my $fields = shift;
     my $cols   = shift;
     my $null   = shift;
+    my $head   = shift;
+    my $sql    = $head ? "$head(" : "(";
     my @bind   = ();
-    my $sql    = "(";
-
     my $val;
 
     foreach my $key (@$cols) {

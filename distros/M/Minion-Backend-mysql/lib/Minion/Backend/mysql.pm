@@ -15,7 +15,7 @@ use Time::Piece ();
 has 'mysql';
 has 'no_txn' => sub { 0 };
 
-our $VERSION = '1.003';
+our $VERSION = '1.004';
 
 # The dequeue system has a couple limitations:
 # 1. There is no way to directly notify a sleeping worker of an incoming
@@ -636,7 +636,7 @@ sub _try {
     FROM minion_jobs job
     LEFT JOIN (
         SELECT depends.child_id, COUNT(depends.child_id) AS pending,
-            COALESCE( SUM(depends.state = 'failed' OR (depends.expires IS NOT NULL AND depends.expires > NOW())), 0 ) AS failed
+            COALESCE( SUM(depends.state = 'failed' OR (depends.expires IS NOT NULL AND depends.expires <= NOW())), 0 ) AS failed
         FROM minion_jobs_depends depends
         WHERE depends.state IS NOT NULL AND (
             depends.state = 'active'
@@ -1192,7 +1192,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 1.003
+version 1.004
 
 =head1 SYNOPSIS
 
@@ -1642,9 +1642,13 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexander Nalobin Dmitry Krylov Hu Yin Jason A. Crome Larry Leszczynski Olaf Alders Paul Cochrane Sergey Andreev Zoffix Znet
+=for stopwords a-leelan Alexander Nalobin Dmitry Krylov Hu Yin Jason A. Crome Larry Leszczynski Olaf Alders Paul Cochrane Sergey Andreev Zoffix Znet
 
 =over 4
+
+=item *
+
+a-leelan <40534142+a-leelan@users.noreply.github.com>
 
 =item *
 
@@ -1806,3 +1810,10 @@ ALTER TABLE minion_jobs ADD CONSTRAINT minion_jobs_pk_id PRIMARY KEY (id), ALGOR
 
 -- 14 down
 ALTER TABLE minion_jobs DROP PRIMARY KEY;
+
+-- 15 up
+DROP INDEX id ON minion_jobs;
+
+-- 15 down
+CREATE UNIQUE INDEX id ON minion_jobs(id);
+

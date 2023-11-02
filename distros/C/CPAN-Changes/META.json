@@ -1,16 +1,16 @@
 {
-   "abstract" : "Read and write Changes files",
+   "abstract" : "Parser for CPAN style change logs",
    "author" : [
-      "Brian Cassidy <bricas@cpan.org>"
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "CPAN-Changes",
    "no_index" : {
@@ -34,14 +34,51 @@
       },
       "runtime" : {
          "requires" : {
-            "Text::Wrap" : "0.003",
-            "version" : "0.9906"
+            "Module::Runtime" : "0",
+            "Moo" : "1.006000",
+            "Sub::Quote" : "1.005000",
+            "Test::Builder" : "0",
+            "Types::Standard" : "0"
          }
       },
       "test" : {
          "requires" : {
             "Test::More" : "0.96"
          }
+      }
+   },
+   "provides" : {
+      "CPAN::Changes" : {
+         "file" : "lib/CPAN/Changes.pm",
+         "version" : "0.500002"
+      },
+      "CPAN::Changes::Entry" : {
+         "file" : "lib/CPAN/Changes/Entry.pm",
+         "version" : "0.500002"
+      },
+      "CPAN::Changes::Group" : {
+         "file" : "lib/CPAN/Changes/Group.pm",
+         "version" : "0.500002"
+      },
+      "CPAN::Changes::HasEntries" : {
+         "file" : "lib/CPAN/Changes/HasEntries.pm",
+         "version" : "0.500002"
+      },
+      "CPAN::Changes::Parser" : {
+         "file" : "lib/CPAN/Changes/Parser.pm",
+         "version" : "0.500002"
+      },
+      "CPAN::Changes::Release" : {
+         "file" : "lib/CPAN/Changes/Release.pm",
+         "version" : "0.500002"
+      },
+      "CPAN::Changes::Spec" : {
+         "file" : "lib/CPAN/Changes/Spec.pod",
+         "version" : "0.500002"
+      },
+      "Test::CPAN::Changes" : {
+         "file" : "lib/Test/CPAN/Changes.pm",
+         "version" : "0.500002"
       }
    },
    "release_status" : "stable",
@@ -55,11 +92,12 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/CPAN-API/CPAN-Changes.git",
-         "web" : "https://github.com/CPAN-API/CPAN-Changes"
+         "url" : "https://github.com/metacpan/CPAN-Changes.git",
+         "web" : "https://github.com/metacpan/CPAN-Changes"
       },
       "x_IRC" : "irc://irc.perl.org/#metacpan"
    },
-   "version" : "0.400002",
-   "x_authority" : "cpan:BRICAS"
+   "version" : "0.500002",
+   "x_authority" : "cpan:BRICAS",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

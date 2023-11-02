@@ -1,0 +1,53 @@
+# -*- mode: perl; -*-
+
+use strict;
+use warnings;
+
+use Test::More;
+use Math::BigRat;
+
+my $cases =
+  [
+   [ "inf", "inf" ],
+   [ "-inf", "-inf" ],
+   [ "NaN", "NaN" ],
+   [ "1/2", "NaN" ],
+   [ "-1/2", "NaN" ],
+  ];
+
+for (my $in = -300 ; $in <= 300 ; $in++) {
+    my $out = sprintf "%o", abs($in);
+    $out = "-" . $out if $in < 0;
+    push @$cases, [ $in, $out ];
+}
+
+for (my $ndig = 4 ; $ndig <= 50 ; $ndig++) {
+    for my $rep (1 .. 5) {
+        my $in = 1 + int rand 9;
+        $in .= int rand 10 for 2 .. $ndig;
+        my $out = `dc <<< "8 o $in p"`;
+        $out =~ tr/0-9A-F//dc;
+        $out = lc $out;
+        push @$cases,
+          [ $in, $out ],
+          [ "-$in", "-$out" ];
+    }
+}
+
+for my $case (@$cases) {
+    my ($in, $want) = @$case;
+    note qq|\n\$x = Math::BigRat -> to_oct("$want");\n\n|;
+    my $got = Math::BigRat -> to_oct($in);
+    is(ref($got), '', 'output is a scalar');
+    is($got, $want, "output is '$want'");
+};
+
+for my $case (@$cases) {
+    my ($in, $want) = @$case;
+    note qq|\n\$x = Math::BigRat -> new("$in") -> to_oct();\n\n|;
+    my $got = Math::BigRat -> new("$in") -> to_oct();
+    is(ref($got), '', 'output is a scalar');
+    is($got, $want, "output is '$want'");
+};
+
+done_testing();

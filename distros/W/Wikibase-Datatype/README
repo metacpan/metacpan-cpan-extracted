@@ -56,6 +56,9 @@ SEE ALSO
     Wikibase::Datatype::Value::Item
         Wikibase item value datatype.
 
+    Wikibase::Datatype::Value::Lexeme
+        Wikibase lexeme value datatype.
+
     Wikibase::Datatype::Value::Monolingual
         Wikibase monolingual value datatype.
 
@@ -96,5 +99,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.31
+    0.33
 

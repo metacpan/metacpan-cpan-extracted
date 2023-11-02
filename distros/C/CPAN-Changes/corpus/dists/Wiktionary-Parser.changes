@@ -1,0 +1,42 @@
+Revision history for Wiktionary::Parser
+
+0.01    2012-07-05
+        First version
+
+0.02    2012-07-07
+        accessors for translations, synonyms, hyponyms, hypernyms, antonyms, pronunciations, word senses, parts of speech
+        stubbed out accessors for etymologies, derived words, alternative forms
+        added methods for accessing and traversing document sections
+        utilize MediaWiki::API package
+
+
+0.03    2012-07-08
+        Added subdocuments to provide more functionality when retrieving child sections of the document.
+        Follow Wikisaurus links for synonyms, hyponyms, hypernyms, etc and include content from those pages.
+        Provided method for downloading audio files for pronunciations
+        Normalize language codes and provide consistent language names
+
+
+0.04    2012-07-11
+        Added unit test for parsing a document
+        Added unit test for parsing translations
+        Refactored translation parser
+
+
+0.05    2012-07-14
+        updated documentation
+        Added example scripts in /bin       
+        Various bugfixes
+
+
+0.06    2012-07-14
+        Added part of speech info to output of get_translations()
+        Included translations from other wiktionary pages linked to the original one
+	   
+
+0.07    2012-07-15
+        Updates to documentation and example scripts
+
+0.08    2012-07-18
+        Various bugfixes for data sanitizing
+        Fixed issue with unit tests

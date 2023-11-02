@@ -5,6 +5,7 @@ use warnings;
 
 use alienfile;
 use Path::Tiny;
+use File::Which;
 
 my $pkg_name = 'cpgplot';
 my $pkg_version = '5.2.2-9';
@@ -24,3 +25,14 @@ share {
     plugin Extract => 'tar.gz';
     plugin 'Build::Autoconf';
 };
+
+# find path to executables for system install, if found.
+sys {
+    after 'gather' => sub {
+        my ( $build) = @_;
+
+        if ( defined( my $exe = which( 'pgxwin_server' ) ) ) {
+            $build->runtime_prop->{system_bin_dir} = path($exe)->parent->stringify;
+        }
+    };
+}

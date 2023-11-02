@@ -1,0 +1,10 @@
+0.005
+    no changes, I accidently deleted the tar.gz from cpan, had to reupload, can't upload same version twice
+0.004
+    version bump for inc::Module::Install upgrade (http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04)
+0.003
+    removed errornous analazyer attribute from QueryParser, added more test cases
+0.002
+    Will now always try and create search index dir if doesn't exist
+0.001
+    First release

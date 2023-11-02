@@ -11,12 +11,12 @@ Doit::File - commands for file creation
     $doit->file_atomic_write('/path/to/file', sub {
         my $fh = shift;
         print $fh "Hello, world!\n";
-    };
+    });
 
     $doit->file_atomic_write('/path/to/file', sub {
         my($fh, $filename) = @_;
 	$doit->system("a_system_cmd > $filename");
-    }, tmpsuffix => '.my.tmp';
+    }, tmpsuffix => '.my.tmp');
 
 =head1 DESCRIPTION
 
@@ -107,7 +107,10 @@ B<NOTES>
 The temporary file creation is done using L<File::Temp>. The temporary
 files are removed as early as possible, even in the case of
 exceptions. Only left-overs may happen if the script is killed from
-outside (e.g. SIGINT, SIGKILL...).
+outside (e.g. SIGINT, SIGKILL...). A possible solution to prevent
+left-overs on CTRL-C is to a define a signal handler like this:
+
+    $SIG{INT} = sub { exit };
 
 Some of L<File::Temp>'s standard behaviors are changed here: mode is
 different (see above), and C<EXLOCK> is not set.

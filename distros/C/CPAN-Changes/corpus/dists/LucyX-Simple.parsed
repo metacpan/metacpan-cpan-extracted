@@ -1,0 +1,70 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 2,
+          "raw" => "    no changes, I accidently deleted the tar.gz from cpan, had to reupload, can't upload same version twice\n",
+          "style" => "",
+          "text" => "no changes, I accidently deleted the tar.gz from cpan, had to reupload, can't upload same version twice"
+        }
+      ],
+      "line" => 1,
+      "raw" => "0.005\n",
+      "version" => "0.005"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "    version bump for inc::Module::Install upgrade (http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04)\n",
+          "style" => "",
+          "text" => "version bump for inc::Module::Install upgrade (http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04)"
+        }
+      ],
+      "line" => 3,
+      "raw" => "0.004\n",
+      "version" => "0.004"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "    removed errornous analazyer attribute from QueryParser, added more test cases\n",
+          "style" => "",
+          "text" => "removed errornous analazyer attribute from QueryParser, added more test cases"
+        }
+      ],
+      "line" => 5,
+      "raw" => "0.003\n",
+      "version" => "0.003"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 8,
+          "raw" => "    Will now always try and create search index dir if doesn't exist\n",
+          "style" => "",
+          "text" => "Will now always try and create search index dir if doesn't exist"
+        }
+      ],
+      "line" => 7,
+      "raw" => "0.002\n",
+      "version" => "0.002"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 10,
+          "raw" => "    First release\n",
+          "style" => "",
+          "text" => "First release"
+        }
+      ],
+      "line" => 9,
+      "raw" => "0.001\n",
+      "version" => "0.001"
+    }
+  ]
+}

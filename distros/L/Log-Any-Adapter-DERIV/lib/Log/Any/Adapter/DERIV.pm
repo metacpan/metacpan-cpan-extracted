@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:DERIV';    # AUTHORITY
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 use feature qw(state);
 use parent  qw(Log::Any::Adapter::Coderef);
@@ -142,7 +142,7 @@ our %SEVERITY_COLOUR = (
     fatal    => [qw(red bold)],
     critical => [qw(red bold)],
 );
-
+my $adapter_context;
 my @methods     = reverse logging_methods();
 my %num_to_name = map { $_ => $methods[$_] } 0 .. $#methods;
 
@@ -333,31 +333,12 @@ Add format and add color code using C<format_line> and writes the log entry
 sub log_entry {
     my ($self, $data) = @_;
     $data = $self->_process_data($data);
+    $data = $self->_process_context($data);
     my $json_data;
     my %text_data = ();
     my $get_json  = sub { $json_data //= encode_json_text($data) . "\n"; return $json_data; };
     my $get_text =
         sub { my $color = shift // 0; $text_data{$color} //= $self->format_line($data, {color => $color}) . "\n"; return $text_data{$color}; };
-
-    # remove substitution context from message
-    if ($data->{message}) {
-        $data->{message} =~ s/\".*//;
-    }
-    # Prepare the JSON object with the required fields
-    my %log_data = (
-        message  => $data->{message},
-        severity => $data->{severity},
-    );
-
-    if ($self->{context} && ref($self->{context}) eq 'HASH') {
-        my @keys = keys %{$self->{context}};    # Get the keys from the context hash
-
-        foreach my $key (@keys) {
-            $log_data{$key} = $self->{context}->{$key};
-        }
-        my $json_string = $JSON->encode(\%log_data);
-        $data->{message} = $json_string;
-    }
 
     if ($self->{json_fh}) {
         _lock($self->{json_fh});
@@ -617,6 +598,43 @@ Return the current log level name.
 sub level {
     my $self = shift;
     return $num_to_name{$self->{log_level}};
+}
+
+=head2 _process_context
+
+add context key value pair into data object
+
+=cut
+
+sub _process_context {
+    my ($self, $data) = @_;
+    # Iterate over the keys in $adapter_context
+    foreach my $key (keys %{$adapter_context}) {
+        $data->{$key} = $adapter_context->{$key};
+    }
+    return $data;
+}
+
+=head2 set_context
+
+Set the log context hash
+
+=cut
+
+sub set_context {
+    my ($self, $context) = @_;
+    $adapter_context = $context;
+}
+
+=head2 clear_context
+
+undef the log context hash
+
+=cut
+
+sub clear_context {
+    my ($self) = @_;
+    $adapter_context = undef;
 }
 
 1;

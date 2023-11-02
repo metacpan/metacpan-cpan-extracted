@@ -27,7 +27,6 @@ my %WriteMakefileArgs = (
     "experimental" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Printer" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
     "Test2::Bundle::More" => 0,
@@ -39,7 +38,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +46,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Data::Printer" => 0,
   "English" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,

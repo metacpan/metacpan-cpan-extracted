@@ -212,6 +212,18 @@ METHODS
 
     Return the current log level name.
 
+ _process_context
+
+    add context key value pair into data object
+
+ set_context
+
+    Set the log context hash
+
+ clear_context
+
+    undef the log context hash
+
 AUTHOR
 
     Deriv Group Services Ltd. DERIV@cpan.org

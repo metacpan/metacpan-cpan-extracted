@@ -20,15 +20,16 @@ sub get_qr
 
 sub align_qrs
 {
-	my @qr1 = @{shift()};
-	my @qr2 = @{shift()};
-	my $offset = ' ' x (length $qr1[0]);
+	my ($qr1, $qr2) = @_;
+	return @$qr1 unless $qr2;
+
+	my $offset = ' ' x (length $qr1->[0]);
 
 	my @output;
-	while (@qr1 || @qr2) {
-		my $line = shift(@qr1) // $offset;
+	while (@$qr1 || @$qr2) {
+		my $line = shift(@$qr1) // $offset;
 		$line .= ' ' x 4;
-		$line .= shift(@qr2) // '';
+		$line .= shift(@$qr2) // '';
 		push @output, $line;
 	}
 
@@ -41,11 +42,17 @@ my $stdout = !!0;
 my $filename = 'wallet.txt';
 my $auto_entropy = !!0;
 my $help = !!0;
+my $words = 24;
+my $compat_addresses = 1;
+my $segwit_addresses = 3;
 
 GetOptions(
 	'auto|a' => \$auto_entropy,
 	'file|f=s' => \$filename,
 	'stdout|o' => \$stdout,
+	'words|w=n' => \$words,
+	'compat_addrs|c=n' => \$compat_addresses,
+	'segwit_addrs|s=n' => \$segwit_addresses,
 	'help|h' => \$help,
 );
 
@@ -88,13 +95,23 @@ if (!$stdout && -e $filename) {
 	die "wallet file $filename already exists";
 }
 
+die 'words must be between 12 and 24'
+	unless $words >= 12 && $words <= 24;
+die 'words must be divisible by 3'
+	unless $words % 3 == 0;
+my $entropy_length = 128 + ($words - 12) * 32 / 3;
+
 my $entropy = $auto_entropy ? undef : get_entropy;
 my $pass = get_passphrase;
 
-my $bitcoin_data = App::Bitcoin::PaperWallet->generate($entropy, $pass);
+my $bitcoin_data = App::Bitcoin::PaperWallet->generate($entropy, $pass, {
+	compat_addresses => $compat_addresses,
+	segwit_addresses => $segwit_addresses,
+	entropy_length => $entropy_length,
+});
 
 my @data;
-my $id = substr $bitcoin_data->{addresses}[0], -5;
+my $id = substr $bitcoin_data->{addresses}[0], -4;
 
 push @data,
 	"-- PASSWORD PROTECTED PRIVATE KEY FOR ID $id --",
@@ -112,6 +129,7 @@ for my $addr (@{$bitcoin_data->{addresses}}) {
 
 push @data, '';
 
+push @qrs, undef unless @qrs % 2 == 0;
 for my $qr (pairs @qrs) {
 	push @data,
 		align_qrs(@$qr),
@@ -168,6 +186,18 @@ for password, or two lines: one for entropy, one for password
 
 Specify filename to print to - default is C<wallet.txt>. Has no effect if
 C<--stdout> is passed.
+
+=item -w [NUMBER], --words [NUMBER]
+
+A number of words to be generated. Must be 12, 15, 18, 21 or 24. Default 24.
+
+=item -c [NUMBER], --compat_addrs [NUMBER]
+
+A number of compat addresses to generate, by default 1.
+
+=item -s [NUMBER], --segwit_addrs [NUMBER]
+
+A number of segwit addresses to generate, by default 3.
 
 =item -h, --help
 

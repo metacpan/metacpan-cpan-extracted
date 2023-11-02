@@ -1,8 +1,10 @@
 package App::Oozie::Types::DateTime;
-$App::Oozie::Types::DateTime::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
 
 use App::Oozie::Date;
 use App::Oozie::Constants qw(
@@ -86,7 +88,7 @@ App::Oozie::Types::DateTime
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

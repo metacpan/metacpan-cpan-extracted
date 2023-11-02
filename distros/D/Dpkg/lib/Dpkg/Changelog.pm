@@ -23,8 +23,8 @@ Dpkg::Changelog - base class to implement a changelog parser
 =head1 DESCRIPTION
 
 Dpkg::Changelog is a class representing a changelog file
-as an array of changelog entries (Dpkg::Changelog::Entry).
-By deriving this class and implementing its parse method, you
+as an array of changelog entries (L<Dpkg::Changelog::Entry>).
+By deriving this class and implementing its parse() method, you
 add the ability to fill this object with changelog entries.
 
 =cut
@@ -107,7 +107,7 @@ Returns the number of changelog entries that have been parsed with success.
 =item $c->reset_parse_errors()
 
 Can be used to delete all information about errors occurred during
-previous L<parse> runs.
+previous parse() runs.
 
 =cut
 
@@ -139,7 +139,7 @@ sub parse_error {
 
 =item $c->get_parse_errors()
 
-Returns all error messages from the last L<parse> run.
+Returns all error messages from the last parse() run.
 If called in scalar context returns a human readable
 string representation. If called in list context returns
 an array of arrays. Each of these arrays contains
@@ -209,15 +209,15 @@ sub get_unparsed_tail {
 
 =item @{$c}
 
-Returns all the Dpkg::Changelog::Entry objects contained in this changelog
+Returns all the L<Dpkg::Changelog::Entry> objects contained in this changelog
 in the order in which they have been parsed.
 
 =item $c->get_range($range)
 
 Returns an array (if called in list context) or a reference to an array of
-Dpkg::Changelog::Entry objects which each represent one entry of the
+L<Dpkg::Changelog::Entry> objects which each represent one entry of the
 changelog. $range is a hash reference describing the range of entries
-to return. See section L<"RANGE SELECTION">.
+to return. See section L</RANGE SELECTION>.
 
 =cut
 
@@ -589,18 +589,18 @@ sub _format_rfc822 {
 
 =item $control = $c->format_range($format, $range)
 
-Formats the changelog into Dpkg::Control::Changelog objects representing the
-entries selected by the optional range specifier (see L<"RANGE SELECTION">
-for details). In scalar context returns a Dpkg::Index object containing the
-selected entries, in list context returns an array of Dpkg::Control::Changelog
-objects.
+Formats the changelog into L<Dpkg::Control::Changelog> objects representing
+the entries selected by the optional range specifier (see L</RANGE SELECTION>
+for details). In scalar context returns a L<Dpkg::Index> object containing
+the selected entries, in list context returns an array of
+L<Dpkg::Control::Changelog> objects.
 
-With format B<dpkg> the returned Dpkg::Control::Changelog object is coalesced
-from the entries in the changelog that are part of the range requested,
-with the fields described below, but considering that "selected entry"
-means the first entry of the selected range.
+With format B<dpkg> the returned L<Dpkg::Control::Changelog> object is
+coalesced from the entries in the changelog that are part of the range
+requested, with the fields described below, but considering that
+"selected entry" means the first entry of the selected range.
 
-With format B<rfc822> each returned Dpkg::Control::Changelog objects
+With format B<rfc822> each returned L<Dpkg::Control::Changelog> objects
 represents one entry in the changelog that is part of the range requested,
 with the fields described below, but considering that "selected entry"
 means for each entry.

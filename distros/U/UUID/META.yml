@@ -3,12 +3,13 @@ abstract: 'DCE compatible Universally Unique Identifier library for Perl'
 author:
   - 'Rick Myers <jrm@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.64'
   Test::More: '0'
 configure_requires:
-  Devel::CheckLib: '1.02'
+  Devel::CheckLib: '1.14'
+  ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,5 +21,5 @@ no_index:
     - inc
 requires:
   perl: '5.005'
-version: '0.28'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: '0.30'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

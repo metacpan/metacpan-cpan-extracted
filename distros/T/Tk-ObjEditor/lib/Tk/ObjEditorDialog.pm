@@ -7,7 +7,7 @@
 # the same terms as the Perl 5 programming language system itself.
 #
 package Tk::ObjEditorDialog;
-$Tk::ObjEditorDialog::VERSION = '2.009';
+$Tk::ObjEditorDialog::VERSION = '2.010';
 use strict;
 use warnings;
 

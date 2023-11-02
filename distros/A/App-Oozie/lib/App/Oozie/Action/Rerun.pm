@@ -1,11 +1,13 @@
 package App::Oozie::Action::Rerun;
-$App::Oozie::Action::Rerun::VERSION = '0.010';
+
 # This is not in use yet, please go to the parent class
 
 use 5.014;
 use strict;
 use warnings;
 use parent qw( App::Oozie::Rerun );
+
+our $VERSION = '0.015'; # VERSION
 
 1;
 
@@ -21,7 +23,7 @@ App::Oozie::Action::Rerun
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

@@ -56,7 +56,6 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Data::Printer" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
             "Test2::Bundle::More" : "0",
@@ -74,7 +73,7 @@
    "provides" : {
       "Game::Lottery" : {
          "file" : "lib/Game/Lottery.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -87,7 +86,7 @@
          "web" : "https://bitbucket.org/brainbuz/lottery"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

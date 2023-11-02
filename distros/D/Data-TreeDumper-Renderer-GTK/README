@@ -1,11 +1,11 @@
 Data/TreeDumper/Renderer/GTK
 ==============================
 
-Version 0.01
+Version 0.03
 
 Data::TreeDumper::Renderer::GTK Rendering plug-in for Data::TreeDumper
 
-This Gtk2::TreeView derived widget allows you to diplay a Data::TreeDumper generated
+This Gtk3::TreeView derived widget allows you to diplay a Data::TreeDumper generated
 dump in a GTK window. The nodes are collapsable.
 
 In this release:
@@ -30,7 +30,7 @@ Data::TreeDumper
 
 COPYRIGHT AND LICENCE
 
-  Copyright (c) 2005 Nadim Ibn Hamouda el Khemir and Muppet.
+  Copyright (c) 2005-2023 Nadim Ibn Hamouda el Khemir and Muppet.
   All rights reserved.  This program is free software; you can redis-
   tribute it and/or modify it under the same terms as Perl itself.
 

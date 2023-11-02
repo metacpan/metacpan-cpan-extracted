@@ -1,43 +1,43 @@
 package App::Oozie::Deploy::Template::ttree;
-$App::Oozie::Deploy::Template::ttree::VERSION = '0.010';
+
 use strict;
 use warnings;
 use parent qw( App::Oozie::Forked::Template::ttree );
 
+our $VERSION = '0.015'; # VERSION
+
 sub new {
-    my $class = shift;
-    my $log_collector = shift;
+    my($class, $log_collector, @pass_through) = @_;
     my $self  = $class->SUPER::new(
-                    @_,
+                    @pass_through,
                 );
-    $self->{log_collector} = $log_collector,
-    $self;
+    $self->{log_collector} = $log_collector;
+    return $self;
 }
 
 sub run {
-    my $self = shift;
-    my @arg  = @_;
-    local @ARGV = @arg;
-    $self->SUPER::run();
+    my($self, @args) = @_;
+    local @ARGV = @args;
+    return $self->SUPER::run();
 }
 
 sub emit_warn {
-    my $self = shift;
-    my $msg  = shift;
-    $self->{log_collector}->(
+    my($self, $msg) = @_;
+    return$self->{log_collector}->(
         level => 'warn',
         msg   => $msg,
     );
 }
 
 sub emit_log {
-    my $self = shift;
-    for my $msg ( @_ ) {
+    my($self, @msgs) = @_;
+    for my $msg ( @msgs ) {
         $self->{log_collector}->(
             level => 'info',
             msg   => $msg,
         );
     }
+    return;
 }
 
 1;
@@ -54,7 +54,7 @@ App::Oozie::Deploy::Template::ttree
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 AUTHORS
 

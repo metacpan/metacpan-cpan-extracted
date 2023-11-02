@@ -1,6 +1,7 @@
 use v5.12;
+use warnings;
 
-use Test::Most;
+use Test2::V0;
 
 use HTTP::Request::Common;
 use HTTP::Status qw/ :constants status_message /;
@@ -66,7 +67,7 @@ subtest "whitelisted" => sub {
             is $res->code, HTTP_OK, "request ok";
         }
 
-        is_deeply \@logs, [], "no warnings logged";
+        is \@logs, [], "no warnings logged";
 
       };
 
@@ -89,7 +90,7 @@ subtest "greylist (blocked)" => sub {
             is $res->code, HTTP_FORBIDDEN, "forbidden";
         }
 
-        is_deeply \@logs,
+        is \@logs,
           [
             { level => "warn", message => "Rate limiting 13.67.224.13 after 1/0 for 13.64.0.0/11" },
             { level => "warn", message => "Rate limiting 13.67.224.13 after 2/0 for 13.64.0.0/11" },
@@ -126,7 +127,7 @@ subtest "greylist (blocked)" => sub {
             is $res->code, HTTP_FORBIDDEN, "forbidden";
 
             # Note that this is counting the /robots.txt request
-            is_deeply \@logs, [ { level => "warn", message => "Rate limiting ${ip} after 2/0 for 66.249.64.0/19" }, ], "logs";
+            is \@logs, [ { level => "warn", message => "Rate limiting ${ip} after 2/0 for 66.249.64.0/19" }, ], "logs";
 
         };
 

@@ -1,5 +1,9 @@
 Revision history for MySQL-GrantParser
 
+1.006     2023-10-26 05:15:39+00:00 UTC
+    [BUG FIXES]
+        - Avoided duplication of the same WITH clause
+
 1.005     2023-05-24 10:28:58+00:00 UTC
     [BUG FIXES]
         - Pack grants carefully in case of existing same objects

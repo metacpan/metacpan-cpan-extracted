@@ -1,0 +1,12 @@
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Aion/Telemetry.md
+lib/Aion/Telemetry.pm
+minil.toml
+t/aion/telemetry.t
+META.json
+META.yml
+MANIFEST
+Build.PL

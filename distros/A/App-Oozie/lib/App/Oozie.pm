@@ -1,8 +1,11 @@
 package App::Oozie;
-$App::Oozie::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use Moo;
@@ -32,7 +35,7 @@ sub run {
     my $action_to_class = find_plugins('App::Oozie::Action');
 
     if ( $debug ) {
-        $logger->debug( sprintf "Found: %s", $_ )
+        $logger->debug( sprintf 'Found: %s', $_ )
             for sort keys %{ $action_to_class };
     }
 
@@ -60,8 +63,8 @@ sub run {
         ( map { '-I' . $_ } @INC ),
         '-M' . $class,
         '-E', "$class->new_with_options->run",
-        '--',
-        @ARGV
+        q{--},
+        @ARGV,
     );
 
     if ( $debug ) {
@@ -70,7 +73,7 @@ sub run {
                     [  \@cmd ],
                     [qw( cmd )]
                 )->Indent( 0 );
-        $logger->debug( sprintf "Executing: %s", $d->Dump );
+        $logger->debug( sprintf 'Executing: %s', $d->Dump );
     }
 
     exec @cmd;
@@ -90,7 +93,7 @@ App::Oozie
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

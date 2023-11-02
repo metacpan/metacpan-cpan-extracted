@@ -579,12 +579,13 @@ sub new
 		 	$html = $response->decoded_content  if ($response->is_success);
 			return undef  unless ($html);
 
-			$html =~ s#^.+\:\{\"runs\"\:\[\{\"text\"\:\"Uploads\"\,##s;  #USER PAGES CAN HAVE A BANNER VIDEO, SKIP THIS!
+			$html =~ s#^.+\"description\"\:\{\"runs\"\:##s;  #USER PAGES CAN HAVE A BANNER VIDEO, *TRY TO* SKIP THIS!
 			if ($html =~ m#\:\{\"url\"\:\"([^\"]+)\"\,\"webPageType\"\:\"WEB\_PAGE\_TYPE\_WATCH\"\,#s) {
 				$url2fetch = $1;
 				$url2fetch =~ s#^\/\/#https\:\/\/#;  #URL STARTS WITH "//" (PREMPTIVE)
 				$url2fetch =~ s#^\/#$self->{'youtube-site'}\/#;  #URL IS JUST "/video-id[?other-junk]" (COMMON)
 				$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
+				$self->{'id'} =~ s/[\?\&].*$//;
 				$self->{'id'} =~ s/^watch\?v\=//;
 				print STDERR "---FOUND 1ST EPISODE! FETCHING=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 				goto DO_YTDL;   #SKIP NON-YOUTUBE PAGE CHECK (NEXT PARAGRAPH):
@@ -614,8 +615,9 @@ sub new
 			while ($html && $html =~ s#\<iframe([^\>]+)\>##s) {
 				my $one = $1;
 				my $embeddedURL = ($one =~ m#\"(https?\:\/\/[^\"]+)#s) ? $1 : '';
-				print STDERR "--embedded IFRAME url=$embeddedURL=\n"  if ($DEBUG);
 				if ($embeddedURL) {
+					$embeddedURL =~ s/[\?\&].*$//  unless ($self->{'notrim'} || $embeddedURL =~ /watch\?v\=/);
+					print STDERR "--embedded IFRAME url=$embeddedURL=\n"  if ($DEBUG);
 					my $haveStreamFinder = 0;
 					eval { require 'StreamFinder.pm'; $haveStreamFinder = 1; };
 					if ($haveStreamFinder) {

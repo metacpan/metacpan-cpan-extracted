@@ -1,0 +1,817 @@
+{
+  "preamble" => "Revision history for Perl extension WWW::YouTube::Download",
+  "raw_preamble" => "Revision history for Perl extension WWW::YouTube::Download\n\n",
+  "releases" => [
+    {
+      "entries" => [],
+      "line" => 3,
+      "raw" => "{{\$NEXT}}\n\n",
+      "version" => "{{\$NEXT}}"
+    },
+    {
+      "date" => "2013-07-27T09:21:38Z",
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "        - Changed signature encoding (kucharskim++)\n\n",
+          "style" => "-",
+          "text" => "Changed signature encoding (kucharskim++)"
+        }
+      ],
+      "line" => 5,
+      "raw" => "0.55 2013-07-27T09:21:38Z\n",
+      "raw_date" => "2013-07-27T09:21:38Z",
+      "version" => "0.55"
+    },
+    {
+      "date" => "2013-07-05T18:29:31Z",
+      "entries" => [
+        {
+          "line" => 9,
+          "raw" => "        - If unavailable video, croak with an appropriate error message. (kucharskim++)\n",
+          "style" => "-",
+          "text" => "If unavailable video, croak with an appropriate error message. (kucharskim++)"
+        },
+        {
+          "line" => 10,
+          "raw" => "        - Support encrypted signature video. (kucharskim++)\n\n",
+          "style" => "-",
+          "text" => "Support encrypted signature video. (kucharskim++)"
+        }
+      ],
+      "line" => 8,
+      "raw" => "0.54 2013-07-05T18:29:31Z\n",
+      "raw_date" => "2013-07-05T18:29:31Z",
+      "version" => "0.54"
+    },
+    {
+      "date" => "2013-06-05T16:05:56Z",
+      "entries" => [
+        {
+          "line" => 13,
+          "raw" => "        - Various improvements to youtube-playlists (kucharskim++)\n\n",
+          "style" => "-",
+          "text" => "Various improvements to youtube-playlists (kucharskim++)"
+        }
+      ],
+      "line" => 12,
+      "raw" => "0.53 2013-06-05T16:05:56Z\n",
+      "raw_date" => "2013-06-05T16:05:56Z",
+      "version" => "0.53"
+    },
+    {
+      "date" => "2013-05-05T16:18:54Z",
+      "entries" => [
+        {
+          "line" => 16,
+          "raw" => "        - Added playlist_id() and video_id() method (kucharskim++)\n\n",
+          "style" => "-",
+          "text" => "Added playlist_id() and video_id() method (kucharskim++)"
+        }
+      ],
+      "line" => 15,
+      "raw" => "0.52 2013-05-05T16:18:54Z\n",
+      "raw_date" => "2013-05-05T16:18:54Z",
+      "version" => "0.52"
+    },
+    {
+      "date" => "2013-05-03T07:49:29Z",
+      "entries" => [
+        {
+          "line" => 19,
+          "raw" => "        - Support new url (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "Support new url (mikolaj++)"
+        }
+      ],
+      "line" => 18,
+      "raw" => "0.51 2013-05-03T07:49:29Z\n",
+      "raw_date" => "2013-05-03T07:49:29Z",
+      "version" => "0.51"
+    },
+    {
+      "date" => "2013-04-19T17:50:39Z",
+      "entries" => [
+        {
+          "line" => 22,
+          "raw" => "        - repackaging\n\n",
+          "style" => "-",
+          "text" => "repackaging"
+        }
+      ],
+      "line" => 21,
+      "raw" => "0.50 2013-04-19T17:50:39Z\n",
+      "raw_date" => "2013-04-19T17:50:39Z",
+      "version" => "0.50"
+    },
+    {
+      "date" => "2013-04-09T21:13:56Z",
+      "entries" => [
+        {
+          "line" => 25,
+          "raw" => "        - repacking\n\n",
+          "style" => "-",
+          "text" => "repacking"
+        }
+      ],
+      "line" => 24,
+      "raw" => "0.49 2013-04-09T21:13:56Z\n",
+      "raw_date" => "2013-04-09T21:13:56Z",
+      "version" => "0.49"
+    },
+    {
+      "date" => "2013-04-09T21:09:55Z",
+      "entries" => [
+        {
+          "line" => 28,
+          "raw" => "        - Fixed parsing problem on youtube-playlists (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "Fixed parsing problem on youtube-playlists (mikolaj++)"
+        }
+      ],
+      "line" => 27,
+      "raw" => "0.48 2013-04-09T21:09:55Z\n",
+      "raw_date" => "2013-04-09T21:09:55Z",
+      "version" => "0.48"
+    },
+    {
+      "date" => "2013-04-02T02:06:07Z",
+      "entries" => [
+        {
+          "line" => 31,
+          "raw" => "        - Added some documentation and added eg/menu.pl (polettix++)\n\n",
+          "style" => "-",
+          "text" => "Added some documentation and added eg/menu.pl (polettix++)"
+        }
+      ],
+      "line" => 30,
+      "raw" => "0.47    Tue Apr  2 02:06:07 2013\n",
+      "raw_date" => "Tue Apr  2 02:06:07 2013",
+      "version" => "0.47"
+    },
+    {
+      "date" => "2013-03-24T15:34:27Z",
+      "entries" => [
+        {
+          "line" => 34,
+          "raw" => "        - YouTube's design was changed (vjp++, yusukebe++)\n\n",
+          "style" => "-",
+          "text" => "YouTube's design was changed (vjp++, yusukebe++)"
+        }
+      ],
+      "line" => 33,
+      "raw" => "0.46    Sun Mar 24 15:34:27 2013\n",
+      "raw_date" => "Sun Mar 24 15:34:27 2013",
+      "version" => "0.46"
+    },
+    {
+      "date" => "2013-02-10T02:14:09Z",
+      "entries" => [
+        {
+          "line" => 37,
+          "raw" => "        - New substitution variable {user} (isync++)\n\n",
+          "style" => "-",
+          "text" => "New substitution variable {user} (isync++)"
+        }
+      ],
+      "line" => 36,
+      "raw" => "0.45    Sun Feb 10 02:14:09 2013\n",
+      "raw_date" => "Sun Feb 10 02:14:09 2013",
+      "version" => "0.45"
+    },
+    {
+      "date" => "2013-01-19T18:29:58Z",
+      "entries" => [
+        {
+          "line" => 40,
+          "raw" => "        - added proxy support (isync++)\n\n",
+          "style" => "-",
+          "text" => "added proxy support (isync++)"
+        }
+      ],
+      "line" => 39,
+      "raw" => "0.44    Sat Jan 19 18:29:58 2013\n",
+      "raw_date" => "Sat Jan 19 18:29:58 2013",
+      "version" => "0.44"
+    },
+    {
+      "date" => "2013-01-05T01:43:17Z",
+      "entries" => [
+        {
+          "line" => 43,
+          "raw" => "        - fixed grammar (mokko++)\n",
+          "style" => "-",
+          "text" => "fixed grammar (mokko++)"
+        },
+        {
+          "line" => 44,
+          "raw" => "        - using Module::Build\n\n",
+          "style" => "-",
+          "text" => "using Module::Build"
+        }
+      ],
+      "line" => 42,
+      "raw" => "0.43    Sat Jan  5 01:43:17 2013\n",
+      "raw_date" => "Sat Jan  5 01:43:17 2013",
+      "version" => "0.43"
+    },
+    {
+      "date" => "2012-11-16T21:35:31Z",
+      "entries" => [
+        {
+          "line" => 47,
+          "raw" => "        - fixed \"failed to extract JSON data\" (ks0608++)\n",
+          "style" => "-",
+          "text" => "fixed \"failed to extract JSON data\" (ks0608++)"
+        },
+        {
+          "line" => 48,
+          "raw" => "        - fixed RT: 81068 (panic83++)\n\n",
+          "style" => "-",
+          "text" => "fixed RT: 81068 (panic83++)"
+        }
+      ],
+      "line" => 46,
+      "raw" => "0.42    Fri Nov 16 21:35:31 2012\n",
+      "raw_date" => "Fri Nov 16 21:35:31 2012",
+      "version" => "0.42"
+    },
+    {
+      "date" => "2012-10-04T00:44:13Z",
+      "entries" => [
+        {
+          "line" => 51,
+          "raw" => "        - follow the change of site (mikolaj++, yusukebe++)\n",
+          "style" => "-",
+          "text" => "follow the change of site (mikolaj++, yusukebe++)"
+        },
+        {
+          "line" => 52,
+          "raw" => "        - fixed color problems on scripts (mikolaj++)\n",
+          "style" => "-",
+          "text" => "fixed color problems on scripts (mikolaj++)"
+        },
+        {
+          "line" => 53,
+          "raw" => "        - fixed RT 79931 (HMBRAND++)\n\n",
+          "style" => "-",
+          "text" => "fixed RT 79931 (HMBRAND++)"
+        }
+      ],
+      "line" => 50,
+      "raw" => "0.41    Thu Oct  4 00:44:13 2012\n",
+      "raw_date" => "Thu Oct  4 00:44:13 2012",
+      "version" => "0.41"
+    },
+    {
+      "date" => "2012-01-22T16:54:53Z",
+      "entries" => [
+        {
+          "line" => 56,
+          "raw" => "        - Fixed a problem that did not works, because YouTube's design was changed.\n          (ks0608++, zentooo++)\n\n",
+          "style" => "-",
+          "text" => "Fixed a problem that did not works, because YouTube's design was changed. (ks0608++, zentooo++)"
+        }
+      ],
+      "line" => 55,
+      "raw" => "0.40    Sun Jan 22 16:54:53 2012\n",
+      "raw_date" => "Sun Jan 22 16:54:53 2012",
+      "version" => "0.40"
+    },
+    {
+      "date" => "2012-01-18T01:28:00Z",
+      "entries" => [
+        {
+          "line" => 60,
+          "raw" => "        - remove suffix from youtube-download.pl and youtube-playlists.pl (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "remove suffix from youtube-download.pl and youtube-playlists.pl (mikolaj++)"
+        }
+      ],
+      "line" => 59,
+      "raw" => "0.39    Wed Jan 18 01:28:00 2012\n",
+      "raw_date" => "Wed Jan 18 01:28:00 2012",
+      "version" => "0.39"
+    },
+    {
+      "date" => "2011-12-08T00:44:52Z",
+      "entries" => [
+        {
+          "line" => 63,
+          "raw" => "        - fix typo (mikolaj++)\n",
+          "style" => "-",
+          "text" => "fix typo (mikolaj++)"
+        },
+        {
+          "line" => 64,
+          "raw" => "        - remove wrong code (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "remove wrong code (mikolaj++)"
+        }
+      ],
+      "line" => 62,
+      "raw" => "0.38    Thu Dec  8 00:44:52 2011\n",
+      "raw_date" => "Thu Dec  8 00:44:52 2011",
+      "version" => "0.38"
+    },
+    {
+      "date" => "2011-12-07T02:33:23Z",
+      "entries" => [
+        {
+          "line" => 67,
+          "raw" => "        - fix wrong characters in filename in youtube-download.pl (mikolaj++)\n",
+          "style" => "-",
+          "text" => "fix wrong characters in filename in youtube-download.pl (mikolaj++)"
+        },
+        {
+          "line" => 68,
+          "raw" => "        - fix doc in youtube-download.pl (mikolaj++)\n",
+          "style" => "-",
+          "text" => "fix doc in youtube-download.pl (mikolaj++)"
+        },
+        {
+          "line" => 69,
+          "raw" => "        - file_name option is DEPRECATED\n\n",
+          "style" => "-",
+          "text" => "file_name option is DEPRECATED"
+        }
+      ],
+      "line" => 66,
+      "raw" => "0.37    Wed Dec  7 02:33:23 2011\n",
+      "raw_date" => "Wed Dec  7 02:33:23 2011",
+      "version" => "0.37"
+    },
+    {
+      "date" => "2011-10-31T02:45:48Z",
+      "entries" => [
+        {
+          "line" => 72,
+          "raw" => "        - fix default filename problem in youtube-download.pl\n\n",
+          "style" => "-",
+          "text" => "fix default filename problem in youtube-download.pl"
+        }
+      ],
+      "line" => 71,
+      "raw" => "0.36    Mon Oct 31 02:45:48 2011\n",
+      "raw_date" => "Mon Oct 31 02:45:48 2011",
+      "version" => "0.36"
+    },
+    {
+      "date" => "2011-10-18T00:28:58Z",
+      "entries" => [
+        {
+          "line" => 75,
+          "raw" => "        - fix typo in youtube-playlists.pl (rt:71721)\n\n",
+          "style" => "-",
+          "text" => "fix typo in youtube-playlists.pl (rt:71721)"
+        }
+      ],
+      "line" => 74,
+      "raw" => "0.35    Tue Oct 18 00:28:58 2011\n",
+      "raw_date" => "Tue Oct 18 00:28:58 2011",
+      "version" => "0.35"
+    },
+    {
+      "date" => "2011-10-15T16:14:57Z",
+      "entries" => [
+        {
+          "line" => 78,
+          "raw" => "        - workaround for win32\n",
+          "style" => "-",
+          "text" => "workaround for win32"
+        },
+        {
+          "line" => 79,
+          "raw" => "        - fix suffix problem\n\n",
+          "style" => "-",
+          "text" => "fix suffix problem"
+        }
+      ],
+      "line" => 77,
+      "raw" => "0.34    Sat Oct 15 16:14:57 2011\n",
+      "raw_date" => "Sat Oct 15 16:14:57 2011",
+      "version" => "0.34"
+    },
+    {
+      "date" => "2011-10-12T01:17:34Z",
+      "entries" => [
+        {
+          "line" => 82,
+          "raw" => "        - added youtube-download.pl and youtube-playlist.pl (request by st3vil++)\n",
+          "style" => "-",
+          "text" => "added youtube-download.pl and youtube-playlist.pl (request by st3vil++)"
+        },
+        {
+          "line" => 83,
+          "raw" => "        - fix doc\n\n",
+          "style" => "-",
+          "text" => "fix doc"
+        }
+      ],
+      "line" => 81,
+      "raw" => "0.33    Wed Oct 12 01:17:34 2011\n",
+      "raw_date" => "Wed Oct 12 01:17:34 2011",
+      "version" => "0.33"
+    },
+    {
+      "date" => "2011-08-23T01:52:20Z",
+      "entries" => [
+        {
+          "line" => 86,
+          "raw" => "        - added LICENSE file (no code change)\n\n",
+          "style" => "-",
+          "text" => "added LICENSE file (no code change)"
+        }
+      ],
+      "line" => 85,
+      "raw" => "0.32    Tue Aug 23 01:52:20 2011\n",
+      "raw_date" => "Tue Aug 23 01:52:20 2011",
+      "version" => "0.32"
+    },
+    {
+      "date" => "2011-08-23T00:25:02Z",
+      "entries" => [
+        {
+          "line" => 89,
+          "raw" => "        - added fmt 38 to .mp4 (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "added fmt 38 to .mp4 (mikolaj++)"
+        }
+      ],
+      "line" => 88,
+      "raw" => "0.31    Tue Aug 23 00:25:02 2011\n",
+      "raw_date" => "Tue Aug 23 00:25:02 2011",
+      "version" => "0.31"
+    },
+    {
+      "date" => "2011-08-07T15:25:11Z",
+      "entries" => [
+        {
+          "line" => 92,
+          "raw" => "        - cleanup (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "cleanup (mikolaj++)"
+        }
+      ],
+      "line" => 91,
+      "raw" => "0.30    Sun Aug  7 15:25:11 2011\n",
+      "raw_date" => "Sun Aug  7 15:25:11 2011",
+      "version" => "0.30"
+    },
+    {
+      "date" => "2011-08-05T01:29:27Z",
+      "entries" => [
+        {
+          "line" => 95,
+          "raw" => "        - fixed a problem that did not works, becouse changed YouTube's design. (katsuhito konishi++)\n\n",
+          "style" => "-",
+          "text" => "fixed a problem that did not works, becouse changed YouTube's design. (katsuhito konishi++)"
+        }
+      ],
+      "line" => 94,
+      "raw" => "0.29    Fri Aug  5 01:29:27 2011\n",
+      "raw_date" => "Fri Aug  5 01:29:27 2011",
+      "version" => "0.29"
+    },
+    {
+      "date" => "2011-08-04T00:03:58Z",
+      "entries" => [
+        {
+          "line" => 98,
+          "raw" => "        - fixed a problem that did not works, becouse changed YouTube's design. (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "fixed a problem that did not works, becouse changed YouTube's design. (mikolaj++)"
+        }
+      ],
+      "line" => 97,
+      "raw" => "0.28    Thu Aug  4 00:03:58 2011\n",
+      "raw_date" => "Thu Aug  4 00:03:58 2011",
+      "version" => "0.28"
+    },
+    {
+      "date" => "2011-05-29T23:32:31Z",
+      "entries" => [
+        {
+          "line" => 101,
+          "raw" => "        - fixed garbled (akiym++)\n",
+          "style" => "-",
+          "text" => "fixed garbled (akiym++)"
+        },
+        {
+          "line" => 102,
+          "raw" => "        - fixed typo (akiym++)\n\n",
+          "style" => "-",
+          "text" => "fixed typo (akiym++)"
+        }
+      ],
+      "line" => 100,
+      "raw" => "0.27    Sun May 29 23:32:31 2011\n",
+      "raw_date" => "Sun May 29 23:32:31 2011",
+      "version" => "0.27"
+    },
+    {
+      "date" => "2011-04-20T01:34:55Z",
+      "entries" => [
+        {
+          "line" => 105,
+          "raw" => "        - fixed scrape problem (reported by Octavian++)\n\n",
+          "style" => "-",
+          "text" => "fixed scrape problem (reported by Octavian++)"
+        }
+      ],
+      "line" => 104,
+      "raw" => "0.26    Wed Apr 20 01:34:55 2011\n",
+      "raw_date" => "Wed Apr 20 01:34:55 2011",
+      "version" => "0.26"
+    },
+    {
+      "date" => "2011-03-19T00:39:41Z",
+      "entries" => [
+        {
+          "line" => 108,
+          "raw" => "        - added few more match URLs (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "added few more match URLs (mikolaj++)"
+        }
+      ],
+      "line" => 107,
+      "raw" => "0.25    Sat Mar 19 00:39:41 2011\n",
+      "raw_date" => "Sat Mar 19 00:39:41 2011",
+      "version" => "0.25"
+    },
+    {
+      "date" => "2011-03-04T01:45:20Z",
+      "entries" => [
+        {
+          "line" => 111,
+          "raw" => "        - fixed could not fetch json data problem (akiym++)\n\n",
+          "style" => "-",
+          "text" => "fixed could not fetch json data problem (akiym++)"
+        }
+      ],
+      "line" => 110,
+      "raw" => "0.24    Fri Mar  4 01:45:20 2011\n",
+      "raw_date" => "Fri Mar  4 01:45:20 2011",
+      "version" => "0.24"
+    },
+    {
+      "date" => "2011-02-22T00:00:22Z",
+      "entries" => [
+        {
+          "line" => 114,
+          "raw" => "        - supported any video urls (mikolaj++)\n\n",
+          "style" => "-",
+          "text" => "supported any video urls (mikolaj++)"
+        }
+      ],
+      "line" => 113,
+      "raw" => "0.23    Tue Feb 22 00:00:22 2011\n",
+      "raw_date" => "Tue Feb 22 00:00:22 2011",
+      "version" => "0.23"
+    },
+    {
+      "date" => "2011-01-05T00:17:54Z",
+      "entries" => [
+        {
+          "line" => 117,
+          "raw" => "        - Fixed a problem that can not download videos there. (reported by Octavian)\n\n",
+          "style" => "-",
+          "text" => "Fixed a problem that can not download videos there. (reported by Octavian)"
+        }
+      ],
+      "line" => 116,
+      "raw" => "0.22    Wed Jan  5 00:17:54 2011\n",
+      "raw_date" => "Wed Jan  5 00:17:54 2011",
+      "version" => "0.22"
+    },
+    {
+      "date" => "2010-12-30T15:28:51Z",
+      "entries" => [
+        {
+          "line" => 120,
+          "raw" => "        - fixed bug for _video_id(). If already had \$1 is defined, was returned \$1 without matches. (woremacx++)\n\n",
+          "style" => "-",
+          "text" => "fixed bug for _video_id(). If already had \$1 is defined, was returned \$1 without matches. (woremacx++)"
+        }
+      ],
+      "line" => 119,
+      "raw" => "0.21    Thu Dec 30 15:28:51 2010\n",
+      "raw_date" => "Thu Dec 30 15:28:51 2010",
+      "version" => "0.21"
+    },
+    {
+      "date" => "2010-12-15T00:57:43Z",
+      "entries" => [
+        {
+          "line" => 123,
+          "raw" => "        - YouTube's API had change, maybe fixed it.\n\n",
+          "style" => "-",
+          "text" => "YouTube's API had change, maybe fixed it."
+        }
+      ],
+      "line" => 122,
+      "raw" => "0.20    Wed Dec 15 00:57:43 2010\n",
+      "raw_date" => "Wed Dec 15 00:57:43 2010",
+      "version" => "0.20"
+    },
+    {
+      "date" => "2010-10-17T18:17:57Z",
+      "entries" => [
+        {
+          "line" => 126,
+          "raw" => "        - Required Text::More 0.96 later\n",
+          "style" => "-",
+          "text" => "Required Text::More 0.96 later"
+        },
+        {
+          "line" => 127,
+          "raw" => "        - fixed POD spell miss\n\n",
+          "style" => "-",
+          "text" => "fixed POD spell miss"
+        }
+      ],
+      "line" => 125,
+      "raw" => "0.16    Sun Oct 17 18:17:57 2010\n",
+      "raw_date" => "Sun Oct 17 18:17:57 2010",
+      "version" => "0.16"
+    },
+    {
+      "date" => "2010-08-11T00:14:53Z",
+      "entries" => [
+        {
+          "line" => 130,
+          "raw" => "        - YouTube's API has changed so I fixed it. (reported by Bruce David)\n\n",
+          "style" => "-",
+          "text" => "YouTube's API has changed so I fixed it. (reported by Bruce David)"
+        }
+      ],
+      "line" => 129,
+      "raw" => "0.15    Wed Aug 11 00:14:53 2010\n",
+      "raw_date" => "Wed Aug 11 00:14:53 2010",
+      "version" => "0.15"
+    },
+    {
+      "date" => "2010-05-07T02:50:42Z",
+      "entries" => [
+        {
+          "line" => 133,
+          "raw" => "        - typo fix\n",
+          "style" => "-",
+          "text" => "typo fix"
+        },
+        {
+          "line" => 134,
+          "raw" => "        - wrote pod\n\n",
+          "style" => "-",
+          "text" => "wrote pod"
+        }
+      ],
+      "line" => 132,
+      "raw" => "0.14    Fri May  7 02:50:42 2010\n",
+      "raw_date" => "Fri May  7 02:50:42 2010",
+      "version" => "0.14"
+    },
+    {
+      "date" => "2010-04-10T18:20:05Z",
+      "entries" => [
+        {
+          "line" => 137,
+          "raw" => "        - Each instance to create a LWP::UserAgent. # thx kuniyoshi\n\n",
+          "style" => "-",
+          "text" => "Each instance to create a LWP::UserAgent. # thx kuniyoshi"
+        }
+      ],
+      "line" => 136,
+      "raw" => "0.13    Sat Apr 10 18:20:05 2010\n",
+      "raw_date" => "Sat Apr 10 18:20:05 2010",
+      "version" => "0.13"
+    },
+    {
+      "date" => "2010-04-03T16:06:33Z",
+      "entries" => [
+        {
+          "line" => 140,
+          "raw" => "        - upload miss X(\n\n",
+          "style" => "-",
+          "text" => "upload miss X("
+        }
+      ],
+      "line" => 139,
+      "raw" => "0.12    Sat Apr  3 16:06:33 2010\n",
+      "raw_date" => "Sat Apr  3 16:06:33 2010",
+      "version" => "0.12"
+    },
+    {
+      "date" => "2010-04-03T15:02:25Z",
+      "entries" => [
+        {
+          "line" => 143,
+          "raw" => "        - added ua setter/getter.\n          using CGI.\n\n",
+          "style" => "-",
+          "text" => "added ua setter/getter. using CGI."
+        }
+      ],
+      "line" => 142,
+      "raw" => "0.11    Sat Apr  3 15:02:25 2010\n",
+      "raw_date" => "Sat Apr  3 15:02:25 2010",
+      "version" => "0.11"
+    },
+    {
+      "date" => "2010-04-03T02:56:18Z",
+      "entries" => [
+        {
+          "line" => 147,
+          "raw" => "        - rewrite all\n\n",
+          "style" => "-",
+          "text" => "rewrite all"
+        }
+      ],
+      "line" => 146,
+      "raw" => "0.10    Sat Apr  3 02:56:18 2010\n",
+      "raw_date" => "Sat Apr  3 02:56:18 2010",
+      "version" => "0.10"
+    },
+    {
+      "date" => "2010-03-01T00:11:55Z",
+      "entries" => [
+        {
+          "line" => 150,
+          "raw" => "        - supported FULL HD quality\n\n",
+          "style" => "-",
+          "text" => "supported FULL HD quality"
+        }
+      ],
+      "line" => 149,
+      "raw" => "0.07    Mon Mar  1 00:11:55 2010\n",
+      "raw_date" => "Mon Mar  1 00:11:55 2010",
+      "version" => "0.07"
+    },
+    {
+      "date" => "2009-11-08T00:46:55Z",
+      "entries" => [
+        {
+          "line" => 153,
+          "raw" => "        - Youtube respond to changes in\n        \n",
+          "style" => "-",
+          "text" => "Youtube respond to changes in"
+        }
+      ],
+      "line" => 152,
+      "raw" => "0.06    Sun Nov  8 00:46:55 2009\n",
+      "raw_date" => "Sun Nov  8 00:46:55 2009",
+      "version" => "0.06"
+    },
+    {
+      "date" => "2009-10-12T14:58:23Z",
+      "entries" => [
+        {
+          "line" => 156,
+          "raw" => "        - Youtube respond to changes in\n\n",
+          "style" => "-",
+          "text" => "Youtube respond to changes in"
+        }
+      ],
+      "line" => 155,
+      "raw" => "0.05    Mon Oct 12 14:58:23 2009\n",
+      "raw_date" => "Mon Oct 12 14:58:23 2009",
+      "version" => "0.05"
+    },
+    {
+      "entries" => [],
+      "line" => 158,
+      "note" => "0.04 lost X(",
+      "raw" => "0.03 ~ 0.04 lost X(\n\n",
+      "version" => "0.03"
+    },
+    {
+      "date" => "2009-06-06T21:04:17Z",
+      "entries" => [
+        {
+          "line" => 161,
+          "raw" => "        - added 'fmt' field\n\n",
+          "style" => "-",
+          "text" => "added 'fmt' field"
+        }
+      ],
+      "line" => 160,
+      "raw" => "0.02    Sat Jun  6 21:04:17 2009\n",
+      "raw_date" => "Sat Jun  6 21:04:17 2009",
+      "version" => "0.02"
+    },
+    {
+      "date" => "2009-04-04T16:26:29Z",
+      "entries" => [
+        {
+          "line" => 164,
+          "raw" => "        - original version\n",
+          "style" => "-",
+          "text" => "original version"
+        }
+      ],
+      "line" => 163,
+      "raw" => "0.01    Sat Apr  4 16:26:29 2009\n",
+      "raw_date" => "Sat Apr  4 16:26:29 2009",
+      "version" => "0.01"
+    }
+  ]
+}

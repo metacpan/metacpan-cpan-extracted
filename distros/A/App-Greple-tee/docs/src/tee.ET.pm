@@ -27,6 +27,10 @@ Valiku B<--diskreetne> abil kutsutakse iga sobitatud osa jaoks eraldi käsk. Eri
 
 Sisend- ja väljundandmete read ei pea olema identsed, kui kasutatakse valikut B<--diskreetne>.
 
+=head1 VERSION
+
+Version 0.9901
+
 =head1 OPTIONS
 
 =over 7
@@ -34,6 +38,24 @@ Sisend- ja väljundandmete read ei pea olema identsed, kui kasutatakse valikut B
 =item B<--discrete>
 
 Kutsuge uus käsk eraldi iga sobitatud osa jaoks.
+
+=item B<--fillup>
+
+Kombineerib mittetühjad read üheks reaks enne nende edastamist käsule filter. Laiade tähemärkide vahel olevad read kustutatakse ja muud read asendatakse tühikutega.
+
+=item B<--blockmatch>
+
+Tavaliselt saadetakse määratud otsingumustrile vastav ala välisele käsule. Kui see valik on määratud, ei töödelda mitte sobivat ala, vaid kogu seda sisaldavat plokki.
+
+Näiteks, et saata väliskäsule mustrit C<foo> sisaldavad read, tuleb määrata kogu reale vastav muster:
+
+    greple -Mtee cat -n -- '^.*foo.*\n'
+
+Kuid valikuga B<--blockmatch> saab seda teha lihtsalt järgmiselt:
+
+    greple -Mtee cat -n -- foo
+
+B<--blockmatch> valikuga käitub see moodul rohkem nagu L<teip(1)> valik B<-g>.
 
 =back
 
@@ -53,11 +75,7 @@ Järgmine käsk leiab tekstiplokid Perli moodulifailis sisalduva L<perlpod(1)> s
 
 Saate neid tõlkida DeepL teenuse abil, kui täidate ülaltoodud käsu koos mooduliga B<-Mtee>, mis kutsub käsu B<deepl> järgmiselt:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-Kuna B<deepl> töötab paremini ühe rea sisendi puhul, võite käsu osa muuta järgmiselt:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 Spetsiaalne moodul L<App::Greple::xlate::deepl> on selleks otstarbeks siiski tõhusam. Tegelikult tuli B<tee> mooduli implementatsiooni vihje B<xlate> moodulist.
 
@@ -87,7 +105,25 @@ Seda osa saab ümber vormindada, kasutades B<tee> moodulit koos B<ansifold> käs
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+Valiku C<--diskreet> kasutamine on aeganõudev. Seega võite kasutada C<--separate '\r'> valikut koos C<ansifold>, mis toodab ühe rea, kasutades CR-märki NL-i asemel.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Seejärel teisendage CR märk NL-ks pärast seda käsuga L<tr(1)> või mõnega.
+
+    ... | tr '\r' '\n'
+
+=head1 EXAMPLE 3
+
+Mõelge olukorrale, kus te soovite grep'i abil leida stringid mitte-pealkirjaridadest. Näiteks võite soovida otsida pilte C<docker image ls> käsust, kuid jätta pealkirjarida alles. Saate seda teha järgmise käsuga.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+Valik C<-Mline -L 2:> otsib välja eelviimased read ja saadab need käsule C<grep perl>. Vajalik on valik C<--diskreet>, kuid seda kutsutakse ainult üks kord, nii et see ei kahjusta jõudlust.
+
+Sellisel juhul annab C<teip -l 2- -- grep> vea, sest väljundis olevate ridade arv on väiksem kui sisend. Tulemus on siiski üsna rahuldav :)
+
 =head1 INSTALL
 
 =head2 CPANMINUS
@@ -106,6 +142,10 @@ L<https://github.com/tecolicom/Greple>
 
 L<App::Greple::xlate>
 
+=head1 BUGS
+
+Valik C<--fillup> ei pruugi koreakeelse teksti puhul korrektselt töötada.
+
 =head1 AUTHOR
 
 Kazumasa Utashiro
@@ -121,7 +161,7 @@ it under the same terms as Perl itself.
 
 package App::Greple::tee;
 
-our $VERSION = "0.03";
+our $VERSION = "0.9901";
 
 use v5.14;
 use warnings;
@@ -134,13 +174,13 @@ use Data::Dumper;
 our $command;
 our $blockmatch;
 our $discrete;
+our $fillup;
 
-my @jammed;
 my($mod, $argv);
 
 sub initialize {
     ($mod, $argv) = @_;
-    if (defined (my $i = first { $argv->[$_] eq '--' } 0 .. $#{$argv})) {
+    if (defined (my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
 	if (my @command = splice @$argv, 0, $i) {
 	    $command = \@command;
 	}
@@ -148,18 +188,30 @@ sub initialize {
     }
 }
 
+use Unicode::EastAsianWidth;
+
+sub fillup_paragraph {
+    (my $s1, local $_, my $s2) = $_[0] =~ /\A(\s*)(.*?)(\s*)\z/s or die;
+    s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
+    s/\s+/ /g;
+    $s1 . $_ . $s2;
+}
+
 sub call {
     my $data = shift;
     $command // return $data;
     state $exec = App::cdif::Command->new;
+    if ($fillup) {
+	$data =~ s/^.+(?:\n.+)*/fillup_paragraph(${^MATCH})/pmge;
+    }
     if (ref $command ne 'ARRAY') {
 	$command = [ shellwords $command ];
     }
-    $exec->command($command)->setstdin($data)->update->data;
+    $exec->command($command)->setstdin($data)->update->data // '';
 }
 
 sub jammed_call {
-    my @need_nl = grep { $_[$_] !~ /\n\z/ } 0 .. $#_;
+    my @need_nl = grep { $_[$_] !~ /\n\z/ } keys @_;
     my @from = @_;
     $from[$_] .= "\n" for @need_nl;
     my @lines = map { int tr/\n/\n/ } @from;
@@ -174,18 +226,20 @@ sub jammed_call {
     return @to;
 }
 
+my @jammed;
+
 sub postgrep {
     my $grep = shift;
-    @jammed = my @block = ();
     if ($blockmatch) {
 	$grep->{RESULT} = [
 	    [ [ 0, length ],
 	      map {
-		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback} ]
+		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback}->[0] ]
 	      } $grep->result
 	    ] ];
     }
     return if $discrete;
+    @jammed = my @block = ();
     for my $r ($grep->result) {
 	my($b, @match) = @$r;
 	for my $m (@match) {
@@ -210,6 +264,7 @@ __DATA__
 
 builtin --blockmatch $blockmatch
 builtin --discrete!  $discrete
+builtin --fillup!    $fillup
 
 option default \
 	--postgrep &__PACKAGE__::postgrep \

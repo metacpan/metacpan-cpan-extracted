@@ -23,6 +23,13 @@ BEGIN {
           str  => '2 days 4 minutes' },
         { diff => 60,
           str  => '1 minute' },
+        # 3 x GitHubIssue#78
+        { diff => 20512/18,
+          str  => '19 minutes' },
+        { diff => 3 * 60 + 59.995,
+          str  => '3 minutes 59.995 seconds' },
+        { diff => 3 * 60 + 59.99951,
+          str  => '4 minutes' },
     );
 
     use Time::Local;
@@ -32,8 +39,6 @@ BEGIN {
     sub localtime { CORE::localtime( timelocal( @fixed ) ) };
     *CORE::GLOBAL::time      = \&time;
     *CORE::GLOBAL::localtime = \&localtime;
-
-    plan tests =>  1 + @diffs + 10;
 }
 BEGIN { use_ok "Test::Smoke::Util", qw( time_in_hhmm calc_timeout ) }
 
@@ -61,3 +66,5 @@ SKIP: {
 is( calc_timeout( '+0:42' ), 60*42, "Relative time +0:42" );
 is( calc_timeout( '+47:45' ), 60*(60*47+45), "Relative time +47:45" );
 is( calc_timeout( '' ), 0, 'No input' );
+
+done_testing();

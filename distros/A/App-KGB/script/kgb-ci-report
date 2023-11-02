@@ -95,7 +95,7 @@ for my $pkg_info (@$json) {
         $failing++;
 
         push @regressions, "$pkg_info->{package} $pkg_info->{version}"
-            if $prev_status eq 'pass';
+            if $prev_status and $prev_status eq 'pass';
     }
 }
 

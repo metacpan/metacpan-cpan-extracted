@@ -29,6 +29,8 @@ sub new {
     $self->{'config'} = App::GUI::Harmonograph::Config->new();
     Wx::ToolTip::Enable( $self->{'config'}->get_value('tips') );
     Wx::InitAllImageHandlers();
+    $self->{'saved'} = 0;
+    $self->{'title'} = $title;
 
     # create GUI parts
     $self->{'tabs'}             = Wx::AuiNotebook->new($self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
@@ -36,8 +38,8 @@ sub new {
     $self->{'tab'}{'circular'}  = Wx::Panel->new($self->{'tabs'});
     $self->{'tab'}{'mod'}       = App::GUI::Harmonograph::Frame::Part::ModMatrix->new( $self->{'tabs'} );
     $self->{'tab'}{'pen'}       = Wx::Panel->new($self->{'tabs'});
-    $self->{'tabs'}->AddPage( $self->{'tab'}{'linear'},   'Lateral Pendulum Settings');
-    $self->{'tabs'}->AddPage( $self->{'tab'}{'circular'}, 'Rotary Pendulum Settings');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'linear'},   'Lateral Pendulum');
+    $self->{'tabs'}->AddPage( $self->{'tab'}{'circular'}, 'Rotary Pendulum');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'mod'},      'Modulation Matrix');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'pen'},      'Pen Settings');
 
@@ -45,8 +47,6 @@ sub new {
     $self->{'pendulum'}{'y'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'linear'}, 'y','pendulum in y direction (left to right)', 1, 100);
     $self->{'pendulum'}{'z'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'circular'}, 'z','circular pendulum',        0, 100);
     $self->{'pendulum'}{'r'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'circular'}, 'R','rotating pendulum',        0, 100);
-    $self->{'pendulum'}{$_}->SetCallBack( sub { $self->sketch( ) } ) for qw/x y z r/;
-    $self->{'tab'}{'mod'}->SetCallBack( sub { $self->sketch( ) } );
 
     $self->{'color'}{'start'}   = App::GUI::Harmonograph::Frame::Part::ColorBrowser->new( $self->{'tab'}{'pen'}, 'start', { red => 20, green => 20, blue => 110 } );
     $self->{'color'}{'end'}     = App::GUI::Harmonograph::Frame::Part::ColorBrowser->new( $self->{'tab'}{'pen'}, 'end',  { red => 110, green => 20, blue => 20 } );
@@ -57,15 +57,18 @@ sub new {
     $self->{'color_flow'}       = App::GUI::Harmonograph::Frame::Part::ColorFlow->new( $self->{'tab'}{'pen'}, $self );
     $self->{'line'}             = App::GUI::Harmonograph::Frame::Part::PenLine->new( $self->{'tab'}{'pen'} );
 
-    $self->{'progress'}            = App::GUI::Harmonograph::Widget::ProgressBar->new( $self, 450, 10, { red => 20, green => 20, blue => 110 });
+    $self->{'pendulum'}{$_}->SetCallBack( sub { $self->sketch( ) } ) for qw/x y z r/;
+    $self->{'line'}->SetCallBack( sub { $self->sketch( ) } );
+    $self->{'color_flow'}->SetCallBack( sub { $self->sketch( ) } );
+    $self->{'tab'}{'mod'}->SetCallBack( sub { $self->sketch( ) } );
+
+    $self->{'progress'}            = App::GUI::Harmonograph::Widget::ProgressBar->new( $self, 450,  10, { red => 20, green => 20, blue => 110 });
     $self->{'board'}               = App::GUI::Harmonograph::Frame::Part::Board->new( $self , 600, 600 );
     $self->{'dialog'}{'about'}     = App::GUI::Harmonograph::Dialog::About->new();
-    $self->{'dialog'}{'interface'} = App::GUI::Harmonograph::Dialog::Interface->new();
-    $self->{'dialog'}{'function'}  = App::GUI::Harmonograph::Dialog::Function->new();
 
     my $btnw = 50; my $btnh     = 40;# button width and height
-    $self->{'btn'}{'dir'}       = Wx::Button->new( $self, -1, 'Dir',   [-1,-1],[$btnw, $btnh] );
-    $self->{'btn'}{'write_next'}= Wx::Button->new( $self, -1, 'INI',   [-1,-1],[$btnw, $btnh] );
+    $self->{'btn'}{'dir'}       = Wx::Button->new( $self, -1, 'Di&r',   [-1,-1],[$btnw, $btnh] );
+    $self->{'btn'}{'write_next'}= Wx::Button->new( $self, -1, '&INI',   [-1,-1],[$btnw, $btnh] );
     $self->{'btn'}{'draw'}      = Wx::Button->new( $self, -1, '&Draw', [-1,-1],[$btnw, $btnh] );
     $self->{'btn'}{'save_next'} = Wx::Button->new( $self, -1, '&Save', [-1,-1],[$btnw, $btnh] );
     $self->{'txt'}{'file_bdir'} = Wx::TextCtrl->new( $self,-1, $self->{'config'}->get_value('file_base_dir'), [-1,-1],  [170, -1] );
@@ -86,7 +89,6 @@ sub new {
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'dir'},  sub { $self->change_base_dir }) ;
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'write_next'},  sub {
         my $data = get_data( $self );
-        $self->inc_base_counter unless App::GUI::Harmonograph::Settings::are_equal( $self->{'last_file_settings'}, $data );
         my $path = $self->base_path . '.ini';
         $self->write_settings_file( $path);
         $self->{'config'}->add_setting_file( $path );
@@ -94,7 +96,6 @@ sub new {
     });
     Wx::Event::EVT_BUTTON( $self, $self->{'btn'}{'save_next'},  sub {
         my $data = get_data( $self );
-        $self->inc_base_counter unless App::GUI::Harmonograph::Settings::are_equal( $self->{'last_file_settings'}, $data );
         my $path = $self->base_path . '.' . $self->{'config'}->get_value('file_base_ending');
         $self->write_image( $path );
         $self->{'last_file_settings'} = $data;
@@ -119,7 +120,7 @@ sub new {
             } else { delete $all_color->{$name} }
         }
         $self->{'config'}->save();
-        $self->{'dialog'}{$_}->Destroy() for qw/interface function about/;
+        $self->{'dialog'}{'about'}->Destroy();
         $_[1]->Skip(1)
     });
 
@@ -163,8 +164,6 @@ sub new {
     $image_menu->Append( 12400, "&Save\tCtrl+S", "save currently displayed image" );
 
     my $help_menu = Wx::Menu->new();
-    #$help_menu->Append( 13100, "&Function\tAlt+F", "Dialog with information how an Harmonograph works" );
-    #$help_menu->Append( 13200, "&Knobs\tAlt+K", "Dialog explaining the layout and function of knobs" );
     $help_menu->Append( 13300, "&About\tAlt+A", "Dialog with general information about the program" );
 
     my $menu_bar = Wx::MenuBar->new();
@@ -232,7 +231,7 @@ sub new {
     my $cmdi_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     my $image_lbl = Wx::StaticText->new( $self, -1, 'Image:' );
     $cmdi_sizer->Add( $image_lbl,     0, $all_attr, 15 );
-    $cmdi_sizer->Add( $self->{'progress'},         1, $all_attr, 10 );
+    $cmdi_sizer->Add( $self->{'progress'},         0, $vset_attr, 20 );
     $cmdi_sizer->AddSpacer(5);
     $cmdi_sizer->Add( $self->{'btn'}{'draw'},      0, $all_attr, 5 );
 
@@ -291,6 +290,7 @@ sub init {
     $self->{'progress'}->set_color( { red => 20, green => 20, blue => 110 } );
     $self->sketch( );
     $self->SetStatusText( "all settings are set to default", 1);
+    $self->{'saved'} = 0;
 }
 
 sub get_data {
@@ -338,9 +338,8 @@ sub write_settings_dialog {
                ( join '|', 'INI files (*.ini)|*.ini', 'All files (*.*)|*.*' ), &Wx::wxFD_SAVE );
     return if $dialog->ShowModal == &Wx::wxID_CANCEL;
     my $path = $dialog->GetPath;
-    #my $i = rindex $path, '.';
-    #$path = substr($path, 0, $i - 1 ) if $i > -1;
-    #$path .= '.ini' unless lc substr ($path, -4) eq '.ini';
+    #my $i = rindex $path, '.';  #$path = substr($path, 0, $i - 1 ) if $i > -1;
+    $path .= '.ini' unless lc substr ($path, -4) eq '.ini';
     return if -e $path and
               Wx::MessageDialog->new( $self, "\n\nReally overwrite the settings file?", 'Confirmation Question',
                                       &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
@@ -353,9 +352,13 @@ sub save_image_dialog {
     my ($self) = @_;
     my @wildcard = ( 'SVG files (*.svg)|*.svg', 'PNG files (*.png)|*.png', 'JPEG files (*.jpg)|*.jpg');
     my $wildcard = '|All files (*.*)|*.*';
-    $wildcard = ( join '|', @wildcard[2,1,0]) . $wildcard if $self->{'config'}->get_value('file_base_ending') eq 'jpg';
-    $wildcard = ( join '|', @wildcard[1,0,2]) . $wildcard if $self->{'config'}->get_value('file_base_ending') eq 'png';
-    $wildcard = ( join '|', @wildcard[0,1,2]) . $wildcard if $self->{'config'}->get_value('file_base_ending') eq 'svg';
+    my $default_ending = $self->{'config'}->get_value('file_base_ending');
+    $wildcard = ($default_ending eq 'jpg') ? ( join '|', @wildcard[2,1,0]) . $wildcard :
+                ($default_ending eq 'png') ? ( join '|', @wildcard[1,0,2]) . $wildcard :
+                                             ( join '|', @wildcard[0,1,2]) . $wildcard ;
+    my @wildcard_ending = ($default_ending eq 'jpg') ? (qw/jpg png svg/) :
+                          ($default_ending eq 'png') ? (qw/png svg jpg/) :
+                                                       (qw/svg jpg png/) ;
 
     my $dialog = Wx::FileDialog->new ( $self, "select a file name to save image", $self->{'config'}->get_value('save_dir'), '', $wildcard, &Wx::wxFD_SAVE );
     return if $dialog->ShowModal == &Wx::wxID_CANCEL;
@@ -363,6 +366,11 @@ sub save_image_dialog {
     return if -e $path and
               Wx::MessageDialog->new( $self, "\n\nReally overwrite the image file?", 'Confirmation Question',
                                       &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
+    my $file_ending = lc substr ($path, -4);
+    unless ($dialog->GetFilterIndex == 3 and # filter set to all endings
+            ($file_ending eq '.jpg' or $file_ending eq '.png' or $file_ending eq '.svg')){
+            $path .= '.' . $wildcard_ending[$dialog->GetFilterIndex];
+    }
     my $ret = $self->write_image( $path );
     if ($ret){ $self->SetStatusText( $ret, 0 ) }
     else     { $self->{'config'}->set_value('save_dir', App::GUI::Harmonograph::Settings::extract_dir( $path )) }
@@ -386,6 +394,11 @@ sub sketch {
     $self->{'board'}->set_sketch_flag( );
     $self->{'board'}->Refresh;
     $self->SetStatusText( "done sketching a preview", 0 );
+    if ($self->{'saved'}){
+        $self->SetTitle($self->{'title'}.'*');
+        $self->inc_base_counter();
+        $self->{'saved'} = 0;
+    }
 }
 
 sub update_base_name {
@@ -397,7 +410,7 @@ sub update_base_name {
 }
 
 sub inc_base_counter {
-    my ($self) = @_;
+    my ($self, $type) = @_;
     my $dir = $self->{'config'}->get_value('file_base_dir');
     $dir = App::GUI::Harmonograph::Settings::expand_path( $dir );
     my $base = File::Spec->catfile( $dir, $self->{'config'}->get_value('file_base_name') );
@@ -462,6 +475,8 @@ sub write_settings_file {
         $self->update_recent_settings_menu();
         $self->SetStatusText( "saved settings into file $file", 1 );
     }
+    $self->{'saved'} = 1;
+    $self->SetTitle( $self->{'title'} );
 }
 
 sub update_recent_settings_menu {
@@ -486,6 +501,8 @@ sub write_image {
     $self->{'board'}->save_file( $file );
     $file = App::GUI::Harmonograph::Settings::shrink_path( $file );
     $self->SetStatusText( "saved image under: $file", 0 );
+    $self->{'saved'} = 1;
+    $self->SetTitle($self->{'title'});
 }
 
 1;

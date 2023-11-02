@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 $prerequisits = 
 	{
 	Text::Wrap  => 2001.0929,
-	Devel::Size => 0.58, 
+	#Devel::Size => 0.58, 
 	Class::ISA  => 0,
 	Sort::Naturally => 0,
 	Check::ISA => 0,

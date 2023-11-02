@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Future::AsyncAwait" => "0.61",
     "IO::Async::Loop" => 0,
-    "Net::Async::Redis" => "3.024"
+    "Net::Async::Redis" => "4.002"
   },
   "TEST_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::MemoryGrowth" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.014",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,7 +47,7 @@ my %FallbackPrereqs = (
   "IO::Async::Loop" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "Net::Async::Redis" => "3.024",
+  "Net::Async::Redis" => "4.002",
   "Test::CheckDeps" => "0.010",
   "Test::Deep" => 0,
   "Test::Fatal" => "0.016",

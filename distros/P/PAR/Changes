@@ -1,3 +1,15 @@
+1.019  2023-11-01
+
+- register XS DLLs extracted into $PAR_TEMP/inc with %PAR::Heavy::FullCache
+  
+  This solves the problems mentioned in GitHub PR #8
+  ("Special case Gtk related dlls to dl_load from the unpacked inc dir")
+  with applications using modules Gtk2, Pango, Cairo and others (this is
+  a Windows only problem)
+
+- Heavy.pm: use strict; use warnings
+  Thanks @shawnlaffan
+
 1.018  2022-09-28
 
 - Fix #6: PAR fails to test its build on MSWin32 with Perl-5.36.0

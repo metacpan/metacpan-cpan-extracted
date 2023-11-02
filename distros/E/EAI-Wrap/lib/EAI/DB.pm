@@ -1,4 +1,4 @@
-package EAI::DB 1.4;
+package EAI::DB 1.5;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
@@ -97,7 +97,7 @@ sub readFromDBHash ($$) {
 	my ($DB, $data) = @_;
 	my $logger = get_logger();
 	my $statement = $DB->{query};
-	my @keyfields = $DB->{keyfields} if defined($DB->{keyfields});
+	my @keyfields = @{$DB->{keyfields}} if $DB->{keyfields} and ref($DB->{keyfields}) eq "ARRAY";
 	eval {
 		die "no ref to hash argument param given ({query=>'',keyfields=>[]})" if ref($DB) ne "HASH";
 		die "no ref to hash argument data (for returning data) given" if ref($data) ne "HASH";
@@ -128,12 +128,19 @@ sub readFromDBHash ($$) {
 sub doInDB ($;$) {
 	my ($DB, $data) = @_;
 	my $logger = get_logger();
-	my $doString = $DB->{doString};
-	my @parameters = @{$DB->{parameters}} if $DB->{parameters};
 	eval {
-		die "no param hash argument ({doString=>''}) given" if ref($DB) ne "HASH";
+		die "no param hash argument ({doString=>'',parameters=>...}) given" if ref($DB) ne "HASH";
 		die "no valid dbh connection available" if !defined($dbh);
-		die "no sql statement doString given" if !$doString;
+		die "no sql statement doString given" if !$DB->{doString};
+		my $doString = $DB->{doString};
+		my @parameters;
+		if ($DB->{parameters}) {
+			if (ref($DB->{parameters}) eq "ARRAY") {
+				@parameters = @{$DB->{parameters}};
+			} else {
+				die "sub argument parameters not ref to array";
+			}
+		}
 		$logger->debug("do in DB: $doString, parameters: @parameters");
 		my $sth = $dbh->prepare($doString);
 		if (@parameters == 0) {
@@ -143,10 +150,16 @@ sub doInDB ($;$) {
 		}
 		die $@.",DB error: ".$sth->errstr." statement: ".$doString if $sth->err;
 		# return record set of statement if possible/required
-		@$data =();
-		do {
-			push @$data, $sth->fetchall_arrayref({}) if ref($data) eq "ARRAY";
-		} while ($sth->{odbc_more_results});
+		if (defined($data)) {
+			if (ref($data) eq "ARRAY") {
+				@$data =();
+				do {
+					push @$data, $sth->fetchall_arrayref({});
+				} while ($sth->{odbc_more_results});
+			} else {
+				die "argument \$data not ref to array, can't pass back results";
+			}
+		}
 	};
 	if ($@) {
 		$logger->error($@);
@@ -696,7 +709,7 @@ set handle with externally created DBD::ODBC connection in case newDBH capabilit
  
 =item getConn
 
-returns the DBI handler and the DSN string to allow direct commands with the handler
+returns the DBI handler and the DSN string to allow direct commands with the handler. This can be used to enable DBI Tracing: (EAI::DB::getConn())[0]->trace(15);
 
 =back
 

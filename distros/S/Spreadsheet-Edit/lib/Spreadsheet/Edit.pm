@@ -15,8 +15,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1000.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-09-23'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1000.011'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-10-28'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -431,6 +431,7 @@ sub _fmt_colx(;$$) {
     }
     foreach (@$specs) {
       if (ref $_) {
+        flush();
         push @items, $$_; # \"string" means insert "string" literally
       } else {
         # Work around old Perl lexical sub limitations...
@@ -445,7 +446,8 @@ sub _fmt_colx(;$$) {
     @items
   }
   my @ABCs    = subset [ map{ my $A = cx2let($_);
-                              u($hash{$A}) eq $_ ? $A : \"  "
+                              #u($hash{$A}) eq $_ ? $A : \"  "
+                              u($hash{$A}) eq $_ ? $A : \"<$A masked>"
                             } 0..$num_cols-1 ];
 
   # More lexical sub bug work-arounds...
@@ -486,12 +488,14 @@ sub _get_usable_titles {
   for my $cx (0 .. $num_cols-1) {
     my $title = $title_row->[$cx];
     next if $title eq "";
-    if ($seen{$title}++) {
-      $self->_carponce("Warning: Non-unique title ", visq($title), " will not be usable for COLSPEC\n") unless $$self->{silent};
+    if (exists $seen{$title}) {
+      $self->_carponce("Warning: Non-unique title ", visq($title), " will not be usable for COLSPEC\n",
+        "(Col ",cx2let($seen{$title})," and ",cx2let($cx),")\n") unless $$self->{silent};
       @normals = grep{ $_->[0] ne $title } @normals;
       @unindexed = grep{ $_->[0] ne $title } @unindexed;
       next;
     }
+    $seen{$title} = $cx;
     if (__unindexed_title($title, $num_cols)) {
       push @unindexed, [$title, $cx];
     } else {
@@ -536,17 +540,20 @@ sub new_sheet(@) {
 #   prefixed with a description of a "focus" sheet and optionally
 #   a specific row.  A final \n is appended if needed.
 #
+#   An optional initial {OPTHASH} argument may contain
+#     package => <packagename>
+#
 # The "focus" sheet and row, if any, are determined as follows:
 #
-#   If the first argument is a sheet object, [sheet_object],
-#   [sheet_object, rx], or [sheet_object, undef] then the indicated
-#   sheet and (optionally) row are used.  Note that if called as a method
-#   the first arg will be the sheet object.
+#   If the first argument (after {OPTHASH}, if present) is a sheet
+#   object, [sheet_object], [sheet_object, rx], or [sheet_object, undef]
+#   then the indicated sheet and (optionally) row are used.
+#   Note that if called as a method the first arg will be the sheet object.
 #
 #   Otherwise the first arg is not special and is included in the message.
 #
-#   If no sheet is identified above, then the caller's package active
-#   sheet is used, if any.
+#   If no sheet is identified above, then the caller's package
+#   (or the package specified in {OPTHASH}) active sheet is used, if any.
 #
 #   If still no sheet is identified, then the sheet of the innermost apply
 #   currently executing (anywhere up the stack) is used, if any; this sheet
@@ -576,9 +583,13 @@ sub new_sheet(@) {
 sub _default_pfx_gen($$) {
   my ($sheet, $rx) = @_;
   confess "bug" unless ref($sheet) =~ /^Spreadsheet::Edit\b/;
-  ($sheet->sheetname() || $sheet->data_source())
+  ($$sheet->{sheetname} || $$sheet->{data_source})
 }
 sub logmsg(@) {
+  my %opts = %{ &__opthash };
+  my $package = delete $opts{package};
+  carp dvis 'Option other than "package" in {OPTHASH} passed to logmsg()'
+    if keys %opts; # really necessary?
   my ($sheet, $rx);
   if (@_ > 0 && ref($_[0])) {
     if (ref($_[0]) =~ /^Spreadsheet::Edit\b/) {
@@ -592,7 +603,7 @@ sub logmsg(@) {
   }
   my $msgstr = join("", grep{defined} @_);
   if (! defined $sheet) {
-    $sheet = $pkg2currsheet{scalar(caller)};
+    $sheet = $pkg2currsheet{$package // scalar(caller)};
   }
   if (! defined $sheet) {
     $sheet = $Spreadsheet::Edit::_inner_apply_sheet;
@@ -1390,7 +1401,7 @@ sub fmt_sheet($) {
   return "undef" unless defined($sheet);
   #oops unless ref($sheet) ne "" && $sheet->isa(__PACKAGE__);
   local $$sheet->{verbose} = 0;
-  my $desc = $sheet->sheetname() || $sheet->data_source() || "no data_source";
+  my $desc = $$sheet->{sheetname} || $$sheet->{data_source} || "no data_source";
   if (length($desc) > $trunclen) { $desc = substr($desc,($trunclen-3))."..." }
   my $r = addrvis($sheet)."($desc)";
   $r
@@ -1658,7 +1669,8 @@ sub _specs2cxdesclist {
       }
       if (! $matched) {
         croak "\n--- Title Row (rx $title_rx) ---\n",
-               vis($title_row),"\n-----------------\n",
+                   # Force evaluation of magicrow as an array ref
+                   vis([ @$title_row ]),"\n-----------------\n",
                "Regex $spec\n",
                "does not match any of the titles (see above) in '",
                fmt_sheet($self),"'\n"
@@ -1666,7 +1678,8 @@ sub _specs2cxdesclist {
       }
       next
     }
-    croak "Invalid column specifier '${spec}'\nnum_cols=$num_cols. Valid keys are:\n",
+    croak "'${spec}' matches no column in $$self->{data_source}\n",
+          "num_cols=$num_cols. Valid keys are:\n",
           $self->_fmt_colx;
   }
   oops unless wantarray;
@@ -1751,7 +1764,7 @@ sub alias(@) {
     my $cx = eval{ $self->_spec2cx($spec) };
     unless(defined $cx) {
       oops unless $@;
-      croak $@ unless $opthash->{optional} && $@ =~ /does not match/is;
+      die $@ unless $opthash->{optional} && $@ =~ /does not match/is;
       # Always throw on other errors, e.g. regex matches more than one title
     };
 
@@ -2818,6 +2831,7 @@ sub _onlyinapply {
         if defined($pkg) && $pkg->isa("Data::Dumper") # perldoc UNIVERSAL
     }
     croak "Can't use $accessor now: Not during apply*\n"
+    #confess "Can't use $accessor now: Not during apply*\n"
   }
   $self
 }
@@ -2867,6 +2881,7 @@ sub sheet(;$$) {
   my $pkg = $opthash->{package} // caller();
   oops if index($pkg,__PACKAGE__) >= 0; # not us or sub-pkg
   my $pkgmsg = $opthash->{package} ? " [for pkg $pkg]" : "";
+  my @opthash_unless_empty = ( keys(%$opthash) ? ($opthash) : () );
   my $curr = $pkg2currsheet{$pkg};
   my $verbose = $opthash->{verbose} || ($curr && $$curr->{verbose});
   if (@_) {
@@ -2877,7 +2892,8 @@ sub sheet(;$$) {
       $verbose ||= $$new->{verbose};
     }
 
-    log_call [$opthash, \(" ".fmt_sheet($new)),
+    log_call [@opthash_unless_empty,
+                        \(" ".fmt_sheet($new)),
                         \(u($curr) eq u($new)
                            ? " [no change]"
                            : " [previous: ".fmt_sheet($curr)."]"),
@@ -2886,7 +2902,7 @@ sub sheet(;$$) {
 
     $pkg2currsheet{$pkg} = $new;
   } else {
-    log_call [$opthash], [\fmt_sheet($curr), \$pkgmsg]
+    log_call [@opthash_unless_empty], [\fmt_sheet($curr), \$pkgmsg]
       if $verbose;
   }
   $curr
@@ -2900,7 +2916,7 @@ use parent 'Tie::Array';
 use Carp;
 #our @CARP_NOT = qw(Tie::Indirect Tie::Indirect::Array
 #                   Tie::Indirect::Hash Tie::Indirect::Scalar);
-use Data::Dumper::Interp 6.004 qw/visnew
+use Data::Dumper::Interp 6.009 qw/visnew
                     vis  viso  avis  alvis  ivis  dvis  hvis  hlvis
                     visq visoq avisq alvisq ivisq dvisq hvisq hlvisq
                     addrvis rvis rvisq u quotekey qsh qshlist qshpath/;
@@ -2988,8 +3004,8 @@ sub _cellref {
 
   if (! defined $cx) {
     exists($colx->{$key})
-      or croak "'$key' is an unknown COLSPEC.  The valid keys are:\n",
-               $sheet->_fmt_colx();
+      or croak "'$key' is an unknown COLSPEC in ",$$sheet->{data_source},
+               "\nThe valid keys are:\n", $sheet->_fmt_colx();
     # Undef colx results from alias({optional => TRUE},...) which failed,
     # or from an alias which became invalid because the column was deleted.
       croak "Attempt to write to 'optional' alias '$key' which is currently NOT DEFINED"

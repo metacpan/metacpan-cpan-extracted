@@ -7,7 +7,7 @@ WriteMakefile(
     'VERSION_FROM'  => 'lib/Net/EPP.pm',
     'ABSTRACT_FROM' => 'lib/Net/EPP.pm',
 	'AUTHOR'		=> [ 'Gavin Brown <gavin.brown@fastmail.uk>' ],
-	'LICENSE'		=> 'gpl_2',
+	'LICENSE'		=> 'perl',
     'PREREQ_PM' => {
         'Digest::SHA'       => 0,
         'IO::Socket::SSL'   => 0,

@@ -16,8 +16,11 @@ my %META = (
     },
     runtime => {
       requires => {
-        'Text::Wrap' => 0.003,
-        'version'    => 0.9906,
+        'Moo' => '1.006000',
+        'Module::Runtime' => 0,
+        'Test::Builder' => 0,
+        'Sub::Quote' => '1.005000',
+        'Types::Standard' => 0,
       },
     },
     develop => {
@@ -29,8 +32,8 @@ my %META = (
   },
   resources => {
     repository => {
-      url => 'https://github.com/CPAN-API/CPAN-Changes.git',
-      web => 'https://github.com/CPAN-API/CPAN-Changes',
+      url => 'https://github.com/metacpan/CPAN-Changes.git',
+      web => 'https://github.com/metacpan/CPAN-Changes',
       type => 'git',
     },
     x_IRC => 'irc://irc.perl.org/#metacpan',
@@ -44,15 +47,50 @@ my %META = (
     directory => [ 't', 'xt' ]
   },
   x_authority => 'cpan:BRICAS',
+  provides => {
+    'CPAN::Changes' => {
+      file => 'lib/CPAN/Changes.pm',
+      version => '0.500002',
+    },
+    'CPAN::Changes::Entry' => {
+      file => 'lib/CPAN/Changes/Entry.pm',
+      version => '0.500002',
+    },
+    'CPAN::Changes::Group' => {
+      file => 'lib/CPAN/Changes/Group.pm',
+      version => '0.500002',
+    },
+    'CPAN::Changes::HasEntries' => {
+      file => 'lib/CPAN/Changes/HasEntries.pm',
+      version => '0.500002',
+    },
+    'CPAN::Changes::Parser' => {
+      file => 'lib/CPAN/Changes/Parser.pm',
+      version => '0.500002',
+    },
+    'CPAN::Changes::Release' => {
+      file => 'lib/CPAN/Changes/Release.pm',
+      version => '0.500002',
+    },
+    'CPAN::Changes::Spec' => {
+      file => 'lib/CPAN/Changes/Spec.pod',
+      version => '0.500002',
+    },
+    'Test::CPAN::Changes' => {
+      file => 'lib/Test/CPAN/Changes.pm',
+      version => '0.500002',
+    },
+  },
 );
 
 my %MM_ARGS = (
   EXE_FILES => [ 'bin/tidy_changelog' ],
+  test => { TESTS => 't/*.t t/*/*.t' },
 );
 
 ## BOILERPLATE ###############################################################
 require ExtUtils::MakeMaker;
-(do 'maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
+(do './maint/Makefile.PL.include' or die $@) unless -f 'META.yml';
 
 # have to do this since old EUMM dev releases miss the eval $VERSION line
 my $eumm_version  = eval $ExtUtils::MakeMaker::VERSION;
@@ -69,6 +107,9 @@ $MM_ARGS{NO_MYMETA} = 1
   if $mymeta_broken;
 $MM_ARGS{META_ADD} = { 'meta-spec' => { version => 2 }, %META }
   unless -f 'META.yml';
+$MM_ARGS{PL_FILES} ||= {};
+$MM_ARGS{NORECURS} = 1
+  if not exists $MM_ARGS{NORECURS};
 
 for (qw(configure build test runtime)) {
   my $key = $_ eq 'runtime' ? 'PREREQ_PM' : uc $_.'_REQUIRES';

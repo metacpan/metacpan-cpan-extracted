@@ -1,180 +1,138 @@
 package CPAN::Changes::Group;
-
 use strict;
 use warnings;
 
-use Text::Wrap   ();
+our $VERSION = '0.500002';
+$VERSION =~ tr/_//d;
 
-sub new {
-    my $class = shift;
-    return bless {
-        changes    => [],
-        @_,
-    }, $class;
+use Sub::Quote qw(qsub);
+use CPAN::Changes::Entry;
+
+use Moo;
+
+has _entry => (
+  is => 'rw',
+  handles => {
+    is_empty => 'has_entries',
+    add_changes => 'add_entry',
+    name => 'text',
+  },
+  lazy => 1,
+  default => qsub q{ CPAN::Changes::Entry->new(text => '') },
+  predicate => 1,
+);
+
+sub _maybe_entry {
+  my $self = shift;
+  if ($self->can('changes') == \&changes) {
+    return $self->_entry;
+  }
+  else {
+    return CPAN::Changes::Entry->new(
+      text => $self->name,
+      entries => $self->changes,
+    );
+  }
 }
 
-# Intentionally read only
-# to prevent hash key and name being out of sync.
-sub name {
-    my $self = shift;
-    if ( not exists $self->{ name } ) {
-      $self->{ name } = q[];
-    }
-    return $self->{ name };
-}
+around BUILDARGS => sub {
+  my ($orig, $self, @args) = @_;
+  my $args = $self->$orig(@args);
+  if (!$args->{_entry}) {
+    $args->{_entry} = CPAN::Changes::Entry->new({
+      text => $args->{name} || '',
+      entries => $args->{changes} || [],
+    });
+  }
+  $args;
+};
 
 sub changes {
-    my $self = shift;
-    return $self->{ changes };
-}
-
-sub add_changes {
-    my $self  = shift;
-    push @{ $self->{ changes } }, @_;
+  my ($self) = @_;
+  return []
+    unless $self->_has_entry;
+  [ map { $_->text } @{ $self->_entry->entries } ];
 }
 
 sub set_changes {
-    my $self  = shift;
-    $self->{ changes } = \@_;
+  my ($self, @changes) = @_;
+  my $entry = $self->_entry->clone(entries => \@changes);
+  $self->_entry($entry);
 }
 
 sub clear_changes {
-    my $self = shift;
-    $self->{ changes } = [];
-}
-
-sub is_empty {
-    my $self = shift;
-    return !@{ $self->changes };
+  my ($self) = @_;
+  my $entry = $self->_entry;
+  @{$entry->entries} = ();
+  $self->changes;
 }
 
 sub serialize {
-    my $self = shift;
-    my %args = @_;
-
-    my $output = '';
-    my $name = $self->name;
-    $output .= sprintf " [%s]\n", $name if length $name;
-    # change logs commonly have long URLs we shouldn't break, and by default
-    # Text::Wrap wraps on NONBREAKING SPACE.
-    local $Text::Wrap::break = '[\t ]';
-    local $Text::Wrap::huge = 'overflow';
-    $output .= Text::Wrap::wrap( ' - ', '   ', $_ ) . "\n" for @{ $self->changes };
-
-    return $output;
+  my ($self, %args) = @_;
+  $args{indents} ||= [' ', ' '];
+  $args{styles} ||= ['[]', '-'];
+  $self->_maybe_entry->serialize(%args);
 }
 
 1;
-
 __END__
 
 =head1 NAME
 
-CPAN::Changes::Group - A group of related change information within a release
+CPAN::Changes::Group - An entry group in a CPAN Changes file
 
 =head1 SYNOPSIS
 
-    my $rel = CPAN::Changes::Release->new(
-        version => '0.01',
-        date    => '2009-07-06',
-    );
-
-    my $grp = CPAN::Changes::Group->new(
-        name => 'BugFixes',
-    );
-
-    $grp->add_changes(
-      'Return a Foo object instead of a Bar object in foobar()'
-    );
-
-    $rel->attach_group( $grp ); # clobbers existing group if present.
+  my $group = CPAN::Changes::Group->new(
+    name    => 'A change group',
+    changes => [
+      'A change entry',
+      'Another change entry',
+    ],
+  );
 
 =head1 DESCRIPTION
 
-A release is made up of several groups. This object provides access
-to all of the key data that embodies a such a group.
+Represents a group of change entries on a changelog release.  This is a legacy
+interface for the and its use is discouraged.
 
-For instance:
+Behind the scenes, this works as a proxy for the real L<CPAN::Changes::Entry>
+objects.
 
-  0.27 2013-12-13
+=head1 ATTRIBUTES
 
-  - Foo
+=head2 name
 
-  [ Spec Changes ]
-
-  - Bar
-
-Here, there are two groups, the second one, C< Spec Changes > and the first with the empty label C<q[]>.
+The name of the change group.
 
 =head1 METHODS
 
-=head2 new( %args )
+=head2 is_empty
 
-Creates a new group object, using C<%args> as the default data.
+=head2 add_changes
 
-  Group->new(
-      name => 'Some Group Name',
-      changes    => [ ],
-  );
+=head2 changes
 
-=head2 name()
+=head2 set_changes
 
-Returns the name of the group itself.
+=head2 clear_changes
 
-=head2 changes( [ $group ] )
-
-Gets the list of changes for this group as an arrayref of changes.
-
-=head2 add_changes( @changes )
-
-Appends a list of changes to the group.
-
-    $group->add_changes( 'Added foo() function' );
-
-=head2 set_changes( @changes )
-
-Replaces the existing list of changes with the supplied values.
-
-=head2 clear_changes( )
-
-Clears all changes from the group.
-
-=head2 groups( sort => \&sorting_function )
-
-Returns a list of current groups in this release.
-
-=head2 is_empty()
-
-Returns whether or not the given group has changes.
-
-=head2 serialize()
-
-Returns the group data as a string, suitable for inclusion in a Changes
-file.
+=head2 serialize
 
 =head1 SEE ALSO
 
 =over 4
 
-=item * L<CPAN::Changes::Release>
-
-=item * L<CPAN::Changes::Spec>
-
 =item * L<CPAN::Changes>
-
-=item * L<Test::CPAN::Changes>
 
 =back
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Brian Cassidy E<lt>bricas@cpan.orgE<gt>
+See L<CPAN::Changes> for authors.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2011-2013 by Brian Cassidy
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+See L<CPAN::Changes> for the copyright and license.
 
 =cut

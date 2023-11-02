@@ -1,0 +1,53 @@
+NAME
+    wd-citace-monografie - Command line tool for create Czech Wikipedia
+    template for monography defined by Wikidata.
+
+SYNOPSIS
+     wd-citace-monografie [-h] [-l lang] [-m mediawiki_site] [-p] [--version] wd_id
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "-l lang"
+
+            Language used defined by ISO 639‑1 Code.
+
+            Default value is en = English.
+
+    *       "-m mediawiki_site"
+
+            MediaWiki site.
+
+            Default value is 'www.wikidata.org'.
+
+    *       "-p"
+
+            Pretty print.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "wd_id"
+
+            Identifier of book edition in Wikidata (qid).
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Wikidata-Template-CS-CitaceM
+    onografie>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2018-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

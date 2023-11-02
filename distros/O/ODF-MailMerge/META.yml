@@ -17,6 +17,7 @@ build_requires:
   Import::Into: '0'
   JSON: '0'
   POSIX: '0'
+  Spreadsheet::Edit: '1000.011'
   Spreadsheet::Edit::IO: '1000.006'
   Test2::Plugin::BailOnFail: '0'
   Test2::V0: '0'
@@ -39,9 +40,10 @@ name: ODF-MailMerge
 requires:
   Carp: '0'
   Clone: '0'
-  Data::Dumper::Interp: '6.007'
+  Data::Dumper::Interp: '6.009'
   DateTime: '0'
   Encode: '0'
+  Encode::Locale: '0'
   Exporter: '0'
   File::ShareDir: '0'
   File::Spec::Functions: '0'
@@ -55,7 +57,7 @@ requires:
   Path::Tiny: '0.144'
   Pod::Usage: '0'
   Scalar::Util: '0'
-  Spreadsheet::Edit: '1000.006'
+  Spreadsheet::Edit: '1000.011'
   Spreadsheet::Edit::IO: '1000.006'
   Spreadsheet::Edit::Log: '1000.005'
   Text::ParseWords: '3.31'
@@ -70,7 +72,7 @@ resources:
   bugtracker: https://github.com/jimav/ODF-MailMerge/issues
   homepage: https://github.com/jimav/ODF-MailMerge
   repository: https://github.com/jimav/ODF-MailMerge.git
-version: '1.004'
+version: '1.005'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: CC0-1.0

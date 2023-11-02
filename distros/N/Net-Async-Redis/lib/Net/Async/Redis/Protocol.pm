@@ -3,7 +3,7 @@ package Net::Async::Redis::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '4.001'; # VERSION
+our $VERSION = '4.002'; # VERSION
 
 =head1 NAME
 

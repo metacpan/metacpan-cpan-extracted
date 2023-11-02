@@ -22,7 +22,7 @@
 	use warnings;
 	use Test::More;
 
-	our $VERSION = "2023.284.1";
+	our $VERSION = "2023.302.1";
 
 	BEGIN{ use_ok('SQL::SimpleOps'); }
 
@@ -1634,6 +1634,26 @@ sub callWhereWith()
 	);
 	&my_cmd
 	(
+		f=> "S1213",
+		s=> sub
+		{
+			$mymod->Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => undef }, where => [ "tab_real1.fld_alias1" => undef ], make_only=>1 )
+		},
+		t=> 'Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => undef }, where => [ "tab_real1.fld_alias1" => undef ]',
+		r=> "UPDATE tab_real1 SET fld_real1 = NULL WHERE fld_real1 IS NULL",
+	);
+	&my_cmd
+	(
+		f=> "S1214",
+		s=> sub
+		{
+			$mymod->Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => undef }, where => [ "tab_real1.fld_alias1" => [ "!", undef ] ], make_only=>1 )
+		},
+		t=> 'Update( table => "tab_real1", fields => { "tab_real1.fld_alias1" => undef }, where => [ "tab_real1.fld_alias1" => [ "!", undef ] ]',
+		r=> "UPDATE tab_real1 SET fld_real1 = NULL WHERE fld_real1 NOT NULL",
+	);
+	&my_cmd
+	(
 		f=> "S1300",
 		s=> sub
 		{
@@ -1965,11 +1985,40 @@ sub callWithout()
 	);
 	&my_cmd
 	(
-		f=> "S0120",
+		f=> "S0121",
+		s=> sub { $mymod->Insert( table=>"t1", fields => { a => undef, b => undef, c => undef }, make_only=>1 ) },
+		t=> 'Insert( table=>"t1", fields => { a => undef, b => undef, c => undef } )',
+		r=> "INSERT INTO t1 (a,b,c) VALUES (NULL,NULL,NULL)",
+	);
+	&my_cmd
+	(
+		f=> "S0122",
 		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a","b","c" ], values => [ 1,2,3 ], make_only=>1 ) },
 		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ 1,2,3 ] )',
 		r=> "INSERT INTO t1 (a,b,c) VALUES ('1','2','3')",
 	);
+	&my_cmd
+	(
+		f=> "S0123",
+		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a","b","c" ], values => [ undef,undef,undef ], make_only=>1 ) },
+		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ undef,undef,undef ] )',
+		r=> "INSERT INTO t1 (a,b,c) VALUES (NULL,NULL,NULL)",
+	);
+	&my_cmd
+	(
+		f=> "S0124",
+		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a" ], values => [ 1,2,3 ], make_only=>1 ) },
+		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ 1,2,3 ] )',
+		r=> "INSERT INTO t1 (a) VALUES ('1'),('2'),('3')",
+	);
+	&my_cmd
+	(
+		f=> "S0125",
+		s=> sub { $mymod->Insert( table=>"t1", fields => [ "a" ], values => [ undef,undef,undef ], make_only=>1 ) },
+		t=> 'Insert( table=>"t1", fields => [ "a","b","c" ], values => [ undef,undef,undef ] )',
+		r=> "INSERT INTO t1 (a) VALUES (NULL),(NULL),(NULL)",
+	);
+
 	&my_cmd
 	(
 		f=> "S0130",
@@ -2364,7 +2413,7 @@ sub callSelectCursorWith()
 	%cursor = {};
 	&my_cmd
 	(
-		f=> "S0240",
+		f=> "S0330",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_TOP, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_TOP, limit=>100 )', 
 		r=> "SELECT a, b, c FROM t1 ORDER BY a ASC LIMIT 100",
@@ -2373,7 +2422,7 @@ sub callSelectCursorWith()
 	);
 	&my_cmd
 	(
-		f=> "S0241",
+		f=> "S0331",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", limit=>100 )', 
 		r=> "SELECT a, b, c FROM t1 ORDER BY a ASC LIMIT 100",
@@ -2382,7 +2431,7 @@ sub callSelectCursorWith()
 	);
 	&my_cmd
 	(
-		f=> "S0250",
+		f=> "S0332",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_NEXT, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_NEXT, limit=>100 )', 
 		n=> 'Command=NEXT, Cursor is empty',
@@ -2391,7 +2440,7 @@ sub callSelectCursorWith()
 	);
 	&my_cmd
 	(
-		f=> "S0260",
+		f=> "S0333",
 		s=> sub { $mymod->SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \%cursor, cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_BACK, limit=>100, make_only=>1) },
 		t=> 'SelectCursor( table=>"t1", fields => [ "a","b","c"], cursor_info => \\%cursor , cursor_key=>"a", cursor_command=>SQL_SIMPLE_CURSOR_BACK, limit=>100 )', 
 		n=> 'Command=BACK, Cursor is empty',

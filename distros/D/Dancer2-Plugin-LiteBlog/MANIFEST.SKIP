@@ -1,0 +1,32 @@
+dist/*
+
+# Avoid version control files:
+\B\.git\b
+.gitignore
+
+# Avoid OS-specific files/dirs:
+\B\.DS_Store
+\B\.AppleDouble
+\B\._.*
+.*\.bak
+.*\.swp
+
+# Avoid build artifacts:
+\bblib\b
+\bMakefile$
+\bpm_to_blib$
+\bMakeMaker-\d
+^MYMETA\.
+\.gz
+
+# Avoid temp and backup files:
+~$
+\.old$
+^#.*#$
+^\.#
+\.bak$
+\.tmp$
+
+# Avoid other test artifacts:
+\.prove$
+^nytprof

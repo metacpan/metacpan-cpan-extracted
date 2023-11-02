@@ -21,7 +21,7 @@ use if bool_supported() eq 'builtin::is_bool', qw(experimental builtin);
 use Carp qw(croak);
 use Config;
 
-our $VERSION = '0.3.2';
+our $VERSION = '1.0.0';
 
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -32,11 +32,7 @@ use base qw(Exporter);
 
 =head1 NAME
 
-Scalar::Type
-
-=head1 DESCRIPTION
-
-Figure out what type a scalar is
+Scalar::Type - figure out what type a scalar is
 
 =head1 SYNOPSIS
 
@@ -65,7 +61,7 @@ B<looks like> a number you'll get a sensible result:
 But in some rare cases, generally when you are serialising data, the difference
 matters. This package provides some useful functions to help you figure out what's
 what. The following functions are available. None of them are exported by default.
-If you want them all, export ':all':
+If you want all that are available, export ':all':
 
     use Scalar::Type qw(:all);
 
@@ -78,8 +74,9 @@ For Reasons, C<:is_*> is equivalent.
 =cut
 
 our @EXPORT_OK = qw(
-    type sizeof is_integer is_number is_bool bool_supported
+    type sizeof is_integer is_number bool_supported
 );
+push @EXPORT_OK, 'is_bool' if(bool_supported());
 our %EXPORT_TAGS = (
     all => \@EXPORT_OK,
     'is_*' => [grep { /^is_/ } @EXPORT_OK]
@@ -178,7 +175,8 @@ sub is_number {
 
 =head2 is_bool
 
-It is a fatal error to call this on perl versions earlier than 5.35.7.
+This is not available on perl versions earlier than 5.35.7. It is a fatal error
+to call this or try to import it on older perls.
 
 Returns true if its argument is a Boolean - ie, the result of a comparison.
 
@@ -311,25 +309,25 @@ an integer) or C<''> (false, an empty string), they have a flag to indicate
 their Booleanness. This is exposed via the C<builtin::is_bool> perl function
 so we don't need to do XS voodoo to interrogate it.
 
-=head2 WHAT Scalar::Type DOES (at least in version 0.1.0)
+=head2 WHAT Scalar::Type DOES (at least in version 1.0.0)
 
 NB that this section documents an internal function that is not intended
 for public use. The interface of C<_scalar_type> should be considered to
 be unstable, not fit for human consumption, and subject to change without
-notice. This documentation is correct as of version 0.1.0 but may not be
+notice. This documentation is correct as of version 1.0.0 but may not be
 updated for future versions - its purpose is pedagogical only.
 
 The C<is_*> functions are just wrappers around the C<type> function. That
 in turn delegates most of the work to a few lines of C code which grovel
 around looking at the contents of the individual slots and flags. That
 function isn't exported, but if you really want to call it directly it's
-called C<_scalar_type> and will return one of four strings, C<INTEGER>,
+called C<_scalar_type> and will return one of three strings, C<INTEGER>,
 C<NUMBER>, or C<SCALAR>. It will return C<SCALAR> even for a reference or
 undef, which is why I said that the C<type> function only *mostly* wraps
 around it :-)
 
 The first thing that C<_scalar_type> does is look at the C<IOK> flag.
-If it's set, and the C<POK> flag is not set, the it returns C<INTEGER>.
+If it's set, and the C<POK> flag is not set, then it returns C<INTEGER>.
 If C<IOK> and C<POK> are set it stringifies the contents of the C<IV> slot,
 compares to the contents of the C<PV> slot, and returns C<INTEGER> if
 they are the same, or C<SCALAR> otherwise.
@@ -372,7 +370,7 @@ I welcome feedback about my code, especially constructive criticism.
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2021 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

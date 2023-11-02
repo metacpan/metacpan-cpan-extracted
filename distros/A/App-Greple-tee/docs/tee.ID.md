@@ -25,11 +25,33 @@ Dengan menggunakan opsi **--discrete**, perintah individual dipanggil untuk seti
 
 Baris data input dan output tidak harus identik ketika digunakan dengan opsi **--discrete**.
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     Memanggil perintah baru satu per satu untuk setiap bagian yang cocok.
+
+- **--fillup**
+
+    Menggabungkan urutan baris yang tidak kosong menjadi satu baris sebelum meneruskannya ke perintah filter. Karakter baris baru di antara karakter lebar dihapus, dan karakter baris baru lainnya diganti dengan spasi.
+
+- **--blockmatch**
+
+    Biasanya, area yang cocok dengan pola pencarian yang ditentukan dikirim ke perintah eksternal. Jika opsi ini ditentukan, bukan area yang cocok tetapi seluruh blok yang berisi area tersebut yang akan diproses.
+
+    Misalnya, untuk mengirim baris yang berisi pola `foo` ke perintah eksternal, Anda perlu menentukan pola yang cocok untuk seluruh baris:
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    Tetapi dengan opsi **--blockmatch**, hal ini dapat dilakukan dengan mudah sebagai berikut:
+
+        greple -Mtee cat -n -- foo
+
+    Dengan opsi **--blockmatch**, modul ini berperilaku seperti opsi **-g** milik [teip(1)](http://man.he.net/man1/teip).
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ Perintah berikutnya akan menemukan blok teks di dalam dokumen gaya [perlpod(1)](
 
 Anda dapat menerjemahkannya melalui layanan DeepL dengan menjalankan perintah di atas yang diyakinkan dengan modul **-Mtee** yang memanggil perintah **deepl** seperti ini:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-Karena **deepl** bekerja lebih baik untuk input satu baris, Anda dapat mengubah bagian perintah seperti ini:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 Modul khusus [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) lebih efektif untuk tujuan ini. Sebenarnya, petunjuk implementasi dari modul **tee** berasal dari modul **xlate**.
 
@@ -82,7 +100,24 @@ Anda dapat memformat ulang bagian ini dengan menggunakan modul **tee** dengan pe
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+Menggunakan opsi `--discrete` memakan waktu. Jadi, Anda dapat menggunakan opsi `--pisah '\r'` dengan `ansifold` yang menghasilkan satu baris menggunakan karakter CR, bukan NL.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Kemudian ubah karakter CR menjadi NL setelahnya dengan perintah [tr(1)](http://man.he.net/man1/tr) atau yang lainnya.
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+Pertimbangkan situasi di mana Anda ingin mencari string dari baris yang bukan header. Sebagai contoh, Anda mungkin ingin mencari gambar dari perintah `docker image ls`, tetapi meninggalkan baris header. Anda dapat melakukannya dengan perintah berikut.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+Opsi `-Mline -L 2:` mengambil baris kedua hingga terakhir dan mengirimkannya ke perintah `grep perl`. Opsi `--discrete` diperlukan, tetapi ini hanya dipanggil sekali, sehingga tidak ada kekurangan dalam hal performa.
+
+Dalam kasus ini, `teip -l 2- - grep` menghasilkan kesalahan karena jumlah baris pada output lebih sedikit dari input. Namun, hasilnya cukup memuaskan :)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ Anda dapat memformat ulang bagian ini dengan menggunakan modul **tee** dengan pe
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+# BUGS
+
+Opsi `--fillup` mungkin tidak bekerja dengan baik untuk teks bahasa Korea.
 
 # AUTHOR
 

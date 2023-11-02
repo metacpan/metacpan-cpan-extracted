@@ -157,7 +157,7 @@ note("using poster: $poster");
     my $remote = $app->option('smokedb_url');
     like(
         $buffer,
-        qr{^Reposting '$single_json' to $remote}m,
+        qr{^Reposting '\Q$single_json\E' to \Q$remote\E}m,
         "Log: Reposter line"
     );
     like(

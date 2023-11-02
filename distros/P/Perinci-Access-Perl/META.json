@@ -68,6 +68,7 @@
             "IPC::Open3" : "0",
             "Monkey::Patch::Action" : "0.060",
             "Perinci::Examples" : "0.824",
+            "Perinci::Examples::Completion" : "0.824",
             "Test::Exception" : "0",
             "Test::More" : "0.98",
             "lib" : "0"
@@ -77,11 +78,11 @@
    "provides" : {
       "Perinci::Access::Perl" : {
          "file" : "lib/Perinci/Access/Perl.pm",
-         "version" : "0.899"
+         "version" : "0.900"
       },
       "Perinci::Access::Schemeless" : {
          "file" : "lib/Perinci/Access/Schemeless.pm",
-         "version" : "0.899"
+         "version" : "0.900"
       }
    },
    "release_status" : "stable",
@@ -96,7 +97,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Access-Perl"
       }
    },
-   "version" : "0.899",
+   "version" : "0.900",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -577,7 +578,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Acme::CPANModules::Blacklist",
             "name" : "@Author::PERLANCAR/Acme::CPANModules::Blacklist",
-            "version" : "0.001"
+            "version" : "0.002"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::EnsureVersion",

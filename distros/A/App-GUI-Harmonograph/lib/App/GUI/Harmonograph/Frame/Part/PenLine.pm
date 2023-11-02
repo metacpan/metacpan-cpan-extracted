@@ -19,6 +19,9 @@ sub new {
     #$self->{'thickness'}->SetToolTip('dot size or thickness of drawn line in pixel');
     $self->{'connect'}->SetToolTip('connect the points / dots');
 
+    # Wx::Event::EVT_CHECKBOX( $self, $self->{'connect'}, sub {  $self->{'callback'}->() });
+
+
     my $row1 = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
     $row1->AddSpacer(  15 );
     $row1->Add( $self->{'connect'},    0, &Wx::wxALIGN_CENTER_VERTICAL|&Wx::wxGROW|&Wx::wxALL, 5);
@@ -63,6 +66,13 @@ sub set_data {
     my ( $self, $data ) = @_;
     return unless ref $data eq 'HASH';
     $self->{$_}->SetValue( $data->{$_} ) for qw/length density thickness connect/,
+}
+
+sub SetCallBack {
+    my ( $self, $code) = @_;
+    return unless ref $code eq 'CODE';
+    $self->{'callback'} = $code;
+    $self->{ $_ }->SetCallBack( $code ) for qw /density thickness/;
 }
 
 1;

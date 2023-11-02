@@ -13,7 +13,7 @@ our @ISA = qw(DynaLoader);
 # SQL_DRIVER_VER is formatted as dd.dd.dddd
 # for version 5.x please switch to 5.00(_00) version numbering
 # keep $VERSION in Bundle/DBD/mysql.pm in sync
-our $VERSION = '5.001';
+our $VERSION = '5.002';
 
 bootstrap DBD::mysql $VERSION;
 
@@ -1060,8 +1060,12 @@ specify "mysql_client_found_rows=0" in the DSN.
 
 =item mysql_compression
 
-If your DSN contains the option "mysql_compression=1", then the communication
-between client and server will be compressed.
+If your DSN contains the option "mysql_compression", then this will be used
+to set the compression algorithms for the connection.
+
+If your DSN contains the option "mysql_compression=1", then the compression
+algorithms will be set to "zlib". This is for backwards compatibility with
+older versions of DBD::mysql.
 
 =item mysql_connect_timeout
 

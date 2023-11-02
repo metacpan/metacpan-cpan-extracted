@@ -1,17 +1,24 @@
 package App::Oozie::Run;
-$App::Oozie::Run::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Constants qw(
     DEFAULT_END_DATE_DAYS
     DEFAULT_START_DATE_DAY_FRAME
     EMPTY_STRING
+    FORMAT_ZULU_TIME
+    INDEX_NOT_FOUND
+    MAX_RETRY
     OOZIE_STATES_RUNNING
     SHORTCUT_METHODS
     SPACE_CHAR
+    TERMINAL_LINE_LEN
 );
 use App::Oozie::Date;
 use App::Oozie::Types::DateTime qw( IsDate IsHour IsMinute );
@@ -19,6 +26,7 @@ use App::Oozie::Types::Common qw( IsJobType );
 use App::Oozie::Util::Misc qw(
     remove_newline
     resolve_tmp_dir
+    trim_slashes
 );
 
 use Config::Properties;
@@ -30,6 +38,7 @@ use IO::Interactive qw( is_interactive );
 use IPC::Cmd        ();
 use Ref::Util       qw( is_ref is_hashref is_arrayref );
 use Template;
+use Time::Duration  qw( duration_exact );
 use Types::Standard qw( Int );
 use XML::LibXML::Simple;
 
@@ -46,6 +55,7 @@ with qw(
     App::Oozie::Role::Fields::Common
     App::Oozie::Role::Fields::Path
     App::Oozie::Role::Meta
+    App::Oozie::Role::Info
 );
 
 #------------------------------------------------------------------------------#
@@ -96,7 +106,7 @@ option path => (
     format  => 's',
     default => \&_option_build_guess_wf_path,
     lazy    => 1,
-    doc     => "HDFS location for the workflow. Defaults to <default_hdfs_destination>/<workflow-basename>",
+    doc     => 'HDFS location for the workflow. Defaults to <default_hdfs_destination>/<workflow-basename>',
 );
 
 option sla_duration => (
@@ -191,6 +201,10 @@ option doas => (
 sub setup_dates {
     my $self = shift;
 
+    state $is_shortcut_date = {
+        map { $_ => 1 } SHORTCUT_METHODS
+    };
+
     return if $self->dates_from_properties;
 
     my $date = $self->date;
@@ -215,7 +229,7 @@ sub setup_dates {
 
             if ( ! $intersects ) {
                 push @{ $self->errors },
-                    sprintf "Start date is out of normal bounds (%s days in the past or in the future)",
+                    sprintf 'Start date is out of normal bounds (%s days in the past or in the future)',
                                 DEFAULT_START_DATE_DAY_FRAME,
                     ;
             }
@@ -230,18 +244,18 @@ sub setup_dates {
 
     $enddate //= $date->move( $date->today, DEFAULT_END_DATE_DAYS );
 
-    if ( $enddate =~ /^(today|yesterday|tomorrow)$/ ) {
+    if ( $is_shortcut_date->{ $enddate } ) {
         $enddate = $date->$enddate();
     }
 
     if ( $enddate lt $startdate ) {
-        die "End date should be later than start date"
+        die 'End date should be later than start date';
     }
 
     if ( ! $self->force
         && abs $date->diff($enddate, $date->today) > DEFAULT_END_DATE_DAYS
     ) {
-        die sprintf "End date should not be later than %s days from today",
+        die sprintf 'End date should not be later than %s days from today',
                         DEFAULT_END_DATE_DAYS,
         ;
     }
@@ -269,11 +283,11 @@ sub _option_build_guess_wf_path {
     my $rv;
     # Should be the same on local file system and HDFS
     my $relativePath;
-    my $local_wf_basedir = "/workflows/";
+    my $local_wf_basedir = '/workflows/';
 
     if (File::Spec->file_name_is_absolute($wf_dir)) {
         my $workflowsPartIndex = rindex($wf_dir, $local_wf_basedir);
-        if ($workflowsPartIndex != -1) {
+        if ( $workflowsPartIndex != INDEX_NOT_FOUND ) {
             $relativePath = substr $wf_dir, $workflowsPartIndex + length($local_wf_basedir);
         }
     }
@@ -281,15 +295,14 @@ sub _option_build_guess_wf_path {
         $relativePath = $wf_dir;
     }
 
-    if (defined($relativePath)) {
-        # removing path separators from both sides
-        $relativePath =~ s{^/}{};
-        $relativePath =~ s{/$}{};
-        my $oozie_basepath = $self->oozie_basepath;
-        $rv = File::Spec->catfile( $oozie_basepath, $relativePath);
+    if ( $relativePath ) {
+        $rv = File::Spec->catfile(
+                    $self->oozie_basepath,
+                    trim_slashes( $relativePath ),
+                );
     }
     else {
-        die "Failed to guess the workflow path!";
+        die 'Failed to guess the workflow path!';
     }
 
     return $rv;
@@ -301,19 +314,23 @@ sub run {
 
     my $logger  = $self->logger;
 
+    my $run_start_epoch = time;
+
     for my $huh ( @_ ) {
         $logger->warn( sprintf 'Unknown parameter: %s', $huh // '[undefined]');
     }
 
     my $verbose = $self->verbose;
 
-    $logger->info( 'Starting' . ( $verbose ? '' : '. Enable --verbose to see the underlying commands' ) );
+    $logger->info( 'Starting' . ( $verbose ? EMPTY_STRING : '. Enable --verbose to see the underlying commands' ) );
+
+    $self->log_versions if $self->verbose;
 
     $self->basedir( $wf_dir );
 
     my $CWD = getcwd() || die "Can't happen: unable to get cwd: $!";
     if ( ! chdir $wf_dir ) {
-        die sprintf "Cannot chdir to %s: %s -- Current dir: %s", $wf_dir, $!, $CWD;
+        die sprintf 'Cannot chdir to %s: %s -- Current dir: %s', $wf_dir, $!, $CWD;
     }
 
     if ( ! $self->appname ) {
@@ -326,8 +343,8 @@ sub run {
     (my $appname = $self->appname) =~ s{ [/]+ \z }{}xms;
     $self->appname( $appname );
 
-    $self->logger->info( "Job name: ",            $self->appname );
-    $self->logger->info( "Job path (HDFS dir): ", $self->path    );
+    $self->logger->info( sprintf 'Job name: %s',            $self->appname );
+    $self->logger->info( sprintf 'Job path (HDFS dir): %s', $self->path    );
 
     $self->setup_dates;
 
@@ -349,7 +366,13 @@ sub run {
     # go back where we started!
     chdir $CWD if $CWD;
 
-    $logger->info( 'Finished' );
+
+    $logger->info(
+        sprintf 'Completed successfully in %s (took %s)',
+                    sprintf( '%s%s', $self->cluster_name, ( $self->dryrun ? ' (dryrun is set)' : EMPTY_STRING ) ),
+                    duration_exact( time - $run_start_epoch ),
+    );
+
     return $success;
 }
 
@@ -380,8 +403,8 @@ sub collect_oozie_cmd_args {
 
     if (@{ $self->errors } ) {
         $logger->error(
-            "Overridable errors encountered",
-            ( $self->force ? EMPTY_STRING : " (relaunch using --force to proceed)" )
+            'Overridable errors encountered',
+            ( $self->force ? EMPTY_STRING : ' (relaunch using --force to proceed)' )
         );
         $logger->error( '- ' . $_ ) for @{ $self->errors };
         die if !$self->force && !$self->dryrun;
@@ -417,11 +440,19 @@ sub collect_oozie_cmd_args {
                             SUFFIX => '.properties',
                             DIR    => resolve_tmp_dir(),
                         );
-    my $original='';
+    my $original = EMPTY_STRING;
+    my $orig_filename = 'job.properties';
 
-    if ( open my $ORIG_FH, '<', 'job.properties' ) {
+    if ( open my $ORIG_FH, '<', $orig_filename ) {
         local $/;
         $original = <$ORIG_FH>;
+        if ( ! close $ORIG_FH ) {
+            $logger->warn(
+                sprintf 'Failed to close %s: %s',
+                            $orig_filename,
+                            $!,
+            );
+        }
     }
 
     $override_file->print( $original, "\n\n" );
@@ -459,7 +490,7 @@ sub collect_oozie_cmd_args {
         : ();
 
     if ( $self->type eq 'bundle' && $self->dryrun ) {
-        die "Oozie does not support dryrun for bundles. We will stop now!";
+        die 'Oozie does not support dryrun for bundles. We will stop now!';
     }
 
     my @cmd_tmpl = (
@@ -474,22 +505,31 @@ sub collect_oozie_cmd_args {
         ($self->secure_cluster ? ($hash_to_def->({ 'oozie.auth.token.cache' => 'false'}, 1)) : ()),
         @username_override,
         job => ( $self->dryrun ? '-dryrun' : '-run' ),
-        @args
+        @args,
     );
 
     if ( $self->notify ) {
         # TODO: check if this whole section can be removed
-        my %ndef = map { $_ => $prop{$_} } grep { /notification[.]url/ } keys %prop;
+        my %ndef =  map {
+                        $_ => $prop{ $_ }
+                    }
+                    grep {
+                        m{ notification[.]url }xms
+                    }
+                    keys %prop
+                    ;
+
         #if ( ! %ndef ) {
         #    die "--notify is set but the required settings are not in your configuration";
         #}
+
         push @cmd_tmpl, $hash_to_def->( \%ndef );
     }
 
     push @cmd_tmpl,'-oozie=[% oozie_uri %]';
 
     my $end_time   = $prop{endTime}
-                        || sprintf "%sT%02d:%02dZ",
+                        || sprintf FORMAT_ZULU_TIME,
                                     map { $self->$_ }
                                     qw(
                                         enddate
@@ -498,7 +538,7 @@ sub collect_oozie_cmd_args {
                                     );
 
     my $start_time = $prop{startTime}
-                        || sprintf "%sT%02d:%02dZ",
+                        || sprintf FORMAT_ZULU_TIME,
                                     map { $self->$_ }
                                     qw(
                                         startdate
@@ -515,7 +555,7 @@ sub collect_oozie_cmd_args {
         oozie_uri     => $self->oozie_uri,
         start_time    => $start_time,
         type          => $self->type,
-        workflow_path => $self->path . ($self->type eq 'bundle'? '/bundle.xml' : '') ,
+        workflow_path => $self->path . ($self->type eq 'bundle'? '/bundle.xml' : EMPTY_STRING) ,
         path          => $nameNode . $self->path,
     );
 
@@ -529,11 +569,11 @@ sub verify_sla {
     # check the SLA parameter is provided if the workflow has an SLA block
     eval {
         my $raw  = $self->hdfs->read(
-                        File::Spec->catfile( $self->path, "workflow.xml" )
+                        File::Spec->catfile( $self->path, 'workflow.xml' )
                     );
-        if ( $raw =~ /sla:info/ ) {
+        if ( $raw =~ m{ sla[:]info }xms ) {
             if ( ! $self->sla_duration ) {
-                die "The workflow contains an SLA block, please provide an --sla-duration parameter in minutes";
+                die 'The workflow contains an SLA block, please provide an --sla-duration parameter in minutes';
             }
             %rv = (
                 slaDuration    => $self->sla_duration,
@@ -541,12 +581,12 @@ sub verify_sla {
             );
         }
         elsif ( $self->sla_duration ) {
-            die "You've specified an SLA duration, but the workflow does not contain the sla:info block! There will be no SLA events";
+            die q{You've specified an SLA duration, but the workflow does not contain the sla:info block! There will be no SLA events};
         }
         1;
     } or do {
         my $eval_error = $@ || 'Zombie error';
-        die "Cannot retrieve the workflow.xml off HDFS; did you deploy the workflow? $eval_error";
+        die sprintf 'Cannot retrieve the workflow.xml off HDFS; did you deploy the workflow? %s', $eval_error;
     };
 
     return %rv;
@@ -555,10 +595,10 @@ sub verify_sla {
 sub check_current_instances {
     my $self = shift;
     my $logger = $self->logger;
-    $logger->info( "Duplicates check" );
+    $logger->info( 'Duplicates check' );
 
     if ( $self->type eq 'wf' ) {
-        $logger->warn( "Please note that this program doesn't check the existence of duplicate workflows yet, only coordinators" );
+        $logger->warn( q{Please note that this program doesn't check the existence of duplicate workflows yet, only coordinators} );
         return;
     }
 
@@ -573,7 +613,7 @@ sub check_current_instances {
 
     return if !@running;
 
-    $logger->warn( "There are coordinator(s) already running under the same name on the server." );
+    $logger->warn( 'There are coordinator(s) already running under the same name on the server.' );
 
     my $meta_tmpl = <<'META';
 
@@ -617,7 +657,7 @@ META
             chomp $yesno;
         }
         else {
-            $logger->warn("Not running interactively and there are other instances. The next calls will fail.");
+            $logger->warn( 'Not running interactively and there are other instances. The next calls will fail.' );
         }
 
         my $outbuffer;
@@ -651,11 +691,11 @@ META
                 };
                 $is_killed++;
             }
-            $logger->info( "Coordinator(s) are now killed" );
+            $logger->info( 'Coordinator(s) are now killed' );
         }
     }
 
-    push @{ $self->errors }, "At least one coordinator running under the same name" if ! $is_killed;
+    push @{ $self->errors }, 'At least one coordinator running under the same name' if ! $is_killed;
 
     return;
 }
@@ -669,7 +709,7 @@ sub check_coordinator_function_calls {
     #    ${coord:formatTime(coord:nominalTime(), 'yyyy-MM-dd')}
     #    ${coord:formatTime(coord:nominalTime(), 'HH')}
     #
-    my $looks_like_coord_conf = qr< \$\{coord\: >xms;
+    my $looks_like_coord_conf = qr< [$][{]coord[:] >xms;
     my %missing;
     my $collector = sub {
         my($h, $key) = @_;
@@ -723,8 +763,8 @@ sub check_coordinator_function_calls {
         eval {
             $raw = $self->hdfs->read( $abs_path );
             if ( ! $raw ) {
-                my $msg = "Could not read the workflow file in HDFS: "
-                        . "did you do the deploy first? No data for: %s"
+                my $msg = 'Could not read the workflow file in HDFS: '
+                        . 'did you do the deploy first? No data for: %s'
                         ;
                 $logger->logdie( sprintf $msg, $abs_path );
             }
@@ -735,7 +775,7 @@ sub check_coordinator_function_calls {
         } or do {
             my $eval_error = $@ || 'Zombie error';
             my $log_level = $conf =~ m{ workflow }xms ? 'logdie' : 'warn';
-            $logger->$log_level( $eval_error ); ## no critic (ProhibitDynamicCall)
+            $logger->$log_level( $eval_error );
             1;
         };
     }
@@ -768,7 +808,7 @@ DEFINE
 
     my %rv;
     foreach my $name ( @vars ) {
-        print "-" x 80, "\n";
+        print q{-} x TERMINAL_LINE_LEN, "\n";
         print "\t$name:\t$missing{$name}\n\n";
         my $value = $self->ask( $name );
         next if ! defined $value;
@@ -782,9 +822,18 @@ sub collect_properties {
     my $self = shift;
     my %rv;
 
+    my $orig_filename = 'job.properties';
+
     my $properties = Config::Properties->new;
     open my $FH, '<', 'job.properties' or die 'Cannot open job.properties';
     $properties->load($FH);
+    if ( ! close $FH ) {
+        $self->logger->warn(
+            sprintf 'Failed to close %s: %s',
+                        $orig_filename,
+                        $!,
+        );
+    }
 
     if ( my $uname = $properties->getProperty('user.name') ) {
         $self->logger->info( "Collected user.name override = $uname" );
@@ -851,7 +900,7 @@ sub ask {
     my $msg = "Please enter the new value for `$var` based on the definition above";
     my($input, $count);
     while ( 1 ) {
-        if ( ++$count > 3 ) {
+        if ( ++$count > MAX_RETRY ) {
             print "\tYou didn't specify anything 3 times, so I give up! ($var=undef)\n";
             last;
         }
@@ -879,7 +928,7 @@ sub execute {
     my $outbuffer;
 
     if ( ! $self->dryrun ) {
-        $logger->info(  "Executing the command to schedule" );
+        $logger->info( 'Executing the command to schedule' );
 
         my ($ok, $err, $full_buf, $stdout_buff, $stderr_buff);
         ($ok, $err, $full_buf, $stdout_buff, $stderr_buff)  = IPC::Cmd::run(
@@ -898,14 +947,24 @@ sub execute {
             $logger->warn( join "\n", @{ $stderr_buff } );
         }
 
-        ($outbuffer) = reverse map { split /\n/, $_ } @{ $stdout_buff };
+        ($outbuffer) = reverse
+                        map {
+                            split m{ \n }xms, $_
+                        }
+                        @{ $stdout_buff }
+                        ;
 
-        if ( $outbuffer =~ m/([0-9-]+oozie-oozi-[CWB])/ ) {
+        if (
+            # TODO: move to constant
+            $outbuffer =~ m{
+                ([0-9-]+ oozie-oozi- [CWB])
+            }xms
+        ) {
             my $job_id =  $1;
             $self->log_console_url( $job_id );
         }
         else {
-            $logger->warn("Failed to locate the Oozie job id from the system call");
+            $logger->warn( 'Failed to locate the Oozie job id from the system call' );
         }
 
         return 1;
@@ -942,7 +1001,7 @@ sub execute {
 sub log_console_url {
     my $self   = shift;
     my $job_id = shift;
-    $self->logger->info( sprintf "Console URL: %s?job=%s", $self->oozie_uri, $job_id );
+    $self->logger->info( sprintf 'Console URL: %s?job=%s', $self->oozie_uri, $job_id );
     return;
 }
 
@@ -960,7 +1019,7 @@ App::Oozie::Run
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

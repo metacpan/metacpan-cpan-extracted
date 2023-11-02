@@ -1,0 +1,39 @@
+Revision history for Perl extension Email::MIME::ContentType
+
+{{$NEXT}}
+
+1.017     2013-08-10 23:19:14 America/New_York
+        - make $STRICT_PARAMS actually work! (thanks, Matthew Green!)
+          [rt.cpan.org #87460]
+
+1.016     2013-08-10 23:14:42 America/New_York
+        - correct the longstanding and embarrassing misuse of "discrete" and
+          "composite" to mean "type" and "subtype"; the returned data still
+          contains the wrong old names so your code shouldn't break
+
+        - repackage to update bugtracker, repo, etc.
+
+1.015     2009-01-22
+        - add repo metadata
+
+1.014     2007-03-22
+        - packaging improvements
+
+1.013     2007-03-20
+        - fix significantly broken SYNOPSIS
+
+1.012     2006-11-25
+        - allow carp-avoidance through (ugh) package variable; bug 14076
+
+1.011     2006-10-12
+        - clearer special case for undef/empty content-type
+          (thanks, JESSE!)
+
+1.01
+        - typo fix in documentation by John Linderman.
+        - new author, Casey West.
+        - Fix bug with blank space following parameters.
+
+0.01      Wed Jan  7 17:38:23 2004
+        - original version; created by h2xs 1.22 with options
+        	-AX -b 5.6.0 -n Email::MIME::ContentType

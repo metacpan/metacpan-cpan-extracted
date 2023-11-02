@@ -2,6 +2,9 @@ name: CI
 
 on:
   push:
+    paths-ignore:
+      - '.github/workflows/*install-doit-from-github*'
+      - '.github/actions/install-doit-from-github/**'
     branches-ignore:
       - '*travis*'
       - '*appveyor*'
@@ -17,68 +20,95 @@ jobs:
         include:
           - config_name: ubuntu-20.04
             os: ubuntu-20.04
-            install_optional_dependencies: false
           - config_name: ubuntu-22.04
             os: ubuntu-22.04
-            install_optional_dependencies: false
           - config_name: ubuntu-22.04 with optional dependencies
             os: ubuntu-22.04
             install_optional_dependencies: true
-          - config_name: macos-latest
-            os: macos-latest
-            install_optional_dependencies: false
+            dist_install_and_test: true
+            test_with_sudo: true
+          - config_name: macos-11
+            os: macos-11
+          - config_name: macos-12
+            os: macos-12
           - config_name: windows-latest
             os: windows-latest
             install_optional_dependencies: true
+            dist_install_and_test: true
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         clean: false
+        show-progress: false
     - run: |
         sudo apt-get update -qq
-        sudo apt-get install -y libipc-run-perl libnet-openssh-perl libbsd-resource-perl libdevel-hide-perl libconfig-inifiles-perl
+        sudo apt-get install -y libipc-run-perl libnet-openssh-perl libbsd-resource-perl libdevel-hide-perl libconfig-inifiles-perl locales
       if: ${{ matrix.install_optional_dependencies && startsWith(matrix.os, 'ubuntu-') }}
     - run: |
         cpanm --quiet --notest Devel::Hide Config::IniFiles Config::IOD::INI
       if: ${{ matrix.install_optional_dependencies && startsWith(matrix.os, 'windows-') }}
+
+    - name: Configure test with sudo
+      run: |
+        echo "DOIT_TEST_WITH_SUDO=1" >> $GITHUB_ENV
+      if: ${{ matrix.test_with_sudo }}
 
     - name: Build and test
       run: |
         perl Build.PL
         ./Build
         ./Build test
+        sudo ./Build test_xt
       if: "!startsWith(matrix.os,'windows-')"
-    - name: Build and test on Windows
+## Running dist_install_and_test is enough, see below
+#    - name: Build and test on Windows
+#      run: |
+#        c:\strawberry\perl\bin\perl Build.PL
+#        c:\strawberry\perl\bin\perl Build
+#        c:\strawberry\perl\bin\perl Build test
+#      if: "startsWith(matrix.os, 'windows-')"
+
+    - name: dist_install_and_test
+      run: |
+        perl Build.PL
+        ./Build dist_install_and_test
+      if: "matrix.dist_install_and_test && !startsWith(matrix.os,'windows-')"
+
+    - name: dist_install_and_test on Windows
       run: |
         c:\strawberry\perl\bin\perl Build.PL
-        c:\strawberry\perl\bin\perl Build
-        c:\strawberry\perl\bin\perl Build test
-      if: "startsWith(matrix.os, 'windows-')"
+        c:\strawberry\perl\bin\perl Build dist_install_and_test
+      if: "matrix.dist_install_and_test && startsWith(matrix.os,'windows-')"
 
   test_in_container:
-    name: Test with perl ${{ matrix.perlimage }}
+    name: Test with ${{ matrix.image }}
     runs-on: ubuntu-latest
-    container: perl:${{ matrix.perlimage }}
+    container: ${{ matrix.image }}
     strategy:
       matrix:
         include:
-          - perlimage: 5.8.9-threaded-stretch
-          - perlimage: 5.10.1-buster
-          - perlimage: 5.12.5-stretch
-          - perlimage: 5.14.4-stretch
-          - perlimage: 5.16.3-buster
-          - perlimage: 5.18.4-buster
-          - perlimage: 5.22.4-stretch
-          - perlimage: 5.36.0-slim-bullseye
+          - image: perl:5.8.9-threaded-stretch
+          - image: perl:5.10.1-buster
+          - image: perl:5.12.5-stretch
+          - image: perl:5.14.4-stretch
+          - image: perl:5.16.3-buster
+          - image: perl:5.18.4-buster
+          - image: perl:5.22.4-stretch
+          - image: perl:5.36.0-slim-bullseye
+          - image: perl:5.38.0-slim-bookworm
+          ## use debian:* images only if there's no suitable perl:* image
+          #- image: debian:bookworm
 
     steps:
-    - uses: actions/checkout@v2
+    # Note: checkout@v4 does not work with older debians (e.g.stretch)
+    - uses: actions/checkout@v3
     - name: Preinstall, Configure, Build and Test
       env:
         HARNESS_TIMER:   1
         HARNESS_OPTIONS: j8
       run: |
+        which cpanm 2>/dev/null || ( apt-get update -qq && apt-get install -qy --no-install-recommends cpanminus )
         cpanm --quiet --installdeps --notest . || ( cat /github/home/.cpanm/work/*/build.log; false )
         perl Build.PL
         ./Build
@@ -88,9 +118,10 @@ jobs:
     name: Test coverage
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         clean: false
+        show-progress: false
     - name: install Devel::Cover::Report::Coveralls and optional Doit deps
       run: |
         sudo apt-get update -qq

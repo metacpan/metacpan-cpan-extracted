@@ -1,5 +1,8 @@
 Revision history for Crypt-Argon2
 
+0.020     2023-10-29 18:28:53+01:00 Europe/Brussels
+          - Only enable optimization when building in CPAN client
+
 0.019     2023-05-24 02:34:02+02:00 Europe/Amsterdam
           - Switch to Apache Public License 2.0
 

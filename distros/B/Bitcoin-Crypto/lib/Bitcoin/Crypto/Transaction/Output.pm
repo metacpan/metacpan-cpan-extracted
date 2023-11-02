@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Output;
-$Bitcoin::Crypto::Transaction::Output::VERSION = '2.002';
+$Bitcoin::Crypto::Transaction::Output::VERSION = '2.003';
 use v5.10;
 use strict;
 use warnings;
@@ -189,7 +189,8 @@ interacted with directly.
 
 =head3 value
 
-Non-negative integer value of the output in the smallest unit (satoshi).
+Non-negative integer value of the output in the smallest unit (satoshi). It is
+an instance of L<Math::BigInt> with type coercions from integers and strings.
 Required.
 
 I<Available in the constructor>.

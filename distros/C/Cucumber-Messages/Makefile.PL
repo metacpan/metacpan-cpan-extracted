@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.014004;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Cucumber-Messages",
   "LICENSE" => "mit",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.014004",
   "NAME" => "Cucumber::Messages",
   "PREREQ_PM" => {
     "JSON::MaybeXS" => 0,
@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
     "Test2::Tools::ClassicCompare" => 0,
     "Test2::V0" => 0
   },
-  "VERSION" => "22.0.0",
+  "VERSION" => "23.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

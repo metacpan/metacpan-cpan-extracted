@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use version;
 
 use Test::More;
 
@@ -10,7 +11,7 @@ BEGIN {
         if $@;
 
     plan skip_all => "Dancer2 is too old: $Dancer2::VERSION"
-        if $Dancer2::VERSION <= 0.166001;   # for to_app()
+        if version->parse($Dancer2::VERSION) <= 0.166001;   # for to_app()
 
     warn "Dancer2 version $Dancer2::VERSION\n";
 

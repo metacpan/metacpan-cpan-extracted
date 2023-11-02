@@ -5,7 +5,7 @@ use warnings;
 
 # Yuck, semver. I give in, the stupid cult that doesn't understand
 # what the *number* bit of *version number* means has won.
-our $VERSION = '1.0.0';
+our $VERSION = '1.0.1';
 
 sub import {
     my $victim = (caller(0))[0];
@@ -19,11 +19,7 @@ sub import {
 
 =head1 NAME
 
-String::Binary::Interpolation
-
-=head1 DESCRIPTION
-
-Make it easier to interpolate binary bytes into a string
+String::Binary::Interpolation - make it easier to interpolate binary bytes into a string
 
 =head1 SYNOPSIS
 

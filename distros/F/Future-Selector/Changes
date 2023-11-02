@@ -1,0 +1,12 @@
+Revision history for Future-Selector
+
+0.02    2023-10-31
+        [CHANGES]
+         * Added `->run` and `->run_until_ready` methods
+
+        [BUGFIXES]
+         * Ensure that an empty selector after `->select` fails another
+           `->select` call even if called immediately within it
+
+0.01    2023-10-30
+        First version, released on an unsuspecting world.

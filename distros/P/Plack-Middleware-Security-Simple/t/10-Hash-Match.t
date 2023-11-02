@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Hash::Match;
 use HTTP::Status qw/ :constants :is /;

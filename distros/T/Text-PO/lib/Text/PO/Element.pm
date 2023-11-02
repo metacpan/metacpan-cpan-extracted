@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Element.pm
-## Version v0.2.2
+## Version v0.2.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/23
-## Modified 2023/10/23
+## Modified 2023/10/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use Text::Wrap ();
-    our $VERSION = 'v0.2.2';
+    our $VERSION = 'v0.2.3';
     use open ':std' => ':utf8';
 };
 
@@ -30,11 +30,11 @@ $Text::Wrap::columns = 80;
 sub init
 {
     my $self = shift( @_ );
-    $self->{msgid}          = '';
-    $self->{msgstr}         = '';
-    $self->{msgid_plural}   = '';
-    $self->{context}        = '';
-    $self->{fuzzy}          = '';
+    $self->{msgid}          = undef;
+    $self->{msgstr}         = undef;
+    $self->{msgid_plural}   = undef;
+    $self->{context}        = undef;
+    $self->{fuzzy}          = undef;
     $self->{comment}        = [];
     $self->{auto_comment}   = [];
     # e.g.: c-format
@@ -42,11 +42,11 @@ sub init
     # Is it plural?
     $self->{plural}         = 0;
     # reference
-    $self->{file}           = '';
-    $self->{line}           = '';
-    $self->{encoding}       = '';
+    $self->{file}           = undef;
+    $self->{line}           = undef;
+    $self->{encoding}       = undef;
     # Parent po object
-    $self->{po}             = '';
+    $self->{po}             = undef;
     $self->{is_meta}        = 0;
     $self->{_po_line}       = 0;
     $self->{_init_strict_use_sub} = 1;
@@ -437,7 +437,7 @@ Text::PO::Element - PO Element
 
 =head1 VERSION
 
-    v0.2.2
+    v0.2.3
 
 =head1 DESCRIPTION
 

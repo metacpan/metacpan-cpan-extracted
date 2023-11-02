@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Future::XS;
 
@@ -85,6 +85,21 @@ no_growth {
    $fret->result;
 } 'Future::XS->followed_by immediate does not leak';
 
+# RT150198
+no_growth {
+   my ( $f1, $f2 );
+   my $fret = ( $f1 = Future::XS->new->set_label( '$f1' ) )
+      ->followed_by( sub {
+         my $f = shift;
+         $f2 = Future->new->set_label( '$f2' );
+         return $f2->then( sub { $f }, sub { $f } )->set_label( '->then' );
+      } );
+
+   $f1->done;
+   $f2->done;
+   $fret->result;
+} 'Future::XS->followed_by + ->then does not leak (RT150198)';
+
 no_growth {
    my $fret = ( my $f1 = Future::XS->new )
       ->catch( fail => sub { Future::XS->done } );
@@ -127,11 +142,13 @@ no_growth {
 no_growth {
    my $f = Future::XS->new;
    $f->set_label( "A string label here" );
+   $f->cancel;
 } 'Future::XS->set_label does not leak';
 
 no_growth {
    my $f = Future::XS->new;
    $f->set_udata( datum => [] );
+   $f->cancel;
 } 'Future::XS->set_label does not leak';
 
 # Test the compaction logic on revocation list

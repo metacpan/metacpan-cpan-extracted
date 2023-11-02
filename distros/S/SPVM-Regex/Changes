@@ -1,3 +1,27 @@
+0.243001 2023-10-27
+  [Bug Fix]
+    * Remove using env->get_ref_count native API.
+    
+0.243 2023-08-12
+  [Performance Improvement]
+    * The performance of the replace method is improved, because the string is not copied repeatedly.
+  [New Features]
+    * The following methods are added to the Regex class.
+    
+      method buffer_match : Regex::Match ($string_buffer : StringBuffer, $offset : int = 0, $length : int = -1);
+      
+      method buffer_match_forward : Regex::Match ($string_buffer : StringBuffer, $offset_ref : int*, $length : int = -1);
+      
+      method buffer_replace  : void ($string_buffer : StringBuffer, $replace : object of string|Regex::Replacer, $offset : int = 0, $length : int = -1, $options : object[] = undef);
+      
+      method buffer_replace_g  : string ($string_buffer : StringBuffer, $replace : object of string|Regex::Replacer, $offset : int = 0, $length : int = -1, $options : object[] = undef);
+      
+      method buffer_replace_common : void ($string_buffer : StringBuffer, $replace : object of string|Regex::Replacer, $offset_ref : int*, $length : int = -1, $options : object[] = undef);
+
+0.242002 2023-08-09
+  [Prerequirement Changes]
+    * SPVM 0.989033+ is required.
+
 0.242001 2023-05-29
   [Prerequirement Changes]
     * SPVM 0.986+ is required.

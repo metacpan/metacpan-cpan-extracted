@@ -1,0 +1,12 @@
+#! /usr/bin/env perl
+my $out= `dzil build`;
+my ($dir)= ($out =~ /built in (\S*)/);
+-d $dir or die "Can't determine build dir";
+print "chdir $dir\n";
+chdir($dir) or die "Failed chdir $dir";
+print "perl Makefile.PL\n";
+system('perl','Makefile.PL') == 0 or die "Failed building makefile";
+print "make\n";
+system('make') == 0 or die "Failed running make";
+print "prove\n";
+system('prove', '-lvb', @ARGV);

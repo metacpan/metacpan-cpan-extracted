@@ -5,7 +5,7 @@ use warnings;
 
 use App::Wikidata::Print;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Run.
 exit App::Wikidata::Print->new->run;
@@ -28,7 +28,7 @@ wd-print - Script to manipulate with Wikidata.org.
 
 =head1 SYNOPSIS
 
- wd-print [-h] [-l lang] [-m mediawiki_site] [--version] wd_id
+ wd-print [-h] [-l lang] [-m mediawiki_site] [-r] [--version] wd_id
 
 =head1 ARGUMENTS
 
@@ -50,6 +50,10 @@ MediaWiki site.
 
 Default value is 'www.wikidata.org'.
 
+=item * C<-r>
+
+Print with references.
+
 =item * C<--version>
 
 Print version of script.
@@ -59,6 +63,566 @@ Print version of script.
 Identifier in Wikidata (qid or pid or lid).
 
 =back
+
+=head1 EXAMPLE
+
+ wd-print -l en Q42
+
+ # Output like:
+ # Label: Douglas Adams (en)
+ # Description: English author and humourist (1952–2001) (en)
+ # Aliases:
+ #   Douglas Noël Adams (en)
+ #   DNA (en)
+ # Sitelinks:
+ #   ডগলাস অ্যাডামস (bnwiki)
+ #   Дуглас Адамс (ukwikiquote)
+ #   Douglas Adams (trwiki)
+ #   道格拉斯·亚当斯 (wuuwiki)
+ #   Douglas Adams (dewikiquote)
+ #   Douglas Adams (frwikiquote)
+ #   Douglas Adams (nnwiki)
+ #   ਡਗਲਸ ਐਡਮਸ (pawiki)
+ #   ڈگلس ایڈمس (pnbwiki)
+ #   Douglas Adams (zh_min_nanwiki)
+ #   დაგლას ადამსი (kawiki)
+ #   Douglas Adams (cawiki)
+ #   Duqlas Adams (azwiki)
+ #   Douglas Adams (simplewiki)
+ #   Ντάγκλας Άνταμς (elwiki)
+ #   Douglas Adams (igwikiquote)
+ #   Douglas Adams (bswikiquote)
+ #   Douglas Adams (svwiki)
+ #   Дъглас Адамс (bgwiki)
+ #   Douglas Adams (fiwiki)
+ #   Douglas Adams (iswiki)
+ #   دوجلاس ادامز (arzwiki)
+ #   Douglas Adams (skwiki)
+ #   Даглас Адамс (srwiki)
+ #   Douglas Adams (fywiki)
+ #   Douglas Adams (jvwiki)
+ #   Adams Duglas (vepwiki)
+ #   Douglas Adams (astwiki)
+ #   Douglas Adams (shwiki)
+ #   Duglassius Adams (lawiki)
+ #   Douglas Adams (glwiki)
+ #   Douglas Adams (nowiki)
+ #   Douglas Adams (itwiki)
+ #   Douglas Adams (plwikiquote)
+ #   دوغلاس آدمز (arwiki)
+ #   Douglas Adams (sqwiki)
+ #   Douglas Adams (kwwiki)
+ #   דאגלס אדמס (hewikiquote)
+ #   Douglas Adams (afwiki)
+ #   Douglas Adams (ptwiki)
+ #   Douglas Adams (nlwiki)
+ #   Douglas Adams (eswikiquote)
+ #   Douglas Adams (idwikiquote)
+ #   Douglas Adams (slwiki)
+ #   Дуглас Ноэль Адамс (ruwikiquote)
+ #   Douglas Adams (enwiki)
+ #   داگلاس آدامز (fawiki)
+ #   Դուգլաս Ադամս (hywikiquote)
+ #   Douglas Adams (cswiki)
+ #   Douglas Adams (eowiki)
+ #   Douglas Adams (iewiki)
+ #   道格拉斯·亚当斯 (zhwiki)
+ #   Douglas Adams (barwiki)
+ #   道格拉斯亞當斯 (zh_yuewiki)
+ #   Douglas Adams (warwiki)
+ #   Douglas Adams (etwikiquote)
+ #   Douglas Adams (iawiki)
+ #   Douglas Adams (mswiki)
+ #   Дуглас Адамз (be_x_oldwiki)
+ #   Douglas Adams (hrwiki)
+ #   Douglas Adams (lfnwiki)
+ #   Douglas Adams (ltwiki)
+ #   Дуглас Адамс (kywiki)
+ #   Douglas Adams (huwiki)
+ #   Douglas Adams (euwiki)
+ #   Douglas Adams (cywiki)
+ #   Douglas Adams (glwikiquote)
+ #   Douglas Adams (itwikiquote)
+ #   Douglas Adams (plwiki)
+ #   دوجلاس آدامز (arwikiquote)
+ #   Douglas Adams (iowiki)
+ #   דאגלס אדמס (hewiki)
+ #   ഡഗ്ലസ് ആഡംസ് (mlwiki)
+ #   Douglas Adams (skwikiquote)
+ #   Даглас Адамс (srwikiquote)
+ #   Douglas Adams (scowiki)
+ #   Ντάγκλας Άνταμς (elwikiquote)
+ #   Douglas Adams (dawiki)
+ #   Douglas Adams (bswiki)
+ #   Douglas Adams (svwikiquote)
+ #   Адамс, Дуглас (mrjwiki)
+ #   Douglas Adams (fiwikiquote)
+ #   Дъглас Адамс (bgwikiquote)
+ #   ডগলাস অ্যাডামস (bnwikiquote)
+ #   ڈگلس ایڈمس (urwiki)
+ #   Дуглас Адамс (ukwiki)
+ #   Douglas Adams (trwikiquote)
+ #   Douglas Adams (dewiki)
+ #   Douglas Adams (frwiki)
+ #   Douglas Adams (gawiki)
+ #   Duqlas Noel Adams (azwikiquote)
+ #   Douglas Adams (ocwiki)
+ #   Douglas Adams (simplewikiquote)
+ #   Douglas Adams (liwikiquote)
+ #   Douglas Adamsas (ltwikiquote)
+ #   داقلاس آدامز (azbwiki)
+ #   Дуглас Адамс (bawiki)
+ #   Douglas Adams (mgwiki)
+ #   Douglas Adams (huwikiquote)
+ #   Douglas Adams (cswikiquote)
+ #   Douglas Adams (guwwikiquote)
+ #   道格拉斯·亞當斯 (zhwikiquote)
+ #   Douglas Adams (eowikiquote)
+ #   Douglas Adams (viwiki)
+ #   Douglas Adams (etwiki)
+ #   Дуглас Адамс (bewiki)
+ #   Douglas Adams (rowiki)
+ #   Duglass Adamss (lvwiki)
+ #   Douglas Adams (enwikiquote)
+ #   داگلاس آدامز (fawikiquote)
+ #   டக்ளஸ் ஆடம்ஸ் (tawiki)
+ #   Դուգլաս Ադամս (hywiki)
+ #   Douglas Adams (ptwikiquote)
+ #   Douglas Adams (scwiki)
+ #   Douglas Adams (eswiki)
+ #   Даглас Адамс (mkwiki)
+ #   Douglas Adams (nlwikiquote)
+ #   डग्लस अ‍ॅडम्स (mrwiki)
+ #   Douglas Adams (idwiki)
+ #   더글러스 애덤스 (kowiki)
+ #   ダグラス・アダムズ (jawiki)
+ #   Адамс, Дуглас (ruwiki)
+ # Statements:
+ #   P10266: 97049 (normal)
+ #   P1315: 847711 (normal)
+ #   P2581: 03688580n (normal)
+ #   P2963: 4 (normal)
+ #    P585: 28 September 2020 (Q1985727)
+ #    P1810: Douglas Adams
+ #    P3744: 19460
+ #   P9196: douglas-adams (normal)
+ #   P1890: 000750942 (normal)
+ #   P3192: Douglas+Adams (normal)
+ #   P10302: douglas-adams (normal)
+ #   P1712: person/douglas-adams (normal)
+ #   P7084: Q8722666 (normal)
+ #    P4224: Q109122021
+ #   P4789: U4994 (normal)
+ #   P8408: DouglasAdams (normal)
+ #   P7071: douglas-adams (normal)
+ #   P7775: Douglas_Adams (normal)
+ #   P1266: 97049 (normal)
+ #   P5247: 3040-1126 (normal)
+ #   P26: Q14623681 (normal)
+ #    P580: 25 November 1991 (Q1985727)
+ #    P582: 11 May 2001 (Q1985727)
+ #    P1534: Q99521170
+ #   P1424: Q22898962 (normal)
+ #   P910: Q8935487 (normal)
+ #   P6173: 3352 (normal)
+ #   P6464: 898203 (normal)
+ #   P7303: douglas-adams/214 (normal)
+ #   P7803: 40761 (normal)
+ #   P3373: Q14623673 (normal)
+ #    P1039: Q10943095
+ #   P8313: Douglas_Adams (normal)
+ #   P2191: 10014 (normal)
+ #   P349: 00430962 (normal)
+ #   P214: 113230702 (normal)
+ #   P4204: Douglas-Adams (normal)
+ #   P800: Q25169 (normal)
+ #   P800: Q20736364 (normal)
+ #   P800: Q7758404 (normal)
+ #   P6394: a1112474x (normal)
+ #   P8851: 26792807 (normal)
+ #   P3305: 199918 (normal)
+ #   P463: Q857679 (normal)
+ #   P463: Q5610831 (normal)
+ #   P866: douglas-adams (normal)
+ #   P136: Q24925 (normal)
+ #   P136: Q40831 (normal)
+ #   P136: Q128758 (normal)
+ #   P6327: 55720 (normal)
+ #   P7154: adams+douglas (normal)
+ #   P7293: 9810669145205606 (normal)
+ #   P5034: KAC200300379 (normal)
+ #   P9171: 95368 (normal)
+ #   P11194: people/douglas-adams (normal)
+ #   P2607: 307812da-da11-4ee5-a906-31e5ce9694bb (normal)
+ #   P5008: Q6173448 (normal)
+ #    P585: 31 October 2022 (Q1985727)
+ #   P10291: 82260 (normal)
+ #   P10832: E39PBJxhkQGbbdgtx94vJRmrv3 (normal)
+ #   P1149: PR6051.D3352 (normal)
+ #   P2889: 9XLD-SZS (normal)
+ #   P4359: douglasadams (normal)
+ #   P2087: douglas-adams (normal)
+ #   P6886: Q1860 (normal)
+ #   P2949: Adams-32825 (normal)
+ #    P1810: Douglas Noel Adams (11 Mar 1952 - 11 May 2001)
+ #   P6620: douglas-adams (normal)
+ #   P396: RAVV034417 (normal)
+ #    P1810: Adams, Douglas <1952-2001>
+ #   P10387: 75 (normal)
+ #   P7284: douglas-adams (normal)
+ #   P1263: 731/000023662 (normal)
+ #   P5404: douglas_adams (normal)
+ #   P109: Douglas Adams signature.svg (normal)
+ #    P2096: Douglas Adams'ın imzası (tr)
+ #   P648: OL272947A (normal)
+ #   P5284: 1032346 (normal)
+ #   P4839: Entity["Person", "DouglasAdams::gh8qf"] (normal)
+ #   P7214: 753186 (normal)
+ #   P2188: 45993 (normal)
+ #   P7859: lccn-n80076765 (normal)
+ #   P7215: 46398 (normal)
+ #   P2021: 10 (deprecated)
+ #    P3680: unknown value
+ #    P585: 13 April 2017 (Q1985727)
+ #   P2638: people/douglas-adams (normal)
+ #   P119: Q533697 (normal)
+ #    P625: (51.5665277777778, -0.145444444444444)
+ #   P8179: ncf10168152 (normal)
+ #   P20: Q159288 (normal)
+ #   P2604: 246164 (normal)
+ #   P9743: 107a9B0DKL (normal)
+ #   P1006: 068744307 (normal)
+ #    P1810: Adams, Douglas (1952-2001)
+ #   P1006: 339433876 (normal)
+ #    P1810: Adams, Douglas (1952-2001)
+ #   P19: Q350 (normal)
+ #   P2850: 2080713 (normal)
+ #   P7369: 000263040 (normal)
+ #   P4438: 4ce2ba117755a (normal)
+ #   P5361: AdamsDouglas1952-2001 (normal)
+ #   P6262: hitchhikers:Douglas_Adams (normal)
+ #    P407: Q1860
+ #    P1810: Douglas Adams
+ #    P9675: 1668
+ #   P6262: tardis:Douglas_Adams (normal)
+ #    P407: Q1860
+ #    P1810: Douglas Adams
+ #    P9675: 8825
+ #   P6262: ru.tardis:Дуглас_Адамс (normal)
+ #    P407: Q7737
+ #    P1810: Дуглас Адамс
+ #    P9675: 28118
+ #   P6262: montypython:Douglas_Adams (normal)
+ #    P407: Q1860
+ #    P1810: Douglas Adams
+ #    P9675: 1927
+ #   P6262: dirkgently:Douglas_Adams (normal)
+ #    P407: Q1860
+ #    P1810: Douglas Adams
+ #    P9675: 2133
+ #   P6262: disney:Douglas_Adams (normal)
+ #    P407: Q1860
+ #    P1810: Douglas Adams
+ #    P9675: 161805
+ #   P6262: muppet:Douglas_Adams (normal)
+ #    P407: Q1860
+ #    P1810: Douglas Adams
+ #    P9675: 15796
+ #   P6262: getfuzzy:Douglas_Adams (normal)
+ #    P407: Q1860
+ #    P1810: Douglas Adams
+ #    P9675: 2050
+ #   P6262: readyplayerone:Douglas_Adams (normal)
+ #    P407: Q1860
+ #    P1810: Douglas Adams
+ #    P9675: 2244
+ #   P2722: 4468812 (normal)
+ #    P1810: Douglas Adams
+ #    P3744: 60
+ #   P9247: 641594 (normal)
+ #   P6874: Douglas-Adams (normal)
+ #   P2605: 39534 (normal)
+ #   P1368: 000057405 (normal)
+ #   P11249: 14651562 (normal)
+ #   P3430: w65h7md1 (normal)
+ #   P3388: 168761 (normal)
+ #   P1233: 122 (normal)
+ #   P11686: 981058527710806706 (normal)
+ #   P21: Q6581097 (normal)
+ #   P9995: 157777 (normal)
+ #   P5408: a/douglas-adams (normal)
+ #   P937: Q84 (normal)
+ #   P373: Douglas Adams (normal)
+ #   P7763: Q73555012 (normal)
+ #   P8849: 6391909 (normal)
+ #   P268: 11888092r (normal)
+ #   P3845: 665243 (normal)
+ #   P4657: 432740401 (normal)
+ #   P11345: douglas-adams-vzq5h5r3 (normal)
+ #    P1810: Douglas Adams
+ #   P7700: vtls005710289 (normal)
+ #   P213: 0000 0000 8045 6315 (normal)
+ #   P7506: 2078791 (normal)
+ #   P4193: Douglas_Noel_Adams_(1952-2001) (normal)
+ #   P2048: +1.96 (Q11573) (normal)
+ #   P22: Q14623675 (normal)
+ #   P2435: 208947 (normal)
+ #   P7699: LNB:Mr+;=Bf (normal)
+ #   P3368: 215957 (normal)
+ #   P3222: douglas-adams (normal)
+ #   P1477: Douglas Noël Adams (en) (normal)
+ #   P3136: 2000059 (normal)
+ #   P7029: 770139179 (normal)
+ #    P1810: Адамс, Дуглас (1952-2001)
+ #    P407: Q7737
+ #   P7029: 770139180 (normal)
+ #    P1810: Adams, Douglas (1952-2001)
+ #    P407: Q1860
+ #   P3106: books/douglasadams (normal)
+ #   P3984: douglasadams (normal)
+ #    P1810: Douglas Adams: From Hitchhikers to Holistic Detectives
+ #    P407: Q1860
+ #    P580: 6 February 2011 (Q1985727)
+ #   P1280: 6050147 (normal)
+ #   P3630: 2627 (normal)
+ #   P6972: douglas-adams (normal)
+ #   P5340: 278771 (normal)
+ #   P1695: a0000001157306 (normal)
+ #   P3348: 202604 (normal)
+ #   P7300: 59932 (normal)
+ #   P8895: Douglas_Adams (normal)
+ #   P8287: 1430 (normal)
+ #   P646: /m/0282x (normal)
+ #   P3762: 140290 (normal)
+ #   P40: Q14623683 (normal)
+ #   P1411: Q3414212 (normal)
+ #    P1686: Q3521267
+ #    P585: 1979 (Q1985727)
+ #   P1411: Q2576795 (normal)
+ #    P585: 1983 (Q1985727)
+ #    P1686: Q721
+ #   P10069: 61960 (normal)
+ #   P906: 230807 (normal)
+ #   P18: Douglas adams portrait cropped.jpg (normal)
+ #    P2096: Porträtt av Douglas Adams. (sv)
+ #    P2096: Douglas Adams portresi (tr)
+ #    P2096: Douglas Adams ååʹbleǩkartt (sms)
+ #    P2096: Douglas Adamsin muotokuva (fi)
+ #    P2096: Portrait of Douglas Adams (en)
+ #    P2096: פורטרט של דאגלס אדמס (he)
+ #    P2096: Portrait von Douglas Adams (de)
+ #    P2096: Portret Douglasa Adamsa (pl)
+ #    P2096: Potret Douglas Adams (ms)
+ #    P2096: ڤوتريت دݢلس ايدمﺯ (ms-arab)
+ #    P2096: Chân dung Douglas Adams (vi)
+ #    P2096: Portrait de Douglas Adams (fr)
+ #    P2096: Portrett av Douglas Adams (nb)
+ #    P2096: پرتره از داگلاس آدامز (fa)
+ #    P2096: Portret Douglasa Adamsa (sh)
+ #    P2096: డగ్లస్ ఆడమ్స్ ఫొటో (te)
+ #   P2626: 159696 (normal)
+ #   P2168: 271209 (normal)
+ #   P6839: Creator/DouglasAdams (normal)
+ #   P3365: douglas-noel-adams (normal)
+ #    P1810: Adams, Douglas Noël
+ #   P244: n80076765 (normal)
+ #    P1810: Adams, Douglas, 1952-2001
+ #    P4970: אדאמס, דאגלאס, 1952-2001-
+ #    P4970: 亞當斯, 1952-2001
+ #   P6351: 41236 (normal)
+ #   P5357: adams_douglas (normal)
+ #   P4198: Acv2pnc5mj2oxjxych7atdfljky (normal)
+ #   P3417: Douglas-Adams-4 (normal)
+ #   P269: 026677636 (normal)
+ #   P1617: aa075cb6-75bf-46d8-b0bf-9751d6c04c93 (normal)
+ #   P4619: 000592321 (normal)
+ #   P7745: 183956 (normal)
+ #   P947: 000002833 (normal)
+ #   P535: 22814 (normal)
+ #   P1953: 134923 (normal)
+ #   P11496: 1140563741729620096 (normal)
+ #   P9965: 40231 (normal)
+ #   P485: Q67074906 (normal)
+ #    P973: https://www.sjcarchives.org.uk/personal/index.php/papers-of-douglas-noel-adams
+ #   P856: https://douglasadams.com/ (normal)
+ #    P407: Q1860
+ #   P434: e9ed318d-8cc5-4cf8-ab77-505e39ab6ea4 (normal)
+ #   P6298: 16115 (normal)
+ #   P2387: 1289170 (normal)
+ #   P551: Q159288 (normal)
+ #    P582: 11 May 2001 (Q1985727)
+ #   P551: Q84 (preferred)
+ #   P551: Q909993 (preferred)
+ #    P580: 1957 (Q1985727)
+ #   P8385: 23691 (normal)
+ #   P8125: 3339 (normal)
+ #   P106: Q214917 (normal)
+ #   P106: Q28389 (normal)
+ #   P106: Q6625963 (normal)
+ #    P580: 1979 (Q1985727)
+ #   P106: Q4853732 (normal)
+ #   P106: Q18844224 (normal)
+ #   P106: Q245068 (normal)
+ #   P106: Q36180 (normal)
+ #   P106: Q639669 (normal)
+ #   P6329: 860573 (normal)
+ #   P6329: 9160480 (normal)
+ #   P9251: 80743 (normal)
+ #   P2163: 56544 (normal)
+ #    P1810: Adams, Douglas, 1952-2001
+ #   P2163: 1775523 (normal)
+ #    P1810: Adams, Douglas
+ #   P3204: 231695 (normal)
+ #   P140: Q7066 (normal)
+ #   P1442: Douglas Adams' gravestone.jpg (normal)
+ #    P585: 24 October 2008 (Q1985727)
+ #    P2096: Douglas Adams' gravestone (en)
+ #    P2096: Grabstein von Douglas Adams (de)
+ #    P2096: Douglas Adams'ın mezar taşı (tr)
+ #    P2096: Batu nisan Douglas Adams (ms)
+ #    P2096: باتو نيسن دݢلس ايدمﺯ (ms-arab)
+ #    P2096: náhrobek Douglase Adamse (cs)
+ #    P2096: 道格拉斯·亞當斯的墓碑 (zh-hant)
+ #    P2096: 道格拉斯·亚当斯的墓碑 (zh-hans)
+ #   P1005: 68537 (normal)
+ #   P569: 11 March 1952 (Q1985727) (normal)
+ #   P1580: a1221374 (normal)
+ #   P108: Q9531 (normal)
+ #   P108: Q3520623 (normal)
+ #    P580: 1996 (Q1985727)
+ #   P25: Q14623678 (normal)
+ #   P227: 119033364 (normal)
+ #   P1889: Q21454969 (normal)
+ #   P6517: Douglas-Adams (normal)
+ #   P9807: 153440 (normal)
+ #   P9807: 172463 (normal)
+ #   P1343: Q67311526 (normal)
+ #    P2699: https://www.obalkyknih.cz/view_auth?auth_id=jn19990000029
+ #   P2734: AdamsDouglas (normal)
+ #   P1273: a10667040 (normal)
+ #   P3846: 87097968038642 (normal)
+ #   P1670: 0052C2705 (normal)
+ #   P11182: 124007 (normal)
+ #   P9307: Douglas_Adams (normal)
+ #   P7400: adamsdouglas-1 (normal)
+ #   P11683: duglas-adams (normal)
+ #   P10553: 079822096 (normal)
+ #   P1417: biography/Douglas-Adams (normal)
+ #    P1810: Douglas Adams
+ #   P742: David Agnew (normal)
+ #    P805: Q11036149
+ #   P1015: 90196888 (normal)
+ #   P9984: 981058527710806706 (normal)
+ #   P2373: Douglas-adams (normal)
+ #   P7502: Douglas_Adams-YNBW (normal)
+ #   P5905: 4040-45935 (normal)
+ #   P5570: 143 (normal)
+ #   P172: Q7994501 (normal)
+ #   P4326: 215853 (normal)
+ #   P2600: 6000000050650155828 (normal)
+ #   P7661: 74033 (normal)
+ #   P5297: x2e9kt_zKEDI0dPr3sAfM_jyUhA (normal)
+ #    P1810: Douglas Noel ADAMS
+ #   P3341: 21019 (normal)
+ #   P949: 000163846 (normal)
+ #   P1728: mn0000803382 (normal)
+ #   P4782: 26898 (normal)
+ #   P3142: n0008574 (normal)
+ #   P166: Q2687578 (normal)
+ #    P585: 1983 (Q1985727)
+ #   P166: Q906455 (normal)
+ #   P7433: 25 (normal)
+ #   P3065: 02-A002907983 (normal)
+ #   P1207: n94004172 (normal)
+ #   P1816: mp60152 (normal)
+ #   P1412: Q1860 (normal)
+ #   P1340: Q17122705 (normal)
+ #   P5695: 8052 (normal)
+ #   P1258: celebrity/douglas_adams (normal)
+ #   P691: jn19990000029 (normal)
+ #    P1810: Adams, Douglas
+ #   P1559: Douglas Adams (en) (normal)
+ #   P9918: PE00105434 (normal)
+ #   P2611: douglas_adams (normal)
+ #   P6868: 1402475181 (normal)
+ #   P11158: 23914 (normal)
+ #   P1828: 00218511589 (normal)
+ #    P1810: ADAMS DOUGLAS
+ #   P5019: adams-douglas-noel (normal)
+ #   P998: Arts/Literature/Authors/A/Adams,_Douglas/ (preferred)
+ #    P407: Q1860
+ #   P998: World/Dansk/Kultur/Litteratur/Forfattere/A/Adams,_Douglas/ (normal)
+ #    P407: Q9035
+ #   P998: World/Français/Arts/Littérature/Genres/Science-fiction_et_fantastique/Auteurs/Adams,_Douglas/ (normal)
+ #    P407: Q150
+ #   P998: World/Deutsch/Kultur/Literatur/Autoren_und_Autorinnen/A/Adams,_Douglas/ (normal)
+ #    P407: Q188
+ #   P998: World/Italiano/Arte/Letteratura/Autori/A/Adams,_Douglas/ (normal)
+ #    P407: Q652
+ #   P998: World/Svenska/Kultur/Litteratur/Genre/Science_fiction_och_fantasy/Författare/Adams,_Douglas/ (normal)
+ #    P407: Q9027
+ #   P345: nm0010930 (normal)
+ #   P1303: Q6607 (normal)
+ #   P2469: 238p (normal)
+ #   P7902: 119033364 (normal)
+ #   P3154: adamsdou (normal)
+ #   P5882: M00000364497 (normal)
+ #   P9802: 114 (normal)
+ #   P10337: A/adams-douglas (normal)
+ #   P1415: 75853 (normal)
+ #   P5534: 52843 (normal)
+ #   P4666: 23878 (normal)
+ #   P101: Q3238422 (normal)
+ #   P5033: 160192 (normal)
+ #   P1375: 000010283 (normal)
+ #   P69: Q4961791 (normal)
+ #    P582: 1970 (Q1985727)
+ #    P580: 1959 (Q1985727)
+ #   P69: Q691283 (normal)
+ #    P582: 1974 (Q1985727)
+ #    P812: Q186579
+ #    P512: Q1765120
+ #    P580: 1971 (Q1985727)
+ #   P3145: nm96558 (normal)
+ #   P4785: 47671 (normal)
+ #   P11180: 9861 (normal)
+ #   P11120: douglas-adams (normal)
+ #   P7195: 201077 (normal)
+ #   P271: DA07517784 (normal)
+ #   P5233: a38 (normal)
+ #   P3913: 337 (normal)
+ #   P4985: 52843 (normal)
+ #   P9100: douglas-adams (normal)
+ #   P4431: douglas-adams-61st-birthday (normal)
+ #    P585: 11 March 2013 (Q1985727)
+ #   P1196: Q3739104 (normal)
+ #   P8292: 236432 (normal)
+ #   P3479: 39a33dc4-5a81-4d67-91d6-1daecdb854e3 (normal)
+ #   P4862: B000AQ2A84 (normal)
+ #   P950: XX1149955 (normal)
+ #   P570: 11 May 2001 (Q1985727) (normal)
+ #   P5587: 1zcfh30k0gr4zxt (normal)
+ #   P6119: douglas-adams (normal)
+ #   P2019: p279442 (normal)
+ #   P31: Q5 (normal)
+ #   P5365: 42 (normal)
+ #   P8189: 987007305652505171 (normal)
+ #   P103: Q1860 (normal)
+ #   P27: Q145 (normal)
+ #   P7704: agent/base/59925 (normal)
+ #   P409: 35163268 (normal)
+ #   P4342: Douglas_Adams (normal)
+ #   P1813: Douglas Adams (en) (normal)
+ #   P734: Q351735 (normal)
+ #   P5337: CAAqJQgKIh9DQkFTRVFvSUwyMHZNREk0TW5nU0JXVnVMVWRDS0FBUAE (normal)
+ #   P735: Q463035 (normal)
+ #    P1545: 1
+ #    P3831: Q3409033
+ #   P735: Q19688263 (normal)
+ #    P1545: 2
+ #   P509: Q12152 (normal)
+ #   P1284: 00000020676 (normal)
+ #   P4768: 212786 (normal)
 
 =head1 REPOSITORY
 
@@ -78,6 +642,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

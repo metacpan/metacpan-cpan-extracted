@@ -1,3 +1,8 @@
+2.010 2023-10-29
+
+    * remove support of obsolete pseudo-hashes
+      (fix Debian #1054981)
+
 2.009 2014-08-03
 
     * fix nb of test skipped when Tk window cannot be created

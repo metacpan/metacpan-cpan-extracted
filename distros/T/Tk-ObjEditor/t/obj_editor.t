@@ -75,7 +75,6 @@ sub new {
         'piped|key'      => { a => 1, b => 2 },
         'scalar_ref_ref' => \\$scalar,
         'empty string'   => '',
-        'pseudo hash'      => [ { a => 1, b => 2 }, 'a value', 'bvalue' ],
         'non_empty string' => ' ',
         'long'             => 'very long line' . '.' x 80,
         'is undef'         => undef,
@@ -96,7 +95,7 @@ package main;
 ok( 1, "compiled" );
 
 my $toto;
-my $mw = eval { MainWindow->new };
+my $mw = eval { MainWindow->new(-width => 600, -height => 400) };
 
 SKIP: {
     skip "Cannot open Tk", 4 unless defined $mw;

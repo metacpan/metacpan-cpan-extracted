@@ -1,6 +1,6 @@
 package SPVM::Regex;
 
-our $VERSION = "0.242001";
+our $VERSION = "0.243001";
 
 1;
 
@@ -179,11 +179,11 @@ The alias for the following L<match_forward|/"match_forward"> method.
 
 =head2 match_forward
 
-  method match_forward : Regex::Match ($string : string, $offset : int*, $length : int = -1);
+  method match_forward : Regex::Match ($string : string, $offset_ref : int*, $length : int = -1);
 
-Performs pattern matching on the substring from the offset $offset to the length $length of the string $string.
+Performs pattern matching on the substring from the offset $$offset_ref to the length $length of the string $string.
 
-The $offset is updated to the next position.
+The $$offset_ref is updated to the next position.
 
 If the pattern matching is successful, returns a L<Regex::Match|SPVM::Regex::Match> object. Otherwise returns undef.
 
@@ -259,6 +259,50 @@ Exceptions of the L<match_forward|/"match_forward"> method can be thrown.
   method split : string[] ($string : string, $limit : int = 0);
 
 The same as the L<split||SPVM::Fn/"split"> method in the L<Fn|SPVM::Fn> class, but the regular expression is used as the separator.
+
+=head2 buffer_match
+
+  method buffer_match : Regex::Match ($string_buffer : StringBuffer, $offset : int = 0, $length : int = -1);
+
+The same as L</"match">, but the first argument is a L<StringBuffer|SPVM::StringBuffer> object, and the following excetpions are thrown.
+
+Exceptions:
+
+The $offset + $length must be less than or equalt to the lenght of the $string_buffer. Otherwise an exception is thrown.
+
+=head2 buffer_match_forward
+
+  method buffer_match_forward : Regex::Match ($string_buffer : StringBuffer, $offset_ref : int*, $length : int = -1);
+
+The same as L</"match_forward">, but the first argument is a L<StringBuffer|SPVM::StringBuffer> object, and the following excetpions are thrown.
+
+Exceptions:
+
+The $offset + $length must be less than or equalt to the lenght of the $string_buffer. Otherwise an exception is thrown.
+
+=head2 buffer_replace
+
+  method buffer_replace  : void ($string_buffer : StringBuffer, $replace : object of string|Regex::Replacer, $offset : int = 0, $length : int = -1, $options : object[] = undef);
+
+The same as L</"replace">, but the first argument is a L<StringBuffer|SPVM::StringBuffer> object, and the return type is void.
+
+The replacement is performed on the string buffer.
+
+=head2 buffer_replace_g
+
+  method buffer_replace_g  : string ($string_buffer : StringBuffer, $replace : object of string|Regex::Replacer, $offset : int = 0, $length : int = -1, $options : object[] = undef);
+
+The same as L</"replace_g">, but the first argument is a L<StringBuffer|SPVM::StringBuffer> object, and the return type is void.
+
+The replacement is performed on the string buffer.
+
+=head2 buffer_replace_common
+
+  method buffer_replace_common : void ($string_buffer : StringBuffer, $replace : object of string|Regex::Replacer, $offset_ref : int*, $length : int = -1, $options : object[] = undef);
+
+The same as L</"replace_common">, but the first argument is a L<StringBuffer|SPVM::StringBuffer> object, and the return type is void.
+
+The replacement is performed on the string buffer.
 
 =head2 cap1
 

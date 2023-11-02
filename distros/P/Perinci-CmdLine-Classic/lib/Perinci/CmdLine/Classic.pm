@@ -12,9 +12,9 @@ use Perinci::Object;
 use Scalar::Util qw(blessed);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2023-10-30'; # DATE
 our $DIST = 'Perinci-CmdLine-Classic'; # DIST
-our $VERSION = '1.817'; # VERSION
+our $VERSION = '1.818'; # VERSION
 
 our $REQ_VERSION = 0; # version requested by user
 
@@ -493,7 +493,7 @@ sub hook_format_result {
 
     require Perinci::Result::Format;
 
-    unless ($format ~~ @{ $self->formats }) {
+    unless (grep { $_ eq $format } @{ $self->formats }) {
         warn "Unknown output format '$format'";
         $format = 'text';
     }
@@ -781,7 +781,7 @@ Perinci::CmdLine::Classic - Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.817 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2022-10-19.
+This document describes version 1.818 of Perinci::CmdLine::Classic (from Perl distribution Perinci-CmdLine-Classic), released on 2023-10-30.
 
 =head1 SYNOPSIS
 
@@ -1032,11 +1032,21 @@ L<Perinci::CmdLine::Any>, L<Perinci::CmdLine::Lite>.
 
 perlancar <perlancar@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Steven Haryanto
+=for stopwords s1 Steven Haryanto
+
+=over 4
+
+=item *
+
+s1 <s1@localhost>
+
+=item *
 
 Steven Haryanto <stevenharyanto@gmail.com>
+
+=back
 
 =head1 CONTRIBUTING
 
@@ -1058,7 +1068,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

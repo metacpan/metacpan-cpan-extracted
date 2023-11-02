@@ -572,3 +572,15 @@ Revision history for StreamFinder
         - StreamFinder::Subsplash - Restore as EXPERIMENTAL, as this site 
         seems to now work again, at least for audio streams on some sites.
         - StreamFinder::Anystream - doc. touchups.
+2.20    2023/10/24
+        - Update default user-agent to:
+        "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0"
+        - StreamFinder::Apple - Handle "embedded" Apple podcasts 
+        (https://embed.podcasts.apple.com/).  Also fix embedded 
+        subsplash.com stream URLs that contain "\u00##" characters and were 
+        being trimmed when encountered.
+        - StreamFinder::Rumble - Convert one of their hosting sites that no 
+        longer works (hugh.cdn.rumble.cloud/video) to the standard one that 
+        still does (sp.rmbl.ws).
+        - StreamFinder::Youtube - Try harder to get the first (most recent) 
+        video from channel pages (by skipping any "banner" video before it).

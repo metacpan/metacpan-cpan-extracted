@@ -1,5 +1,24 @@
 Revision history for Perl extension UUID.
 
+0.30 Tue Oct 31 17:16:50 EDT 2023
+  - Make all devel version use UUID_DEBUG=1.
+  - Bump ExtUtils::MakeMaker prereq to 6.64 (first version supporting
+    TEST_REQUIRES).
+  - Add debug message to show current Devel::CheckLib::VERSION.
+  - Add debug message to show current ExtUtils::MakeMaker::VERSION.
+  - Reorder configure tests for win32.
+  - Add RPC_CSTR typedef for older Win32.
+  - Define UuidCreateSequential() for older Win32.
+  - Make META.json and META.yml placeholders. Generate during distdir.
+  - Make README a placeholder. Generate during distdir.
+  - Fix trivial build warning.
+
+0.29 Wed Oct 25 01:15:57 EDT 2023
+  - Bump prereq version for Devel::CheckLib to 1.14 to fix problems with
+    Strawberry versions 5.18 to 5.28. Earlier Strawberry did not ship
+    Devel::CheckLib. Newer versions shipped 1.14 or later.
+    - Thanks to twata. [rt.cpan.org #143841]
+
 0.28 Sat Dec 29 00:59:25 EST 2018
   - Add OSSP variant of libuuid. CentOS7 (and presumably other RedHat
     derivatives) have packages for both OSSP and e2fs. Favor e2fs, if

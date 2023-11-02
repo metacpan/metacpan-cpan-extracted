@@ -1,7 +1,7 @@
 package CodeGen::Cpppp::Template;
 
-our $VERSION = '0.001'; # VERSION
-# ABSTRACT: Parent of template classes created by parsing and compiling cpppp
+our $VERSION = '0.002'; # VERSION
+# ABSTRACT: Base class for template classes created by compiling cpppp
 
 use v5.20;
 use warnings;
@@ -127,8 +127,10 @@ sub new($class, @args) {
    }
 
    my $self= bless {
+      autocomma => 1,
+      autostatementline => 1,
       (map +($_ => $parse->{$_}), qw(
-         autocomma autoindent autostatementline autocolumn
+         autoindent autocolumn
          context
       )),
       output => CodeGen::Cpppp::Output->new,
@@ -138,7 +140,7 @@ sub new($class, @args) {
    Scalar::Util::weaken($self->{context})
       if $self->{context};
    $self->BUILD(\%attrs);
-   $self;
+   $self->flush;
 }
 
 
@@ -232,22 +234,23 @@ sub _render_code_block {
    my ($self, $i, @expr_subs)= @_;
    my $block= $self->_parse_data->{code_block_templates}[$i];
    my $text= $block->{text};
+   # Continue appending to the same output buffer so that autocolumn can
+   # inspect the result as a whole.
    my $out= \($self->{current_out} //= '');
    my $at= 0;
    my %colmarker;
-   my $prev_colmark;
-   # First pass, perform substitutions and record new column markers
-   my $subst= $block->{subst};
-   for (my $i= 0; $i < @$subst; $i++) {
-      my $s= $subst->[$i];
+   # @subst contains a list of positions in the template body where text
+   # may need inserted.
+   for my $s (@{$block->{subst}}) {
       $$out .= substr($text, $at, $s->{pos} - $at);
       $at= $s->{pos} + $s->{len};
+      # Column marker - may substitute for whitespace during _finish_render
       if ($s->{colgroup}) {
          my $mark= $colmarker{$s->{colgroup}} //= _colmarker($s->{colgroup});
          $$out .= $mark;
-         $prev_colmark= $s;
          $self->{current_out_colgroup_state}{$s->{colgroup}}= $s->{last}? 2 : 1;
       }
+      # Variable interpolation - insert value of one of the @expr_subs here
       elsif (defined $s->{eval_idx}) {
          my $fn= $expr_subs[$s->{eval_idx}]
             or die;
@@ -323,11 +326,11 @@ __END__
 
 =head1 NAME
 
-CodeGen::Cpppp::Template - Parent of template classes created by parsing and compiling cpppp
+CodeGen::Cpppp::Template - Base class for template classes created by compiling cpppp
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 DESCRIPTION
 

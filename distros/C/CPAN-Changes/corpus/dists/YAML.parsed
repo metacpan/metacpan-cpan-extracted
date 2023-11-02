@@ -1,0 +1,1229 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "date" => "2014-02-10T08:42:31Z",
+      "entries" => [
+        {
+          "line" => 2,
+          "raw" => " - Revert Mo from 0.38 to 0.31 - zefram++ reported it breaking cpan client\n\n",
+          "style" => "-",
+          "text" => "Revert Mo from 0.38 to 0.31 - zefram++ reported it breaking cpan client"
+        }
+      ],
+      "line" => 1,
+      "raw" => "0.90 Mon Feb 10 08:42:31 PST 2014\n",
+      "raw_date" => "Mon Feb 10 08:42:31 PST 2014",
+      "version" => "0.90"
+    },
+    {
+      "date" => "2014-11-08T12:51:48Z",
+      "entries" => [
+        {
+          "line" => 5,
+          "raw" => " - Fixed tests to work under parallel testing -- kentnl\n",
+          "style" => "-",
+          "text" => "Fixed tests to work under parallel testing -- kentnl"
+        },
+        {
+          "line" => 6,
+          "raw" => " - Switched to dzil release process\n\n",
+          "style" => "-",
+          "text" => "Switched to dzil release process"
+        }
+      ],
+      "line" => 4,
+      "raw" => "0.89 Sat Nov  8 12:51:48 PST 2014\n",
+      "raw_date" => "Sat Nov  8 12:51:48 PST 2014",
+      "version" => "0.89"
+    },
+    {
+      "date" => "2013-12-03T05:29:34Z",
+      "entries" => [
+        {
+          "line" => 9,
+          "raw" => " - Fixed YAML loading on perl 5.8 (broken in YAML 0.85) by removing\n   5.10-specific regex construct. -- hobbs++\n\n",
+          "style" => "-",
+          "text" => "Fixed YAML loading on perl 5.8 (broken in YAML 0.85) by removing 5.10-specific regex construct. -- hobbs++"
+        }
+      ],
+      "line" => 8,
+      "raw" => "0.88 Tue Dec  3 05:29:34 UTC 2013\n",
+      "raw_date" => "Tue Dec  3 05:29:34 UTC 2013",
+      "version" => "0.88"
+    },
+    {
+      "date" => "2013-11-30T21:51:48Z",
+      "entries" => [
+        {
+          "line" => 13,
+          "raw" => " - Using latest Test::Builder tp fix\n   https://rt.cpan.org/Public/Bug/Display.html?id=90847\n\n",
+          "style" => "-",
+          "text" => "Using latest Test::Builder tp fix https://rt.cpan.org/Public/Bug/Display.html?id=90847"
+        }
+      ],
+      "line" => 12,
+      "raw" => "0.87 Sat Nov 30 21:51:48 PST 2013\n",
+      "raw_date" => "Sat Nov 30 21:51:48 PST 2013",
+      "version" => "0.87"
+    },
+    {
+      "date" => "2013-11-26T16:43:27Z",
+      "entries" => [
+        {
+          "line" => 17,
+          "raw" => " - Revert YAML::Mo for https://rt.cpan.org/Public/Bug/Display.html?id=90817\n\n",
+          "style" => "-",
+          "text" => "Revert YAML::Mo for https://rt.cpan.org/Public/Bug/Display.html?id=90817"
+        }
+      ],
+      "line" => 16,
+      "raw" => "0.86 Tue Nov 26 16:43:27 UTC 2013\n",
+      "raw_date" => "Tue Nov 26 16:43:27 UTC 2013",
+      "version" => "0.86"
+    },
+    {
+      "date" => "2013-11-24T07:43:13Z",
+      "entries" => [
+        {
+          "line" => 20,
+          "raw" => " - Fix for https://rt.cpan.org/Ticket/Display.html?id=19838 where synopsis\n   in YAML::Dumper doesn't work as exptected.\n",
+          "style" => "-",
+          "text" => "Fix for https://rt.cpan.org/Ticket/Display.html?id=19838 where synopsis in YAML::Dumper doesn't work as exptected."
+        },
+        {
+          "line" => 22,
+          "raw" => " - Thorsten++ https://rt.cpan.org/Public/Bug/Display.html?id=90593\n",
+          "style" => "-",
+          "text" => "Thorsten++ https://rt.cpan.org/Public/Bug/Display.html?id=90593"
+        },
+        {
+          "line" => 23,
+          "raw" => " - Upgrade to latest Mo\n\n",
+          "style" => "-",
+          "text" => "Upgrade to latest Mo"
+        }
+      ],
+      "line" => 19,
+      "raw" => "0.85 Sun Nov 24 07:43:13 PST 2013\n",
+      "raw_date" => "Sun Nov 24 07:43:13 PST 2013",
+      "version" => "0.85"
+    },
+    {
+      "date" => "2012-07-13T18:17:27Z",
+      "entries" => [
+        {
+          "line" => 26,
+          "raw" => " - Resolve distribution error that caused .git to be shipped in the .tar.gz\n\n",
+          "style" => "-",
+          "text" => "Resolve distribution error that caused .git to be shipped in the .tar.gz"
+        }
+      ],
+      "line" => 25,
+      "raw" => "0.84 Fri Jul 13 18:17:27 GMT 2012\n",
+      "raw_date" => "Fri Jul 13 18:17:27 GMT 2012",
+      "version" => "0.84"
+    },
+    {
+      "date" => "2012-07-13T15:44:03Z",
+      "entries" => [
+        {
+          "line" => 29,
+          "raw" => " - Only call stat() and tell() on a filehandle if fileno existed\n",
+          "style" => "-",
+          "text" => "Only call stat() and tell() on a filehandle if fileno existed"
+        },
+        {
+          "line" => 30,
+          "raw" => " - Explicit tied() call on globs to avoid a 5.16 deprecation warning\n\n",
+          "style" => "-",
+          "text" => "Explicit tied() call on globs to avoid a 5.16 deprecation warning"
+        }
+      ],
+      "line" => 28,
+      "raw" => "0.83 Fri Jul 13 15:44:03 GMT 2012\n",
+      "raw_date" => "Fri Jul 13 15:44:03 GMT 2012",
+      "version" => "0.83"
+    },
+    {
+      "date" => "2012-07-12T18:49:45Z",
+      "entries" => [
+        {
+          "line" => 33,
+          "raw" => " - Test scalar \@array rather than deprecated defined \@array (Sebastian\n   Stumpf)\n\n",
+          "style" => "-",
+          "text" => "Test scalar \@array rather than deprecated defined \@array (Sebastian Stumpf)"
+        }
+      ],
+      "line" => 32,
+      "raw" => "0.82 Thu Jul 12 18:49:45 GMT 2012\n",
+      "raw_date" => "Thu Jul 12 18:49:45 GMT 2012",
+      "version" => "0.82"
+    },
+    {
+      "date" => "2012-04-19T11:03:38Z",
+      "entries" => [
+        {
+          "line" => 37,
+          "raw" => " - Patch from https://rt.cpan.org/Public/Bug/Display.html?id=74826\n",
+          "style" => "-",
+          "text" => "Patch from https://rt.cpan.org/Public/Bug/Display.html?id=74826"
+        },
+        {
+          "line" => 38,
+          "raw" => " - YAML::Mo uses Safe Mo\n   https://rt.cpan.org/Public/Bug/Display.html?id=76664\n\n",
+          "style" => "-",
+          "text" => "YAML::Mo uses Safe Mo https://rt.cpan.org/Public/Bug/Display.html?id=76664"
+        }
+      ],
+      "line" => 36,
+      "raw" => "0.81 Thu Apr 19 11:03:38 PDT 2012\n",
+      "raw_date" => "Thu Apr 19 11:03:38 PDT 2012",
+      "version" => "0.81"
+    },
+    {
+      "date" => "2012-02-10T12:56:08Z",
+      "entries" => [
+        {
+          "line" => 42,
+          "raw" => " - Patch from https://rt.cpan.org/Ticket/Display.html?id=73702\n",
+          "style" => "-",
+          "text" => "Patch from https://rt.cpan.org/Ticket/Display.html?id=73702"
+        },
+        {
+          "line" => 43,
+          "raw" => " - Make YAML::Node subclass YAML::Mo::Object as well as Exporter (MSTROUT)\n\n",
+          "style" => "-",
+          "text" => "Make YAML::Node subclass YAML::Mo::Object as well as Exporter (MSTROUT)"
+        }
+      ],
+      "line" => 41,
+      "raw" => "0.80 Fri Feb 10 12:56:08 PST 2012\n",
+      "raw_date" => "Fri Feb 10 12:56:08 PST 2012",
+      "version" => "0.80"
+    },
+    {
+      "date" => "2012-02-08T17:25:55Z",
+      "entries" => [
+        {
+          "line" => 46,
+          "raw" => " - Peter Scott and others noticed Mo::xxx causing problems on newer perls.\n   Removed xxx for now.\n\n",
+          "style" => "-",
+          "text" => "Peter Scott and others noticed Mo::xxx causing problems on newer perls. Removed xxx for now."
+        }
+      ],
+      "line" => 45,
+      "raw" => "0.79 Wed Feb  8 17:25:55 PST 2012\n",
+      "raw_date" => "Wed Feb  8 17:25:55 PST 2012",
+      "version" => "0.79"
+    },
+    {
+      "date" => "2012-01-01T23:53:57Z",
+      "entries" => [
+        {
+          "line" => 50,
+          "raw" => " - Apply patch from ANDK++ to deal with B::Deparse changes.\n\n",
+          "style" => "-",
+          "text" => "Apply patch from ANDK++ to deal with B::Deparse changes."
+        }
+      ],
+      "line" => 49,
+      "raw" => "0.78 Sun Jan  1 23:53:57 PST 2012\n",
+      "raw_date" => "Sun Jan  1 23:53:57 PST 2012",
+      "version" => "0.78"
+    },
+    {
+      "date" => "2011-09-29T18:28:25Z",
+      "entries" => [
+        {
+          "line" => 53,
+          "raw" => " - Add \$VERSION back to all modules.\n",
+          "style" => "-",
+          "text" => "Add \$VERSION back to all modules."
+        },
+        {
+          "line" => 54,
+          "raw" => " - Released from Liz++ and Wendy++ garage attic!\n\n",
+          "style" => "-",
+          "text" => "Released from Liz++ and Wendy++ garage attic!"
+        }
+      ],
+      "line" => 52,
+      "raw" => "0.77 Thu Sep 29 18:28:25 CEST 2011\n",
+      "raw_date" => "Thu Sep 29 18:28:25 CEST 2011",
+      "version" => "0.77"
+    },
+    {
+      "date" => "2011-09-28T12:05:08Z",
+      "entries" => [
+        {
+          "line" => 57,
+          "raw" => " - Removed YAML::import per mst.\n\n",
+          "style" => "-",
+          "text" => "Removed YAML::import per mst."
+        }
+      ],
+      "line" => 56,
+      "raw" => "0.76 Wed Sep 28 12:05:08 CEST 2011\n",
+      "raw_date" => "Wed Sep 28 12:05:08 CEST 2011",
+      "version" => "0.76"
+    },
+    {
+      "date" => "2011-09-27T00:46:19Z",
+      "entries" => [
+        {
+          "line" => 60,
+          "raw" => " - Switch to Mo for OO (YAML::Mo)\n",
+          "style" => "-",
+          "text" => "Switch to Mo for OO (YAML::Mo)"
+        },
+        {
+          "line" => 61,
+          "raw" => " - use_test_base in Makefile.PL.\n\n",
+          "style" => "-",
+          "text" => "use_test_base in Makefile.PL."
+        }
+      ],
+      "line" => 59,
+      "raw" => "0.75 Tue Sep 27 00:46:19 CEST 2011\n",
+      "raw_date" => "Tue Sep 27 00:46:19 CEST 2011",
+      "version" => "0.75"
+    },
+    {
+      "date" => "2011-09-25T22:05:05Z",
+      "entries" => [
+        {
+          "line" => 64,
+          "raw" => " - Switch to Module::Package\n",
+          "style" => "-",
+          "text" => "Switch to Module::Package"
+        },
+        {
+          "line" => 65,
+          "raw" => " - Removed extra \$VERSION lines from submodules\n",
+          "style" => "-",
+          "text" => "Removed extra \$VERSION lines from submodules"
+        },
+        {
+          "line" => 66,
+          "raw" => " - Released from Liz++ and Wendy++'s Tool Basement!\n\n",
+          "style" => "-",
+          "text" => "Released from Liz++ and Wendy++'s Tool Basement!"
+        }
+      ],
+      "line" => 63,
+      "raw" => "0.74 Sun Sep 25 22:05:05 CEST 2011\n",
+      "raw_date" => "Sun Sep 25 22:05:05 CEST 2011",
+      "version" => "0.74"
+    },
+    {
+      "date" => "2011-04-19T20:14:59Z",
+      "entries" => [
+        {
+          "line" => 69,
+          "raw" => " - Apply ANDK's patch for 5.14.0\n\n",
+          "style" => "-",
+          "text" => "Apply ANDK's patch for 5.14.0"
+        }
+      ],
+      "line" => 68,
+      "raw" => "0.73 Tue Apr 19 20:14:59 EST 2011\n",
+      "raw_date" => "Tue Apr 19 20:14:59 EST 2011",
+      "version" => "0.73"
+    },
+    {
+      "date" => "2010-09-01T11:54:00Z",
+      "entries" => [
+        {
+          "line" => 72,
+          "raw" => " - Upgrade to Module::Install 1.00\n",
+          "style" => "-",
+          "text" => "Upgrade to Module::Install 1.00"
+        },
+        {
+          "line" => 73,
+          "raw" => " - Upgraded author tests via new ADAMK release automation\n",
+          "style" => "-",
+          "text" => "Upgraded author tests via new ADAMK release automation"
+        },
+        {
+          "line" => 74,
+          "raw" => " - Normalise Ingy's name to ASCII in Makefile.PL so that we don't have\n   Unicode in our own META.yml\n\n",
+          "style" => "-",
+          "text" => "Normalise Ingy's name to ASCII in Makefile.PL so that we don't have Unicode in our own META.yml"
+        }
+      ],
+      "line" => 71,
+      "raw" => "0.72 Wed Sep 1 11:54:00 AEST 2010\n",
+      "raw_date" => "Wed Sep 1 11:54:00 AEST 2010",
+      "version" => "0.72"
+    },
+    {
+      "date" => "2010-01-03T12:25:00Z",
+      "entries" => [
+        {
+          "line" => 78,
+          "raw" => " - Set file encoding to UTF-8 in LoadFile/DumpFile (RT#25434) by Olivier\n   Mengue\n",
+          "style" => "-",
+          "text" => "Set file encoding to UTF-8 in LoadFile/DumpFile (RT#25434) by Olivier Mengue"
+        },
+        {
+          "line" => 80,
+          "raw" => " - We shouldn't have to care about 5.8.0. Since it's causing CPAN Testers\n   failures, bump the minimum Perl to 5.8.1\n\n",
+          "style" => "-",
+          "text" => "We shouldn't have to care about 5.8.0. Since it's causing CPAN Testers failures, bump the minimum Perl to 5.8.1"
+        }
+      ],
+      "line" => 77,
+      "raw" => "0.71 Sun Jan 3 12:25:00 AEST 2010\n",
+      "raw_date" => "Sun Jan 3 12:25:00 AEST 2010",
+      "version" => "0.71"
+    },
+    {
+      "date" => "2009-08-11T02:52:10Z",
+      "entries" => [
+        {
+          "line" => 84,
+          "raw" => " - Updated Module::Install dependency to 0.91\n",
+          "style" => "-",
+          "text" => "Updated Module::Install dependency to 0.91"
+        },
+        {
+          "line" => 85,
+          "raw" => " - Bumping dependency to 5.8.0 but I think it's only in the test suite.\n   However, I can't prove it. So if anyone wants 5.6 compatibility back you\n   need to fix or rewrite the test suite.\n\n",
+          "style" => "-",
+          "text" => "Bumping dependency to 5.8.0 but I think it's only in the test suite. However, I can't prove it. So if anyone wants 5.6 compatibility back you need to fix or rewrite the test suite."
+        }
+      ],
+      "line" => 83,
+      "raw" => "0.70 Tue Aug 11 02:52:10 AEST 2009\n",
+      "raw_date" => "Tue Aug 11 02:52:10 AEST 2009",
+      "version" => "0.70"
+    },
+    {
+      "date" => "2009-08-10T22:37:37Z",
+      "entries" => [
+        {
+          "line" => 90,
+          "raw" => " - Developer \$VERSION now has eval correction\n\n",
+          "style" => "-",
+          "text" => "Developer \$VERSION now has eval correction"
+        }
+      ],
+      "line" => 89,
+      "raw" => "0.69_02 Mon Aug 10 22:37:37 AEST 2009\n",
+      "raw_date" => "Mon Aug 10 22:37:37 AEST 2009",
+      "version" => "0.69_02"
+    },
+    {
+      "date" => "2009-07-09T02:01:12Z",
+      "entries" => [
+        {
+          "line" => 93,
+          "raw" => " - Added \$VERSION to all modules\n",
+          "style" => "-",
+          "text" => "Added \$VERSION to all modules"
+        },
+        {
+          "line" => 94,
+          "raw" => " - Removed the use of use base\n",
+          "style" => "-",
+          "text" => "Removed the use of use base"
+        },
+        {
+          "line" => 95,
+          "raw" => " - Imported into the svn.ali.as repo\n\n",
+          "style" => "-",
+          "text" => "Imported into the svn.ali.as repo"
+        }
+      ],
+      "line" => 92,
+      "raw" => "0.69_01 Sun Jul  9 02:01:12 AEST 2009\n",
+      "raw_date" => "Sun Jul  9 02:01:12 AEST 2009",
+      "version" => "0.69_01"
+    },
+    {
+      "date" => "2008-12-04T01:00:44Z",
+      "entries" => [
+        {
+          "line" => 98,
+          "raw" => " - Used update Test::Base to ensure Filter::Util::Call\n\n",
+          "style" => "-",
+          "text" => "Used update Test::Base to ensure Filter::Util::Call"
+        }
+      ],
+      "line" => 97,
+      "raw" => "0.68 Thu Dec  4 01:00:44 PST 2008\n",
+      "raw_date" => "Thu Dec  4 01:00:44 PST 2008",
+      "version" => "0.68"
+    },
+    {
+      "date" => "2008-12-01T02:34:21Z",
+      "entries" => [
+        {
+          "line" => 101,
+          "raw" => " - Add YAML::Any\n",
+          "style" => "-",
+          "text" => "Add YAML::Any"
+        },
+        {
+          "line" => 102,
+          "raw" => " - Move ysh to YAML::Shell\n",
+          "style" => "-",
+          "text" => "Move ysh to YAML::Shell"
+        },
+        {
+          "line" => 103,
+          "raw" => " - Add doc section explaining YAML::Old\n\n",
+          "style" => "-",
+          "text" => "Add doc section explaining YAML::Old"
+        }
+      ],
+      "line" => 100,
+      "raw" => "0.67 Mon Dec  1 02:34:21 PST 2008\n",
+      "raw_date" => "Mon Dec  1 02:34:21 PST 2008",
+      "version" => "0.67"
+    },
+    {
+      "date" => "2007-09-27T01:37:16Z",
+      "entries" => [
+        {
+          "line" => 106,
+          "raw" => " - Blessed code refs with LoadCode=0 still get blessed. rafl++\n\n",
+          "style" => "-",
+          "text" => "Blessed code refs with LoadCode=0 still get blessed. rafl++"
+        }
+      ],
+      "line" => 105,
+      "raw" => "0.66 Thu Sep 27 01:37:16 PDT 2007\n",
+      "raw_date" => "Thu Sep 27 01:37:16 PDT 2007",
+      "version" => "0.66"
+    },
+    {
+      "date" => "2007-06-21T17:37:32Z",
+      "entries" => [
+        {
+          "line" => 109,
+          "raw" => " - \\z is really \\0\n",
+          "style" => "-",
+          "text" => "\\z is really \\0"
+        },
+        {
+          "line" => 110,
+          "raw" => " - Speed up regexp loading. audreyt++\n\n",
+          "style" => "-",
+          "text" => "Speed up regexp loading. audreyt++"
+        }
+      ],
+      "line" => 108,
+      "raw" => "0.65 Thu Jun 21 17:37:32 PDT 2007\n",
+      "raw_date" => "Thu Jun 21 17:37:32 PDT 2007",
+      "version" => "0.65"
+    },
+    {
+      "date" => "2007-06-21T14:31:20Z",
+      "entries" => [
+        {
+          "line" => 113,
+          "raw" => " - Better support for loading regexps. audreyt++\n\n",
+          "style" => "-",
+          "text" => "Better support for loading regexps. audreyt++"
+        }
+      ],
+      "line" => 112,
+      "raw" => "0.64 Thu Jun 21 14:31:20 PDT 2007\n",
+      "raw_date" => "Thu Jun 21 14:31:20 PDT 2007",
+      "version" => "0.64"
+    },
+    {
+      "date" => "2007-06-20T16:03:22Z",
+      "entries" => [
+        {
+          "line" => 116,
+          "raw" => " - Don't emit nodes blessed into '' in the new tag scheme, and improve\n   semantics of loading such nodes.\n",
+          "style" => "-",
+          "text" => "Don't emit nodes blessed into '' in the new tag scheme, and improve semantics of loading such nodes."
+        },
+        {
+          "line" => 118,
+          "raw" => " - New support for dumping/loading regexps.\n\n",
+          "style" => "-",
+          "text" => "New support for dumping/loading regexps."
+        }
+      ],
+      "line" => 115,
+      "raw" => "0.63 Wed Jun 20 16:03:22 PDT 2007\n",
+      "raw_date" => "Wed Jun 20 16:03:22 PDT 2007",
+      "version" => "0.63"
+    },
+    {
+      "date" => "2006-07-03T15:41:20Z",
+      "entries" => [
+        {
+          "line" => 121,
+          "raw" => " - Patch from rgs for Catalyst users\n\n",
+          "style" => "-",
+          "text" => "Patch from rgs for Catalyst users"
+        }
+      ],
+      "line" => 120,
+      "raw" => "0.62 Mon Jul  3 15:41:20 PDT 2006\n",
+      "raw_date" => "Mon Jul  3 15:41:20 PDT 2006",
+      "version" => "0.62"
+    },
+    {
+      "date" => "2006-07-02T15:25:08Z",
+      "entries" => [
+        {
+          "line" => 124,
+          "raw" => " - New CGI.pm made test fail.\n\n",
+          "style" => "-",
+          "text" => "New CGI.pm made test fail."
+        }
+      ],
+      "line" => 123,
+      "raw" => "0.61 Sun Jul  2 15:25:08 CDT 2006\n",
+      "raw_date" => "Sun Jul  2 15:25:08 CDT 2006",
+      "version" => "0.61"
+    },
+    {
+      "date" => "2006-06-30T21:55:55Z",
+      "entries" => [
+        {
+          "line" => 127,
+          "raw" => " - Changed object tag format in non backwards compatible way\n",
+          "style" => "-",
+          "text" => "Changed object tag format in non backwards compatible way"
+        },
+        {
+          "line" => 128,
+          "raw" => " - Removed support for folded scalar emission\n",
+          "style" => "-",
+          "text" => "Removed support for folded scalar emission"
+        },
+        {
+          "line" => 129,
+          "raw" => " - Added new tests\n",
+          "style" => "-",
+          "text" => "Added new tests"
+        },
+        {
+          "line" => 130,
+          "raw" => " - Sync with YAML::Syck\n\n",
+          "style" => "-",
+          "text" => "Sync with YAML::Syck"
+        }
+      ],
+      "line" => 126,
+      "raw" => "0.60 Fri Jun 30 21:55:55 CDT 2006\n",
+      "raw_date" => "Fri Jun 30 21:55:55 CDT 2006",
+      "version" => "0.60"
+    },
+    {
+      "date" => "2006-02-14T12:42:34Z",
+      "entries" => [
+        {
+          "line" => 133,
+          "raw" => " - Fixed bug reported by Slaven Rezic on 5.8.0\n",
+          "style" => "-",
+          "text" => "Fixed bug reported by Slaven Rezic on 5.8.0"
+        },
+        {
+          "line" => 134,
+          "raw" => " - Fixed a ysh bug reported on rt. 17589\n\n",
+          "style" => "-",
+          "text" => "Fixed a ysh bug reported on rt. 17589"
+        }
+      ],
+      "line" => 132,
+      "raw" => "0.58 Tue Feb 14 12:42:34 PST 2006\n",
+      "raw_date" => "Tue Feb 14 12:42:34 PST 2006",
+      "version" => "0.58"
+    },
+    {
+      "date" => "2006-02-01T23:06:25Z",
+      "entries" => [
+        {
+          "line" => 137,
+          "raw" => " - Add obligatory '1;' to end of each module.\n\n",
+          "style" => "-",
+          "text" => "Add obligatory '1;' to end of each module."
+        }
+      ],
+      "line" => 136,
+      "raw" => "0.57 Wed Feb  1 23:06:25 PST 2006\n",
+      "raw_date" => "Wed Feb  1 23:06:25 PST 2006",
+      "version" => "0.57"
+    },
+    {
+      "date" => "2006-01-30T10:26:33Z",
+      "entries" => [
+        {
+          "line" => 140,
+          "raw" => " - Add Module::Install::TestBase support\n\n",
+          "style" => "-",
+          "text" => "Add Module::Install::TestBase support"
+        }
+      ],
+      "line" => 139,
+      "raw" => "0.56 Mon Jan 30 10:26:33 PST 2006\n",
+      "raw_date" => "Mon Jan 30 10:26:33 PST 2006",
+      "version" => "0.56"
+    },
+    {
+      "date" => "2006-01-29T19:03:35Z",
+      "entries" => [
+        {
+          "line" => 143,
+          "raw" => " - Load YAML::Node because Module::Build expects it to be loaded. We can\n   undo this when Module::Build starts loading it for itself.\n\n",
+          "style" => "-",
+          "text" => "Load YAML::Node because Module::Build expects it to be loaded. We can undo this when Module::Build starts loading it for itself."
+        }
+      ],
+      "line" => 142,
+      "raw" => "0.55 Sun Jan 29 19:03:35 PST 2006\n",
+      "raw_date" => "Sun Jan 29 19:03:35 PST 2006",
+      "version" => "0.55"
+    },
+    {
+      "date" => "2006-01-29T17:28:46Z",
+      "entries" => [
+        {
+          "line" => 147,
+          "raw" => " - Remove dependency on Class::Spiffy (and/or Spiffy).\n\n",
+          "style" => "-",
+          "text" => "Remove dependency on Class::Spiffy (and/or Spiffy)."
+        }
+      ],
+      "line" => 146,
+      "raw" => "0.54 Sun Jan 29 17:28:46 PST 2006\n",
+      "raw_date" => "Sun Jan 29 17:28:46 PST 2006",
+      "version" => "0.54"
+    },
+    {
+      "date" => "2006-01-19T06:03:17Z",
+      "entries" => [
+        {
+          "line" => 150,
+          "raw" => " - Depend on Class::Spiffy instead of Spiffy. No source filtering.\n\n",
+          "style" => "-",
+          "text" => "Depend on Class::Spiffy instead of Spiffy. No source filtering."
+        }
+      ],
+      "line" => 149,
+      "raw" => "0.53 Thu Jan 19 06:03:17 PST 2006\n",
+      "raw_date" => "Thu Jan 19 06:03:17 PST 2006",
+      "version" => "0.53"
+    },
+    {
+      "date" => "2006-01-18T14:25:24Z",
+      "entries" => [
+        {
+          "line" => 153,
+          "raw" => " - Error in Spiffy-0.26 causing problems. Require 0.27\n\n",
+          "style" => "-",
+          "text" => "Error in Spiffy-0.26 causing problems. Require 0.27"
+        }
+      ],
+      "line" => 152,
+      "raw" => "0.52 Wed Jan 18 14:25:24 PST 2006\n",
+      "raw_date" => "Wed Jan 18 14:25:24 PST 2006",
+      "version" => "0.52"
+    },
+    {
+      "date" => "2006-01-14T17:09:09Z",
+      "entries" => [
+        {
+          "line" => 156,
+          "raw" => " - Tests pass on win32 and cygwin\n",
+          "style" => "-",
+          "text" => "Tests pass on win32 and cygwin"
+        },
+        {
+          "line" => 157,
+          "raw" => " - Don't gpg sign the distribution tarball\n\n",
+          "style" => "-",
+          "text" => "Don't gpg sign the distribution tarball"
+        }
+      ],
+      "line" => 155,
+      "raw" => "0.51 Sat Jan 14 17:09:09 GMT 2006\n",
+      "raw_date" => "Sat Jan 14 17:09:09 GMT 2006",
+      "version" => "0.51"
+    },
+    {
+      "date" => "2005-12-25T11:09:18Z",
+      "entries" => [
+        {
+          "line" => 160,
+          "raw" => " - Major refactoring of YAML.pm\n",
+          "style" => "-",
+          "text" => "Major refactoring of YAML.pm"
+        },
+        {
+          "line" => 161,
+          "raw" => " - Completely OO with same old functional UI\n",
+          "style" => "-",
+          "text" => "Completely OO with same old functional UI"
+        },
+        {
+          "line" => 162,
+          "raw" => " - Support the \$YAML::Stringify option which most be on for objects to get\n   stringified. Otherwise dump the object.\n",
+          "style" => "-",
+          "text" => "Support the \$YAML::Stringify option which most be on for objects to get stringified. Otherwise dump the object."
+        },
+        {
+          "line" => 164,
+          "raw" => " - Can dump overloaded objects now.\n",
+          "style" => "-",
+          "text" => "Can dump overloaded objects now."
+        },
+        {
+          "line" => 165,
+          "raw" => " - Completely refactor test suite using Test::Base\n",
+          "style" => "-",
+          "text" => "Completely refactor test suite using Test::Base"
+        },
+        {
+          "line" => 166,
+          "raw" => " - Create Test::YAML\n",
+          "style" => "-",
+          "text" => "Create Test::YAML"
+        },
+        {
+          "line" => 167,
+          "raw" => " - Make test framework compatible with YAML::Syck - Test-Base-0.45\n",
+          "style" => "-",
+          "text" => "Make test framework compatible with YAML::Syck - Test-Base-0.45"
+        },
+        {
+          "line" => 168,
+          "raw" => " - Reviewed all rt bugs. fixed many\n",
+          "style" => "-",
+          "text" => "Reviewed all rt bugs. fixed many"
+        },
+        {
+          "line" => 169,
+          "raw" => " - Reviewed all emailed bugs. Fixed many.\n",
+          "style" => "-",
+          "text" => "Reviewed all emailed bugs. Fixed many."
+        },
+        {
+          "line" => 170,
+          "raw" => " - Helped audrey complete YAML::Syck and worked on interoperability issues\n",
+          "style" => "-",
+          "text" => "Helped audrey complete YAML::Syck and worked on interoperability issues"
+        },
+        {
+          "line" => 171,
+          "raw" => " - Test well known yaml docs like svk and META.yml\n",
+          "style" => "-",
+          "text" => "Test well known yaml docs like svk and META.yml"
+        },
+        {
+          "line" => 172,
+          "raw" => " - Eliminate unsafe string evals\n",
+          "style" => "-",
+          "text" => "Eliminate unsafe string evals"
+        },
+        {
+          "line" => 173,
+          "raw" => " - Can use with autouse. Spiffy-0.25\n",
+          "style" => "-",
+          "text" => "Can use with autouse. Spiffy-0.25"
+        },
+        {
+          "line" => 174,
+          "raw" => " - Support YAML::Marshall to help classes that want to do their own\n   marshalling\n",
+          "style" => "-",
+          "text" => "Support YAML::Marshall to help classes that want to do their own marshalling"
+        },
+        {
+          "line" => 176,
+          "raw" => " - Make objects tags configurable\n",
+          "style" => "-",
+          "text" => "Make objects tags configurable"
+        },
+        {
+          "line" => 177,
+          "raw" => " - -M option for ysh to test other implementations like YAML::Syck\n\n",
+          "style" => "-",
+          "text" => "-M option for ysh to test other implementations like YAML::Syck"
+        }
+      ],
+      "line" => 159,
+      "raw" => "0.50 Sun Dec 25 11:09:18 PST 2005\n",
+      "raw_date" => "Sun Dec 25 11:09:18 PST 2005",
+      "version" => "0.50"
+    },
+    {
+      "date" => "2005-04-12T15:28:40Z",
+      "entries" => [
+        {
+          "line" => 180,
+          "raw" => " - Need newer Test::More or tests hang.\n\n",
+          "style" => "-",
+          "text" => "Need newer Test::More or tests hang."
+        }
+      ],
+      "line" => 179,
+      "raw" => "0.39 Tue Apr 12 15:28:40 PDT 2005\n",
+      "raw_date" => "Tue Apr 12 15:28:40 PDT 2005",
+      "version" => "0.39"
+    },
+    {
+      "date" => "2005-03-31T01:43:21Z",
+      "entries" => [
+        {
+          "line" => 183,
+          "raw" => " - Deleted Spiffy -XXX artifact :(\n\n",
+          "style" => "-",
+          "text" => "Deleted Spiffy -XXX artifact :("
+        }
+      ],
+      "line" => 182,
+      "raw" => "0.38 Thu Mar 31 01:43:21 PST 2005\n",
+      "raw_date" => "Thu Mar 31 01:43:21 PST 2005",
+      "version" => "0.38"
+    },
+    {
+      "date" => "2005-03-31T01:56:24Z",
+      "entries" => [
+        {
+          "line" => 186,
+          "raw" => " - All the edge cases with hash key dumping (commas, [], {}, etc) should\n   now be covered\n\n",
+          "style" => "-",
+          "text" => "All the edge cases with hash key dumping (commas, [], {}, etc) should now be covered"
+        }
+      ],
+      "line" => 185,
+      "raw" => "0.37 Thu Mar 31 01:56:24 CST 2005\n",
+      "raw_date" => "Thu Mar 31 01:56:24 CST 2005",
+      "version" => "0.37"
+    },
+    {
+      "date" => "2005-01-30T21:00:28Z",
+      "entries" => [
+        {
+          "line" => 190,
+          "raw" => " - Slight changes to the way things are dumped.\n",
+          "style" => "-",
+          "text" => "Slight changes to the way things are dumped."
+        },
+        {
+          "line" => 191,
+          "raw" => " - Fixed bugs dumping \"foo\\nbar\" for svk acceptance\n\n",
+          "style" => "-",
+          "text" => "Fixed bugs dumping \"foo\\nbar\" for svk acceptance"
+        }
+      ],
+      "line" => 189,
+      "raw" => "0.36 Sun Jan 30 21:00:28 PST 2005\n",
+      "raw_date" => "Sun Jan 30 21:00:28 PST 2005",
+      "version" => "0.36"
+    },
+    {
+      "date" => "2002-05-11T19:54:52Z",
+      "entries" => [
+        {
+          "line" => 194,
+          "raw" => " - Moved error handling into YAML::Error\n",
+          "style" => "-",
+          "text" => "Moved error handling into YAML::Error"
+        },
+        {
+          "line" => 195,
+          "raw" => " - Enabled UseAliases=0 to mean skip Dump checking of alias nodes.\n",
+          "style" => "-",
+          "text" => "Enabled UseAliases=0 to mean skip Dump checking of alias nodes."
+        },
+        {
+          "line" => 196,
+          "raw" => " - Changed Defaults. Indent=2. CompressSeries=1.\n",
+          "style" => "-",
+          "text" => "Changed Defaults. Indent=2. CompressSeries=1."
+        },
+        {
+          "line" => 197,
+          "raw" => " - Deprecated Store() in favor of Dump()\n",
+          "style" => "-",
+          "text" => "Deprecated Store() in favor of Dump()"
+        },
+        {
+          "line" => 198,
+          "raw" => " - Refactored test suite\n",
+          "style" => "-",
+          "text" => "Refactored test suite"
+        },
+        {
+          "line" => 199,
+          "raw" => " - Added key list to SortKeys\n",
+          "style" => "-",
+          "text" => "Added key list to SortKeys"
+        },
+        {
+          "line" => 200,
+          "raw" => " - Added ForceBlock option\n",
+          "style" => "-",
+          "text" => "Added ForceBlock option"
+        },
+        {
+          "line" => 201,
+          "raw" => " - CONTROL-D can be used to terminate ysh. Ryan King will be happy.\n",
+          "style" => "-",
+          "text" => "CONTROL-D can be used to terminate ysh. Ryan King will be happy."
+        },
+        {
+          "line" => 202,
+          "raw" => " - Added the ability to direct STDIN to the ysh.\n\n",
+          "style" => "-",
+          "text" => "Added the ability to direct STDIN to the ysh."
+        }
+      ],
+      "line" => 193,
+      "raw" => "0.32 Sat May 11 19:54:52 EDT 2002\n",
+      "raw_date" => "Sat May 11 19:54:52 EDT 2002",
+      "version" => "0.32"
+    },
+    {
+      "date" => "2002-01-15T01:46:18Z",
+      "entries" => [
+        {
+          "line" => 205,
+          "raw" => " - Make '-' chomp all trailing newlines\n",
+          "style" => "-",
+          "text" => "Make '-' chomp all trailing newlines"
+        },
+        {
+          "line" => 206,
+          "raw" => " - Change folded indicator from '^' to ']'.\n",
+          "style" => "-",
+          "text" => "Change folded indicator from '^' to ']'."
+        },
+        {
+          "line" => 207,
+          "raw" => " - YAC-010 Allow a map as a sequence entry to be collapsed to one line.\n",
+          "style" => "-",
+          "text" => "YAC-010 Allow a map as a sequence entry to be collapsed to one line."
+        },
+        {
+          "line" => 208,
+          "raw" => " - Changed the nextline scalar indicators. '^' means folded, and escaping\n   ('\\') can be applied to folded or blocks. Chomping is now '-'.\n",
+          "style" => "-",
+          "text" => "Changed the nextline scalar indicators. '^' means folded, and escaping ('\\') can be applied to folded or blocks. Chomping is now '-'."
+        },
+        {
+          "line" => 210,
+          "raw" => " - YAC-013. Generic indentation. This change was big, ugly, hard and it\n   really made my brain hurt. But look. It works! :)\n",
+          "style" => "-",
+          "text" => "YAC-013. Generic indentation. This change was big, ugly, hard and it really made my brain hurt. But look. It works! :)"
+        },
+        {
+          "line" => 212,
+          "raw" => " - YAC-012. Added ability to put comments anywhere, at any indentation\n   level.\n",
+          "style" => "-",
+          "text" => "YAC-012. Added ability to put comments anywhere, at any indentation level."
+        },
+        {
+          "line" => 214,
+          "raw" => " - Added \$YAML::UseBlock and \$YAML::UseFold\n",
+          "style" => "-",
+          "text" => "Added \$YAML::UseBlock and \$YAML::UseFold"
+        },
+        {
+          "line" => 215,
+          "raw" => " - Changed \$YAML::PerlCode to \$YAML::UseCode\n",
+          "style" => "-",
+          "text" => "Changed \$YAML::PerlCode to \$YAML::UseCode"
+        },
+        {
+          "line" => 216,
+          "raw" => " - Added \$YAML::Indent config option\n",
+          "style" => "-",
+          "text" => "Added \$YAML::Indent config option"
+        },
+        {
+          "line" => 217,
+          "raw" => " - YAC-012. Handled all Throwaway Issues. Blank lines and comments can be\n   used anywhere, and they will work appropriately.\n",
+          "style" => "-",
+          "text" => "YAC-012. Handled all Throwaway Issues. Blank lines and comments can be used anywhere, and they will work appropriately."
+        },
+        {
+          "line" => 219,
+          "raw" => " - Converted Changes file (this file) to use YAML\n",
+          "style" => "-",
+          "text" => "Converted Changes file (this file) to use YAML"
+        },
+        {
+          "line" => 220,
+          "raw" => " - AC-016. Support \"assumed header\" (---\n",
+          "style" => "-",
+          "text" => "AC-016. Support \"assumed header\" (---"
+        },
+        {
+          "line" => 221,
+          "raw" => " - Added \$YAML::UseBlock option\n",
+          "style" => "-",
+          "text" => "Added \$YAML::UseBlock option"
+        },
+        {
+          "line" => 222,
+          "raw" => " - YAC-015. Support Top Level Inline nodes\n",
+          "style" => "-",
+          "text" => "YAC-015. Support Top Level Inline nodes"
+        },
+        {
+          "line" => 223,
+          "raw" => " - Added testing for Store to test suite. (Now there's no excuse not to\n   create lot's of new tests. :)\n\n",
+          "style" => "-",
+          "text" => "Added testing for Store to test suite. (Now there's no excuse not to create lot's of new tests. :)"
+        }
+      ],
+      "line" => 204,
+      "raw" => "0.27 Tue Jan 15 01:46:18 PST 2002\n",
+      "raw_date" => "Tue Jan 15 01:46:18 PST 2002",
+      "version" => "0.27"
+    },
+    {
+      "date" => "2002-01-09T21:13:45Z",
+      "entries" => [
+        {
+          "line" => 227,
+          "raw" => " - Detect implicit scalars more correctly\n",
+          "style" => "-",
+          "text" => "Detect implicit scalars more correctly"
+        },
+        {
+          "line" => 228,
+          "raw" => " - Refactor test suite\n",
+          "style" => "-",
+          "text" => "Refactor test suite"
+        },
+        {
+          "line" => 229,
+          "raw" => " - Proofed documentation\n",
+          "style" => "-",
+          "text" => "Proofed documentation"
+        },
+        {
+          "line" => 230,
+          "raw" => " - Fix ysh doc. Document flags in the pod.\n",
+          "style" => "-",
+          "text" => "Fix ysh doc. Document flags in the pod."
+        },
+        {
+          "line" => 231,
+          "raw" => " - Move test code out of YAML.pm and into testlib\n",
+          "style" => "-",
+          "text" => "Move test code out of YAML.pm and into testlib"
+        },
+        {
+          "line" => 232,
+          "raw" => " - Change directives to use\n",
+          "style" => "-",
+          "text" => "Change directives to use"
+        },
+        {
+          "line" => 233,
+          "raw" => " - Parse regexes\n",
+          "style" => "-",
+          "text" => "Parse regexes"
+        },
+        {
+          "line" => 234,
+          "raw" => " - YAC-017. Change !perl/ syntax\n",
+          "style" => "-",
+          "text" => "YAC-017. Change !perl/ syntax"
+        },
+        {
+          "line" => 235,
+          "raw" => " - Emit regexes\n",
+          "style" => "-",
+          "text" => "Emit regexes"
+        },
+        {
+          "line" => 236,
+          "raw" => " - support 'ysh -v' and 'ysh -V' and 'ysh -h'\n",
+          "style" => "-",
+          "text" => "support 'ysh -v' and 'ysh -V' and 'ysh -h'"
+        },
+        {
+          "line" => 237,
+          "raw" => " - Support blessed globs\n",
+          "style" => "-",
+          "text" => "Support blessed globs"
+        },
+        {
+          "line" => 238,
+          "raw" => " - Make ysh installable\n",
+          "style" => "-",
+          "text" => "Make ysh installable"
+        },
+        {
+          "line" => 239,
+          "raw" => " - Parse CODE leaves\n",
+          "style" => "-",
+          "text" => "Parse CODE leaves"
+        },
+        {
+          "line" => 240,
+          "raw" => " - Support blessed scalars\n",
+          "style" => "-",
+          "text" => "Support blessed scalars"
+        },
+        {
+          "line" => 241,
+          "raw" => " - Test warnings as well as errors\n",
+          "style" => "-",
+          "text" => "Test warnings as well as errors"
+        },
+        {
+          "line" => 242,
+          "raw" => " - Use B::Deparse to serialize code\n",
+          "style" => "-",
+          "text" => "Use B::Deparse to serialize code"
+        },
+        {
+          "line" => 243,
+          "raw" => " - Change 'implicit' to 'simple'\n\n",
+          "style" => "-",
+          "text" => "Change 'implicit' to 'simple'"
+        }
+      ],
+      "line" => 226,
+      "raw" => "0.26 Wed Jan  9 21:13:45 PST 2002\n",
+      "raw_date" => "Wed Jan  9 21:13:45 PST 2002",
+      "version" => "0.26"
+    },
+    {
+      "date" => "2001-12-19T02:34:38Z",
+      "entries" => [
+        {
+          "line" => 246,
+          "raw" => " - Initial module shipped to CPAN\n\n",
+          "style" => "-",
+          "text" => "Initial module shipped to CPAN"
+        }
+      ],
+      "line" => 245,
+      "raw" => "0.25 Wed Dec 19 02:34:38 PST 2001\n",
+      "raw_date" => "Wed Dec 19 02:34:38 PST 2001",
+      "version" => "0.25"
+    },
+    {
+      "date" => "2001-10-15T19:18:49Z",
+      "entries" => [
+        {
+          "line" => 249,
+          "raw" => " - original version; created by h2xs 1.19\n\n",
+          "style" => "-",
+          "text" => "original version; created by h2xs 1.19"
+        }
+      ],
+      "line" => 248,
+      "raw" => "0.01 Mon Oct 15 19:18:49 2001\n",
+      "raw_date" => "Mon Oct 15 19:18:49 2001",
+      "version" => "0.01"
+    }
+  ]
+}

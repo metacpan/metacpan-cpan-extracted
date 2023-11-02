@@ -125,3 +125,7 @@
       
 0.3.2 Wed Aug 30 01:05:00 2023
     - POD update 
+
+0.3.3 Wed Nov 01 01:05:00 2023
+    - made yaml2o an alias for yaml2h2o to be consistent with ini2h2o/ini2o
+    - POD update 

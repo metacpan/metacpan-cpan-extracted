@@ -277,6 +277,18 @@ Returns boolean
 
 Return the current log level name.
 
+=head2 _process_context
+
+add context key value pair into data object
+
+=head2 set_context
+
+Set the log context hash
+
+=head2 clear_context
+
+undef the log context hash
+
 =head1 INHERITED METHODS
 
 =over 4

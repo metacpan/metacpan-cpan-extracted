@@ -25,11 +25,33 @@ Met de optie **--discreet** wordt voor elk gematcht onderdeel een afzonderlijk c
 
 Bij gebruik van de optie **--discreet** hoeven de regels invoer- en uitvoergegevens niet identiek te zijn.
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     Roep nieuw commando individueel op voor elk onderdeel.
+
+- **--fillup**
+
+    Combineer een reeks niet lege regels tot één regel voordat je ze doorgeeft aan de filteropdracht. Newline-tekens tussen brede tekens worden verwijderd en andere newline-tekens worden vervangen door spaties.
+
+- **--blockmatch**
+
+    Normaal gesproken wordt het gebied dat overeenkomt met het opgegeven zoekpatroon naar de externe opdracht gestuurd. Als deze optie is opgegeven, wordt niet het gebied dat overeenkomt, maar het hele blok dat het bevat, verwerkt.
+
+    Om bijvoorbeeld regels met het patroon `foo` naar de externe opdracht te sturen, moet je het patroon opgeven dat overeenkomt met de hele regel:
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    Maar met de optie **--blockmatch** kan het als volgt eenvoudig:
+
+        greple -Mtee cat -n -- foo
+
+    Met de **--blockmatch** optie gedraagt deze module zich meer als de **-g** optie van [teip(1)](http://man.he.net/man1/teip).
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ Het volgende commando vindt tekstblokken in [perlpod(1)](http://man.he.net/man1/
 
 U kunt ze vertalen door DeepL service door het bovenstaande commando uit te voeren in combinatie met **-Mtee** module die het commando **deepl** als volgt oproept:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-Omdat **deepl** beter werkt voor invoer op één regel, kunt u het commandogedeelte als volgt wijzigen:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 De speciale module [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) is echter effectiever voor dit doel. In feite kwam de implementatiehint van de module **tee** van de module **xlate**.
 
@@ -82,7 +100,24 @@ U kunt dit deel opnieuw formatteren door de module **tee** te gebruiken met het 
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+Het gebruik van de optie `--discrete` is tijdrovend. Dus je kunt de optie `--separate '\r'` gebruiken met `ansifold` die een enkele regel produceert met CR-karakters in plaats van NL.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Converteer vervolgens CR naar NL met [tr(1)](http://man.he.net/man1/tr) of iets dergelijks.
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+Overweeg een situatie waarin je wilt grepen naar tekenreeksen buiten de koptekstregels. Bijvoorbeeld, je wilt zoeken naar afbeeldingen van het `docker image ls` commando, maar laat de header regel staan. Je kunt dit doen met het volgende commando.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+Optie `-Mline -L 2:` haalt de voorlaatste regels op en stuurt ze naar het commando `grep perl`. Optie `--discrete` is vereist, maar deze wordt maar één keer aangeroepen, dus er is geen prestatieverlies.
+
+In dit geval geeft `teip -l 2- -- grep` een foutmelding omdat het aantal regels in de uitvoer minder is dan de invoer. Het resultaat is echter heel bevredigend :)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ U kunt dit deel opnieuw formatteren door de module **tee** te gebruiken met het 
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+# BUGS
+
+De optie `-fillup` werkt mogelijk niet correct voor Koreaanse tekst.
 
 # AUTHOR
 

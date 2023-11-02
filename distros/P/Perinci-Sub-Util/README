@@ -2,8 +2,8 @@ NAME
     Perinci::Sub::Util - Helper when writing functions
 
 VERSION
-    This document describes version 0.471 of Perinci::Sub::Util (from Perl
-    distribution Perinci-Sub-Util), released on 2023-07-02.
+    This document describes version 0.472 of Perinci::Sub::Util (from Perl
+    distribution Perinci-Sub-Util), released on 2023-10-28.
 
 SYNOPSIS
     Example for err() and caller():
@@ -160,6 +160,10 @@ FUNCTIONS
     *   description => *str*
 
         Description for the mod subroutine.
+
+    *   die => *bool*
+
+        Die upon failure.
 
     *   install_sub => *bool* (default: 1)
 

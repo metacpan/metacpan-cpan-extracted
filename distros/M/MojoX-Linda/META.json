@@ -1,0 +1,78 @@
+{
+   "abstract" : "Plausibly helpful (and probably drunk) wrapper around morbo",
+   "author" : [
+      "Gryphon Shafer <gryphon@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MojoX-Linda",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Method::Modifiers" : "0",
+            "Config::App" : "1.16",
+            "File::Find" : "0",
+            "Mojo::File" : "0",
+            "Mojo::Server::Morbo" : "0",
+            "exact" : "1.14",
+            "exact::cli" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test2::V0" : "0",
+            "Test::More" : "0",
+            "perl" : "5.022",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gryphonshafer/MojoX-Linda/issues"
+      },
+      "homepage" : "https://github.com/gryphonshafer/MojoX-Linda",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gryphonshafer/MojoX-Linda.git",
+         "web" : "https://github.com/gryphonshafer/MojoX-Linda"
+      }
+   },
+   "version" : "1.02",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

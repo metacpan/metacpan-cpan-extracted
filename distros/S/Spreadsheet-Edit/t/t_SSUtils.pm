@@ -18,7 +18,7 @@ use t_TestCommon ':no-Test2',
 use Spreadsheet::Edit qw/fmt_sheet cx2let let2cx sheet/;
 
 sub fmtsheet(;$) {
-  my $s = $_[0] // sheet({package => caller});
+  my $s = $_[0] // sheet({package => scalar(caller)});
   return "sheet=undef" if ! defined $s;
   "sheet->".Spreadsheet::Edit::fmt_sheet($s);
   #"sheet->".visnew->Maxdepth(1)->vis($$s)
@@ -30,7 +30,7 @@ sub fmtsheet(;$) {
 sub check_colspec_is_undef(@) {
   my $pkg = caller;
   no strict 'refs';
-  my $s = sheet({package => caller});
+  my $s = sheet({package => scalar(caller)});
   foreach(@_) {
     bug "Colspec ".vis($_)." is unexpectedly defined"
       if defined ${"$pkg\::colx"}{$_};

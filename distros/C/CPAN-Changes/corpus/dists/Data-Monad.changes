@@ -1,0 +1,18 @@
+Revision history for Perl extension Data::Monad
+
+{{$NEXT}}
+
+0.05  2013-09-08 00:23:32 JST
+        - Fix the bug which breaks Data::Monad::CondVar on perl 5.17.2
+
+0.04    Sat, 13 Oct 2012 
+        - Fix a bug related perl contexts. 
+
+0.03    Tue, 26 Jun 2012 
+        - Fix dependencies (reported by mschwern)
+
+0.02    Sun, 23 Oct 2011
+        - Add dependencies
+
+0.01    Wed, 12 Oct 2011
+        - original version

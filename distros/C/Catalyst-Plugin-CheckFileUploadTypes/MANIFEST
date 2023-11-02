@@ -12,6 +12,9 @@ t/01app.t
 t/02pod.t
 t/03podcoverage.t
 t/data/implementation.png
+t/data/notshell.txt
+t/data/shell.sh
 t/data/test.txt
+t/data/test.xml
 t/lib/TestApp.pm
 t/lib/TestApp/Controller/Root.pm

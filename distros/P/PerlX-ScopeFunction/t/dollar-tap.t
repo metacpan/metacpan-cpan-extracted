@@ -12,7 +12,7 @@ package TestScope1 {
         subtest "\$tap can be imported", sub {
             my $pass = 0;
             $obj->$tap(sub {
-                           is $_[0]->isa('O'), T();
+                           is $_->isa('O'), T();
                            $pass++;
                        })
                 ->$tap(sub {
@@ -27,7 +27,7 @@ package TestScope1 {
 
             my $pass = 0;
             $obj->$tap2(sub {
-                            is $_[0]->isa('O'), T();
+                            is $_->isa('O'), T();
                             $pass++;
                         })
                 ->$tap2(sub {

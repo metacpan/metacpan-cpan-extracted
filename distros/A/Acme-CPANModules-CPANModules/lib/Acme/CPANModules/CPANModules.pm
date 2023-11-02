@@ -1,15 +1,15 @@
 package Acme::CPANModules::CPANModules;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-01'; # DATE
-our $DIST = 'Acme-CPANModules-CPANModules'; # DIST
-our $VERSION = '0.002'; # VERSION
-
 use strict;
 use Acme::CPANModulesUtil::Misc;
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-08-06'; # DATE
+our $DIST = 'Acme-CPANModules-CPANModules'; # DIST
+our $VERSION = '0.003'; # VERSION
+
 our $LIST = {
-    summary => 'Modules related to Acme::CPANModules',
+    summary => 'List of modules related to Acme::CPANModules',
     description => <<'_',
 
 ## Specification
@@ -46,6 +46,8 @@ blacklisted dependencies into your distribution.
 
 ## Other modules
 
+<pm:TableData::Acme::CPANModules>
+
 <pm:Acme::CPANLists> is an older, deprecated specification.
 
 <pm:Pod::From::Acme::CPANModules>
@@ -77,7 +79,7 @@ _
 Acme::CPANModulesUtil::Misc::populate_entries_from_module_links_in_description;
 
 1;
-# ABSTRACT: Modules related to Acme::CPANModules
+# ABSTRACT: List of modules related to Acme::CPANModules
 
 __END__
 
@@ -87,15 +89,13 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::CPANModules - Modules related to Acme::CPANModules
+Acme::CPANModules::CPANModules - List of modules related to Acme::CPANModules
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::CPANModules (from Perl distribution Acme-CPANModules-CPANModules), released on 2020-03-01.
+This document describes version 0.003 of Acme::CPANModules::CPANModules (from Perl distribution Acme-CPANModules-CPANModules), released on 2023-08-06.
 
 =head1 DESCRIPTION
-
-Modules related to Acme::CPANModules.
 
 =head2 Specification
 
@@ -128,6 +128,8 @@ blacklisted dependencies into your distribution.
 
 =head2 Other modules
 
+L<TableData::Acme::CPANModules>
+
 L<Acme::CPANLists> is an older, deprecated specification.
 
 L<Pod::From::Acme::CPANModules>
@@ -151,42 +153,80 @@ This does not prevent duplicates. To do so:
           }
  ];
 
-=head1 INCLUDED MODULES
+=head1 ACME::CPANMODULES ENTRIES
 
 =over
 
-=item * L<Acme::CPANModules>
+=item L<Acme::CPANModules>
 
-=item * L<App::cpanmodules>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::lcpan::CmdBundle::cpanmodules>
+=item L<App::cpanmodules>
 
-=item * L<App::lcpan>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::CPANModulesUtils>
+=item L<App::lcpan::CmdBundle::cpanmodules>
 
-=item * L<App::CreateAcmeCPANModulesImportModules>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<App::CreateAcmeCPANModulesImportCPANRatingsModules>
+=item L<App::lcpan>
 
-=item * L<Dist::Zilla::Plugin::Acme::CPANModules>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Pod::Weaver::Plugin::Acme::CPANModules>
+=item L<App::CPANModulesUtils>
 
-=item * L<Dist::Zilla::Plugin::Acme::CPANModules::Blacklist>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Acme::CPANLists>
+=item L<App::CreateAcmeCPANModulesImportModules>
 
-=item * L<Pod::From::Acme::CPANModules>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<App::CreateAcmeCPANModulesImportCPANRatingsModules>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Dist::Zilla::Plugin::Acme::CPANModules>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Pod::Weaver::Plugin::Acme::CPANModules>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Dist::Zilla::Plugin::Acme::CPANModules::Blacklist>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<TableData::Acme::CPANModules>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Acme::CPANLists>
+
+=item L<Pod::From::Acme::CPANModules>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
 =head1 FAQ
 
-=head2 What are ways to use this module?
+=head2 What is an Acme::CPANModules::* module?
 
-Aside from reading it, you can install all the listed modules using
-L<cpanmodules>:
+An Acme::CPANModules::* module, like this module, contains just a list of module
+names that share a common characteristics. It is a way to categorize modules and
+document CPAN. See L<Acme::CPANModules> for more details.
+
+=head2 What are ways to use this Acme::CPANModules module?
+
+Aside from reading this Acme::CPANModules module's POD documentation, you can
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n CPANModules
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries CPANModules | cpanm -n
 
@@ -194,9 +234,15 @@ or L<Acme::CM::Get>:
 
     % perl -MAcme::CM::Get=CPANModules -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-This module also helps L<lcpan> produce a more meaningful result for C<lcpan
-related-mods> when it comes to finding related modules for the modules listed
-in this Acme::CPANModules module.
+or directly:
+
+    % perl -MAcme::CPANModules::CPANModules -E'say $_->{module} for @{ $Acme::CPANModules::CPANModules::LIST->{entries} }' | cpanm -n
+
+This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
+result for C<lcpan related-mods> command when it comes to finding related
+modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -205,14 +251,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-CPANModules>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-CPANModules>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -224,11 +262,37 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-CPANModules>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

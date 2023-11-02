@@ -1,8 +1,11 @@
 package App::Oozie::Role::Fields::Path;
-$App::Oozie::Role::Fields::Path::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Types::Common qw( IsExecutable IsFile IsDir );
@@ -23,7 +26,7 @@ option oozie_client_jar => (
     isa      => IsFile,
     format   => 's',
     doc      => 'Full path to the Oozie client jar containing the XML schemas',
-    default  => sub { '/usr/lib/oozie/lib/oozie-client.jar' }
+    default  => sub { '/usr/lib/oozie/lib/oozie-client.jar' },
 );
 
 option local_oozie_code_path => (
@@ -57,7 +60,7 @@ App::Oozie::Role::Fields::Path
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

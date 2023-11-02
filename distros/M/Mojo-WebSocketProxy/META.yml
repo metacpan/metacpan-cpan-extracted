@@ -3,17 +3,10 @@ abstract: 'WebSocket proxy for JSON-RPC 2.0 server'
 author:
   - 'binary.com <BINARY@cpan.org>'
 build_requires:
-  Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  Future: '0.36'
   IO::Handle: '0'
   IPC::Open3: '0'
-  JSON::MaybeXS: '0'
-  Mojo::IOLoop: '0'
-  MojoX::JSON::RPC::Service: '0'
-  Mojolicious: '7.29'
-  Net::EmptyPort: '0'
   Path::Tiny: '0'
   Test::CheckDeps: '0.010'
   Test::Fatal: '0'
@@ -24,106 +17,38 @@ build_requires:
   Test::Simple: '0.44'
   Test::TCP: '0'
   Test::Warnings: '0'
-  base: '0'
-  perl: '5.024000'
+  perl: '5.024'
 configure_requires:
-  ExtUtils::MakeMaker: '7.64'
+  ExtUtils::MakeMaker: '7.1101'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Mojo-WebSocketProxy
-no_index:
-  directory:
-    - eg
-    - share
-    - shares
-    - t
-    - xt
-provides:
-  Mojo::WebSocketProxy:
-    file: lib/Mojo/WebSocketProxy.pm
-    version: '0.14'
-  Mojo::WebSocketProxy::Backend:
-    file: lib/Mojo/WebSocketProxy/Backend.pm
-    version: '0.14'
-  Mojo::WebSocketProxy::Backend::JSONRPC:
-    file: lib/Mojo/WebSocketProxy/Backend/JSONRPC.pm
-    version: '0.14'
-  Mojo::WebSocketProxy::Config:
-    file: lib/Mojo/WebSocketProxy/Config.pm
-    version: '0.14'
-  Mojo::WebSocketProxy::Dispatcher:
-    file: lib/Mojo/WebSocketProxy/Dispatcher.pm
-    version: '0.14'
-  Mojo::WebSocketProxy::Parser:
-    file: lib/Mojo/WebSocketProxy/Parser.pm
-    version: '0.14'
-  Mojolicious::Plugin::WebSocketProxy:
-    file: lib/Mojolicious/Plugin/WebSocketProxy.pm
-    version: '0.14'
 requires:
   Class::Method::Modifiers: '0'
   Data::UUID: '0'
   DataDog::DogStatsd::Helper: '0.05'
-  Encode: '0'
   Future: '0.36'
   Future::Mojo: '0.004'
-  Future::Utils: '0'
   IO::Async::Loop::Mojo: '0'
   JSON::MaybeUTF8: '0'
   Log::Any: '0'
-  Mojo::Base: '0'
   Mojo::Redis2: '0'
-  Mojo::Util: '0'
   MojoX::JSON::RPC: '0'
-  MojoX::JSON::RPC::Client: '0'
   Mojolicious: '7.29'
   Scalar::Util: '0'
   Syntax::Keyword::Try: '0.04'
   Unicode::Normalize: '1.25'
-  constant: '0'
   curry: '1.001'
-  feature: '0'
   indirect: '0'
-  parent: '0'
-  perl: '5.024000'
-  strict: '0'
-  warnings: '0'
+  perl: '5.024'
 resources:
   bugtracker: https://github.com/binary-com/perl-Mojo-WebSocketProxy/issues
-  homepage: https://github.com/binary-com/perl-Mojo-WebSocketProxy
-  repository: https://github.com/binary-com/perl-Mojo-WebSocketProxy.git
-version: '0.14'
-x_authority: cpan:DERIV
-x_contributors:
-  - 'Evgeniy Vostrov <evgeniy@binary.com>'
-  - 'Chylli <chylli@binary.com>'
-  - 'nima <nima@firstsource.tech>'
-  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
-  - 'Jean-Yves Sireau <jy@binary.com>'
-  - 'nima <69203365+nima-fs@users.noreply.github.com>'
-  - 'Ivan Baidakou <ivan@binary.com>'
-  - 'Tom Molesworth <tom@binary.com>'
-  - 'Zak B. Elep <zakame@zakame.net>'
-  - 'Amin Marashi <marashi.s.amin@gmail.com>'
-  - 'Mahdi Zarei <60599487+mehdi-fs@users.noreply.github.com>'
-  - 'Ivan Baidakou <basiliscos@openmailbox.org>'
-  - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'
-  - 'Amin Marashi <amin.marashi@binary.com>'
-  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
-  - 'Nael Alolwani <nael@binary.com>'
-  - 'Paul Evans <leonerd@leonerd.org.uk>'
-  - 'Anthony-Wong <34021543+Anthony-Wong@users.noreply.github.com>'
-  - 'Apoorv Joshi <apoorv@binary.com>'
-  - 'Chylli <chylli.email@gmail.com>'
-  - 'Diego Ramírez <57363189+diego-binary@users.noreply.github.com>'
-  - 'limchengyang <45479072+limchengyang@users.noreply.github.com>'
-  - 'mat-fs <53427463+mat-fs@users.noreply.github.com>'
-  - 'Michael Mueller <52896557+michaelmueller-binary@users.noreply.github.com>'
-  - 'youssef-deriv <79835196+youssef-deriv@users.noreply.github.com>'
+  repository: git://github.com/binary-com/perl-Mojo-WebSocketProxy.git
+version: '0.15'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

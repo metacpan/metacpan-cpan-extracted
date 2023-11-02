@@ -20,6 +20,9 @@ USE_IMP_SYS	:= define
 # PERLIO, should *always* be 'define' (we don't do -U...)
 USE_PERLIO	= define
 
+# Additional compiler flags can be specified here.
+#BUILDOPT	:= $(BUILDOPTEXTRA)
+
 # Large File Support (files > 2Gb)
 # Not touched by default
 USE_LARGE_FILES	:= define

@@ -386,15 +386,16 @@ if ( $major > 2 or $major == 2 and $minor >= 9 ) {  # 2.9.0+
 } else {
     $ign = $git->command( 'merge', 'allnew' );
 }
+my $mergemsg = $git->command_oneline('log', '-1', '--format=format:%s');
 push_ok();
 $c2 = $commit = $c->describe_commit;
 ok( defined($commit), 'empty branch merge commit exists' );
 is( $commit->branch, 'master' );
-is( $commit->log, "Merge branch 'allnew'" );
+is( $commit->log, $mergemsg );
 
 TestBot->expect( 'dummy/#test 12test/03there 05master '
         . $c2->id
-        . ' 06Test U. Ser (06ser) Merge branch \'allnew\' * 14http://scm.host.org/there/master/?commit='
+        . ' 06Test U. Ser (06ser) ' . $mergemsg . ' * 14http://scm.host.org/there/master/?commit='
         . $c2->id
         . '' );
 

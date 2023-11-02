@@ -28,7 +28,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %attributes = (
     action      => {
@@ -102,7 +102,8 @@ my %url_templates = (
     ],
     fellig => [
         map {
-            [$_ => sprintf('https://www.fellig.org/subject/best/any/%s/%%s', $_), undef, [qw(info render)]]
+            [$_ => sprintf('https://www.fellig.org/subject/best/any/%s/%%s', $_), undef, [qw(info render)]],
+            [$_ => sprintf('https://api.fellig.org/v0/overview/%s/%%s', $_), undef, [qw(metadata)]],
         } qw(fellig-identifier fellig-box-number uuid oid uri wikidata-identifier e621-post-identifier wikimedia-commons-identifier british-museum-term musicbrainz-identifier gnd-identifier e621tagtype)
     ],
     youtube => [
@@ -205,11 +206,19 @@ my %url_parser = (
         },
         {
             host => 'www.fellig.org',
-            path => qr#^/subject/(?:info|best)/[^/]+/(fellig-identifier|fellig-box-number|uuid|oid|uri|wikidata-identifier|e621-post-identifier|wikimedia-commons-identifier|british-museum-term|musicbrainz-identifier|gnd-identifier|e621tagtype)/([^/]+)$#,
+            path => qr#^/subject/(?:info|best)/[^/]+/(fellig-identifier|fellig-box-number|uuid|oid|uri|wikidata-identifier|e621-post-identifier|wikimedia-commons-identifier|british-museum-term|musicbrainz-identifier|gnd-identifier|e621tagtype|[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})/([^/]+)$#,
             source => 'fellig',
             type => \1,
             id => \2,
             action => 'info',
+        },
+        {
+            host => 'api.fellig.org',
+            path => qr#^/v0/(?:overview|full)/(fellig-identifier|fellig-box-number|uuid|oid|uri|wikidata-identifier|e621-post-identifier|wikimedia-commons-identifier|british-museum-term|musicbrainz-identifier|gnd-identifier|e621tagtype|[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12})/([^/]+)$#,
+            source => 'fellig',
+            type => \1,
+            id => \2,
+            action => 'metadata',
         },
         {
             host => 'www.youtube.com',
@@ -443,7 +452,8 @@ sub _lookup_with_mode {
     return if $mode eq 'online' && !$extractor->online;
 
     foreach my $pass (0..2) {
-        foreach my $id_type (map {$extractor->ise_to_name(type => $_)} keys %{$self->{id}}) {
+        foreach my $id_type_ise (keys %{$self->{id}}) {
+            my $id_type = eval {$extractor->ise_to_name(type => $id_type_ise)} // next;
             foreach my $service (@{$lookup_services{$id_type}}) {
                 $self->_lookup_one($service, %opts);
             }
@@ -765,7 +775,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -774,7 +784,7 @@ version v0.02
     my $extractor = Data::URIID->new;
     my $result = $extractor->lookup( $URI );
 
-=head1 OO METHODS
+=head1 METHODS
 
 =head2 extractor
 

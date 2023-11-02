@@ -1,5 +1,8 @@
 Revision history for Perl module Mojo::WebSocketProxy
-0.14      2022-11-09 07:45:53+00:00 UTC
+0.15      2023-10-27 14:29:50+08:00 Asia/Shanghai
+    -Logger Wrapper added to Proxy for logging context with request 
+
+0.14
     - Move Mojo::WebSocketProxy::Backend::JobAsync and Mojo::WebSocketProxy::Backend::ConsumerGroups out
     - Add support for separating messages to different channels with
       different timeout values for each channel.
@@ -50,11 +53,11 @@ Revision history for Perl module Mojo::WebSocketProxy
 0.04      2017-02-21 02:16:06+00:00 UTC
     - Switch to dzil
 
-0.03 2016-06-09 15:50:00
+0.03 Thu Jun  9 15:50:00 2016
     - Use before send hook to check response size
 
-0.02 2016-06-09 09:28:00
+0.02 Thu Jun  9 09:28:00 2016
     - Minor fixes
 
-0.01 2016-0602 06:02:18
+0.01 Thu Jun  2 06:02:18 2016
     - First version, released on an unsuspecting world.

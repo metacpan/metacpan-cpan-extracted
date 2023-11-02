@@ -18,13 +18,14 @@ eval
 my $text = '';
 open my($fh), '>', \$text;
 
+dispatcher FILE => 'out', to => $fh, accept => 'NOTICE-', format => sub {shift};
 dispatcher close => 'default';
-dispatcher FILE => 'out', to => $fh, accept => 'ALL', format => sub {shift};
 
 cmp_ok(length $text, '==', 0, 'created normal file logger');
 
 my $text_l1 = length $text;
-info "test";
+notice "test";
+
 my $text_l2 = length $text;
 cmp_ok($text_l2, '>', $text_l1);
 
@@ -88,6 +89,11 @@ my @list = try {
 };
 is($context, 'LIST', 'try in LIST context');
 cmp_ok(scalar @list, '==', 5);
+
+### Bug reported by Andy Beverley 2022-12-17
+local $@;
+try { report {is_fatal => 1}, INFO => __"oops"; } on_die => 'PANIC';
+ok defined($@->wasFatal->message), 'Can reach message';
 
 ### convert die/croak/confess
 # conversions by Log::Report::Die, see t/*die.t

@@ -5,7 +5,7 @@ use utf8;
 use v5.14;
 use warnings;
 
-use Test::Most;
+use Test2::V0;
 
 use HTTP::Request::Common;
 use Plack::Builder;

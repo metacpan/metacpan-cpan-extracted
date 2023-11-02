@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
     "Carp" => 0,
     "Clone" => 0,
     "Data::Dumper" => 0,
-    "Data::Dumper::Interp" => "6.007",
+    "Data::Dumper::Interp" => "6.009",
     "Devel::Symdump" => 0,
     "Digest::MD5" => 0,
     "Encode" => 0,
@@ -81,7 +81,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "open" => 0
   },
-  "VERSION" => "1000.009",
+  "VERSION" => "1000.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -94,7 +94,7 @@ my %FallbackPrereqs = (
   "Clone" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,
-  "Data::Dumper::Interp" => "6.007",
+  "Data::Dumper::Interp" => "6.009",
   "Devel::Symdump" => 0,
   "Digest::MD5" => 0,
   "Encode" => 0,

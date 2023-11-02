@@ -1,7 +1,7 @@
 package JobCenter::Client::Mojo;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.45'; # VERSION
+our $VERSION = '0.46'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -312,8 +312,8 @@ sub call_nb {
 		my ($steps, $e, $r) = @_;
 		my ($job_id, $msg);
 		if ($e) {
-			$self->log->error("create_job returned error: $e->{message} ($e->{code}");
-			$msg = "$e->{message} ($e->{code}"
+			$self->log->error("create_job returned error: $e->{message} ($e->{code})");
+			$msg = "$e->{message} ($e->{code})"
 		} else {
 			($job_id, $msg) = @$r; # fixme: check for arrayref?
 			if ($msg) {
@@ -387,7 +387,7 @@ sub check_if_lock_exists {
 	croak('no locktype?') unless $locktype;
 	croak('no lockvalue?') unless $lockvalue;
 
-	my ($done, $err, $found);
+	my ($done, $found);
 	JobCenter::Client::Mojo::Steps->new(ioloop => $self->ioloop)->steps([
 	sub {
 		my $steps = shift;
@@ -404,7 +404,6 @@ sub check_if_lock_exists {
 		$done++; # received something so done waiting
 		if ($e) {
 			$self->log->error("find_jobs got error $e->{message} ($e->{code})");
-			$err = $e->{message};
 			return;
 		}
 		$found = $r;
@@ -499,7 +498,9 @@ sub get_job_status_nb {
 		#$self->log->debug("get_job_satus_nb got job_id: $res msg: $msg");
 		if ($e) {
 			$self->log->error("get_job_status got error $e->{message} ($e->{code})");
-			$statuscb->(undef, $e->{message});
+			$e = { error => "$e->{message} ($e->{code})" };
+			$e = $self->{jsonobject}->encode($e) if $self->{json};
+			$statuscb->(undef, $e);
 			return;
 		}
 		my ($job_id2, $outargs) = @$r;
@@ -1048,7 +1049,7 @@ this callback will be called on completion of the job.
 
 =head2 check_if_lock_exists
 
-$found = $client->find_jobs($locktype, $lockvalue);
+$found = $client->check_if_lock_exists($locktype, $lockvalue);
 
 Checks if a lock with the given locktype and lockvalue exists. (I.e. a job
 is currently running that holds that lock.
@@ -1239,7 +1240,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Wieger Opmeer.
+This software is copyright (C) 2017-2023 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

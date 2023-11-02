@@ -1,5 +1,10 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+6.010 - trying to find mystery test failure on one Windows smoker host
+6.009 - Fix result-parsing bug with Deparse(1).
+        Show (classname) before [] and {} from overloaded operators.
+        Updated cmd.com support in qsh(), and allow $^O to be localized
+6.008 - Recursively visit overload results.
 6.007 - Require List::Util v1.45 for uniqstr.
         Croak if vis, etc. called in void context (typically a missing "say ").
         Fix bug where ivis & dvis would not interpolate \$ -> $

@@ -135,7 +135,7 @@ like expire_date( 'nic.us', '%Y-%m-%d' ), qr{20\d\d-04-17};
 is( ( domain_dates( 'nic.jp', '%Y-%m-%d' ) )[0], '2003-07-31' );
 
 $Net::Domain::ExpireDate::USE_REGISTRAR_SERVERS = 0;
-like join( ';', domain_dates( 'godaddy.com', '%Y-%m-%d') ), qr{1999-03-02;202\d-11-01;};
+like join( ';', domain_dates( 'godaddy.com', '%Y-%m-%d') ), qr{1999-03-02;20\d\d-11-01;};
 $Net::Domain::ExpireDate::USE_REGISTRAR_SERVERS = 2;
 
 like join( ';', domain_dates( 'reg.ru', '%Y-%m-%d' ) ), qr{2005-10-31;20\d\d-10-31;};

@@ -1,5 +1,15 @@
 Revision history for Future-XS
 
+0.11    2023-10-26
+        [CHANGES]
+         * Module style updates:
+            + Swap unit tests from `Test::More` to `Test2::V0`
+         * Removed the now-redundant `sub import`
+
+        [BUGFIXES]
+         * Avoid memory leak with combined `->followed_by` + `->then`
+           (RT150198)
+
 0.10    2023-03-28
         [BUGFIXES]
          * Remember to destroy the `catches` HV after immediate `->thencatch`

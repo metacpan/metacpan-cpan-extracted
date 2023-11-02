@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp qw( croak );
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 my @tone_list = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
                  'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B');
@@ -151,6 +151,18 @@ sub chord_num
     return split /,/, $base_chord_list->{$chord};
 }
 
+sub chord_intervals
+{
+    my ($self, $name) = @_;
+
+    my @num = $self->chord_num($name);
+
+    my @intervals = reverse map { $_ == 0 ? $num[$_] : $num[$_] - $num[$_ - 1] }
+        reverse 0 .. $#num;
+
+    return @intervals;
+}
+
 sub scale
 {
     my $self = shift;
@@ -197,6 +209,10 @@ Music::Chord::Note - get Chord Tone List from Chord Name
 
     print "@tone_num"; # 0 4 7 11
 
+    my @intervals = $cn->chord_intervals('M7');
+
+    print "@intervals"; # 0 4 3 4
+
     my $note = $cn->scale('D#');
 
     print "$note"; # 3
@@ -221,6 +237,10 @@ get tone list from chord name with octave for MIDI
 =item chord_num($kind_of_chord)
 
 get scalic value list(ex. M7 -> 0 4 7 11)
+
+=item chord_intervals($chord_name)
+
+get relative scalic value list(ex. M7 -> 0 4 3 4)
 
 =item scale($note)
 

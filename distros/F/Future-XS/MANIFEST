@@ -1,3 +1,4 @@
+.editorconfig
 Build.PL
 Changes
 hax/av-utils.c.inc

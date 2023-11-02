@@ -11,6 +11,8 @@ my @files = (
     'lib/Net/Async/Github.pod',
     'lib/Net/Async/Github/Branch.pm',
     'lib/Net/Async/Github/Branch.pod',
+    'lib/Net/Async/Github/Comment.pm',
+    'lib/Net/Async/Github/Comment.pod',
     'lib/Net/Async/Github/Common.pm',
     'lib/Net/Async/Github/Plan.pm',
     'lib/Net/Async/Github/Plan.pod',

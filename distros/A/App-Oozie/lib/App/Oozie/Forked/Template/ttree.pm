@@ -1,5 +1,7 @@
 package App::Oozie::Forked::Template::ttree;
 
+## no critic
+
 # This is currently a fork.
 
 # See https://github.com/abw/Template2/pull/316
@@ -1039,7 +1041,7 @@ App::Oozie::Forked::Template::ttree
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

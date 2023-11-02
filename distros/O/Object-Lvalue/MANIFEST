@@ -1,0 +1,18 @@
+CHANGES
+README
+MANIFEST
+Makefile.PL
+lib/Object/Lvalue.pm
+t/01-methods.t
+t/02-import.t
+t/03-attributes.t
+t/04-inherit.t
+t/05-Lvalues.t
+t/06-initialize.t
+t/10-inherit-attrs.t
+t/11-inherit-attrs.t
+t/12-assign-lvalues.t
+t/21-inherit-attrs.t
+t/22-assign-lvalues.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

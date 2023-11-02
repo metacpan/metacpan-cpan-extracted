@@ -3,12 +3,12 @@
 package Acme::CPANModulesBundle::PERLANCAR;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-13'; # DATE
+our $DATE = '2023-11-01'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 1;
-# ABSTRACT: PERLANCAR's collection of Acme::CPANModules::* modules
+# ABSTRACT: Bundle of Acme::CPANModules::PERLANCAR::* modules
 
 __END__
 
@@ -18,11 +18,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModulesBundle::PERLANCAR - PERLANCAR's collection of Acme::CPANModules::* modules
+Acme::CPANModulesBundle::PERLANCAR - Bundle of Acme::CPANModules::PERLANCAR::* modules
 
 =head1 VERSION
 
-This document describes version 0.010 of Acme::CPANModulesBundle::PERLANCAR (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
+This document describes version 0.014 of Acme::CPANModulesBundle::PERLANCAR (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2023-11-01.
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ The following Acme::CPANModules::* modules are included in this distribution:
 
 =item * L<PERLANCAR::Avoided|Acme::CPANModules::PERLANCAR::Avoided>
 
-Modules I'm currently avoiding.
+List of modules I'm currently avoiding.
 
 This is a list of modules I'm currently avoiding to use in my code, for some
 reason. Most of the modules wered used in my code in the past.
@@ -45,17 +45,21 @@ during building, your distribution does not specify a prerequisite to any of the
 modules listed here. (You should make your own blacklist though).
 
 
+=item * L<PERLANCAR::MyCLIWithSubcommands|Acme::CPANModules::PERLANCAR::MyCLIWithSubcommands>
+
+List of distributions that contain CLI scripts with subcommands.
+
 =item * L<PERLANCAR::MyGetoptLongExperiment|Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment>
 
-My experiments writing Getopt::Long replacementsE<sol>alternatives.
+List of my experiments writing Getopt::Long replacementsE<sol>alternatives.
 
 Most of these modules provide a L<Getopt::Long>-compatible interface, but they
 differ in some aspect: either they offer more features (or less).
 
 
-=item * L<PERLANCAR::Retired|Acme::CPANModules::PERLANCAR::Retired>
+=item * L<PERLANCAR::MyRetired|Acme::CPANModules::PERLANCAR::MyRetired>
 
-Retired modules.
+List of my retired modules.
 
 This is a list of some of the modules which I wrote but have now been retired
 and purged from CPAN, for various reasons but mostly because they are no longer
@@ -69,7 +73,7 @@ don't purge most of the repos) if needed.
 
 =item * L<PERLANCAR::Weird|Acme::CPANModules::PERLANCAR::Weird>
 
-Weird modules.
+List of weird modules.
 
 List of modules I find weird (non-pejoratively speaking) in one way or another,
 e.g. peculiar API, name.
@@ -110,13 +114,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

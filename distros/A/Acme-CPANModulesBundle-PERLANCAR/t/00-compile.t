@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Acme/CPANModules/PERLANCAR/Avoided.pm',
+    'Acme/CPANModules/PERLANCAR/MyCLIWithSubcommands.pm',
     'Acme/CPANModules/PERLANCAR/MyGetoptLongExperiment.pm',
-    'Acme/CPANModules/PERLANCAR/Retired.pm',
+    'Acme/CPANModules/PERLANCAR/MyRetired.pm',
     'Acme/CPANModules/PERLANCAR/Weird.pm',
     'Acme/CPANModulesBundle/PERLANCAR.pm'
 );

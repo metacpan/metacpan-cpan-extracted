@@ -1,5 +1,14 @@
 Revision history for Devel-MAT-Tool-Future
 
+0.03    2023-10-26
+        [CHANGES]
+         * Module style updates:
+            + Swap unit tests from `Test::More` to `Test2::V0`
+         * Better reliability when detecting PP vs XS-based futures
+
+        [BUGFIXES]
+         * Account for `magic ~` output when testing the `show` command
+
 0.02    2022-10-03
         [CHANGES]
          * Updates to handle both Future::PP and Future::XS

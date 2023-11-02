@@ -49,14 +49,23 @@
       },
       "test" : {
          "requires" : {
+            "Command::Runner" : "0",
+            "Term::ANSIColor::Concise" : "0",
             "Test::More" : "0.98"
          }
       }
    },
    "provides" : {
+      "App::ansiprintf" : {
+         "file" : "lib/App/ansiprintf.pm",
+         "version" : "2.05"
+      },
+      "App::ansiprintf::Util" : {
+         "file" : "lib/App/ansiprintf/Util.pm"
+      },
       "Text::ANSI::Printf" : {
          "file" : "lib/Text/ANSI/Printf.pm",
-         "version" : "2.03"
+         "version" : "2.05"
       }
    },
    "release_status" : "stable",
@@ -71,7 +80,7 @@
          "web" : "https://github.com/tecolicom/Text-ANSI-Printf"
       }
    },
-   "version" : "2.03",
+   "version" : "2.05",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

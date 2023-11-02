@@ -1,0 +1,201 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 2,
+          "raw" => " - Catch subclasses of Ouch as well Thanks to Graham Knop.\n\n",
+          "style" => "-",
+          "text" => "Catch subclasses of Ouch as well Thanks to Graham Knop."
+        }
+      ],
+      "line" => 1,
+      "note" => "September 23, 2013",
+      "raw" => "0.0407 - September 23, 2013\n",
+      "version" => "0.0407"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 5,
+          "raw" => " - Ouch doesn't need 5.12 afterall. Just needed to include the correct prereqs for the pragmas. Thanks to MidLifeXis and Ether.\n\n",
+          "style" => "-",
+          "text" => "Ouch doesn't need 5.12 afterall. Just needed to include the correct prereqs for the pragmas. Thanks to MidLifeXis and Ether."
+        }
+      ],
+      "line" => 4,
+      "note" => "September 13, 2013",
+      "raw" => "0.0406 - September 13, 2013\n",
+      "version" => "0.0406"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 8,
+          "raw" => " - worr submitted a patch fixing some a POD error\n\n",
+          "style" => "-",
+          "text" => "worr submitted a patch fixing some a POD error"
+        }
+      ],
+      "line" => 7,
+      "note" => "August 19, 2013",
+      "raw" => "0.0405 - August 19, 2013\n",
+      "version" => "0.0405"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 11,
+          "raw" => " - Made Ouch explicitly require Perl 5.12 due to use of \"use overload\" and \"use parent\".\n\n",
+          "style" => "-",
+          "text" => "Made Ouch explicitly require Perl 5.12 due to use of \"use overload\" and \"use parent\"."
+        }
+      ],
+      "line" => 10,
+      "note" => "August 19, 2013",
+      "raw" => "0.0404 - August 19, 2013\n",
+      "version" => "0.0404"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 14,
+          "raw" => " - Fixed documentation misspellings. \@richdouglasevans\n\n",
+          "style" => "-",
+          "text" => "Fixed documentation misspellings. \@richdouglasevans"
+        }
+      ],
+      "line" => 13,
+      "note" => "July 11, 2013",
+      "raw" => "0.0403 - July 11, 2013\n",
+      "version" => "0.0403"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 17,
+          "raw" => " - Fixed missing documentation for \"barf\".\n",
+          "style" => "-",
+          "text" => "Fixed missing documentation for \"barf\"."
+        },
+        {
+          "line" => 18,
+          "raw" => " - Depricated :traditional in favor of Try::Tiny.\n",
+          "style" => "-",
+          "text" => "Depricated :traditional in favor of Try::Tiny."
+        },
+        {
+          "line" => 19,
+          "raw" => " - Documented rethrowing Ouches. \n",
+          "style" => "-",
+          "text" => "Documented rethrowing Ouches."
+        },
+        {
+          "line" => 20,
+          "raw" => " - Added more docs for the :trytiny aliases\n\n",
+          "style" => "-",
+          "text" => "Added more docs for the :trytiny aliases"
+        }
+      ],
+      "line" => 16,
+      "note" => "June 18, 2013",
+      "raw" => "0.0402 - June 18, 2013\n",
+      "version" => "0.0402"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 23,
+          "raw" => " - beppu pointed out there was no \$VERSION. Told Dist::Zilla to add that.\n\n",
+          "style" => "-",
+          "text" => "beppu pointed out there was no \$VERSION. Told Dist::Zilla to add that."
+        }
+      ],
+      "line" => 22,
+      "note" => "April 30, 2011",
+      "raw" => "0.0401 - April 30, 2011\n",
+      "version" => "0.0401"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 26,
+          "raw" => " - Merged barf() from William Orr.\n",
+          "style" => "-",
+          "text" => "Merged barf() from William Orr."
+        },
+        {
+          "line" => 27,
+          "raw" => " - Added an export called \":trytiny\" which exports throw(), caught(), and caught_all().\n\n",
+          "style" => "-",
+          "text" => "Added an export called \":trytiny\" which exports throw(), caught(), and caught_all()."
+        }
+      ],
+      "line" => 25,
+      "note" => "April 30, 2011",
+      "raw" => "0.0400 - April 30, 2011\n",
+      "version" => "0.0400"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 30,
+          "raw" => " - Added hug() as a catch all.\n\n",
+          "style" => "-",
+          "text" => "Added hug() as a catch all."
+        },
+        {
+          "line" => 32,
+          "raw" => " By popular demand: http://blogs.perl.org/users/jt_smith/2011/04/ouch---exceptions-that-dont-hurt.html#comments\n",
+          "style" => "",
+          "text" => "By popular demand: http://blogs.perl.org/users/jt_smith/2011/04/ouch---exceptions-that-dont-hurt.html#comments"
+        },
+        {
+          "line" => 33,
+          "raw" => " - Codes can now be strings.\n",
+          "style" => "-",
+          "text" => "Codes can now be strings."
+        },
+        {
+          "line" => 34,
+          "raw" => " - Added an export called 'traditional' which gives you more traditional names like try(), catch(), throw(), and catch_all().\n\n",
+          "style" => "-",
+          "text" => "Added an export called 'traditional' which gives you more traditional names like try(), catch(), throw(), and catch_all()."
+        }
+      ],
+      "line" => 29,
+      "note" => "April 14, 2011",
+      "raw" => "0.0300 - April 14, 2011\n",
+      "version" => "0.0300"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 37,
+          "raw" => " - Added 'bleep'.\n\n",
+          "style" => "-",
+          "text" => "Added 'bleep'."
+        }
+      ],
+      "line" => 36,
+      "note" => "April 14, 2011",
+      "raw" => "0.0200 - April 14, 2011\n",
+      "version" => "0.0200"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 40,
+          "raw" => " - Initial public release.\n\n",
+          "style" => "-",
+          "text" => "Initial public release."
+        }
+      ],
+      "line" => 39,
+      "note" => "April 13, 2011",
+      "raw" => "0.0100 - April 13, 2011\n",
+      "version" => "0.0100"
+    }
+  ]
+}

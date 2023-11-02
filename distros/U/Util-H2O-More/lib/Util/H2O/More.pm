@@ -3,12 +3,10 @@ use warnings;
 
 package Util::H2O::More;
 use parent q/Exporter/;
-
-our $VERSION = q{0.3.2};
-
-our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini o2ini Getopt2h2o ddd dddie tr4h2o yaml2o/);
-
 use Util::H2O ();
+
+our @EXPORT_OK = (qw/baptise opt2h2o h2o o2h d2o o2d o2h2o ini2h2o ini2o h2o2ini o2ini Getopt2h2o ddd dddie tr4h2o yaml2h2o yaml2o/);
+our $VERSION = q{0.3.3};
 
 use feature 'state';
 
@@ -252,7 +250,7 @@ sub dddie(@) {
 }
 
 # YAML configuration support - may return more than 1 reference
-sub yaml2o($) {
+sub yaml2h2o($) {
     require YAML;
     my $file_or_yaml = shift; # may be a file or a string
     my @yaml         = ();    # yaml can have multiple objects serialized, via ---
@@ -286,7 +284,12 @@ sub yaml2o($) {
     return @obs;
 }
 
-# NOTE: no o2yaml, but can add one if somebody needs it ... please file an issue on the tracker (GH these days)
+# back compat
+sub yaml2o($) {
+    return yaml2h2o(shift);
+}
+
+# NOTE: no h2o2yaml or o2yaml, but can add one if somebody needs it ... please file an issue on the tracker (GH these days)
 
 1;
 
@@ -539,16 +542,16 @@ C<baptise> and friends.
     # now $o can be used to query all possible options, even if they were
     # never passed at the commandline 
 
-=head2 C<yaml2o FILENAME_OR_YAML_STRING>
+=head2 C<yaml2h2o FILENAME_OR_YAML_STRING>
 
 Takes a single parameter that may be the name of a YAML file (in which case
 it uses L<YAML>'s C<LoadFile>) or as a string of YAML (in which case it uses
 L<YAML>'s C<Load> to parse it). If either C<YAML::LoadFile> or C<YAML::Load>
 fails and throws an exception, it will not be caught and propagate to the
-caller of C<yaml2o>.
+caller of C<yaml2h2o>.
 
 Note: C<YAML> may contain more than one serialized object (separated by a
-line with C<---\n>. Therefore C<yaml2o> should be treated as returning a
+line with C<---\n>. Therefore C<yaml2h2o> should be treated as returning a
 list of C<d2o>'d objects.
 
 For example, say the YAML file looks like the following, saved as C<myfile.yaml>:
@@ -564,18 +567,18 @@ For example, say the YAML file looks like the following, saved as C<myfile.yaml>
   devices:
     copter1:
       active:  1
-      macaddr: a0:ff:6b:14:19:6e
-      host:    192.168.0.14
+      macaddr: ab:ba:0b:a1:1a:d7
+      host:    192.168.1.11
       port:    80
     thingywhirl:
       active:  1
-      macaddr: 00:88:fb:1a:5f:08
-      host:    192.168.0.14
+      macaddr: de:ad:0d:db:a1:11
+      host:    192.168.1.33
       port:    80
 
-Then the one may use the C<yaml2o> as follows:
+Then the one may use the C<yaml2h2o> as follows:
 
-  my @objects_from_yaml = yaml2o q{/path/to/myfile.yaml>;
+  my @objects_from_yaml = yaml2h2o q{/path/to/myfile.yaml>;
 
 And C<@objects_from_yaml> will have 2 objects in it, but having been C<bless>ed
 with accessors via the C<d2o> command, which will detect and handle properly lists.
@@ -583,14 +586,14 @@ with accessors via the C<d2o> command, which will detect and handle properly lis
 If known ahead of time how many serialized objects C<myfile.yaml> would have
 contained, then this is also a useful way to call it:
 
-  my ($dbconfig, $devices) = yaml2o q{/path/to/myfile.yaml};
+  my ($dbconfig, $devices) = yaml2h2o q{/path/to/myfile.yaml};
 
-More exotic C<YAML> files may break C<yaml2o>; this method was added to support
+More exotic C<YAML> files may break C<yaml2h2o>; this method was added to support
 simple C<YAML>. YAML can be used to encode a lot of things that we do not need.
 
 If you just need, e.g., the C<$dbconfig>; then this trick would apply well also:
 
-  my ($dbconfig, undef) = yaml2o q{/path/to/myfile.yaml};
+  my ($dbconfig, undef) = yaml2h2o q{/path/to/myfile.yaml};
 
 Similarly, the following works as expected. The only different is that C<$YAML>
 contains a string.
@@ -617,11 +620,11 @@ contains a string.
       port:    80
   EOYAML
   
-  my ($dbconfig, $devices) = yaml2o $YAML;
+  my ($dbconfig, $devices) = yaml2h2o $YAML;
 
-=head3 C<yaml2o> May C<die>!
+=head3 C<yaml2h2o> May C<die>!
 
-If whatever is passed to C<yaml2o> looks like neither a block of YAML or a file
+If whatever is passed to C<yaml2h2o> looks like neither a block of YAML or a file
 name, an exception will be thrown with an error saying as much.
 
 =head3 Note on Serialization to YAML
@@ -631,7 +634,13 @@ at a later date. If you're reading this and want it, please create an issue at
 the Github repository to request it (or other things).
 
 See also, C<o2h>, which returns the pure underlying Perl data structure that is
-objectified by C<h2o>, C<baptise>, C<ini2o>, C<yaml2o>, C<d2o>, etc.
+objectified by C<h2o>, C<baptise>, C<ini2h2o>, C<yaml2h2o>, C<d2o>, etc.
+
+=head2 C<yaml2o FILENAME>
+
+Alias to C<yaml2h2o> for backward compatibility. I made the same inconsistent choice
+when originally adding C<YAML> support in the naming, so this is just a shim to
+bridge that gap.
 
 =head2 C<ini2h2o FILENAME>
 

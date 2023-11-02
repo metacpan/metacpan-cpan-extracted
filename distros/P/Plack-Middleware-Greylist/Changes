@@ -1,5 +1,11 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.5.1    2023-10-28 09:04:21+01:00 Europe/London
+  [Tests]
+  - Migrated to Test2.
+
+  - Remove the use of Test::Most.
+
 v0.5.0    2023-08-02 11:40:11+01:00 Europe/London
   [Enhancements]
   - Added "allowed" and "rejected" as synonyms for "whitelist" and "blacklist".

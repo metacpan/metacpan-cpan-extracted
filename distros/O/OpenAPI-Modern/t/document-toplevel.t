@@ -10,14 +10,6 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
-use JSON::Schema::Modern;
-use JSON::Schema::Modern::Document::OpenAPI;
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
-use constant { true => JSON::PP::true, false => JSON::PP::false };
-
 # the document where most constraints are defined
 use constant SCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
 

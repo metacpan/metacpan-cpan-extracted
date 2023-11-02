@@ -1,0 +1,756 @@
+{
+  "preamble" => "Revision history for Perl extension Business::PayPal::API.\n\nRelease 0.71\n-------------------------------------------\n\n- Merge in changes from Ron Phipps.\n  - Reduce SOAP version requirement.\n  - Protection eligibility support.\n- Merge in changes from Tomas Doran.\n  - CPAN packaging enhancements.\n- Extract out more payer details from XML. (PayerName, NameSuffix, PayerCountry).\n- Fix https://rt.cpan.org/Public/Bug/Display.html?id=67386\n\nRelease 0.70 - First OALDERS release\n-------------------------------------\n- Fixes RT #70424 (Syntax deprecated in perl v5.14)\n>>>>>>> Fixes RT #70424 and bumps version to 0.70 for release.\n\nRelease 0.68 - First hembreed release\n-------------------------------------\nI've moved the module's scm to http://github.com/hembreed/Business-PayPal-API so others may share my pain. CPAN will be updated from there.\n\n- API.pm\n   1. Changed eq 'Success' to =~ /Success/ to accomodate variations introduced\n      by PayPal.\n   2. Changed test for duplicates to test for defined variable first. This\n      was causing errors in 5.10+ perl versions.\n-t/*t Changed test for Success in all test modules as above\n-t/RecurringPayments Corrected errors in type definitions and testing. Needs more work.\n-TransactionSearch Corrected test instructions and code to allow transaction searches using the transactionID. This works for some types of transactions but not others as per PayPal. It is   the only way to get MassPayment information.\n\nRelease 0.62 - last scottw release\n----------------------------",
+  "raw_preamble" => "Revision history for Perl extension Business::PayPal::API.\n\nRelease 0.71\n-------------------------------------------\n\n- Merge in changes from Ron Phipps.\n  - Reduce SOAP version requirement.\n  - Protection eligibility support.\n- Merge in changes from Tomas Doran.\n  - CPAN packaging enhancements.\n- Extract out more payer details from XML. (PayerName, NameSuffix, PayerCountry).\n- Fix https://rt.cpan.org/Public/Bug/Display.html?id=67386\n\nRelease 0.70 - First OALDERS release\n-------------------------------------\n- Fixes RT #70424 (Syntax deprecated in perl v5.14)\n>>>>>>> Fixes RT #70424 and bumps version to 0.70 for release.\n\nRelease 0.68 - First hembreed release\n-------------------------------------\nI've moved the module's scm to http://github.com/hembreed/Business-PayPal-API so others may share my pain. CPAN will be updated from there.\n\n- API.pm\n   1. Changed eq 'Success' to =~ /Success/ to accomodate variations introduced\n      by PayPal.\n   2. Changed test for duplicates to test for defined variable first. This\n      was causing errors in 5.10+ perl versions.\n-t/*t Changed test for Success in all test modules as above\n-t/RecurringPayments Corrected errors in type definitions and testing. Needs more work.\n-TransactionSearch Corrected test instructions and code to allow transaction searches using the transactionID. This works for some types of transactions but not others as per PayPal. It is   the only way to get MassPayment information.\n\nRelease 0.62 - last scottw release\n----------------------------\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 35,
+          "raw" => "date: 2009/07/28 18:00:58;  author: scott;  state: Exp;  lines: +44 -4\n",
+          "style" => "",
+          "text" => "date: 2009/07/28 18:00:58;  author: scott;  state: Exp;  lines: +44 -4"
+        },
+        {
+          "line" => 36,
+          "raw" => "- getFields() returns an array ref if multiple values are returned\n  from PayPal, otherwise it behaves as it always did, returning a\n  non-ref scalar.\n",
+          "style" => "-",
+          "text" => "getFields() returns an array ref if multiple values are returned from PayPal, otherwise it behaves as it always did, returning a non-ref scalar."
+        },
+        {
+          "line" => 39,
+          "raw" => "- BillingAgreement information returned in ExpressCheckout\n",
+          "style" => "-",
+          "text" => "BillingAgreement information returned in ExpressCheckout"
+        },
+        {
+          "line" => 40,
+          "raw" => "- Fix GetTransactionDetails 'PII_SalesTax' parameter\n",
+          "style" => "-",
+          "text" => "Fix GetTransactionDetails 'PII_SalesTax' parameter"
+        },
+        {
+          "line" => 41,
+          "raw" => "- Fix GetTransactionDetails to return multiple PaymentItems\n",
+          "style" => "-",
+          "text" => "Fix GetTransactionDetails to return multiple PaymentItems"
+        },
+        {
+          "line" => 42,
+          "raw" => "- Fix MassPay to use the correct UniqueID parameter\n",
+          "style" => "-",
+          "text" => "Fix MassPay to use the correct UniqueID parameter"
+        },
+        {
+          "line" => 43,
+          "raw" => "- Add DoReferenceTransaction to RecurringPayments API\n",
+          "style" => "-",
+          "text" => "Add DoReferenceTransaction to RecurringPayments API"
+        },
+        {
+          "line" => 44,
+          "raw" => "- Lots of credit given to great folks with patches in API docs\n\n",
+          "style" => "-",
+          "text" => "Lots of credit given to great folks with patches in API docs"
+        },
+        {
+          "line" => 46,
+          "raw" => "Thanks everyone! I'm handing this module off to Danny Hembree for\nmaintenance now.\n\n",
+          "style" => "",
+          "text" => "Thanks everyone! I'm handing this module off to Danny Hembree for maintenance now."
+        },
+        {
+          "line" => 49,
+          "raw" => "Release 0.61\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.61"
+        }
+      ],
+      "line" => 34,
+      "raw" => "revision 1.24\n",
+      "version" => "1.24"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 52,
+          "raw" => "date: 2008/05/05 15:10:40;  author: scott;  state: Exp;  lines: +37 -5\n",
+          "style" => "",
+          "text" => "date: 2008/05/05 15:10:40;  author: scott;  state: Exp;  lines: +37 -5"
+        },
+        {
+          "line" => 53,
+          "raw" => "- timeout setting available\n",
+          "style" => "-",
+          "text" => "timeout setting available"
+        },
+        {
+          "line" => 54,
+          "raw" => "- additional troubleshooting documentation (auth error handling, URL munging)\n----------------------------\n",
+          "style" => "-",
+          "text" => "additional troubleshooting documentation (auth error handling, URL munging)"
+        }
+      ],
+      "line" => 51,
+      "raw" => "revision 1.23\n",
+      "version" => "1.23"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 57,
+          "raw" => "date: 2008/05/05 15:11:14;  author: scott;  state: Exp;  lines: +34 -2\n",
+          "style" => "",
+          "text" => "date: 2008/05/05 15:11:14;  author: scott;  state: Exp;  lines: +34 -2"
+        },
+        {
+          "line" => 58,
+          "raw" => "- add shipto parameters\n----------------------------\n",
+          "style" => "-",
+          "text" => "add shipto parameters"
+        }
+      ],
+      "line" => 56,
+      "note" => "[DirectPayments.pm]",
+      "raw" => "revision 1.4 [DirectPayments.pm]\n",
+      "version" => "1.4"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 61,
+          "raw" => "date: 2008/05/05 15:11:51;  author: scott;  state: Exp;  lines: +11 -3\n",
+          "style" => "",
+          "text" => "date: 2008/05/05 15:11:51;  author: scott;  state: Exp;  lines: +11 -3"
+        },
+        {
+          "line" => 62,
+          "raw" => "- MaxAmount parameter take currencyID attribute (Sandbox)\n----------------------------\n",
+          "style" => "-",
+          "text" => "MaxAmount parameter take currencyID attribute (Sandbox)"
+        }
+      ],
+      "line" => 60,
+      "note" => "[ExpressCheckout.pm]",
+      "raw" => "revision 1.12 [ExpressCheckout.pm]\n",
+      "version" => "1.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 65,
+          "raw" => "date: 2008/05/05 15:15:04;  author: scott;  state: Exp;\n",
+          "style" => "",
+          "text" => "date: 2008/05/05 15:15:04;  author: scott;  state: Exp;"
+        },
+        {
+          "line" => 66,
+          "raw" => "- add base for RecurringPayments (not working yet)\n\n",
+          "style" => "-",
+          "text" => "add base for RecurringPayments (not working yet)"
+        },
+        {
+          "line" => 68,
+          "raw" => "Release 0.51\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.51"
+        }
+      ],
+      "line" => 64,
+      "note" => "[RecurringPayments.pm]",
+      "raw" => "revision 1.1 [RecurringPayments.pm]\n",
+      "version" => "1.1"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 71,
+          "raw" => "date: 2007/09/27 20:32:31;  author: scott;  state: Exp;  lines: +18 -6\n",
+          "style" => "",
+          "text" => "date: 2007/09/27 20:32:31;  author: scott;  state: Exp;  lines: +18 -6"
+        },
+        {
+          "line" => 72,
+          "raw" => "- [API.pm] add three-token signature testing URI (Oliver Ready)\n",
+          "style" => "-",
+          "text" => "[API.pm] add three-token signature testing URI (Oliver Ready)"
+        },
+        {
+          "line" => 73,
+          "raw" => "- [DirectPayments.pm] add ShippingTotal field (patch: Michael Hendricks)\n",
+          "style" => "-",
+          "text" => "[DirectPayments.pm] add ShippingTotal field (patch: Michael Hendricks)"
+        },
+        {
+          "line" => 74,
+          "raw" => "- [VoidRequest.pm] documentation fixes for method call (Oliver Ready)\n",
+          "style" => "-",
+          "text" => "[VoidRequest.pm] documentation fixes for method call (Oliver Ready)"
+        },
+        {
+          "line" => 75,
+          "raw" => "- [ReauthorizationRequest.pm] documentation fixes for method call (Oliver Ready)\n\n",
+          "style" => "-",
+          "text" => "[ReauthorizationRequest.pm] documentation fixes for method call (Oliver Ready)"
+        },
+        {
+          "line" => 77,
+          "raw" => "Release 0.51\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.51"
+        }
+      ],
+      "line" => 70,
+      "raw" => "revision 1.22\n",
+      "version" => "1.22"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 80,
+          "raw" => "date: 2007/08/29 20:56:42;  author: scott;  state: Exp;  lines: +4 -2\n",
+          "style" => "",
+          "text" => "date: 2007/08/29 20:56:42;  author: scott;  state: Exp;  lines: +4 -2"
+        },
+        {
+          "line" => 81,
+          "raw" => "- fix PayerStatus location in DOM, add AddressStatus element (patch: Michael Hendricks)\n\n",
+          "style" => "-",
+          "text" => "fix PayerStatus location in DOM, add AddressStatus element (patch: Michael Hendricks)"
+        },
+        {
+          "line" => 83,
+          "raw" => "Release 0.50\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.50"
+        }
+      ],
+      "line" => 79,
+      "raw" => "revision 1.10\n",
+      "version" => "1.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 86,
+          "raw" => "date: 2007/05/21 21:59:33;  author: scott;  state: Exp;  lines: +5 -5\n",
+          "style" => "",
+          "text" => "date: 2007/05/21 21:59:33;  author: scott;  state: Exp;  lines: +5 -5"
+        },
+        {
+          "line" => 87,
+          "raw" => "- minor doc changes\n",
+          "style" => "-",
+          "text" => "minor doc changes"
+        },
+        {
+          "line" => 88,
+          "raw" => "- new Mass Pay API module included\n----------------------------\n\n",
+          "style" => "-",
+          "text" => "new Mass Pay API module included"
+        },
+        {
+          "line" => 91,
+          "raw" => "Release 0.41\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.41"
+        }
+      ],
+      "line" => 85,
+      "raw" => "revision 1.20\n",
+      "version" => "1.20"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 94,
+          "raw" => "date: 2007/05/15 20:46:56;  author: scott;  state: Exp;  lines: +34 -12\n",
+          "style" => "",
+          "text" => "date: 2007/05/15 20:46:56;  author: scott;  state: Exp;  lines: +34 -12"
+        },
+        {
+          "line" => 95,
+          "raw" => "- some minor documentation additions\n\n",
+          "style" => "-",
+          "text" => "some minor documentation additions"
+        },
+        {
+          "line" => 97,
+          "raw" => "Release 0.40\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.40"
+        }
+      ],
+      "line" => 93,
+      "raw" => "revision 1.19\n",
+      "version" => "1.19"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 100,
+          "raw" => "date: 2006/10/06 17:53:44;  author: scott;  state: Exp;  lines: +2 -2\n",
+          "style" => "",
+          "text" => "date: 2006/10/06 17:53:44;  author: scott;  state: Exp;  lines: +2 -2"
+        },
+        {
+          "line" => 101,
+          "raw" => "- version bump\n----------------------------\n",
+          "style" => "-",
+          "text" => "version bump"
+        }
+      ],
+      "line" => 99,
+      "raw" => "revision 1.18\n",
+      "version" => "1.18"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 104,
+          "raw" => "date: 2006/10/06 17:49:50;  author: scott;  state: Exp;  lines: +42 -38\n",
+          "style" => "",
+          "text" => "date: 2006/10/06 17:49:50;  author: scott;  state: Exp;  lines: +42 -38"
+        },
+        {
+          "line" => 105,
+          "raw" => "- using PayPal API version 2.0\n",
+          "style" => "-",
+          "text" => "using PayPal API version 2.0"
+        },
+        {
+          "line" => 106,
+          "raw" => "- note about SSL requirements of LWP\n",
+          "style" => "-",
+          "text" => "note about SSL requirements of LWP"
+        },
+        {
+          "line" => 107,
+          "raw" => "- minor documentation cleanup\n",
+          "style" => "-",
+          "text" => "minor documentation cleanup"
+        },
+        {
+          "line" => 108,
+          "raw" => "- DirectPayments tests added\n",
+          "style" => "-",
+          "text" => "DirectPayments tests added"
+        },
+        {
+          "line" => 109,
+          "raw" => "- New modules (with tests!) from Danny Hembree:\n  AuthorizationRequest.pm\n  CaptureRequest.pm\n  ReauthorizationRequest.pm\n  VoidRequest.pm\n----------------------------\n",
+          "style" => "-",
+          "text" => "New modules (with tests!) from Danny Hembree: AuthorizationRequest.pm CaptureRequest.pm ReauthorizationRequest.pm VoidRequest.pm"
+        }
+      ],
+      "line" => 103,
+      "raw" => "revision 1.17\n",
+      "version" => "1.17"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 116,
+          "raw" => "date: 2006/07/06 15:25:21;  author: scott;  state: Exp;  lines: +9 -2\n",
+          "style" => "",
+          "text" => "date: 2006/07/06 15:25:21;  author: scott;  state: Exp;  lines: +9 -2"
+        },
+        {
+          "line" => 117,
+          "raw" => "- add acknowledgement and pointers to example code from Andy Spiegl and others\n\n",
+          "style" => "-",
+          "text" => "add acknowledgement and pointers to example code from Andy Spiegl and others"
+        },
+        {
+          "line" => 119,
+          "raw" => "Release 0.33\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.33"
+        }
+      ],
+      "line" => 115,
+      "raw" => "revision 1.16\n",
+      "version" => "1.16"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 122,
+          "raw" => "date: 2006/07/05 18:05:39;  author: scott;  state: Exp;  lines: +2 -2\n",
+          "style" => "",
+          "text" => "date: 2006/07/05 18:05:39;  author: scott;  state: Exp;  lines: +2 -2"
+        },
+        {
+          "line" => 123,
+          "raw" => "- fix documentation regarding SetExpressCheckout (returns a hash, not\n  a scalar). If you were following the code in the SYNOPSIS for\n  ExpressCheckout and getting a token with '3/8' or '4/8', you should\n  change the \$token to %response, since SetExpressCheckout() returns a\n  hash (big thanks to Andy Spiegl for finding this).\n\n",
+          "style" => "-",
+          "text" => "fix documentation regarding SetExpressCheckout (returns a hash, not a scalar). If you were following the code in the SYNOPSIS for ExpressCheckout and getting a token with '3/8' or '4/8', you should change the \$token to %response, since SetExpressCheckout() returns a hash (big thanks to Andy Spiegl for finding this)."
+        },
+        {
+          "line" => 129,
+          "raw" => "Release 0.32\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.32"
+        }
+      ],
+      "line" => 121,
+      "raw" => "revision 1.15\n",
+      "version" => "1.15"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 132,
+          "raw" => "date: 2006/07/03 15:46:24;  author: scott;  state: Exp;  lines: +16 -1\n",
+          "style" => "",
+          "text" => "date: 2006/07/03 15:46:24;  author: scott;  state: Exp;  lines: +16 -1"
+        },
+        {
+          "line" => 133,
+          "raw" => "- acknowledgements section\n----------------------------\n",
+          "style" => "-",
+          "text" => "acknowledgements section"
+        }
+      ],
+      "line" => 131,
+      "raw" => "revision 1.14\n",
+      "version" => "1.14"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 136,
+          "raw" => "date: 2006/07/03 15:40:16;  author: scott;  state: Exp;  lines: +11 -2\n",
+          "style" => "",
+          "text" => "date: 2006/07/03 15:40:16;  author: scott;  state: Exp;  lines: +11 -2"
+        },
+        {
+          "line" => 137,
+          "raw" => "- fix for 3-token auth\n\n",
+          "style" => "-",
+          "text" => "fix for 3-token auth"
+        },
+        {
+          "line" => 139,
+          "raw" => "Release 0.31\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.31"
+        }
+      ],
+      "line" => 135,
+      "raw" => "revision 1.13\n",
+      "version" => "1.13"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 142,
+          "raw" => "date: 2006/06/29 02:36:24;  author: scott;  state: Exp;  lines: +2 -2\n",
+          "style" => "",
+          "text" => "date: 2006/06/29 02:36:24;  author: scott;  state: Exp;  lines: +2 -2"
+        },
+        {
+          "line" => 143,
+          "raw" => "- fix StateOrProvince typo [rt.cpan.org #20176]\n\n",
+          "style" => "-",
+          "text" => "fix StateOrProvince typo [rt.cpan.org #20176]"
+        },
+        {
+          "line" => 145,
+          "raw" => "Release 0.30\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.30"
+        }
+      ],
+      "line" => 141,
+      "raw" => "revision 1.12\n",
+      "version" => "1.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 148,
+          "raw" => "date: 2006/04/18 16:23:18;  author: scott;  state: Exp;  lines: +2 -2\n",
+          "style" => "",
+          "text" => "date: 2006/04/18 16:23:18;  author: scott;  state: Exp;  lines: +2 -2"
+        },
+        {
+          "line" => 149,
+          "raw" => "- added DirectPayments API by Daniel Hembree. Thanks Daniel!\n\n",
+          "style" => "-",
+          "text" => "added DirectPayments API by Daniel Hembree. Thanks Daniel!"
+        },
+        {
+          "line" => 151,
+          "raw" => "Release 0.23\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.23"
+        }
+      ],
+      "line" => 147,
+      "raw" => "revision 1.11\n",
+      "version" => "1.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 154,
+          "raw" => "date: 2006/04/04 19:29:08;  author: scott;  state: Exp;  lines: +12 -5\n",
+          "style" => "",
+          "text" => "date: 2006/04/04 19:29:08;  author: scott;  state: Exp;  lines: +12 -5"
+        },
+        {
+          "line" => 155,
+          "raw" => "- typo fix\n",
+          "style" => "-",
+          "text" => "typo fix"
+        },
+        {
+          "line" => 156,
+          "raw" => "- wrap soap call in eval for safety (if ssl neg. fails w/ paypal, it croaks)\n",
+          "style" => "-",
+          "text" => "wrap soap call in eval for safety (if ssl neg. fails w/ paypal, it croaks)"
+        },
+        {
+          "line" => 157,
+          "raw" => "- version bump\n\n",
+          "style" => "-",
+          "text" => "version bump"
+        },
+        {
+          "line" => 159,
+          "raw" => "Release 0.22\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.22"
+        }
+      ],
+      "line" => 153,
+      "raw" => "revision 1.10\n",
+      "version" => "1.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 162,
+          "raw" => "date: 2006/03/28 18:05:03;  author: scott;  state: Exp;  lines: +54 -44\n",
+          "style" => "",
+          "text" => "date: 2006/03/28 18:05:03;  author: scott;  state: Exp;  lines: +54 -44"
+        },
+        {
+          "line" => 163,
+          "raw" => "- documentation updates\n\n",
+          "style" => "-",
+          "text" => "documentation updates"
+        },
+        {
+          "line" => 165,
+          "raw" => "Release 0.21\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.21"
+        }
+      ],
+      "line" => 161,
+      "raw" => "revision 1.9\n",
+      "version" => "1.9"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 168,
+          "raw" => "date: 2006/03/24 17:12:59;  author: scott;  state: Exp;  lines: +14 -4\n",
+          "style" => "",
+          "text" => "date: 2006/03/24 17:12:59;  author: scott;  state: Exp;  lines: +14 -4"
+        },
+        {
+          "line" => 169,
+          "raw" => "- fix fault printing\n",
+          "style" => "-",
+          "text" => "fix fault printing"
+        },
+        {
+          "line" => 170,
+          "raw" => "- fix getFieldsList record population\n\n",
+          "style" => "-",
+          "text" => "fix getFieldsList record population"
+        },
+        {
+          "line" => 172,
+          "raw" => "Release 0.20\n----------------------------\n",
+          "style" => "",
+          "text" => "Release 0.20"
+        }
+      ],
+      "line" => 167,
+      "raw" => "revision 1.8\n",
+      "version" => "1.8"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 175,
+          "raw" => "date: 2006/03/23 17:28:10;  author: scott;  state: Exp;  lines: +90 -9\n",
+          "style" => "",
+          "text" => "date: 2006/03/23 17:28:10;  author: scott;  state: Exp;  lines: +90 -9"
+        },
+        {
+          "line" => 176,
+          "raw" => "- allow subclass methods to be imported into API.pm namespace\n----------------------------\n",
+          "style" => "-",
+          "text" => "allow subclass methods to be imported into API.pm namespace"
+        }
+      ],
+      "line" => 174,
+      "raw" => "revision 1.7\n",
+      "version" => "1.7"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 179,
+          "raw" => "date: 2006/03/22 23:20:09;  author: scott;  state: Exp;  lines: +2 -2\n",
+          "style" => "",
+          "text" => "date: 2006/03/22 23:20:09;  author: scott;  state: Exp;  lines: +2 -2"
+        },
+        {
+          "line" => 180,
+          "raw" => "- version bump\n----------------------------\n",
+          "style" => "-",
+          "text" => "version bump"
+        }
+      ],
+      "line" => 178,
+      "raw" => "revision 1.6\n",
+      "version" => "1.6"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 183,
+          "raw" => "date: 2006/03/22 23:19:03;  author: scott;  state: Exp;  lines: +40 -13\n",
+          "style" => "",
+          "text" => "date: 2006/03/22 23:19:03;  author: scott;  state: Exp;  lines: +40 -13"
+        },
+        {
+          "line" => 184,
+          "raw" => "- add GetTransactionDetails API\n",
+          "style" => "-",
+          "text" => "add GetTransactionDetails API"
+        },
+        {
+          "line" => 185,
+          "raw" => "- add TransactionSearch API\n",
+          "style" => "-",
+          "text" => "add TransactionSearch API"
+        },
+        {
+          "line" => 186,
+          "raw" => "- getFieldList() for API.pm\n----------------------------\n",
+          "style" => "-",
+          "text" => "getFieldList() for API.pm"
+        }
+      ],
+      "line" => 182,
+      "raw" => "revision 1.5\n",
+      "version" => "1.5"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 189,
+          "raw" => "date: 2006/03/21 22:15:11;  author: scott;  state: Exp;  lines: +2 -2\n",
+          "style" => "",
+          "text" => "date: 2006/03/21 22:15:11;  author: scott;  state: Exp;  lines: +2 -2"
+        },
+        {
+          "line" => 190,
+          "raw" => "- bump version\n----------------------------\n",
+          "style" => "-",
+          "text" => "bump version"
+        }
+      ],
+      "line" => 188,
+      "raw" => "revision 1.4\n",
+      "version" => "1.4"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 193,
+          "raw" => "date: 2006/03/21 22:05:19;  author: scott;  state: Exp;  lines: +55 -31\n",
+          "style" => "",
+          "text" => "date: 2006/03/21 22:05:19;  author: scott;  state: Exp;  lines: +55 -31"
+        },
+        {
+          "line" => 194,
+          "raw" => "- minor debugging changes\n",
+          "style" => "-",
+          "text" => "minor debugging changes"
+        },
+        {
+          "line" => 195,
+          "raw" => "- documentation update for developers\n",
+          "style" => "-",
+          "text" => "documentation update for developers"
+        },
+        {
+          "line" => 196,
+          "raw" => "- note about using IO::Socket::SSL (don't)\n----------------------------\n",
+          "style" => "-",
+          "text" => "note about using IO::Socket::SSL (don't)"
+        }
+      ],
+      "line" => 192,
+      "raw" => "revision 1.3\n",
+      "version" => "1.3"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 199,
+          "raw" => "date: 2006/03/16 23:33:49;  author: scott;  state: Exp;  lines: +184 -26\n",
+          "style" => "",
+          "text" => "date: 2006/03/16 23:33:49;  author: scott;  state: Exp;  lines: +184 -26"
+        },
+        {
+          "line" => 200,
+          "raw" => "- initial checkin of API and subclasses\n",
+          "style" => "-",
+          "text" => "initial checkin of API and subclasses"
+        },
+        {
+          "line" => 201,
+          "raw" => "- all tests working, documentation done\n----------------------------\n",
+          "style" => "-",
+          "text" => "all tests working, documentation done"
+        }
+      ],
+      "line" => 198,
+      "raw" => "revision 1.2\n",
+      "version" => "1.2"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 204,
+          "raw" => "date: 2006/03/15 23:33:53;  author: scott;  state: Exp;\n",
+          "style" => "",
+          "text" => "date: 2006/03/15 23:33:53;  author: scott;  state: Exp;"
+        },
+        {
+          "line" => 205,
+          "raw" => "- moved from Business::PayPal::WPP::ExpressCheckout\n",
+          "style" => "-",
+          "text" => "moved from Business::PayPal::WPP::ExpressCheckout"
+        },
+        {
+          "line" => 206,
+          "raw" => "- uses API.pm for authorization/authentication and other common functions\n=============================================================================\n",
+          "style" => "-",
+          "text" => "uses API.pm for authorization/authentication and other common functions"
+        }
+      ],
+      "line" => 203,
+      "raw" => "revision 1.1\n",
+      "version" => "1.1"
+    }
+  ]
+}

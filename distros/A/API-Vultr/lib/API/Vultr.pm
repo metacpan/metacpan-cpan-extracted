@@ -7,8 +7,9 @@ use warnings;
 
 use Carp qw(croak);
 use URI  qw();
+use LWP::UserAgent ();
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 
 sub _make_uri {
     my ( $self, $path, %query ) = @_;

@@ -18,9 +18,9 @@ use Tie::Cache;
 use URI::Split qw(uri_split uri_join);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-09'; # DATE
+our $DATE = '2023-10-24'; # DATE
 our $DIST = 'Perinci-Access-Perl'; # DIST
-our $VERSION = '0.899'; # VERSION
+our $VERSION = '0.900'; # VERSION
 
 our $re_perl_package =
     qr/\A[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9][A-Za-z_0-9]*)*\z/;
@@ -1048,7 +1048,7 @@ Perinci::Access::Schemeless - Base class for Perinci::Access::Perl
 
 =head1 VERSION
 
-This document describes version 0.899 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2023-07-09.
+This document describes version 0.900 of Perinci::Access::Schemeless (from Perl distribution Perinci-Access-Perl), released on 2023-10-24.
 
 =head1 DESCRIPTION
 

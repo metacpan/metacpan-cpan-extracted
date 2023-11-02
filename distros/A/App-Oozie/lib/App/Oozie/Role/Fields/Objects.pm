@@ -1,8 +1,11 @@
 package App::Oozie::Role::Fields::Objects;
-$App::Oozie::Role::Fields::Objects::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Constants qw(
@@ -17,6 +20,11 @@ use MooX::Options;
 use Net::Hadoop::Oozie;
 use Net::Hadoop::WebHDFS::LWP;
 use Types::Standard qw( InstanceOf );
+
+option resource_manager => (
+    is     => 'rw',
+    format => 's',
+);
 
 option timezone => (
     is       => 'rw',
@@ -93,7 +101,7 @@ App::Oozie::Role::Fields::Objects
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -113,6 +121,8 @@ App::Oozie::Role::Fields::Objects - Overridable objects for internal programs/li
 =head1 Accessors
 
 =head2 Overridable from cli
+
+=head3 resource_manager
 
 =head3 timezone
 

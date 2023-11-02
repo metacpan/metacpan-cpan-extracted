@@ -3,7 +3,7 @@ package Wikibase::Datatype;
 use strict;
 use warnings;
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 1;
 
@@ -93,6 +93,10 @@ Wikibase globe coordinate value datatype.
 
 Wikibase item value datatype.
 
+=item L<Wikibase::Datatype::Value::Lexeme>
+
+Wikibase lexeme value datatype.
+
 =item L<Wikibase::Datatype::Value::Monolingual>
 
 Wikibase monolingual value datatype.
@@ -151,6 +155,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.33
 
 =cut

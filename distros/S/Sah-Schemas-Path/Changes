@@ -1,3 +1,35 @@
+0.021   2023-10-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: dirname::default_curdir.
+
+
+0.020   2023-08-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: {file,dir}name::{,unix::}not_exists.
+
+        - [doc] Add description (guideline) in the main module.
+
+        - [doc] Add description to all schemas which previously did not have
+          description.
+
+
+0.019   2023-08-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: {path,dir,file}name::unix::exists,
+          pathname::unix::not_exists.
+
+
+0.018   2023-08-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: pathname::not_exists.
+
+
+0.017   2023-08-11  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: {file,dir,path}name::exists, filenames,
+          filenames::exist, dirnames, dirnames::exist, pathnames::exist.
+
+
 0.016   2021-07-17  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

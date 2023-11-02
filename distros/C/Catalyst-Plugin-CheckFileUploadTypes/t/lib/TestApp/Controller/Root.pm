@@ -26,6 +26,10 @@ sub expect_image :Local :Args(0) ExpectUploads(image/png) {
     $c->response->body("Hit expect_image");
 }
 
+sub expect_text :Local :Args(0) ExpectUploads(text/plain) {
+    my ($self, $c) = @_;
+    $c->response->body("Hit expect_text");
+}
 
 __PACKAGE__->meta->make_immutable;
 

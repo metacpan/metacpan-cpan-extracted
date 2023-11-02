@@ -1,0 +1,29 @@
+Revision history for Ubic-Service-Plack
+
+{{$NEXT}}
+
+1.15    Sun Oct 14, 2012
+        * minor POD improvements
+        * don't package debian/ into CPAN distribution
+        * fix cwd test on OS X
+
+1.14    Tue Jan 10, 2012
+        * group, env and cmd options
+        * deprecate app_name option, derive pidfile from service's full_name
+        * improve and cleanup docs
+
+1.13    Wed Jul 13, 2011
+        * Compatible with new ubic 'default user' feature
+        * Support arrayref values in server_args
+        * Support single-letter keys in server_args
+        * bin() method, pidfile() method, refactor to use
+          Ubic::Service::Skeleton instead of Ubic::Service::Common
+
+1.12    Sun Nov 07, 2010
+        Pass 'port' option to plackup.
+
+1.11    Sat Jul 31, 2010
+        Add Plack into CPAN deps.
+
+1.10    Fri Jul 30, 2010
+        First opensource release.

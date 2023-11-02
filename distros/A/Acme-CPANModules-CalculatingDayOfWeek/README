@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModules::CalculatingDayOfWeek - Modules to calculate day of
-    week
+    Acme::CPANModules::CalculatingDayOfWeek - List of modules to calculate
+    day of week
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     Acme::CPANModules::CalculatingDayOfWeek (from Perl distribution
-    Acme-CPANModules-CalculatingDayOfWeek), released on 2019-11-20.
+    Acme-CPANModules-CalculatingDayOfWeek), released on 2023-08-06.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -20,8 +20,39 @@ SYNOPSIS
     list/include/exclude/add datasets, etc), see bencher or run "bencher
     --help".
 
-DESCRIPTION
-    Modules to calculate day of week.
+ACME::CPANMODULES ENTRIES
+    Date::DayOfWeek
+        Author: RBOW <https://metacpan.org/author/RBOW>
+
+        Both Date::DayOfWeek and Time::DayOfWeek are lightweight modules.
+
+    Time::DayOfWeek
+        Author: PIP <https://metacpan.org/author/PIP>
+
+        Both Date::DayOfWeek and Time::DayOfWeek are lightweight modules.
+
+        This module offers cryptic and confusing function names: "DoW"
+        returns 0-6, "Dow" returns 3-letter abbrev.
+
+    DateTime
+        Author: DROLSKY <https://metacpan.org/author/DROLSKY>
+
+        Compared to Date::DayOfWeek and Time::DayOfWeek, DateTime is a
+        behemoth. But it provides a bunch of other functionalities as well.
+
+    Date::Calc
+        Author: STBEY <https://metacpan.org/author/STBEY>
+
+        Date::Calc is a nice compromise when you want something that is more
+        lightweight and does not need to be as accurate as DateTime.
+
+    Time::Moment
+        Author: CHANSEN <https://metacpan.org/author/CHANSEN>
+
+        Time::Moment is also a nice alternative to DateTime. Although it's
+        not as featureful as DateTime, it is significantly more lightweight.
+        Compared to Date::Calc, Time::Moment's API is closer to DateTime's.
+        Being an XS module, it's also faster.
 
 BENCHMARKED MODULES
     Version numbers shown below are the versions used when running the
@@ -31,11 +62,11 @@ BENCHMARKED MODULES
 
     Time::DayOfWeek 1.8
 
-    DateTime 1.39
+    DateTime 1.59
 
     Date::Calc 6.4
 
-    Time::Moment 0.38
+    Time::Moment 0.44
 
 BENCHMARK PARTICIPANTS
     *   Date::DayOfWeek::dayofweek (perl_code)
@@ -71,72 +102,125 @@ BENCHMARK PARTICIPANTS
 BENCHMARK DATASETS
     *   date1
 
-SAMPLE BENCHMARK RESULTS
-    Run on: perl: *v5.24.0*, CPU: *Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
-    (4 cores)*, OS: *GNU/Linux LinuxMint version 18.2*, OS kernel: *Linux
-    version 4.8.0-53-generic*.
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.38.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 20.04*, OS kernel: *Linux
+    version 5.4.0-91-generic*.
 
-    Benchmark with default options ("bencher --cpanmodules-module
-    CalculatingDayOfWeek"):
+    Benchmark command (default options):
+
+     % bencher --cpanmodules-module CalculatingDayOfWeek
+
+    Result formatted as table:
 
      #table1#
      {dataset=>"date1"}
-     +----------------------------+-----------+-----------+------------+---------+---------+
-     | participant                | rate (/s) | time (μs) | vs_slowest |  errors | samples |
-     +----------------------------+-----------+-----------+------------+---------+---------+
-     | DateTime                   |     44000 | 23        |     1      | 5.3e-08 |      20 |
-     | Date::DayOfWeek::dayofweek |    630000 |  1.59     |    14.2    | 7.9e-10 |      22 |
-     | Date::Calc::Day_of_Week    |    753000 |  1.33     |    17      | 3.2e-10 |      35 |
-     | Time::DayOfWeek::DoW       |   1100000 |  0.89     |    25      | 1.2e-09 |      21 |
-     | Time::Moment               |   2974870 |  0.336149 |    67.0065 |   0     |      20 |
-     +----------------------------+-----------+-----------+------------+---------+---------+
+     +----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | participant                | rate (/s) | time (Î¼s) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
+     | DateTime                   |     37000 |    27     |                 0.00% |              8030.29% | 3.8e-08 |      24 |
+     | Date::DayOfWeek::dayofweek |    562000 |     1.78  |              1415.39% |               436.51% | 3.8e-10 |      20 |
+     | Date::Calc::Day_of_Week    |    650000 |     1.54  |              1650.85% |               364.36% | 9.3e-10 |      20 |
+     | Time::DayOfWeek::DoW       |   1030000 |     0.97  |              2677.36% |               192.73% | 6.3e-10 |      20 |
+     | Time::Moment               |   3020000 |     0.331 |              8030.29% |                 0.00% | 1.7e-10 |      20 |
+     +----------------------------+-----------+-----------+-----------------------+-----------------------+---------+---------+
 
-    Benchmark module startup overhead ("bencher --cpanmodules-module
-    CalculatingDayOfWeek --module-startup"):
+    The above result formatted in Benchmark.pm style:
+
+                     Rate      D  DD:d  DC:D_o_W  TD:D   T:M 
+      D           37000/s     --  -93%      -94%  -96%  -98% 
+      DD:d       562000/s  1416%    --      -13%  -45%  -81% 
+      DC:D_o_W   650000/s  1653%   15%        --  -37%  -78% 
+      TD:D      1030000/s  2683%   83%       58%    --  -65% 
+      T:M       3020000/s  8057%  437%      365%  193%    -- 
+ 
+     Legends:
+       D: participant=DateTime
+       DC:D_o_W: participant=Date::Calc::Day_of_Week
+       DD:d: participant=Date::DayOfWeek::dayofweek
+       T:M: participant=Time::Moment
+       TD:D: participant=Time::DayOfWeek::DoW
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher --cpanmodules-module CalculatingDayOfWeek --module-startup
+
+    Result formatted as table:
 
      #table2#
-     +---------------------+-----------+------------------------+------------+-----------+---------+
-     | participant         | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
-     +---------------------+-----------+------------------------+------------+-----------+---------+
-     | DateTime            |      98   |                   95.3 |        1   |   0.00021 |      21 |
-     | Date::Calc          |      17   |                   14.3 |        5.7 | 2.5e-05   |      20 |
-     | Time::Moment        |       7   |                    4.3 |       14   | 1.3e-05   |      20 |
-     | Time::DayOfWeek     |       5.9 |                    3.2 |       17   | 2.3e-05   |      20 |
-     | Date::DayOfWeek     |       5.2 |                    2.5 |       19   | 8.3e-06   |      21 |
-     | perl -e1 (baseline) |       2.7 |                    0   |       36   |   7e-06   |      20 |
-     +---------------------+-----------+------------------------+------------+-----------+---------+
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+     | participant         | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors | samples |
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+     | DateTime            |    145    |            139.2  |                 0.00% |              2398.83% | 3.7e-05 |      20 |
+     | Date::Calc          |     24.9  |             19.1  |               483.22% |               328.45% | 1.2e-05 |      21 |
+     | Time::Moment        |     12.2  |              6.4  |              1086.86% |               110.54% | 8.3e-06 |      20 |
+     | Time::DayOfWeek     |      9.8  |              4    |              1380.99% |                68.73% | 5.7e-06 |      20 |
+     | Date::DayOfWeek     |      9.34 |              3.54 |              1453.50% |                60.85% |   5e-06 |      20 |
+     | perl -e1 (baseline) |      5.8  |              0    |              2398.83% |                 0.00% | 6.4e-06 |      20 |
+     +---------------------+-----------+-------------------+-----------------------+-----------------------+---------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate      D   D:C   T:M   T:D   D:D  perl -e1 (baseline) 
+      D                      6.9/s     --  -82%  -91%  -93%  -93%                 -96% 
+      D:C                   40.2/s   482%    --  -51%  -60%  -62%                 -76% 
+      T:M                   82.0/s  1088%  104%    --  -19%  -23%                 -52% 
+      T:D                  102.0/s  1379%  154%   24%    --   -4%                 -40% 
+      D:D                  107.1/s  1452%  166%   30%    4%    --                 -37% 
+      perl -e1 (baseline)  172.4/s  2400%  329%  110%   68%   61%                   -- 
+ 
+     Legends:
+       D: mod_overhead_time=139.2 participant=DateTime
+       D:C: mod_overhead_time=19.1 participant=Date::Calc
+       D:D: mod_overhead_time=3.54 participant=Date::DayOfWeek
+       T:D: mod_overhead_time=4 participant=Time::DayOfWeek
+       T:M: mod_overhead_time=6.4 participant=Time::Moment
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
     To display as an interactive HTML table on a browser, you can add option
     "--format html+datatables".
 
-INCLUDED MODULES
-    *   Date::DayOfWeek
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
 
-        Both Date::DayOfWeek and Time::DayOfWeek are lightweight modules.
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
 
-    *   Time::DayOfWeek
+     % cpanm-cpanmodules -n CalculatingDayOfWeek
 
-        Both Date::DayOfWeek and Time::DayOfWeek are lightweight modules.
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
-        This module offers cryptic and confusing function names: "DoW"
-        returns 0-6, "Dow" returns 3-letter abbrev.
+        % cpanmodules ls-entries CalculatingDayOfWeek | cpanm -n
 
-    *   DateTime
+    or Acme::CM::Get:
 
-        Compared to Date::DayOfWeek and Time::DayOfWeek, DateTime is a
-        behemoth. But it provides a bunch of other functionalities as well.
+        % perl -MAcme::CM::Get=CalculatingDayOfWeek -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
 
-    *   Date::Calc
+    or directly:
 
-        Date::Calc is a nice compromise when you want something that is more
-        lightweight and does not need to be as accurate as DateTime.
+        % perl -MAcme::CPANModules::CalculatingDayOfWeek -E'say $_->{module} for @{ $Acme::CPANModules::CalculatingDayOfWeek::LIST->{entries} }' | cpanm -n
 
-    *   Time::Moment
+    This Acme::CPANModules module contains benchmark instructions. You can
+    run a benchmark for some/all the modules listed in this
+    Acme::CPANModules module using the bencher CLI (from Bencher
+    distribution):
 
-        Time::Moment is also a nice alternative to DateTime. Although it's
-        not as featureful as DateTime, it is significantly more lightweight.
-        Compared to Date::Calc, Time::Moment's API is closer to DateTime's.
-        Being an XS module, it's also faster.
+        % bencher --cpanmodules-module CalculatingDayOfWeek
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -147,14 +231,6 @@ SOURCE
     <https://github.com/perlancar/perl-Acme-CPANModules-CalculatingDayOfWeek
     >.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Calc
-    ulatingDayOfWeek>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -163,9 +239,33 @@ SEE ALSO
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Calc
+    ulatingDayOfWeek>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

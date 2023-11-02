@@ -1,12 +1,10 @@
 {
    "abstract" : "collaborative IRC helper",
    "author" : [
-      "Martín Ferrari",
-      "Damyan Ivanov",
-      "gregor herrmann"
+      "KGB authors. See the copyright notices in individual files"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "gpl_2"
    ],
@@ -39,6 +37,7 @@
             "IPC::System::Simple" : "0",
             "JSON::RPC::Legacy::Client" : "0",
             "JSON::XS" : "0",
+            "List::MoreUtils" : "0",
             "Net::IP" : "0",
             "POE" : "0",
             "POE::Component::IRC" : "5.56",
@@ -49,6 +48,7 @@
             "SVN::Fs" : "0",
             "SVN::Repos" : "0",
             "Schedule::RateLimiter" : "0",
+            "Text::Glob" : "0",
             "Time::Piece" : "0",
             "WWW::Shorten" : "0",
             "YAML" : "0",
@@ -82,6 +82,6 @@
          "http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt"
       ]
    },
-   "version" : "1.55",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.59",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

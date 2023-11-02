@@ -3,9 +3,9 @@ use utf8;
 use v5.14;
 use warnings;
 
-use Test::More 1.302183;
+use Test2::V0;
 
-use_ok "Text::Minify::XS", "minify_utf8";
+use Text::Minify::XS qw( minify_utf8 );
 
 is minify_utf8("") => "", "empty";
 

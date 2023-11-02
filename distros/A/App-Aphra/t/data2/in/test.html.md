@@ -1,0 +1,4 @@
+---
+title: Testing
+---
+# [% page.title %]

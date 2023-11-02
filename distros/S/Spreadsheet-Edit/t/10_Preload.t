@@ -3,9 +3,8 @@ use FindBin qw($Bin);
 use lib $Bin;
 use t_Common qw/oops/; # strict, warnings, Carp
 use t_TestCommon # Test2::V0 etc.
-  qw/$silent $verbose $debug run_perlscript/;
+  qw/$silent $verbose $debug run_perlscript my_capture/;
 use t_SSUtils qw/create_testdata/;
-use Capture::Tiny qw/capture/;
 
 our ($tdata1_path, $withARGV_path, $opthash_comma);
 BEGIN{
@@ -31,7 +30,7 @@ BEGIN{
 
 # Still in package main
 
-{ my ($out, $err) = capture {
+{ my ($out, $err) = my_capture {
     run_perlscript('-wE', '
        package Foo::Clash1;
        sub TitleA { 42 };
@@ -54,7 +53,7 @@ BEGIN{
   }
 }
 
-{ my ($out, $err) = capture {
+{ my ($out, $err) = my_capture {
     run_perlscript('-wE', '
        package Foo::Clash1;
        use Spreadsheet::Edit::Preload '.$opthash_comma.vis($main::withARGV_path->stringify).';

@@ -32,7 +32,7 @@ sub config_mswin32 {
     my $w32cc = uc( $self->handle_option(w32cc_option(\%compilers, $osvers)) );
     my $w32make = $self->handle_option(w32make_option($w32cc, $compilers{$w32cc}));
 
-    $self->current_values('w32args') = [
+    $self->current_values->{w32args} = [
         "--win32-cctype" => $w32cc,
         "--win32-maker"  => $w32make,
         "osvers=$osvers",
@@ -71,7 +71,7 @@ sub w32cc_option {
         helptext   => "Which compiler should be used for $osvers?",
         configtext => $compiler_info,
         configdft  => sub { ( sort keys %$compilers )[-1] },
-        configalt  => [ sort keys %$compilers ],
+        configalt  => sub { [ sort keys %$compilers ] },
     );
 }
 
@@ -88,7 +88,7 @@ sub w32make_option {
         helptext   => "Which 'make' should be used for $w32cc?",
         configtext => join(", ", @{$this_compiler->{maker}}),
         configdft  => sub { ( sort @{$this_compiler->{maker}} )[-1] },
-        configalt  => [ sort @{$this_compiler->{maker}} ],
+        configalt  => sub { [ sort @{$this_compiler->{maker}} ] },
     );
 }
 

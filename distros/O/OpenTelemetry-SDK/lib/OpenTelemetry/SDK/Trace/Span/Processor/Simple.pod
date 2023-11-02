@@ -1,0 +1,84 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Trace::Span::Processor::Simple - A basic OpenTelemetry span processor
+
+=head1 SYNOPSIS
+
+    ...
+
+=head1 DESCRIPTION
+
+This is a simple span processor that receives read-only
+L<OpenTelemetry::Trace::Span> instances and forwards them to an exporter as
+readable instances of L<OpenTelemetry::SDK::Trace::Span::Readable>.
+
+This processor will mostly be useful for testing. It could be suitable for
+use in production environments in cases where custom attributes should be
+added to spans based on code scopes, etc.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::Trace::Span::Processor> role.
+Please consult that module's documentation for details on the behaviours it
+provides.
+
+=head2 new
+
+    $processor = OpenTelemetry::SDK::Trace::Processor::Simple->new(
+        exporter => $span_exporter,
+    );
+
+The constructor takes a mandatory C<exporter> parameter that must be set to an
+instance of a class that implements the L<OpenTelemetry::Exporter> role.
+
+=head2 on_start
+
+    $processor->on_start( $span, $parent_context );
+
+Called when a span is started. In this class, this method does nothing.
+
+=head2 on_end
+
+    $processor->on_end( $span );
+
+Called when a span is ended. Calling this will convert the span into a
+readable instance and forward it to the configured exporter.
+
+=head2 force_flush
+
+    $result = await $processor->force_flush( $timeout );
+
+Calls L<"force_flush"|OpenTelemetry::Exporter/force_flush> on the configured
+exporter and returns a L<Future> that will hold the result of that operation.
+
+=head2 shutdown
+
+    $result = await $processor->shutdown( $timeout );
+
+Calls L<"shutdown"|OpenTelemetry::Exporter/shutdown> on the configured
+exporter and returns a L<Future> that will hold the result of that operation.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Future>
+
+=item L<OpenTelemetry::Exporter>
+
+=item L<OpenTelemetry::SDK::Trace::Span::Readable>
+
+=item L<OpenTelemetry::Trace::Span>
+
+=item L<OpenTelemetry::Trace::Span::Processor>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

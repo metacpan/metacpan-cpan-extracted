@@ -175,7 +175,13 @@ PPCODE:
                     break;
                 }
                 case ':': { /* integer */
-                    int n = 0;
+#ifdef HAS_STRTOLL
+                    char *target;
+                    long long n = strtoll(ptr, &target, 10);
+                    ptr = target;
+#else
+#error "No Strtoll"
+                    long long n = 0;
                     int negative = 0;
                     if(*ptr == '-') {
                         negative = 1;
@@ -188,6 +194,7 @@ PPCODE:
                     if(negative) {
                         n = -n;
                     }
+#endif
                     if(ptr + 2 > end) {
                         goto end_parsing;
                     }

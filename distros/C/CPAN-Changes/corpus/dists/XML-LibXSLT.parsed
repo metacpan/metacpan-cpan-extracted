@@ -1,0 +1,1314 @@
+{
+  "preamble" => "Revision history for Perl extension XML::LibXSLT.",
+  "raw_preamble" => "Revision history for Perl extension XML::LibXSLT.\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 5,
+              "raw" => "        - Setting it as 1.1.28 did not fix the failures, and now we have\n        some more tests to test against it.\n",
+              "style" => "-",
+              "text" => "Setting it as 1.1.28 did not fix the failures, and now we have some more tests to test against it."
+            },
+            {
+              "line" => 7,
+              "raw" => "        - https://rt.cpan.org/Ticket/Display.html?id=92659\n",
+              "style" => "-",
+              "text" => "https://rt.cpan.org/Ticket/Display.html?id=92659"
+            },
+            {
+              "line" => 8,
+              "raw" => "        - Thanks to Slaven Rezic for the report.\n\n",
+              "style" => "-",
+              "text" => "Thanks to Slaven Rezic for the report."
+            }
+          ],
+          "line" => 4,
+          "raw" => "    - Decrease the minimum libxslt version again.\n",
+          "style" => "-",
+          "text" => "Decrease the minimum libxslt version again."
+        }
+      ],
+      "line" => 3,
+      "note" => "Mon  3 Feb 10:07:31 IST 2014",
+      "raw" => "1.87            Mon  3 Feb 10:07:31 IST 2014\n",
+      "version" => "1.87"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 12,
+              "raw" => "        - Add some data files for it under t/data/*.\n",
+              "style" => "-",
+              "text" => "Add some data files for it under t/data/*."
+            },
+            {
+              "line" => 13,
+              "raw" => "        - This fails on FreeBSD 9.2 currently.\n\n",
+              "style" => "-",
+              "text" => "This fails on FreeBSD 9.2 currently."
+            }
+          ],
+          "line" => 11,
+          "raw" => "    - Add t/xml-grammar-failures.t to catch test failures in dependent modules.\n",
+          "style" => "-",
+          "text" => "Add t/xml-grammar-failures.t to catch test failures in dependent modules."
+        }
+      ],
+      "line" => 10,
+      "note" => "Sun  2 Feb 17:06:07 IST 2014",
+      "raw" => "1.86            Sun  2 Feb 17:06:07 IST 2014\n",
+      "version" => "1.86"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 16,
+          "raw" => "    - Add \"use strict;\" and \"use warnings;\" globally (CPANTS).\n",
+          "style" => "-",
+          "text" => "Add \"use strict;\" and \"use warnings;\" globally (CPANTS)."
+        },
+        {
+          "line" => 17,
+          "raw" => "    - Add LICENSE to the MANIFEST.\n\n",
+          "style" => "-",
+          "text" => "Add LICENSE to the MANIFEST."
+        }
+      ],
+      "line" => 15,
+      "note" => "Sat  1 Feb 16:23:43 IST 2014",
+      "raw" => "1.85            Sat  1 Feb 16:23:43 IST 2014\n",
+      "version" => "1.85"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 21,
+              "raw" => "        - https://rt.cpan.org/Ticket/Display.html?id=91652\n",
+              "style" => "-",
+              "text" => "https://rt.cpan.org/Ticket/Display.html?id=91652"
+            },
+            {
+              "line" => 22,
+              "raw" => "        - Thanks to Alexandr Ciornii for the report, and to Nikolay Sivov\n        for providing help.\n\n",
+              "style" => "-",
+              "text" => "Thanks to Alexandr Ciornii for the report, and to Nikolay Sivov for providing help."
+            }
+          ],
+          "line" => 20,
+          "raw" => "    - Hopefully fix a segmentation fault on Win32 introduced in the last ver.\n",
+          "style" => "-",
+          "text" => "Hopefully fix a segmentation fault on Win32 introduced in the last ver."
+        }
+      ],
+      "line" => 19,
+      "note" => "Thu 26 Dec 14:19:19 IST 2013",
+      "raw" => "1.84            Thu 26 Dec 14:19:19 IST 2013\n",
+      "version" => "1.84"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 27,
+              "raw" => "        - https://rt.cpan.org/Public/Bug/Display.html?id=91118\n",
+              "style" => "-",
+              "text" => "https://rt.cpan.org/Public/Bug/Display.html?id=91118"
+            },
+            {
+              "line" => 28,
+              "raw" => "        - Thanks to Daniel Macks for the report.\n\n",
+              "style" => "-",
+              "text" => "Thanks to Daniel Macks for the report."
+            }
+          ],
+          "line" => 26,
+          "raw" => "    - Get rid of compiler warnings when compiling using CLANG.\n",
+          "style" => "-",
+          "text" => "Get rid of compiler warnings when compiling using CLANG."
+        }
+      ],
+      "line" => 25,
+      "note" => "Sun 22 Dec 18:20:23 IST 2013",
+      "raw" => "1.83            Sun 22 Dec 18:20:23 IST 2013\n",
+      "version" => "1.83"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 32,
+              "raw" => "        - https://rt.cpan.org/Ticket/Display.html?id=90085\n",
+              "style" => "-",
+              "text" => "https://rt.cpan.org/Ticket/Display.html?id=90085"
+            },
+            {
+              "line" => 33,
+              "raw" => "        - Thanks to David Schmidt for the report, and to joel and brother\n        from the channel #perl-help for analysis.\n\n",
+              "style" => "-",
+              "text" => "Thanks to David Schmidt for the report, and to joel and brother from the channel #perl-help for analysis."
+            }
+          ],
+          "line" => 31,
+          "raw" => "    - Makefile.PL: Report LibXSLT mismatch correctly.\n",
+          "style" => "-",
+          "text" => "Makefile.PL: Report LibXSLT mismatch correctly."
+        }
+      ],
+      "line" => 30,
+      "note" => "Wed  6 Nov 13:17:39 IST 2013",
+      "raw" => "1.82            Wed  6 Nov 13:17:39 IST 2013\n",
+      "version" => "1.82"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 38,
+              "raw" => "        - https://rt.cpan.org/Ticket/Display.html?id=86689\n\n",
+              "style" => "-",
+              "text" => "https://rt.cpan.org/Ticket/Display.html?id=86689"
+            }
+          ],
+          "line" => 37,
+          "raw" => "    - Fix a typo reported by dsteinbrunner:\n",
+          "style" => "-",
+          "text" => "Fix a typo reported by dsteinbrunner:"
+        }
+      ],
+      "line" => 36,
+      "note" => "Fri  5 Jul 10:13:36 IDT 2013",
+      "raw" => "1.81            Fri  5 Jul 10:13:36 IDT 2013\n",
+      "version" => "1.81"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 42,
+              "raw" => "        - due to failures such as http://www.cpantesters.org/cpan/report/6f5029ee-639a-11e2-8465-2a97270fb964\n\n",
+              "style" => "-",
+              "text" => "due to failures such as http://www.cpantesters.org/cpan/report/6f5029ee-639a-11e2-8465-2a97270fb964"
+            }
+          ],
+          "line" => 41,
+          "raw" => "    - Bump the minimum version of libxslt2 to 1.1.28.\n",
+          "style" => "-",
+          "text" => "Bump the minimum version of libxslt2 to 1.1.28."
+        }
+      ],
+      "line" => 40,
+      "note" => "Wed 23 Jan 07:53:57 IST 2013",
+      "raw" => "1.80            Wed 23 Jan 07:53:57 IST 2013\n",
+      "version" => "1.80"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 46,
+              "raw" => "        - Due to this bug - https://bugzilla.gnome.org/show_bug.cgi?id=684564\n\n",
+              "style" => "-",
+              "text" => "Due to this bug - https://bugzilla.gnome.org/show_bug.cgi?id=684564"
+            }
+          ],
+          "line" => 45,
+          "raw" => "    - Die when libxslt is 1.1.27.\n",
+          "style" => "-",
+          "text" => "Die when libxslt is 1.1.27."
+        }
+      ],
+      "line" => 44,
+      "note" => "Mon 26 Nov 12:15:35 IST 2012",
+      "raw" => "1.79            Mon 26 Nov 12:15:35 IST 2012\n",
+      "version" => "1.79"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 51,
+              "raw" => "        - Thanks, Dorian!\n\n",
+              "style" => "-",
+              "text" => "Thanks, Dorian!"
+            }
+          ],
+          "line" => 49,
+          "raw" => "    - Add output_method method, update documentation of media_type\n    (dorian\@cpan).\n",
+          "style" => "-",
+          "text" => "Add output_method method, update documentation of media_type (dorian\@cpan)."
+        }
+      ],
+      "line" => 48,
+      "note" => "Thu  6 Sep 13:17:28 IDT 2012",
+      "raw" => "1.78            Thu  6 Sep 13:17:28 IDT 2012\n",
+      "version" => "1.78"
+    },
+    {
+      "date" => "2012-02-25T16:23:57Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 56,
+              "raw" => "        - Thanks, Michael!\n\n",
+              "style" => "-",
+              "text" => "Thanks, Michael!"
+            }
+          ],
+          "line" => 54,
+          "raw" => "    - Apply a patch from Michael Ludwig clarifying the quoting of string\n    parameters to the XSLT transformation.\n",
+          "style" => "-",
+          "text" => "Apply a patch from Michael Ludwig clarifying the quoting of string parameters to the XSLT transformation."
+        }
+      ],
+      "line" => 53,
+      "raw" => "1.77            Sat Feb 25 16:23:57 IST 2012\n",
+      "raw_date" => "Sat Feb 25 16:23:57 IST 2012",
+      "version" => "1.77"
+    },
+    {
+      "date" => "2012-01-12T19:15:03Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 61,
+              "raw" => "        - https://rt.cpan.org/Public/Bug/Display.html?id=73905\n",
+              "style" => "-",
+              "text" => "https://rt.cpan.org/Public/Bug/Display.html?id=73905"
+            },
+            {
+              "line" => 62,
+              "raw" => "        - These include Microsoft Visual C++ (in C-mode).\n\n",
+              "style" => "-",
+              "text" => "These include Microsoft Visual C++ (in C-mode)."
+            }
+          ],
+          "line" => 59,
+          "raw" => "    - Made LibXSLT.xs compile with C compilers that don't accept declarations\n    inside blocks:\n",
+          "style" => "-",
+          "text" => "Made LibXSLT.xs compile with C compilers that don't accept declarations inside blocks:"
+        }
+      ],
+      "line" => 58,
+      "raw" => "1.76            Thu Jan 12 19:15:03 IST 2012\n",
+      "raw_date" => "Thu Jan 12 19:15:03 IST 2012",
+      "version" => "1.76"
+    },
+    {
+      "date" => "2011-10-28T17:26:57Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 66,
+              "raw" => "        - t/03input.t\n",
+              "style" => "-",
+              "text" => "t/03input.t"
+            }
+          ],
+          "line" => 65,
+          "raw" => "    - Convert the following test scripts from Test.pm to Test::More :\n",
+          "style" => "-",
+          "text" => "Convert the following test scripts from Test.pm to Test::More :"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 69,
+              "raw" => "        - \302\253segfault in free()\302\273\n",
+              "style" => "-",
+              "text" => "\302\253segfault in free()\302\273"
+            },
+            {
+              "line" => 70,
+              "raw" => "        - Thanks, Tim!\n\n",
+              "style" => "-",
+              "text" => "Thanks, Tim!"
+            }
+          ],
+          "line" => 67,
+          "raw" => "    - Fix for https://rt.cpan.org/Public/Bug/Display.html?id=71345 by Tim\n    Brody:\n",
+          "style" => "-",
+          "text" => "Fix for https://rt.cpan.org/Public/Bug/Display.html?id=71345 by Tim Brody:"
+        }
+      ],
+      "line" => 64,
+      "raw" => "1.75            Fri Oct 28 17:26:57 IST 2011\n",
+      "raw_date" => "Fri Oct 28 17:26:57 IST 2011",
+      "version" => "1.75"
+    },
+    {
+      "date" => "2011-10-25T21:48:48Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 74,
+              "raw" => "        - t/01basic.t\n",
+              "style" => "-",
+              "text" => "t/01basic.t"
+            },
+            {
+              "line" => 75,
+              "raw" => "        - t/02dromeds.t\n",
+              "style" => "-",
+              "text" => "t/02dromeds.t"
+            },
+            {
+              "line" => 76,
+              "raw" => "        - t/04params.t\n",
+              "style" => "-",
+              "text" => "t/04params.t"
+            },
+            {
+              "line" => 77,
+              "raw" => "        - t/05quick.t\n",
+              "style" => "-",
+              "text" => "t/05quick.t"
+            },
+            {
+              "line" => 78,
+              "raw" => "        - t/06output.t\n",
+              "style" => "-",
+              "text" => "t/06output.t"
+            },
+            {
+              "line" => 79,
+              "raw" => "        - t/06entities.t\n",
+              "style" => "-",
+              "text" => "t/06entities.t"
+            },
+            {
+              "line" => 80,
+              "raw" => "        - t/07blankdoc.t\n",
+              "style" => "-",
+              "text" => "t/07blankdoc.t"
+            },
+            {
+              "line" => 81,
+              "raw" => "        - t/08literal.t\n",
+              "style" => "-",
+              "text" => "t/08literal.t"
+            },
+            {
+              "line" => 82,
+              "raw" => "        - t/09exslt.t\n",
+              "style" => "-",
+              "text" => "t/09exslt.t"
+            },
+            {
+              "line" => 83,
+              "raw" => "        - t/10functions.t\n",
+              "style" => "-",
+              "text" => "t/10functions.t"
+            },
+            {
+              "line" => 84,
+              "raw" => "        - t/11utf8.t\n",
+              "style" => "-",
+              "text" => "t/11utf8.t"
+            },
+            {
+              "line" => 85,
+              "raw" => "        - t/12import.t\n",
+              "style" => "-",
+              "text" => "t/12import.t"
+            },
+            {
+              "line" => 86,
+              "raw" => "        - t/13error.t\n",
+              "style" => "-",
+              "text" => "t/13error.t"
+            },
+            {
+              "line" => 87,
+              "raw" => "        - t/14security.t\n",
+              "style" => "-",
+              "text" => "t/14security.t"
+            },
+            {
+              "line" => 88,
+              "raw" => "        - t/15misc.t\n\n",
+              "style" => "-",
+              "text" => "t/15misc.t"
+            }
+          ],
+          "line" => 73,
+          "raw" => "    - Convert the following test scripts from Test.pm to Test::More :\n",
+          "style" => "-",
+          "text" => "Convert the following test scripts from Test.pm to Test::More :"
+        },
+        {
+          "line" => 90,
+          "raw" => "    - In the process made \"Encode\" and perl-5.8.1. pre-requisites of this\n    distribution.\n\n",
+          "style" => "-",
+          "text" => "In the process made \"Encode\" and perl-5.8.1. pre-requisites of this distribution."
+        },
+        {
+          "line" => 93,
+          "raw" => "    - Add the \"make runtest\" and \"make distruntest\" targets to test using\n    Test-Run.\n\n",
+          "style" => "-",
+          "text" => "Add the \"make runtest\" and \"make distruntest\" targets to test using Test-Run."
+        }
+      ],
+      "line" => 72,
+      "raw" => "1.74            Tue Oct 25 21:48:48 IST 2011\n",
+      "raw_date" => "Tue Oct 25 21:48:48 IST 2011",
+      "version" => "1.74"
+    },
+    {
+      "date" => "2011-10-09T17:32:30Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 98,
+              "raw" => "        - made the port reservation on t/14security.t for the non-existent\n        URL more robust.\n\n",
+              "style" => "-",
+              "text" => "made the port reservation on t/14security.t for the non-existent URL more robust."
+            }
+          ],
+          "line" => 97,
+          "raw" => "    - Possible fix for https://rt.cpan.org/Ticket/Display.html?id=71456 :\n",
+          "style" => "-",
+          "text" => "Possible fix for https://rt.cpan.org/Ticket/Display.html?id=71456 :"
+        }
+      ],
+      "line" => 96,
+      "raw" => "1.73            Sun Oct  9 17:32:30 IST 2011\n",
+      "raw_date" => "Sun Oct  9 17:32:30 IST 2011",
+      "version" => "1.73"
+    },
+    {
+      "date" => "2011-10-06T13:37:13Z",
+      "entries" => [
+        {
+          "line" => 102,
+          "raw" => "    - Moved the benchmarking code under benchmark/ so it won't be indexed\n    by CPAN (Tim Brody).\n",
+          "style" => "-",
+          "text" => "Moved the benchmarking code under benchmark/ so it won't be indexed by CPAN (Tim Brody)."
+        },
+        {
+          "line" => 104,
+          "raw" => "    - Avoid leaking memory inside extension elements by cleaning up on\n    stylesheet DESTROY (Tim Brody).\n",
+          "style" => "-",
+          "text" => "Avoid leaking memory inside extension elements by cleaning up on stylesheet DESTROY (Tim Brody)."
+        },
+        {
+          "line" => 106,
+          "raw" => "    - xsltInit() and xsltCleanupGlobals() to avoid leaking memory on\n    init/shutdown (Tim Brody).\n",
+          "style" => "-",
+          "text" => "xsltInit() and xsltCleanupGlobals() to avoid leaking memory on init/shutdown (Tim Brody)."
+        },
+        {
+          "line" => 108,
+          "raw" => "    - Added support for stylesheet context functions via a\n    \$stylesheet->register_function() method with the same arguments as\n    XML::LibXSLT->register_function(). (Tim Brody)\n",
+          "style" => "-",
+          "text" => "Added support for stylesheet context functions via a \$stylesheet->register_function() method with the same arguments as XML::LibXSLT->register_function(). (Tim Brody)"
+        },
+        {
+          "line" => 111,
+          "raw" => "    - Added support for register_element() on stylesheet objects. The callback\n    may leak memory though - nothing frees the _private attributes of the\n    node + document owner for the passed arguments? (Tim Brody)\n\n",
+          "style" => "-",
+          "text" => "Added support for register_element() on stylesheet objects. The callback may leak memory though - nothing frees the _private attributes of the node + document owner for the passed arguments? (Tim Brody)"
+        }
+      ],
+      "line" => 101,
+      "raw" => "1.72            Thu Oct  6 13:37:13 IST 2011\n",
+      "raw_date" => "Thu Oct  6 13:37:13 IST 2011",
+      "version" => "1.72"
+    },
+    {
+      "date" => "2011-09-10T20:38:23Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 117,
+              "raw" => "        - add a blacklist for libxslt-1.1.25 which has a deadlock that\n        hangs a test.\n",
+              "style" => "-",
+              "text" => "add a blacklist for libxslt-1.1.25 which has a deadlock that hangs a test."
+            }
+          ],
+          "line" => 116,
+          "raw" => "    - Fixed https://rt.cpan.org/Ticket/Display.html?id=50487 :\n",
+          "style" => "-",
+          "text" => "Fixed https://rt.cpan.org/Ticket/Display.html?id=50487 :"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 120,
+              "raw" => "        - Unexpected webserver dependency in test\n",
+              "style" => "-",
+              "text" => "Unexpected webserver dependency in test"
+            }
+          ],
+          "line" => 119,
+          "raw" => "    - Fixed https://rt.cpan.org/Ticket/Display.html?id=52422 :\n",
+          "style" => "-",
+          "text" => "Fixed https://rt.cpan.org/Ticket/Display.html?id=52422 :"
+        },
+        {
+          "line" => 121,
+          "raw" => "    - Updated the version control instructions in the README to bitbucket.org.\n\n",
+          "style" => "-",
+          "text" => "Updated the version control instructions in the README to bitbucket.org."
+        }
+      ],
+      "line" => 115,
+      "raw" => "1.71            Sat Sep 10 20:38:23 IDT 2011\n",
+      "raw_date" => "Sat Sep 10 20:38:23 IDT 2011",
+      "version" => "1.71"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 124,
+          "raw" => "     - fixed various bugs\n",
+          "style" => "-",
+          "text" => "fixed various bugs"
+        },
+        {
+          "line" => 125,
+          "raw" => "     - documentation updates\n",
+          "style" => "-",
+          "text" => "documentation updates"
+        },
+        {
+          "line" => 126,
+          "raw" => "     - #48247: Win32 patch kindly provided by KMX\@cpan.org\n",
+          "style" => "-",
+          "text" => "#48247: Win32 patch kindly provided by KMX\@cpan.org"
+        },
+        {
+          "line" => 127,
+          "raw" => "     - sync with latest XML::LibXML ABI and add a compatibility check\n",
+          "style" => "-",
+          "text" => "sync with latest XML::LibXML ABI and add a compatibility check"
+        },
+        {
+          "line" => 128,
+          "raw" => "     - do not force -lgcrypt and -lgpg-error linker flags\n",
+          "style" => "-",
+          "text" => "do not force -lgcrypt and -lgpg-error linker flags"
+        },
+        {
+          "line" => 129,
+          "raw" => "     - fix for attribute nodes returned by user-defined XPath functions\n",
+          "style" => "-",
+          "text" => "fix for attribute nodes returned by user-defined XPath functions"
+        },
+        {
+          "line" => 130,
+          "raw" => "     - address #41542: restore internalDTD subset on the source\n       document of a transformation (libxslt unlinks it)\n\n",
+          "style" => "-",
+          "text" => "address #41542: restore internalDTD subset on the source document of a transformation (libxslt unlinks it)"
+        }
+      ],
+      "line" => 123,
+      "raw" => "1.70\n",
+      "version" => "1.70"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 134,
+          "raw" => "     - fix compilation problems\n",
+          "style" => "-",
+          "text" => "fix compilation problems"
+        },
+        {
+          "line" => 135,
+          "raw" => "     - skip exslt tests if not available\n",
+          "style" => "-",
+          "text" => "skip exslt tests if not available"
+        },
+        {
+          "line" => 136,
+          "raw" => "     - added XML::LibXSLT::HAVE_EXSLT() (1/0)\n\n",
+          "style" => "-",
+          "text" => "added XML::LibXSLT::HAVE_EXSLT() (1/0)"
+        }
+      ],
+      "line" => 133,
+      "raw" => "1.68\n",
+      "version" => "1.68"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 139,
+          "raw" => "     - sync the binary internals to those of XML::LibXML 1.67\n",
+          "style" => "-",
+          "text" => "sync the binary internals to those of XML::LibXML 1.67"
+        },
+        {
+          "line" => 140,
+          "raw" => "     - update regression tests for compatibility with up-to-date libxslt\n\n",
+          "style" => "-",
+          "text" => "update regression tests for compatibility with up-to-date libxslt"
+        }
+      ],
+      "line" => 138,
+      "raw" => "1.67\n",
+      "version" => "1.67"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 143,
+          "raw" => "     - bump requirements to libxslt 1.1.8\n",
+          "style" => "-",
+          "text" => "bump requirements to libxslt 1.1.8"
+        },
+        {
+          "line" => 144,
+          "raw" => "     - sync the binary internals to those of XML::LibXML 1.66\n\n",
+          "style" => "-",
+          "text" => "sync the binary internals to those of XML::LibXML 1.66"
+        }
+      ],
+      "line" => 142,
+      "raw" => "1.66\n",
+      "version" => "1.66"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 147,
+          "raw" => "     - fix SIGSEGV regarding freeing nodes created by extension functions\n       (reported by Elizabeth Mattijsen)\n",
+          "style" => "-",
+          "text" => "fix SIGSEGV regarding freeing nodes created by extension functions (reported by Elizabeth Mattijsen)"
+        },
+        {
+          "line" => 149,
+          "raw" => "     - use pkg-config to determine linker flags for libexslt\n\n",
+          "style" => "-",
+          "text" => "use pkg-config to determine linker flags for libexslt"
+        }
+      ],
+      "line" => 146,
+      "raw" => "1.63\n",
+      "version" => "1.63"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 152,
+          "raw" => "     - security callback interface contributed by Shane Corgatelli\n",
+          "style" => "-",
+          "text" => "security callback interface contributed by Shane Corgatelli"
+        },
+        {
+          "line" => 153,
+          "raw" => "     - check libxslt version\n",
+          "style" => "-",
+          "text" => "check libxslt version"
+        },
+        {
+          "line" => 154,
+          "raw" => "     - added XML::LibXML-like API to retrieve libxslt version\n",
+          "style" => "-",
+          "text" => "added XML::LibXML-like API to retrieve libxslt version"
+        },
+        {
+          "line" => 155,
+          "raw" => "     - added output_as_bytes() and output_as_chars()\n",
+          "style" => "-",
+          "text" => "added output_as_bytes() and output_as_chars()"
+        },
+        {
+          "line" => 156,
+          "raw" => "     - added regression tests for output_as_* to 11utf8.t\n",
+          "style" => "-",
+          "text" => "added regression tests for output_as_* to 11utf8.t"
+        },
+        {
+          "line" => 157,
+          "raw" => "     - output_as_string documentation fixed to match reality\n",
+          "style" => "-",
+          "text" => "output_as_string documentation fixed to match reality"
+        },
+        {
+          "line" => 158,
+          "raw" => "     - make 06entities.t to pass with older libxml2/libxslt\n",
+          "style" => "-",
+          "text" => "make 06entities.t to pass with older libxml2/libxslt"
+        },
+        {
+          "line" => 159,
+          "raw" => "     - POD uses items instead of headings\n",
+          "style" => "-",
+          "text" => "POD uses items instead of headings"
+        },
+        {
+          "line" => 160,
+          "raw" => "     - fixed media_type and output_encoding for imported stylesheets [rt.cpan.org #23440]\n\n",
+          "style" => "-",
+          "text" => "fixed media_type and output_encoding for imported stylesheets [rt.cpan.org #23440]"
+        }
+      ],
+      "line" => 151,
+      "raw" => "1.62\n",
+      "version" => "1.62"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 163,
+          "raw" => "     - fixed error reporting: die on fatal errors, warn otherwise\n       (in particular, warn rather than die on <xsl:message terminate=\"no\">)\n\n",
+          "style" => "-",
+          "text" => "fixed error reporting: die on fatal errors, warn otherwise (in particular, warn rather than die on <xsl:message terminate=\"no\">)"
+        }
+      ],
+      "line" => 162,
+      "raw" => "1.61\n",
+      "version" => "1.61"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 167,
+          "raw" => "     - fix a huge memory leak in transform_file (bug #1314)\n",
+          "style" => "-",
+          "text" => "fix a huge memory leak in transform_file (bug #1314)"
+        },
+        {
+          "line" => 168,
+          "raw" => "     - make it clear from the docs that output_string returns bytes (bug #8875)\n",
+          "style" => "-",
+          "text" => "make it clear from the docs that output_string returns bytes (bug #8875)"
+        },
+        {
+          "line" => 169,
+          "raw" => "     - added missing type-casting to fix compile-time warnings (bug #18508)\n",
+          "style" => "-",
+          "text" => "added missing type-casting to fix compile-time warnings (bug #18508)"
+        },
+        {
+          "line" => 170,
+          "raw" => "     - using call_* instead of perl_call_* (perl_ variants are obsolete)\n",
+          "style" => "-",
+          "text" => "using call_* instead of perl_call_* (perl_ variants are obsolete)"
+        },
+        {
+          "line" => 171,
+          "raw" => "     - in callbacks, POPs on error before croaking, otherwise it has no\n       effect (and we probably leak)\n",
+          "style" => "-",
+          "text" => "in callbacks, POPs on error before croaking, otherwise it has no effect (and we probably leak)"
+        },
+        {
+          "line" => 173,
+          "raw" => "     - added test case which used to fail (provided in rt #15723)\n",
+          "style" => "-",
+          "text" => "added test case which used to fail (provided in rt #15723)"
+        },
+        {
+          "line" => 174,
+          "raw" => "     - apply patch for Makefile.PL for non-standard libxslt paths (bug #16224)\n",
+          "style" => "-",
+          "text" => "apply patch for Makefile.PL for non-standard libxslt paths (bug #16224)"
+        },
+        {
+          "line" => 175,
+          "raw" => "     - fix segfault with registered functions returning nodes\n",
+          "style" => "-",
+          "text" => "fix segfault with registered functions returning nodes"
+        },
+        {
+          "line" => 176,
+          "raw" => "     - fix leaks in parse_stylesheet\n",
+          "style" => "-",
+          "text" => "fix leaks in parse_stylesheet"
+        },
+        {
+          "line" => 177,
+          "raw" => "     - error reporting\n\n",
+          "style" => "-",
+          "text" => "error reporting"
+        }
+      ],
+      "line" => 166,
+      "raw" => "1.60\n",
+      "version" => "1.60"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 180,
+          "raw" => "    - (revision bumped to match XML::LibXML)\n",
+          "style" => "-",
+          "text" => "(revision bumped to match XML::LibXML)"
+        },
+        {
+          "line" => 181,
+          "raw" => "    - adapted for new XML::LibXML::InputCallback API\n",
+          "style" => "-",
+          "text" => "adapted for new XML::LibXML::InputCallback API"
+        },
+        {
+          "line" => 182,
+          "raw" => "    - support for static linking against libxml2\n\n",
+          "style" => "-",
+          "text" => "support for static linking against libxml2"
+        }
+      ],
+      "line" => 179,
+      "raw" => "1.59\n",
+      "version" => "1.59"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 185,
+          "raw" => "    - (revision bumped to match XML::LibXML)\n",
+          "style" => "-",
+          "text" => "(revision bumped to match XML::LibXML)"
+        },
+        {
+          "line" => 186,
+          "raw" => "    - Some minor fixes to perl extension functions support\n",
+          "style" => "-",
+          "text" => "Some minor fixes to perl extension functions support"
+        },
+        {
+          "line" => 187,
+          "raw" => "    - Fixed callbacks support\n",
+          "style" => "-",
+          "text" => "Fixed callbacks support"
+        },
+        {
+          "line" => 188,
+          "raw" => "    - Enable xinclude in XSLT files\n",
+          "style" => "-",
+          "text" => "Enable xinclude in XSLT files"
+        },
+        {
+          "line" => 189,
+          "raw" => "    - Fixed some memory leaks\n",
+          "style" => "-",
+          "text" => "Fixed some memory leaks"
+        },
+        {
+          "line" => 190,
+          "raw" => "    - Fixed some segfaults\n\n",
+          "style" => "-",
+          "text" => "Fixed some segfaults"
+        }
+      ],
+      "line" => 184,
+      "raw" => "1.57\n",
+      "version" => "1.57"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 193,
+          "raw" => "    - Fixed ordering of params to perl extension funcs\n",
+          "style" => "-",
+          "text" => "Fixed ordering of params to perl extension funcs"
+        },
+        {
+          "line" => 194,
+          "raw" => "    - Implemented nodelist and other data type passing to\n      extension functions, and returning nodelist and elements\n      (some code from Ido Ben-Zvi)\n",
+          "style" => "-",
+          "text" => "Implemented nodelist and other data type passing to extension functions, and returning nodelist and elements (some code from Ido Ben-Zvi)"
+        },
+        {
+          "line" => 197,
+          "raw" => "    - Slightly better error handling\n\n",
+          "style" => "-",
+          "text" => "Slightly better error handling"
+        }
+      ],
+      "line" => 192,
+      "raw" => "1.53\n",
+      "version" => "1.53"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 200,
+          "raw" => "    - Perl extension functions (whee!)\n\n",
+          "style" => "-",
+          "text" => "Perl extension functions (whee!)"
+        }
+      ],
+      "line" => 199,
+      "raw" => "1.52\n",
+      "version" => "1.52"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 203,
+          "raw" => "    - Mac OS X fixes\n",
+          "style" => "-",
+          "text" => "Mac OS X fixes"
+        },
+        {
+          "line" => 204,
+          "raw" => "    - Cleaned up XPath quoting\n",
+          "style" => "-",
+          "text" => "Cleaned up XPath quoting"
+        },
+        {
+          "line" => 205,
+          "raw" => "    - Fixed document('') test (though if it still doesn't work\n      in your code, see t/07blankdoc.t for details about how to\n      make it work).\n\n",
+          "style" => "-",
+          "text" => "Fixed document('') test (though if it still doesn't work in your code, see t/07blankdoc.t for details about how to make it work)."
+        }
+      ],
+      "line" => 202,
+      "raw" => "1.51\n",
+      "version" => "1.51"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 210,
+          "raw" => "    - Cleaned up media_type method so it doesn't segfault.\n\n",
+          "style" => "-",
+          "text" => "Cleaned up media_type method so it doesn't segfault."
+        }
+      ],
+      "line" => 209,
+      "raw" => "1.50\n",
+      "version" => "1.50"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 213,
+          "raw" => "    - Migrated to new XML::LibXML 1.49 (with new memory stuff)\n\n",
+          "style" => "-",
+          "text" => "Migrated to new XML::LibXML 1.49 (with new memory stuff)"
+        }
+      ],
+      "line" => 212,
+      "raw" => "1.49\n",
+      "version" => "1.49"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 216,
+          "raw" => "    - removed global callbacks\n",
+          "style" => "-",
+          "text" => "removed global callbacks"
+        },
+        {
+          "line" => 217,
+          "raw" => "    - changed callbacks to using LibXML globals\n\n",
+          "style" => "-",
+          "text" => "changed callbacks to using LibXML globals"
+        }
+      ],
+      "line" => 215,
+      "raw" => "1.31\n",
+      "version" => "1.31"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 220,
+          "raw" => "    - Compatibility with XML::LibXML 1.30 (esp callbacks)\n",
+          "style" => "-",
+          "text" => "Compatibility with XML::LibXML 1.30 (esp callbacks)"
+        },
+        {
+          "line" => 221,
+          "raw" => "    - EXSLT support\n",
+          "style" => "-",
+          "text" => "EXSLT support"
+        },
+        {
+          "line" => 222,
+          "raw" => "    - Better test files\n\n",
+          "style" => "-",
+          "text" => "Better test files"
+        }
+      ],
+      "line" => 219,
+      "raw" => "1.30\n",
+      "version" => "1.30"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 225,
+          "raw" => "    - Some fixes and tests for document('')\n",
+          "style" => "-",
+          "text" => "Some fixes and tests for document('')"
+        },
+        {
+          "line" => 226,
+          "raw" => "    - Better have_library implementation in Makefile.PL\n\n",
+          "style" => "-",
+          "text" => "Better have_library implementation in Makefile.PL"
+        }
+      ],
+      "line" => 224,
+      "raw" => "1.09\n",
+      "version" => "1.09"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 229,
+          "raw" => "    - Fixed Makefile.PL check for libxslt > 0.7.0 to work with 1.0.0\n\n",
+          "style" => "-",
+          "text" => "Fixed Makefile.PL check for libxslt > 0.7.0 to work with 1.0.0"
+        }
+      ],
+      "line" => 228,
+      "raw" => "1.08\n",
+      "version" => "1.08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 232,
+          "raw" => "    - Fixes to work with XML::LibXML 0.94\n\n",
+          "style" => "-",
+          "text" => "Fixes to work with XML::LibXML 0.94"
+        }
+      ],
+      "line" => 231,
+      "raw" => "1.07\n",
+      "version" => "1.07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 235,
+          "raw" => "    - Support text/html defaulting for media_type when document element\n      is <html>.\n",
+          "style" => "-",
+          "text" => "Support text/html defaulting for media_type when document element is <html>."
+        },
+        {
+          "line" => 237,
+          "raw" => "    - Support building on Win32\n\n",
+          "style" => "-",
+          "text" => "Support building on Win32"
+        }
+      ],
+      "line" => 234,
+      "raw" => "1.06\n",
+      "version" => "1.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 240,
+          "raw" => "    - More tests and fixes for media_type\n\n",
+          "style" => "-",
+          "text" => "More tests and fixes for media_type"
+        }
+      ],
+      "line" => 239,
+      "raw" => "1.05\n",
+      "version" => "1.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 243,
+          "raw" => "    - Fixed media_type method\n\n",
+          "style" => "-",
+          "text" => "Fixed media_type method"
+        }
+      ],
+      "line" => 242,
+      "raw" => "1.04\n",
+      "version" => "1.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 246,
+          "raw" => "    - Added output_encoding and media_type methods\n\n",
+          "style" => "-",
+          "text" => "Added output_encoding and media_type methods"
+        }
+      ],
+      "line" => 245,
+      "raw" => "1.03\n",
+      "version" => "1.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 249,
+          "raw" => "    - Fixed Makefile.PL to work with libxslt 0.10\n\n",
+          "style" => "-",
+          "text" => "Fixed Makefile.PL to work with libxslt 0.10"
+        }
+      ],
+      "line" => 248,
+      "raw" => "1.02\n",
+      "version" => "1.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 252,
+          "raw" => "    - Removed hack where we set dom->standalone = 42 to prevent\n      XML::LibXML from garbage collecting\n",
+          "style" => "-",
+          "text" => "Removed hack where we set dom->standalone = 42 to prevent XML::LibXML from garbage collecting"
+        },
+        {
+          "line" => 254,
+          "raw" => "    - Removed XML::LibXML from the distribution. Now separate.\n\n",
+          "style" => "-",
+          "text" => "Removed XML::LibXML from the distribution. Now separate."
+        }
+      ],
+      "line" => 251,
+      "raw" => "1.01\n",
+      "version" => "1.01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 257,
+          "raw" => "    - More segfault fixes\n",
+          "style" => "-",
+          "text" => "More segfault fixes"
+        },
+        {
+          "line" => 258,
+          "raw" => "    - Benchmark updates\n\n",
+          "style" => "-",
+          "text" => "Benchmark updates"
+        }
+      ],
+      "line" => 256,
+      "raw" => "1.00\n",
+      "version" => "1.00"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 261,
+          "raw" => "    - More segfault fixes\n\n",
+          "style" => "-",
+          "text" => "More segfault fixes"
+        }
+      ],
+      "line" => 260,
+      "raw" => "0.99_01\n",
+      "version" => "0.99_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 264,
+          "raw" => "    - Fixed segfaults on 5.00503\n\n",
+          "style" => "-",
+          "text" => "Fixed segfaults on 5.00503"
+        }
+      ],
+      "line" => 263,
+      "raw" => "0.99\n",
+      "version" => "0.99"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 267,
+          "raw" => "    - Fixed output encoding problems\n\n",
+          "style" => "-",
+          "text" => "Fixed output encoding problems"
+        }
+      ],
+      "line" => 266,
+      "raw" => "0.98\n",
+      "version" => "0.98"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 270,
+          "raw" => "    - Now needs libxslt 0.7.0\n",
+          "style" => "-",
+          "text" => "Now needs libxslt 0.7.0"
+        },
+        {
+          "line" => 271,
+          "raw" => "    - Removed add_param() (now passed to transform())\n",
+          "style" => "-",
+          "text" => "Removed add_param() (now passed to transform())"
+        },
+        {
+          "line" => 272,
+          "raw" => "    - Makefile.PL works without gnome-config now\n\n",
+          "style" => "-",
+          "text" => "Makefile.PL works without gnome-config now"
+        }
+      ],
+      "line" => 269,
+      "raw" => "0.97\n",
+      "version" => "0.97"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 275,
+          "raw" => "    - Various cleanups and code additions to make stable.\n\n",
+          "style" => "-",
+          "text" => "Various cleanups and code additions to make stable."
+        }
+      ],
+      "line" => 274,
+      "note" => "0.96",
+      "raw" => "0.95 & 0.96\n",
+      "version" => "0.95"
+    },
+    {
+      "date" => "2001-03-13",
+      "entries" => [
+        {
+          "line" => 278,
+          "raw" => "    - First release to CPAN\n\n",
+          "style" => "-",
+          "text" => "First release to CPAN"
+        }
+      ],
+      "line" => 277,
+      "raw" => "0.94  Tue Mar 13 2001\n",
+      "raw_date" => "Tue Mar 13 2001",
+      "version" => "0.94"
+    },
+    {
+      "date" => "2001-03-03T17:08:00Z",
+      "entries" => [
+        {
+          "line" => 281,
+          "raw" => "\t- original version; created by h2xs 1.19\n\n",
+          "style" => "-",
+          "text" => "original version; created by h2xs 1.19"
+        }
+      ],
+      "line" => 280,
+      "raw" => "0.01  Sat Mar  3 17:08:00 2001\n",
+      "raw_date" => "Sat Mar  3 17:08:00 2001",
+      "version" => "0.01"
+    }
+  ]
+}

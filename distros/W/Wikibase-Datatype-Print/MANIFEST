@@ -20,6 +20,7 @@ examples/create_and_print_statement_translated.pl
 examples/create_and_print_value.pl
 examples/create_and_print_value_globecoordinate.pl
 examples/create_and_print_value_item.pl
+examples/create_and_print_value_lexeme.pl
 examples/create_and_print_value_monolingual.pl
 examples/create_and_print_value_property.pl
 examples/create_and_print_value_quantity.pl
@@ -63,6 +64,7 @@ Print/Utils.pm
 Print/Value.pm
 Print/Value/Globecoordinate.pm
 Print/Value/Item.pm
+Print/Value/Lexeme.pm
 Print/Value/Monolingual.pm
 Print/Value/Property.pm
 Print/Value/Quantity.pm
@@ -125,6 +127,9 @@ t/Wikibase-Datatype-Print-Value-Globecoordinate/03-print.t
 t/Wikibase-Datatype-Print-Value-Item/01-use.t
 t/Wikibase-Datatype-Print-Value-Item/02-version.t
 t/Wikibase-Datatype-Print-Value-Item/03-print.t
+t/Wikibase-Datatype-Print-Value-Lexeme/01-use.t
+t/Wikibase-Datatype-Print-Value-Lexeme/02-version.t
+t/Wikibase-Datatype-Print-Value-Lexeme/03-print.t
 t/Wikibase-Datatype-Print-Value-Monolingual/01-use.t
 t/Wikibase-Datatype-Print-Value-Monolingual/02-version.t
 t/Wikibase-Datatype-Print-Value-Monolingual/03-print.t
@@ -148,6 +153,7 @@ t/Wikibase-Datatype-Print-Value/02-version.t
 t/Wikibase-Datatype-Print-Value/03-print.t
 t/Wikibase-Datatype-Print/01-use.t
 t/Wikibase-Datatype-Print/02-version.t
+t/Wikibase-Datatype-Print/03-print.t
 xt/Wikibase-Datatype-Print-Form/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Form/02-pod.t
 xt/Wikibase-Datatype-Print-Item/01-pod_coverage.t
@@ -178,6 +184,8 @@ xt/Wikibase-Datatype-Print-Value-Globecoordinate/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Value-Globecoordinate/02-pod.t
 xt/Wikibase-Datatype-Print-Value-Item/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Value-Item/02-pod.t
+xt/Wikibase-Datatype-Print-Value-Lexeme/01-pod_coverage.t
+xt/Wikibase-Datatype-Print-Value-Lexeme/02-pod.t
 xt/Wikibase-Datatype-Print-Value-Monolingual/01-pod_coverage.t
 xt/Wikibase-Datatype-Print-Value-Monolingual/02-pod.t
 xt/Wikibase-Datatype-Print-Value-Property/01-pod_coverage.t

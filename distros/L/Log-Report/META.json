@@ -54,6 +54,6 @@
          "web" : "https://github.com/markov2/perl5-Log-Report"
       }
    },
-   "version" : "1.34",
+   "version" : "1.36",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

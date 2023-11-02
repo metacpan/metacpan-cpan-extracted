@@ -1,0 +1,89 @@
+1.11 2013-08-04
+
+* Switch from the deprecated Any::Moose to Moo
+
+1.10 2012-11-07
+
+* Provide and API got accessing the original key that a value was set
+  with, in a case-preserving way.  If the case of the key in a file
+  matters, it is now possible to determine.
+* The 'name' value passed to the 'callback' parameter is now no longer
+  forced to lower-case, as a consequence.
+
+1.09 2012-08-10
+
+* Multiple bug fixes concerning filters, including empty filters,
+  valueless keys, and applying filters to single values.
+* Add "human" argument to get_all and get_regexp, to match get
+* Add an add_comment method
+* Add an encoding attribute, which adds the appropriate layer on file
+  I/O
+* Enforce that all keys must have sections, as git 1.7.4.4 began doing
+
+1.08 2012-02-15
+
+* Fix loading of user_file, broken in dcdd01f, due to unexpanded ~
+  (alexmv, clkao@clkao.org)
+
+1.07 2011-10-25
+
+* Fix a spelling mistake in Config::GitLike::Cascaded
+  (gregoa@debian.org, forwarded by carnil@debian.org)
+
+1.06 2011-10-12
+
+* Allow calling ->load_file as a class method, for simple use cases
+  (alexmv)
+* Fix a parsing bug when quoted strings directly adjoined to unquoted
+  strings (alexmv)
+* Calling ->load_file on a nonexistant file no longer sets ->is_loaded
+  (alexmv)
+* Document that getters implicitly call ->load (alexmv)
+* Make ->dump implicitly call ->load as well (alexmv)
+* Minor POD fixes (alexmv, spang)
+
+1.05 2011-01-07
+
+* support Module::Install::ExtraTests 0.007 (sunnavy)
+* properly set is => 'rw' in inherited classes (trs, alexmv)
+* silence lc warnings on undef under perl 5.12 (iarnell@gmail.com)
+
+1.04 - 2010-04-03
+
+* The functionality of Config::GitLike::Cascaded has been folded into
+  Config::GitLike as a "cascade" option, and the subpackage is now
+  deprecated. (alexmv)
+* Config::GitLike::Git->new->load("/path/to/git") when the path is
+  lacking a ".git", or is a bare repository, now works. (alexmv)
+* Fixed a bug wherein the home directory config file would be loaded
+  twice, causing all values to be multiple, if that was your cwd.
+  Reported by rjbs. (alexmv)
+* Allow explicitly calling ->load_file without previously having
+  called ->load (alexmv)
+
+1.03 - 2010-01-03
+
+* Filter without replace_all should only replace the _first_ match (alexmv)
+* Having a matching filter with multiple and not replace_all does mean
+  replacement (alexmv)
+* Fix a test that failed because multiple now works, and we're too smart
+  (alexmv)
+* Fix for when ->set_multiple called with no arguments (alexmv)
+
+1.02 - 2009-08-19
+
+* Bugfixes and extra tests for escaped \ and " in subsections (sunnavy)
+* win32 fixes (sunnavy)
+* auto-escape \ and " in subsections on set (sunnavy)
+
+1.01 - 2009-08-11
+
+* Fix breakage under Mouse due to Moose references
+* New Config::GitLike::Git module for loading config
+  files from the git locations
+* various cleanups of Makefile.PL
+* remove extraneous dep Regexp::Common
+
+1.00 - 2009-07-08
+
+* Initial release

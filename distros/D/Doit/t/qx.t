@@ -15,6 +15,9 @@ plan 'no_plan';
 
 use Doit;
 
+# some of the qx commands or kills may cause a hanging test script
+alarm(60) if $^O eq 'MSWin32';
+
 use TestUtil qw(signal_kill_num);
 my $KILL = signal_kill_num;
 my $KILLrx = qr{$KILL};

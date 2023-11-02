@@ -140,20 +140,34 @@ SKIP: {
     test(qw(-f %1$*3$.*2$f 1.2345 3 6), " 1.234\n");
 }
 
-# width parameter: *
-test(qw(-f %*s 5 abc),         "  abc\n");
-test(qw(-f %*.*s 5 5 abc),     "  abc\n");
-test(qw(-f %*.*s 5 5 abcdefg), "abcde\n");
+# width/precision parameter: *
+test(qw(-f %*s 5 abc)         => "  abc\n");
+test(qw(-f %*.*s 5 5 abc)     => "  abc\n");
+test(qw(-f %*.*s 5 5 abcdefg) => "abcde\n");
 
-test(qw(-f %%%*s%% 5 abc),   "%  abc%\n");
-test(qw(-f %0*d 5 123),      "00123\n");
-test(qw(-f %-*d 5 123),      "123  \n");
-test(qw(-f %-*d 5 -123),     "-123 \n");
-test(qw(-f %0*.*d 5 5 123),  "00123\n");
-test(qw(-f %-*.*d 5 5 123),  "00123\n");
-test(qw(-f %-*.*d 5 5 -123), "-00123\n");
+test(qw(-f %%%*s%% 5 abc)   => "%  abc%\n");
+test(qw(-f %0*d 5 123)      => "00123\n");
+test(qw(-f %-*d 5 123)      => "123  \n");
+test(qw(-f %-*d 5 -123)     => "-123 \n");
+test(qw(-f %0*.*d 5 5 123)  => "00123\n");
+test(qw(-f %-*.*d 5 5 123)  => "00123\n");
+test(qw(-f %-*.*d 5 5 -123) => "-00123\n");
 
-# recurtion
+# vector
+test(qw(-f %b 123)                  => "1111011\n");
+test(qw(-f %vb 123)                 => "110001.110010.110011\n");
+test(qw(-f %v8.8b 123)              => "00110001.00110010.00110011\n");
+test(qw(-f %*v8.8b / 123)           => "00110001/00110010/00110011\n");
+test(qw(-f %v*.*b 8 8 123)          => "00110001.00110010.00110011\n");
+test(qw(-f %*2$v8.8b 123 /)         => "00110001/00110010/00110011\n");
+SKIP: {
+    skip "reordered precision arguments was supported by v5.24", 2
+	if $] < 5.024;
+test(qw(-f %v*2$.*3$b 123 8 8)      => "00110001.00110010.00110011\n");
+test(qw(-f %*4$v*2$.*3$b 123 8 8 /) => "00110001/00110010/00110011\n");
+}
+
+# recursion
 test(qw(-f %5s -c -f %s/%s W R abc),
    sprintf("  %s\n", WonR("abc")));
 test(qw(-f %5s -c -f %s/%s -f %s W -f %s R abc),

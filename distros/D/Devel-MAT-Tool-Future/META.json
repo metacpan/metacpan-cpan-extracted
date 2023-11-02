@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -29,14 +29,15 @@
       },
       "test" : {
          "requires" : {
-            "Future" : "0"
+            "Future" : "0",
+            "Test2::V0" : "0"
          }
       }
    },
    "provides" : {
       "Devel::MAT::Tool::Future" : {
          "file" : "lib/Devel/MAT/Tool/Future.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -45,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

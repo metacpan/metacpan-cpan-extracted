@@ -2,8 +2,8 @@ NAME
     Data::Sah::Coerce - Coercion rules for Data::Sah
 
 VERSION
-    This document describes version 0.053 of Data::Sah::Coerce (from Perl
-    distribution Data-Sah-Coerce), released on 2022-09-22.
+    This document describes version 0.054 of Data::Sah::Coerce (from Perl
+    distribution Data-Sah-Coerce), released on 2023-10-24.
 
 SYNOPSIS
      use Data::Sah::Coerce qw(gen_coercer);
@@ -68,12 +68,11 @@ DESCRIPTION
     *   might_fail => bool (default: 0)
 
         Whether coercion might fail, e.g. because of invalid input. If set
-        to 1, "expr_coerce" key that the "coerce()" routine returns must be
-        an expression that returns an array (envelope) of "(error_msg,
-        data)" instead of just coerced data. Error message should be a
-        string that is set when coercion fails and explains why. Otherwise,
-        if coercion succeeds, the error message string should be set to
-        undefined value.
+        to 1, "expr_coerce" key that the coerce() routine returns must be an
+        expression that returns an array (envelope) of "(error_msg, data)"
+        instead of just coerced data. Error message should be a string that
+        is set when coercion fails and explains why. Otherwise, if coercion
+        succeeds, the error message string should be set to undefined value.
 
         An example of a rule like this is coercing from string in the form
         of "YYYY-MM-DD" to a DateTime object. The rule might match any
@@ -176,6 +175,81 @@ VARIABLES
      % TRACE=1 perl -MLog::ger::LevelFromEnv -MLog::ger::Output=Screen \
          -MData::Sah::Coerce=gen_coercer -E'my $c = gen_coercer(...)'
 
+FUNCTIONS
+  gen_coercer
+    Usage:
+
+     gen_coercer(%args) -> any
+
+    Generate coercer code.
+
+    This is mostly for testing. Normally the coercion rules will be used
+    from Data::Sah.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   coerce_rules => *array[str]*
+
+        A specification of coercion rules to use (or avoid).
+
+        This setting is used to specify which coercion rules to use (or
+        avoid) in a flexible way. Each element is a string, in the form of
+        either "NAME" to mean specifically include a rule, or "!NAME" to
+        exclude a rule.
+
+        Some coercion modules are used by default, unless explicitly avoided
+        using the '!NAME' rule.
+
+        To not use any rules:
+
+        To use the default rules plus R1 and R2:
+
+         ['R1', 'R2']
+
+        To use the default rules but not R1 and R2:
+
+         ['!R1', '!R2']
+
+    *   coerce_to => *str*
+
+        Some Sah types, like "date", can be represented in a choice of types
+        in the target language. For example, in Perl you can store it as a
+        floating number a.k.a. float(epoch), or as a DateTime object, or
+        Time::Moment object. Storing in DateTime can be convenient for date
+        manipulation but requires an overhead of loading the module and
+        storing in a bulky format. The choice is yours to make, via this
+        setting.
+
+    *   return_type => *str* (default: "val")
+
+        "val" means the coercer will return the input (possibly) coerced or
+        undef if coercion fails.
+
+        "bool_coerced+val" means the coercer will return a 2-element array.
+        The first element is a bool value set to 1 if coercion has been
+        performed or 0 if otherwise. The second element is the (possibly)
+        coerced input.
+
+        "bool_coerced+str_errmsg+val" means the coercer will return a
+        3-element array. The first element is a bool value set to 1 if
+        coercion has been performed or 0 if otherwise. The second element is
+        the error message string which will be set if there is a failure in
+        coercion (or undef if coercion is successful). The third element is
+        the (possibly) coerced input.
+
+    *   source => *bool*
+
+        If set to true, will return coercer source code string instead of
+        compiled code.
+
+    *   type* => *sah::type_name*
+
+        (No description)
+
+    Return value: (any)
+
 ENVIRONMENT
   LOG_SAH_COERCER_CODE => bool
     Set default for $Log_Coercer_Code.
@@ -219,8 +293,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016
-    by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017,
+    2016 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

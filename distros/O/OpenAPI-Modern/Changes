@@ -1,5 +1,11 @@
 Revision history for OpenAPI-Modern
 
+0.049     2023-10-29 01:01:38Z
+          - fix "recursive_get" to take a uri-reference, rather than a json
+            pointer
+          - fix some "discriminator" tests that fail with JSON::Schema::Modern
+            0.574, and some inconsistencies with the spec
+
 0.048     2023-10-04 05:34:44Z
           - now validating all headers of a given name, not just the first,
           when provided on the request/response as separate lines
@@ -14,6 +20,7 @@ Revision history for OpenAPI-Modern
           - new "recursive_get" method on
             JSON::Schema::Modern::Document::OpenAPI for fetching a
             specification at a json pointer and following any $refs
+            (note this interface has changed as of 0.049)
 
 0.046     2023-06-24 21:56:39Z
           - extra validation for Transfer-Encoding response header

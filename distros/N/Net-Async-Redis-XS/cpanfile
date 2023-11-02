@@ -1,6 +1,6 @@
 requires 'perl', '>= 5.026';
 requires 'Future::AsyncAwait', '>= 0.61';
-requires 'Net::Async::Redis', '>= 3.024';
+requires 'Net::Async::Redis', '>= 4.002';
 requires 'IO::Async::Loop';
 
 on 'test' => sub {

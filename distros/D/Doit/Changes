@@ -1,5 +1,65 @@
 Revision history for Doit.
 
+0.027    2023-10-31
+	- stable release, containing all changes since 0.026_50
+	- tests
+	  - shorter connection timeout in ssh-local.t
+
+0.026_53 2023-10-30
+	- tests
+	  - disable atime tests by default
+
+0.026_52 2023-10-30
+	- build
+	  - more support for rpm-based systems in test_in_docker
+	- tests
+	  - various fixes, mainly OS related
+
+0.026_51 2023-10-30
+	- features
+	  - Doit::Util: new function get_os_release
+	  - Doit::Ini can handle shell config files better
+	- build improvements
+	  - test_standard: show report about test results
+	  - use which command instead of system() call in Build.Pl
+	  - more hacks for older debian versions
+	- tests
+	  - git.t: use "master" as test branch everywhere
+	  - github: use another action for freebsd testing
+	  - freebsd testing: another test run after installing optional deps
+
+0.026_50 2023-10-05
+	- features
+	  - new module Doit::Fork
+	  - Doit::Ini: add ini_info_as_HoH
+	  - add github action: install-doit-from-github
+	- fixes
+	  - don't log "dry-run" for info_* commands in dry-run mode
+	- documentation
+	  - hint about $SIG{INT}
+	  - small fixes
+	- build
+	  - new action ci_precheck
+	  - fix centos:6, debian:jessie and debian:stretch docker builds+tests
+	  - dist_install_and_test: use sudo if needed
+	- tests
+	  - test case for info_system
+	  - test case for leftover tmpfiles
+	  - locale.t: additional test case
+	  - lwp-http-tiny.t: skip also on unexpected 502 + 504
+	  - lwp-http-tiny.t: more diagnostics
+	  - lwp-http-tiny.t: switch to httpbingo.org
+	  - man.t: workaround broken file command on some Debian+Ubuntu systems
+	  - qx.t: maximum runtime on Windows
+	  - brew.t: use "hello" instead of "perl" as test package
+	  - github: test macos-11 and -12
+	  - github: test freebsd
+	  - github: add perl 5.38.0
+	  - github: enable more tests (check GITHUB_ACTIONS env var)
+	  - add debian:bookworm in tests (docker, github)
+	  - remove travis-related files
+	  - test_in_docker: more optional modules and Dockerfile optimization
+
 0.026	 2022-09-01
 	- stable release, no changes since 0.025_59
 

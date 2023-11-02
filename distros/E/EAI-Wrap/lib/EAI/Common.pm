@@ -1,4 +1,4 @@
-package EAI::Common 1.4;
+package EAI::Common 1.5;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number); use Module::Refresh ();
@@ -120,6 +120,7 @@ my %hashCheck = (
 		filename => "", # the name of the file to be read
 		firstLineProc => "", # processing done in reading the first line of text files
 		format_allowLinefeedInData => 1, # line feeds in values don't create artificial new lines/records, only works for csv quoted data
+		format_autoheader => 1, # assumption: header exists in file and format_header should be derived from there. only for readText
 		format_beforeHeader => "", # additional String to be written before the header in write text
 		format_dateColumns => [], # numeric array of columns that contain date values (special parsing) in excel files
 		format_decimalsep => "", # decimal separator used in numbers of sourcefile (defaults to . if not given)
@@ -502,6 +503,15 @@ sub setupLogging {
 	my $logger = get_logger();
 	$logger->warn($noLogFolderErr) if $noLogFolderErr;
 	if ($config{smtpServer}) {
+		# remove explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl)
+		for my $lookupKey (keys(%{$config{checkLookup}})) {
+			if ($lookupKey =~ /^\d:.*/) {
+				my $lookupKeyAdd = $lookupKey;
+				$lookupKeyAdd =~ s/^\d://;
+				$config{checkLookup}{$lookupKeyAdd} = $config{checkLookup}{$lookupKey};
+				delete($config{checkLookup}{$lookupKey});
+			}
+		}
 		# configure err mail sending
 		MIME::Lite->send('smtp', $config{smtpServer}, AuthUser=>$config{sensitive}{smtpAuth}{user}, AuthPass=>$config{sensitive}{smtpAuth}{pwd}, Timeout=>$config{smtpTimeout});
 		# get email from central log error handling $config{checkLookup}{<>};
@@ -792,9 +802,11 @@ set context specific subject for ErrorMail
 
 set up logging from site.config information (potentially split up using additional configs) and the central log.config. Important configs for logging in the config hash are logRootPath (direct or environment lookup setting for the log root folder), errmailaddress (default address for sending mails in case of error), errmailsubject (subject for error mails, can be changed with L<setErrSubject|/setErrSubject>), testerrmailaddress (default address for sending mails in case of error in non production environments), smtpServer (for error and other mail sending), smtpTimeout and checkLookup.
 
-checkLookup is both used by checkLogExist.pl and setupLogging. The key is used to lookup the scriptname + any additional defined interactive options, which are being passed to the script in an alphabetically sorted manner. So, a call of C<mytask.pl --process interactive_addinfo=add12 interactive_type=type3 interactive_zone=zone4> would yield a lookup of C<mytask.pladd12type3zone4>, which should have an existing key in checkLookup, like C<$config{checkLookup} = {"mytask.pladd12type3zone4" =E<gt> {...}, ...}>.
+checkLookup is both used by checkLogExist.pl and setupLogging. The key is used to lookup the scriptname (inlcuding .pl) + any additional defined interactive options, which are being passed to the script in an alphabetically sorted manner. So, a call of C<mytask.pl --process interactive_addinfo=add12 interactive_type=type3 interactive_zone=zone4> would yield a lookup of C<mytask.pladd12type3zone4>, which should have an existing key in checkLookup, like C<$config{checkLookup} = {"mytask.pladd12type3zone4" =E<gt> {...}, ...}>.
 
 Each entry of the sub-hash defines defines the errmailaddress to receive error mails and the errmailsubject, the rest is used by checkLogExist.pl.
+
+Explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl, etc.) that are required for differentiated treatment in checkLogExist.pl are removed and replaced by one with key scriptname.pl.
 
 =item checkStartingCond ($)
 

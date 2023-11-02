@@ -2,9 +2,7 @@ package Plack::Middleware::TrafficAdvice;
 
 # ABSTRACT: handle requests for /.well-known/traffic-advice
 
-use v5.8.5;
-
-use strict;
+use v5.12;
 use warnings;
 
 use parent 'Plack::Middleware';
@@ -17,7 +15,7 @@ use HTTP::Date;
 use HTTP::Status qw/ :constants /;
 use JSON::MaybeXS 1.004000;
 
-our $VERSION = 'v0.2.4';
+our $VERSION = 'v0.2.5';
 
 
 sub prepare_app {
@@ -113,7 +111,7 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 =head1 VERSION
 
-version v0.2.4
+version v0.2.5
 
 =head1 SYNOPSIS
 
@@ -165,7 +163,7 @@ valid JSON, or that the JSON conforms to the specification.
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
-This module requires Perl v5.8.5 or later.
+This module requires Perl v5.12 or later.
 
 Future releases may only support Perl versions released in the last ten years.
 

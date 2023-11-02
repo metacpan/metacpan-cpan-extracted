@@ -4,7 +4,7 @@ For an updated list of bugs, see
 
 The following list is not up to date:
 
-Known bugs:
+Known bugs and limitations:
 
 * TODO BUGS:
   + implement test for the upgrading bug in bsub()
@@ -35,12 +35,20 @@ Known bugs:
     under older Perls on filesystems that can not cope with the
     'Math/BigInt/Calc.pm'-style filenames.
 
+* BigRat:
+  +  BigRat does not handle modify() yet or in a very incomplete manner
+  +  There are probably many... rats.
+  +  inf handling (partial)
+  +  NaN handling (partial)
+  +  rounding (not implemented except for bceil/bfloor)
+  +  $x ** $y where $y is not an integer
+  +  bmod(), blog(), bmodinv() and bmodpow() (partial)
+
 ###############################################################################
 
 Mixing of classes does not always work like expected. "use bignum;",
-"use bigint;" and "use bigrat;" should solve this problem for most cases.
+"use bigint;", "use bigfloat", and "use bigrat;" should solve this problem for
+most cases.
 
 Please send me test-reports, your experiences with this and your ideas - I love
 to hear about my work!
-
-Tels <http://bloodgate.com/>

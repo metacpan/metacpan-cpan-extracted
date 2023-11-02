@@ -1,6 +1,5 @@
 LANGS    := DE EL ET FR ID JA KO NL RO RU TR UK ZH
 RM_LANGS := JA KO ZH
-IGNORE   := AUTHOR LICENSE
 
 LIB    := ../lib/App/Greple
 SRCDIR := src
@@ -24,13 +23,7 @@ SRCPATH := $(if $(SRCDIR),$(SRCDIR)/,)
 
 $(foreach mod,$(MODS),$(eval $(SRCPATH)$(notdir $(mod)): $(mod); cp $$< $(if $(SRCPATH),$(SRCPATH),.) ))
 
-XLATE := greple -Mxlate::deepl --match-podtext --xlate-format=none --xlate --xlate-cache=yes --all
-
-ifdef IGNORE
-$(foreach ignore,$(IGNORE),$(eval \
-  XLATE += --exclude '^=head\d[ ]+$(ignore)\b(?s:.*?)(?=^=|\z)'\
-))
-endif
+XLATE := xlate $(if $(USEAPI),-a)
 
 JA_FORM   ?= dearu
 JA_DICT   := $(wildcard *.dict)
@@ -42,9 +35,9 @@ JA_FILTER := greple -Mperl -Msubst::desumasu \
 define LANG_PM
   $(SRCPATH)%.$1.pm: $(SRCPATH)%.pm Makefile
   ifdef $1_FILTER
-	$$(XLATE) --xlate-to $1 $$< | $$($1_FILTER) > $$@
+	$$(XLATE) -t $1 $$< | $$($1_FILTER) > $$@
   else
-	$$(XLATE) --xlate-to $1 $$< > $$@
+	$$(XLATE) -t $1 $$< > $$@
   endif
 endef
 

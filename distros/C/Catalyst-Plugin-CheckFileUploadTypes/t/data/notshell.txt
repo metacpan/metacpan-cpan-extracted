@@ -1,0 +1,12 @@
+This file is not a shell script, but contains an example of one in the
+middle, to make sure we don't falsely detect it.
+
+Here's our shell script:
+
+```sh
+#!/bin/bash
+
+echo "Example shell script"
+```
+
+Clearly this file isn't a shell script itself, so should be left alone.

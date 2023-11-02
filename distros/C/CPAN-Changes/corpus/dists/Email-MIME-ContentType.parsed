@@ -1,0 +1,173 @@
+{
+  "preamble" => "Revision history for Perl extension Email::MIME::ContentType",
+  "raw_preamble" => "Revision history for Perl extension Email::MIME::ContentType\n\n",
+  "releases" => [
+    {
+      "entries" => [],
+      "line" => 3,
+      "raw" => "{{\$NEXT}}\n\n",
+      "version" => "{{\$NEXT}}"
+    },
+    {
+      "date" => "2013-08-10T23:19:14Z",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 7,
+              "raw" => "          [rt.cpan.org #87460]\n\n",
+              "style" => "[]",
+              "text" => "rt.cpan.org #87460"
+            }
+          ],
+          "line" => 6,
+          "raw" => "        - make \$STRICT_PARAMS actually work! (thanks, Matthew Green!)\n",
+          "style" => "-",
+          "text" => "make \$STRICT_PARAMS actually work! (thanks, Matthew Green!)"
+        }
+      ],
+      "line" => 5,
+      "note" => "America/New_York",
+      "raw" => "1.017     2013-08-10 23:19:14 America/New_York\n",
+      "raw_date" => "2013-08-10 23:19:14 America/New_York",
+      "version" => "1.017"
+    },
+    {
+      "date" => "2013-08-10T23:14:42Z",
+      "entries" => [
+        {
+          "line" => 10,
+          "raw" => "        - correct the longstanding and embarrassing misuse of \"discrete\" and\n          \"composite\" to mean \"type\" and \"subtype\"; the returned data still\n          contains the wrong old names so your code shouldn't break\n\n",
+          "style" => "-",
+          "text" => "correct the longstanding and embarrassing misuse of \"discrete\" and \"composite\" to mean \"type\" and \"subtype\"; the returned data still contains the wrong old names so your code shouldn't break"
+        },
+        {
+          "line" => 14,
+          "raw" => "        - repackage to update bugtracker, repo, etc.\n\n",
+          "style" => "-",
+          "text" => "repackage to update bugtracker, repo, etc."
+        }
+      ],
+      "line" => 9,
+      "note" => "America/New_York",
+      "raw" => "1.016     2013-08-10 23:14:42 America/New_York\n",
+      "raw_date" => "2013-08-10 23:14:42 America/New_York",
+      "version" => "1.016"
+    },
+    {
+      "date" => "2009-01-22",
+      "entries" => [
+        {
+          "line" => 17,
+          "raw" => "        - add repo metadata\n\n",
+          "style" => "-",
+          "text" => "add repo metadata"
+        }
+      ],
+      "line" => 16,
+      "raw" => "1.015     2009-01-22\n",
+      "raw_date" => "2009-01-22",
+      "version" => "1.015"
+    },
+    {
+      "date" => "2007-03-22",
+      "entries" => [
+        {
+          "line" => 20,
+          "raw" => "        - packaging improvements\n\n",
+          "style" => "-",
+          "text" => "packaging improvements"
+        }
+      ],
+      "line" => 19,
+      "raw" => "1.014     2007-03-22\n",
+      "raw_date" => "2007-03-22",
+      "version" => "1.014"
+    },
+    {
+      "date" => "2007-03-20",
+      "entries" => [
+        {
+          "line" => 23,
+          "raw" => "        - fix significantly broken SYNOPSIS\n\n",
+          "style" => "-",
+          "text" => "fix significantly broken SYNOPSIS"
+        }
+      ],
+      "line" => 22,
+      "raw" => "1.013     2007-03-20\n",
+      "raw_date" => "2007-03-20",
+      "version" => "1.013"
+    },
+    {
+      "date" => "2006-11-25",
+      "entries" => [
+        {
+          "line" => 26,
+          "raw" => "        - allow carp-avoidance through (ugh) package variable; bug 14076\n\n",
+          "style" => "-",
+          "text" => "allow carp-avoidance through (ugh) package variable; bug 14076"
+        }
+      ],
+      "line" => 25,
+      "raw" => "1.012     2006-11-25\n",
+      "raw_date" => "2006-11-25",
+      "version" => "1.012"
+    },
+    {
+      "date" => "2006-10-12",
+      "entries" => [
+        {
+          "line" => 29,
+          "raw" => "        - clearer special case for undef/empty content-type\n          (thanks, JESSE!)\n\n",
+          "style" => "-",
+          "text" => "clearer special case for undef/empty content-type (thanks, JESSE!)"
+        }
+      ],
+      "line" => 28,
+      "raw" => "1.011     2006-10-12\n",
+      "raw_date" => "2006-10-12",
+      "version" => "1.011"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 33,
+          "raw" => "        - typo fix in documentation by John Linderman.\n",
+          "style" => "-",
+          "text" => "typo fix in documentation by John Linderman."
+        },
+        {
+          "line" => 34,
+          "raw" => "        - new author, Casey West.\n",
+          "style" => "-",
+          "text" => "new author, Casey West."
+        },
+        {
+          "line" => 35,
+          "raw" => "        - Fix bug with blank space following parameters.\n\n",
+          "style" => "-",
+          "text" => "Fix bug with blank space following parameters."
+        }
+      ],
+      "line" => 32,
+      "raw" => "1.01\n",
+      "version" => "1.01"
+    },
+    {
+      "date" => "2004-01-07T17:38:23Z",
+      "entries" => [
+        {
+          "line" => 38,
+          "raw" => "        - original version; created by h2xs 1.22 with options\n        \t-AX -b 5.6.0 -n Email::MIME::ContentType\n",
+          "style" => "-",
+          "text" => "original version; created by h2xs 1.22 with options -AX -b 5.6.0 -n Email::MIME::ContentType"
+        }
+      ],
+      "line" => 37,
+      "raw" => "0.01      Wed Jan  7 17:38:23 2004\n",
+      "raw_date" => "Wed Jan  7 17:38:23 2004",
+      "version" => "0.01"
+    }
+  ]
+}

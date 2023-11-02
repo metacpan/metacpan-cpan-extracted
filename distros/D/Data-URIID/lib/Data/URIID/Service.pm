@@ -20,13 +20,12 @@ use Scalar::Util qw(weaken);
 
 use Data::URIID::Result;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 my %idmap_wikidata = (
     P213   => 'isni',
     P214   => 'viaf-identifier',
     P227   => 'gnd-identifier',
-    P434   => 'musicbrainz-identifier',
     P648   => 'open-library-identifier',
     P1566  => 'geonames-identifier',
     P2041  => 'ngv-artist-identifier',
@@ -37,6 +36,7 @@ my %idmap_wikidata = (
     P7704  => 'europeana-entity-identifier',
     P8168  => 'factgrid-identifier',
     P10787 => 'factgrid-identifier',
+    (map {$_ => 'musicbrainz-identifier'} qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052)),
 );
 
 my @fellig_types = qw(fellig-identifier fellig-box-number uuid oid uri wikidata-identifier e621-post-identifier wikimedia-commons-identifier british-museum-term musicbrainz-identifier gnd-identifier e621tagtype);
@@ -112,6 +112,7 @@ sub online {
 
     return $self->{online};
 }
+
 
 # Private helper:
 sub _extra_lookup_services {
@@ -416,7 +417,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -429,35 +430,65 @@ version v0.02
     my $name = $service->name;
     my $ise = $service->ise;
 
-=head1 OO METHODS
+=head1 METHODS
 
 =head2 extractor
 
-    my $extractor = $result->extractor;
+    my $extractor = $service->extractor;
 
 Returns the L<Data::URIID> object used to create this object.
 
 =head2 ise
 
-    my $ise = $result->ise;
+    my $ise = $service->ise;
 
 Returns the ISE of this service.
 
 =head2 name
 
-    my $name = $result->name;
+    my $name = $service->name;
 
 Returns the name of this service.
 
 =head2 online
 
-    my $online = $extractor->online( [ $new_value ] );
+    my $online = $service->online( [ $new_value ] );
 
 Gets or sets the online status of the service.
 If this value is false no online operations are permitted.
 In addition to this value being true the online value for the extractor need to be true.
 
 See also L<"extractor">, L<Data::URIID/"online">.
+
+=head1 KNOWN/SUPPORTED SERVICES
+
+The following is a non-complete list of services for which lookups (online or offline) are supported.
+For a complete list of known services see L<Data::URIID/"known">.
+
+=head2 C<wikidata> and C<wikipedia>
+
+Wikidata is a large collection of machine readable data from all categories. It can act as a central connecting point
+for several types of identifiers and services. It also provides Wikipedia pages for the given subject.
+
+The C<wikipedia> services is only used for online lookups if a Wikipedia page is used as an input. It does not provide
+lookup from identifiers to Wikipedia links.
+
+In many cases you want to enable online lookups for both C<wikidata>, and C<wikipedia>. This is specifically true if you
+want to work with very different services at once.
+
+You commonly don't need to enable online lookups if all the services you're interested in use the same type of identifiers.
+
+=head2 C<osm> and C<overpass>
+
+The C<osm> service is mainly used to lookup from OpenStreetMap identifiers to other identifiers as well as attributes.
+While the C<overpass> service is mostly used to look up from other identifiers to OpenStreetMap identifiers.
+
+If you work with places you most likely want to enable online lookups on those services.
+
+=head2 C<Data::URIID>
+
+This service is used to perform internal offline lookups on identifiers known to the module.
+It mainly provides display names for ISEs used by this module.
 
 =head1 AUTHOR
 

@@ -57,6 +57,6 @@
          "web" : "https://github.com/LouisStrous/p5-Image-Synchronize"
       }
    },
-   "version" : "2.010",
+   "version" : "2.011",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -57,6 +57,35 @@ subtest 'should compare simple messages' => sub {
 	];
 };
 
+subtest 'should compare simple messages with MSH' => sub {
+	my $comparer = App::HL7::Compare->new(
+		files => [
+			\(
+				'MSH|^~\&|test1|test2'
+			),
+			\(
+				'MSH|^~\&|test3|test2'
+			),
+		],
+		message_opts => {
+			skip_MSH => 0,
+		},
+	);
+	my $comparison = $comparer->compare;
+
+	is_deeply $comparison, [
+		{
+			'segment' => 'MSH.1',
+			'compared' => [
+				{
+					'path' => [2],
+					'value' => ['test1', 'test3']
+				},
+			]
+		}
+	];
+};
+
 subtest 'should stringify a comparison (with matching)' => sub {
 	my $comparer = App::HL7::Compare->new(
 		files => ['t/data/test1.hl7', 't/data/test2.hl7'],

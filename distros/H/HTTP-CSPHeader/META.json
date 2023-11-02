@@ -70,9 +70,9 @@
             "Module::Metadata" : "0",
             "Plack::Middleware::ContentLength" : "0",
             "Plack::Middleware::Head" : "0",
+            "Test2::V0" : "0",
             "Test::Differences" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -81,7 +81,7 @@
    "provides" : {
       "HTTP::CSPHeader" : {
          "file" : "lib/HTTP/CSPHeader.pm",
-         "version" : "v0.3.2"
+         "version" : "v0.3.3"
       }
    },
    "release_status" : "stable",
@@ -95,7 +95,7 @@
          "web" : "https://github.com/robrwo/perl-HTTP-CSPHeader"
       }
    },
-   "version" : "v0.3.2",
+   "version" : "v0.3.3",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",

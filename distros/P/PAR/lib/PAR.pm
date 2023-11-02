@@ -1,5 +1,5 @@
 package PAR;
-$PAR::VERSION = '1.018';
+$PAR::VERSION = '1.019';
 
 use 5.006;
 use strict;
@@ -725,15 +725,20 @@ sub _extract_inc {
                 Archive::Zip::setChunkSize(64 * 1024);
             }
 
-            for ( $zip->memberNames() ) {
-                s{^/}{};
-                my $outfile =  File::Spec->catfile($inc, $_);
+            foreach my $name ($zip->memberNames()) {
+                $name =~ s{^/}{};
+                my $outfile =  File::Spec->catfile($inc, $name);
                 next if -e $outfile and not -w _;
-                $zip->extractMember($_, $outfile);
+                $zip->extractMember($name, $outfile);
                 # Unfortunately Archive::Zip doesn't have an option
                 # NOT to restore member timestamps when extracting, hence set
                 # it to "now" (making it younger than the canary file).
                 utime(undef, undef, $outfile);
+
+                if (my ($xs_dll) = $name =~ m{^lib/(auto/.*\.\Q$dlext\E)$}) {
+                    $PAR::Heavy::FullCache{$outfile} = $xs_dll;
+                    $PAR::Heavy::FullCache{$xs_dll} = $outfile;
+                }
             }
         }
 

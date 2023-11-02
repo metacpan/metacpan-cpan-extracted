@@ -1,10 +1,17 @@
 package App::Oozie::Deploy::Validate::Spec;
-$App::Oozie::Deploy::Validate::Spec::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
+use App::Oozie::Constants qw(
+    EMPTY_STRING
+    INDEX_NOT_FOUND
+);
 use App::Oozie::Deploy::Validate::Oozie;
 use App::Oozie::Deploy::Validate::DAG::Workflow;
 use App::Oozie::Deploy::Validate::Spec::Coordinator;
@@ -78,7 +85,13 @@ sub maybe_parse_xml {
     my @lines = do {
         open my $FH, '<', $xml_file or die "Failed to read $xml_file: $!";
         my @rv = <$FH>;
-        close $FH;
+        if ( ! close $FH ) {
+            $self->logger->warn(
+                sprintf 'Failed to close %s: %s',,
+                            $xml_file,
+                            $!,
+            );
+        }
         @rv;
     };
 
@@ -96,7 +109,7 @@ sub maybe_parse_xml {
     my ($xml_in, $localname);
     eval {
         my $xml = App::Oozie::XML->new(
-                        data             => join('', @lines),
+                        data             => join( EMPTY_STRING, @lines ),
                         oozie_client_jar => $self->oozie_client_jar,
                         verbose          => $self->verbose,
                     );
@@ -121,7 +134,7 @@ sub maybe_parse_xml {
 sub local_xml_files {
     my $self = shift;
     my $dest = $self->local_path;
-    File::Find::Rule
+    return File::Find::Rule
             ->file
             ->maxdepth( 1       )
             ->name(     '*.xml' )
@@ -159,7 +172,7 @@ sub verify {
         # ii) or even validate the basic syntax for such documents
         #        and skip Oozie schema checks (which will fail)
         #
-        if (index($xml_file, "common_datasets.xml") != -1) {
+        if ( index( $xml_file, 'common_datasets.xml' ) != INDEX_NOT_FOUND ) {
             next;
         }
         my $oozie_cli_validation = 1;
@@ -176,8 +189,13 @@ sub verify {
 
         my($xml_in, $localname) = @{ $parsed }{qw/ xml_in localname /};
 
-        if( $localname eq "workflow-app" ) {
-            $logger->info("$relative_file_name identified as workflow-app.");
+        if( $localname eq 'workflow-app' ) {
+            $logger->info(
+                sprintf '%s identified as %s.',
+                        $relative_file_name,
+                        $localname,
+            );
+
             eval {
                 my ($wf_validation_errors,
                     $wf_total_errors,
@@ -213,15 +231,22 @@ sub verify {
 
                 1;
             } or do {
+                my $eval_error = $@ || 'Zombie error';
                 $logger->warn(
-                    sprintf "Unable to validate `%s` as workflow-app. Please consider fixing the error: %s",
+                    sprintf 'Unable to validate `%s` as %s. Please consider fixing the error: %s',
                                 $relative_file_name,
-                                $@,
+                                $localname,
+                                $eval_error,
                 );
                 next;
             };
-        } elsif( $localname eq "coordinator-app" ) {
-            $logger->info("$relative_file_name identified as coordinator-app.");
+        }
+        elsif ( $localname eq 'coordinator-app' ) {
+            $logger->info(
+                sprintf '%s identified as %s.',
+                        $relative_file_name,
+                        $localname,
+            );
             eval {
                 my ($coord_validation_errors,
                     $coord_total_errors,
@@ -234,15 +259,22 @@ sub verify {
 
                 1;
             } or do {
+                my $eval_error = $@ || 'Zombie error';
                 $logger->warn(
-                    sprintf "Unable to validate `%s` as coordinator-app. Please consider fixing error: %s",
+                    sprintf 'Unable to validate `%s` as %s. Please consider fixing error: %s',
                                 $relative_file_name,
-                                $@,
+                                $localname,
+                                $eval_error,
                 );
                 next;
             };
-        } elsif( $localname eq "bundle-app" ) {
-            $logger->info("$relative_file_name identified as bundle-app.");
+        }
+        elsif( $localname eq 'bundle-app' ) {
+            $logger->info(
+                sprintf '%s identified as %s.',
+                        $relative_file_name,
+                        $localname,
+            );
             eval {
                 my ($bundle_validation_errors,
                     $bundle_total_errors,
@@ -255,17 +287,20 @@ sub verify {
 
                 1;
             } or do {
+                my $eval_error = $@ || 'Zombie error';
                 $logger->warn(
-                    sprintf "Unable to validate `%s` as bundle-app. Please consider fixing error: %s",
+                    sprintf 'Unable to validate `%s` as %s. Please consider fixing error: %s',
                                 $relative_file_name,
-                                $@,
+                                $localname,
+                                $eval_error,
                 );
                 next;
             };
-        } else { # we can't identify it and validate, so just yield a warning
+        }
+        else { # we can't identify it and validate, so just yield a warning
             $oozie_cli_validation = 0;
             $logger->fatal(
-                sprintf "We can't validate `%s` since it doesn't look like either workflow-app, coordinator-app or bundle-app.",
+                sprintf q{We can't validate `%s` since it doesn't look like either workflow-app, coordinator-app or bundle-app.},
                             $relative_file_name,
             );
             $validation_errors++;
@@ -296,7 +331,7 @@ App::Oozie::Deploy::Validate::Spec
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

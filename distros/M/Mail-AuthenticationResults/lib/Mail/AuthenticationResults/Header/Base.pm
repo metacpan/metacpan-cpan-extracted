@@ -4,7 +4,7 @@ package Mail::AuthenticationResults::Header::Base;
 require 5.008;
 use strict;
 use warnings;
-our $VERSION = '2.20230112'; # VERSION
+our $VERSION = '2.20231031'; # VERSION
 use Scalar::Util qw{ weaken refaddr };
 use JSON;
 use Carp;
@@ -100,8 +100,10 @@ sub stringify {
     my ( $self, $value ) = @_;
     my $string = $value;
     $string = q{} if ! defined $string; #5.8;
+    my $strict_quotes = $self->strict_quotes;
 
-    if ( $string =~ /[\s\t \(\);=]/ ) {
+    if (  (  $strict_quotes && $string =~ /[\s\t \(\);=<>@,:\\\/\[\]\?]/ )
+       || ( !$strict_quotes && $string =~ /[\s\t \(\);=]/ ) ) {
         $string = '"' . $string . '"';
     }
 
@@ -210,6 +212,24 @@ sub ancestor {
     }
 
     return ( $eldest, $depth );
+}
+
+
+sub strict_quotes {
+    my ( $self ) = @_;
+
+    return $self->{ 'strict_quotes' } if defined $self->{ 'strict_quotes' };
+
+    my ( $eldest, $depth ) = $self->ancestor();
+    return 0 if $depth == 0;
+    return $eldest->strict_quotes;
+}
+
+
+sub set_strict_quotes {
+    my ( $self, $value ) = @_;
+    $self->{ 'strict_quotes' } = $value ? 1 : 0;
+    return $self;
 }
 
 
@@ -426,7 +446,7 @@ Mail::AuthenticationResults::Header::Base - Base class for modelling parts of th
 
 =head1 VERSION
 
-version 2.20230112
+version 2.20231031
 
 =head1 DESCRIPTION
 
@@ -570,6 +590,21 @@ Croaks if the relationship between $child and $self is not valid.
 =head2 ancestor()
 
 Returns the top Header object and depth of this child
+
+=head2 strict_quotes()
+
+Return the current value of strict quotes flag for this header or for its
+ancestor if not set locally
+
+If true, we are stricter about which characters result in a quoted string
+
+=head2 set_strict_quotes( $value )
+
+Set the value of strict quotes
+
+If true, we are stricter about which characters result in a quoted string
+
+Default false
 
 =head2 as_string_prefix( $header )
 

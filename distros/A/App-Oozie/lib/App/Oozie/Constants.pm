@@ -1,10 +1,11 @@
-## no critic (RequireStrictDeclarations ProhibitUselessNoCritic)
 package App::Oozie::Constants;
-$App::Oozie::Constants::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
 use parent qw( Exporter );
+
+our $VERSION = '0.015'; # VERSION
 
 use constant OOZIE_STATES_RERUNNABLE => qw(
     KILLED
@@ -31,16 +32,35 @@ use constant SHORTCUT_METHODS => qw(
 use constant {
     DATE_PATTERN                            => '%Y-%m-%d',
     DEFAULT_CLUSTER_NAME                    => 'MyCluster',
+    DEFAULT_DIR_MODE                        => 775,
     DEFAULT_END_DATE_DAYS                   => 180,
+    DEFAULT_FILE_MODE                       => 755,
     DEFAULT_HDFS_WF_PATH                    => '/oozie_wfs',
+    DEFAULT_MAX_RETRY                       => 3,
     DEFAULT_META_FILENAME                   => 'meta.yml',
     DEFAULT_NAMENODE_RPC_PORT               => 8020,
+    DEFAULT_OOZIE_MAX_JOBS                  => 1_000,
     DEFAULT_START_DATE_DAY_FRAME            => 7,
     DEFAULT_TIMEOUT                         => 60 * 3,
     DEFAULT_TZ                              => 'CET',
-    DEFAULT_WEBHDFS_PORT                    => 14000,
+    DEFAULT_WEBHDFS_PORT                    => 14_000,
     EMPTY_STRING                            => q{},
     FILE_FIND_FOLLOW_SKIP_IGNORE_DUPLICATES => 2,
+    FORMAT_ZULU_TIME                        => '%sT%02d:%02dZ',
+    HOURS_IN_A_DAY                          => 24,
+    INDEX_NOT_FOUND                         => -1,
+    LAST_ELEM                               => -1,
+    MAX_RETRY                               => 3,
+    MILISEC_DIV                             => 1000,
+    MIN_LEN_JUSTIFICATION                   => 200,
+    MIN_OOZIE_SCHEMA_VERSION_FOR_SLA        => 0.5,
+    MIN_OOZIE_SLA_VERSION                   => 0.2,
+    MODE_BITSHIFT_READ                      => 3,
+    ONE_HOUR                                => 3600,
+    RE_AT                                   => qr{ \@ }xms,
+    RE_COLON                                => qr{ [:] }xms,
+    RE_DOT                                  => qr{ [.] }xms,
+    RE_EQUAL                                => qr{ [=] }xms,
     RE_LINEAGE_DATA_ITEM                    => qr{
         \A
             hive     # Data source type
@@ -56,39 +76,76 @@ use constant {
         oozie-oozi -
     }xms,
     SPACE_CHAR      => q{ },
+    STAT_MODE       => 2,
+    STAT_SIZE       => 7,
     VALID_JOB_TYPES => [qw(
         bundle
         coord
         wf
     )],
     TEMPLATE_DEFINE_VAR       => q{%s='%s'},
+    TERMINAL_INFO_LINE_LEN    => 10,
+    TERMINAL_LINE_LEN         => 80,
     WEBHDFS_CREATE_CHUNK_SIZE => 1024**1024 * 2,
-
+    XML_LOCALNAME_POS         => -2,
+    XML_NS_FIRST_POS          => 0,
+    XML_UNPACK_LOCALNAME_POS  => 0,
+    XML_VERSION_PADDING       => 5,
+    XML_VERSION_POS           => -1,
 };
 
 our @EXPORT_OK = qw(
     DATE_PATTERN
     DEFAULT_CLUSTER_NAME
+    DEFAULT_DIR_MODE
     DEFAULT_END_DATE_DAYS
+    DEFAULT_FILE_MODE
     DEFAULT_HDFS_WF_PATH
+    DEFAULT_MAX_RETRY
     DEFAULT_META_FILENAME
     DEFAULT_NAMENODE_RPC_PORT
+    DEFAULT_OOZIE_MAX_JOBS
     DEFAULT_START_DATE_DAY_FRAME
     DEFAULT_TIMEOUT
     DEFAULT_TZ
     DEFAULT_WEBHDFS_PORT
     EMPTY_STRING
     FILE_FIND_FOLLOW_SKIP_IGNORE_DUPLICATES
+    FORMAT_ZULU_TIME
     HDFS_COMPARE_SKIP_FILES
+    HOURS_IN_A_DAY
+    INDEX_NOT_FOUND
+    LAST_ELEM
+    MAX_RETRY
+    MILISEC_DIV
+    MIN_LEN_JUSTIFICATION
+    MIN_OOZIE_SCHEMA_VERSION_FOR_SLA
+    MIN_OOZIE_SLA_VERSION
+    MODE_BITSHIFT_READ
+    ONE_HOUR
     OOZIE_STATES_RERUNNABLE
     OOZIE_STATES_RUNNING
+    RE_AT
+    RE_COLON
+    RE_DOT
+    RE_EQUAL
     RE_LINEAGE_DATA_ITEM
     RE_OOZIE_ID
     SHORTCUT_METHODS
     SPACE_CHAR
+    STAT_MODE
+    STAT_SIZE
     TEMPLATE_DEFINE_VAR
+    TERMINAL_INFO_LINE_LEN
+    TERMINAL_LINE_LEN
     VALID_JOB_TYPES
     WEBHDFS_CREATE_CHUNK_SIZE
+    XML_LOCALNAME_POS
+    XML_NS_FIRST_POS
+    XML_UNPACK_LOCALNAME_POS
+    XML_UNPACK_LOCALNAME_POS
+    XML_VERSION_PADDING
+    XML_VERSION_POS
 );
 
 1;
@@ -105,7 +162,7 @@ App::Oozie::Constants
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@
       "Slaven Rezic <srezic@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Doit version 0.026, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Doit version 0.027, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,6 @@
          "url" : "git://github.com/eserte/Doit"
       }
    },
-   "version" : "0.026",
+   "version" : "0.027",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

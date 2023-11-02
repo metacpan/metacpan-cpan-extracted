@@ -1,13 +1,16 @@
 package App::Oozie::Role::Fields::Generic;
-$App::Oozie::Role::Fields::Generic::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
 
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use App::Oozie::Constants qw(
     DEFAULT_TIMEOUT
+    DEFAULT_MAX_RETRY
 );
 
 use Moo::Role;
@@ -29,7 +32,7 @@ option force => (
 option max_retry => (
     is       => 'rw',
     isa      => Int,
-    default  => sub { 3 },
+    default  => sub { DEFAULT_MAX_RETRY },
     doc      => 'Maximum number of retries for various function calls',
 );
 
@@ -52,7 +55,7 @@ has effective_username => (
     is      => 'ro',
     default => sub {
         (getpwuid $<)[0]
-            || die "Unable to locate the effective user name";
+            || die 'Unable to locate the effective user name';
     },
 );
 
@@ -70,7 +73,7 @@ App::Oozie::Role::Fields::Generic
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

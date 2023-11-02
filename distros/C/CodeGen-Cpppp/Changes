@@ -1,31 +1,21 @@
+0.002 - 2023-10-31
+  - Remove autocomma and autostatementline attributes on Cpppp object,
+     because they change the validity of tempalte output.
+  - Output object stringifies to its content
+  - Automatically flush new template instances after BUILD
+  - Documentation improvements, and minor code cleanup.
+
 0.001 - 2023-10-11
-  - Fixed bugs in output-to-file
-  - More documentation and unit tests
+  - Initial version with features:
+     - Template blocks with interpolated Perl expressions
+     - Compilation of cpppp to perl packages
+     - 'param' declarations that become attributes
+     - 'sub' declarations that become methods
+     - multi-section output accumulator
+     - template inclusion from other templates
+     - autoindent, autocolumn, autocomma, autostatementline
+     - anticharacters '$trim_comma' and '$trim_ws'
+     - file-writing and file-patching output options
+     - 'cpppp' CLI tool
+  - Reasonable documentation and test coverage
   - Back-compat to 5.20
-
-0.001_04 - 2023-09-25
-  - template parameters, assignable from cli
-  - output file patching, configurable from cli
-  - call templates from templates, and cache based on filename
-  - template include path
-  - numerous improvements to autoformatting features, and can
-     now span blocks
-  - AntiCharacter objects
-
-0.001_03 - 2023-09-20
-  - Construct perl classes from each template
-  - Special cases for '@' substitutions: 'autocomma', 'autostatementline'
-  - Greatly improved 'autoindent' feature.
-  - Streamline generated perl code to be more efficient.
-  - Accurate line number reporting in generated Perl code.
-
-0.001_02 - 2023-09-15
-  - Fix various glaring documentation mistakes
-  - List some ideas for future features
-  - Remove debugging output
-  - "--help" for command line
-
-0.001_01 - 2023-09-15
-  - Basic intermingling of perl variables in C code
-  - Arbitrary perl in '##' directives
-  - Magic indent adjustment after variable substitution

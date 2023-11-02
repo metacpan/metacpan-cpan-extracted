@@ -50,7 +50,7 @@
          "requires" : {
             "Plack::Middleware" : "0",
             "Ref::Util" : "0",
-            "Text::Minify::XS" : "v0.6.2",
+            "Text::Minify::XS" : "v0.7.0",
             "parent" : "0",
             "perl" : "v5.14.0",
             "warnings" : "0"
@@ -70,9 +70,9 @@
             "Plack::MIME" : "0",
             "Plack::Middleware::ContentLength" : "0",
             "Plack::Test" : "0",
+            "Test2::V0" : "0",
             "Test::Differences" : "0",
             "Test::More" : "0",
-            "Test::Most" : "0",
             "strict" : "0",
             "utf8" : "0"
          }
@@ -81,7 +81,7 @@
    "provides" : {
       "Plack::Middleware::Text::Minify" : {
          "file" : "lib/Plack/Middleware/Text/Minify.pm",
-         "version" : "v0.4.0"
+         "version" : "v0.4.1"
       }
    },
    "release_status" : "stable",
@@ -95,7 +95,7 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Text-Minify"
       }
    },
-   "version" : "v0.4.0",
+   "version" : "v0.4.1",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",

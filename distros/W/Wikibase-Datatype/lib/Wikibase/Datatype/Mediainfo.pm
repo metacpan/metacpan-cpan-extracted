@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build default is);
 use Mo::utils qw(check_array_object check_number check_number_of_items);
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 has descriptions => (
 	default => [],
@@ -270,7 +270,7 @@ Returns string.
  use Wikibase::Datatype::Value::String;
  use Wikibase::Datatype::Value::Time;
 
- # Object.
+ # Statements.
  my $statement1 = Wikibase::Datatype::MediainfoStatement->new(
          # depicts (P180) beach (Q40080)
          'snak' => Wikibase::Datatype::MediainfoSnak->new(
@@ -475,6 +475,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.33
 
 =cut

@@ -37,11 +37,12 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => 0,
     "Plack::Builder" => 0,
     "Plack::Test" => 0,
+    "Test2::V0" => 0,
     "Test::More" => 0,
     "Test::Vars" => "0.015",
     "strict" => 0
   },
-  "VERSION" => "v0.11.0",
+  "VERSION" => "v0.11.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -65,6 +66,7 @@ my %FallbackPrereqs = (
   "Plack::Util::Accessor" => 0,
   "Ref::Util" => 0,
   "Regexp::Common" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0,
   "Test::Vars" => "0.015",
   "parent" => 0,

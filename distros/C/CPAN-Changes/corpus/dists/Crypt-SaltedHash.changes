@@ -1,0 +1,22 @@
+Revision history for Perl extension Crypt::SaltedHash.
+
+0.06  Sun Feb 28 01:55:22 2010
+    - added clear method
+	- add returns now $self
+
+0.05  Thu Aug 10 03:04:33 2006
+    - switched to Module::Build
+
+0.04  Thu Jan 26 04:56:56 2006
+	- algorithm recognition fixed
+
+0.03  Mon Nov 14 23:59:59 2005
+	- spelling fixed
+
+0.02  Mon Nov 14 17:54:00 2005
+    - fixed some bugs; added tests and documentation
+
+0.01  Sun Nov 13 05:41:23 2005
+    - original version; created by h2xs 1.23 with options
+		-XA -n Crypt::SaltedHash
+

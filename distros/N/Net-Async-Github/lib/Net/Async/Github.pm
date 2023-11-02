@@ -3,7 +3,7 @@ package Net::Async::Github;
 use strict;
 use warnings;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -66,8 +66,9 @@ use Net::Async::Github::Plan;
 use Net::Async::Github::PullRequest;
 use Net::Async::Github::Repository;
 use Net::Async::Github::RateLimit;
+use Net::Async::Github::Comment;
 
-my $json = JSON::MaybeXS->new;
+use JSON::MaybeUTF8 qw(:v2);
 
 =head1 METHODS
 
@@ -245,6 +246,19 @@ sub pull_requests {
             repo => $args{repo},
         },
         class => 'Net::Async::Github::PullRequest'
+    );
+}
+
+sub issue_comments {
+    my ($self, %args) = @_;
+    $self->validate_args(%args);
+    $self->api_get_list(
+        endpoint => 'issue_comments',
+        endpoint_args => {
+            owner => $args{owner},
+            repo  => $args{repo},
+        },
+        class => 'Net::Async::Github::Comment'
     );
 }
 
@@ -849,7 +863,7 @@ sub endpoints {
                 'endpoints.json'
             )
         ) unless $path->exists;
-        $json->decode($path->slurp_utf8)
+        decode_json_text($path->slurp_utf8)
     };
 }
 
@@ -1042,7 +1056,7 @@ sub http_get {
         ) if 3 == ($resp->code / 100);
         try {
             return Future->done(
-                $json->decode(
+                decode_json_utf8(
                     $resp->decoded_content
                 ),
                 $resp
@@ -1102,7 +1116,7 @@ sub http_delete {
         ) if 3 == ($resp->code / 100);
         try {
             return Future->done(
-                $json->decode(
+                decode_json_utf8(
                     $resp->decoded_content
                 ),
                 $resp
@@ -1137,7 +1151,7 @@ sub http_put {
     my $uri = delete $args{uri};
     my $data = delete $args{data};
     $log->tracef("%s %s { %s } <= %s", $method, $uri->as_string, \%args, $data);
-    $data = $json->encode($data) if ref $data;
+    $data = encode_json_utf8($data) if ref $data;
     $self->http->do_request(
         method       => $method,
         uri          => $uri,
@@ -1165,7 +1179,7 @@ sub http_put {
         ) if 3 == ($resp->code / 100);
         try {
             return Future->done(
-                $json->decode(
+                decode_json_utf8(
                     $resp->decoded_content
                 ),
                 $resp
@@ -1204,7 +1218,7 @@ sub http_post {
     my $uri = delete $args{uri};
     my $data = delete $args{data};
     $log->tracef("POST %s { %s } <= %s", $uri->as_string, \%args, $data);
-    $data = $json->encode($data) if ref $data;
+    $data = encode_json_utf8($data) if ref $data;
     $self->http->POST(
         $uri,
         $data,
@@ -1231,7 +1245,7 @@ sub http_post {
         ) if 3 == ($resp->code / 100);
         try {
             return Future->done(
-                $json->decode(
+                decode_json_utf8(
                     $resp->decoded_content
                 ),
                 $resp
@@ -1409,7 +1423,7 @@ sub validate_repo_name {
     # https://github.com/Automattic/_s
     # Canonical repositories with '. character would include the `.wiki` "magic" repo for each
     # Github repo
-    die "repo name contains invalid characters" if $repo =~ /[^a-z0-9.-]/i;
+    die "repo name contains invalid characters" if $repo =~ /[^a-z0-9._-]/i;
     die "repo name too long" if length($repo) > 100;
     return 1;
 }

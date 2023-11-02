@@ -7,15 +7,17 @@ use warnings;
 use feature 'signatures';
 
 use Carp;
-use List::Util qw( first );
+use List::Util qw( any first );
 use Encode qw( encode decode );
 use X11::XCB ':all';
 use X11::korgwm::Common;
 
 our $focus_prev;
+my $sid = 1;
 
 sub new($class, $id) {
-    bless { id => $id, on_tags => {} }, $class;
+    # Full structure is defined in architecture/05_data_structures.txt
+    bless { id => $id, sid => $sid++, on_tags => {} }, $class;
 }
 
 sub DESTROY($self) {
@@ -50,6 +52,7 @@ sub _resize($wid, $w, $h) {
 
 sub _configure_notify($wid, $sequence, $x, $y, $w, $h, $above_sibling=0, $override_redirect=0,
         $bw=$cfg->{border_width}) {
+    return carp "Undefined ($x, $y, $w, $h) for configure notify" unless 4 == grep defined, $x, $y, $w, $h;
     my $packed = pack('CCSLLLssSSSC', CONFIGURE_NOTIFY, 0, $sequence,
         $wid, # event
         $wid, # window
@@ -102,7 +105,7 @@ UNITCHECK {
 
 sub resize_and_move($self, $x, $y, $w, $h, $bw=$cfg->{border_width}) {
     croak "Undefined window" unless $self->{id};
-    @{ $self }{qw( real_x real_y real_w real_h )} = ($x, $y, $w, $h);
+    @{ $self }{qw( real_x real_y real_w real_h real_bw )} = ($x, $y, $w, $h, $bw);
     _resize_and_move($self->{id}, $x, $y, $w, $h, $bw);
 }
 
@@ -146,7 +149,20 @@ sub focus($self) {
     my @visible_tags = $self->tags_visible();
     my $tag = $visible_tags[0];
 
-    if (0 == @visible_tags and not $self->{always_on}) {
+    if ($self->{always_on}) {
+        # Select current tag if self is always_on
+        $tag = $focus->{screen}->current_tag();
+    } elsif (0 == @visible_tags) {
+        # Override tag if the window is actually invisible but was appended to some visible tag
+        my @tags = grep { any { $self == $_ } @{ $_->{windows_appended} } } map { $_->current_tag() } @screens;
+
+        # Not sure how to handle such a situation. Maybe select random/first one?
+        return carp "Trying to focus a window which is appended to multiple tags" if @tags > 1;
+
+        $tag = $tags[0];
+    }
+
+    if (0 == @visible_tags and not $tag) {
         # We were asked to focus invisible window, do nothing?
         carp "Trying to focus an invisible window " . $self->{id};
 
@@ -155,7 +171,7 @@ sub focus($self) {
     } elsif (@visible_tags > 1) {
         # Focusing window residing on multiple visible tags is not implemented yet
         croak "Focusing window on multiple visible tags is not supported";
-    } elsif ($self->{maximized} or $self->{always_on} or 0 == @{ $tag->{windows_float} }) {
+    } elsif ($self->{maximized} or (0 == @{ $tag->{windows_float} } and 0 == @{ $tag->{screen}->{always_on} })) {
         # Just raise the window if it is maximized or there are no floating windows on current tag
         $self->_stack_above();
     } else {
@@ -168,7 +184,7 @@ sub focus($self) {
         # - if current window is floating, place it below
         push @stack, $self if $self->{floating};
         # - if there are other floating windows, place them below
-        push @stack, grep { $_ != $self } @{ $tag->{windows_float} };
+        push @stack, grep { $_ != $self } @{ $tag->{windows_float} }, @{ $tag->{screen}->{always_on} };
         # - place this window below if it's tiled
         push @stack, $self unless $self->{floating};
         # - place all others below
@@ -217,11 +233,12 @@ sub update_title($self) {
 }
 
 sub hide($self) {
-    # Ignore notifications from our actions
-    $unmap_prevent->{$self->{id}} = 1;
+    # We do not actually unmap them anymore, just move out of screen
+    $self->{_hidden} = 1;
+    $X->configure_window($self->{id}, CONFIG_WINDOW_X | CONFIG_WINDOW_Y, $self->{sid} * 4096, $visible_max_y * 2);
 
     # Drop panel title
-    $_->{panel}->title() for grep { $_->{focus} == $self } $self->screens();
+    $_->{panel}->title() for grep { ($_->{focus} // 0) == $self } $self->screens();
 
     # Drop focus
     $focus->{window} = undef if $self == ($focus->{window} // 0);
@@ -229,13 +246,17 @@ sub hide($self) {
 
     # Execute hooks, see Expose.pm
     $_->($self) for our @hooks_hide;
-
-    # Do actual unmap
-    $X->unmap_window($self->{id});
 }
 
 sub show($self) {
+    # Not using $self->move() to avoid garbage in real_*
+    $X->configure_window($self->{id}, CONFIG_WINDOW_X | CONFIG_WINDOW_Y, @{ $self }{qw( x y )}) if $self->{floating};
+
+    # Map anyways as client could've unmapped on their own
     $X->map_window($self->{id});
+
+    # Remove _hidden mark as it was requested manually
+    delete $self->{_hidden};
 }
 
 sub tags($self) {
@@ -350,7 +371,7 @@ sub toggle_always_on($self) {
 
     if ($self->{always_on} = ! $self->{always_on}) {
         # Remove window from all tags and store it in always_on of current screen
-        $_->win_remove($self) for $self->tags();
+        $_->win_remove($self, 1) for $self->tags();
         push @{ $focus->{screen}->{always_on} }, $self;
         $self->{always_on} = $focus->{screen};
     } else {

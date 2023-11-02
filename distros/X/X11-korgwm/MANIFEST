@@ -28,7 +28,5 @@ README.md
 script/korgwm
 t/00-load.t
 t/10-layout.t
-X11-korgwm-1.0/META.json
-X11-korgwm-1.0/META.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

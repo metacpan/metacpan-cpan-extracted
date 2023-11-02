@@ -18,6 +18,9 @@ WriteMakefile(
     Template => 0,
     Moose    => 0,
     'Template::Provider::Pandoc' => 0,
+    'Text::FrontMatter::YAML' => 0,
+    'Path::Tiny' => 0,
+    'YAML::XS' => 0,
   },
 
   META_MERGE    => {

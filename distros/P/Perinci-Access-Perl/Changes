@@ -1,3 +1,8 @@
+0.900   2023-10-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add dependency to Perinci::Examples::Completion.
+
+
 0.899   2023-07-09  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

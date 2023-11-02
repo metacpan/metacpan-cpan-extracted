@@ -23,7 +23,7 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 
 @EXPORT_OK = ( @{$EXPORT_TAGS{'all'}} );
 
-$VERSION = '0.28';
+$VERSION = '0.30';
 
 bootstrap UUID $VERSION;
 
@@ -204,7 +204,7 @@ Need more tests and sanity checks.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014-2016 by Rick Myers.
+This software is Copyright (c) 2014-2023 by Rick Myers.
 
 This is free software, licensed under:
 
@@ -237,6 +237,8 @@ William Faulk
 gregor herrmann
 
 Slaven Rezic
+
+twata
 
 =head1 SEE ALSO
 

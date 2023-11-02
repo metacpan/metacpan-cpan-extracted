@@ -14,9 +14,9 @@ with (
 );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-07'; # DATE
+our $DATE = '2023-11-01'; # DATE
 our $DIST = 'Dist-Zilla-PluginBundle-Author-PERLANCAR'; # DIST
-our $VERSION = '0.608'; # VERSION
+our $VERSION = '0.609'; # VERSION
 
 sub before_build {
     my $self = shift;
@@ -49,7 +49,7 @@ Dist::Zilla::Plugin::PERLANCAR::BeforeBuild - Do stuffs before building
 
 =head1 VERSION
 
-This document describes version 0.608 of Dist::Zilla::Plugin::PERLANCAR::BeforeBuild (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-07-07.
+This document describes version 0.609 of Dist::Zilla::Plugin::PERLANCAR::BeforeBuild (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2023-11-01.
 
 =head1 SYNOPSIS
 

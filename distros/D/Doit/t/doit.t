@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2023 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -17,6 +17,7 @@ use FindBin;
 use lib $FindBin::RealBin;
 
 use File::Temp 'tempdir';
+use Getopt::Long;
 use Test::More 'no_plan';
 use Errno ();
 use Hash::Util qw(lock_keys);
@@ -24,8 +25,6 @@ use Hash::Util qw(lock_keys);
 use Doit;
 use Doit::Log;
 use Doit::Util qw(new_scope_cleanup);
-
-use TestUtil qw(skip_utime_atime_unreliable);
 
 sub with_unreadable_directory (&$);
 
@@ -43,6 +42,10 @@ chdir $tempdir or die "Can't chdir to $tempdir: $!";
 
 my $r = Doit->init;
 my $has_ipc_run = $r->can_ipc_run;
+
+my $enable_atime_tests = $ENV{GITHUB_ACTIONS} || $ENV{DOIT_TEST_WITH_ATIME};
+GetOptions("enable-atime-tests!" => \$enable_atime_tests)
+    or die "usage: $0 [--enable-atime-tests]\n";
 
 ######################################################################
 # touch
@@ -62,20 +65,14 @@ $r->unlink("doit-a", "doit-b", "doit-c");
 is $r->utime(100000, 100000, "doit-test"), 1;
 {
     my @s = stat "doit-test";
-    skip_utime_atime_unreliable {
-	is $s[8], 100000, 'utime changed accesstime';
-    };
+    is $s[8], 100000, 'utime changed accesstime' if $enable_atime_tests;
     is $s[9], 100000, 'utime changed modtime';
 }
-skip_utime_atime_unreliable {
-    is $r->utime(100000, 100000, "doit-test"), 0; # should not run
-};
+is $r->utime(100000, 100000, "doit-test"), 0 if $enable_atime_tests; # should not run
 is $r->utime(100000, 200000, "doit-test"), 1;
 {
     my @s = stat "doit-test";
-    skip_utime_atime_unreliable {
-	is $s[8], 100000, 'accesstime still unchanged';
-    };
+    is $s[8], 100000, 'accesstime still unchanged' if $enable_atime_tests;
     is $s[9], 200000, 'utime changed modtime';
 }
 {
@@ -396,7 +393,9 @@ if ($^O ne 'MSWin32') { # date is interactive on Windows
 	$r->run(["date"]);
     }
 }
-{
+SKIP: {
+    skip "hostname command is missing", 1
+	if !$r->which('hostname');
     my @hostname = ('hostname');
     if ($^O =~ m{^(linux|freebsd|darwin|gnukfreebsd)$}) {
 	push @hostname, '-f';

@@ -2,7 +2,7 @@ package Test::Smoke::Smoker;
 use warnings;
 use strict;
 
-our $VERSION = '0.046';
+our $VERSION = '0.047';
 
 use Config;
 use Cwd;
@@ -23,6 +23,7 @@ my %CONFIG = (
     df_locale         => '',
     df_force_c_locale => 0,
     df_defaultenv     => 0,
+    df_perlio_only    => 0,
     df_harness_destruct => 2,
 
     df_is_vms         => $^O eq 'VMS',
@@ -526,7 +527,10 @@ sub make_test {
     # No use testing different io layers without PerlIO
     # just output 'stdio' for mkovz.pl
     my @layers = ( ($config_args =~ /-Uuseperlio\b/) || $self->{defaultenv} )
-               ? qw( stdio ) : qw( stdio perlio );
+        ? qw( stdio )
+        : $self->{perlio_only}
+            ? qw( perlio )
+            : qw( stdio perlio );
 
     my @locales;
     if ( !($config_args =~ /-Uuseperlio\b/ || $self->{defaultenv}) &&
@@ -549,8 +553,9 @@ sub make_test {
             # make default 'make test' runs possible
             delete $ENV{PERLIO} if $self->{defaultenv};
         } else {
-            $ENV{LC_ALL} = $self->{locale};
-            $perlio_logmsg .= ":" . pop @locales;
+            my $this_locale = pop(@locales);
+            $ENV{LC_ALL} = $this_locale;
+            $perlio_logmsg .= ":$this_locale";
         }
         $self->ttylog( "TSTENV = $perlio_logmsg\t" );
 

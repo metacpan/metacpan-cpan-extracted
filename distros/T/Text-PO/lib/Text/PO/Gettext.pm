@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Gettext.pm
-## Version v0.3.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/12
-## Modified 2023/01/04
+## Modified 2023/10/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -35,7 +35,7 @@ BEGIN
             (?:\.(?<locale_encoding>[\w-]+))?
         )
     $/x;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -45,11 +45,11 @@ sub init
 {
     my $self = shift( @_ );
     $self->{category} = 'LC_MESSAGES';
-    $self->{domain} = '';
+    $self->{domain} = undef;
     # We also try LANGUAGE because GNU gettext actually only recognise LANGUAGE
     # For example: LANGUAGE=fr_FR.utf-8 TEXTDOMAINDIR=./t gettext -d "com.example.api" -s "Bad Request"
     $self->{locale} = $ENV{LANG} || $ENV{LANGUAGE};
-    $self->{path}   = '';
+    $self->{path}   = undef;
     $self->{plural} = [];
     $self->{use_json} = 1;
     $self->{_init_strict_use_sub} = 1;
@@ -732,7 +732,7 @@ Text::PO::Gettext - A GNU Gettext implementation
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 

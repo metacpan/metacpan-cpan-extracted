@@ -1,0 +1,66 @@
+#!/usr/bin/env perl
+use exact;
+use exact::cli;
+
+# PODNAME: linda
+# ABSTRACT: Plausibly helpful (and probably drunk) wrapper around morbo
+our $VERSION = '1.02'; # VERSION
+
+use MojoX::Linda;
+
+sub usage ( $verbose, $message = undef ) {
+    pod2usage(
+        '-message'  => $message,
+        '-exitval'  => 1,
+        '-verbose'  => $verbose,
+        '-input'    => 'MojoX/Linda.pm',
+        '-pathlist' => \@INC,
+    );
+}
+
+my $help_man =
+    ( grep { /^\s*\-+\s*h/i } @ARGV ) ? 1 :
+    ( grep { /^\s*\-+\s*m/i } @ARGV ) ? 2 : undef;
+
+usage($help_man) if $help_man;
+
+my $conf = MojoX::Linda::conf( options( qw{
+    silent|s
+    app|a=s
+    mode|m=s
+    backend|b=s
+    listen|l=s@
+    watch|w=s@
+} ) );
+
+usage( 1, 'Unable to identify "app" implicitly' ) unless $conf->{app};
+
+exit MojoX::Linda::run($conf);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+linda - Plausibly helpful (and probably drunk) wrapper around morbo
+
+=head1 VERSION
+
+version 1.02
+
+=head1 AUTHOR
+
+Gryphon Shafer <gryphon@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023-2050 by Gryphon Shafer.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

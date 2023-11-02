@@ -1,6 +1,7 @@
 use v5.12;
+use warnings;
 
-use Test::Most;
+use Test2::V0;
 
 use HTTP::Request::Common;
 use HTTP::Status qw/ :constants status_message /;
@@ -73,7 +74,7 @@ subtest "rate limiting" => sub {
         my $res = $cb->($req);
         is $res->code, HTTP_TOO_MANY_REQUESTS, "too many requests";
 
-        is_deeply \@logs, [ { level => "warn", message => "Rate limiting 127.0.0.1 after 6/5 for default" } ], "logs";
+        is \@logs, [ { level => "warn", message => "Rate limiting 127.0.0.1 after 6/5 for default" } ], "logs";
 
         is $res->header('Retry-After'), 120, "Retry-After";
 
@@ -109,7 +110,7 @@ subtest "rate limiting (netblock)" => sub {
         my $res = $cb->($req);
         is $res->code, HTTP_TOO_MANY_REQUESTS, "too many requests";
 
-        is_deeply \@logs, [ { level => "warn", message => "Rate limiting 172.16.0.10 after 6/5 for 172.16.0.0/24" } ], "logs";
+        is \@logs, [ { level => "warn", message => "Rate limiting 172.16.0.10 after 6/5 for 172.16.0.0/24" } ], "logs";
 
       };
 
@@ -135,7 +136,7 @@ subtest "rate limiting (shared blocks)" => sub {
         my $res = $cb->($req);
         is $res->code, HTTP_TOO_MANY_REQUESTS, "too many requests";
 
-        is_deeply \@logs, [ { level => "warn", message => "Rate limiting 13.104.0.1 after 6/5 for 13.104.0.0/14" } ], "logs";
+        is \@logs, [ { level => "warn", message => "Rate limiting 13.104.0.1 after 6/5 for 13.104.0.0/14" } ], "logs";
 
       };
 
@@ -158,7 +159,7 @@ subtest "whitelisted" => sub {
             is $res->code, HTTP_OK, "request ok";
         }
 
-        is_deeply \@logs, [], "no warnings logged";
+        is \@logs, [], "no warnings logged";
 
       };
 
@@ -185,7 +186,7 @@ subtest "greylist (lower limit)" => sub {
             is $res->code, HTTP_TOO_MANY_REQUESTS, "too many requests";
         }
 
-        is_deeply \@logs, [ { level => "warn", message => "Rate limiting 107.20.17.110 after 4/3 for 107.20.0.0/14" } ], "logs";
+        is \@logs, [ { level => "warn", message => "Rate limiting 107.20.17.110 after 4/3 for 107.20.0.0/14" } ], "logs";
 
         {
             my $res = $cb->( HEAD "/", "X-Forwarded-For" => "107.20.17.111" );
@@ -212,7 +213,7 @@ subtest "greylist (blocked)" => sub {
             is $res->code, HTTP_FORBIDDEN, "forbidden";
         }
 
-        is_deeply \@logs,
+        is \@logs,
           [
             { level => "warn", message => "Rate limiting 13.67.224.13 after 1/0 for 13.64.0.0/11" },
             { level => "warn", message => "Rate limiting 13.67.224.13 after 2/0 for 13.64.0.0/11" },
@@ -242,7 +243,7 @@ subtest "greylist (higher limit)" => sub {
         my $res = $cb->($req);
         is $res->code, HTTP_TOO_MANY_REQUESTS, "too many requests";
 
-        is_deeply \@logs, [ { level => "warn", message => "Rate limiting 66.249.64.1 after 11/10 for 66.249.64.0/19" } ], "logs";
+        is \@logs, [ { level => "warn", message => "Rate limiting 66.249.64.1 after 11/10 for 66.249.64.0/19" } ], "logs";
 
       };
 

@@ -33,7 +33,9 @@ unless ( $changelog ) {
 if ($opt{check}) {
     require Test::CPAN::Changes;
     require Test::More;
-    Test::CPAN::Changes::changes_file_ok();
+    Test::CPAN::Changes::changes_file_ok($changelog || "Changes");
+    # test plan is only set when using changes_ok()
+    Test::More::done_testing();
     exit;
 }
 

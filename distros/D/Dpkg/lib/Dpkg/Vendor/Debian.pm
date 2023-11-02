@@ -184,6 +184,7 @@ sub set_build_features {
         i386
         kfreebsd-amd64
         kfreebsd-i386
+        loong64
         mips
         mips64
         mips64el
@@ -336,7 +337,7 @@ sub set_build_features {
 	#   compiler supports it incorrectly (leads to SEGV)
 	$use_feature{hardening}{stackprotector} = 0;
     }
-    if (none { $cpu eq $_ } qw(amd64 arm64 armhf armel)) {
+    if (none { $arch eq $_ } qw(amd64 arm64 armhf armel)) {
         # Stack clash protector only available on amd64 and arm.
         $use_feature{hardening}{stackclash} = 0;
     }
@@ -397,7 +398,6 @@ sub _add_build_flags {
         OBJCXXFLAGS
         FFLAGS
         FCFLAGS
-        GCJFLAGS
     );
 
     my $default_flags;
@@ -412,7 +412,9 @@ sub _add_build_flags {
     }
 
     $flags->append($_, $default_flags) foreach @compile_flags;
+    $flags->append($_ . '_FOR_BUILD', $default_flags) foreach @compile_flags;
     $flags->append('DFLAGS', $default_d_flags);
+    $flags->append('DFLAGS_FOR_BUILD', $default_d_flags);
 
     ## Area: abi
 

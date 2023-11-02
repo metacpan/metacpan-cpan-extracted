@@ -1,0 +1,468 @@
+{
+  "preamble" => "Revision history for Archer",
+  "raw_preamble" => "Revision history for Archer\n\n",
+  "releases" => [
+    {
+      "entries" => [],
+      "line" => 3,
+      "raw" => "{{\$NEXT}}\n\n",
+      "version" => "{{\$NEXT}}"
+    },
+    {
+      "date" => "2013-07-25T06:32:29Z",
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "    - fix asset_dir resolving in ConfigLoader\n",
+          "style" => "-",
+          "text" => "fix asset_dir resolving in ConfigLoader"
+        },
+        {
+          "line" => 7,
+          "raw" => "    - restore ShareDir missing in 0.14 and move asset/ to share/asset for Minilla friendly.\n",
+          "style" => "-",
+          "text" => "restore ShareDir missing in 0.14 and move asset/ to share/asset for Minilla friendly."
+        },
+        {
+          "line" => 8,
+          "raw" => "    - add error message of Archer::Util.\n\n",
+          "style" => "-",
+          "text" => "add error message of Archer::Util."
+        }
+      ],
+      "line" => 5,
+      "raw" => "0.16 2013-07-25T06:32:29Z\n",
+      "raw_date" => "2013-07-25T06:32:29Z",
+      "version" => "0.16"
+    },
+    {
+      "date" => "2013-06-18T02:20:51Z",
+      "entries" => [
+        {
+          "line" => 11,
+          "raw" => "    - fix dependencies\n",
+          "style" => "-",
+          "text" => "fix dependencies"
+        },
+        {
+          "line" => 12,
+          "raw" => "    - fix tests for perl5.17 or higher\n\n",
+          "style" => "-",
+          "text" => "fix tests for perl5.17 or higher"
+        }
+      ],
+      "line" => 10,
+      "raw" => "0.15 2013-06-18T02:20:51Z\n",
+      "raw_date" => "2013-06-18T02:20:51Z",
+      "version" => "0.15"
+    },
+    {
+      "date" => "2013-06-17T12:06:02Z",
+      "entries" => [
+        {
+          "line" => 15,
+          "raw" => "    - Switch to Minilla\n",
+          "style" => "-",
+          "text" => "Switch to Minilla"
+        },
+        {
+          "line" => 16,
+          "raw" => "    - Fixup dependencies\n",
+          "style" => "-",
+          "text" => "Fixup dependencies"
+        },
+        {
+          "line" => 17,
+          "raw" => "    - move script files to bin\n",
+          "style" => "-",
+          "text" => "move script files to bin"
+        },
+        {
+          "line" => 18,
+          "raw" => "    - fix typo in documents\n\n",
+          "style" => "-",
+          "text" => "fix typo in documents"
+        }
+      ],
+      "line" => 14,
+      "raw" => "0.14 2013-06-17T12:06:02Z\n",
+      "raw_date" => "2013-06-17T12:06:02Z",
+      "version" => "0.14"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 21,
+          "raw" => "    - add 'ready' phase.\n",
+          "style" => "-",
+          "text" => "add 'ready' phase."
+        },
+        {
+          "line" => 22,
+          "raw" => "    - appropriately handling when specified several values in --skip and --with.\n",
+          "style" => "-",
+          "text" => "appropriately handling when specified several values in --skip and --with."
+        },
+        {
+          "line" => 23,
+          "raw" => "    - remove old descriptions.\n",
+          "style" => "-",
+          "text" => "remove old descriptions."
+        },
+        {
+          "line" => 24,
+          "raw" => "    - refactor tests.\n\n",
+          "style" => "-",
+          "text" => "refactor tests."
+        }
+      ],
+      "line" => 20,
+      "raw" => "0.13\n",
+      "version" => "0.13"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 27,
+          "raw" => "    - add validate feature in Plugin::Exec::Local.\n",
+          "style" => "-",
+          "text" => "add validate feature in Plugin::Exec::Local."
+        },
+        {
+          "line" => 28,
+          "raw" => "    - depend to Test::More 0.98.\n\n",
+          "style" => "-",
+          "text" => "depend to Test::More 0.98."
+        }
+      ],
+      "line" => 26,
+      "raw" => "0.12\n",
+      "version" => "0.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 31,
+          "raw" => "    - add install_script `archer`\n",
+          "style" => "-",
+          "text" => "add install_script `archer`"
+        },
+        {
+          "line" => 32,
+          "raw" => "    - fix shebang in archer.pl and arher\n",
+          "style" => "-",
+          "text" => "fix shebang in archer.pl and arher"
+        },
+        {
+          "line" => 33,
+          "raw" => "    - set default assets path to share_dir\n\n",
+          "style" => "-",
+          "text" => "set default assets path to share_dir"
+        }
+      ],
+      "line" => 30,
+      "raw" => "0.11\n",
+      "version" => "0.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 37,
+          "raw" => "    - hide from pause SVN::Agent\n\n",
+          "style" => "-",
+          "text" => "hide from pause SVN::Agent"
+        }
+      ],
+      "line" => 35,
+      "raw" => "0.10\n\n",
+      "version" => "0.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 41,
+          "raw" => "    - add feature to specify multi roles in config.yaml\n",
+          "style" => "-",
+          "text" => "add feature to specify multi roles in config.yaml"
+        },
+        {
+          "line" => 42,
+          "raw" => "    - use IO::Prompt::Simple instead of IO::Prompt, because IO::Prompt doesn't work in perl-5.14 after.\n",
+          "style" => "-",
+          "text" => "use IO::Prompt::Simple instead of IO::Prompt, because IO::Prompt doesn't work in perl-5.14 after."
+        },
+        {
+          "line" => 43,
+          "raw" => "    - add feature to specify role in command line option\n",
+          "style" => "-",
+          "text" => "add feature to specify role in command line option"
+        },
+        {
+          "line" => 44,
+          "raw" => "    - role support in Archer::Schell\n\n",
+          "style" => "-",
+          "text" => "role support in Archer::Schell"
+        }
+      ],
+      "line" => 39,
+      "raw" => "0.09\n\n",
+      "version" => "0.09"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 48,
+          "raw" => "    commit 239829c5d2fd0a15abdbecbe593146c466905c3c\n",
+          "style" => "",
+          "text" => "commit 239829c5d2fd0a15abdbecbe593146c466905c3c"
+        },
+        {
+          "line" => 49,
+          "raw" => "    Author: Masayuki Matsuki <y.songmu\@gmail.com>\n",
+          "style" => "",
+          "text" => "Author: Masayuki Matsuki <y.songmu\@gmail.com>"
+        },
+        {
+          "line" => 50,
+          "raw" => "    Date:   Wed Dec 14 19:13:15 2011 +0900\n\n",
+          "style" => "",
+          "text" => "Date:   Wed Dec 14 19:13:15 2011 +0900"
+        },
+        {
+          "line" => 52,
+          "raw" => "    stringify \$rsync->out and \$rsync->err for log.\n\n",
+          "style" => "",
+          "text" => "stringify \$rsync->out and \$rsync->err for log."
+        },
+        {
+          "line" => 54,
+          "raw" => "    File::Rsync::out and File::Rsync::err retruns array in array context,\n",
+          "style" => "",
+          "text" => "File::Rsync::out and File::Rsync::err retruns array in array context,"
+        },
+        {
+          "line" => 55,
+          "raw" => "    and retruns array ref in scalar context.\n\n",
+          "style" => "",
+          "text" => "and retruns array ref in scalar context."
+        },
+        {
+          "line" => 57,
+          "raw" => "    lib/Archer/Plugin/Rsync.pm |    4 ++--\n",
+          "style" => "",
+          "text" => "lib/Archer/Plugin/Rsync.pm |    4 ++--"
+        },
+        {
+          "line" => 58,
+          "raw" => "    1 files changed, 2 insertions(+), 2 deletions(-)\n\n",
+          "style" => "",
+          "text" => "1 files changed, 2 insertions(+), 2 deletions(-)"
+        }
+      ],
+      "line" => 46,
+      "raw" => "0.08\n\n",
+      "version" => "0.08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 62,
+          "raw" => "    * b3ab89f re-packaging\n",
+          "style" => "*",
+          "text" => "b3ab89f re-packaging"
+        },
+        {
+          "line" => 63,
+          "raw" => "    * 5fbafad use_test_base sucks\n",
+          "style" => "*",
+          "text" => "5fbafad use_test_base sucks"
+        },
+        {
+          "line" => 64,
+          "raw" => "    * 08c7ad2  shell\343\203\242\343\203\274\343\203\211\343\201\256 {on,with} ... do ... \345\275\242\345\274\217\343\201\250 !task {on,with} ...\345\275\242\345\274\217\343\201\214\345\213\225\343\201\217\343\202\210 \343\201\206\343\201\253\343\201\227\343\201\237\343\200\202 \343\203\206\343\202\271\343\203\210\343\202\263\343\203\274\343\203\211\343\202\202\350\277\275\345\212\240\343\200\202\n",
+          "style" => "*",
+          "text" => "08c7ad2  shell\343\203\242\343\203\274\343\203\211\343\201\256 {on,with} ... do ... \345\275\242\345\274\217\343\201\250 !task {on,with} ...\345\275\242\345\274\217\343\201\214\345\213\225\343\201\217\343\202\210 \343\201\206\343\201\253\343\201\227\343\201\237\343\200\202 \343\203\206\343\202\271\343\203\210\343\202\263\343\203\274\343\203\211\343\202\202\350\277\275\345\212\240\343\200\202"
+        },
+        {
+          "line" => 65,
+          "raw" => "    * dd059b7 'role' should be here :p\n",
+          "style" => "*",
+          "text" => "dd059b7 'role' should be here :p"
+        },
+        {
+          "line" => 66,
+          "raw" => "    * 97e332b \343\203\215\343\202\271\343\203\210\343\201\227\343\201\237for\343\203\253\343\203\274\343\203\227\343\201\256\347\275\240\343\201\253\343\203\217\343\203\236\343\201\243\343\201\237\n",
+          "style" => "*",
+          "text" => "97e332b \343\203\215\343\202\271\343\203\210\343\201\227\343\201\237for\343\203\253\343\203\274\343\203\227\343\201\256\347\275\240\343\201\253\343\203\217\343\203\236\343\201\243\343\201\237"
+        },
+        {
+          "line" => 67,
+          "raw" => "    * 2dcb78c fixed log level.\n",
+          "style" => "*",
+          "text" => "2dcb78c fixed log level."
+        },
+        {
+          "line" => 68,
+          "raw" => "    * 2277280 added with option for do deploy with skip_default tasks.\n",
+          "style" => "*",
+          "text" => "2277280 added with option for do deploy with skip_default tasks."
+        },
+        {
+          "line" => 69,
+          "raw" => "    * 9cc7ea9 added skip_default setting for none-always-need task.\n",
+          "style" => "*",
+          "text" => "9cc7ea9 added skip_default setting for none-always-need task."
+        },
+        {
+          "line" => 70,
+          "raw" => "    * 7cc348c not \$plugin but \$args.\n",
+          "style" => "*",
+          "text" => "7cc348c not \$plugin but \$args."
+        },
+        {
+          "line" => 71,
+          "raw" => "    * 62d4b85 fixed indent.\n",
+          "style" => "*",
+          "text" => "62d4b85 fixed indent."
+        },
+        {
+          "line" => 72,
+          "raw" => "    * afbe53f added --log_level option for debuging setting.\n",
+          "style" => "*",
+          "text" => "afbe53f added --log_level option for debuging setting."
+        },
+        {
+          "line" => 73,
+          "raw" => "    * 6e6a6ef added only feature.\n",
+          "style" => "*",
+          "text" => "6e6a6ef added only feature."
+        },
+        {
+          "line" => 74,
+          "raw" => "    * 2fc1822 Added project filter for project only task. Tweaked info message.\n\n",
+          "style" => "*",
+          "text" => "2fc1822 Added project filter for project only task. Tweaked info message."
+        }
+      ],
+      "line" => 60,
+      "raw" => "0.07\n\n",
+      "version" => "0.07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 78,
+          "raw" => "    - added YAML::Syck support\n",
+          "style" => "-",
+          "text" => "added YAML::Syck support"
+        },
+        {
+          "line" => 79,
+          "raw" => "    - specify assets path in config.yaml\n\n",
+          "style" => "-",
+          "text" => "specify assets path in config.yaml"
+        }
+      ],
+      "line" => 76,
+      "raw" => "0.06\n\n",
+      "version" => "0.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 83,
+          "raw" => "    - Plugin::Flock: added\n",
+          "style" => "-",
+          "text" => "Plugin::Flock: added"
+        },
+        {
+          "line" => 84,
+          "raw" => "    - Plugin::Confirm: support timeout\n",
+          "style" => "-",
+          "text" => "Plugin::Confirm: support timeout"
+        },
+        {
+          "line" => 85,
+          "raw" => "    - Plugin::Exec::Remote: do not use sudo when does not specify user name in configuration(by mizzy++)\n",
+          "style" => "-",
+          "text" => "Plugin::Exec::Remote: do not use sudo when does not specify user name in configuration(by mizzy++)"
+        },
+        {
+          "line" => 86,
+          "raw" => "    - fixed some test problem.\n\n",
+          "style" => "-",
+          "text" => "fixed some test problem."
+        }
+      ],
+      "line" => 81,
+      "raw" => "0.05\n\n",
+      "version" => "0.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 90,
+          "raw" => "    - fixed test script.\n",
+          "style" => "-",
+          "text" => "fixed test script."
+        },
+        {
+          "line" => 91,
+          "raw" => "    - no feature changes.\n\n",
+          "style" => "-",
+          "text" => "no feature changes."
+        }
+      ],
+      "line" => 88,
+      "raw" => "0.04\n\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 95,
+          "raw" => "    - fixed test.\n",
+          "style" => "-",
+          "text" => "fixed test."
+        },
+        {
+          "line" => 96,
+          "raw" => "    - no feature changes.\n\n",
+          "style" => "-",
+          "text" => "no feature changes."
+        }
+      ],
+      "line" => 93,
+      "raw" => "0.03\n\n",
+      "version" => "0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 100,
+          "raw" => "    - initial cpan release.\n\n",
+          "style" => "-",
+          "text" => "initial cpan release."
+        }
+      ],
+      "line" => 98,
+      "raw" => "0.02\n\n",
+      "version" => "0.02"
+    },
+    {
+      "date" => "2006-10-06T12:38:02Z",
+      "entries" => [
+        {
+          "line" => 103,
+          "raw" => "       Initial release.\n\n",
+          "style" => "",
+          "text" => "Initial release."
+        }
+      ],
+      "line" => 102,
+      "raw" => "0.01  Fri Oct  6 12:38:02 2006\n",
+      "raw_date" => "Fri Oct  6 12:38:02 2006",
+      "version" => "0.01"
+    }
+  ]
+}

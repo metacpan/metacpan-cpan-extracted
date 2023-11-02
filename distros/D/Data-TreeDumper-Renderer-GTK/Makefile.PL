@@ -7,7 +7,7 @@ WriteMakefile(
     'PREREQ_PM'		=> 
 	{
 	Glib => 0,
-	Gtk2 => 0,
+	Gtk3 => 0,
 	Cairo => 0,
 	Data::TreeDumper => 0.33,
 	}, 

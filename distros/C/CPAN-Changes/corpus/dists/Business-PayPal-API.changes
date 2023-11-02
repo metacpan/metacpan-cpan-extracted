@@ -1,0 +1,207 @@
+Revision history for Perl extension Business::PayPal::API.
+
+Release 0.71
+-------------------------------------------
+
+- Merge in changes from Ron Phipps.
+  - Reduce SOAP version requirement.
+  - Protection eligibility support.
+- Merge in changes from Tomas Doran.
+  - CPAN packaging enhancements.
+- Extract out more payer details from XML. (PayerName, NameSuffix, PayerCountry).
+- Fix https://rt.cpan.org/Public/Bug/Display.html?id=67386
+
+Release 0.70 - First OALDERS release
+-------------------------------------
+- Fixes RT #70424 (Syntax deprecated in perl v5.14)
+>>>>>>> Fixes RT #70424 and bumps version to 0.70 for release.
+
+Release 0.68 - First hembreed release
+-------------------------------------
+I've moved the module's scm to http://github.com/hembreed/Business-PayPal-API so others may share my pain. CPAN will be updated from there.
+
+- API.pm
+   1. Changed eq 'Success' to =~ /Success/ to accomodate variations introduced
+      by PayPal.
+   2. Changed test for duplicates to test for defined variable first. This
+      was causing errors in 5.10+ perl versions.
+-t/*t Changed test for Success in all test modules as above
+-t/RecurringPayments Corrected errors in type definitions and testing. Needs more work.
+-TransactionSearch Corrected test instructions and code to allow transaction searches using the transactionID. This works for some types of transactions but not others as per PayPal. It is   the only way to get MassPayment information.
+
+Release 0.62 - last scottw release
+----------------------------
+revision 1.24
+date: 2009/07/28 18:00:58;  author: scott;  state: Exp;  lines: +44 -4
+- getFields() returns an array ref if multiple values are returned
+  from PayPal, otherwise it behaves as it always did, returning a
+  non-ref scalar.
+- BillingAgreement information returned in ExpressCheckout
+- Fix GetTransactionDetails 'PII_SalesTax' parameter
+- Fix GetTransactionDetails to return multiple PaymentItems
+- Fix MassPay to use the correct UniqueID parameter
+- Add DoReferenceTransaction to RecurringPayments API
+- Lots of credit given to great folks with patches in API docs
+
+Thanks everyone! I'm handing this module off to Danny Hembree for
+maintenance now.
+
+Release 0.61
+----------------------------
+revision 1.23
+date: 2008/05/05 15:10:40;  author: scott;  state: Exp;  lines: +37 -5
+- timeout setting available
+- additional troubleshooting documentation (auth error handling, URL munging)
+----------------------------
+revision 1.4 [DirectPayments.pm]
+date: 2008/05/05 15:11:14;  author: scott;  state: Exp;  lines: +34 -2
+- add shipto parameters
+----------------------------
+revision 1.12 [ExpressCheckout.pm]
+date: 2008/05/05 15:11:51;  author: scott;  state: Exp;  lines: +11 -3
+- MaxAmount parameter take currencyID attribute (Sandbox)
+----------------------------
+revision 1.1 [RecurringPayments.pm]
+date: 2008/05/05 15:15:04;  author: scott;  state: Exp;
+- add base for RecurringPayments (not working yet)
+
+Release 0.51
+----------------------------
+revision 1.22
+date: 2007/09/27 20:32:31;  author: scott;  state: Exp;  lines: +18 -6
+- [API.pm] add three-token signature testing URI (Oliver Ready)
+- [DirectPayments.pm] add ShippingTotal field (patch: Michael Hendricks)
+- [VoidRequest.pm] documentation fixes for method call (Oliver Ready)
+- [ReauthorizationRequest.pm] documentation fixes for method call (Oliver Ready)
+
+Release 0.51
+----------------------------
+revision 1.10
+date: 2007/08/29 20:56:42;  author: scott;  state: Exp;  lines: +4 -2
+- fix PayerStatus location in DOM, add AddressStatus element (patch: Michael Hendricks)
+
+Release 0.50
+----------------------------
+revision 1.20
+date: 2007/05/21 21:59:33;  author: scott;  state: Exp;  lines: +5 -5
+- minor doc changes
+- new Mass Pay API module included
+----------------------------
+
+Release 0.41
+----------------------------
+revision 1.19
+date: 2007/05/15 20:46:56;  author: scott;  state: Exp;  lines: +34 -12
+- some minor documentation additions
+
+Release 0.40
+----------------------------
+revision 1.18
+date: 2006/10/06 17:53:44;  author: scott;  state: Exp;  lines: +2 -2
+- version bump
+----------------------------
+revision 1.17
+date: 2006/10/06 17:49:50;  author: scott;  state: Exp;  lines: +42 -38
+- using PayPal API version 2.0
+- note about SSL requirements of LWP
+- minor documentation cleanup
+- DirectPayments tests added
+- New modules (with tests!) from Danny Hembree:
+  AuthorizationRequest.pm
+  CaptureRequest.pm
+  ReauthorizationRequest.pm
+  VoidRequest.pm
+----------------------------
+revision 1.16
+date: 2006/07/06 15:25:21;  author: scott;  state: Exp;  lines: +9 -2
+- add acknowledgement and pointers to example code from Andy Spiegl and others
+
+Release 0.33
+----------------------------
+revision 1.15
+date: 2006/07/05 18:05:39;  author: scott;  state: Exp;  lines: +2 -2
+- fix documentation regarding SetExpressCheckout (returns a hash, not
+  a scalar). If you were following the code in the SYNOPSIS for
+  ExpressCheckout and getting a token with '3/8' or '4/8', you should
+  change the $token to %response, since SetExpressCheckout() returns a
+  hash (big thanks to Andy Spiegl for finding this).
+
+Release 0.32
+----------------------------
+revision 1.14
+date: 2006/07/03 15:46:24;  author: scott;  state: Exp;  lines: +16 -1
+- acknowledgements section
+----------------------------
+revision 1.13
+date: 2006/07/03 15:40:16;  author: scott;  state: Exp;  lines: +11 -2
+- fix for 3-token auth
+
+Release 0.31
+----------------------------
+revision 1.12
+date: 2006/06/29 02:36:24;  author: scott;  state: Exp;  lines: +2 -2
+- fix StateOrProvince typo [rt.cpan.org #20176]
+
+Release 0.30
+----------------------------
+revision 1.11
+date: 2006/04/18 16:23:18;  author: scott;  state: Exp;  lines: +2 -2
+- added DirectPayments API by Daniel Hembree. Thanks Daniel!
+
+Release 0.23
+----------------------------
+revision 1.10
+date: 2006/04/04 19:29:08;  author: scott;  state: Exp;  lines: +12 -5
+- typo fix
+- wrap soap call in eval for safety (if ssl neg. fails w/ paypal, it croaks)
+- version bump
+
+Release 0.22
+----------------------------
+revision 1.9
+date: 2006/03/28 18:05:03;  author: scott;  state: Exp;  lines: +54 -44
+- documentation updates
+
+Release 0.21
+----------------------------
+revision 1.8
+date: 2006/03/24 17:12:59;  author: scott;  state: Exp;  lines: +14 -4
+- fix fault printing
+- fix getFieldsList record population
+
+Release 0.20
+----------------------------
+revision 1.7
+date: 2006/03/23 17:28:10;  author: scott;  state: Exp;  lines: +90 -9
+- allow subclass methods to be imported into API.pm namespace
+----------------------------
+revision 1.6
+date: 2006/03/22 23:20:09;  author: scott;  state: Exp;  lines: +2 -2
+- version bump
+----------------------------
+revision 1.5
+date: 2006/03/22 23:19:03;  author: scott;  state: Exp;  lines: +40 -13
+- add GetTransactionDetails API
+- add TransactionSearch API
+- getFieldList() for API.pm
+----------------------------
+revision 1.4
+date: 2006/03/21 22:15:11;  author: scott;  state: Exp;  lines: +2 -2
+- bump version
+----------------------------
+revision 1.3
+date: 2006/03/21 22:05:19;  author: scott;  state: Exp;  lines: +55 -31
+- minor debugging changes
+- documentation update for developers
+- note about using IO::Socket::SSL (don't)
+----------------------------
+revision 1.2
+date: 2006/03/16 23:33:49;  author: scott;  state: Exp;  lines: +184 -26
+- initial checkin of API and subclasses
+- all tests working, documentation done
+----------------------------
+revision 1.1
+date: 2006/03/15 23:33:53;  author: scott;  state: Exp;
+- moved from Business::PayPal::WPP::ExpressCheckout
+- uses API.pm for authorization/authentication and other common functions
+=============================================================================

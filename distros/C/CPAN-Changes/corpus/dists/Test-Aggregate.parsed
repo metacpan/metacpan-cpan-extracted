@@ -1,0 +1,980 @@
+{
+  "preamble" => "Revision history for Test-Aggregate",
+  "raw_preamble" => "Revision history for Test-Aggregate\n\n",
+  "releases" => [
+    {
+      "date" => "2013-08-14",
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "        - Fix tests on windows\n\n",
+          "style" => "-",
+          "text" => "Fix tests on windows"
+        }
+      ],
+      "line" => 3,
+      "raw" => "0.368  2013-08-14\n",
+      "raw_date" => "2013-08-14",
+      "version" => "0.368"
+    },
+    {
+      "date" => "2013-08-13",
+      "entries" => [
+        {
+          "line" => 7,
+          "raw" => "        - Improve Test::Aggregate::Nested error handling:\n          Don't treat undef as a failure;\n          Show a warning and let Test::More::subtest() determine the result.\n          This solves the false negative reported in\n          https://rt.cpan.org/Public/Bug/Display.html?id=87240\n          Thanks to the venerable Andreas J. K\303\266nig for reporting!\n",
+          "style" => "-",
+          "text" => "Improve Test::Aggregate::Nested error handling: Don't treat undef as a failure; Show a warning and let Test::More::subtest() determine the result. This solves the false negative reported in https://rt.cpan.org/Public/Bug/Display.html?id=87240 Thanks to the venerable Andreas J. K\303\266nig for reporting!"
+        },
+        {
+          "line" => 13,
+          "raw" => "        - Add more tests.\n",
+          "style" => "-",
+          "text" => "Add more tests."
+        },
+        {
+          "line" => 14,
+          "raw" => "        - Actually include previously added tests to the dist\n          (Where are you Dist::Zilla?)\n\n",
+          "style" => "-",
+          "text" => "Actually include previously added tests to the dist (Where are you Dist::Zilla?)"
+        }
+      ],
+      "line" => 6,
+      "raw" => "0.367  2013-08-13\n",
+      "raw_date" => "2013-08-13",
+      "version" => "0.367"
+    },
+    {
+      "date" => "2013-07-11",
+      "entries" => [
+        {
+          "line" => 18,
+          "raw" => "        - Update metadata; Re-release to reindex with additional permissions\n\n",
+          "style" => "-",
+          "text" => "Update metadata; Re-release to reindex with additional permissions"
+        }
+      ],
+      "line" => 17,
+      "raw" => "0.366  2013-07-11\n",
+      "raw_date" => "2013-07-11",
+      "version" => "0.366"
+    },
+    {
+      "date" => "2013-07-10",
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 23,
+              "raw" => "            - The problem was that the \$verbose option was hard-coded as\n              '2' deep inside the module.\n",
+              "style" => "-",
+              "text" => "The problem was that the \$verbose option was hard-coded as '2' deep inside the module."
+            }
+          ],
+          "line" => 21,
+          "raw" => "        - Avoid printing unnecessary \"ok - \"'s diag()s when they are passing,\n          and when the 'verbose' option is set to 0.\n",
+          "style" => "-",
+          "text" => "Avoid printing unnecessary \"ok - \"'s diag()s when they are passing, and when the 'verbose' option is set to 0."
+        },
+        {
+          "line" => 25,
+          "raw" => "        - Catch errors in tests under Test::Aggregate::Nested; report as ok(0)\n",
+          "style" => "-",
+          "text" => "Catch errors in tests under Test::Aggregate::Nested; report as ok(0)"
+        },
+        {
+          "line" => 26,
+          "raw" => "        - Pod fixes\n",
+          "style" => "-",
+          "text" => "Pod fixes"
+        },
+        {
+          "line" => 27,
+          "raw" => "        - Update repository metadata\n\n",
+          "style" => "-",
+          "text" => "Update repository metadata"
+        }
+      ],
+      "line" => 20,
+      "raw" => "0.365  2013-07-10\n",
+      "raw_date" => "2013-07-10",
+      "version" => "0.365"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 30,
+          "raw" => "        - Allow skipping the rest of a test using\n            plan skip_all => \$reason\n\n",
+          "style" => "-",
+          "text" => "Allow skipping the rest of a test using plan skip_all => \$reason"
+        }
+      ],
+      "line" => 29,
+      "note" => "04/12/2010",
+      "raw" => "0.364  04/12/2010\n",
+      "version" => "0.364"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 34,
+          "raw" => "        - Pass current test name to setup and teardown.\n\n",
+          "style" => "-",
+          "text" => "Pass current test name to setup and teardown."
+        }
+      ],
+      "line" => 33,
+      "note" => "24/11/2009",
+      "raw" => "0.363  24/11/2009\n",
+      "version" => "0.363"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 37,
+          "raw" => "        - Removed broken \"check_plan\" from Test::Aggregate.  It was always\n          dodgy and really doesn't contribute much and the latest release\n          broke with 'no_plan'.  We now warn if we see this.\n",
+          "style" => "-",
+          "text" => "Removed broken \"check_plan\" from Test::Aggregate.  It was always dodgy and really doesn't contribute much and the latest release broke with 'no_plan'.  We now warn if we see this."
+        },
+        {
+          "line" => 40,
+          "raw" => "        - Minimum Test::More is now 0.94.  This gives us more robust nested\n          TAP.\n\n",
+          "style" => "-",
+          "text" => "Minimum Test::More is now 0.94.  This gives us more robust nested TAP."
+        }
+      ],
+      "line" => 36,
+      "note" => "17/11/2009",
+      "raw" => "0.362  17/11/2009\n",
+      "version" => "0.362"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 44,
+          "raw" => "        - Keep Makefile.PL in synch.  Reported by Andreas Koenig\n          (https://rt.cpan.org/Ticket/Display.html?id=50673)\n\n",
+          "style" => "-",
+          "text" => "Keep Makefile.PL in synch.  Reported by Andreas Koenig (https://rt.cpan.org/Ticket/Display.html?id=50673)"
+        }
+      ],
+      "line" => 43,
+      "note" => "20/10/2009",
+      "raw" => "0.361   20/10/2009\n",
+      "version" => "0.361"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 48,
+          "raw" => "        - Mark for production.\n",
+          "style" => "-",
+          "text" => "Mark for production."
+        },
+        {
+          "line" => 49,
+          "raw" => "        - Removed 'dump.t' files in tests.\n",
+          "style" => "-",
+          "text" => "Removed 'dump.t' files in tests."
+        },
+        {
+          "line" => 50,
+          "raw" => "        - Improve Test::Aggregate::Nested docs.\n",
+          "style" => "-",
+          "text" => "Improve Test::Aggregate::Nested docs."
+        },
+        {
+          "line" => 51,
+          "raw" => "        - Removed some dead code.\n",
+          "style" => "-",
+          "text" => "Removed some dead code."
+        },
+        {
+          "line" => 52,
+          "raw" => "        - Suppress multiple plans (#48352, Chisel Wright)\n\n",
+          "style" => "-",
+          "text" => "Suppress multiple plans (#48352, Chisel Wright)"
+        }
+      ],
+      "line" => 47,
+      "note" => "18/10/2009",
+      "raw" => "0.36    18/10/2009\n",
+      "version" => "0.36"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 55,
+          "raw" => "        - Added missing files to MANIFEST.\n\n",
+          "style" => "-",
+          "text" => "Added missing files to MANIFEST."
+        }
+      ],
+      "line" => 54,
+      "note" => "19/08/2009",
+      "raw" => "0.35_07 19/08/2009\n",
+      "version" => "0.35_07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 58,
+          "raw" => "        - Added support for nested TAP via Test::Aggregate::Nested.\n",
+          "style" => "-",
+          "text" => "Added support for nested TAP via Test::Aggregate::Nested."
+        },
+        {
+          "line" => 59,
+          "raw" => "        - I really, really need to get a real release out.\n\n",
+          "style" => "-",
+          "text" => "I really, really need to get a real release out."
+        }
+      ],
+      "line" => 57,
+      "note" => "28/06/2009",
+      "raw" => "0.35_06 28/06/2009\n",
+      "version" => "0.35_06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 62,
+          "raw" => "        - Removed bogus test file throwing my counts off.  No wonder all tests\n          were failing for people!\n",
+          "style" => "-",
+          "text" => "Removed bogus test file throwing my counts off.  No wonder all tests were failing for people!"
+        },
+        {
+          "line" => 64,
+          "raw" => "        - Remove development lib links.\n\n",
+          "style" => "-",
+          "text" => "Remove development lib links."
+        }
+      ],
+      "line" => 61,
+      "note" => "20/05/2009",
+      "raw" => "0.35_05 20/05/2009\n",
+      "version" => "0.35_05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 67,
+          "raw" => "        - Unlink dump files in tests.\n\n",
+          "style" => "-",
+          "text" => "Unlink dump files in tests."
+        }
+      ],
+      "line" => 66,
+      "note" => "Unreleased.",
+      "raw" => "0.35_04 Unreleased.\n",
+      "version" => "0.35_04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 70,
+          "raw" => "        - Don't run done_testing() in tests if it doesn't exist.\n\n",
+          "style" => "-",
+          "text" => "Don't run done_testing() in tests if it doesn't exist."
+        }
+      ],
+      "line" => 69,
+      "note" => "15/05/2009",
+      "raw" => "0.35_03 15/05/2009\n",
+      "version" => "0.35_03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 73,
+          "raw" => "        - Deprecate tests run in BEGIN/END/CHECK/INIT.\n          See http://use.perl.org/~Ovid/journal/38974 for more information.\n",
+          "style" => "-",
+          "text" => "Deprecate tests run in BEGIN/END/CHECK/INIT. See http://use.perl.org/~Ovid/journal/38974 for more information."
+        },
+        {
+          "line" => 75,
+          "raw" => "        - check_plan, if set, is now done at the end of each test instead of\n          the end of all tests.\n",
+          "style" => "-",
+          "text" => "check_plan, if set, is now done at the end of each test instead of the end of all tests."
+        },
+        {
+          "line" => 77,
+          "raw" => "        - Make it work with the Test::Builder 0.88 and previous versions.\n",
+          "style" => "-",
+          "text" => "Make it work with the Test::Builder 0.88 and previous versions."
+        },
+        {
+          "line" => 78,
+          "raw" => "        - Embed the calling test script name in a comment at the top of the\n          dump file.\n",
+          "style" => "-",
+          "text" => "Embed the calling test script name in a comment at the top of the dump file."
+        },
+        {
+          "line" => 80,
+          "raw" => "        - Fix a doc typo (thanks to Offer Kaye for the report)\n",
+          "style" => "-",
+          "text" => "Fix a doc typo (thanks to Offer Kaye for the report)"
+        },
+        {
+          "line" => 81,
+          "raw" => "        - Cleaned up some tests.\n\n",
+          "style" => "-",
+          "text" => "Cleaned up some tests."
+        }
+      ],
+      "line" => 72,
+      "note" => "14/05/2009",
+      "raw" => "0.35_02 14/05/2009\n",
+      "version" => "0.35_02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 84,
+          "raw" => "        - Make 'exit()' scream loudly if called.\n",
+          "style" => "-",
+          "text" => "Make 'exit()' scream loudly if called."
+        },
+        {
+          "line" => 85,
+          "raw" => "        - Move Test::Aggregate::Builder globals into a hashref in the object.\n          Further encapsulation to come later.\n",
+          "style" => "-",
+          "text" => "Move Test::Aggregate::Builder globals into a hashref in the object. Further encapsulation to come later."
+        },
+        {
+          "line" => 87,
+          "raw" => "        - Export &run_this_test_program from Test::Aggregate to make dump\n          files cleaner.\n",
+          "style" => "-",
+          "text" => "Export &run_this_test_program from Test::Aggregate to make dump files cleaner."
+        },
+        {
+          "line" => 89,
+          "raw" => "        - Reorganize the test suite to avoid false negatives.\n\n",
+          "style" => "-",
+          "text" => "Reorganize the test suite to avoid false negatives."
+        }
+      ],
+      "line" => 83,
+      "note" => "18/11/2008",
+      "raw" => "0.35_01 18/11/2008\n",
+      "version" => "0.35_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 92,
+          "raw" => "        - Move from developer to production version number.\n",
+          "style" => "-",
+          "text" => "Move from developer to production version number."
+        },
+        {
+          "line" => 93,
+          "raw" => "        - Add 'use Test::Aggregate' to the dump file.\n",
+          "style" => "-",
+          "text" => "Add 'use Test::Aggregate' to the dump file."
+        },
+        {
+          "line" => 94,
+          "raw" => "        - Updated the docs to explain that the C<Test::More> functions are\n          re-exported.\n\n",
+          "style" => "-",
+          "text" => "Updated the docs to explain that the C<Test::More> functions are re-exported."
+        }
+      ],
+      "line" => 91,
+      "note" => "27/10/2008",
+      "raw" => "0.35    27/10/2008\n",
+      "version" => "0.35"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 98,
+          "raw" => "        - Added 'tests' key to the constructor.  This is an optional method of\n          identifying which tests you wish to aggregate.\n\n",
+          "style" => "-",
+          "text" => "Added 'tests' key to the constructor.  This is an optional method of identifying which tests you wish to aggregate."
+        }
+      ],
+      "line" => 97,
+      "note" => "15/10/2008",
+      "raw" => "0.34_09 15/10/2008\n",
+      "version" => "0.34_09"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 102,
+          "raw" => "        - Much refactoring of internals.  This moves some autogenerated code\n          directly into the Test::Aggregate namespace and Test::Aggregate->run\n          calls this code directly to better synchronize behavior between\n          running the code and running the dump file.  This has the side\n          effect of making individual test files much easier to find and read\n          and makes the 'dump.t' file smaller.\n",
+          "style" => "-",
+          "text" => "Much refactoring of internals.  This moves some autogenerated code directly into the Test::Aggregate namespace and Test::Aggregate->run calls this code directly to better synchronize behavior between running the code and running the dump file.  This has the side effect of making individual test files much easier to find and read and makes the 'dump.t' file smaller."
+        },
+        {
+          "line" => 108,
+          "raw" => "        - Fixed a bug where a test dieing could cause the wrong test to be\n          reported as failing.\n",
+          "style" => "-",
+          "text" => "Fixed a bug where a test dieing could cause the wrong test to be reported as failing."
+        },
+        {
+          "line" => 110,
+          "raw" => "        - Removed %INC from the list of localized variables.  Localazing this\n          doesn't remove the code from the symbol tables, so attempting to\n          later reload this code leads to strange failures.\n\n",
+          "style" => "-",
+          "text" => "Removed %INC from the list of localized variables.  Localazing this doesn't remove the code from the symbol tables, so attempting to later reload this code leads to strange failures."
+        }
+      ],
+      "line" => 101,
+      "note" => "14/10/2008",
+      "raw" => "0.34_08 14/10/2008\n",
+      "version" => "0.34_08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 115,
+          "raw" => "        - Fixed bug where dump file tests would fail if check_plan is set to\n          true.\n",
+          "style" => "-",
+          "text" => "Fixed bug where dump file tests would fail if check_plan is set to true."
+        },
+        {
+          "line" => 117,
+          "raw" => "        - Common environment variables are now localized on a \"per test file\"\n          basis.\n",
+          "style" => "-",
+          "text" => "Common environment variables are now localized on a \"per test file\" basis."
+        },
+        {
+          "line" => 119,
+          "raw" => "        - Make the \"5.006\" requirement explicit in the Build.PL and\n          Makefile.PL scripts.\n\n",
+          "style" => "-",
+          "text" => "Make the \"5.006\" requirement explicit in the Build.PL and Makefile.PL scripts."
+        }
+      ],
+      "line" => 114,
+      "note" => "13/10/2008",
+      "raw" => "0.34_07 13/10/2008\n",
+      "version" => "0.34_07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 123,
+          "raw" => "        - Skip findbin test if FindBin < 1.47.  Seems to cause test failures\n          as FindBin *appears* to be getting confused by the setting of \$0,\n          but I'm not sure yet as I don't have an older Perl installed.\n\n",
+          "style" => "-",
+          "text" => "Skip findbin test if FindBin < 1.47.  Seems to cause test failures as FindBin *appears* to be getting confused by the setting of \$0, but I'm not sure yet as I don't have an older Perl installed."
+        }
+      ],
+      "line" => 122,
+      "note" => "21/10/2008",
+      "raw" => "0.34_06 21/10/2008\n",
+      "version" => "0.34_06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 128,
+          "raw" => "        - Changed 'unlink dump.t or die' to a warn (tests only).\n\n",
+          "style" => "-",
+          "text" => "Changed 'unlink dump.t or die' to a warn (tests only)."
+        }
+      ],
+      "line" => 127,
+      "note" => "19/09/2008",
+      "raw" => "0.34_05 19/09/2008\n",
+      "version" => "0.34_05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 131,
+          "raw" => "        - Fixed major regression where --dry was eliminated and test counts (X\n          of Y tests) were eliminated.\n",
+          "style" => "-",
+          "text" => "Fixed major regression where --dry was eliminated and test counts (X of Y tests) were eliminated."
+        },
+        {
+          "line" => 133,
+          "raw" => "        - Automatically build a proper Makefile.PL.\n",
+          "style" => "-",
+          "text" => "Automatically build a proper Makefile.PL."
+        },
+        {
+          "line" => 134,
+          "raw" => "        - Add FindBin to the dependencies.\n",
+          "style" => "-",
+          "text" => "Add FindBin to the dependencies."
+        },
+        {
+          "line" => 135,
+          "raw" => "        - Major refactoring of internals to make debugging dump files much\n          cleaner and easier (and reduce their size, while we're at it).\n\n",
+          "style" => "-",
+          "text" => "Major refactoring of internals to make debugging dump files much cleaner and easier (and reduce their size, while we're at it)."
+        }
+      ],
+      "line" => 130,
+      "note" => "18/09/2008",
+      "raw" => "0.34_03 18/09/2008\n",
+      "version" => "0.34_03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 139,
+          "raw" => "        - Again cleaned up dump file generated when running tests.  Need to\n          guard against that better.  Also removed it from the MANIFEST.\n\n",
+          "style" => "-",
+          "text" => "Again cleaned up dump file generated when running tests.  Need to guard against that better.  Also removed it from the MANIFEST."
+        }
+      ],
+      "line" => 138,
+      "note" => "15/09/2008",
+      "raw" => "0.34_03 15/09/2008\n",
+      "version" => "0.34_03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 143,
+          "raw" => "        - Allow skip_all tests.\n\n",
+          "style" => "-",
+          "text" => "Allow skip_all tests."
+        }
+      ],
+      "line" => 142,
+      "note" => "14/09/2008",
+      "raw" => "0.34_02 14/09/2008\n",
+      "version" => "0.34_02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 146,
+          "raw" => "        - Add an option to reinitialize FindBin for each aggregated test.\n",
+          "style" => "-",
+          "text" => "Add an option to reinitialize FindBin for each aggregated test."
+        },
+        {
+          "line" => 147,
+          "raw" => "        - Don't emit a plan when not running any tests.\n\n",
+          "style" => "-",
+          "text" => "Don't emit a plan when not running any tests."
+        }
+      ],
+      "line" => 145,
+      "note" => "04/09/2008",
+      "raw" => "0.34_01 04/09/2008\n",
+      "version" => "0.34_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 150,
+          "raw" => "        - Upload 0.32_05 as a non-development release.\n\n",
+          "style" => "-",
+          "text" => "Upload 0.32_05 as a non-development release."
+        }
+      ],
+      "line" => 149,
+      "note" => "03/09/2008",
+      "raw" => "0.33    03/09/2008\n",
+      "version" => "0.33"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 153,
+          "raw" => "        - Added Test::Aggregate::Builder to the MANIFEST.\n\n",
+          "style" => "-",
+          "text" => "Added Test::Aggregate::Builder to the MANIFEST."
+        }
+      ],
+      "line" => 152,
+      "note" => "03/08/2008",
+      "raw" => "0.32_02 03/08/2008\n",
+      "version" => "0.32_02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 156,
+          "raw" => "        - Added line directives to aggregated tests to ensure that\n          Test::Builder::ok can now report the correct filename and line\n          number.\n",
+          "style" => "-",
+          "text" => "Added line directives to aggregated tests to ensure that Test::Builder::ok can now report the correct filename and line number."
+        },
+        {
+          "line" => 159,
+          "raw" => "        - set_filenames => 1 is now the default behavior.\n",
+          "style" => "-",
+          "text" => "set_filenames => 1 is now the default behavior."
+        },
+        {
+          "line" => 160,
+          "raw" => "        - Split the Test::Builder override into its own package.\n\n",
+          "style" => "-",
+          "text" => "Split the Test::Builder override into its own package."
+        }
+      ],
+      "line" => 155,
+      "note" => "03/08/2008",
+      "raw" => "0.32_01 03/08/2008\n",
+      "version" => "0.32_01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 163,
+          "raw" => "        - Minor bugfix to play well with Test::Most (reset test failure when\n          forcing failure after test program eval).\n\n",
+          "style" => "-",
+          "text" => "Minor bugfix to play well with Test::Most (reset test failure when forcing failure after test program eval)."
+        }
+      ],
+      "line" => 162,
+      "note" => "22/07/2008",
+      "raw" => "0.31    22/07/2008\n",
+      "version" => "0.31"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 167,
+          "raw" => "        - Resolved final (known) bug with Test::NoWarnings.  If it's loaded\n          before the plan is set, make sure we still adjust the plan.\n\n",
+          "style" => "-",
+          "text" => "Resolved final (known) bug with Test::NoWarnings.  If it's loaded before the plan is set, make sure we still adjust the plan."
+        }
+      ],
+      "line" => 166,
+      "note" => "17/07/2008",
+      "raw" => "0.30    17/07/2008\n",
+      "version" => "0.30"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 171,
+          "raw" => "        - Document the 'local \$\@' problem in \"COMMON PITFALLS\".\n",
+          "style" => "-",
+          "text" => "Document the 'local \$\@' problem in \"COMMON PITFALLS\"."
+        },
+        {
+          "line" => 172,
+          "raw" => "        - Ensure that dump file also forces a failure outside the eval().\n",
+          "style" => "-",
+          "text" => "Ensure that dump file also forces a failure outside the eval()."
+        },
+        {
+          "line" => 173,
+          "raw" => "        - Make sure that the TEST_AGGREGATE environment variable is set in a\n          BEGIN block.  Otherwise, code relying on this variable might get\n          called too soon to check it.\n\n",
+          "style" => "-",
+          "text" => "Make sure that the TEST_AGGREGATE environment variable is set in a BEGIN block.  Otherwise, code relying on this variable might get called too soon to check it."
+        }
+      ],
+      "line" => 170,
+      "note" => "15/07/2008",
+      "raw" => "0.24    15/07/2008\n",
+      "version" => "0.24"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 178,
+          "raw" => "        - Reluctantly added Test::NoWarnings as a dependency to avoid test\n          failures.\n\n",
+          "style" => "-",
+          "text" => "Reluctantly added Test::NoWarnings as a dependency to avoid test failures."
+        }
+      ],
+      "line" => 177,
+      "note" => "12/06/08",
+      "raw" => "0.23    12/06/08\n",
+      "version" => "0.23"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 182,
+          "raw" => "        - If we really do have an error from the eval listed below, make sure\n          we have a failing test to accompany it.  Otherwise, tests which die\n          might be reported as passing.\n\n",
+          "style" => "-",
+          "text" => "If we really do have an error from the eval listed below, make sure we have a failing test to accompany it.  Otherwise, tests which die might be reported as passing."
+        }
+      ],
+      "line" => 181,
+      "note" => "11/06/2008",
+      "raw" => "0.22    11/06/2008\n",
+      "version" => "0.22"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 187,
+          "raw" => "        - Wrap ->run_the_tests() calls in an eval so that one package failing\n          is less likely to stop the other tests from running.\n\n",
+          "style" => "-",
+          "text" => "Wrap ->run_the_tests() calls in an eval so that one package failing is less likely to stop the other tests from running."
+        }
+      ],
+      "line" => 186,
+      "note" => "11/06/2008",
+      "raw" => "0.21    11/06/2008\n",
+      "version" => "0.21"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 191,
+          "raw" => "        - 'startup' and 'shutdown' are no longer called in BEGIN/END blocks.\n          They were getting rather tricky due to timing issues.  This may\n          change in the future.\n",
+          "style" => "-",
+          "text" => "'startup' and 'shutdown' are no longer called in BEGIN/END blocks. They were getting rather tricky due to timing issues.  This may change in the future."
+        },
+        {
+          "line" => 194,
+          "raw" => "        - Added 'check_plan' attribute.  This allows us to verify the plan of\n          those test programs which have one (experimental).\n",
+          "style" => "-",
+          "text" => "Added 'check_plan' attribute.  This allows us to verify the plan of those test programs which have one (experimental)."
+        },
+        {
+          "line" => 196,
+          "raw" => "        - Added 'test_nowarnings' attribute.  This can be used to disable\n          C<Test::NoWarnings>.\n",
+          "style" => "-",
+          "text" => "Added 'test_nowarnings' attribute.  This can be used to disable C<Test::NoWarnings>."
+        },
+        {
+          "line" => 198,
+          "raw" => "        - Reworked some of the Test::Builder changes to minimize the amount of\n          monkey patching and to make the intent clearer.\n",
+          "style" => "-",
+          "text" => "Reworked some of the Test::Builder changes to minimize the amount of monkey patching and to make the intent clearer."
+        },
+        {
+          "line" => 200,
+          "raw" => "        - Verbosity is now 0, 1, or 2.  If '1' is verbosity, we only show test\n          failures.\n",
+          "style" => "-",
+          "text" => "Verbosity is now 0, 1, or 2.  If '1' is verbosity, we only show test failures."
+        },
+        {
+          "line" => 202,
+          "raw" => "        - We now maintain the Build.PL and Makefile.PL files separately due to\n          issues with the latter not supporting the features of the former.\n",
+          "style" => "-",
+          "text" => "We now maintain the Build.PL and Makefile.PL files separately due to issues with the latter not supporting the features of the former."
+        },
+        {
+          "line" => 204,
+          "raw" => "        - Eliminated some bogus tests added which were only there to show you\n          which aggtest was being run.\n",
+          "style" => "-",
+          "text" => "Eliminated some bogus tests added which were only there to show you which aggtest was being run."
+        },
+        {
+          "line" => 206,
+          "raw" => "        - Fixed the dates in the Changes file.\n\n",
+          "style" => "-",
+          "text" => "Fixed the dates in the Changes file."
+        }
+      ],
+      "line" => 190,
+      "note" => "04/04/2008",
+      "raw" => "0.20    04/04/2008\n",
+      "version" => "0.20"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 209,
+          "raw" => "        - Fixed bug where not having Data::Dump::Streamer installed would\n          cause test failures if 'dump' was not set.  Reported by numerous\n          CPAN smoke testers :)\n",
+          "style" => "-",
+          "text" => "Fixed bug where not having Data::Dump::Streamer installed would cause test failures if 'dump' was not set.  Reported by numerous CPAN smoke testers :)"
+        },
+        {
+          "line" => 212,
+          "raw" => "        - Added optional (and experimental) Perl::Tidy support.\n",
+          "style" => "-",
+          "text" => "Added optional (and experimental) Perl::Tidy support."
+        },
+        {
+          "line" => 213,
+          "raw" => "        - Fixed broken 'verbose'.  The 'ok/not ok' message was being output\n          regardless of verbose setting.\n\n",
+          "style" => "-",
+          "text" => "Fixed broken 'verbose'.  The 'ok/not ok' message was being output regardless of verbose setting."
+        }
+      ],
+      "line" => 208,
+      "note" => "15/03/2008",
+      "raw" => "0.11    15/03/2008\n",
+      "version" => "0.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 217,
+          "raw" => "        - Added startup, shutdown, setup, teardown attributes.\n",
+          "style" => "-",
+          "text" => "Added startup, shutdown, setup, teardown attributes."
+        },
+        {
+          "line" => 218,
+          "raw" => "        - Add more tests.\n",
+          "style" => "-",
+          "text" => "Add more tests."
+        },
+        {
+          "line" => 219,
+          "raw" => "        - Clean up dump file generated by tests.\n\n",
+          "style" => "-",
+          "text" => "Clean up dump file generated by tests."
+        }
+      ],
+      "line" => 216,
+      "note" => "13/03/2008",
+      "raw" => "0.10   13/03/2008\n",
+      "version" => "0.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 222,
+          "raw" => "        - Require Test::Builder 0.74.\n",
+          "style" => "-",
+          "text" => "Require Test::Builder 0.74."
+        },
+        {
+          "line" => 223,
+          "raw" => "        - We now diag ok/not ok messages for each test program.  This makes it\n          much easier to figure out which program failed.\n",
+          "style" => "-",
+          "text" => "We now diag ok/not ok messages for each test program.  This makes it much easier to figure out which program failed."
+        },
+        {
+          "line" => 225,
+          "raw" => "        - Fixed warnings when 'dump' was not set.  Thanks to RENEEB for the\n          bug report [http://rt.cpan.org/Ticket/Display.html?id=32443]\n\n",
+          "style" => "-",
+          "text" => "Fixed warnings when 'dump' was not set.  Thanks to RENEEB for the bug report [http://rt.cpan.org/Ticket/Display.html?id=32443]"
+        }
+      ],
+      "line" => 221,
+      "note" => "09/03/2008",
+      "raw" => "0.08    09/03/2008\n",
+      "version" => "0.08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 229,
+          "raw" => "        - Added TEST_AGGREGATE environment variable.\n\n",
+          "style" => "-",
+          "text" => "Added TEST_AGGREGATE environment variable."
+        }
+      ],
+      "line" => 228,
+      "note" => "05/03/2008",
+      "raw" => "0.07    05/03/2008\n",
+      "version" => "0.07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 232,
+          "raw" => "        - Use an END block instead of adding Test::Builder::DESTROY.  This is\n          cleaner and doesn't override the DESTROY provided by Test::Most.\n\n",
+          "style" => "-",
+          "text" => "Use an END block instead of adding Test::Builder::DESTROY.  This is cleaner and doesn't override the DESTROY provided by Test::Most."
+        }
+      ],
+      "line" => 231,
+      "note" => "15/01/2007",
+      "raw" => "0.06    15/01/2007\n",
+      "version" => "0.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 236,
+          "raw" => "        - Fixed an open in aggtests/boilerplate.t which made the module fail\n          with 5.005.\n\n",
+          "style" => "-",
+          "text" => "Fixed an open in aggtests/boilerplate.t which made the module fail with 5.005."
+        }
+      ],
+      "line" => 235,
+      "note" => "29/12/2007",
+      "raw" => "0.05    29/12/2007\n",
+      "version" => "0.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 240,
+          "raw" => "        - Fixed open() to work with versions of Perl < 5.6\n",
+          "style" => "-",
+          "text" => "Fixed open() to work with versions of Perl < 5.6"
+        },
+        {
+          "line" => 241,
+          "raw" => "        - More extensive overriding of Test::Builder internals.  I tried to\n          subclass it but it's not designed to be subclassed and much pain\n          ensued.\n",
+          "style" => "-",
+          "text" => "More extensive overriding of Test::Builder internals.  I tried to subclass it but it's not designed to be subclassed and much pain ensued."
+        },
+        {
+          "line" => 244,
+          "raw" => "        - Dump file now has all \"run_the_tests\" lines at the top and the\n          packages below them.  This makes for easier debugging as you can\n          comment out test packages one by one simply by commenting out its\n          \"run_the_tests\" line.\n",
+          "style" => "-",
+          "text" => "Dump file now has all \"run_the_tests\" lines at the top and the packages below them.  This makes for easier debugging as you can comment out test packages one by one simply by commenting out its \"run_the_tests\" line."
+        },
+        {
+          "line" => 248,
+          "raw" => "        - Fixed bug where runtests() would run tests in a different order from\n          the dump file.\n",
+          "style" => "-",
+          "text" => "Fixed bug where runtests() would run tests in a different order from the dump file."
+        },
+        {
+          "line" => 250,
+          "raw" => "        - Fixed bug where Test::NoWarnings would try to run a test after the\n          plan was output.\n\n",
+          "style" => "-",
+          "text" => "Fixed bug where Test::NoWarnings would try to run a test after the plan was output."
+        }
+      ],
+      "line" => 239,
+      "note" => "29/12/2007",
+      "raw" => "0.04    29/12/2007\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 254,
+          "raw" => "        - Moved 'skip_all' files into the t/ directory. Aggregating them\n          fails.  mauzo (http://use.perl.org/~mauzo/)\n\n",
+          "style" => "-",
+          "text" => "Moved 'skip_all' files into the t/ directory. Aggregating them fails.  mauzo (http://use.perl.org/~mauzo/)"
+        }
+      ],
+      "line" => 253,
+      "note" => "29/11/2007",
+      "raw" => "0.03    29/11/2007\n",
+      "version" => "0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 258,
+          "raw" => "        - Fixed bug where multiple tests setting an explicit plan in the use\n          statement would cause failures.\n",
+          "style" => "-",
+          "text" => "Fixed bug where multiple tests setting an explicit plan in the use statement would cause failures."
+        },
+        {
+          "line" => 260,
+          "raw" => "        - Attempt to work around 'unauthorized release' issue on the CPAN.\n          Simply declaring the 'Test::Builder' package directly is frowned\n          upon.\n",
+          "style" => "-",
+          "text" => "Attempt to work around 'unauthorized release' issue on the CPAN. Simply declaring the 'Test::Builder' package directly is frowned upon."
+        },
+        {
+          "line" => 263,
+          "raw" => "        - Update the docs to warn explain 'shared variable' warnings.\n\n",
+          "style" => "-",
+          "text" => "Update the docs to warn explain 'shared variable' warnings."
+        }
+      ],
+      "line" => 257,
+      "note" => "26/11/2007",
+      "raw" => "0.02    26/11/2007\n",
+      "version" => "0.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 266,
+          "raw" => "        First version.  Run test suites faster.\n",
+          "style" => "",
+          "text" => "First version.  Run test suites faster."
+        }
+      ],
+      "line" => 265,
+      "note" => "25/11/2007",
+      "raw" => "0.01    25/11/2007\n",
+      "version" => "0.01"
+    }
+  ]
+}

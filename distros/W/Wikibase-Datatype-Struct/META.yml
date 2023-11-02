@@ -19,10 +19,11 @@ build_requires:
   Wikibase::Datatype::Property: 0.25
   Wikibase::Datatype::Reference: 0
   Wikibase::Datatype::Sitelink: 0
-  Wikibase::Datatype::Snak: 0
+  Wikibase::Datatype::Snak: 0.32
   Wikibase::Datatype::Statement: 0
   Wikibase::Datatype::Value::Globecoordinate: 0
   Wikibase::Datatype::Value::Item: 0
+  Wikibase::Datatype::Value::Lexeme: 0
   Wikibase::Datatype::Value::Monolingual: 0
   Wikibase::Datatype::Value::Property: 0
   Wikibase::Datatype::Value::Quantity: 0
@@ -33,7 +34,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -62,11 +63,12 @@ requires:
   Wikibase::Datatype::Reference: 0
   Wikibase::Datatype::Sense: 0
   Wikibase::Datatype::Sitelink: 0
-  Wikibase::Datatype::Snak: 0
+  Wikibase::Datatype::Snak: 0.32
   Wikibase::Datatype::Statement: 0
   Wikibase::Datatype::Value: 0.29
   Wikibase::Datatype::Value::Globecoordinate: 0
   Wikibase::Datatype::Value::Item: 0
+  Wikibase::Datatype::Value::Lexeme: 0
   Wikibase::Datatype::Value::Monolingual: 0
   Wikibase::Datatype::Value::Property: 0
   Wikibase::Datatype::Value::Quantity: 0
@@ -79,4 +81,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Wikibase-Datatype-Struct
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Wikibase-Datatype-Struct
-version: '0.11'
+version: '0.12'

@@ -7,7 +7,6 @@ use warnings;
 use feature 'signatures';
 
 use Carp;
-use List::Util qw( first );
 use X11::XCB ':all';
 use X11::korgwm::Common;
 require X11::korgwm::Config;
@@ -19,7 +18,6 @@ sub _motion_regular($evt) {
     return if @screens == 1 or $evt->{child};
     my $screen = screen_by_xy(@{ $evt }{qw( event_x event_y )}) or return;
     return if $focus->{screen} == $screen;
-    $focus->{window}->reset_border() if defined $focus->{window};
     $screen->focus();
     $X->flush();
 }
@@ -58,10 +56,12 @@ sub _motion_move($evt) {
     # Check if the pointer went outside the screen
     my $new_screen;
     if ($new_screen = screen_by_xy($evt->{event_x}, $evt->{event_y}) and $focus->{screen} != $new_screen) {
+        my $always_on = $_motion_win->{always_on};
         $focus->{screen}->win_remove($_motion_win, 1);
         $focus->{screen}->{panel}->title();
-        $new_screen->win_add($_motion_win);
+        $new_screen->win_add($_motion_win, $always_on);
         $focus->{screen} = $new_screen;
+        $new_screen->{panel}->title($_motion_win->title());
     }
     $X->flush();
 }
@@ -107,9 +107,11 @@ sub init {
         # XXX Do we really need to ignore EnterNotifies on unknown windows? I'll leave it here waiting for bugs.
         return unless exists $windows->{$wid};
 
+        # Ignore notifies for hidden windows
         my $win = $windows->{$wid};
         return if $win->{_hidden};
 
+        # Ignore rapid notifies
         return if $_on_hold{$wid};
         $_on_hold{$wid} = AE::timer 0, 0.09, sub { exists $_on_hold{$wid} and delete $_on_hold{$wid} };
 

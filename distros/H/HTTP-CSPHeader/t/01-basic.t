@@ -1,6 +1,7 @@
 use v5.14;
+use warnings;
 
-use Test::Most;
+use Test2::V0;
 
 use HTTP::CSPHeader;
 
@@ -96,7 +97,7 @@ subtest 'corce nonces_for' => sub {
 
     isa_ok $h, 'HTTP::CSPHeader';
 
-    is_deeply $h->nonces_for, [qw/ script-src /], 'nonces_for';
+    is $h->nonces_for, [qw/ script-src /], 'nonces_for';
 };
 
 done_testing;

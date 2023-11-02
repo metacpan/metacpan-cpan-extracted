@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 983f0994fd91912b8c57e5fda5a8461e24baf1dc1f2b3a9bb280f9756cf0c43c Changes
+SHA256 8fe735228348a2644f842b30c1a661c29e2626829e609fec35f42e9d3a25d25a LICENSE
+SHA256 365ac8755a38690659fdf2da9082994333024458749960108257d3f5e1593a84 MANIFEST
+SHA256 0dc6ee8e5f75dfcb1c8a926215129a1cc50b6e252711a4154a1c468ead6c4797 META.yml
+SHA256 ca08f34e68829334ff9e04bfcfeca5db2600fdbe50ff6acf1b4014dd91daf608 Makefile.PL
+SHA256 47ce96ad9489e1e17dc1a154fdaa7e7035533877ede05e70d3f059a7dff2a047 Query.pm
+SHA256 b0ff9fd51c2d01d25a19354139cb8377934ffd98f9555611802f5698c48ad5f1 README
+SHA256 1f22f2013aaffe2a6077d2916510818f54b25cf58fcde78f5141cc5df2e525a8 examples/query_item.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 609deb3ce51350e4ad51bd3012d73abbf9d64f834239e2ca29971aab39d5c1a7 t/Wikibase-Datatype-Query/01-use.t
+SHA256 f37890c0ed246839f8dba5ab37e1099850f2b664905dcabb2e5434b0cd060bd6 t/Wikibase-Datatype-Query/02-version.t
+SHA256 e38f1faa660c530fceca2833da195fde48847f728805912eceeb1acbdd746848 t/Wikibase-Datatype-Query/03-new.t
+SHA256 c6f389bec8103d65901008c5ce7d2a96cd69672a3c7e70afa802a5968a909679 t/Wikibase-Datatype-Query/04-query_item.t
+SHA256 9e7fcae1efc7867a6871551bb08fc12900bde02acb6dadd9a2cf4074cd7c33a8 t/Wikibase-Datatype-Query/05-query_item-alias.t
+SHA256 11dfbc8af2c558dbd78b5df7c5c704a9280469d3214bbafb8de8d5cb1ac8997a t/Wikibase-Datatype-Query/06-query_item-description.t
+SHA256 146d9c941001a08fa0c036ede24bcf2c02576e6756e42d7e710820a3bdf78d77 t/Wikibase-Datatype-Query/07-query_item-label.t
+SHA256 09be4420ea9b9d6d2302b6417ff2d61ee81a2f6bbade4873f8b5ce0eba82f06b t/Wikibase-Datatype-Query/08-query_item-property.t
+SHA256 c234949e08ee95c2eba58a97f9c033d16603d50351e97d60a012dff7fad8e9b2 xt/Wikibase-Datatype-Query/01-pod_coverage.t
+SHA256 4133debcb05194c3f75f8f5df01547887b5ad58c71d82445410c16d218bac0aa xt/Wikibase-Datatype-Query/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmU/jHEACgkQojV9Rpe/
+B8uu+Q//Xzej8pW+TDD2+9Pdkk+DYyDM56i11pwgE+m9PeuLRk+RM1GXLdBwWFYZ
+VZ3yXgbUbuChQVw7qwamXCXJLKlMjIdfFOlZ4nfgoH9wRoBrNcUsunIYCY8dNaxy
+JyFB689G3bpCRXXJm5O62bDm1D1RhYHUb1TFzUkCHF9czaSB/C4lZwCGvDeRTitx
+hbuUDUVfP3s5PAPNdtoAjSuZCxpkExX+4TH6fYPTS4F3/56wrJ2383oElMedHPr+
+bBdyRNFeQcGZphF77kh2Affy4Hig3dssF42zrWYYkinkWO8oYuvR/IHXcUcfSoSC
+Xy9zUXL77rpSI5+yRNDznkFsPPw8/0hy3KWxEouB/brW+pAtBgT8hkegFHP4LZTw
+v7Xq8W9N/cs59vbxCfttFobgBPa226eQauwPVZIE2DSk8GeMLYP0TRY2o1vGPIUq
+dirIKVNbuDSoTFKW6arqXxHUzrhvB/ObBEsEeCu+JzJBR8iN1bsNwqRYKwwDTtAB
+uwip0/Ei2mZBkH1ItyTn6PkH3w2GR9Cu9bCXkFCRr7zpDbb2wtCIpDxfcoAgH45q
+vAkawpUXbVwWwddMTgrbGBDYRl1Es+6aOYah28ryem1RJGIjv3E44AliE9NgnKCK
+dW09mqJOHs1ZTg4kppvw+qKYZdRxNihdGdw57uN3i4HFBrqSQTs=
+=JG24
+-----END PGP SIGNATURE-----

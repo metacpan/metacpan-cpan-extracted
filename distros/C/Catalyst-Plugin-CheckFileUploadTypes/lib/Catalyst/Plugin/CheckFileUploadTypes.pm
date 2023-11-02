@@ -1,5 +1,5 @@
 package Catalyst::Plugin::CheckFileUploadTypes;
-$Catalyst::Plugin::CheckFileUploadTypes::VERSION = '0.02';
+$Catalyst::Plugin::CheckFileUploadTypes::VERSION = '0.10';
 # ABSTRACT: Check uploaded files are expected and of the correct type
 
 use Data::Printer;
@@ -42,6 +42,13 @@ sub dispatch {
     }
     
     my $mm = File::MMagic->new;
+
+    # Detect XML files by opening <?xml tag
+    $mm->addSpecials('text/xml', qr{^<\?xml}i);
+
+    # Detect shell scripts by opening shebang:
+    $mm->addSpecials('text/x-shellscript', qr{^#\!}i);
+
 
     my $expects_uploads = $action->attributes->{ExpectUploads};
 

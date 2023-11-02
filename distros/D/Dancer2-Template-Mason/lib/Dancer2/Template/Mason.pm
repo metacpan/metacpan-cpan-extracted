@@ -1,7 +1,7 @@
 package Dancer2::Template::Mason;
 our $AUTHORITY = 'cpan:YANICK';
 # ABSTRACT: Mason wrapper for Dancer2
-$Dancer2::Template::Mason::VERSION = '0.1.1';
+$Dancer2::Template::Mason::VERSION = '0.1.2';
 use strict;
 use warnings;
 
@@ -73,7 +73,7 @@ Dancer2::Template::Mason - Mason wrapper for Dancer2
 
 =head1 VERSION
 
-version 0.1.1
+version 0.1.2
 
 =head1 SYNOPSIS
 
@@ -121,6 +121,65 @@ the configuration file, like so:
 
 If unspecified, C<comp_root> defaults to the C<views> configuration setting
 or, if it's undefined, to the C</views> subdirectory of the application.
+
+=head2 Dancer2 Tokens and Mason Parameters
+
+As with other template adapters, Dancer2 passes the following to your
+templates automatically:
+
+=over
+
+=item * C<perl_version>
+
+=item * C<dancer_version>
+
+=item * C<settings>
+
+=item * C<request>
+
+=item * C<params>
+
+=item * C<vars>
+
+=item * C<session>
+
+=back
+
+(see L<Dancer2::Core::Role::Template> for more details)
+
+Content you pass via the C<template> keyword creates another token, C<content>.
+
+To access them in your Mason templates, you have options. To use these tokens
+in the most explicit way possible, declare C<%args> in your Mason template as
+such:
+
+    <%args>
+    $perl_version
+    $dancer_version
+    $settings
+    $request
+    $params
+    $vars
+    $session
+    </%args>
+
+You can then pass them explicitly to other components:
+
+    <& /components/topbar.m, title => $title, session => $session &>
+
+For the lazy, all tokens are passed via Mason as C<%ARGS>. You can reference
+them as keys of this hash:
+
+    % my $session = $ARGS{ session };
+    <h1>Hello, <% $session->{ username } %>!</h1>
+
+For the really lazy, rather than build a list of parameters to pass other
+components, you can simply pass the entire C<%ARGS> hash:
+
+    <& /components/topbar.m, %ARGS &>
+
+See L<https://metacpan.org/dist/HTML-Mason/view/lib/HTML/Mason/Devel.pod#PASSING-PARAMETERS|the Mason Developer's Manual>
+for more information about passing parameters to components.
 
 =head2 Notes on Mason Caching and Performance
 

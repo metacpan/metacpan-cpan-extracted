@@ -34,7 +34,7 @@ resources:
   homepage: http://dbi.perl.org/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-mysql.git
-version: '5.001'
+version: '5.002'
 x_contributors:
   - 'Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>'
   - 'Alexandr Ciornii <alexchorny@gmail.com>'

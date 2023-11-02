@@ -17,12 +17,12 @@ name: PerlX-ScopeFunction
 provides:
   PerlX::ScopeFunction:
     file: lib/PerlX/ScopeFunction.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Const::Fast: '0'
   Keyword::Simple: '0'
   PPR: '0'
   Package::Stash: '0'
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: MIT

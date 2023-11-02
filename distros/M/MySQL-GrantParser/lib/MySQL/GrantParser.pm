@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.008_005;
 
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 use DBI;
 use Carp;
@@ -186,7 +186,14 @@ sub pack_grants {
                 }
                 if ($grant->{with}) {
                     if ($packed->{$user_host}{objects}{$object}{with}) {
-                        $packed->{$user_host}{objects}{$object}{with} .= ' ' . $grant->{with};
+                        # Starting with MySQL 8.0, SHOW GRANTS output
+                        # enumerates individual privileges instead of
+                        # ALL PRIVILEGES. In this case, the same WITH
+                        # clause is duplicated, so the same WITH clause
+                        # should not be added.
+                        if ($packed->{$user_host}{objects}{$object}{with} ne $grant->{with}) {
+                            $packed->{$user_host}{objects}{$object}{with} .= ' ' . $grant->{with};
+                        }
                     } else {
                         $packed->{$user_host}{objects}{$object}{with} = $grant->{with};
                     }

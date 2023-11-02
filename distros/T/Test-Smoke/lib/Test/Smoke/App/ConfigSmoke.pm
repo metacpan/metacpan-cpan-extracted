@@ -2,7 +2,7 @@ package Test::Smoke::App::ConfigSmoke;
 use warnings;
 use strict;
 
-our $VERSION = '0.101';
+our $VERSION = '0.103';
 
 use base 'Test::Smoke::App::Base';
 
@@ -117,7 +117,11 @@ sub run {
 
     $self->write_config();
 
-    $self->write_smoke_script();
+    my ($cronbin, $crontime) = (
+        $self->current_values->{cronbin},
+        $self->current_values->{crontime}
+    );
+    $self->write_smoke_script($cronbin, $crontime);
 
     $self->say_bye();
 }
@@ -190,7 +194,7 @@ sub write_config {
     my $self = shift;
 
     # Filter some values we don't want:
-    my @donot_save = qw( cronbin add2cron docron );
+    my @donot_save = qw( cronbin docron add2cron );
     my %current_config = %{ $self->current_values };
     delete($current_config{$_}) for @donot_save;
 
@@ -362,7 +366,6 @@ sub prompt_yn {
     $option->configdft( sub { $default } );
 
     my $yesno = lc($self->prompt($option, qr{^[ny]$}i)) || 0;
-    print "Got [$yesno]\n";
     ( my $retval = $yesno ) =~ tr/ny/01/;
     return 0 + $retval;
 }
@@ -529,7 +532,7 @@ sub _sort_configkeys {
         qw( w32cc w32make w32args ),
 
         # Test environment related
-        qw( force_c_locale locale defaultenv skip_tests ),
+        qw( force_c_locale locale defaultenv perlio_only skip_tests ),
 
         # SmokeDB
         qw( smokedb_url poster send_log send_out ua_timeout curlbin ),

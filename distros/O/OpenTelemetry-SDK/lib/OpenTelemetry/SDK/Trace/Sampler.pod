@@ -1,0 +1,107 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Trace::Sampler - The abstract interface for a sampler object
+
+=head1 SYNOPSIS
+
+    use Object::Pad;
+    class My::Sampler :does(OpenTelemetry::SDK::Trace::Sampler) {
+        field $description :param :reader;
+        method should_sample (%args) { ... }
+    }
+
+    my $sampler = My::Sampler->new;
+
+    my $result = $sampler->should_sample( ... );
+
+    if ( $result->sampled ) {
+        # this span should be sampled
+    }
+
+=head1 DESCRIPTION
+
+This role describes the interface that all sampler classes should implement.
+
+=head1 REQUIRED METHODS
+
+=head2 description
+
+    $string = $sampler->description;
+
+Returns a string that can be used to identify the current configuration of the
+sampler. This string may appear in debug pages and logs. Standard samplers
+have a PascalCased name for the sampler, and additional configuration between
+braces (C<{...}>), which can be used as a guide.
+
+=head2 should_sample
+
+    $result = $sampler->should_sample(
+        context    => $context,
+        trace_id   => $trace_id,
+        kind       => $span_kind,
+        name       => $span_name,
+        attributes => \%attributes,
+        links      => \@links,
+    );
+
+Returns a sampling decision for a span to be created. Takes a set of named
+parameters, all of which are required:
+
+=over
+
+=item C<context>
+
+A L<OpenTelemetry::Context> object that holds the parent span. The
+L<OpenTelemetry::Trace::SpanContext> may be invalid to indicate a root span.
+
+=item C<trace_id>
+
+The binary trace ID of the span to be created. This must match the trace ID
+of the parent's span context if it is valid.
+
+=item C<name>
+
+The name of the span to be created.
+
+=item C<kind>
+
+The kind of the span to be created.
+
+=item C<attributes>
+
+The initial set of attributes of the span to be created.
+
+=item C<links>
+
+A set of links that will be associated with the span to be created.
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Attributes>
+
+=item L<OpenTelemetry::Context>
+
+=item L<OpenTelemetry::SDK::Trace::Sampler::Result>
+
+=item L<OpenTelemetry::Trace::Link>
+
+=item L<OpenTelemetry::Trace::SpanContext>
+
+=item L<Span kind constants|OpenTelemetry::Constants/Span kinds>
+
+=item L<The specification for a sampler's C<should_sample> method|https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#shouldsample>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

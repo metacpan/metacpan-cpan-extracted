@@ -1,5 +1,5 @@
 package Bitcoin::Crypto::Transaction::Digest;
-$Bitcoin::Crypto::Transaction::Digest::VERSION = '2.002';
+$Bitcoin::Crypto::Transaction::Digest::VERSION = '2.003';
 use v5.10;
 use strict;
 use warnings;

@@ -1,0 +1,16 @@
+File::Takeput changelog
+
+0.30 2023-10-31
+- Unique configuration.
+
+0.21 2023-10-30
+- Fixed flatten import bug.
+
+0.20 2023-10-29
+- Per namespace defaults and flatten configuration.
+
+0.11 2023-10-26
+- Fixed problem with import sub.
+
+0.10 2023-10-25
+- First public release.

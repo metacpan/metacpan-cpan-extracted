@@ -25,11 +25,33 @@ Utilizând opțiunea **--discret**, se apelează o comandă individuală pentru 
 
 Liniile de date de intrare și de ieșire nu trebuie să fie identice atunci când se utilizează opțiunea **--discrete**.
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     Invocarea unei noi comenzi individuale pentru fiecare piesă care se potrivește.
+
+- **--fillup**
+
+    Combină o secvență de linii care nu sunt goale într-o singură linie înainte de a le transmite comenzii de filtrare. Caracterele newline dintre caracterele largi sunt șterse, iar alte caractere newline sunt înlocuite cu spații.
+
+- **--blockmatch**
+
+    În mod normal, zona care corespunde modelului de căutare specificat este trimisă la comanda externă. În cazul în care se specifică această opțiune, nu zona care corespunde, ci întregul bloc care o conține va fi procesat.
+
+    De exemplu, pentru a trimite liniile care conțin modelul `foo` la comanda externă, trebuie să specificați modelul care se potrivește cu întreaga linie:
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    Dar cu opțiunea **<--blockmatch**, se poate face la fel de simplu, după cum urmează:
+
+        greple -Mtee cat -n -- foo
+
+    Cu opțiunea **--blockmatch**, acest modul se comportă mai mult ca opțiunea **-g** a lui [teip(1)](http://man.he.net/man1/teip).
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ Următoarea comandă va găsi blocuri de text în interiorul documentului de sti
 
 Puteți să le traduceți prin serviciul DeepL executând comanda de mai sus convinsă cu modulul **-Mtee** care apelează comanda **deepl** astfel:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-Deoarece **deepl** funcționează mai bine pentru introducerea unei singure linii, puteți schimba partea de comandă astfel::
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 Totuși, modulul dedicat [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) este mai eficient în acest scop. De fapt, sugestia de implementare a modulului **tee** a venit de la modulul **xlate**.
 
@@ -82,7 +100,24 @@ Puteți reformata această parte utilizând modulul **tee** cu comanda **ansifol
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+Utilizarea opțiunii `--discrete` necesită mult timp. Deci, puteți utiliza opțiunea `--separate '\r'` cu `ansifold` care produce o singură linie folosind caracterul CR în loc de NL.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+Apoi, convertiți caracterul CR în NL prin comanda [tr(1)](http://man.he.net/man1/tr) sau alta.
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+Luați în considerare o situație în care doriți să căutați prin grep șiruri de caractere din liniile fără antet. De exemplu, este posibil să doriți să căutați imagini din comanda `docker image ls`, dar să lăsați linia de antet. Puteți face acest lucru prin următoarea comandă.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+Opțiunea `-Mline -L 2:` recuperează penultima linie și o trimite la comanda `grep perl`. Opțiunea `--discrete` este necesară, dar aceasta este apelată o singură dată, deci nu există niciun dezavantaj de performanță.
+
+În acest caz, `teip -l 2- -- grep` produce o eroare deoarece numărul de linii de la ieșire este mai mic decât cel de la intrare. Cu toate acestea, rezultatul este destul de satisfăcător :)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ Puteți reformata această parte utilizând modulul **tee** cu comanda **ansifol
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+# BUGS
+
+Este posibil ca opțiunea `--fillup` să nu funcționeze corect pentru textul coreean.
 
 # AUTHOR
 

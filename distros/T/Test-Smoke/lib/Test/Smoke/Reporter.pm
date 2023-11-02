@@ -33,6 +33,7 @@ my %CONFIG = (
 
     df_locale       => undef,
     df_defaultenv   => undef,
+    df_perlio_only  => undef,
     df_is56x        => undef,
     df_skip_tests   => undef,
 
@@ -1326,9 +1327,14 @@ sub bldenv_legend {
                 my $locale = shift @locale;     # XXX: perhaps pop()
                 $line .= "LC_ALL = $locale"
             } else {
-                $line .= ( (($i - @{$self->{_locale}}) % $half) % 2 == 0 )
-                    ? "PERLIO = perlio"
-                    : "PERLIO = stdio ";
+                if ( $self->{perlio_only} ) {
+                    $line .= "PERLIO = perlio"
+                }
+                else {
+                    $line .= ( (($i - @{$self->{_locale}}) % $half) % 2 == 0 )
+                        ? "PERLIO = perlio"
+                        : "PERLIO = stdio ";
+                }
             }
             $i < $half and $line .= " $debugging";
             $line .= "\n";

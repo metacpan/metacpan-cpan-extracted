@@ -3,13 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply chromatic and diatonic transposition to notes
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0601';
 
+use Moo;
+use strictures 2;
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
 use Music::Scales qw(get_scale_MIDI is_scale);
-use Moo;
-use strictures 2;
 use namespace::clean;
 
 with('Music::PitchNum');
@@ -45,6 +45,13 @@ sub _build__scale {
 }
 
 
+has notes => (
+    is      => 'rw',
+    isa     => sub { die "$_[0] is not a valid list" unless ref($_[0]) eq 'ARRAY' },
+    default => sub { [] },
+);
+
+
 has verbose => (
     is      => 'ro',
     isa     => sub { die "$_[0] is not a valid boolean" unless $_[0] =~ /^[01]$/ },
@@ -54,6 +61,8 @@ has verbose => (
 
 sub transpose {
     my ($self, $offset, $notes) = @_;
+
+    $notes ||= $self->notes;
 
     my $named = $notes->[0] =~ /[A-G]/ ? 1 : 0;
 
@@ -103,7 +112,7 @@ Music::MelodicDevice::Transposition - Apply chromatic and diatonic transposition
 
 =head1 VERSION
 
-version 0.0502
+version 0.0601
 
 =head1 SYNOPSIS
 
@@ -112,14 +121,20 @@ version 0.0502
   my @notes = qw(C4 E4 D4 G4 C5); # either named notes or midinums
 
   # Chromatic
-  my $md = Music::MelodicDevice::Transposition->new;
-  my $transposed = $md->transpose(2, \@notes); # [D4, F#4, E4, A4, D5]
-  $transposed = $md->transpose(4, \@notes);    # [E4, G#4, F#4, B4, E5]
+  my $md = Music::MelodicDevice::Transposition->new(
+    notes => \@notes,
+  );
+  my $transposed = $md->transpose(2); # [D4, F#4, E4, A4, D5]
+  $transposed = $md->transpose(4);    # [E4, G#4, F#4, B4, E5]
+  $transposed = $md->transpose(4, \@notes); # same thing
 
   # Diatonic
   $md = Music::MelodicDevice::Transposition->new(scale_name => 'major');
-  $transposed = $md->transpose(2, \@notes); # [E4, G4, F4, B4, E5]
-  $transposed = $md->transpose(4, \@notes); # [G4, B4, A4, D5, G5]
+  $md->notes(\@notes);
+  $transposed = $md->transpose(2); # [E4, G4, F4, B4, E5]
+  $transposed = $md->transpose(4); # [G4, B4, A4, D5, G5]
+  $md->notes([qw(C4 E4 G4)]);
+  $transposed = $md->transpose(4); # [G4, B4, D5]
 
 =head1 DESCRIPTION
 
@@ -149,6 +164,17 @@ Please see L<Music::Scales/SCALES> for a list of valid scale names.
 
 =for Pod::Coverage OCTAVES
 
+=head2 notes
+
+  $md->notes(\@notes);
+
+The list of notes to use in transposition operations.
+
+This can be overriden with a B<notes> argument given to the
+B<transposition> method.
+
+Default: C<[]> (no notes)
+
 =head2 verbose
 
 Default: C<0>
@@ -160,6 +186,7 @@ Default: C<0>
   $md = Music::MelodicDevice::Transposition->new(
     scale_note => $scale_note,
     scale_name => $scale_name,
+    notes      => \@notes,
     verbose    => $verbose,
   );
 
@@ -167,9 +194,10 @@ Create a new C<Music::MelodicDevice::Transposition> object.
 
 =head2 transpose
 
-  $transposed = $md->transpose($offset, $notes);
+  $transposed = $md->transpose($offset);
+  $transposed = $md->transpose($offset, \@notes);
 
-Return the transposed series of B<notes> given an B<offset>
+Return the transposed list of B<notes> given an B<offset>
 appropriately based on the number of notes in the chosen scale.
 
 =head1 SEE ALSO

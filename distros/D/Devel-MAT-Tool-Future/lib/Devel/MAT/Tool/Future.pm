@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
 
-package Devel::MAT::Tool::Future 0.02;
+package Devel::MAT::Tool::Future 0.03;
 
 use v5.14;
 use warnings;
@@ -48,6 +48,26 @@ sub init_tool
    my $heap_total = scalar $df->heap;
    my $count;
 
+   # Are Futures XS or PP-based?
+   my $future_is_xs;
+   if( my $isaav = $self->pmat->find_symbol( '@Future::ISA' ) ) {
+      foreach my $isaelem ( $isaav->elems ) {
+         my $superclass = $isaelem->pv;
+         if( $superclass eq "Future::XS" ) {
+            $future_is_xs = 1;
+            last;
+         }
+         elsif( $superclass eq "Future::PP" ) {
+            $future_is_xs = 0;
+            last;
+         }
+      }
+   }
+   unless( defined $future_is_xs ) {
+      # TODO: Suppress this mesasge if $Future::VERSION is less than whatever it would need to be
+      warn "Unable to determine if Future is based on Future::XS or Future::PP; presuming older version on PP";
+   }
+
    # Find all the classes that derive from Future
    $self->{classes} = \my %classes;
    $classes{Future}++;
@@ -64,6 +84,8 @@ sub init_tool
       $self->class_is_future( $sv );
    }
 
+   my $persv_data = [ $future_is_xs ];
+
    $count = 0;
    foreach my $sv ( $df->heap ) {
       $count++;
@@ -72,7 +94,7 @@ sub init_tool
 
       next unless my $pkg = $sv->blessed;
 
-      $classes{ $pkg->stashname } and $sv->{tool_future}++;
+      $classes{ $pkg->stashname } and $sv->{tool_future} = $persv_data;
    }
 
    $self->init_cmd;
@@ -151,7 +173,7 @@ sub init_ui
 
 =head2 class_is_future
 
-   $ok = $tool->class_is_future( $pkg )
+   $ok = $tool->class_is_future( $pkg );
 
 Returns true if the given package is a C<Future> class. C<$pkg> may be either
 a C<Devel::MAT::SV> instance referring to a stash, or a plain string.
@@ -194,7 +216,7 @@ This tool adds the following SV methods.
 
 =head2 is_future (SV)
 
-   $ok = $sv->is_future
+   $ok = $sv->is_future;
 
 Returns true if the C<Devel::MAT::SV> instance represents a C<Future>
 instance.
@@ -208,19 +230,27 @@ sub Devel::MAT::SV::is_future
    return defined $sv->{tool_future};
 }
 
+sub Devel::MAT::SV::_future_is_xs
+{
+   my $sv = shift;
+
+   return $sv->{tool_future} && $sv->{tool_future}[0];
+}
+
 sub Devel::MAT::SV::_future_xs_struct
 {
    my $sv = shift;
 
    $sv->basetype eq "SV" or return undef;
 
-   my $ref = $sv->maybe_outref_named( "the FutureXS structure" ) or return undef;
+   my $ref = $sv->maybe_outref_named( "the FutureXS structure" ) or
+      croak "Expected $sv to have a FutureXS structure";
    return $ref->sv;
 }
 
 =head2 future_state (SV)
 
-   $state = $sv->future_state
+   $state = $sv->future_state;
 
 Returns a string describing the state of the given C<Future> instance; one of
 C<pending>, C<done>, C<failed> or C<cancelled>.
@@ -233,8 +263,9 @@ sub Devel::MAT::SV::future_state
 
    $sv->is_future or croak "$sv is not a Future";
 
-   if( my $struct = $sv->_future_xs_struct ) {
-      # Using Future::XS
+   if( $sv->_future_is_xs ) {
+      my $struct = $sv->_future_xs_struct;
+
       if( $struct->field_named( "cancelled" ) ) {
          return "cancelled";
       }
@@ -249,7 +280,9 @@ sub Devel::MAT::SV::future_state
       }
    }
    else {
-      # Using Future::PP
+      $sv->type eq "HASH" or
+         croak "Expected $sv to be a HASH";
+
       my $tmp;
       if( $tmp = $sv->value( "cancelled" ) and $tmp->uv ) {
          return "cancelled";
@@ -268,7 +301,7 @@ sub Devel::MAT::SV::future_state
 
 =head2 future_result
 
-   @result = $sv->future_result
+   @result = $sv->future_result;
 
 Returns a list of SVs containing the result of a successful C<Future>.
 
@@ -280,19 +313,22 @@ sub Devel::MAT::SV::future_result
 
    $sv->is_future or croak "$sv is not a Future";
 
-   if( my $struct = $sv->_future_xs_struct ) {
-      # Using Future::XS
+   if( $sv->_future_is_xs ) {
+      my $struct = $sv->_future_xs_struct;
+
       return $struct->field_named( "the result AV" )->elems;
    }
    else {
-      # Using Future::PP
+      $sv->type eq "HASH" or
+         croak "Expected $sv to be a HASH";
+
       return $sv->value( "result" )->rv->elems;
    }
 }
 
 =head2 future_failure
 
-   @failure = $sv->future_failure
+   @failure = $sv->future_failure;
 
 Returns a list of SVs containing the failure of a failed C<Future>.
 
@@ -304,12 +340,15 @@ sub Devel::MAT::SV::future_failure
 
    $sv->is_future or croak "$sv is not a Future";
 
-   if( my $struct = $sv->_future_xs_struct ) {
-      # Using Future::XS
+   if( $sv->_future_is_xs ) {
+      my $struct = $sv->_future_xs_struct;
+
       return $struct->field_named( "the failure AV" )->elems;
    }
    else {
-      # Using Future::XS
+      $sv->type eq "HASH" or
+         croak "Expected $sv to be a HASH";
+
       return $sv->value( "failure" )->rv->elems;
    }
 }

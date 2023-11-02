@@ -186,6 +186,7 @@ t/mojo/collection.t
 t/mojo/content.t
 t/mojo/cookie.t
 t/mojo/cookiejar.t
+t/mojo/cookies/curl.txt
 t/mojo/daemon.t
 t/mojo/daemon_ipv6_tls.t
 t/mojo/date.t

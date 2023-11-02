@@ -18,6 +18,8 @@ use Doit::Util qw(in_directory);
 
 use TestUtil qw(is_dir_eq);
 
+sub git_init ();
+
 my $d = Doit->init;
 
 if (!$d->which('git')) {
@@ -27,6 +29,9 @@ if (!$d->which('git')) {
 plan 'no_plan';
 
 $d->add_component('git');
+
+my $git_version = $d->info_qx({quiet=>1}, 'git', '--version');
+diag $git_version;
 
 my $git_less_directory;
 if (-d '/' && !-d '/.git') {
@@ -64,6 +69,9 @@ my $my_git_short_status;
 if ($ENV{HOME} && -x "$ENV{HOME}/bin/sh/git-short-status") {
     $my_git_short_status = "$ENV{HOME}/bin/sh/git-short-status";
 }
+
+## enable the following to test different default branches (master, main, user-defined in ~/.gitconfig...)
+#$d->system(qw(git config --global init.defaultBranch an-unexpected-default-branch));
 
 ######################################################################
 # Tests with the Doit repository (if checked out)
@@ -120,7 +128,7 @@ SKIP: {
     my $workdir = "$dir/newworkdir";
     $d->mkdir($workdir);
     chdir $workdir or die "chdir failed: $!";
-    $d->system(qw(git init));
+    git_init;
 
     # after init checks
     is_dir_eq $d->git_root, $workdir, 'git_root in root directory';
@@ -326,7 +334,7 @@ SKIP: {
 	    like $history[0], qr{actually some content};
 
 	    local $TODO;
-	    if ($d->info_qx({quiet=>1}, 'git', '--version') =~ /^git version 1\.7\./) {
+	    if ($git_version =~ /^git version 1\.7\./) {
 		$TODO = "git version 1.7.x detected --- this version actually fetches two commits with --depth=1";
 	    }
 	    is scalar(@history), 1, '--depth=1 was effective'
@@ -531,7 +539,7 @@ SKIP: {
 	    my $workdir = "$dir/newworkdir13_$remote";
 	    $d->mkdir($workdir);
 	    in_directory {
-		$d->system(qw(git init));
+		git_init;
 		$d->touch(qw(testfile));
 		$d->system(qw(git add testfile));
 		_git_commit_with_author('test');
@@ -672,6 +680,13 @@ sub git_short_status_check {
 	    chomp(my $script_result = $doit->info_qx({quiet=>1}, $my_git_short_status, @git_short_status_opts));
 	    is $script_result, $doit_result, "$testname (against $my_git_short_status)";
 	} $directory;
+    }
+}
+
+sub git_init () {
+    $d->system(qw(git init));
+    if ($d->git_current_branch ne 'master') {
+	$d->system(qw(git checkout -b master));
     }
 }
 

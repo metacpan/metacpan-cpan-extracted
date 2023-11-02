@@ -1,0 +1,33 @@
+<div class="blog-cards">
+        <!-- Individual blog post cards go here -->
+        [% FOREACH p IN widget.elements %]
+    <div class="blog-card" id="blog-[% p.slug %]">
+        [% IF p.image %]
+        <a href="[% p.permalink %]"><img class="post-image" src="[% p.image %]" alt="[% p.title %]"></a>
+        [% END %]
+        <h3 class="post-title">[% p.title %]</h3>
+
+        [% UNLESS p.is_page %]
+	    <div class="category-container">
+            <div class="category-ribbon">[% p.category %]</div>
+        </div>
+        [% END %]
+    
+	    <p class="post-excerpt">[% p.excerpt %]</p>
+    </div>
+
+    <script type="text/javascript">
+    // JavaScript code to make the blog-card clickable
+    document.getElementById('blog-[% p.slug %]').addEventListener('click', function() {
+        window.location.href = '[% p.permalink %]';
+    });
+    </script>
+    [% END %]
+
+</div> <!-- END blog-cards -->
+    
+[% IF widget.readmore_button %]
+<div class="blog-button">
+    <a href="/blog">[% widget.readmore_button %]</a>
+</div>
+[% END %]

@@ -1,0 +1,30 @@
+<div class="container">
+
+  [% IF page_image %]
+  <section class="post-header" style="background-image: url('[% page_image %]');">
+  [% ELSE %]
+  <section class="post-header no-featured-image">
+  [% END %]
+
+  <div class="header-content">
+    <h1 class="post-title">[% page_title %]</h1>
+
+    [% IF meta %]
+      <ul class="post-meta">
+      [% FOREACH m IN meta %]
+        [% IF m.link %]
+        <li class="clickable"><a href="[% m.link %]/">[% m.label %]</a></li>
+        [% ELSE %]
+        <li>[% m.label %]</li>
+        [% END %]
+      [% END %]
+    </ul>
+    [% END %]
+  </div> <!-- END div header-content -->
+  </section> <!-- END section post-header -->
+
+  <article class="main-content">
+  [% content %]
+  </article> <!-- END article main-content -->
+
+</div> <!-- END div container -->

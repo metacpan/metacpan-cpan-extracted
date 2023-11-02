@@ -1,13 +1,13 @@
 ---
-abstract: 'Read and write Changes files'
+abstract: 'Parser for CPAN style change logs'
 author:
-  - 'Brian Cassidy <bricas@cpan.org>'
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
 build_requires:
   Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,13 +17,42 @@ no_index:
   directory:
     - t
     - xt
+provides:
+  CPAN::Changes:
+    file: lib/CPAN/Changes.pm
+    version: '0.500002'
+  CPAN::Changes::Entry:
+    file: lib/CPAN/Changes/Entry.pm
+    version: '0.500002'
+  CPAN::Changes::Group:
+    file: lib/CPAN/Changes/Group.pm
+    version: '0.500002'
+  CPAN::Changes::HasEntries:
+    file: lib/CPAN/Changes/HasEntries.pm
+    version: '0.500002'
+  CPAN::Changes::Parser:
+    file: lib/CPAN/Changes/Parser.pm
+    version: '0.500002'
+  CPAN::Changes::Release:
+    file: lib/CPAN/Changes/Release.pm
+    version: '0.500002'
+  CPAN::Changes::Spec:
+    file: lib/CPAN/Changes/Spec.pod
+    version: '0.500002'
+  Test::CPAN::Changes:
+    file: lib/Test/CPAN/Changes.pm
+    version: '0.500002'
 requires:
-  Text::Wrap: '0.003'
-  version: '0.9906'
+  Module::Runtime: '0'
+  Moo: '1.006000'
+  Sub::Quote: '1.005000'
+  Test::Builder: '0'
+  Types::Standard: '0'
 resources:
   IRC: irc://irc.perl.org/#metacpan
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Changes
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/CPAN-API/CPAN-Changes.git
-version: '0.400002'
+  repository: https://github.com/metacpan/CPAN-Changes.git
+version: '0.500002'
 x_authority: cpan:BRICAS
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

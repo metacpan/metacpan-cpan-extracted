@@ -13,7 +13,7 @@ use DateTime::Format::Strptime;
 use List::Util qw(any);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.17';
+our $VERSION = '4.18';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -89,17 +89,21 @@ sub new {
 		}
 	}
 
-	my $date_ref = ( split( qr{[|]}, $jid ) )[4];
-	if ( length($date_ref) < 7 ) {
-		warn("HAFAS, not even once -- midnight crossing may be bogus");
+	my $datetime_ref;
+
+	if ( @{ $journey->{stopL} // [] } or $journey->{stbStop} ) {
+		my $date_ref = ( split( qr{[|]}, $jid ) )[4];
+		if ( length($date_ref) < 7 ) {
+			warn("HAFAS, not even once -- midnight crossing may be bogus");
+		}
+		if ( length($date_ref) == 7 ) {
+			$date_ref = "0${date_ref}";
+		}
+		$datetime_ref = DateTime::Format::Strptime->new(
+			pattern   => '%d%m%Y',
+			time_zone => 'Europe/Berlin'
+		)->parse_datetime($date_ref);
 	}
-	if ( length($date_ref) == 7 ) {
-		$date_ref = "0${date_ref}";
-	}
-	my $datetime_ref = DateTime::Format::Strptime->new(
-		pattern   => '%d%m%Y',
-		time_zone => 'Europe/Berlin'
-	)->parse_datetime($date_ref);
 
 	my $class = $product->{cls};
 
@@ -473,7 +477,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.17
+version 4.18
 
 =head1 DESCRIPTION
 
@@ -516,7 +520,7 @@ Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
 Returns the journey or line name, either in a format like "Bus SB16" (Bus line
 SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
 no line information).  May contain extraneous whitespace characters.  Note that
-this accessor does not return line informatikn for IC/ICE/EC services, even if
+this accessor does not return line information for IC/ICE/EC services, even if
 it is available. Use B<line_no> for those.
 
 =item $journey->line_no

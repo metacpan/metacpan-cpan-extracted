@@ -8,18 +8,10 @@ use Cwd 'abs_path';
 use Scalar::Util 'blessed', 'looks_like_number';
 use CodeGen::Cpppp::Template;
 
-our $VERSION= '0.001'; # VERSION
+our $VERSION= '0.002'; # VERSION
 # ABSTRACT: The C Perl-Powered Pre-Processor
 
 
-sub autocomma($self, $newval=undef) {
-   $self->{autocomma}= $newval if defined $newval;
-   $self->{autocomma} // 1;
-}
-sub autostatementline($self, $newval=undef) {
-   $self->{autostatementline}= $newval if defined $newval;
-   $self->{autostatementline} // 1;
-}
 sub autoindent($self, $newval=undef) {
    $self->{autoindent}= $newval if defined $newval;
    $self->{autoindent} // 1;
@@ -166,8 +158,6 @@ sub parse_cpppp($self, $in, $filename=undef, $line=undef) {
    }
    $line //= 1;
    $self->{cpppp_parse}= {
-      autocomma         => $self->autocomma,
-      autostatementline => $self->autostatementline,
       autoindent        => $self->autoindent,
       autocolumn        => $self->autocolumn,
       filename          => $filename,
@@ -350,8 +340,7 @@ sub _parse_code_block($self, $text, $file=undef, $orig_line=undef) {
    }xg;
    
    my $prev_eval;
-   for (0..$#subst) {
-      my $s= $subst[$_];
+   for my $s (@subst) {
       if (exists $s->{colgroup}) {
          my $linestart= (rindex($text, "\n", $s->{pos})+1);
          my $col= $s->{pos} - $linestart;
@@ -390,11 +379,10 @@ sub _parse_code_block($self, $text, $file=undef, $orig_line=undef) {
          $prev_eval= $s;
       }
    }
-   # cleanup
+   # Clean up any tracked column that ended before the final line of the template
    for my $c (grep looks_like_number($_), keys $parse->{coltrack}->%*) {
-      if ($parse->{coltrack}{$c}{line} < $line-1) {
-         _finish_coltrack($parse->{coltrack}, $c);
-      }
+      _finish_coltrack($parse->{coltrack}, $c)
+         if $parse->{coltrack}{$c}{line} < $line-1;
    }
    @subst= grep defined $_->{eval} || defined $_->{colgroup}, @subst;
    
@@ -465,9 +453,102 @@ CodeGen::Cpppp - The C Perl-Powered Pre-Processor
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
+
+  # Cpppp object is a template factory
+  my $cpppp= CodeGen::Cpppp->new(%options);
+  
+  # Simple templates immediately generate their output during
+  # construction, which goes to the output accumulator of $cpppp
+  # by default.
+  $cpppp->new_template($filename, %params);
+  
+  # Complex templates can define custom methods
+  my $tpl= $cpppp->new_template($otherfile, %params);
+  $tpl->generate_more_stuff(...);
+  
+  # Inspect or print the accumulated output
+  say $cpppp->output;
+  $cpppp->write_sections_to_file(public  => 'project.h');
+  $cpppp->write_sections_to_file(private => 'project.c');
+
+B<Input:>
+
+  #! /usr/bin/env cpppp
+  ## param $min_bits = 8;
+  ## param $max_bits = 16;
+  ## param $feature_parent = 0;
+  ## param $feature_count = 0;
+  ## param @extra_node_fields;
+  ##
+  ## for (my $bits= $min_bits; $bits <= $max_bits; $bits <<= 1) {
+  struct tree_node_$bits {
+    uint${bits}_t  left :  ${{$bits-1}},
+                   color:  1,
+                   right:  ${{$bits-1}},
+                   parent,   ## if $feature_parent;
+                   count,    ## if $feature_count;
+                   $trim_comma $trim_ws;
+    @extra_node_fields;
+  };
+  ## }
+
+B<Output:>
+
+  struct tree_node_8 {
+    uint8_t  left :  7,
+             color:  1,
+             right:  7;
+  };
+  struct tree_node_16 {
+    uint16_t left : 15,
+             color:  1,
+             right: 15;
+  };
+
+=head1 DESCRIPTION
+
+This module is a preprocessor for C, or maybe more like a perl template engine
+that specializes in generating C code.  Each input file gets translated to Perl
+in a way that declares a new OO class, and then you can create instances of that
+class with various parameters to generate your C output, or call methods on it
+like automatically generating headers or function prototypes.
+
+For the end-user, there is a 'cpppp' command line tool that behaves much like
+the 'cpp' tool.
+
+B<WARNING: this API is not stable>.  It would be unwise to use C<cpppp>
+as part of a distribution's build scripts yet, but it is perfectly safe to use
+it to generate sources and then add those generated files to a project.
+
+If you have an interest in this topic, contact me, because I could use help
+brainstorming ideas about how to accommodate the most possibilities, here.
+
+B<Possible Future Features:>
+
+=over
+
+=item *
+
+Scan existing headers to discover available macros, structs, and functions on the host.
+
+=item *
+
+Pass a list of headers through the real cpp and analyze the macro output.
+
+=item *
+
+Shell out to a compiler to find 'sizeof' information for structs.
+
+=item *
+
+Directly perform the work of inlining one function into another.
+
+=back
+
+=head1 RATIONALE
 
 I<It's very special, because, if you can see, the preprocessor, goes up, to
 C<perl>.  Look, right across the directory, C<perl>, C<perl>, C<perl>.>
@@ -511,93 +592,15 @@ preprocessor?>
 
 I<...>
 
-I<These go to B<perl>.>
+I<... These go to B<perl>.>
 
-B<Input:>
+=head1 SECURITY NOTICE
 
-  #! /usr/bin/env cpppp
-  ## param $min_bits = 8;
-  ## param $max_bits = 16;
-  ## param $feature_parent = 0;
-  ## param $feature_count = 0;
-  ## param @extra_node_fields;
-  ##
-  ## for (my $bits= $min_bits; $bits <= $max_bits; $bits <<= 1) {
-  struct tree_node_$bits {
-    uint${bits}_t  left :  ${{$bits-1}},
-                   color:  1,
-                   right:  ${{$bits-1}},
-                   parent,   ## if $feature_parent;
-                   count,    ## if $feature_count;
-                   $trim_comma $trim_ws;
-    @extra_node_fields;
-  };
-  ## }
-
-B<Output:>
-
-  struct tree_node_8 {
-    uint8_t  left :  7,
-             color:  1,
-             right:  7;
-  };
-  struct tree_node_16 {
-    uint16_t left : 15,
-             color:  1,
-             right: 15;
-  };
-
-=head1 DESCRIPTION
-
-B<WARNING: this API is completely and totally unstable>.
-
-This module is a preprocessor for C, or maybe more like a perl template engine
-that specializes in generating C code.  Each input file gets translated to Perl
-in a way that declares a new OO class, and then you can create instances of that
-class with various parameters to generate your C output, or call methods on it
-like automatically generating headers or function prototypes.
-
-For the end-user, there is a 'cpppp' command line tool that behaves much like
-the 'cpp' tool.
-
-If you have an interest in this, contact me, because I could use help
-brainstorming ideas about how to accommodate the most possibilities, here.
-
-B<Possible Future Features:>
-
-=over
-
-=item *
-
-Scan existing headers to discover available macros, structs, and functions on the host.
-
-=item *
-
-Pass a list of headers through the real cpp and analyze the macro output.
-
-=item *
-
-Shell out to a compiler to find 'sizeof' information for structs.
-
-=item *
-
-Directly perform the work of inlining one function into another.
-
-=back
+B<Templates are equivalent to perl scripts>.  Use the same caution when
+using cpppp templates that you would use when running perl scripts.
+Do not load, compile, or render templates from un-trusted authors.
 
 =head1 ATTRIBUTES
-
-=head2 autocomma
-
-Default value for new templates; determines whether expansion of an array
-variable will automatically join with commas depending on the surrounding
-generated C code.
-
-=head2 autostatementline
-
-Default value for new templates; determines whether expansion of an array
-variable in statement context automatically joins them with a semicolon and
-line feed.
 
 =head2 autoindent
 
@@ -613,7 +616,8 @@ output after variables have been expanded.
 =head2 include_path
 
 An arrayref of directories to search for template files during
-C<require_template>.
+C<require_template>.  Make sure no un-trusted users have control over any
+directory in this path, the same as you would do for Perl's C<@INC> paths.
 
 =head2 output
 

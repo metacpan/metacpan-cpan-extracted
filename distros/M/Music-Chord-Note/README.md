@@ -2,7 +2,7 @@
 
 This is Perl module `Music::Chord::Note`.
 
-<a href="https://github.com/bayashi/Music-Chord-Note/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Music-Chord-Note/actions"><img src="https://github.com/bayashi/Music-Chord-Note/workflows/main/badge.svg?_t=1675942646"/></a> <a href="https://coveralls.io/r/bayashi/Music-Chord-Note"><img src="https://coveralls.io/repos/bayashi/Music-Chord-Note/badge.png?_t=1675942646&branch=main"/></a>
+<a href="https://github.com/bayashi/Music-Chord-Note/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Music-Chord-Note/actions"><img src="https://github.com/bayashi/Music-Chord-Note/workflows/main/badge.svg?_t=1698542809"/></a> <a href="https://coveralls.io/r/bayashi/Music-Chord-Note"><img src="https://coveralls.io/repos/bayashi/Music-Chord-Note/badge.png?_t=1698542809&branch=main"/></a>
 
 
 ## INSTALLATION

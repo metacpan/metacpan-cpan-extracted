@@ -4,14 +4,13 @@ use strict;
 use warnings;
 
 use Class::Utils qw(set_params);
+use English;
 use Getopt::Std;
 use Unicode::UTF8 qw(encode_utf8);
 use Wikibase::API;
-use Wikibase::Datatype::Print::Item;
-use Wikibase::Datatype::Print::Lexeme;
-use Wikibase::Datatype::Print::Property;
+use Wikibase::Datatype::Print;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -36,12 +35,14 @@ sub run {
 		'h' => 0,
 		'l' => 'en',
 		'm' => 'www.wikidata.org',
+		'r' => 0,
 	};
-	if (! getopts('hl:m:', $self->{'_opts'}) || $self->{'_opts'}->{'h'}) {
-		print STDERR "Usage: $0 [-h] [-l lang] [-m mediawiki_site] [--version] wd_id\n";
+	if (! getopts('hl:m:r', $self->{'_opts'}) || $self->{'_opts'}->{'h'} || @ARGV < 1) {
+		print STDERR "Usage: $0 [-h] [-l lang] [-m mediawiki_site] [-r] [--version] wd_id\n";
 		print STDERR "\t-h\t\t\tPrint help.\n";
 		print STDERR "\t-l lang\t\t\tLanguage used (default is English = en).\n";
 		print STDERR "\t-m mediawiki_site\tMediaWiki site (default is www.wikidata.org).\n";
+		print STDERR "\t-r\t\t\tWith references.\n";
 		print STDERR "\t--version\t\tPrint version.\n";
 		print STDERR "\twd_id\t\t\tWikidata id (qid or pid or lid).\n";
 		return 1;
@@ -54,19 +55,17 @@ sub run {
 
 	my $obj = $api->get_item($wd_id);
 
-	if (ref $obj eq 'Wikibase::Datatype::Item') {
-		print encode_utf8(scalar Wikibase::Datatype::Print::Item::print($obj, {
-			'lang' => $self->{'_opts'}->{'l'},
-		})), "\n";
-	} elsif (ref $obj eq 'Wikibase::Datatype::Lexeme') {
-		print encode_utf8(scalar Wikibase::Datatype::Print::Lexeme::print($obj, {
-			'lang' => $self->{'_opts'}->{'l'},
-		})), "\n";
-	} elsif (ref $obj eq 'Wikibase::Datatype::Property') {
-		print encode_utf8(scalar Wikibase::Datatype::Print::Property::print($obj, {
-			'lang' => $self->{'_opts'}->{'l'},
-		})), "\n";
-	} else {
+	my $opts_hr = {
+		'lang' => $self->{'_opts'}->{'l'},
+	};
+	if (! $self->{'_opts'}->{'r'}) {
+		$opts_hr->{'no_print_references'} = 1;
+	}
+
+	eval {
+		print encode_utf8(scalar Wikibase::Datatype::Print::print($obj, $opts_hr)), "\n";
+	};
+	if ($EVAL_ERROR) {
 		print STDERR "Unsupported Wikibase::Datatype object.";
 		return 1;
 	}
@@ -183,12 +182,11 @@ Returns 1 for error, 0 for success.
 =head1 DEPENDENCIES
 
 L<Class::Utils>,
+L<English>,
 L<Getopt::Std>,
 L<Unicode::UTF8>,
 L<Wikibase::API>,
-L<Wikibase::Datatype::Print::Item>,
-L<Wikibase::Datatype::Print::Lexeme>,
-L<Wikibase::Datatype::Print::Property>.
+L<Wikibase::Datatype::Print>.
 
 =head1 REPOSITORY
 
@@ -208,6 +206,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

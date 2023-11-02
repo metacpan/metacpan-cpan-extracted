@@ -1,4 +1,4 @@
-package EAI::DateUtil 1.4;
+package EAI::DateUtil 1.5;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime);
@@ -16,6 +16,7 @@ my %intTomonths = (
 
 sub monthsToInt ($$) {
 	my ($m,$locale) = @_;
+	return undef if !$m or !$locale;
 	if ($intTomonths{lc($locale)} and defined($monthsToInt{lc($locale)}{$m})) {
 		return $monthsToInt{lc($locale)}{$m};
 	} else {
@@ -25,6 +26,7 @@ sub monthsToInt ($$) {
 
 sub intToMonths ($$) {
 	my ($m,$locale) = @_;
+	return undef if !$m or !$locale;
 	if ($intTomonths{lc($locale)} and @{$intTomonths{lc($locale)}} >= $m) {
 		return $intTomonths{lc($locale)}[$m-1];
 	} else {
@@ -46,6 +48,7 @@ sub get_curdate_dot {
 
 sub addLocaleMonths ($$) {
 	my ($locale,$monthList) = @_;
+	return undef if !$locale or !$monthList;
 	$locale = lc($locale);
 	if (defined($monthsToInt{$locale})) {
 		warn("locale <$locale> already implemented for monthsToInt !");
@@ -66,6 +69,7 @@ sub addLocaleMonths ($$) {
 
 sub formatDate ($$$;$) {
 	my ($y,$m,$d,$template) = @_;
+	return undef if !$y or !$m or !$d;
 	$template = "YMD" if !$template;
 	my ($locale) = $template =~ /\[(.*?)\]$/;
 	my $result = $template;
@@ -87,8 +91,10 @@ sub formatDate ($$$;$) {
 }
 
 sub formatDateFromYYYYMMDD ($;$) {
+	return undef if !$_[0];
 	my ($year,$mon,$day) = $_[0] =~ /(.{4})(..)(..)/;
-	my ($template) = $_[1];
+	return undef if !$year or !$mon or !$day;
+	my ($template) = $_[1] if $_[1];
 	return formatDate($year,$mon,$day,$template);
 }
 
@@ -103,6 +109,7 @@ sub get_curdate_dash {
 
 sub get_curdate_dash_plus_X_years ($;$$) {
 	my ($y) = $_[0];
+	return undef if !$y;
 	my ($year,$mon,$day) = $_[1] =~ /(.{4})(..)(..)/ if $_[1];
 	my $daysToSubtract = $_[2] if $_[2];
 	if ($year) {
@@ -135,12 +142,16 @@ sub get_curtime_HHMM {
 }
 
 sub is_first_day_of_month ($) {
+	return undef if !$_[0];
 	my ($y,$m,$d) = $_[0] =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	((gmtime(timegm_modern(0,0,12,$d,$m-1,$y)-24*60*60))[4] != $m-1 ? 1 : 0);
 }
 
 sub is_last_day_of_month ($;$) {
+	return undef if !$_[0];
 	my ($y,$m,$d) = $_[0] =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	my $cal = $_[1];
 	# for respecting holidays add 1 day and compare month
 	if ($cal) {
@@ -152,8 +163,9 @@ sub is_last_day_of_month ($;$) {
 	}
 }
 sub get_last_day_of_month ($) {
+	return undef if !$_[0];
 	my ($y,$m,$d) = $_[0] =~ /(.{4})(..)(..)/;
-	
+	return undef if !$y or !$m or !$d;
 	# first of following month minus 1 day is always last of current month, timegm_modern expects 0 based month, $m is the following month for timegm_modern therefore
 	if ($m == 12) {
 		# for December -> January next year
@@ -167,22 +179,29 @@ sub get_last_day_of_month ($) {
 }
 
 sub weekday ($) {
+	return undef if !$_[0];
 	my ($y,$m,$d) = $_[0] =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	(gmtime(timegm_modern(0,0,12,$d,$m-1,$y)))[6]+1;
 }
 
 sub is_weekend ($) {
+	return undef if !$_[0];
 	my ($y,$m,$d) = $_[0] =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	(gmtime(timegm_modern(0,0,12,$d,$m-1,$y)))[6] =~ /(0|6)/;
 }
 # makeMD: argument in timegm_modern form (datetime), returns date in format DDMM (for holiday calculation)
 sub makeMD ($) {
+	return undef if !$_[0];
 	sprintf("%02d%02d", (gmtime($_[0]))[3],(gmtime($_[0]))[4] + 1);
 }
 
 # British specialties
 sub UKspecial {
+	return undef if !$_[0];
 	my ($y,$m,$d) = $_[0] =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	return 1 if (first_week($d,$m,$y,1,5) || last_week($d,$m,$y,1,5) || last_week($d,$m,$y,1,8));
 	return 0;
 }
@@ -209,6 +228,7 @@ my %specialHol = ("UK" => \&UKspecial);
 # adds calendar to DateUtil, first arg name of $cal, second arg fixed holidays hash, third easter holidays hash and fourth special function for additional calculations
 sub addCalendar ($$$$) {
 	my ($cal,$fixHol,$eastHol,$specialHolSub) = @_;
+	return undef if !$cal or !$fixHol or !$eastHol or !$specialHolSub;
 	if (defined($fixedHol{$cal})) {
 		warn("calender <$cal> already implemented for fixed holidays !");
 		return 0;
@@ -231,7 +251,9 @@ sub addCalendar ($$$$) {
 # requires entry of calendar in %easterHol hash: "$Cal" => {"GF"=>1,"EM"=>1,"ES"=>1,"AS"=>1,"WM"=>1,"CC"=>1}
 sub is_easter ($$) {
 	my ($cal) = $_[0];
+	return undef if !$cal or !$_[1];
 	my ($y,$m,$d) = $_[1] =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	# first find easter sunday using year
 	my $D = (((255 - 11 * ($y % 19)) - 21) % 30) + 21;
 	my $easter = timegm_modern(0,0,12,1,2,$y) + ($D + ($D > 48 ? 1 : 0) + 6 - (($y + int($y / 4) + $D + ($D > 48 ? 1 : 0) + 1) % 7))*86400;
@@ -248,8 +270,9 @@ sub is_easter ($$) {
 # check whether second arg is holiday in passed calendar (first arg)
 sub is_holiday ($$) {
 	my ($cal) = $_[0];
-	return 0 if $cal eq "WE"; # weekends are checked with "is_weekend", so no holiday passed here!
+	return undef if !$cal or $cal eq "WE" or !$_[1]; # weekends are checked with "is_weekend", so no holiday passed here! Same for empty dates passed
 	my ($y,$m,$d) = $_[1] =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	return 1 if $fixedHol{$cal}->{$d.$m};
 	return 1 if is_easter($cal,$_[1]);
 	return 1 if $specialHol{$cal} and $specialHol{$cal}->($_[1]);
@@ -262,6 +285,7 @@ sub is_holiday ($$) {
 
 sub first_week ($$$$;$) {
 	my ($d,$m,$y,$day,$month) = @_;
+	return undef if !$y or !$m or !$d or !defined($day);
 	$month = $m if !$month;
 	unless ((0 <= $day) && ( $day <= 6)) {
 		warn("day <$day> is out of range 0 - 6  (sunday==0)");
@@ -277,13 +301,16 @@ sub first_week ($$$$;$) {
 
 sub first_weekYYYYMMDD ($$;$) {
 	my ($date,$day,$month) = @_;
+	return undef if !$date or !defined($day);
 	my ($y,$m,$d) = $date =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	$month = $m if !$month;
 	return first_week ($d,$m,$y,$day,$month);
 }
 
 sub last_week ($$$$;$) {
 	my ($d,$m,$y,$day,$month) = @_;
+	return undef if !$y or !$m or !$d or !defined($day);
 	$month = $m if !$month;
 	unless ((0 <= $day) && ( $day <= 6)) {
 		warn("day <$day> is out of range 0 - 6  (sunday==0)");
@@ -298,18 +325,21 @@ sub last_week ($$$$;$) {
 
 sub last_weekYYYYMMDD ($$;$) {
 	my ($date,$day,$month) = @_;
+	return undef if !$date or !defined($day);
 	my ($y,$m,$d) = $date =~ /(.{4})(..)(..)/;
 	$month = $m if !$month;
 	return last_week ($d,$m,$y,$day,$month);
 }
 
 sub convertDate ($) {
+	return undef if !$_[0];
 	my ($y,$m,$d) = ($_[0] =~ /(\d{4})[.\/](\d\d)[.\/](\d\d)/);
 	return sprintf("%04d%02d%02d",$y, $m, $d);
 }
 
 sub convertDateFromMMM ($$$$;$) {
 	my ($inDate,$day,$mon,$year,$locale) = @_;
+	return undef if !$inDate or !$day or !$mon or !$year;
 	$locale = "en" if !$locale;
 	my ($d,$m,$y) = ($inDate =~ /(\d{2})-(\w{3})-(\d{4})/);
 	$$day = $d;
@@ -320,17 +350,20 @@ sub convertDateFromMMM ($$$$;$) {
 
 sub convertDateToMMM ($$$;$) {
 	my ($day,$mon,$year,$locale) = @_;
+	return undef if !$day or !$mon or !$year;
 	$locale = "en" if !$locale;
 	return sprintf("%02d-%03s-%04d",$day, $intTomonths{lc($locale)}[$mon-1], $year);
 }
 
 sub convertToDDMMYYYY ($) {
 	my ($y,$m,$d) = $_[0] =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	return "$d.$m.$y";
 }
 
 sub addDays ($$$$;$) {
 	my ($day,$mon,$year,$dayDiff,$locale) = @_;
+	return undef if !$day or !$mon or !$year or !$dayDiff;
 	$locale = "en" if !$locale;
 	my $curDateEpoch = timelocal_modern(0,0,0,$$day,$$mon-1,$$year);
 	my $diffDate = localtime($curDateEpoch + $dayDiff * 60 * 60 * 25);
@@ -343,7 +376,9 @@ sub addDays ($$$$;$) {
 
 sub subtractDays ($$) {
 	my ($date,$days) = @_;
+	return undef if !$date;
 	my ($y,$m,$d) = $date =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	my $theDate = localtime(timelocal_modern(0,0,12,$d,$m-1,$y) - $days*24*60*60);
 	return sprintf("%04d%02d%02d",$theDate->year()+ 1900, $theDate->mon()+1, $theDate->mday());
 }
@@ -351,6 +386,7 @@ sub subtractDays ($$) {
 sub addDaysHol ($$;$$) {
 	my ($date, $days, $template, $cal) = @_;
 	$cal="NO" if !$cal;
+	return undef if !$date;
 	my ($y,$m,$d) = $date =~ /(.{4})(..)(..)/;
 	return undef if !$y or !$m or !$d;
 	# first add days
@@ -367,6 +403,7 @@ sub addDaysHol ($$;$$) {
 sub subtractDaysHol ($$;$$) {
 	my ($date,$days,$template,$cal) = @_;
 	$cal="NO" if !$cal;
+	return undef if !$date;
 	my ($y,$m,$d) = $date =~ /(.{4})(..)(..)/;
 	return undef if !$y or !$m or !$d;
 	# first subtract days
@@ -382,8 +419,10 @@ sub subtractDaysHol ($$;$$) {
 
 sub addDatePart {
 	my ($date, $count, $datepart, $template) = @_;
+	return if !$date;
 	my %datepart = (d=>3,m=>4,y=>5,day=>3,mon=>4,year=>5,D=>3,M=>4,Y=>5,month=>4);
 	my ($y,$m,$d) = $date =~ /(.{4})(..)(..)/;
+	return undef if !$y or !$m or !$d;
 	my $parts = localtime(timelocal_modern(0,0,12,$d,$m-1,$y));
 	@$parts[$datepart{$datepart}] += $count if $datepart{$datepart};
 	my $refdate =localtime(mktime @$parts);
@@ -404,6 +443,7 @@ sub get_lastdateDDMMYYYY {
 
 sub convertcomma ($;$) {
 	my ($number, $divideBy) = @_;
+	return undef if !defined($number);
 	$number = $number / $divideBy if $divideBy;
 	$number = "$number";
 	$number =~ s/\./,/;
@@ -412,6 +452,7 @@ sub convertcomma ($;$) {
 
 sub convertToThousendDecimal ($;$) {
 	my ($value,$ignoreDecimal) = @_;
+	return undef if !defined($value);
 	my ($negSign) = ($value =~ /(-).*?/);
 	$negSign = "" if !defined($negSign);
 	$value =~ s/-//;
@@ -429,8 +470,10 @@ sub convertToThousendDecimal ($;$) {
 
 sub get_dateseries ($$;$) {
 	my ($fromDate,$toDate,$cal) = @_;
+	return undef if !$fromDate or !$toDate;
 	my ($yf,$mf,$df) = $fromDate =~ /(.{4})(..)(..)/;
 	my ($yt,$mt,$dt) = $toDate =~ /(.{4})(..)(..)/;
+	return undef if !$yf or !$mf or !$df or !$yt or !$mt or !$dt;
 	my $from = timelocal_modern(0,0,12,$df,$mf-1,$yf);
 	my $to = timelocal_modern(0,0,12,$dt,$mt-1,$yt);
 	my @dateseries;
@@ -448,15 +491,19 @@ sub get_dateseries ($$;$) {
 
 sub parseFromDDMMYYYY ($) {
 	my ($dateStr) = @_;
+	return undef if !$dateStr;
 	my ($df,$mf,$yf) = $dateStr =~ /(..*)\.(..*)\.(.{4})/;
-	return "invalid date" if !($yf >= 1900) or !($mf >= 1 && $mf <= 12) or !($df >= 1 && $df <= 31);
+	return undef if !$yf or !$mf or !$df;
+	return undef if !($yf >= 1900) or !($mf >= 1 && $mf <= 12) or !($df >= 1 && $df <= 31);
 	return timelocal_modern(0,0,0,$df,$mf-1,$yf);
 }
 
 sub parseFromYYYYMMDD ($) {
 	my ($dateStr) = @_;
+	return undef if !$dateStr;
 	my ($yf,$mf,$df) = $dateStr =~ /(.{4})(..)(..)/;
-	return "invalid date" if !$dateStr or !($yf >= 1900) or !($mf >= 1 && $mf <= 12) or !($df >= 1 && $df <= 31);
+	return undef if !$yf or !$mf or !$df;
+	return undef if !$dateStr or !($yf >= 1900) or !($mf >= 1 && $mf <= 12) or !($df >= 1 && $df <= 31);
 	return timelocal_modern(0,0,0,$df,$mf-1,$yf);
 }
 
@@ -464,7 +511,7 @@ sub convertEpochToYYYYMMDD ($) {
 	my ($arg) = @_;
 	if (ref($arg) eq 'Time::Piece') {
 		return sprintf("%04d%02d%02d",$arg->year(),$arg->mon(),$arg->mday());
-	} else {
+	} elsif($arg) {
 		my $date = localtime($arg);
 		return sprintf("%04d%02d%02d",$date->year()+1900,$date->mon()+1,$date->mday());
 	}

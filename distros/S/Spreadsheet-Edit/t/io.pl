@@ -15,7 +15,6 @@ use t_TestCommon ':no-Test2',
             @quotes/;
 
 use t_SSUtils;
-use Capture::Tiny qw/capture_merged tee_merged/;
 use Encode qw/encode decode/;
 
 use Spreadsheet::Edit qw/:all logmsg fmt_sheet cx2let let2cx sheet/;

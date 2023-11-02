@@ -56,6 +56,11 @@ plain string (a filename) or a reference to a string (a file's contents).
 Optional, boolean, true by default. If the value is the same, line is excluded
 from the comparison.
 
+=head3 message_opts
+
+Optional, hash reference, empty by default. Additional constructor parameters
+for L<App::HL7::Compare::Parser::Message>.
+
 =head2 Methods
 
 =head3 compare

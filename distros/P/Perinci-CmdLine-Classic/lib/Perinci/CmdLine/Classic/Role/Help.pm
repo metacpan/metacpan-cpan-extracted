@@ -11,9 +11,9 @@ use Locale::TextDomain::UTF8 'Perinci-CmdLine';
 use Perinci::Object;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2023-10-30'; # DATE
 our $DIST = 'Perinci-CmdLine-Classic'; # DIST
-our $VERSION = '1.817'; # VERSION
+our $VERSION = '1.818'; # VERSION
 
 sub _help_draw_curtbl {
     my ($self, $r) = @_;
@@ -519,7 +519,7 @@ Perinci::CmdLine::Classic::Role::Help - Help-related routines
 
 =head1 VERSION
 
-This document describes version 1.817 of Perinci::CmdLine::Classic::Role::Help (from Perl distribution Perinci-CmdLine-Classic), released on 2022-10-19.
+This document describes version 1.818 of Perinci::CmdLine::Classic::Role::Help (from Perl distribution Perinci-CmdLine-Classic), released on 2023-10-30.
 
 =for Pod::Coverage ^(.+)$
 
@@ -566,7 +566,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

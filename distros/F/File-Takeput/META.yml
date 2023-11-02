@@ -1,0 +1,40 @@
+---
+abstract: 'Slurp style file IO with locking.'
+author:
+  - 'Bjoern Hee <github@spredehagl.com>'
+build_requires:
+  Cwd: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Takeput
+provides:
+  File::Takeput:
+    file: lib/File/Takeput.pm
+    version: '0.3'
+  File::Takeput::Unix:
+    file: lib/File/Takeput/Unix.pm
+  File::Takeput::Win32:
+    file: lib/File/Takeput/Win32.pm
+requires:
+  Cwd: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/spragl/Takeput/issues
+  license: http://apache.org/licenses/LICENSE-2.0
+  repository: https://github.com/spragl/Takeput
+version: '0.3'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

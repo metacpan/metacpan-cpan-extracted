@@ -25,6 +25,7 @@ Readonly::Hash our %DATA_TYPES => (
 	'time' => 'Wikibase::Datatype::Value::Time',
 	'url' => 'Wikibase::Datatype::Value::String',
 	'wikibase-item' => 'Wikibase::Datatype::Value::Item',
+	'wikibase-lexeme' => 'Wikibase::Datatype::Value::Lexeme',
 	'wikibase-property' => 'Wikibase::Datatype::Value::Property',
 	'wikibase-sense' => 'Wikibase::Datatype::Value::Sense',
 );
@@ -34,7 +35,7 @@ Readonly::Array our @SNAK_TYPES => qw(
 	value
 );
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 has datatype => (
 	is => 'ro',
@@ -144,6 +145,7 @@ Parameter is required.
  - time (Wikibase::Datatype::Value::Time)
  - url (Wikibase::Datatype::Value::String)
  - wikibase-item (Wikibase::Datatype::Value::Item)
+ - wikibase-lexeme (Wikibase::Datatype::Value::Lexeme)
  - wikibase-property (Wikibase::Datatype::Value::Property)
  - wikibase-sense (Wikibase::Datatype::Value::Sense)
 
@@ -296,6 +298,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.33
 
 =cut

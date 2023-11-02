@@ -6,7 +6,7 @@ use warnings;
 use Mo qw(build is);
 use Mo::utils qw(check_required);
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 has value => (
 	is => 'ro',
@@ -153,6 +153,10 @@ Wikibase property value datatype.
 
 Wikibase quantity value datatype.
 
+=item L<Wikibase::Datatype::Value::Sense>
+
+Wikibase sense value datatype.
+
 =item L<Wikibase::Datatype::Value::String>
 
 Wikibase string value datatype.
@@ -181,6 +185,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.33
 
 =cut

@@ -1,6 +1,7 @@
 class TestCase::Regex {
   use Regex;
   use Regex::ReplaceInfo;
+  use StringBuffer;
   
   static method compile : int () {
     my $re = Regex->new("abc");
@@ -16,7 +17,7 @@ class TestCase::Regex {
       my $offset = 0;
       my $length = -1;
       my $replace_info_ref = new Regex::ReplaceInfo[1];
-      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1, info => $replace_info_ref});
+      my $result = $re->replace_g($target, "ABC", $offset, $length, {info => $replace_info_ref});
       
       unless ($replace_info_ref->[0]->replaced_count == 2) {
         return 0;
@@ -34,7 +35,7 @@ class TestCase::Regex {
       my $offset = 6;
       my $length = -1;
       my $replace_info_ref = new Regex::ReplaceInfo[1];
-      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1, info => $replace_info_ref});
+      my $result = $re->replace_g($target, "ABC", $offset, $length, {info => $replace_info_ref});
       
       unless ($replace_info_ref->[0]->replaced_count == 2) {
         return 0;
@@ -52,7 +53,7 @@ class TestCase::Regex {
       my $offset = 0;
       my $length = -1;
       my $replace_info_ref = new Regex::ReplaceInfo[1];
-      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1, info => $replace_info_ref});
+      my $result = $re->replace_g($target, "ABC", $offset, $length, {info => $replace_info_ref});
       
       unless ($replace_info_ref->[0]->replaced_count == 1) {
         return 0;
@@ -70,7 +71,7 @@ class TestCase::Regex {
       my $offset = 0;
       my $length = -1;
       my $replace_info_ref = new Regex::ReplaceInfo[1];
-      my $result = $re->replace_common($target, "ABC", \$offset, $length, {global => 1, info => $replace_info_ref});
+      my $result = $re->replace_g($target, "ABC", $offset, $length, {info => $replace_info_ref});
       
       unless ($replace_info_ref->[0]->replaced_count == 0) {
         return 0;
@@ -1937,6 +1938,175 @@ class TestCase::Regex {
       $@ = undef;
     }
 
+    return 1;
+  }
+  
+  static method buffer_match : int () {
+
+    {
+      my $re = Regex->new("abc");
+      my $target = StringBuffer->new("zabcz");
+      
+      my $match = $re->buffer_match($target);
+      
+      unless ($match) {
+        return 0;
+      }
+    }
+    
+    {
+      my $re = Regex->new("abc");
+      my $target = StringBuffer->new("zabcz");
+      
+      my $offset = 0;
+      my $match = $re->buffer_match($target, $offset);
+      
+      unless ($match) {
+        return 0;
+      }
+    }
+    
+    {
+      my $re = Regex->new("abc");
+      my $target = StringBuffer->new("zabcz");
+      
+      my $offset = 0;
+      my $length = -1;
+      my $match = $re->buffer_match($target, $offset, $length);
+      
+      unless ($match) {
+        return 0;
+      }
+    }
+    
+    {
+      my $re = Regex->new("abc");
+      my $target = StringBuffer->new("zabc");
+      
+      my $offset = 1;
+      my $length = 3;
+      my $match = $re->buffer_match($target, $offset, $length);
+      
+      unless ($match) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $re = Regex->new("abc");
+        my $target = StringBuffer->new("zabc");
+        
+        my $offset = 1;
+        my $length = 4;
+        eval { my $match = $re->buffer_match($target, $offset, $length); }
+        
+        unless (Fn->contains($@, "The \$offset + \$length must be less than or equalt to the lenght of the \$string_buffer.")) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method buffer_match_forward : int () {
+    
+    # Match string
+    {
+      my $re = Regex->new("abc");
+      my $target = StringBuffer->new("zabcz");
+      
+      my $offset = 1;
+      my $match = $re->buffer_match_forward($target, \$offset);
+      
+      unless ($match) {
+        return 0;
+      }
+      
+      unless ($offset == 4) {
+        return 0;
+      }
+    }
+    
+    # Exceptions
+    {
+      {
+        my $re = Regex->new("abc");
+        my $target = StringBuffer->new("zabc");
+        
+        my $offset = 1;
+        my $length = 4;
+        eval { my $match = $re->buffer_match_forward($target, \$offset, $length); }
+        
+        unless (Fn->contains($@, "The \$\$offset_ref + \$length must be less than or equalt to the lenght of the \$string_buffer.")) {
+          return 0;
+        }
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+  
+  static method buffer_replace : int () {
+    
+    {
+      my $re = Regex->new("abc");
+      my $target = StringBuffer->new("ppzabcz");
+      $re->buffer_replace($target, "ABC");
+      
+      unless ($target->to_string eq "ppzABCz") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method buffer_replace_g : int () {
+    {
+      my $re = Regex->new("abc");
+      my $target = StringBuffer->new("ppzabczabcz");
+      my $offset = 0;
+      my $length = -1;
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      $re->buffer_replace_g($target, "ABC", $offset, $length, {info => $replace_info_ref});
+      
+      unless ($replace_info_ref->[0]->replaced_count == 2) {
+        return 0;
+      }
+      
+      unless ($target->to_string eq "ppzABCzABCz") {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method buffer_replace_common : int () {
+    # Replace
+    {
+      my $re = Regex->new("abc");
+      my $target = StringBuffer->new("ppzabcz");
+      my $offset = 0;
+      my $replace_info_ref = new Regex::ReplaceInfo[1];
+      $re->buffer_replace_common($target, "ABC", \$offset, -1, {info => $replace_info_ref});
+      
+      unless ($replace_info_ref->[0]->replaced_count == 1) {
+        return 0;
+      }
+      
+      unless ($target->to_string eq "ppzABCz") {
+        return 0;
+      }
+    }
+    
     return 1;
   }
 }

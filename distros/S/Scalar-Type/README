@@ -15,5 +15,6 @@ To install, do the usual:
 	make test
 	make install
 
-You may use, modify and distribute this code under the same terms as you
-may use, modify and distribute perl itself.
+You may use, modify and distribute this code under the terms of either the GNU
+General Public Licence, version 2, or the Artistic Licence. The full text of
+these can be found in the files GPL2.txt and ARTISTIC.txt respectively.

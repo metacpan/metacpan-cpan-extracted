@@ -1,0 +1,40 @@
+[% IF no_widgets %]
+<section id="main-page">
+    <div class="main-page-content">
+        <h2>Great! Now it's time to enable some widgets</h2>
+        <p>
+            Welcome to your LiteBlog site! Everything is working just fine. You just have to enable some widgets in your Dancer2 config.
+
+            Try adding those lines in your <code>config.yml</code> file and restart your app.
+        </p>
+
+        <pre>
+liteblog:
+  title: "My Liteblog Site"
+  logo: "/images/liteblog.jpg"
+  feature:
+    highlight: 1
+  navigation:
+    - label: "Home"
+      link: "/"
+    - label: "Tech"
+      link: "/blog/tech"
+  widgets:
+    - name: activities
+      params: 
+        source: "activities.yml"
+    - name: blog
+      params:
+        title: "Read my Stories"
+        root: "articles"
+        </pre>
+    </div>
+</section>
+[% ELSE %]
+
+[% FOREACH widget IN widgets %]
+[% INCLUDE "liteblog/widgets/$widget.view" %]
+[% END %]
+
+[% END %]
+

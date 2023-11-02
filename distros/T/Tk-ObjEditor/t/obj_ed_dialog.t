@@ -28,7 +28,6 @@ sub new {
         'piped|key'      => { a => 1, b => 2 },
         'scalar_ref_ref' => \\$scalar,
         'empty string'   => '',
-        'pseudo hash'      => [ { a => 1, b => 2 }, 'a value', 'bvalue' ],
         'non_empty string' => ' ',
         'long'             => 'very long line' . '.' x 80,
         'is undef'         => undef,

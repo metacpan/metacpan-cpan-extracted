@@ -15,7 +15,7 @@ name: Svg-Simple
 provides:
   Svg::Simple:
     file: lib/Svg/Simple.pm
-    version: '20231021'
+    version: '20231031'
 requires:
   Carp: '0'
   Data::Table::Text: '20201029'
@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/philiprbrenan/SvgSimple
   license: http://dev.perl.org/licenses/
   repository: https://github.com/philiprbrenan/SvgSimple
-version: '20231021'
+version: '20231031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

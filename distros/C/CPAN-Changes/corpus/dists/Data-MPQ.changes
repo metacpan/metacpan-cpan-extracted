@@ -1,0 +1,11 @@
+0.04 30 Oct 2011
+	- Add full covered tests for Data::MPQ
+	- Change repository name in META
+0.03 29 Oct 2011
+	- Fix some critical bugs
+	- Rename module to Data::MPQ::* (https://rt.cpan.org/Public/Bug/Display.html?id=71938)
+	- Add a bit of Pod documentation
+0.02 26 Oct 2011
+	- Fix bugs at 32bit platform
+0.01 23 Oct 2011
+	- First version

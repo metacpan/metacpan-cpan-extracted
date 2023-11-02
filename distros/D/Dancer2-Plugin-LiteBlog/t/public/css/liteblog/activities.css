@@ -1,0 +1,69 @@
+
+/* Restore full width */
+section#activities {
+    max-width: 2000px;
+    margin: auto;
+}
+
+#activity-welcome {
+    width: calc(66.66% - 20px); /* 2/3 of the width minus the margin */
+    margin: 0 auto; /* Center the card horizontally */
+}
+
+#activities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 40px 20px;
+
+}
+
+.activity-card {
+    background-color: #ffffff;
+    
+    flex: 1 0 calc(33.333% - 20px); /* this ensures the card takes up 1/3 of the width minus the gap */
+    min-width: 280px; /* this is the minimum width each card will have */
+    max-width: 320px; /* this is the maximum width each card will have */
+
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 20px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.activity-card pre {
+    margin:0;
+    padding: 0;
+    text-align: left;
+}
+
+.activity-card img {
+    width: 100%;
+    height: 160px; /* Fixed height of 60px */
+    object-fit: cover; /* Maintain aspect ratio */
+    object-position: center; /* Center the image horizontally and vertically */
+}
+
+.activity-card h2 {
+    margin-top: 0;
+}
+
+.activity-card p {
+    text-align: left;
+}
+
+@media screen and (max-width: 768px) {
+    .activity-card {
+        width: calc(30% - 20px);
+    }
+}
+
+@media screen and (max-width: 680px) {
+    .activity-card {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+

@@ -13,7 +13,7 @@ Test::Neo4j::Types - Tools for testing Neo4j type modules
 
 =head1 VERSION
 
-version 0.03
+version 0.06
 
 =head1 OVERVIEW
 
@@ -22,24 +22,22 @@ be deemed successful, it will eventually be merged with the
 existing L<Neo4j-Types|https://metacpan.org/dist/Neo4j-Types>
 distribution.
 
-You probably shouldn't be using this module at this time, because
-the requirements it checks for are evolving and might shift under
-your feet at any moment. For further information, see
+Note that the requirements this module checks for are
+still evolving. For further information, see
 L<johannessen/neo4j-types Version 2 (milestone)|https://github.com/johannessen/neo4j-types/milestone/1>.
 
 =head1 SYNOPSIS
 
- # For a node class that happens to have a new()
- # constructor with parameters that match the ones
- # given here exactly:
- neo4j_node_ok 'Local::Node', \&Local::Node::new;
- 
  # For a node data structure that happens to match
  # the given parameters exactly:
  neo4j_node_ok 'Local::Node', sub {
    my ($class, $params) = @_;
    return bless { %$params }, $class;
  };
+ 
+ # For a node class that happens to already have
+ # a new() constructor exactly like that:
+ neo4j_node_ok 'Local::Node', \&Local::Node::new;
  
  # For a relationship data structure that needs
  # adapting from the given parameters:
@@ -54,14 +52,17 @@ L<johannessen/neo4j-types Version 2 (milestone)|https://github.com/johannessen/n
  
  # For the typical path data structure:
  neo4j_path_ok 'Local::Path', sub {
-   my ($class, $elements) = @_;
-   return bless [ @$elements ], $class;
+   my ($class, $params) = @_;
+   return bless [ $params->{elements}->@* ], $class;
  };
  
  # For spatial / temporal data structures:
  neo4j_point_ok 'Local::Point', sub {...};
  neo4j_datetime_ok 'Local::Temporal::Instant', sub {...};
  neo4j_duration_ok 'Local::Temporal::Duration', sub {...};
+ 
+ # For a byte array data structure:
+ neo4j_bytearray_ok 'Local::ByteArray', sub {...};
 
 =head1 DESCRIPTION
 
@@ -69,13 +70,41 @@ Offers a simple way to test your Neo4j::Types implementation for
 correctness. These test tools not only verify that the required
 methods are provided, they also try to verify that the methods
 actually work as expected. While the checks provided by this
-module certainly won't cover all requirements, they will cover
+module certainly don't cover all requirements, they do cover
 many of them.
+
+It is anticipated that the checks these tools perform will be
+expanded in future. If this worries you, you should consider
+only using these tools for author tests.
+That said, if your code is on CPAN and declares this module
+as a dependency, the author of this module will take every
+effort to avoid problems caused by such changes.
 
 =head1 FUNCTIONS
 
 L<Test::Neo4j::Types> offers the following functions.
 All functions are exported by default.
+
+=head2 neo4j_bytearray_ok
+
+ sub bytearray_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_bytearray_ok $bytearray_class, \&bytearray_new;
+ neo4j_bytearray_ok $bytearray_class, \&bytearray_new, $subtest_name;
+
+Verifies that C<$bytearray_class> is a package that implements
+the interface specified for Neo4j byte arrays by L<Neo4j::Types>.
+
+C<\&bytearray_new> must be a reference to a subroutine that can
+construct a new Neo4j byte array of the type C<$bytearray_class>
+based on the parameter provided in the hash ref C<$params>.
+The parameter has a name exactly matching the method in
+L<Neo4j::Types::ByteArray>:
+
+ $params = {
+   as_string => 'bytes',
+ };
 
 =head2 neo4j_datetime_ok
 
@@ -150,10 +179,13 @@ L<Neo4j::Types::Node>:
    properties => { key => 'value' },
  };
 
+An unavailable S<element ID> will during tests be
+represented by an undefined parameter value.
+
 =head2 neo4j_path_ok
 
- sub path_new ($class, $elements) {
-   return bless [ @$elements ], $class;
+ sub path_new ($class, $params) {
+   return bless { ... }, $class;
  }
  neo4j_path_ok $path_class, \&path_new;
  neo4j_path_ok $path_class, \&path_new, $subtest_name;
@@ -163,18 +195,20 @@ the interface specified for paths by L<Neo4j::Types>.
 
 C<\&path_new> must be a reference to a subroutine that can
 construct a new path of the type C<$path_class> based
-on the elements provided in the array ref C<$elements>.
-The elements are alternating between references that
-represent nodes and relationships in the exact same order
-as for L<Neo4j::Types::Path/"elements">:
+on the parameter provided in the hash ref C<$params>.
+The parameter is an array of references that alternate
+between nodes and relationships, matching the method
+L<Neo4j::Types::Path/"elements">:
 
- $elements = [
-   $node_0,
-   $relationship_0,
-   $node_1,
-   $relationship_1,
-   $node_2,
- ];
+ $params = {
+   elements => [
+     $node_0,
+     $relationship_0,
+     $node_1,
+     $relationship_1,
+     $node_2,
+   ],
+ };
 
 Inside C<path_new>, these references will purport to perform
 the L<Neo4j::Types::Node> and L<Neo4j::Types::Relationship>
@@ -231,6 +265,9 @@ L<Neo4j::Types::Relationship>:
    type             => 'TYPE',
  };
 
+An unavailable S<element ID> will during tests be
+represented by an undefined parameter value.
+
 =head1 BUGS AND LIMITATIONS
 
 The diagnostics are not particularly great. All of these tools
@@ -260,8 +297,9 @@ perhaps adequate) way to implement this might be a global
 C<@Test::Neo4j::Types::no_warnings> variable, which users
 could then localise and configure as required.
 
-If these tools are ever developed further than this, switching
-to L<Test2::Manual::Tooling> should be considered.
+If these tools are ever developed further than this,
+L<switching to Test2|Test2::Manual::Tooling> should be
+considered.
 
 =head1 SEE ALSO
 

@@ -7,9 +7,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-02'; # DATE
+our $DATE = '2023-10-28'; # DATE
 our $DIST = 'Perinci-Sub-Util'; # DIST
-our $VERSION = '0.471'; # VERSION
+our $VERSION = '0.472'; # VERSION
 
 our @EXPORT_OK = qw(
                        sort_args
@@ -40,7 +40,7 @@ Perinci::Sub::Util::Sort - Sort routines
 
 =head1 VERSION
 
-This document describes version 0.471 of Perinci::Sub::Util::Sort (from Perl distribution Perinci-Sub-Util), released on 2023-07-02.
+This document describes version 0.472 of Perinci::Sub::Util::Sort (from Perl distribution Perinci-Sub-Util), released on 2023-10-28.
 
 =head1 SYNOPSIS
 

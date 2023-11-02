@@ -1,0 +1,34 @@
+#!perl
+use v5.38;
+use CPANSEC::Admin;
+exit CPANSEC::Admin->new->run(@ARGV);
+
+__END__
+
+=head1 USAGE
+
+    cpansec-admin <command> [arguments]
+
+    Available commands:
+
+        show       Displays a given CPANSEC id in human-friendly format
+        new        Creates a new custom entry for triage
+        triage     Approve/Reject advisories from triage
+        cvescan    Scans CVE entries to triage for potential CPAN packages
+        publish    Assigns CPANSEC ids and publish approved advisories in OSV format
+        help       Shows detailed help for any given command
+
+    try 'cpansec-admin help <command>' for extra information regarding any
+    specific command.
+
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) CPAN Security Working Group.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

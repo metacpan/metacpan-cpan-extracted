@@ -1,5 +1,13 @@
 Revision history for HTTP-CSPHeader
 
+v0.3.3    2023-10-28 10:01:10+01:00 Europe/London
+  [Tests]
+  - Migrated to Test2.
+
+  - Removed use of Test::Most.
+
+  - Enable "use strict" Kwalitee test.
+
 v0.3.2    2023-06-14 15:32:22+01:00 Europe/London
   [Documentation]
   - Fixed typo in SYNOPSIS.

@@ -1,4 +1,4 @@
-package EAI::File 1.4;
+package EAI::File 1.5;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -49,6 +49,7 @@ sub readText ($$$;$) {
 			return 0;
 		}
 	}
+	my $autoheader = $File->{format_autoheader} if $File->{format_autoheader};
 	$Data::Dumper::Terse = 1;
 	$logger->debug("skip:$skip,sep:".Data::Dumper::qquote($origsep).",header:@header\ntargetheader:@targetheader");
 	$Data::Dumper::Terse = 0;
@@ -103,6 +104,14 @@ sub readText ($$$;$) {
 						last if /$skip/;
 					}
 				}
+			}
+			# assumption: header exists in file and format_header should be derived from there
+			if ($autoheader) {
+				$sep = "," if !$sep;
+				$_ = <FILE>; chomp;
+				@header = split $sep;
+				@targetheader = @header;
+				$logger->debug("autoheader set, sep: [".$sep."], headings: @header");
 			}
 			# iterate through all rows of file
 			my $lineno = 0;
@@ -546,12 +555,15 @@ sub writeText ($$) {
 		return 0;
 	}
 	# in case we need to print out csv/quoted values
-	my $sv = Text::CSV->new ({
-		binary    => 1,
-		auto_diag => 1,
-		sep_char  => $File->{format_sep},
-		eol => ($File->{format_eol} ? $File->{format_eol} : $/),
-	});
+	my $sv;
+	if ($File->{format_quotedcsv}) {
+		$sv = Text::CSV->new ({
+			binary    => 1,
+			auto_diag => 1,
+			sep_char  => $File->{format_sep},
+			eol => ($File->{format_eol} ? $File->{format_eol} : $/),
+		});
+	}
 	my @columnnames; my @paddings;
 	if (ref($File->{columns}) eq 'ARRAY') {
 		@columnnames = @{$File->{columns}};

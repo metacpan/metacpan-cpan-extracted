@@ -16,8 +16,8 @@ system is B<incomplete>. A full reimplementation would not only be very hard to
 achieve but also very likely insecure (see
 L<https://bitcointalk.org/index.php?topic=260595.0>). In addition, it would be
 very ineffective to verify the entire blockchain using Perl + XS code. Instead,
-we focus on support to standard transaction types (see below) under today's
-consensus rules (without much regard for transactions' backward compatibility
+we focus on support for standard transaction types (see below) under today's
+consensus rules (without much regard to transactions' backward compatibility
 quirks).
 
 By using the transaction system of this module you take full responsibility for
@@ -90,6 +90,17 @@ Bitcoin::Crypto test suite contains pretty thorough testing of following output 
 =item * NULLDATA (provably unspendable outputs with OP_RETURN)
 
 =back
+
+=head2 Coin values
+
+All the value fields used by this module are in the smallest unit (satoshi) and
+are BigInt objects. This is to ensure 32-bit compatibility of 64-bit
+value fields. There are type coercions implemented to make it as opaque as
+possible, but you may sometimes bump into issues with these objects when doing
+value calculations. Refer to L<Math::BigInt> documentation when required.
+
+If you need to calculate full coin value, you may use
+C<Bitcoin::Crypto::Constants::units_per_coin> constant.
 
 =head2 Transaction examples
 

@@ -1,8 +1,10 @@
 package App::Oozie::Util::Log4perl;
-$App::Oozie::Util::Log4perl::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
 
 use App::Oozie::Util::Plugin qw(
     find_files_in_inc
@@ -18,7 +20,7 @@ sub find_template {
     my @found = find_files_in_inc('App/Oozie/Util/Log4perl/Templates', 'l4p');
     my %tmpl = map { @{ $_ }{qw/ name abs_path /} } @found;
 
-    return $tmpl{ $type } || $tmpl{simple} || die "No log4perl template file was found";
+    return $tmpl{ $type } || $tmpl{simple} || die 'No log4perl template file was found';
 }
 
 1;
@@ -35,7 +37,7 @@ App::Oozie::Util::Log4perl
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ use Carp;
 
 
 
-our $VERSION = "0.031";
+our $VERSION = "0.032";
 
 =head1 NAME
 
@@ -204,11 +204,13 @@ May be negative to lower the text.
 Note: In Pango conformance mode, C<rise> does B<not> accumulate.
  Use C<baseline_shift> instead.
 
-=item rise=C<NUM>pt   rise=C<NUM>%
+=item rise=C<NUM>pt   rise=C<NUM>%   rise=C<NUM>em   rise=C<NUM>ex
 
 Rises the text from the baseline. May be negative to lower the text.
 
 Units are points if postfixed by B<pt>, and a percentage of the current font size if postfixed by B<%>.
+
+B<em> units are equal to the current font size, B<ex> half the font size.
 
 Note: This is not (yet?) part of the Pango markup standard.
 
@@ -419,7 +421,8 @@ layout from the markup as this function does not clear all attributes.
 sub set_text {
     my ( $self, $string ) = @_;
     $self->{_content} =
-      [ { text  => $string,
+      [ { type  => "text",
+	  text  => $string,
 	  font  => $self->{_currentfont},
 	  size  => $self->{_currentsize},
 	  color => $self->{_currentcolor},
@@ -647,6 +650,9 @@ sub set_markup {
 		    elsif ( !$self->{_pango} && $v =~ /^(-?\d+(?:\.\d*)?)\%$/ ) {
 			$base = -$1 * $fsiz / 100;
 		    }
+		    elsif ( !$self->{_pango} && $v =~ /^(-?\d+(?:\.\d*)?)e([mx])$/ ) {
+			$base = $2 eq 'x' ? -$1 * $fsiz / 2 : -$1 * $fsiz;
+		    }
 		    else {
 			$v /= PANGO_SCALE;
 			$base = $self->{_pango} ? -$v : $base + $v * $fsiz;
@@ -661,6 +667,9 @@ sub set_markup {
 		    }
 		    elsif ( $v =~ /^(-?\d+(?:\.\d*)?)\%$/ ) {
 			$base -= $1 * $fsiz / 100;
+		    }
+		    elsif ( $v =~ /^(-?\d+(?:\.\d*)?)e([mx])$/ ) {
+			$base = $2 eq 'x' ? $1 * $fsiz / 2 : $1 * $fsiz;
 		    }
 		    else {
 			$base -= $self->{_pango} ? $v : -$v * $fsiz;
@@ -710,8 +719,52 @@ sub set_markup {
 	}
     };
 
+    my $image = sub {
+	my ( $v ) = @_;
+
+	my %img;
+	# Split the attributes.
+	foreach my $k ( shellwords($v) ) {
+
+	    # key=value
+	    if ( $k =~ /^([-\w]+)=(.+)$/ ) {
+		my ( $k, $v ) = ( $1, $2 );
+
+		# Ignore case unless required.
+		$v = lc $v unless $k =~ /^(src|id)$/;
+
+		# Strip quotes. Shouldn't be necessary now we use shellwords.
+		# $v =~ s/^(["'])(.*)\1$/$2/;
+
+		if ( $k eq "src" ) {
+		    $img{src} = $v;
+		}
+		elsif ( $k eq "id" ) {
+		    $img{id} = $v;
+		}
+		elsif ( $k =~ /^(width|height|w|h)$/ ) {
+		    $img{$k} = $v;
+		}
+		elsif ( $k =~ /^(x|y)$/ ) {
+		    $img{$k} = $v;
+		}
+		elsif ( $k eq "border" ) {
+		    $img{border} = $v;
+		}
+		else {
+		    carp("Invalid image attribute: \"$k\"\n");
+		}
+	    }
+	    else {
+		carp("Invalid image attribute: \"$k\"\n");
+	    }
+	}
+	return \%img;
+    };
+
+
     # Split the string on markup instructions.
-    foreach my $a ( split( /(<.*?>)/, $string ) ) {
+ L: foreach my $a ( split( /(<.*?>)/, $string ) ) {
 
 	# Closing markup, e.g. </b> or </span>.
 	if ( $a =~ m;^<\s*/\s*(\w+)(.*)>$; ) {
@@ -739,9 +792,11 @@ sub set_markup {
 	}
 
 	# Opening markup, e.g. <b> or <span ...>.
-	elsif ( $a =~ m;^<\s*([-\w]+)(.*)>$; ) {
+	elsif ( $a =~ m;^<\s*([-\w]+)(.*)?>$; ) {
 	    my $k = lc $1;
 	    my $v = $2;
+	    my $closed = $v =~ s;\s*/\s*$;;;
+
 	    # Save.
 	    push( @stack, [ "<$k".lc($v).">",
 			    $fcur, $fsiz, $fcol, $undl, $uncl, $ovrl, $ovcl,
@@ -797,15 +852,40 @@ sub set_markup {
 		$span->($v);
 	    }
 
+	    # <.../>.
+	    elsif ( ( my $p = $self->get_element_handler($k) ) && $closed ) {
+		push( @content, { type => $k,
+				  %{ $p->parse
+				       ( { type			      => $k,
+					   font			      => $fcur,
+					   size			      => $fsiz,
+					   color		      => $fcol,
+					   bgcolor		      => $bcol,
+					   underline		      => $undl,
+					   underline_color	      => $uncl,
+					   overline		      => $ovrl,
+					   overline_color	      => $ovcl,
+					   strikethrough	      => $strk,
+					   strikethrough_color	      => $stcl,
+					   base			      => $base,
+					   href			      => $href,
+					 }, $k, $v ) } } );
+	    }
+
 	    else {
 		carp("Invalid markup: \"$k\"\n");
+	    }
+	    if ( $closed ) {
+		$a = "</$k>";
+		redo L;
 	    }
 	}
 
 	# Text.
 	else {
 	    push( @content,
-		  { text		     => $a,
+		  { type		     => "text",
+		    text		     => $a,
 		    font		     => $fcur,
 		    size		     => $fsiz,
 		    color		     => $fcol,
@@ -1770,6 +1850,22 @@ sub get_pango_scale {
 
 sub nyi {
     croak("Method \"" . (caller(1))[3] . "\" not implemented");
+}
+
+my $aliens;
+sub register_element {
+    my ( $self, $hd, @tags ) = @_;
+    croak("Element handler for \"$tags[0]\" does not play nicely")
+      unless $hd->DOES(qw(Text::Layout::ElementRole));
+    for ( @tags ) {
+	$aliens->{$_} = $hd;
+    }
+}
+
+sub get_element_handler {
+    my ( $self, $tag ) = @_;
+    return unless $tag;
+    $aliens->{$tag};
 }
 
 =head1 SEE ALSO

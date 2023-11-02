@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Dancer2::Plugin::LiteBlog::Scaffolder;
+
+my $basedir = $ARGV[0];
+my $force   = $ARGV[1] || 0;
+
+# TODO: use a nice param module instead of this ugly manual check
+if (! defined $basedir) {
+	print "Usage: $0 <basedir>\n";
+    print "basedir: the base directory where scaffolded files should be generated\n";
+    print "Note: any existing file will *not* be replaced\n";
+    exit 255;
+}
+
+if (! -d $basedir) {
+    print "basedir should be a valid directory (does not exist)\n";
+    exit 255;
+}
+
+if ($force eq '-f') {
+    $force = 1;
+}
+
+Dancer2::Plugin::LiteBlog::Scaffolder::scaffold($basedir, $force);

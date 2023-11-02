@@ -102,9 +102,7 @@ sub paint {
     $max_freq = abs $fz if $max_freq < abs $fz;
     $max_freq = abs $fr if $max_freq < abs $fr;
 
-    my $step_in_circle = exists $self->{'data'}{'sketch'}
-                       ? 50 * $max_freq
-                       : $self->{'data'}{'line'}{'density'} * $self->{'data'}{'line'}{'density'} * $max_freq;
+    my $step_in_circle = $self->{'data'}{'line'}{'density'} * $self->{'data'}{'line'}{'density'} * $max_freq;
     my $t_iter =         exists $self->{'data'}{'sketch'}
                ? 5 * $step_in_circle
                : $self->{'data'}{'line'}{'length'} * $step_in_circle;

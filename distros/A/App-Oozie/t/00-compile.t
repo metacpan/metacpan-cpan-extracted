@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 43 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 45 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/Oozie.pm',
@@ -35,9 +35,11 @@ my @module_files = (
     'App/Oozie/Role/Fields/Objects.pm',
     'App/Oozie/Role/Fields/Path.pm',
     'App/Oozie/Role/Git.pm',
+    'App/Oozie/Role/Info.pm',
     'App/Oozie/Role/Log.pm',
     'App/Oozie/Role/Meta.pm',
     'App/Oozie/Role/NameNode.pm',
+    'App/Oozie/Role/Validate/XML.pm',
     'App/Oozie/Run.pm',
     'App/Oozie/Serializer.pm',
     'App/Oozie/Serializer/Dummy.pm',

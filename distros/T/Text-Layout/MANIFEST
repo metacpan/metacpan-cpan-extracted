@@ -1,11 +1,13 @@
 Changes
 lib/Text/Layout.pm
 lib/Text/Layout/Cairo.pm
+lib/Text/Layout/ElementRole.pm
 lib/Text/Layout/FontConfig.pm
 lib/Text/Layout/FontDescriptor.pm
 lib/Text/Layout/Markdown.pm
 lib/Text/Layout/Pango.pm
 lib/Text/Layout/PDFAPI2.pm
+lib/Text/Layout/PDFAPI2/ImageElement.pm
 lib/Text/Layout/Testing.pm
 lib/Text/Layout/Version.pm
 Makefile.PL
@@ -37,5 +39,7 @@ tests/underline.pl
 tests/md1.pl
 tests/Lohit-Devanagari.ttf
 tests/fontbb.pl
+tests/im1.pl
+tests/ab.jpg
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

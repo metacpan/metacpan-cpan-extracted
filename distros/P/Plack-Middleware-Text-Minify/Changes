@@ -1,5 +1,14 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.4.1    2023-10-28 09:34:02+01:00 Europe/London
+  [Tests]
+  - Migrated tests to use Test2.
+
+  - Removed use of Test::Most.
+
+  [Other]
+  - Bumped the minimum version of Text::Minify::XS to v0.7.0.
+
 v0.4.0    2023-05-10 08:58:43+01:00 Europe/London
   [Incompatible Changes]
   - Upgraded the minimum Perl version to v5.14.

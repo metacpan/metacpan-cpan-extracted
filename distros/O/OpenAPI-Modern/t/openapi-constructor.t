@@ -8,16 +8,12 @@ no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 
-use Test::More 0.88;
 use Test::Fatal;
-use Test::Deep;
 use Test::Memory::Cycle;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use JSON::Schema::Modern::Document::OpenAPI;
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
-use constant { true => JSON::PP::true, false => JSON::PP::false };
 use Feature::Compat::Try;
-use OpenAPI::Modern;
+
+use lib 't/lib';
+use Helper;
 
 my $minimal_document = {
   openapi => '3.1.0',

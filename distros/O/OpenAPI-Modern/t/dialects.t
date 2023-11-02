@@ -7,13 +7,8 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
-use File::ShareDir 'dist_dir';
-use Test::Deep;
-use JSON::Schema::Modern;
-use JSON::Schema::Modern::Document::OpenAPI;
+use lib 't/lib';
+use Helper;
 
 use constant STRICT_DIALECT_URI => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-dialect.json';
 use constant STRICT_METASCHEMA_URI => 'https://raw.githubusercontent.com/karenetheridge/OpenAPI-Modern/master/share/strict-schema.json';

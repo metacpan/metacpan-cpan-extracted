@@ -1,0 +1,71 @@
+Revision history for Dancer2-Plugin-LiteBlog
+
+0.03    2023-11-02
+
+        [FEATURES]
+        * New route to render static assets in article's directory (eg: 
+          /blog/some-article/featured.jpg). 
+        * New method <render_client_error> to properly render 404 in Liteblog's
+          look and feel.
+        * If 'navigation' is set, on mobile displays, a hamburger menu is
+          displayed. When the user clicks on it, the navigation items are
+          displayed as a popup menu.
+        * Widgets now log what they do in Dancer2's logging system.
+        * (CSS) Blog post header has a nice styling even when no feature image
+          is set.
+        * (CSS) Activities cards are now fixed to a maximum of 3 cards per row,
+           with a maximum width of 320px and minimum width of 280px;
+        * (CSS) Use CSS variables for common colors in liteblog.css to ease
+          theming changes.
+
+        [SCAFFOLDER]
+        * The provided article is a little documentation about the 'Blog'
+          widget, with guidelines on how to edit the article.
+
+        [FIXES]
+        * (CSS) Images adapt their width to small screens.
+        * All routes for articles, pages, categories are now forced to their
+          trailing slash version (/some/article/). Requests to the version
+          without a trailing / are redirected. Needed to allow images loeaded
+          locally from article locations.
+        * (CSS) Activities Cards sizes are now stable to 280px. Responsiveness
+          is good now.
+        * (CSS) blog-cards sizes are now stable (420px max). Responsiveness is
+          good now.
+        * Fix article->image accessor to return proper permalinks if the meta
+          value of the 'image' parameter is relative.
+        * It's now possible to mount the Blog widget to the root of the site
+          (/). This was causing many bugs in permalinks generation. Fixed now.
+
+0.02    2023-10-31
+
+        [FEATURES]
+        * Feature 'highlight' can be set to include the Highligh JS library.
+        * Navigation Bar: possible to configure navigation links in the liteblog
+          settings. If present (as an array of hash containing a link and a
+          label), each element will be displayed in the navigation bar.
+          Currently only visible in the single-page layout.
+        
+        [DIST]
+        * ship bin/liteblog-scaffold (was not in 0.01)
+        * README.md/README with more information.
+        
+        [SCAFFOLDER]
+        * Better design for the blog post page
+
+0.01    2023-10-30
+
+        [ DOCUMENTATION ]
+        * All public Classes are documented.
+
+        [ SCAFFOLDER ]
+        * bin/liteblog-scaffold to generate views and assets in a Dancer2 app
+          dir.
+
+        [ FEATURES ]
+        * Default routes loaded when using the plugin for a landing page (/) and
+          blog-related routes (/blog/cat/slug, ...)
+        * Activities card to show off hobby, social networks, profesional links…
+        * Widgets are generic classes that allow for unlimited extensibility in
+          the future (Activities and Blog are implementing it).
+

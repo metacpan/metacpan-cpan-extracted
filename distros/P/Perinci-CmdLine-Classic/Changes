@@ -1,3 +1,10 @@
+1.818   2023-10-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to latest Test::Perinci::CmdLine (1.484).
+
+        - Remove use of smartmatch to avoid warning under perl 5.38+.
+
+
 1.817   2022-10-19  Released-By: PERLANCAR; Urgency: medium
 
         - Unbreak VERSION() by calling SUPER::VERSION() (RT#144732).

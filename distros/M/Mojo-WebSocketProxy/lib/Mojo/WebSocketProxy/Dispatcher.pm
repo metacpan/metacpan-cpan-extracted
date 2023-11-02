@@ -18,8 +18,9 @@ use Encode;
 use DataDog::DogStatsd::Helper qw(stats_inc);
 
 use constant TIMEOUT => $ENV{MOJO_WEBSOCKETPROXY_TIMEOUT} || 15;
+use Mojo::WebSocketProxy::RequestLogger;
 
-our $VERSION = '0.14';     ## VERSION
+our $VERSION = '0.15';     ## VERSION
 around 'send' => sub {
     my ($orig, $c, $api_response, $req_storage) = @_;
 
@@ -51,7 +52,6 @@ sub open_connection {
 
     my $log = $c->app->log;
     $log->debug("accepting a websocket connection from " . $c->tx->remote_address);
-
     # Enable permessage-deflate
     $c->tx->with_compression;
 
@@ -123,6 +123,7 @@ sub on_message {
     my $req_storage = {};
     $req_storage->{args} = $args;
 
+    $req_storage->{logger} = Mojo::WebSocketProxy::RequestLogger->new;
     # We still want to run any hooks even for invalid requests.
     if (my $err = Mojo::WebSocketProxy::Parser::parse_req($c, $req_storage)) {
         $c->send({json => $err}, $req_storage);
@@ -293,6 +294,8 @@ Handle message - parse and dispatch request messages.
 Dispatching action and forward to RPC server. Note that all
 incoming JSON messages are first normalised using
 L<NFC|https://www.w3.org/International/articles/unicode-migration/#normalization>.
+ 
+
 
 =head2 before_forward
 

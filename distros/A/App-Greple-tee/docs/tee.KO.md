@@ -25,11 +25,33 @@ Greple의 **-Mtee** 모듈은 지정된 필터 명령에 일치하는 텍스트 
 
 **-- 불연속** 옵션과 함께 사용할 경우 입력 및 출력 데이터의 줄이 동일할 필요는 없습니다.
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     일치하는 모든 부분에 대해 개별적으로 새 명령을 호출합니다.
+
+- **--fillup**
+
+    필터 명령에 전달하기 전에 빈 줄이 아닌 일련의 줄을 한 줄로 결합합니다. 넓은 문자 사이의 개행 문자는 삭제되고 다른 개행 문자는 공백으로 바뀝니다.
+
+- **--blockmatch**
+
+    일반적으로 지정된 검색 패턴과 일치하는 영역이 외부 명령으로 전송됩니다. 이 옵션을 지정하면 일치하는 영역이 아니라 해당 패턴이 포함된 전체 블록이 처리됩니다.
+
+    예를 들어 `foo` 패턴이 포함된 줄을 외부 명령으로 보내려면 전체 줄에 일치하는 패턴을 지정해야 합니다:
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    하지만 **--blockmatch** 옵션을 사용하면 다음과 같이 간단하게 수행할 수 있습니다:
+
+        greple -Mtee cat -n -- foo
+
+    **--blockmatch** 옵션을 사용하면 이 모듈은 [teip(1)](http://man.he.net/man1/teip)의 **-g** 옵션과 비슷하게 동작합니다.
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ Greple의 **-Mtee** 모듈은 지정된 필터 명령에 일치하는 텍스트 
 
 DeepL 서비스에서 위 명령어를 **-Mtee** 모듈과 결합하여 실행하면 다음과 같이 **deepl** 명령어를 호출합니다:
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-**deepl**은 한 줄 입력에 더 잘 동작하므로 명령어 부분을 다음과 같이 변경할 수 있습니다:
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 하지만 이런 용도로는 전용 모듈인 [App::Greple::xlate::deep](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeep)을 사용하는 것이 더 효과적입니다. 사실 **tee** 모듈의 구현 힌트는 **xlate** 모듈에서 따온 것입니다.
 
@@ -82,7 +100,24 @@ DeepL 서비스에서 위 명령어를 **-Mtee** 모듈과 결합하여 실행�
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+`--불연속` 옵션을 사용하면 시간이 많이 걸립니다. 따라서 NL 대신 CR 문자를 사용하여 한 줄을 생성하는 `--별도 '\r'` 옵션을 `ansifold`와 함께 사용할 수 있습니다.
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+그런 다음 [tr(1)](http://man.he.net/man1/tr) 명령 등으로 CR 문자를 NL로 변환합니다.
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+헤더가 아닌 줄에서 문자열을 찾으려는 상황을 생각해 봅시다. 예를 들어, 헤더 줄은 그대로 두고 `docker image ls` 명령에서 이미지를 검색하고 싶을 수 있습니다. 다음 명령을 사용하면 됩니다.
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+옵션 `-Mline -L 2:`는 두 번째 줄부터 마지막 줄까지 검색하여 `grep perl` 명령으로 보냅니다. 옵션 `-- 불연속`이 필요하지만 이 옵션은 한 번만 호출되므로 성능 저하가 없습니다.
+
+이 경우 출력의 줄 수가 입력보다 적기 때문에 `teip -l 2- -- grep`가 오류를 생성합니다. 하지만 결과는 꽤 만족스럽습니다.)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ DeepL 서비스에서 위 명령어를 **-Mtee** 모듈과 결합하여 실행�
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
+
+# BUGS
+
+`--fillup` 옵션은 한글 텍스트에 대해 제대로 작동하지 않을 수 있습니다.
 
 # AUTHOR
 

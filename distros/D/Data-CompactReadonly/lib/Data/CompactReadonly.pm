@@ -7,11 +7,11 @@ use Data::CompactReadonly::V0::Node;
 
 # Yuck, semver. I give in, the stupid cult that doesn't understand
 # what the *number* bit of *version number* means has won.
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 =head1 NAME
 
-Data::CompactReadonly
+Data::CompactReadonly - create and read Compact Read Only Databases
 
 =head1 DESCRIPTION
 
@@ -173,7 +173,7 @@ L<git://github.com/DrHyde/perl-modules-Data-CompactReadonly.git>
 
 =head1 AUTHOR, COPYRIGHT and LICENCE
 
-Copyright 2020 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+Copyright 2023 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
 
 This software is free-as-in-speech software, and may be used,
 distributed, and modified under the terms of either the GNU

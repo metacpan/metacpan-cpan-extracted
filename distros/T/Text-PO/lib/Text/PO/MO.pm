@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/MO.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/06/25
-## Modified 2022/07/06
+## Modified 2023/10/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use IO::File;
     use Nice::Try;
     use Text::PO;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -38,8 +38,8 @@ sub init
     $file = shift( @_ );
     $self->{auto_decode} = 1;
     $self->{default_encoding} = 'utf-8';
-    $self->{domain} = '';
-    $self->{encoding}    = '';
+    $self->{domain} = undef;
+    $self->{encoding}    = undef;
     $self->{file} = $file;
     $self->{use_cache} = 1;
     $self->{_init_strict_use_sub} = 1;
@@ -491,7 +491,7 @@ Text::PO::MO - Machine Object File Read, Write
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

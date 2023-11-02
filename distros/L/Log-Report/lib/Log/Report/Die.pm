@@ -1,4 +1,4 @@
-# Copyrights 2007-2022 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 2007-2023 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.03.
@@ -8,7 +8,7 @@
 
 package Log::Report::Die;
 use vars '$VERSION';
-$VERSION = '1.34';
+$VERSION = '1.36';
 
 use base 'Exporter';
 
@@ -130,7 +130,7 @@ sub exception_decode($%)
       , errno   => $errno
       );
 
-    my $reason = $errno ? 'FAULT' : $args{on_die} || 'ERROR';
+    my $reason = $errno ? 'FAULT' : ($args{on_die} || 'ERROR');
 
     # hopefully stringification is overloaded
     (\%opt, $reason, "$exception");

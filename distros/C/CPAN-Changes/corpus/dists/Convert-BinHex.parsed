@@ -1,0 +1,184 @@
+{
+  "preamble" => "Revision history for Perl module Convert::BinHex",
+  "raw_preamble" => "Revision history for Perl module Convert::BinHex\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "\t- Fixed pod error in debinhex and added pod tests\n\n",
+          "style" => "-",
+          "text" => "Fixed pod error in debinhex and added pod tests"
+        }
+      ],
+      "line" => 3,
+      "raw" => "{{\$NEXT}}\n",
+      "version" => "{{\$NEXT}}"
+    },
+    {
+      "date" => "2013-08-25",
+      "entries" => [
+        {
+          "line" => 7,
+          "raw" => "    - Added unit tests for OO and CRC code\n\n",
+          "style" => "-",
+          "text" => "Added unit tests for OO and CRC code"
+        }
+      ],
+      "line" => 6,
+      "raw" => "1.122 2013-08-25\n",
+      "raw_date" => "2013-08-25",
+      "version" => "1.122"
+    },
+    {
+      "date" => "2013-08-23",
+      "entries" => [
+        {
+          "line" => 10,
+          "raw" => "    - Changes file reformatted thanks to Neil Bowers (NEILB)\n",
+          "style" => "-",
+          "text" => "Changes file reformatted thanks to Neil Bowers (NEILB)"
+        },
+        {
+          "line" => 11,
+          "raw" => "    - Moved to Dist::Zilla's OurPkgVersion for keeping \$VERSIONs in sync\n\n",
+          "style" => "-",
+          "text" => "Moved to Dist::Zilla's OurPkgVersion for keeping \$VERSIONs in sync"
+        }
+      ],
+      "line" => 9,
+      "raw" => "1.121 2013-08-23\n",
+      "raw_date" => "2013-08-23",
+      "version" => "1.121"
+    },
+    {
+      "date" => "2013-08-22",
+      "entries" => [
+        {
+          "line" => 14,
+          "raw" => "    - First CPAN release by Stephen Nelson (STEPHEN),\n      who's now maintaining this module.\n\n",
+          "style" => "-",
+          "text" => "First CPAN release by Stephen Nelson (STEPHEN), who's now maintaining this module."
+        }
+      ],
+      "line" => 13,
+      "raw" => "1.120 2013-08-22\n",
+      "raw_date" => "2013-08-22",
+      "version" => "1.120"
+    },
+    {
+      "date" => "1997-06-27",
+      "entries" => [
+        {
+          "line" => 18,
+          "raw" => "    - Changes unknown, but this was the last (and first?) CPAN release by ERYQ\n\n",
+          "style" => "-",
+          "text" => "Changes unknown, but this was the last (and first?) CPAN release by ERYQ"
+        }
+      ],
+      "line" => 17,
+      "raw" => "1.119 1997-06-27\n",
+      "raw_date" => "1997-06-27",
+      "version" => "1.119"
+    },
+    {
+      "date" => "unknown",
+      "entries" => [
+        {
+          "line" => 22,
+          "raw" => "    - Ready to go public (with Paul's version, patched for native Mac support)!\n",
+          "style" => "-",
+          "text" => "Ready to go public (with Paul's version, patched for native Mac support)!"
+        },
+        {
+          "line" => 23,
+          "raw" => "    - Warnings have been suppressed in a few places\n      where undefined values appear.\n\n",
+          "style" => "-",
+          "text" => "Warnings have been suppressed in a few places where undefined values appear."
+        }
+      ],
+      "line" => 20,
+      "raw" => "1.118 unknown\n\n",
+      "raw_date" => "unknown",
+      "version" => "1.118"
+    },
+    {
+      "date" => "unknown",
+      "entries" => [
+        {
+          "line" => 28,
+          "raw" => "    - Fixed another bug in comp2bin, related to the MARK falling on a\n      boundary between inputs.  Added testing code.\n\n",
+          "style" => "-",
+          "text" => "Fixed another bug in comp2bin, related to the MARK falling on a boundary between inputs.  Added testing code."
+        }
+      ],
+      "line" => 26,
+      "raw" => "1.115 unknown\n\n",
+      "raw_date" => "unknown",
+      "version" => "1.115"
+    },
+    {
+      "date" => "unknown",
+      "entries" => [
+        {
+          "line" => 33,
+          "raw" => "    - Added BIN-to-HEX conversion.  Eh.  It's a start.\n",
+          "style" => "-",
+          "text" => "Added BIN-to-HEX conversion.  Eh.  It's a start."
+        },
+        {
+          "line" => 34,
+          "raw" => "    - Also, a lot of documentation additions and cleanups.\n",
+          "style" => "-",
+          "text" => "Also, a lot of documentation additions and cleanups."
+        },
+        {
+          "line" => 35,
+          "raw" => "    - Some methods were also renamed.\n\n",
+          "style" => "-",
+          "text" => "Some methods were also renamed."
+        }
+      ],
+      "line" => 31,
+      "raw" => "1.114 unknown\n\n",
+      "raw_date" => "unknown",
+      "version" => "1.114"
+    },
+    {
+      "date" => "unknown",
+      "entries" => [
+        {
+          "line" => 38,
+          "raw" => "    - Fixed bug in decompression (wasn't saving last character).\n",
+          "style" => "-",
+          "text" => "Fixed bug in decompression (wasn't saving last character)."
+        },
+        {
+          "line" => 39,
+          "raw" => "    - Fixed \"NoComment\" bug.\n\n",
+          "style" => "-",
+          "text" => "Fixed \"NoComment\" bug."
+        }
+      ],
+      "line" => 37,
+      "raw" => "1.103 unknown\n",
+      "raw_date" => "unknown",
+      "version" => "1.103"
+    },
+    {
+      "date" => "unknown",
+      "entries" => [
+        {
+          "line" => 42,
+          "raw" => "    - Initial release.\n\n",
+          "style" => "-",
+          "text" => "Initial release."
+        }
+      ],
+      "line" => 41,
+      "raw" => "1.102 unknown\n",
+      "raw_date" => "unknown",
+      "version" => "1.102"
+    }
+  ]
+}

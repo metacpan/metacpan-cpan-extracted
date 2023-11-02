@@ -1,8 +1,11 @@
 package App::Oozie::Deploy::Validate::DAG::Vertex;
-$App::Oozie::Deploy::Validate::DAG::Vertex::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 use overload
     '""' => \&stringify,
@@ -53,7 +56,7 @@ App::Oozie::Deploy::Validate::DAG::Vertex
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

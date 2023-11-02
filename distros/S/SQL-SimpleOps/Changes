@@ -1,5 +1,11 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2023.302.1 Sun Oct 29 03:14:35 2023
+	- NOTICE: For end users of previous version 2023.284.1 only
+	- NOTICE: The version provide enchanced changes (you must see the version notes)
+	- news: Option 'cursor_order' added; by CCELSO
+	- news: Info 'previouscmd' added in cursor_info; by CCELSO
+
 2023.284.1 Wed Oct 11 23:14:01 2023
 	- WARNING: The Enchanced Changes can provide differents results by previous versions
 	- WARNING: Before applying this version you must retest your SQL command 

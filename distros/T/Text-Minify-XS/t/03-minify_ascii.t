@@ -3,11 +3,11 @@ use utf8;
 use v5.14;
 use warnings;
 
-use Test::More 1.302183;
+use Test2::V0;
 
 use Encode qw/ encode /;
 
-use_ok "Text::Minify::XS", "minify_ascii";
+use Text::Minify::XS qw( minify_ascii );
 
 is minify_ascii("") => "", "empty";
 

@@ -1,0 +1,13 @@
+Revision history for Dancer-Logger-Syslog
+
+0.4 April 22nd, 2013
+    * Call 'openlog()' in all child processes. (GH#4, Sam Crawley)
+
+0.3  April 14th, 2013
+    * Add 'info' in the log levels. (GH#2, Sam Crawley)
+    * Facility can be set via config. (GH#1, Sam Crawley)
+
+0.2   October 5th, 2010
+    
+0.1   Jan 29th, 2010
+    * First version, released on an unsuspecting world.

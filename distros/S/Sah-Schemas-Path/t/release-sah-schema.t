@@ -12,8 +12,8 @@ BEGIN {
 
 use Test::More;
 
-eval "use Test::Sah::Schema 0.009";
-plan skip_all => "Test::Sah::Schema 0.001 required for testing Sah::Schema::* modules"
+eval "use Test::Sah::Schema 0.016";
+plan skip_all => "Test::Sah::Schema 0.016 required for testing Sah::Schema::* modules"
   if $@;
 
 sah_schema_modules_ok();

@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-13'; # DATE
+our $DATE = '2023-11-01'; # DATE
 our $DIST = 'Acme-CPANModulesBundle-PERLANCAR'; # DIST
-our $VERSION = '0.010'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our $LIST = {
-    summary => 'My experiments writing Getopt::Long replacements/alternatives',
+    summary => 'List of my experiments writing Getopt::Long replacements/alternatives',
     description => <<'_',
 
 Most of these modules provide a <pm:Getopt::Long>-compatible interface, but they
@@ -29,7 +29,7 @@ _
 };
 
 1;
-# ABSTRACT: My experiments writing Getopt::Long replacements/alternatives
+# ABSTRACT: List of my experiments writing Getopt::Long replacements/alternatives
 
 __END__
 
@@ -39,11 +39,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment - My experiments writing Getopt::Long replacements/alternatives
+Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment - List of my experiments writing Getopt::Long replacements/alternatives
 
 =head1 VERSION
 
-This document describes version 0.010 of Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
+This document describes version 0.014 of Acme::CPANModules::PERLANCAR::MyGetoptLongExperiment (from Perl distribution Acme-CPANModulesBundle-PERLANCAR), released on 2023-11-01.
 
 =head1 DESCRIPTION
 
@@ -54,27 +54,27 @@ differ in some aspect: either they offer more features (or less).
 
 =over
 
-=item * L<Getopt::Long::Less> - Like Getopt::Long, but with less features
+=item L<Getopt::Long::Less>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Getopt::Long::EvenLess> - Like Getopt::Long::Less, but with even less features
+=item L<Getopt::Long::EvenLess>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Getopt::Long::More> - Like Getopt::Long, but with more stuffs
+=item L<Getopt::Long::More>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Getopt::Long::Complete> - A drop-in replacement for Getopt::Long, with shell tab completion
+=item L<Getopt::Long::Complete>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Getopt::Long::Subcommand> - Process command-line options, with subcommands and completion
+=item L<Getopt::Long::Subcommand>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
-=item * L<Getopt::Panjang> - Parse command-line options
+=item L<Getopt::Panjang>
 
 Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
@@ -146,13 +146,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

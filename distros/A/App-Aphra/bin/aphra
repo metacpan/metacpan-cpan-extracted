@@ -197,6 +197,38 @@ directory:
     docs/style.css
     docs/about/index.html
 
+=head1 SITE CONFIGURATION FILE - site.yml
+
+You can store site-wide configuration and data in a file called C<site.yml>,
+which should be in the same directory as the various directories discussed
+above.
+
+The file is in YAML format. Any variables defined inside this file will be
+available inside your templates within the `site` variable. For example, your
+`site.yml` could contain the following definition:
+
+    name: My Cool Site
+
+And you could access that text inside your templates with markup like this:
+
+    <h1><% site.name %></h1>
+
+=head1 FRONT MATTER IN INDIVIDUAL PAGES
+
+At the start of the template for a page, you can add a data section which
+contains variable defintions. This section is preceded and followed by lines
+consisting of three dashed. The variables are defined using YAML format. The
+variables defined in this section are available within templates by using the
+`page` variable. For example, your template could start with this definition:
+
+    ---
+    title: Important Page
+    ---
+
+And you could access that text inside your templates with markdown like this:
+
+    ## <% page.title %>
+
 =cut
 
 use strict;
@@ -213,7 +245,7 @@ Dave Cross <dave@perlhacks.com>
 
 =head1 COPYRIGHT AND LICENCE
 
-Copyright (c) 2017, Magnum Solutions Ltd. All Rights Reserved.
+Copyright (c) 2017-2023, Magnum Solutions Ltd. All Rights Reserved.
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

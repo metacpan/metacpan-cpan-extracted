@@ -4,9 +4,9 @@ use 5.010001;
 use strict 'subs', 'vars';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-22'; # DATE
+our $DATE = '2023-10-24'; # DATE
 our $DIST = 'Data-Sah-Coerce'; # DIST
-our $VERSION = '0.053'; # VERSION
+our $VERSION = '0.054'; # VERSION
 
 our $SUPPORT_OLD_PREFIX = $ENV{PERL_DATA_SAH_COERCE_SUPPORT_OLD_PREFIX} // 1;
 
@@ -247,7 +247,7 @@ Data::Sah::CoerceCommon - Common stuffs for Data::Sah::Coerce and Data::Sah::Coe
 
 =head1 VERSION
 
-This document describes version 0.053 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2022-09-22.
+This document describes version 0.054 of Data::Sah::CoerceCommon (from Perl distribution Data-Sah-Coerce), released on 2023-10-24.
 
 =head1 FUNCTIONS
 
@@ -305,9 +305,15 @@ yours to make, via this setting.
 
 =item * B<compiler>* => I<str>
 
+(No description)
+
 =item * B<data_term>* => I<str>
 
+(No description)
+
 =item * B<type>* => I<sah::type_name>
+
+(No description)
 
 
 =back
@@ -362,7 +368,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

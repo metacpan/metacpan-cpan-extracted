@@ -1,12 +1,14 @@
 package Acme::CPANModules::CPANModules::API;
 
+use strict;
+
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-03-27'; # DATE
+our $DATE = '2023-08-06'; # DATE
 our $DIST = 'Acme-CPANModules-CPANModules-API'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
-    summary => "Acme::CPANModules modules relating to API",
+    summary => "List of Acme::CPANModules modules relating to API",
     entries => [
         {module=>'Acme::CPANModules::API::Dead::Currency'},
         {module=>'Acme::CPANModules::API::Domain::Registrar'},
@@ -14,7 +16,7 @@ our $LIST = {
 };
 
 1;
-# ABSTRACT: Acme::CPANModules modules relating to API
+# ABSTRACT: List of Acme::CPANModules modules relating to API
 
 __END__
 
@@ -24,11 +26,11 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::CPANModules::API - Acme::CPANModules modules relating to API
+Acme::CPANModules::CPANModules::API - List of Acme::CPANModules modules relating to API
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::CPANModules::API (from Perl distribution Acme-CPANModules-CPANModules-API), released on 2021-03-27.
+This document describes version 0.003 of Acme::CPANModules::CPANModules::API (from Perl distribution Acme-CPANModules-CPANModules-API), released on 2023-08-06.
 
 =head1 DESCRIPTION
 
@@ -36,9 +38,13 @@ This document describes version 0.002 of Acme::CPANModules::CPANModules::API (fr
 
 =over
 
-=item * L<Acme::CPANModules::API::Dead::Currency>
+=item L<Acme::CPANModules::API::Dead::Currency>
 
-=item * L<Acme::CPANModules::API::Domain::Registrar>
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<Acme::CPANModules::API::Domain::Registrar>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 
@@ -53,8 +59,13 @@ document CPAN. See L<Acme::CPANModules> for more details.
 =head2 What are ways to use this Acme::CPANModules module?
 
 Aside from reading this Acme::CPANModules module's POD documentation, you can
-install all the listed modules (entries) using L<cpanmodules> CLI (from
-L<App::cpanmodules> distribution):
+install all the listed modules (entries) using L<cpanm-cpanmodules> script (from
+L<App::cpanm::cpanmodules> distribution):
+
+ % cpanm-cpanmodules -n CPANModules::API
+
+Alternatively you can use the L<cpanmodules> CLI (from L<App::cpanmodules>
+distribution):
 
     % cpanmodules ls-entries CPANModules::API | cpanm -n
 
@@ -69,6 +80,8 @@ or directly:
 This Acme::CPANModules module also helps L<lcpan> produce a more meaningful
 result for C<lcpan related-mods> command when it comes to finding related
 modules for the modules listed in this Acme::CPANModules module.
+See L<App::lcpan::Cmd::related_mods> for more details on how "related modules"
+are found.
 
 =head1 HOMEPAGE
 
@@ -77,14 +90,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANM
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Acme-CPANModules-CPANModules-API>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Acme-CPANModules-CPANModules-API/issues>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -96,11 +101,37 @@ L<cpanmodules> - CLI tool to let you browse/view the lists
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-CPANModules-API>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

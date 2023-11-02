@@ -10,3 +10,14 @@ Changes.md
 t/00-load.t
 t/01-basic.t
 t/02-files.t
+t/04-run.t
+t/05-vars.t
+t/data1/in/index.html.md
+t/data1/in/static.txt
+t/data1/layouts/page
+t/data2/in/index.html.md
+t/data2/in/static.txt
+t/data2/in/test.html.md
+t/data2/docs/static.txt
+t/data2/site.yml
+t/data2/layouts/page

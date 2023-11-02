@@ -28,9 +28,11 @@ my $r = Doit->init;
 is $r->system($^X, '-e', 'exit 0'), 1;
 pass 'no exception';
 
+my $can_capture_tiny = eval { require Capture::Tiny; 1 };
+
 SKIP: {
     skip "Requires Capture::Tiny", 1
-	if !eval { require Capture::Tiny; 1 };
+	if !$can_capture_tiny;
     in_directory {
 	my($stdout, $stderr) = Capture::Tiny::capture
 	    (sub {
@@ -44,7 +46,7 @@ SKIP: {
 
 SKIP: {
     skip "Requires Capture::Tiny", 1
-	if !eval { require Capture::Tiny; 1 };
+	if !$can_capture_tiny;
     in_directory {
 	my($stdout, $stderr) = Capture::Tiny::capture
 	    (sub {
@@ -123,6 +125,19 @@ SKIP: {
 	is $dry_run->system({info=>1}, $^X, '-e', 'open my $fh, ">", $ARGV[0] or die $!', $create_file), 1, 'returns 1 as system call with info=>1 option';
 	ok -e $create_file, 'system with info=>1 option runs even in dry-run mode';
 	$r->unlink($create_file);
+    }
+
+ SKIP: {
+	skip "Requires Capture::Tiny", 1
+	    if !$can_capture_tiny;
+	in_directory {
+	    my($stdout, $stderr) = Capture::Tiny::capture
+		(sub {
+		     $dry_run->info_system('echo', 'hello');
+		 });
+	    is $stdout, "hello\n";
+	    like $stderr, qr{INFO:.*echo hello$}, 'no "(dry-run)" message for info_* commands';
+	} "/";
     }
 }
 

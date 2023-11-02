@@ -2055,7 +2055,7 @@ network errors. If such an error occurs it will return C<undef>.
 sub get_frame {
 	my $self = shift;
 	if (!$self->connected) {
-		$self->debug('cannot send frame if not connected');
+		$self->debug('cannot get frame if not connected');
 		$Code = COMMAND_FAILED;
 		$Error = $Message = 'Not connected';
 		return undef;
@@ -2096,7 +2096,7 @@ sub get_frame {
 sub send_frame {
 	my ($self, $frame, $wfcheck) = @_;
 	if (!$self->connected) {
-		$self->debug('cannot get frame if not connected');
+		$self->debug('cannot send frame if not connected');
 		$Code = 2400;
 		$Message = 'Not connected';
 		return undef;

@@ -1,0 +1,414 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 2,
+          "raw" => "      Update changes for 0.11\n",
+          "style" => "",
+          "text" => "Update changes for 0.11"
+        },
+        {
+          "line" => 3,
+          "raw" => "      Fix build on perl 5.8\n\n",
+          "style" => "",
+          "text" => "Fix build on perl 5.8"
+        }
+      ],
+      "line" => 1,
+      "note" => "Rafael Garcia-Suarez (2):",
+      "raw" => "0.12- Rafael Garcia-Suarez (2):\n",
+      "version" => "0.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 6,
+          "raw" => "      Adding new test for signatures as part of Feb 2015 PRC.\n\n",
+          "style" => "",
+          "text" => "Adding new test for signatures as part of Feb 2015 PRC."
+        },
+        {
+          "line" => 8,
+          "raw" => "      Rafael Garcia-Suarez (8):\n",
+          "style" => "",
+          "text" => "Rafael Garcia-Suarez (8):"
+        },
+        {
+          "line" => 9,
+          "raw" => "      Bump version to 0.10\n",
+          "style" => "",
+          "text" => "Bump version to 0.10"
+        },
+        {
+          "line" => 10,
+          "raw" => "      Merge pull request #6 from estrabd/Issue-5-add-signature-test\n",
+          "style" => "",
+          "text" => "Merge pull request #6 from estrabd/Issue-5-add-signature-test"
+        },
+        {
+          "line" => 11,
+          "raw" => "      Fix skipping tests on earliers perls\n",
+          "style" => "",
+          "text" => "Fix skipping tests on earliers perls"
+        },
+        {
+          "line" => 12,
+          "raw" => "      Add new test to MANIFEST\n",
+          "style" => "",
+          "text" => "Add new test to MANIFEST"
+        },
+        {
+          "line" => 13,
+          "raw" => "      Do not let get_code_location() segfault on XSUBs\n",
+          "style" => "",
+          "text" => "Do not let get_code_location() segfault on XSUBs"
+        },
+        {
+          "line" => 14,
+          "raw" => "      Add a test for calling get_code_location on XSUBs\n",
+          "style" => "",
+          "text" => "Add a test for calling get_code_location on XSUBs"
+        },
+        {
+          "line" => 15,
+          "raw" => "      Add a pure-perl version of last test\n",
+          "style" => "",
+          "text" => "Add a pure-perl version of last test"
+        },
+        {
+          "line" => 16,
+          "raw" => "      Bump version\n\n",
+          "style" => "",
+          "text" => "Bump version"
+        }
+      ],
+      "line" => 5,
+      "note" => "B. Estrade (1):",
+      "raw" => "0.11- B. Estrade (1):\n",
+      "version" => "0.11"
+    },
+    {
+      "entries" => [],
+      "line" => 18,
+      "note" => "No changes",
+      "raw" => "0.10- No changes\n\n",
+      "version" => "0.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 21,
+          "raw" => "      Fix test failure due to hard-coded filenames.\n\n",
+          "style" => "",
+          "text" => "Fix test failure due to hard-coded filenames."
+        }
+      ],
+      "line" => 20,
+      "note" => "A. Sinan Unur (1):",
+      "raw" => "0.09- A. Sinan Unur (1):\n",
+      "version" => "0.09"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 24,
+          "raw" => "      Require at least perl 5.8.0\n",
+          "style" => "",
+          "text" => "Require at least perl 5.8.0"
+        },
+        {
+          "line" => 25,
+          "raw" => "      Improve docs beyond a really terse synopsis\n\n",
+          "style" => "",
+          "text" => "Improve docs beyond a really terse synopsis"
+        }
+      ],
+      "line" => 23,
+      "note" => "Rafael Garcia-Suarez (2):",
+      "raw" => "0.08- Rafael Garcia-Suarez (2):\n",
+      "version" => "0.08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 28,
+          "raw" => "      Require B unconditionally on older perls\n\n",
+          "style" => "",
+          "text" => "Require B unconditionally on older perls"
+        }
+      ],
+      "line" => 27,
+      "note" => "Rafael Garcia-Suarez (1):",
+      "raw" => "0.07- Rafael Garcia-Suarez (1):\n",
+      "version" => "0.07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 31,
+          "raw" => "      Remove perl version requirement\n",
+          "style" => "",
+          "text" => "Remove perl version requirement"
+        },
+        {
+          "line" => 32,
+          "raw" => "      Skip tests that rely on perls more recent than 5.14.0\n",
+          "style" => "",
+          "text" => "Skip tests that rely on perls more recent than 5.14.0"
+        },
+        {
+          "line" => 33,
+          "raw" => "      Update ppport.h\n",
+          "style" => "",
+          "text" => "Update ppport.h"
+        },
+        {
+          "line" => 34,
+          "raw" => "      Use the pure-perl version of is_sub_constant on perls earlier than 5.16\n\n",
+          "style" => "",
+          "text" => "Use the pure-perl version of is_sub_constant on perls earlier than 5.16"
+        }
+      ],
+      "line" => 30,
+      "note" => "Rafael Garcia-Suarez (4):",
+      "raw" => "0.06- Rafael Garcia-Suarez (4):\n",
+      "version" => "0.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 37,
+          "raw" => "      Add test for function prototypes\n",
+          "style" => "",
+          "text" => "Add test for function prototypes"
+        },
+        {
+          "line" => 38,
+          "raw" => "      Require at least perl 5.14.1\n",
+          "style" => "",
+          "text" => "Require at least perl 5.14.1"
+        },
+        {
+          "line" => 39,
+          "raw" => "      Better, simpler code for testing if we can load the XS version\n",
+          "style" => "",
+          "text" => "Better, simpler code for testing if we can load the XS version"
+        },
+        {
+          "line" => 40,
+          "raw" => "      Add gitignore file\n",
+          "style" => "",
+          "text" => "Add gitignore file"
+        },
+        {
+          "line" => 41,
+          "raw" => "      Experimental implementation of get_code_location\n",
+          "style" => "",
+          "text" => "Experimental implementation of get_code_location"
+        },
+        {
+          "line" => 42,
+          "raw" => "      Add XS implementation of get_code_location()\n",
+          "style" => "",
+          "text" => "Add XS implementation of get_code_location()"
+        },
+        {
+          "line" => 43,
+          "raw" => "      Add test for the prototype of get_code_location\n",
+          "style" => "",
+          "text" => "Add test for the prototype of get_code_location"
+        },
+        {
+          "line" => 44,
+          "raw" => "      Make get_code_location work on undefined subs\n",
+          "style" => "",
+          "text" => "Make get_code_location work on undefined subs"
+        },
+        {
+          "line" => 45,
+          "raw" => "      Add link to github repo in the meta file\n",
+          "style" => "",
+          "text" => "Add link to github repo in the meta file"
+        },
+        {
+          "line" => 46,
+          "raw" => "      Add TODO file\n",
+          "style" => "",
+          "text" => "Add TODO file"
+        },
+        {
+          "line" => 47,
+          "raw" => "      Add pure-perl implementation of is_sub_constant()\n",
+          "style" => "",
+          "text" => "Add pure-perl implementation of is_sub_constant()"
+        },
+        {
+          "line" => 48,
+          "raw" => "      Add XS implemetation of is_constant_sub()\n",
+          "style" => "",
+          "text" => "Add XS implemetation of is_constant_sub()"
+        },
+        {
+          "line" => 49,
+          "raw" => "      Add documentation\n\n",
+          "style" => "",
+          "text" => "Add documentation"
+        }
+      ],
+      "line" => 36,
+      "note" => "Rafael Garcia-Suarez (13):",
+      "raw" => "0.05- Rafael Garcia-Suarez (13):\n",
+      "version" => "0.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 52,
+          "raw" => "      First stab as a dual implementation XS / pure Perl\n",
+          "style" => "",
+          "text" => "First stab as a dual implementation XS / pure Perl"
+        },
+        {
+          "line" => 53,
+          "raw" => "      Update MANIFEST and add ppport.h from bleadperl\n",
+          "style" => "",
+          "text" => "Update MANIFEST and add ppport.h from bleadperl"
+        },
+        {
+          "line" => 54,
+          "raw" => "      Bump version to 0.04\n",
+          "style" => "",
+          "text" => "Bump version to 0.04"
+        },
+        {
+          "line" => 55,
+          "raw" => "      Add license to Makefile.PL\n",
+          "style" => "",
+          "text" => "Add license to Makefile.PL"
+        },
+        {
+          "line" => 56,
+          "raw" => "      Re-add \"use strict\"\n",
+          "style" => "",
+          "text" => "Re-add \"use strict\""
+        },
+        {
+          "line" => 57,
+          "raw" => "      Mortalize return values\n",
+          "style" => "",
+          "text" => "Mortalize return values"
+        },
+        {
+          "line" => 58,
+          "raw" => "      Add tests for a bug reported on P5P by Ren\303\251e B\303\244cker\n",
+          "style" => "",
+          "text" => "Add tests for a bug reported on P5P by Ren\303\251e B\303\244cker"
+        },
+        {
+          "line" => 59,
+          "raw" => "      Fix segfault / compilation error by returning nothing for a sub being compiled\n",
+          "style" => "",
+          "text" => "Fix segfault / compilation error by returning nothing for a sub being compiled"
+        },
+        {
+          "line" => 60,
+          "raw" => "      Regenerate META.yml\n\n",
+          "style" => "",
+          "text" => "Regenerate META.yml"
+        }
+      ],
+      "line" => 51,
+      "note" => "Rafael Garcia-Suarez (9):",
+      "raw" => "0.04- Rafael Garcia-Suarez (9):\n",
+      "version" => "0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 63,
+          "raw" => "      Import Sub-Identify 0.02\n",
+          "style" => "",
+          "text" => "Import Sub-Identify 0.02"
+        },
+        {
+          "line" => 64,
+          "raw" => "      Add MANIFEST.SKIP file\n",
+          "style" => "",
+          "text" => "Add MANIFEST.SKIP file"
+        },
+        {
+          "line" => 65,
+          "raw" => "      Add get_code_info, as suggested by Shawn M Moore\n",
+          "style" => "",
+          "text" => "Add get_code_info, as suggested by Shawn M Moore"
+        },
+        {
+          "line" => 66,
+          "raw" => "      Export get_code_info()\n",
+          "style" => "",
+          "text" => "Export get_code_info()"
+        },
+        {
+          "line" => 67,
+          "raw" => "      Add tests for get_code_info()\n",
+          "style" => "",
+          "text" => "Add tests for get_code_info()"
+        },
+        {
+          "line" => 68,
+          "raw" => "      More tests for undefined subroutines\n",
+          "style" => "",
+          "text" => "More tests for undefined subroutines"
+        },
+        {
+          "line" => 69,
+          "raw" => "      Fix email address\n",
+          "style" => "",
+          "text" => "Fix email address"
+        },
+        {
+          "line" => 70,
+          "raw" => "      New tests for errors\n",
+          "style" => "",
+          "text" => "New tests for errors"
+        },
+        {
+          "line" => 71,
+          "raw" => "      Merge branch 'moose'\n",
+          "style" => "",
+          "text" => "Merge branch 'moose'"
+        },
+        {
+          "line" => 72,
+          "raw" => "      Add pod test file\n",
+          "style" => "",
+          "text" => "Add pod test file"
+        },
+        {
+          "line" => 73,
+          "raw" => "      Pre-require Test::More\n",
+          "style" => "",
+          "text" => "Pre-require Test::More"
+        },
+        {
+          "line" => 74,
+          "raw" => "      Add copyright and license\n",
+          "style" => "",
+          "text" => "Add copyright and license"
+        },
+        {
+          "line" => 75,
+          "raw" => "      Bump version and regenerate the META.yml\n",
+          "style" => "",
+          "text" => "Bump version and regenerate the META.yml"
+        }
+      ],
+      "line" => 62,
+      "note" => "Rafael Garcia-Suarez (13):",
+      "raw" => "0.03- Rafael Garcia-Suarez (13):\n",
+      "version" => "0.03"
+    }
+  ]
+}

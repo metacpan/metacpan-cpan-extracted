@@ -151,6 +151,11 @@ subtest "opt:return_type=bool_coerced+str_errmsg+val" => sub {
     };
 
     subtest "js" => sub {
+        plan skip_all => "node.js not available" unless eval {
+            require Nodejs::Util;
+            Nodejs::Util::get_nodejs_path();
+        };
+
         # JavaScript::QuickJS does not support Date object yet?
         my $c_js = Data::Sah::CoerceJS::gen_coercer(
             engine=>'nodejs',

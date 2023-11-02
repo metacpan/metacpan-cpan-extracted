@@ -11,6 +11,7 @@ use Doit::Util;
 use Doit::Log;
 use Errno;
 use File::Temp qw(tempdir);
+use Getopt::Long;
 use Test::More;
 
 sub run_copy_stat {
@@ -25,6 +26,10 @@ require FindBin;
 require TestUtil;
 
 plan 'no_plan';
+
+my $enable_atime_tests = $ENV{GITHUB_ACTIONS} || $ENV{DOIT_TEST_WITH_ATIME};
+GetOptions("enable-atime-tests!" => \$enable_atime_tests)
+    or die "usage: $0 [--enable-atime-tests]\n";
 
 ######################################################################
 # in_directory
@@ -198,22 +203,22 @@ SKIP: {
 
 	$doit->utime(86400,86400,'source');
 	copy_stat('source', 'target');
-	TestUtil::skip_utime_atime_unreliable(sub { is((stat('target'))[8], 86400, 'preserving atime') });
+	is((stat('target'))[8], 86400, 'preserving atime') if $enable_atime_tests;
 	is((stat('target'))[9], 86400, 'preserving mtime');
 
 	$stat[8] = $stat[9] = 86400*2;
 	copy_stat(\@stat, 'target');
-	TestUtil::skip_utime_atime_unreliable(sub { is((stat('target'))[8], 86400*2, 'preserving atime using stat array') });
+	is((stat('target'))[8], 86400*2, 'preserving atime using stat array') if $enable_atime_tests;
 	is((stat('target'))[9], 86400*2, 'preserving mtime using stat array');
 
 	$stat[8] = $stat[9] = 86400*3;
 	copy_stat(\@stat, 'target', 'time' => 1);
-	TestUtil::skip_utime_atime_unreliable(sub { is((stat('target'))[8], 86400*3, 'explicit preserve option (atime)') });
+	is((stat('target'))[8], 86400*3, 'explicit preserve option (atime)') if $enable_atime_tests;
 	is((stat('target'))[9], 86400*3, 'explicit preserve option (mtime)');
 
 	$stat[8] = $stat[9] = 86400*4;
 	copy_stat(\@stat, 'target', 'mode' => 1);
-	TestUtil::skip_utime_atime_unreliable(sub { is((stat('target'))[8], 86400*3, 'unchanged atime, non-matching preserve option') });
+	is((stat('target'))[8], 86400*3, 'unchanged atime, non-matching preserve option') if $enable_atime_tests;
 	is((stat('target'))[9], 86400*3, 'unchanged mtime, non-matching preserve option');
 
 	# Must be last in this block --- source+target are deleted

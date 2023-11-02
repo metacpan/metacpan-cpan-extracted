@@ -5,7 +5,7 @@ Doit::Util - utility functions for Doit
 =head1 SYNOPSIS
 
     use Doit::Util;
-    use Doit::Util qw(in_directory new_scope_cleanup copy_stat get_sudo_cmd);
+    use Doit::Util qw(in_directory new_scope_cleanup copy_stat get_sudo_cmd get_os_release);
 
 =head1 DESCRIPTION
 
@@ -60,13 +60,32 @@ Handy for writing commands like:
 
     $doit->system(get_sudo_cmd(), 'apt-get', '-y', 'install', @missing_packages);
 
+=head3 get_os_release
+
+Return a hash reference of F</etc/os-release> contents, or undef if
+such a file does not exist. Usually the hash will contain keys like
+
+    ID => 'ubuntu',
+    VERSION_ID => '22.04'
+
+The file is parsed only once and cached for subsequent calls. To force
+a cache refresh use the option
+
+    refresh => 1
+
+To specify another file than F</etc/os-release> use the option
+
+    file => /path/to/another/os-release
+
+This is probably only useful for test purposes.
+
 =head1 AUTHOR
 
 Slaven Rezic <srezic@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2022 Slaven Rezic. All rights reserved.
+Copyright (c) 2022,2023 Slaven Rezic. All rights reserved.
 This module is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 

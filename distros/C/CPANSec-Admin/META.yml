@@ -1,0 +1,58 @@
+---
+abstract: 'CPAN Advisory DB Admin Utility'
+author:
+  - unknown
+build_requires:
+  Test2::Suite: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CPANSec-Admin
+provides:
+  CPANSEC::Admin:
+    file: lib/CPANSEC/Admin.pm
+    version: '0.001'
+  CPANSEC::Admin::Command:
+    file: lib/CPANSEC/Admin/Command.pm
+  CPANSEC::Admin::Command::Amend:
+    file: lib/CPANSEC/Admin/Command/Amend.pm
+  CPANSEC::Admin::Command::CVEScan:
+    file: lib/CPANSEC/Admin/Command/CVEScan.pm
+  CPANSEC::Admin::Command::Help:
+    file: lib/CPANSEC/Admin/Command/Help.pm
+  CPANSEC::Admin::Command::New:
+    file: lib/CPANSEC/Admin/Command/New.pm
+  CPANSEC::Admin::Command::Publish:
+    file: lib/CPANSEC/Admin/Command/Publish.pm
+  CPANSEC::Admin::Command::Revoke:
+    file: lib/CPANSEC/Admin/Command/Revoke.pm
+  CPANSEC::Admin::Command::Triage:
+    file: lib/CPANSEC/Admin/Command/Triage.pm
+  CPANSEC::Admin::Util:
+    file: lib/CPANSEC/Admin/Util.pm
+requires:
+  CPAN::Meta::Requirements: '0'
+  ENV::Util: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  List::Util: '0'
+  MetaCPAN::Client: '0'
+  Net::NVD: '0'
+  Path::Tiny: '0'
+  Pod::Find: '0'
+  Pod::Usage: '0'
+  Time::Piece: '0'
+  URI: '0'
+  perl: v5.38.0
+resources:
+  bugtracker: https://github.com/CPAN-Security/CPANSEC-Admin/issues/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/CPAN-Security/CPANSEC-Admin
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

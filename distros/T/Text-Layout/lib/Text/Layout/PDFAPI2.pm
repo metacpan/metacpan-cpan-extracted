@@ -26,7 +26,17 @@ sub new {
 	$fc = { __PDF__ => $data[0] };
 	Text::Layout::FontConfig->reset;
     }
+    require Text::Layout::PDFAPI2::ImageElement;
+    $self->register_element
+      ( Text::Layout::PDFAPI2::ImageElement->new( pdf => $data[0] ), "img" )
+      unless $self->get_element_handler("img");
+
     $self;
+}
+
+sub _pdf {
+    my ( $self ) = @_;
+    $self->{_context};
 }
 
 # Creates a (singleton) HarfBuzz::Shaper object.
@@ -91,7 +101,15 @@ sub render {
     my $upem = 1000;
 
     foreach my $fragment ( @{ $self->{_content} } ) {
-	next unless length($fragment->{text});
+
+	if ( my $hd = $self->get_element_handler($fragment->{type}) ) {
+	    $text->textend;
+	    my $ab = $hd->render($fragment, $text, $x, $y-$bl);
+	    $text->textstart;
+	    $x += $ab->[2];
+	}
+	next unless $fragment->{type} eq "text" && length($fragment->{text});
+
 	my $x0 = $x;
 	my $y0 = $y;
 	my $f = $fragment->{font};
@@ -121,18 +139,20 @@ sub render {
 		my $y = $y0;
 		my $h = -$sz*($f->get_ascender-$f->get_descender)/$upem;
 		my $x = $x0;
-		$text->add(PDF::API2::Content::_save());
-
-		$text->add($text->_fillcolor($fragment->{bgcolor}));
-		$text->add($text->_strokecolor($fragment->{bgcolor}));
-		$text->add(PDF::API2::Content::_linewidth(2));
-		$text->add(PDF::API2::Content::_move($x, $y));
-		$text->add(PDF::API2::Content::_line($x+$w, $y));
-		$text->add(PDF::API2::Content::_line($x+$w, $y+$h));
-		$text->add(PDF::API2::Content::_line($x, $y+$h));
-		$text->add('h'); # close
-		$text->add('B'); # fillstroke
-		$text->add(PDF::API2::Content::_restore());
+		$text->textend;
+		my $gfx = $text;
+		$gfx->save;
+		$gfx->fillcolor($fragment->{bgcolor});
+		$gfx->strokecolor($fragment->{bgcolor});
+		$gfx->linewidth(2);
+		$gfx->move($x, $y);
+		$gfx->line($x+$w, $y);
+		$gfx->line($x+$w, $y+$h);
+		$gfx->line($x, $y+$h);
+		$text->close;
+		$text->fillstroke;
+		$gfx->restore;
+		$text->textstart;
 	    }
 
 	    foreach my $g ( @$info ) {
@@ -176,20 +196,22 @@ sub render {
 		    my $y = $y0;
 		    my $h = -($a0-$d0);
 		    my $x = $x0;
-		    $text->add(PDF::API2::Content::_save());
-
-		    $text->add($text->_fillcolor($fragment->{bgcolor}));
-		    $text->add($text->_strokecolor($fragment->{bgcolor}));
-		    $text->add(PDF::API2::Content::_linewidth(2));
-		    $text->add(PDF::API2::Content::_move($x, $y));
-		    $text->add(PDF::API2::Content::_line($x+$w, $y));
-		    $text->add(PDF::API2::Content::_line($x+$w, $y+$h));
-		    $text->add(PDF::API2::Content::_line($x, $y+$h));
-		    $text->add('h'); # close
-		    $text->add('B'); # fillstroke
-		    $text->add(PDF::API2::Content::_restore());
+		    $text->textend;
+		    my $gfx = $text;
+		    $gfx->save;
+		    $gfx->fillcolor($fragment->{bgcolor});
+		    $gfx->strokecolor($fragment->{bgcolor});
+		    $gfx->linewidth(2);
+		    $gfx->move($x, $y);
+		    $gfx->line($x+$w, $y);
+		    $gfx->line($x+$w, $y+$h);
+		    $gfx->line($x, $y+$h);
+		    $text->close;
+		    $text->fillstroke;
+		    $gfx->restore;
+		    $text->textstart;
 		}
-
+		$text->font( $f->get_font, $sz );
 		$text->translate( $x, $y );
 		$text->text($t);
 		$x += $w;
@@ -247,18 +269,18 @@ sub render {
 		push( @strikes, [ $d+$h/2, $h, $col ] );
 	    }
 	}
+	$text->textend if @strikes;
 	for ( @strikes ) {
-
-	    # Mostly copied from PDF::API2::Content::_text_underline.
-	    $text->add_post(PDF::API2::Content::_save());
-
-	    $text->add_post($text->_strokecolor($_->[2]));
-	    $text->add_post(PDF::API2::Content::_linewidth($_->[1]));
-	    $text->add_post(PDF::API2::Content::_move($x0, $y0-$fragment->{base}-$bl-$_->[0]));
-	    $text->add_post(PDF::API2::Content::_line($x, $y0-$fragment->{base}-$bl-$_->[0]));
-	    $text->add_post(PDF::API2::Content::_stroke());
-	    $text->add_post(PDF::API2::Content::_restore());
+	    my $gfx = $text;	# prevent mental insanity
+	    $gfx->save;
+	    $gfx->strokecolor($_->[2]);
+	    $gfx->linewidth($_->[1]);
+	    $gfx->move( $x0, $y0-$fragment->{base}-$bl-$_->[0] );
+	    $gfx->line( $x,  $y0-$fragment->{base}-$bl-$_->[0] );
+	    $gfx->stroke;
+	    $gfx->restore;
 	}
+	$text->textstart if @strikes;
 
 	if ( $fragment->{href} ) {
 	    my $sz = $fragment->{size} || $self->{_currentsize};
@@ -282,6 +304,28 @@ sub bbox {
     my $dir;
 
     foreach ( @{ $self->{_content} } ) {
+
+	0&&
+	warn("IB: ",
+	     join(", ",
+		  map { defined($_) ? sprintf("%.2f", $_) : "<undef>" }
+		  $xMin, $yMin, $xMax, $yMax ), "\n");
+
+	if ( my $hd = $self->get_element_handler($_->{type}) ) {
+	    my @ab = @{$hd->bbox($_)->{abox}};
+	    $xMin //= $w + $ab[0] if $all;
+	    $xMax = $w + $ab[2];
+	    $w += $ab[2];
+	    $a = $ab[3] if $ab[3] > $a;
+	    $d = $ab[1] if $ab[1] < $d;
+	    if ( $all ) {
+		$yMin = $ab[1] if !defined($yMin) || $ab[1] < $yMin;
+		$yMax = $ab[3] if !defined($yMax) || $ab[3] > $yMax;
+	    }
+	}
+
+	next unless $_->{type} eq "text" && length($_->{text});
+
 	my $f = $_->{font};
 	my $font = $f->get_font($self);
 	unless ( $font ) {
@@ -437,6 +481,27 @@ sub load_font {
 
 sub xheight {
     $_[0]->data->{xheight};
+}
+
+sub bbextend {
+    my ( $cur, $bb, $dx, $dy ) = @_;
+    $dx //= 0;
+    $dy //= 0;
+    if ( defined $cur->[0] ) {
+	$dx += $cur->[2];
+	$dy += $cur->[3];
+	$cur->[0] = $bb->[0] + $dx if $cur->[0] > $bb->[0] + $dx;
+	$cur->[1] = $bb->[1] + $dy if $cur->[1] > $bb->[1] + $dy;
+	$cur->[2] = $bb->[2] + $dx if $cur->[2] < $bb->[2] + $dx;
+	$cur->[3] = $bb->[3] + $dy if $cur->[3] < $bb->[3] + $dy;
+    }
+    else {
+	$cur->[0] = $bb->[0] + $dx;
+	$cur->[1] = $bb->[1] + $dy;
+	$cur->[2] = $bb->[2] + $dx;
+	$cur->[3] = $bb->[3] + $dy;
+    }
+    return $cur;		# for convenience
 }
 
 ################ Extensions to PDF::API2 ################

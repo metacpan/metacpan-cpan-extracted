@@ -1,0 +1,388 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK - An implementation of the OpenTelemetry SDK for Perl
+
+=head1 SYNOPSIS
+
+    # Read configuration from the environment at compile time
+    use OpenTelemetry::SDK;
+
+    # Or do that at runtime
+    require OpenTelemetry::SDK;
+    OpenTelemetry::SDK->import;
+
+    # Load any integrations you may want
+    use OpenTelemetry::Integration qw( HTTP::Tiny );
+
+    # You can also configure some parts of the SDK manually
+    OpenTelemetry->tracer_provider->add_span_processor(
+        OpenTelemetry::SDK::Trace::Span::Processor::Simple->new(
+            OpenTelemetry::SDK::Exporter::Console->new,
+        ),
+    );
+
+=head1 DESCRIPTION
+
+The L<OpenTelemetry|https://opentelemetry.io> standard keeps a strict
+separation between an API layer that implements an interface that is
+backend-agnostic, and an SDK layer that can be connected to the API to do the
+actual work.
+
+For a Perl implementation of the API layer, please refer to the
+L<OpenTelemetry> distribution.
+
+The OpenTelemetry::SDK distribution provides the other half of that picture:
+it implements the OpenTelemetry SDK. While the API allows library authors to
+instrument their code so it produces telemetry data, the SDK allows
+application authors who use those libraries to process that data and make use
+of it how they see fit.
+
+In most cases, simply importing this module will be enough. This can happen
+at compile time if the module is loaded via
+L<"use"|https://perldoc.perl.org/functions/use>, or at runtime if the module
+is loaded with L<"require"|https://perldoc.perl.org/functions/require> and
+L</import> is manually called.
+
+When the SDK is loaded, it will install an instance of
+L<OpenTelemetry::SDK::Trace::TracerProvider> as the global tracer provider,
+and configure the span exporters and processors that have been configured in
+the environment.
+
+=head1 CONFIGURATION
+
+When loaded, the SDK will read its configuration from the environment and
+automatically apply those settings. This section lists the environment
+variables that are supported by the SDK and the way they are interpreted.
+
+The OpenTelemetry specification has
+L<a full list of variables|https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/configuration/sdk-environment-variables.md>,
+and this SDK aims to support all the required ones.
+
+When the variable controls aspects of the SDK that have not been fully
+implemented, those parts will be marked with the "(NYI)" label.
+When the variables are not defined by the official specification, this
+will be stated in their description.
+
+All of the variables below are listed using their standard names. As they are
+read using L<OpenTelemetry::Common/config>, Perl-specific versions of all of
+these can also be used by replacing the C<OTEL> prefix with the C<OTEL_PERL>
+string: eg. C<OTEL_PERL_SDK_DISABLED> can be set instead of
+C<OTEL_SDK_DISABLED> to disable the Perl SDK I<specifically>. In all cases,
+the Perl-specific versions are preferred over the standard ones if both are
+set.
+
+=over
+
+=item OTEL_SDK_DISABLED
+
+Disable the SDK for all signals. Default: C<false>
+
+=item OTEL_RESOURCE_ATTRIBUTES
+
+Key-value pairs to be used as resource attributes. Default: empty, for no
+attributes.
+
+See L<OpenTelemetry::SDK::Resource> for more details.
+
+=item OTEL_SERVICE_NAME
+
+Sets the value of the C<service.name> resource attribute. If C<service.name>
+is also provided in L</OTEL_RESOURCE_ATTRIBUTES>, that value will be overridden
+by the one provided in this variable. Default: empty.
+
+See L<OpenTelemetry::SDK::Resource> for more details.
+
+=item OTEL_PROPAGATORS
+
+Propagators to be used as a comma-separated list. Values are deduplicated
+before use. Default: C<tracecontext,baggage>.
+
+Possible values, and the propagators that they refer to, are listed below:
+
+=over
+
+=item C<b3>
+
+L<OpenTelemetry::Propagator::B3> (NYI)
+
+=item C<b3multi>
+
+L<OpenTelemetry::Propagator::B3::Multi> (NYI)
+
+=item C<baggage>
+
+L<OpenTelemetry::Propagator::Baggage>
+
+=item C<jaeger>
+
+L<OpenTelemetry::Propagator::Jaeger> (NYI)
+
+=item C<none>
+
+L<OpenTelemetry::Propagator::None>
+
+=item C<ottrace>
+
+L<OpenTelemetry::Propagator::OTTrace> (NYI)
+
+=item C<tracecontext>
+
+L<OpenTelemetry::Propagator::TraceContext>
+
+=item C<xray>
+
+L<OpenTelemetry::Propagator::XRay> (NYI)
+
+=back
+
+=item OTEL_TRACES_SAMPLER
+
+Sampler to be used for traces. Default: C<parentbased_always_on>.
+See
+L<"Sampling"|https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/trace/sdk.md#sampling>
+for more details.
+
+Possible values, and the classes that represent them, are listed below:
+
+=over
+
+=item C<always_on>
+
+L<OpenTelemetry::SDK::Trace::Sampler::AlwaysOn>
+
+=item C<always_off>
+
+L<OpenTelemetry::SDK::Trace::Sampler::AlwaysOff>
+
+=item C<jaeger_remote>
+
+L<OpenTelemetry::SDK::Trace::Sampler::Jaeger::Remote> (NYI)
+
+=item C<traceidratio>
+
+L<OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased>
+
+=item C<parentbased_always_on>
+
+L<OpenTelemetry::SDK::Trace::Sampler::ParentBased> with an C<always_on>
+parent
+
+=item C<parentbased_always_off>
+
+L<OpenTelemetry::SDK::Trace::Sampler::ParentBased> with an C<always_off>
+parent
+
+=item C<parentbased_traceidratio>
+
+L<OpenTelemetry::SDK::Trace::Sampler::ParentBased> with a C<traceidratio>
+parent
+
+=item C<parentbased_jaeger_remote>
+
+L<OpenTelemetry::SDK::Trace::Sampler::ParentBased> with a C<jaeger_remote>
+parent (NYI)
+
+=back
+
+=item OTEL_TRACES_SAMPLER_ARG
+
+String value to be used as the sampler argument. Each sampler can decide
+whether to use this or not, and they get to define what the meaning of the
+argument is. Defaults to empty.
+
+This will only be used if L</OTEL_TRACES_SAMPLER> is set, and if the sampler
+requires it. Invalid or unrecognised input will be logged and will be ignored.
+
+=item OTEL_BSP_SCHEDULE_DELAY
+
+Delay interval (in milliseconds) between two consecutive exports of the
+batch exporter. Default: 5000.
+
+See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
+
+=item OTEL_BSP_EXPORT_TIMEOUT
+
+Maximum allowed time (in milliseconds) for the batch exporter to export data.
+Default: 30000.
+
+See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
+
+=item OTEL_BSP_MAX_QUEUE_SIZE
+
+Maximum queue size for the batch exporter. Default: 2048.
+
+See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
+
+=item OTEL_BSP_MAX_EXPORT_BATCH_SIZE
+
+Maximum batch size for the batch exporter. Default: 512. Must be less than or
+equal to L</OTEL_BSP_MAX_QUEUE_SIZE>.
+
+See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
+
+=item OTEL_ATTRIBUTE_COUNT_LIMIT
+
+Maximum allowed attribute count. Default: 128.
+
+This is used as the default value for L</OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT>,
+L</OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT>, and L</OTEL_LINK_ATTRIBUTE_COUNT_LIMIT>.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT
+
+Maximum allowed attribute value size. Default is to have no limit.
+If set, this will apply to span, event, and link attributes, unless
+a more specific limit is set for these with the
+L</OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT>,
+L</OTEL_EVENT_ATTRIBUTE_VALUE_LENGTH_LIMIT>, or
+L</OTEL_LINK_ATTRIBUTE_VALUE_LENGTH_LIMIT> variables described below.
+Note that, of these, only the one for spans is defined by the
+OpenTelemetry standard specification.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT
+
+Maximum allowed attribute per span event count. Default: the value of
+L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_EVENT_ATTRIBUTE_VALUE_LENGTH_LIMIT
+
+Maximum allowed size for event attribute values. Default is to have no
+limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
+latter will apply to event attributes as well.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+This variable is non-standard.
+
+=item OTEL_LINK_ATTRIBUTE_COUNT_LIMIT
+
+Maximum allowed attribute per span link count. Default: the value of
+L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_LINK_ATTRIBUTE_VALUE_LENGTH_LIMIT
+
+Maximum allowed size for link attribute values. Default is to have no
+limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
+latter will apply to link attributes as well.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+This variable is non-standard.
+
+=item OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT
+
+Maximum allowed span attribute count. Default: the value of
+L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT
+
+Maximum allowed size for span attribute values. Default is to have no
+limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
+latter will apply to span attributes as well.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_SPAN_EVENT_COUNT_LIMIT
+
+Maximum allowed span event count. Default: 128.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_SPAN_LINK_COUNT_LIMIT
+
+Maximum allowed span link count. Default: 128.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_TRACES_EXPORTER
+
+Trace exporter to be used. Default: C<otlp>.
+
+Possible values (and the classes that represent them) are listed below:
+
+=over
+
+=item C<otlp>
+
+L<OpenTelemetry::Exporter::OTLP>
+
+=item C<zipkin>
+
+L<OpenTelemetry::Exporter::Zipkin> (NYI)
+
+=item none
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry>
+
+=item L<OpenTelemetry::Exporter::OTLP>
+
+=item L<OpenTelemetry::Exporter::Zipkin> (NYI)
+
+=item L<OpenTelemetry::Propagator::B3::Multi> (NYI)
+
+=item L<OpenTelemetry::Propagator::B3> (NYI)
+
+=item L<OpenTelemetry::Propagator::Baggage>
+
+=item L<OpenTelemetry::Propagator::Jaeger> (NYI)
+
+=item L<OpenTelemetry::Propagator::None>
+
+=item L<OpenTelemetry::Propagator::OTTrace> (NYI)
+
+=item L<OpenTelemetry::Propagator::TraceContext>
+
+=item L<OpenTelemetry::Propagator::XRay> (NYI)
+
+=item L<OpenTelemetry::SDK::Resource>
+
+=item L<OpenTelemetry::SDK::Trace::Sampler::AlwaysOff>
+
+=item L<OpenTelemetry::SDK::Trace::Sampler::AlwaysOn>
+
+=item L<OpenTelemetry::SDK::Trace::Sampler::Jaeger::Remote> (NYI)
+
+=item L<OpenTelemetry::SDK::Trace::Sampler::ParentBased>
+
+=item L<OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased>
+
+=item L<OpenTelemetry::SDK::Trace::Span::Processor::Batch>
+
+=item L<OpenTelemetry::SDK::Trace::SpanLimits>
+
+=item L<OpenTelemetry::SDK::Trace::TracerProvider>
+
+=item L<opentelemetry.io|https://opentelemetry.io>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Special thanks to L<CV-Library Ltd.|https://cv-library.co.uk> for their
+support in the development of this library.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

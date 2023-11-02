@@ -11,6 +11,7 @@ use X11::XCB 0.21 ':all';
 use X11::XCB::Connection;
 use Carp;
 use AnyEvent;
+use List::Util qw( any min max );
 
 # Those two should be included prior any DEBUG stuf
 use X11::korgwm::Common;
@@ -52,20 +53,32 @@ use X11::korgwm::Hotkeys;
 ## Define internal variables
 $SIG{CHLD} = "IGNORE";
 my %evt_masks = (x => CONFIG_WINDOW_X, y => CONFIG_WINDOW_Y, w => CONFIG_WINDOW_WIDTH, h => CONFIG_WINDOW_HEIGHT);
-my ($ROOT);
+my ($ROOT, $atom_wmstate);
 our $exit_trigger = 0;
-our $VERSION = "1.0";
+our $VERSION = "2.0";
 
 ## Define functions
 # Handles any screen change
 sub handle_screens {
     my @xscreens = @{ $X->screens() };
 
+    # Drop information about visible area
+    undef $visible_min_x;
+    undef $visible_min_y;
+    undef $visible_max_x;
+    undef $visible_max_y;
+
     # Count current screens
     my %curr_screens;
     for my $s (@xscreens) {
         my ($x, $y, $w, $h) = map { $s->rect->$_ } qw( x y width height );
         $curr_screens{"$x,$y,$w,$h"} = undef;
+
+        # Collect new information about visible area
+        $visible_min_x = defined $visible_min_x ? min($visible_min_x, $x)      : $x;
+        $visible_min_y = defined $visible_min_y ? min($visible_min_y, $y)      : $y;
+        $visible_max_x = defined $visible_max_x ? max($visible_max_x, $x + $w) : $x + $w;
+        $visible_max_y = defined $visible_max_y ? max($visible_max_y, $y + $h) : $y + $h;
     }
 
     # Categorize them
@@ -124,6 +137,7 @@ sub handle_existing_windows {
     for my $win (values %{ $windows }) {
         $win->{floating} = 1;
         $X->change_window_attributes($win->{id}, CW_EVENT_MASK, EVENT_MASK_ENTER_WINDOW | EVENT_MASK_PROPERTY_CHANGE);
+        $X->change_property(PROP_MODE_REPLACE, $win->{id}, $atom_wmstate, $atom_wmstate, 32, 1, pack L => 1);
 
         my ($x, $y, $w, $h) = $win->query_geometry();
         $y = $cfg->{panel_height} if $y < $cfg->{panel_height};
@@ -151,9 +165,20 @@ sub hide_window($wid, $delete=undef) {
         }
     }
 
-    if ($win->{always_on} and $win->{always_on}->{focus} == $win) {
-        $win->{always_on}->{focus} = undef;
-        $win->{always_on}->{panel}->title();
+    # Remove from all the tags where it is appended
+    $_->win_remove($win) for values %{ $win->{also_tags} // {} };
+
+    if (my $on_screen = $win->{always_on}) {
+        # Drop focus and title
+        if (($on_screen->{focus} // 0) == $win) {
+            $on_screen->{focus} = undef;
+            $on_screen->{panel}->title();
+        }
+
+        # Remove from always_on
+        my $arr = $on_screen->{always_on};
+        $win->{always_on} = undef;
+        splice @{ $arr }, $_, 1 for reverse grep { $arr->[$_] == $win } 0..$#{ $arr };
     }
 
     if ($win == ($focus->{window} // 0)) {
@@ -174,6 +199,9 @@ sub FireInTheHole {
 
     # Save root window
     $ROOT = $X->root;
+
+    # Preload some atoms
+    $atom_wmstate = $X->atom(name => "WM_STATE")->id;
 
     # Check for another WM
     my $wm = $X->change_window_attributes_checked($ROOT->id, CW_EVENT_MASK,
@@ -219,6 +247,9 @@ sub FireInTheHole {
     add_event_cb(MAP_REQUEST(), sub($evt) {
         my ($wid, $follow, $win, $screen, $tag, $floating) = ($evt->{window}, 1);
 
+        # Ignore windows with no class (hello Google Chrome)
+        my $class = X11::korgwm::Window::_class($wid) // return;
+
         # Create a window if needed
         $win = $windows->{$wid};
         if (defined $win) {
@@ -228,12 +259,12 @@ sub FireInTheHole {
 
             $X->change_window_attributes($wid, CW_EVENT_MASK, EVENT_MASK_ENTER_WINDOW | EVENT_MASK_PROPERTY_CHANGE);
 
+            # Unconditionally set NormalState for any windows, we do not want to correctly process this property
+            $X->change_property(PROP_MODE_REPLACE, $wid, $atom_wmstate, $atom_wmstate, 32, 1, pack L => 1);
+
             # Fix geometry if needed
             @{ $win }{qw( x y w h )} = $win->query_geometry() unless defined $win->{x};
         }
-
-        # Ignore windows with no class (hello Google Chrome)
-        my $class = $win->class() // return;
 
         # Apply rules
         my $rule = $cfg->{rules}->{$class};
@@ -306,8 +337,8 @@ sub FireInTheHole {
     });
 
     add_event_cb(UNMAP_NOTIFY(), sub($evt) {
-        # This condition is to distinguish between unmap due to $tag->hide() and unmap request from client
-        hide_window($evt->{window}) unless delete $unmap_prevent->{$evt->{window}};
+        # Handle only client unmap requests as we do not call unmap anymore
+        hide_window($evt->{window});
     });
 
     add_event_cb(CONFIGURE_REQUEST(), sub($evt) {
@@ -317,6 +348,7 @@ sub FireInTheHole {
         if (my $win = $windows->{$win_id}) {
             # This ugly code is an answer to bad apps like Google Chrome
             my %geom;
+            my $bw = $cfg->{border_width};
 
             # Parse masked fields from $evt
             $evt->{value_mask} & $evt_masks{$_} and $geom{$_} = $evt->{$_} for qw( x y w h );
@@ -335,17 +367,42 @@ sub FireInTheHole {
 
             # Handle floating windows properly
             if ($win->{floating}) {
+                my ($old_screen, $new_screen);
+
+                # Verify that it moved inside the same screen
+                if (defined $win->{real_y} and any { $geom{$_} != ($win->{"real_$_"} // 0) } qw( x y )) {
+                    $old_screen = screen_by_xy(@{ $win }{qw( real_x real_y )});
+                    $new_screen = screen_by_xy(@geom{qw( x y )});
+
+                    if ($old_screen != $new_screen) {
+                        # Reparent screen
+                        my $always_on = $win->{always_on};
+                        $old_screen->win_remove($win);
+                        $new_screen->win_add($win, $always_on);
+                    } else {
+                        undef $old_screen;
+                    }
+                }
+
                 # For floating we need fixup border
-                my $bw = $cfg->{border_width};
-                # TODO check if it moved to another screen
                 $win->resize_and_move($geom{x}, $geom{y}, $geom{w} + 2 * $bw, $geom{h} + 2 * $bw);
+
+                # Update the screens if needed
+                $old_screen->refresh() if $old_screen;
             } else {
                 # If window is tiled or maximized, tell it it's real size
                 @geom{qw( x y w h )} = @{ $win }{qw( real_x real_y real_w real_h )};
+
+                # Two reasons: 1. some windows prefer not to know about their border; 2. $Layout::hide_border
+                $bw = 0 if 0 == ($win->{real_bw} // $cfg->{border_width});
+                $geom{x} += $bw;
+                $geom{y} += $bw;
+                $geom{w} -= 2 * $bw;
+                $geom{h} -= 2 * $bw;
             }
 
             # Send notification to the client and return
-            $win->configure_notify($evt->{sequence}, @geom{qw( x y w h )});
+            $win->configure_notify($evt->{sequence}, @geom{qw( x y w h )}, 0, 0, $bw);
             $X->flush();
             return;
         }
@@ -373,8 +430,9 @@ sub FireInTheHole {
     # Set the initial pointer position, if needed
     if (my $pos = $cfg->{initial_pointer_position}) {
         if ($pos eq "center") {
-            my $screen = $screens[0];
-            $ROOT->warp_pointer(map { int($screen->{$_} / 2) - 1 } qw( w h ));
+            my $screen = $screens[$#screens / 2];
+            $ROOT->warp_pointer(map { $screen->{$_ eq "w" ? "x" : "y"} + int($screen->{$_} / 2) - 1 } qw( w h ));
+            $screen->focus();
         } elsif ($pos eq "hidden") {
             $ROOT->warp_pointer($ROOT->_rect->width, $ROOT->_rect->height);
         } else {
@@ -412,3 +470,52 @@ sub FireInTheHole {
 }
 
 "Sergei Zhmylev loves FreeBSD";
+
+__END__
+
+=head1 NAME
+
+korgwm - a tiling window manager written in Perl
+
+=head1 DESCRIPTION
+
+Manages X11 windows in a tiling manner and supports all the stuff KorG needs.
+Built on top of XCB, AnyEvent, and Gtk3.
+It is not reparenting for purpose, so borders are rendered by X11 itself.
+There are no any command-line parameters, nor any environment variables.
+The only way to start it is: just to execute C<korgwm> when no any other WM is running.
+Please see bundled README.md if you are interested in details.
+
+=head1 CONFIGURATION
+
+There are several things which affects korgwm behaviour.
+Firstly, it has pretty good config defaults.
+Then it reads several files during startup and merges the configuration.
+Note that it merges configs pretty silly.
+So it is recommended to completely specify rules or hotkeys if you want to change their parts.
+The files are being read in such an order: C</etc/korgwm/korgwm.conf>, C<$HOME/.korgwmrc>, C<$HOME/.config/korgwm/korgwm.conf>.
+
+Please see bundled korgwm.conf.sample to get the full listing of available configuration parameters.
+
+=head1 INSTALLATION
+
+As it is written entirely in pure Perl, the installation is pretty straightforward:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Although it has number of dependencies which in turn rely on C libraries.
+To make installation process smooth and nice you probably want to install them in advance.
+For Debian GNU/Linux these should be sufficient:
+
+    build-essential libcairo-dev libgirepository1.0-dev libglib2.0-dev xcb-proto
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2023 Sergei Zhmylev E<lt>zhmylove@cpan.orgE<gt>
+
+MIT License.  Full text is in LICENSE.
+
+=cut

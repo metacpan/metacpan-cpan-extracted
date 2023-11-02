@@ -2,7 +2,7 @@ package WWW::Suffit::RSA;
 use strict;
 use utf8;
 
-=encoding utf-8
+=encoding utf8
 
 =head1 NAME
 

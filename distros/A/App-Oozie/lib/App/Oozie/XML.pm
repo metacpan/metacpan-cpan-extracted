@@ -1,12 +1,28 @@
 package App::Oozie::XML;
-$App::Oozie::XML::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
+use App::Oozie::Constants qw(
+    EMPTY_STRING
+    LAST_ELEM
+    MIN_OOZIE_SCHEMA_VERSION_FOR_SLA
+    MIN_OOZIE_SLA_VERSION
+    RE_COLON
+    RE_DOT
+    XML_LOCALNAME_POS
+    XML_NS_FIRST_POS
+    XML_UNPACK_LOCALNAME_POS
+    XML_VERSION_PADDING
+    XML_VERSION_POS
+);
 use App::Oozie::Types::Common qw( IsFile );
-use App::Oozie::Util::Misc qw( resolve_tmp_dir );
+use App::Oozie::Util::Misc    qw( resolve_tmp_dir );
 
 use Archive::Zip;
 use Clone qw( clone );
@@ -131,7 +147,10 @@ sub _init_data {
 
         };
     }
+
     $self->data( $data );
+
+    return;
 }
 
 sub _probe_parse_error_for_workflow {
@@ -171,17 +190,25 @@ sub _probe_parse_error_for_workflow {
 
     my @extra_error;
 
-    if ( defined $sla_version && $sla_version < 0.2 ) {
+    if ( defined $sla_version && $sla_version < MIN_OOZIE_SLA_VERSION ) {
         push @extra_error,
-            "Schema version mismatch for the SLA feature!",
-            "Your sla definition refers to a schema older than the minimum required version of 0.2 (you have defined $sla_version).",
+            'Schema version mismatch for the SLA feature!',
+            sprintf(
+                'Your sla definition refers to a schema older than the minimum required version of %s (you have defined %s).',
+                    MIN_OOZIE_SLA_VERSION,
+                    $sla_version,
+            ),
         ;
     }
 
-    if ( defined $wf_version && $wf_version < 0.5 ) {
+    if ( defined $wf_version && $wf_version < MIN_OOZIE_SCHEMA_VERSION_FOR_SLA ) {
         push @extra_error,
-            "Schema version mismatch for the SLA feature!",
-            "Your workflow definition refers to a schema older than the minimum required version of 0.5 (you have defined $wf_version).",
+            'Schema version mismatch for the SLA feature!',
+            sprintf(
+                'Your workflow definition refers to a schema older than the minimum required version of %s (you have defined %s).',
+                    MIN_OOZIE_SCHEMA_VERSION_FOR_SLA,
+                    $wf_version,
+            ),
         ;
     }
 
@@ -207,16 +234,16 @@ NEED_AT_LEAST_TWO
 sub localname {
     my ($self) = @_;
     my $type = $XML_NAMESPACE{ $self->prefix };
-    ( XML::Compile::Util::unpack_type( $type ) )[-1]
+    return +( XML::Compile::Util::unpack_type( $type ) )[LAST_ELEM];
 }
 
 sub is_foreign_prefix {
     my ($self, $prefix) = @_;
     my ($ns, $localname) = XML::Compile::Util::unpack_type($XML_NAMESPACE{$self->prefix});
-    my $nsobj = ($XML_SCHEMA->namespaces->namespace($ns))[0];
+    my $nsobj = ( $XML_SCHEMA->namespaces->namespace($ns) )[XML_NS_FIRST_POS];
     my %elements =
         map { lc $_ => 1 }
-        map { (XML::Compile::Util::unpack_type($_))[1] }
+        map { (XML::Compile::Util::unpack_type($_))[XML_UNPACK_LOCALNAME_POS] }
         $nsobj->elements, $nsobj->types;
     return not exists $elements{$prefix};
 }
@@ -232,7 +259,7 @@ sub xml {
     my @queue = ($data);
     while ( my $this = shift @queue ) {
         if ( is_hashref $this ) {
-            for my $prefix ( keys %$this ) {
+            for my $prefix ( keys %{ $this } ) {
                 if ( exists $XML_NAMESPACE{$prefix} and $self->is_foreign_prefix($prefix) ) {
                     $this->{ $XML_NAMESPACE{$prefix} } =
                       $XML_SCHEMA->writer( $XML_NAMESPACE{$prefix} )
@@ -259,8 +286,8 @@ sub sniff_doc {
     my $logger  = $self->logger;
     my $verbose = $self->verbose;
 
-    my $type = fileno $doc                                    ? 'IO'
-             : ( ( $doc =~ m/^\s*</s ) or is_scalarref $doc ) ? 'string'
+    my $type = fileno $doc ? 'IO'
+             : ( ( $doc =~ m{ \A \s* [<] }xms ) or is_scalarref $doc ) ? 'string'
              : 'location';
 
     my $xml  = XML::LibXML->load_xml($type => $doc);
@@ -269,17 +296,25 @@ sub sniff_doc {
     my $namespace = $root->getNamespaceURI;
 
     if ($namespace) {
-        my ($localname, $version) = (split /:/, $namespace )[-2, -1];
+        my ($localname, $version) = (split RE_COLON, $namespace )[XML_LOCALNAME_POS, XML_VERSION_POS];
         if ($localname and $version) {
             return $localname, $version;
         }
         else {
-            $logger->logdie("Can't parse out localname and version from namespace: ".$namespace)
+            $logger->logdie(
+                sprintf q{Can't parse out localname and version from namespace: %s},
+                        $namespace,
+            )
         }
     }
     else {
-        $logger->logdie("Can't get namespace URI from xml document: ".trim($doc));
+        $logger->logdie(
+            sprintf q{Can't get namespace URI from xml document: %s},
+                    trim( $doc ),
+        );
     }
+
+    return;
 }
 
 sub _build_schema {
@@ -338,12 +373,12 @@ sub _build_schema {
         }
 
         @xsd = glob "${tempdir}/*.xsd"
-                    or die sprintf "Failed to locate xsd files inside %s",
+                    or die sprintf 'Failed to locate xsd files inside %s',
                                         $oozie_client_jar;
         1;
     } or do {
         my $eval_error = $@ || 'Zombie error';
-        my $msg = sprintf "Error collecting Oozie schemas. Ensure oozie-client is installed and the specs exist under %s: %s",
+        my $msg = sprintf 'Error collecting Oozie schemas. Ensure oozie-client is installed and the specs exist under %s: %s',
                             $oozie_client_jar,
                             $eval_error,
                     ;
@@ -360,24 +395,30 @@ sub _build_schema {
 
         # read the XSD file as XML and get the schema attributes
         my $xml = XML::LibXML->load_xml( location => $file );
-        my ($XML_SCHEMA) = $xml->findnodes('/xs:schema');
+        my ($this_xml_schema) = $xml->findnodes('/xs:schema');
         my ($first)  = $xml->findnodes('/xs:schema/xs:element');
 
         # get the namespace and version
-        my %attr      = map +( $_->name, $_->value ), $XML_SCHEMA->attributes;
+        my %attr      = map +( $_->name, $_->value ), $this_xml_schema->attributes;
         if ( ! exists $attr{targetNamespace} ) {
             # seems to be a change in new version
             next;
         }
         my $namespace = delete $attr{targetNamespace};
-        my $version   = ( split /:/, $namespace )[-1];                       # assuming uri:oozie:...:$version
-        my $prefix = ( split /:/, ( grep $attr{$_} eq $namespace, keys %attr )[0] )[-1];
+        my $version   = ( split RE_COLON, $namespace )[LAST_ELEM]; # assuming uri:oozie:...:$version
+        my $prefix    = ( split RE_COLON, ( grep $attr{$_} eq $namespace, keys %attr )[0] )[LAST_ELEM];
 
         # build a "version string" that can be asciibetically compared
-        my $v = join '', map sprintf( '%04d', $_ ), ( split( /\./, $version ), (0) x 5 )[ 0 .. 5 ];
+        my $v = join EMPTY_STRING,
+                map sprintf( '%04d', $_ ),
+                    (
+                        split( RE_DOT, $version ),
+                        (0) x XML_VERSION_PADDING
+                    )[ 0 .. XML_VERSION_PADDING ]
+                ;
 
         # keep name, version and xsd file for the latest version
-        if ( $v gt( $prefixes{$prefix}[2] || '' ) ) {
+        if ( $v gt( $prefixes{$prefix}[2] || EMPTY_STRING ) ) {
             $prefixes{$prefix} = [
                 $prefix,
                 $namespace,
@@ -402,14 +443,14 @@ sub _build_schema {
     # clean up %prefixes
     # value = [ prefix, namespace, version, top-element, file ]
     for ( sort { $a->[2] cmp $b->[2] } values %prefixes ) {
-        my ($prefix, $namespace, $v, $version, $top, $file) = @$_;
+        my ($prefix, $namespace, $v, $version, $top, $file) = @{ $_ };
         $XML_NAMESPACE{"$prefix"} = # assume latest
         $XML_NAMESPACE{"$prefix:$version"} = XML::Compile::Util::pack_type($namespace, $top);
         $_ = $namespace;    # changes the value in %prefixes
     }
 
     # build the final $XML_SCHEMA object
-    XML::Compile::Cache->new(
+    return XML::Compile::Cache->new(
         \@xsd,
         prefixes         => \%prefixes,
         allow_undeclared => 1,
@@ -431,7 +472,7 @@ App::Oozie::XML
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

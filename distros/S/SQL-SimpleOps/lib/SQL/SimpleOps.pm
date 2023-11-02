@@ -94,7 +94,7 @@
 		$err
 	);
 
-	our $VERSION = "2023.284.1";
+	our $VERSION = "2023.302.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -135,6 +135,15 @@
 	use constant SQL_SIMPLE_RC_OK => 0;		# sql successul
 	use constant SQL_SIMPLE_RC_ERROR => 1;		# sql error
 	use constant SQL_SIMPLE_RC_EMPTY => 2;		# sql successul, empty
+
+	our $SQL_SIMPLE_CURSOR_ORDER =
+	{
+		1 => SQL_SIMPLE_ORDER_ASC,	# top
+		2 => SQL_SIMPLE_ORDER_DESC,	# last
+		3 => SQL_SIMPLE_ORDER_ASC,	# next
+		4 => SQL_SIMPLE_ORDER_DESC,	# last
+		5 => SQL_SIMPLE_ORDER_ASC,	# reload
+	};
 
 ################################################################################
 ## local environments
@@ -191,6 +200,7 @@
 		"046" => { T=>"E", M=>"[%s] Buffer hashkey must be scalaref or arrayref" },
 		"047" => { T=>"E", M=>"[%s] Buffer arrayref Off not allowed for multiple field list" },
 		"048" => { T=>"E", M=>"[%s] Buffer hashindex must be arrayref" },
+		"049" => { T=>"E", M=>"[%s] Cursor_order invalid" },
 		"099" => { T=>"S", M=>"[%s] %s" },
 	);
 
@@ -558,6 +568,26 @@ sub _SelectCursor()
 				$argv->{cursor} = $first;
 			}
 		}
+		
+		## enforce rerun last command if exists and request is reload
+		if ($argv->{cursor_command} == SQL_SIMPLE_CURSOR_RELOAD)
+		{
+			$self->{work}{cursor_command_reload} = 1;
+			if	(ref($argv->{cursor_info}) eq "HASH")
+			{
+				$argv->{cursor_command} = $argv->{cursor_info}{previouscmd} if (defined($argv->{cursor_info}{previouscmd}));
+			}
+			elsif	(ref($argv->{cursor_info}) eq "ARRAY")
+			{
+				$argv->{cursor_command} = $argv->{cursor_info}[ @{$argv->{cursor_info}}-1 ] if (@{$argv->{cursor_info}} >= 5);
+			}
+			else
+			{
+				my @a = split(" ",$argv->{cursor_info});
+				my $b = (@{$self->{work}{cursor_key}} < 2) ? 2 : @{$self->{work}{cursor_key}} * 2;
+				$argv->{cursor_command} = $a[@a-1] if (@a > (2 + $b));
+			}
+		}
 	}
 
 	## validade where
@@ -591,10 +621,11 @@ sub _SelectCursor()
 	}
 	elsif	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_BACK)
 	{
+		my $oper = ($self->{work}{cursor_command_reload}) ? "<=" : "<";
 		if (ref($argv->{cursor_key}) ne "ARRAY")
 		{
 			unshift(@order,{$argv->{cursor_key} => SQL_SIMPLE_ORDER_DESC});
-			unshift(@{$argv->{where}}, $argv->{cursor_key} => [ "<", $argv->{cursor} ]);
+			unshift(@{$argv->{where}}, $argv->{cursor_key} => [ $oper, $argv->{cursor} ]);
 		}
 		else
 		{
@@ -608,7 +639,7 @@ sub _SelectCursor()
 				{
 					push(@s,$argv->{cursor_key}[$j] => $argv->{cursor}[$j]);
 				}
-				push(@s,$argv->{cursor_key}[$i] => [ "<", $argv->{cursor}[$i]]);
+				push(@s,$argv->{cursor_key}[$i] => [ $oper, $argv->{cursor}[$i]]);
 				push(@w,"or") if (@w);
 				push(@w,\@s);
 			}
@@ -618,7 +649,7 @@ sub _SelectCursor()
 	}
 	elsif	($argv->{cursor_command} == SQL_SIMPLE_CURSOR_NEXT || $argv->{cursor_command} == SQL_SIMPLE_CURSOR_RELOAD)
 	{
-		my $oper = ($argv->{cursor_command} == SQL_SIMPLE_CURSOR_NEXT) ? ">" : ">=";
+		my $oper = ($argv->{cursor_command} == SQL_SIMPLE_CURSOR_RELOAD || $self->{work}{cursor_command_reload}) ? ">=" : ">";
 		if (ref($argv->{cursor_key}) ne "ARRAY")
 		{
 			unshift(@order,{$argv->{cursor_key} => SQL_SIMPLE_ORDER_ASC});
@@ -660,6 +691,18 @@ sub _SelectCursor()
 	}
 	$argv->{order_by} = \@order;
 
+	## validate cursor_order option
+	if	(!defined($argv->{cursor_order})) { }
+	elsif	($argv->{cursor_order} eq SQL_SIMPLE_ORDER_ASC || $argv->{cursor_order} eq SQL_SIMPLE_ORDER_DESC)
+	{
+		$self->{work}{cursor_order} = ($argv->{cursor_order} eq $SQL_SIMPLE_CURSOR_ORDER->{$argv->{cursor_command}})+0;
+	}
+	else
+	{
+		$self->_setMessage("select",SQL_SIMPLE_RC_SYNTAX,"049");
+		return SQL_SIMPLE_RC_SYNTAX;
+	}	
+
 	## validate limits
 	if (!defined($argv->{limit}) || $argv->{limit} eq "")
 	{
@@ -697,6 +740,7 @@ sub _SelectCursor()
 			$argv->{cursor_info}{first} = (ref($argv->{cursor_key}) eq "ARRAY") ? $self->{init}{cursor}{first} :$self->{init}{cursor}{first}[0];
 			$argv->{cursor_info}{last}  = (ref($argv->{cursor_key}) eq "ARRAY") ? $self->{init}{cursor}{last} : $self->{init}{cursor}{last}[0];
 		}
+		$argv->{cursor_info}{previouscmd} = $argv->{cursor_command};
 	}
 	elsif (ref($argv->{cursor_info}) eq "ARRAY")
 	{
@@ -712,6 +756,7 @@ sub _SelectCursor()
 			push(@{$argv->{cursor_info}},(ref($argv->{cursor_key}) eq "ARRAY") ? $self->{init}{cursor}{first} :$self->{init}{cursor}{first}[0]);
 			push(@{$argv->{cursor_info}},(ref($argv->{cursor_key}) eq "ARRAY") ? $self->{init}{cursor}{last} : $self->{init}{cursor}{last}[0]);
 		}
+		push(@{$argv->{cursor_info}},$argv->{cursor_command});
 	}
 	elsif (ref($argv->{cursor_info}) eq "SCALAR")
 	{
@@ -730,7 +775,7 @@ sub _SelectCursor()
 				(ref($argv->{cursor_key}) eq "ARRAY") ? join(" ",@{$self->{init}{cursor}{last}}) : $self->{init}{cursor}{last}[0],
 			);
 		}
-		${$argv->{cursor_info}} = join(" ",$self->{init}{cursor}{rc},$self->{init}{cursor}{lines},@a);
+		${$argv->{cursor_info}} = join(" ",$self->{init}{cursor}{rc},$self->{init}{cursor}{lines},@a,$argv->{cursor_command});
 	}
 	return SQL_SIMPLE_RC_OK;
 }
@@ -773,7 +818,7 @@ sub Select()
 	$self->_setQuote($saved_quote) if (defined($argv->{quote}));
 	$self->_setSqlSave($saved_sql_save) if (defined($argv->{sql_save}));
 
-	return "\\(".$self->getLastSQL().")" if ($argv->{subquery});
+	return "\\(". ( ($self->getRC()==0) ? $self->getLastSQL() : "**".$self->getMessage()."**" ) .")" if ($argv->{subquery});
 	return $rc;
 }
 
@@ -1095,9 +1140,12 @@ sub _Select()
 		buffer_hashkey => $argv->{buffer_hashkey},
 		buffer_arrayref => $argv->{buffer_arrayref},
 		buffer_hashindex => $argv->{buffer_hashindex},
+		buffer_hashindex => $argv->{buffer_hashindex},
 		buffer_fields => @fields+0,
+		cursor => $argv->{cursor},
 		cursor_command => $argv->{cursor_command},
 		cursor_key => $argv->{cursor_key},
+		cursor_order => $argv->{cursor_order},
 		make_only => $argv->{make_only},
 		flush => $argv->{flush},
 		sql_save => $argv->{sql_save},
@@ -1309,7 +1357,7 @@ sub _Insert()
 		foreach my $field(sort(keys(%{$argv->{fields}})))
 		{
 			push(@fields,$self->_getAliasCols(8,$field,SQL_SIMPLE_ALIAS_INSERT));
-			push(@value_,$self->{argv}{quote}.$argv->{fields}{$field}.$self->{argv}{quote});
+			push(@value_,(!defined($argv->{fields}{$field})) ? "NULL" : $self->{argv}{quote}.$argv->{fields}{$field}.$self->{argv}{quote});
 		}
 		@values = ("(".join(",",@value_).")");
 	}
@@ -1325,12 +1373,16 @@ sub _Insert()
 		{
 			if (ref($value) ne "ARRAY")
 			{
-				push(@value_,$self->{argv}{quote}.$value.$self->{argv}{quote});
+				push(@value_,(!defined($value)) ? "NULL" : $self->{argv}{quote}.$value.$self->{argv}{quote});
 			}
 			else
 			{
-				$value = $self->{argv}{quote}.join($self->{argv}{quote}.",".$value.$self->{argv}{quote},@{$value}).$self->{argv}{quote};
-				push(@values,"(".$value.")");
+				my @value2;
+				foreach my $value2(@{$value})
+				{
+					push(@value2,(!defined($value2)) ? "NULL" : $value.$self->{argv}{quote},$value2.$self->{argv}{quote});
+				}
+				push(@values,"(".join(",",@value2).")");
 			}
 		}
 		push(@values, (@fields == 1) ? "(".join("),(",@value_).")" : "(".join(",",@value_).")" ) if (@value_);
@@ -1435,7 +1487,11 @@ sub _Update()
 		my $realn = $self->_getAliasCols(13,$field,SQL_SIMPLE_ALIAS_UPDATE);
 		$ident = 1 if ($realn =~ /^.*\..*$/);
 
-		if ($argv->{fields}{$field} =~ /^\\(.*)/)
+		if	(!defined($argv->{fields}{$field}))
+		{
+			push(@fields,$realn." = NULL");
+		}
+		elsif	($argv->{fields}{$field} =~ /^\\(.*)/)
 		{
 			my $value = $1;
 			push(@fields,$realn." = ".$value);
@@ -1614,7 +1670,11 @@ sub _Call()
 			$self->_setMessage("call",SQL_SIMPLE_RC_SYNTAX,"046");
 			return SQL_SIMPLE_RC_SYNTAX;
 		}
-		undef(%{$argv->{buffer}}) if ($flush_buffer);
+		if ($flush_buffer)
+		{
+			undef(%{$argv->{buffer}});;
+			undef(@{$argv->{buffer_hashindex}}) if (defined($argv->{buffer_hashindex}));
+		}
 	}
 	else
 	{
@@ -1659,6 +1719,9 @@ sub _Call()
 	$argv->{command} =~ s/^\s+|\s+$//;
 	my $sth = $self->{init}{dbh}->prepare($argv->{command}.( ($argv->{command} =~ /\;$/) ? "":";") );
 
+	## enforce cursor_order if not defined
+	$self->{work}{cursor_order} = 1 if (!defined($self->{work}{cursor_order}));
+
 	## execute command
 	if (defined($sth))
 	{
@@ -1688,7 +1751,7 @@ sub _Call()
 
 					## move data
 					if	($type == 1) { %{$argv->{buffer}} = %{$ref}; }
-					elsif	($type == 2) { push(@{$argv->{buffer}},$ref); }
+					elsif	($type == 2) { ($self->{work}{cursor_order}) ? push(@{$argv->{buffer}},$ref): unshift(@{$argv->{buffer}},$ref); }
 					elsif	($type == 3) { last if (&{$argv->{buffer}}($ref,$argv->{buffer_options})); }
 					elsif	($type == 4) { foreach my $id(keys(%{$ref})) { ${$argv->{buffer}} = $ref->{$id}; }}
 					elsif	($type == 5)
@@ -1698,7 +1761,7 @@ sub _Call()
 						$self->{work}{cursor_last_saved}{ $self->{work}{buffer_hashkey}[0] } = $val if ($self->{work}{cursor_key_vs_hashkey});
 						
 						## create hashindex if required
-						push(@{$argv->{buffer_hashindex}},$val) if (defined($argv->{buffer_hashindex}));
+						(($self->{work}{cursor_order}) ? push(@{$argv->{buffer_hashindex}},$val) : unshift(@{$argv->{buffer_hashindex}},$val)) if (defined($argv->{buffer_hashindex}));
 
 						## remove hashkey from the data buffer
 						delete($ref->{ $self->{work}{buffer_hashkey}[0] });
@@ -1740,7 +1803,7 @@ sub _Call()
 							delete($ref->{$key});
 						}
 						## create hashindex if required
-						push(@{$argv->{buffer_hashindex}},\@keys) if (defined($argv->{buffer_hashindex}));
+						(($self->{work}{cursor_order}) ? push(@{$argv->{buffer_hashindex}},\@keys) : unshift(@{$argv->{buffer_hashindex}},\@keys)) if (defined($argv->{buffer_hashindex}));
 
 						## move data to buffer
 						%{$addr} = (keys(%{$ref}) != 1) ? %{$ref} : $ref->{ each(%{$ref}) };
@@ -1748,7 +1811,7 @@ sub _Call()
 					elsif	($type == 7)
 					{
 						my @key = keys(%{$ref});
-						push(@{$argv->{buffer}},$ref->{ $key[0] });
+						($self->{work}{cursor_order}) ? push(@{$argv->{buffer}},$ref->{ $key[0] }) : unshift(@{$argv->{buffer}},$ref->{ $key[0] });
 					}
 					$ref_saved = $ref;
 				}
@@ -1991,7 +2054,7 @@ sub _getWhereRecursive()
 		}
 
 		## process value if not escape
-		if (!($value1 =~ /^\\/))
+		if (!($value1 =~ /^\\(.*)/))
 		{
 			## validate functions as arguments
 			if ($self->_checkFunctions(\$value1,SQL_SIMPLE_ALIAS_WHERE))
@@ -2015,6 +2078,10 @@ sub _getWhereRecursive()
 			{
 				$value1 = $self->_getAliasCols(21,$value1,SQL_SIMPLE_ALIAS_WHERE);
 			}
+		}
+		else
+		{
+			$value1 = $1;
 		}
 
 		## finis where if no more values
@@ -2065,12 +2132,16 @@ sub _getWhereRecursive()
 
 			## construct condition
 			if ($operator eq "=" || $operator eq "!=")
-		       	{
+			{
 				if (@_value2 > 1)
 				{
 					for (my $i=0; $i < @_value2; $i++)
 					{
-						if ($_value2[$i] =~ /^\\(.*)/)
+						if (!defined($_value2[$i]))
+						{
+							$_value2[$i] = 'NULL';
+						}
+						elsif ($_value2[$i] =~ /^\\(.*)/)
 						{
 							my $v = $1;
 							if ($v =~ /^(\(SELECT\s+.*\))$/)
@@ -2108,7 +2179,8 @@ sub _getWhereRecursive()
 			my @where_aux;
 			foreach my $value(@_value2)
 			{
-				if	(defined($value) && $value ne "")
+##				if	(defined($value) && $value ne "")
+				if	(defined($value)) ## && $value ne "")
 				{
 					if ($value =~ /^\\(.*)/)
 					{
@@ -2132,10 +2204,10 @@ sub _getWhereRecursive()
 							push(@where_aux,$value1." ".$operator." ".$v);
 						}
 					}
-#					elsif (@{$self->{work}{tables_inuse}} == 1)
-#					{
-#						push(@where_aux,$value1." ".$operator." ".$quote.$value2_a.$value.$value2_b.$quote);
-#					}
+##					elsif (@{$self->{work}{tables_inuse}} == 1)
+##					{
+##						push(@where_aux,$value1." ".$operator." ".$quote.$value2_a.$value.$value2_b.$quote);
+##					}
 					else
 					{
 						push(@where_aux,$value1." ".$operator." ".$quote.$value2_a.$value.$value2_b.$quote);
@@ -2167,8 +2239,8 @@ sub _getWhereRecursive()
 		}
 		if (ref($value2) eq "")
 		{
-			if ($value2 ne "")
-			{
+##			if ($value2 ne "")
+##			{
 				if ($value2 =~ /^\\(.*)/)
 				{
 					my $v = $1;
@@ -2189,19 +2261,19 @@ sub _getWhereRecursive()
 						push(@where_tmp,$value1." = ".$v);
 					}
 				}
-				elsif (@{$self->{work}{tables_inuse}} == 1)
-				{
-					push(@where_tmp,$value1." = ".$quote.$value2.$quote);
-				}
+##				elsif (@{$self->{work}{tables_inuse}} == 1)
+##				{
+##					push(@where_tmp,$value1." = ".$quote.$value2.$quote);
+##				}
 				else
 				{
 					push(@where_tmp,$value1." = ".$quote.$value2.$quote);
 				}
-			}
-			else
-			{
-				push(@where_tmp,$value1." IS NULL");
-			}
+##			}
+##			else
+##			{
+##				push(@where_tmp,$value1." IS NULL");
+##			}
 			next;
 		}
 

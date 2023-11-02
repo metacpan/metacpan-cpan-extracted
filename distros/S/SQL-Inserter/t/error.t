@@ -41,8 +41,8 @@ my $mock = Test2::Mock->new(
 );
 
 subtest 'Cover croak fail' => sub {
-    ok(lives {my $sql = SQL::Inserter->new()}, "Missing dbh");
-    ok(lives {my $sql = SQL::Inserter->new(dbh=>1)}, "Missing table");
+    ok(lives {my $sql = SQL::Inserter->new(oracle=>1)}, "Missing dbh");
+    ok(lives {my $sql = SQL::Inserter->new(oracle=>1, dbh=>1)}, "Missing table");
 };
 
 done_testing;

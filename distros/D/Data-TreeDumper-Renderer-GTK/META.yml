@@ -1,17 +1,26 @@
---- #YAML:1.0
-name:                Data-TreeDumper-Renderer-GTK
-version:             0.02
-abstract:            Gtk2::TreeView renderer for B<Data::TreeDumper>
-license:             ~
-author:              
-    - Nadim Khemir
-generated_by:        ExtUtils::MakeMaker version 6.44
-distribution_type:   module
-requires:     
-    Cairo:                         0
-    Data::TreeDumper:              0.33
-    Glib:                          0
-    Gtk2:                          0
+---
+abstract: 'Gtk3::TreeView renderer for B<Data::TreeDumper>'
+author:
+  - 'Nadim Khemir'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-TreeDumper-Renderer-GTK
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cairo: '0'
+  Data::TreeDumper: '0.33'
+  Glib: '0'
+  Gtk3: '0'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,21 +1,10 @@
 NAME
-    CPAN::Changes - Read and write Changes files
+    CPAN::Changes - Parser for CPAN style change logs
 
 SYNOPSIS
-        # Load from file
-        my $changes = CPAN::Changes->load( 'Changes' );
-
-        # Create a new Changes file
-        $changes = CPAN::Changes->new(
-            preamble => 'Revision history for perl module Foo::Bar'
-        );
-    
-        $changes->add_release( {
-            version => '0.01',
-            date    => '2009-07-06',
-        } );
-
-        $changes->serialize;
+      use CPAN::Changes;
+      my $changes = CPAN::Changes->load('Changes');
+      $changes->release('0.01');
 
 DESCRIPTION
     It is standard practice to include a Changes file in your distribution.
@@ -30,116 +19,89 @@ DESCRIPTION
     files that conform to the specification.
 
 METHODS
-  new( %args )
-    Creates a new object using %args as the initial data.
+  new ( %args )
+    Creates a CPAN::Changes object.
 
-    "next_token"
-        Used to passes a regular expression for a "next version" placeholder
-        token. See "DEALING WITH "NEXT VERSION" PLACEHOLDERS" for an example
-        of its usage.
+   %args
+    preamble
+        The preamble section of the changelog.
 
-  load( $filename, %args )
-    Parses $filename as per CPAN::Changes::Spec. If present, the optional
-    %args are passed to the underlaying call to "new()".
+    releases
+        An arrayref of CPAN::Changes::Release objects.
 
-  load_string( $string, %args )
-    Parses $string as per CPAN::Changes::Spec. If present, the optional
-    %args are passed to the underlaying call to "new()".
+  load ( $filename, %args )
+    Creates a new CPAN::Changes object by parsing the given file via
+    CPAN::Changes::Parser.
 
-  preamble( [ $preamble ] )
-    Gets/sets the preamble section.
+  load_string ( $filename, %args )
+    Creates a new CPAN::Changes object by parsing the given string via
+    CPAN::Changes::Parser.
 
-  releases( [ @releases ] )
-    Without any arguments, a list of current release objects is returned
-    sorted by ascending release date. When arguments are specified, all
-    existing releases are removed and replaced with the supplied
-    information. Each release may be either a regular hashref, or a
-    CPAN::Changes::Release object.
+  preamble ( [ $preamble ] )
+    Gets or sets the preamble section.
 
-        # Hashref argument
-        $changes->releases( { version => '0.01', date => '2009-07-06' } );
-    
-        # Release object argument
-        my $rel = CPAN::Changes::Release->new(
-            version => '0.01', date => '2009-07-06'
-        );
-        $changes->releases( $rel );
+  releases ( [ @releases ] )
+    Gets or sets the list of releases as CPAN::Changes::Release objects.
 
-  add_release( @releases )
-    Adds the release to the changes file. If a release at the same version
-    exists, it will be overwritten with the supplied data.
+  add_release ( @releases )
+    Adds the given releases to the change log. If a release of the same
+    version exists, it will be overwritten.
 
-  delete_release( @versions )
-    Deletes all of the releases specified by the versions supplied to the
-    method.
+  delete_release ( @versions )
+    Removes the given versions from change log.
 
-  release( $version )
-    Returns the release object for the specified version. Should there be no
-    matching release object, undef is returned.
+  find_release ( $version )
+    Finds a release with the given version.
 
-  serialize( reverse => $boolean, group_sort => \&sorting_function )
-    Returns all of the data as a string, suitable for saving as a Changes
+  reversed
+    Returns a new CPAN::Changes object with the releases in the opposite
+    order.
+
+  clone ( %attrs )
+    Returns a new "CPAN::Changes" object with the given attributes changed.
+
+  serialize ( %options )
+    Returns the change log as a string suitable for saving as a Changes
     file.
 
-    If *reverse* is provided and true, the releases are printed in the
-    reverse order (oldest to latest).
+    width
+        The width to wrap lines at. By default, lines will be wrapped at 75
+        characters.
 
-    If *group_sort* is provided, change groups are sorted according to the
-    given function. If not, groups are sorted alphabetically.
+    styles
+        An array reference of styles to use when outputting the entries.
 
-  delete_empty_groups( )
-    Deletes change groups without changes in all releases.
+        The styles can be either a single character to prefix change lines
+        or two characters to use as a prefix and suffix.
 
-DEALING WITH "NEXT VERSION" PLACEHOLDERS
-    In the working copy of a distribution, it's not uncommon to have a "next
-    release" placeholder section as the first entry of the "Changes" file.
+    indents
+        An array reference of indent strings to use when outputting the
+        entries.
 
-    For example, the "Changes" file of a distribution using Dist::Zilla and
-    Dist::Zilla::Plugin::NextRelease would look like:
+    reverse (legacy)
+        If true, releases will be output in reversed order.
 
-        Revision history for Foo-Bar
+    group_sort (legacy)
+        A code reference used to sort the groups in the releases.
 
-        {{$NEXT}}
-            - Add the 'frobuscate' method.
+LEGACY METHODS
+  delete_empty_groups
+    Removes empty groups.
 
-        1.0.0     2010-11-30
-            - Convert all comments to Esperanto.
-
-        0.0.1     2010-09-29
-            - Original version unleashed on an unsuspecting world
-
-    To have "CPAN::Changes" recognizes the "{{$NEXT}}" token as a valid
-    version, you can use the "next_token" argument with any of the class'
-    constructors. Note that the resulting release object will also be
-    considered the latest release, regardless of its timestamp.
-
-    To continue with our example:
-
-        # recognizes {{$NEXT}} as a version
-        my $changes = CPAN::Changes->load( 
-            'Changes',
-            next_token => qr/{{\$NEXT}}/,
-        );
-
-        my @releases = $changes->releases;
-        print $releases[-1]->version;       # prints '{{$NEXT}}'
-
-SEE ALSO
-    *   CPAN::Changes::Spec
-
-    *   Test::CPAN::Changes
-
-  SIMILAR MODULES
-    *   Module::Metadata::Changes
-
-    *   Module::Changes
+  release
+    An alias for find_release.
 
 AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
     Brian Cassidy <bricas@cpan.org>
 
-COPYRIGHT AND LICENSE
-    Copyright 2011-2013 by Brian Cassidy
+COPYRIGHT
+    Copyright (c) 2011-2015 the CPAN::Changes "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
 
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself.
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself. See <http://dev.perl.org/licenses/>.
 

@@ -1,16 +1,27 @@
 Revision history for Perl extension Image::Synchronize.
 
-2.010 2022-06-05
+2.011 2023-10-27
 
-      - Re-enable path name patterns matching the _end_ of path names.
+      - Use Win32::UTCFileTime to modify file modification times on
+        Microsoft Windows, because the previous functionality turns
+        out not to always work correctly on Windows 11.
+      - Allow arbitrary - and _ in option names.
 
-2.009 2022-06-03
+2.010 2023-04-19
+
+      - Suppress position changes of less than 1 cm, to avoid position
+        differences that are smaller than can be written to EXIF or
+        XMP.
+
+2.009 2022-06-05
 
       - Support character sets [qx3], character ranges [a-z], and
         alteratives {foo,bar} in path name patterns.
 
       - Make path name matching case insensitive in environments where
         path names are case insensitive (in particular MS Windows).
+
+      - Re-enable path name patterns matching the _end_ of path names.
 
 2.008 2021-02-28
 

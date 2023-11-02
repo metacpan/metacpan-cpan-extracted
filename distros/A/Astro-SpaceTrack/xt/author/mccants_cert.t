@@ -33,7 +33,7 @@ my $ua = LWP::UserAgent->new(
 );
 
 my $resp = $ua->get(
-    'http://www.prismnet.com/~mmccants/tles/iridium.html',
+    'https://www.mmccants.org//tles/iridium.html',
 );
 
 ok !got_expected_response( $resp ),

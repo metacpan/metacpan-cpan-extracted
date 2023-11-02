@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build::Tiny' => '0.034',
+                                        'perl' => 'v5.32.0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Feature::Compat::Try' => '0',
+                                      'Future' => '0.26',
+                                      'Future::AsyncAwait' => '0.38',
+                                      'IO::Async::Loop' => '0',
+                                      'Metrics::Any' => '0',
+                                      'Mutex' => '0',
+                                      'Object::Pad' => '0.74',
+                                      'OpenTelemetry' => '0',
+                                      'String::CRC32' => '0',
+                                      'perl' => 'v5.32.0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'JSON::PP' => '0',
+                                   'Syntax::Keyword::Dynamically' => '0',
+                                   'Test2::V0' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => 'v5.32.0'
+                                 }
+                 }
+     };
+  $x;
+ }

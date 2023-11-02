@@ -24,7 +24,7 @@ use Config;
 use Getopt::ArgvFile default=>1;
 use Getopt::Long qw / GetOptionsFromArray :config pass_through /;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 use constant CASE_INSENSITIVE_OS => ($^O eq 'MSWin32');
 
@@ -84,6 +84,7 @@ sub build {
     );
 
     my $method   = $self->{autolink_list_method};
+    say 'Scanning dependent dynamic libs';
     my @dll_list = $self->$method;
     my $alien_sys_installs = $self->{alien_sys_installs};
     
@@ -173,6 +174,7 @@ sub get_autolink_list {
     #  - need to find a different approach to get
     #  canonical file name while handling case,
     #  poss Win32::GetLongPathName
+    say "Getting dependent DLLs";
     my @dlls = @$argv_linkers;
     push @dlls,
       $self->get_dep_dlls;
@@ -487,21 +489,13 @@ sub get_dep_dlls {
     my $script = $self->{script_fullname};
     my $no_execute_flag = $self->{no_execute_flag};
     my $alien_sys_installs = $self->{alien_sys_installs};
-    my $cache_file = $self->{cache_file};
+    # my $cache_file = $self->{cache_file};
 
-    #  This is clunky:
-    #  make sure $script/../lib is in @INC
-    #  assume script is in a bin folder
-    my $rlib_path = (path ($script)->parent->parent->stringify) . '/lib';
-    #say "======= $rlib_path/lib ======";
-    local @INC = (@INC, $rlib_path)
-      if -d $rlib_path;
-    
     my $deps_hash = scan_deps(
         files   => [ $script ],
         recurse => 1,
         execute => !$no_execute_flag,
-        cache_file => $cache_file,
+        # cache_file => $cache_file,
     );
 
     #my @lib_paths 

@@ -1,4 +1,16 @@
 Revision history for OpenTelemetry
 
+0.011     2023-11-01 23:18:14+00:00 Europe/London
+
+    * Added missing documentation for
+      OpenTelemetry::Propagator::TraceContext::TraceState
+    * Publicly index existing OpenTelemetry::Trace::Span::Status
+    * Fix other minor issues in the documentation
+
+0.010     2023-10-31 23:05:38+00:00 Europe/London
+
+    Added Tracing API implementation.
+
 0.001     2020-06-29 00:03:29+08:00 Asia/Kuala_Lumpur
+
     Initial release.

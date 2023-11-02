@@ -1,8 +1,10 @@
 package App::Oozie::Types::Common;
-$App::Oozie::Types::Common::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
 
 use App::Oozie::Constants qw(
     RE_OOZIE_ID
@@ -113,7 +115,7 @@ App::Oozie::Types::Common
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

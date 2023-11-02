@@ -1,0 +1,30 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+
+0.006     2013-07-29
+    - Make sure we can run the script on
+      the same zonefile again without
+      creating nonsense.
+    - Fix tests by not reading from the file,
+      but using a new return scalar value
+      from ->write. It used to return 1, now
+      it returns the string that will be
+      written out.
+
+0.005
+    - Make sure that our split spf records
+      contain the protocol, v=spf1.
+
+0.004   2013-07-26
+    - Add documentation.
+
+0.003   2013-07-25
+    - Make script be found and installed. 
+
+0.002   2013-07-25
+    - Make module get opts, and
+    - add script
+
+0.001   2013-07-25
+    - Initial release. Hello world!

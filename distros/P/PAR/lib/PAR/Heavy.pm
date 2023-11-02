@@ -1,4 +1,7 @@
 package PAR::Heavy;
+use strict;
+use warnings;
+
 $PAR::Heavy::VERSION = '0.12';
 
 =head1 NAME
@@ -24,6 +27,8 @@ No user-serviceable parts inside.
 # enable debug/trace messages from DynaLoader perl code
 my $dl_debug = $ENV{PERL_DL_DEBUG} || 0;
 
+our %FullCache;
+
 my ($bootstrap, $dl_findfile);  # Caches for code references
 my ($cache_key);                # The current file to find
 my $is_insensitive_fs = (
@@ -43,10 +48,14 @@ sub _init_dynaloader {
     $bootstrap   = \&DynaLoader::bootstrap;
     $dl_findfile = \&DynaLoader::dl_findfile;
 
-    local $^W;
-    *{'DynaLoader::dl_expandspec'}  = sub { return };
-    *{'DynaLoader::bootstrap'}      = \&_bootstrap;
-    *{'DynaLoader::dl_findfile'}    = \&_dl_findfile;
+    {
+        no strict 'refs';
+        local $^W;
+        no warnings 'redefine';
+        *{'DynaLoader::dl_expandspec'}  = sub { return };
+        *{'DynaLoader::bootstrap'}      = \&_bootstrap;
+        *{'DynaLoader::dl_findfile'}    = \&_dl_findfile;
+    }
 }
 
 # Return the cached location of .dll inside PAR first, if possible.

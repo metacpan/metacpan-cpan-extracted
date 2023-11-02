@@ -1,0 +1,137 @@
+NAME
+    Acme::CPANModules::LanguageCodes - List of modules related to language
+    codes
+
+VERSION
+    This document describes version 0.002 of
+    Acme::CPANModules::LanguageCodes (from Perl distribution
+    Acme-CPANModules-LanguageCodes), released on 2023-08-06.
+
+DESCRIPTION
+  Basics
+    Locale::Language and Locale::Codes::Language (both part of
+    <pm:Locale::Codes now) should be your first go-to module. It is a core
+    module since perl 5.14 (Locale::Language from 5.8) and supports
+    converting between English language names and 2-letter- and 3-letter ISO
+    country codes, and retired codes. If you need to squeeze some
+    milliseconds of loading time, you can use Locale::Codes::Language_Codes
+    directly.
+
+  Types
+    Sah: Sah::Schema::language::code, Sah::Schema::language::code::alpha2,
+    Sah::Schema::language::code::alpha3.
+
+    Moose: MooseX::Types::Locale::Language,
+    MooseX::Types::Locale::Language::Fast.
+
+  Other utilities
+    Locale::Util::Language
+
+ACME::CPANMODULES ENTRIES
+    Locale::Language
+        Author: SBECK <https://metacpan.org/author/SBECK>
+
+    Locale::Codes::Language
+        Author: SBECK <https://metacpan.org/author/SBECK>
+
+    Locale::Codes::Language_Codes
+        Author: SBECK <https://metacpan.org/author/SBECK>
+
+    Sah::Schema::language::code
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Sah::Schema::language::code::alpha2
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Sah::Schema::language::code::alpha3
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    MooseX::Types::Locale::Language
+        Author: MORIYA <https://metacpan.org/author/MORIYA>
+
+    MooseX::Types::Locale::Language::Fast
+        Author: MORIYA <https://metacpan.org/author/MORIYA>
+
+    Locale::Util::Language
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n LanguageCodes
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries LanguageCodes | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=LanguageCodes -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::LanguageCodes -E'say $_->{module} for @{ $Acme::CPANModules::LanguageCodes::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-LanguageCodes>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-LanguageCodes>.
+
+SEE ALSO
+    Related lists: Acme::CPANModules::CountryCodes
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Lang
+    uageCodes>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

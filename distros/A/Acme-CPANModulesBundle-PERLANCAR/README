@@ -1,11 +1,11 @@
 NAME
-    Acme::CPANModulesBundle::PERLANCAR - PERLANCAR's collection of
-    Acme::CPANModules::* modules
+    Acme::CPANModulesBundle::PERLANCAR - Bundle of
+    Acme::CPANModules::PERLANCAR::* modules
 
 VERSION
-    This document describes version 0.010 of
+    This document describes version 0.014 of
     Acme::CPANModulesBundle::PERLANCAR (from Perl distribution
-    Acme-CPANModulesBundle-PERLANCAR), released on 2021-11-13.
+    Acme-CPANModulesBundle-PERLANCAR), released on 2023-11-01.
 
 DESCRIPTION
 ACME::CPANMODULES MODULES
@@ -14,7 +14,7 @@ ACME::CPANMODULES MODULES
 
     *   PERLANCAR::Avoided
 
-        Modules I'm currently avoiding.
+        List of modules I'm currently avoiding.
 
         This is a list of modules I'm currently avoiding to use in my code,
         for some reason. Most of the modules wered used in my code in the
@@ -26,17 +26,22 @@ ACME::CPANMODULES MODULES
         prerequisite to any of the modules listed here. (You should make
         your own blacklist though).
 
+    *   PERLANCAR::MyCLIWithSubcommands
+
+        List of distributions that contain CLI scripts with subcommands.
+
     *   PERLANCAR::MyGetoptLongExperiment
 
-        My experiments writing Getopt::Long replacements/alternatives.
+        List of my experiments writing Getopt::Long
+        replacements/alternatives.
 
         Most of these modules provide a Getopt::Long-compatible interface,
         but they differ in some aspect: either they offer more features (or
         less).
 
-    *   PERLANCAR::Retired
+    *   PERLANCAR::MyRetired
 
-        Retired modules.
+        List of my retired modules.
 
         This is a list of some of the modules which I wrote but have now
         been retired and purged from CPAN, for various reasons but mostly
@@ -49,7 +54,7 @@ ACME::CPANMODULES MODULES
 
     *   PERLANCAR::Weird
 
-        Weird modules.
+        List of weird modules.
 
         List of modules I find weird (non-pejoratively speaking) in one way
         or another, e.g. peculiar API, name.
@@ -83,13 +88,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar
+    This software is copyright (c) 2023, 2021, 2020, 2019, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

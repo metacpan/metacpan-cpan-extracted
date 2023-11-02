@@ -29,7 +29,7 @@ Louis Strous, E<lt>imsync@quae.nl<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018-2021 by Louis Strous
+Copyright (C) 2018-2023 by Louis Strous
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.26.2 or,
@@ -37,7 +37,8 @@ at your option, any later version of Perl 5 you may have available.
 
 =cut
 
-use Modern::Perl;
+use parent 'Exporter';
+our @EXPORT_OK = qw(normalize_options);
 
 use feature 'state';
 
@@ -81,10 +82,22 @@ use YAML::Any qw(
   LoadFile
 );
 
+BEGIN {
+  if ($^O eq 'MSWin32'
+      and (!$^V or $^V lt v5.33.5)
+      and eval 'require Win32::UTCFileTime')
+  {
+    import Win32::UTCFileTime;
+  }
+}
+
 # always use x.yyy version numbering, so that string comparison and
 # numeric comparison give the same ordering, to avoid trouble due to
 # different ways of interpreting version numbers.
-our $VERSION = '2.010';
+our $VERSION = '2.011';
+
+# TODO: check each folder for an .imsync-cameraoffsets.yaml file
+# TODO: allow timezone specification on --time
 
 my $CASE_TOLERANT;
 my $PIRname; # for 'name' or 'iname' as appropriate for
@@ -140,6 +153,8 @@ my @all_tags;
      'MIMEType',
      'Model',
      'QuickTime:CreationDate',
+     'QuickTime:AndroidManufacturer',
+     'QuickTime:AndroidModel',
      'SerialNumber',
      map { "XMP:$_" } @own_xmp_tags,
    );
@@ -404,6 +419,13 @@ sub basename_pattern {
   return $name;
 }
 
+my %camera_id_tags
+  = (
+     Make => [qw(Make QuickTime:AndroidManufacturer)],
+     Model => [qw(Model QuickTime:AndroidModel)],
+     SerialNumber => [qw(SerialNumber)],
+   );
+
 #   $camera_id = camera_id($info);
 #
 # returns the ID of the camera, based on information extracted from an
@@ -412,17 +434,32 @@ sub basename_pattern {
 # unique to the camera.
 sub camera_id {
   my ( $info ) = @_;
-  my $id =
-    join( '|', map { $info->get($_) // '' } qw(Make Model SerialNumber) );
-  $id = undef if $id =~ /^\|+$/;
+  my @values;
+  foreach my $maintag (qw(Make Model SerialNumber)) {
+    my $value;
+    foreach my $tagtry (@{$camera_id_tags{$maintag}}) {
+      my $v = $info->get(split /:/, $tagtry);
+      if (defined $v) {
+        $value = $v;
+        last;
+      }
+    }
+    push @values, $value // '';
+  }
+  my $id = join( '|', @values );
+  if ($id =~ /^\|+$/) {
+    $id = undef;
+  } elsif ($info->get('supposedly_utc')) {
+    $id .= '|U';
+  }
   return $id;
 }
 
 #   $camera_id = $ims->camera_id_from_fallback($fallback_camera_id);
 #
 # Returns the regular camera ID of a camera that has a fallback camera
-# ID equal to C<$fallback_camera_id>, or C<undef> if there is no such
-# camera.
+# ID equal to C<$fallback_camera_id>, or C<$fallback_camera_id> if
+# there is no such camera.
 sub camera_id_from_fallback {
   my ( $self, $fallback_camera_id ) = @_;
   my $r = $self->{fallback_to_camera_id}->{$fallback_camera_id};
@@ -431,7 +468,7 @@ sub camera_id_from_fallback {
       sort { ( $r->{$b} <=> $r->{$a} ) or ( $a cmp $b ) } keys %{$r};
     return $candidates[0];
   } else {
-    return;
+    return $fallback_camera_id;
   }
 }
 
@@ -607,6 +644,49 @@ sub best_scorers {
   return grep { $score{$_} == $bestscore } keys %score;
 }
 
+sub potential_donors {
+  my ($self, $file, $info) = @_;
+  my $number = $info->get('image_number');
+  my @targets;
+  if ( defined($number)
+       && defined( $self->{files_for_image_numbers}->{$number} ) ) {
+    my $target;
+    @targets = grep { $_ ne $file }
+      @{ $self->{files_for_image_numbers}->{$number} };
+    if (@targets > 1) {
+      # multiple files with the same number.  Arrange them in
+      # descending order of priority; metadata that is missing from
+      # the current file will be copied from the first target file
+      # that has it.
+
+      # descending priority order:
+      # 1. current file name with '.yaml' appended
+      # 2. greatest directory prefix in common with current file
+      # 3. metadata file
+      # 4. greatest basename pattern prefix in common with current file
+      # 5. lexicographic order
+      my $t1 = "${file}.yaml";
+      my $t3 = basename_pattern($file);
+      @targets = map { $_->[0] }
+        sort {
+               $b->[1] <=> $a->[1] # with .yaml suffix
+            or $b->[2] <=> $a->[2] # common directory prefix
+            or $b->[3] <=> $a->[3] # metadata file
+            or $b->[4] <=> $a->[4] # common base name pattern
+            or $a->[0] cmp $b->[0] # fallback: lexicographic order
+            }
+        map { [
+               $_,
+               ($_ eq $t1)? 1: 0,
+               length_of_common_directory_prefix($_, $file),
+               ($self->{original_info}->{$_}->get('is_metadata') // 0),
+               length_of_common_prefix(basename_pattern($_), $t3)
+             ] } @targets;
+    }
+  }
+  return @targets;
+}
+
 #    $ims->determine_new_values_for_all_files;
 #
 # Determines the proposed final values (target timestamp, location, and
@@ -622,7 +702,6 @@ sub determine_new_values_for_all_files {
 
   # Process the files
   my @files_handle_by_number;
-  my %files_for_image_numbers;
   my $count_modified    = 0;
   my %count_needs_force;
   foreach my $file (@files) {
@@ -632,10 +711,11 @@ sub determine_new_values_for_all_files {
 
       # remember which files with embedded timestamps have which image
       # number
-      push @{ $files_for_image_numbers{ $info->get('image_number') } }, $file
+      push @{ $self->{files_for_image_numbers}->{ $info->get('image_number') } }, $file
         if defined $info->get('image_number');
 
-      my $modification_type = $self->determine_new_values_for_file($file);
+      my @potential_donors = $self->potential_donors($file, $info);
+      my $modification_type = $self->determine_new_values_for_file($file, \@potential_donors);
 
       ++$count_modified    if $modification_type == 1;
 
@@ -674,41 +754,10 @@ EOD
   foreach my $file (@files_handle_by_number) {
     my $info   = $self->{original_info}->{$file};
     my $number = $info->get('image_number');
-    if ( defined( $files_for_image_numbers{$number} ) ) {
-      my $target;
-      my @targets = @{ $files_for_image_numbers{$number} };
-      if (@targets > 1) {
-        # multiple files with the same number.  Arrange them in
-        # descending order of priority; metadata that is missing from
-        # the current file will be copied from the first target file
-        # that has it.
-
-        # descending priority order:
-        # 1. current file name with '.yaml' appended
-        # 2. greatest directory prefix in common with current file
-        # 3. metadata file
-        # 4. greatest basename pattern prefix in common with current file
-        # 5. lexicographic order
-        my $t1 = "${file}.yaml";
-        my $t3 = basename_pattern($file);
-        @targets = map { $_->[0] }
-          sort {
-                 $b->[1] <=> $a->[1] # with .yaml suffix
-              or $b->[2] <=> $a->[2] # common directory prefix
-              or $b->[3] <=> $a->[3] # metadata file
-              or $b->[4] <=> $a->[4] # common base name pattern
-              or $a->[0] cmp $b->[0] # fallback: lexicographic order
-            }
-          map { [
-                 $_,
-                 ($_ eq $t1)? 1: 0,
-                 length_of_common_directory_prefix($_, $file),
-                 ($self->{original_info}->{$_}->get('is_metadata') // 0),
-                 length_of_common_prefix(basename_pattern($_), $t3)
-               ] } @targets;
-      }
+    if ( defined( $self->{files_for_image_numbers}->{$number} ) ) {
+      my @potential_donors = $self->potential_donors($file, $info);
       $count_modified +=
-        ($self->determine_new_values_for_file( $file, \@targets ) == 1);
+        ($self->determine_new_values_for_file( $file, \@potential_donors ) == 1);
       my $extra_info = $self->{extra_info}->{$file};
       if (defined($extra_info)) {
         my $f = $extra_info->get('min_force_for_change');
@@ -906,7 +955,14 @@ sub get_changes {
     my $distance = geo_distance( \@old_pos, \@new_pos );
     if ( defined $distance ) {  # the GPS location was complete in old
                                 # and new
-      if ( $distance ) {
+
+      # The precision of the updated or new coordinates as written in
+      # the image file may differ from the precision provided by the
+      # source of the coordinates.  Then later runs of this
+      # application with the same inputs and configuration may report
+      # a non-zero distance.  To avoid this problem we ignore
+      # distances less than 1 cm.
+      if ( $distance >= 0.01 ) {
         my ( $value, $prefix ) = si_prefix($distance);
         push @{$messages}, " GPS position has changed by $value ${prefix}m.";
         $extra_info->set( 'position_change', $distance );
@@ -1022,8 +1078,7 @@ sub determine_new_values_for_file {
     new Image::Synchronize::GroupedInfo;
 
   # copy preferred tags to final list
-  foreach my $tag (
-    qw(
+  my @tagstoget = qw(
     CameraID
     CreateDate
     DateTimeOriginal
@@ -1033,8 +1088,9 @@ sub determine_new_values_for_file {
     GPSLatitude
     GPSLongitude
     TimeSource
-    )
-    )
+    );
+
+  foreach my $tag (@tagstoget)
   {
     my $v = $info->get($tag);
     if (blessed $v) {
@@ -1056,6 +1112,31 @@ sub determine_new_values_for_file {
   # any tags except FileModifyDate.
   my $can_change = is_image_or_movie($info);
 
+  # For image and movie files, if there is at least one donator file
+  # and if the first of them is a metadata file then we prefer the
+  # metadata from the donator file.
+  if ($can_change
+      and defined($donator_files)
+      and @{$donator_files}) {
+    my $first_donator_info = $self->{original_info}->{$donator_files->[0]};
+    if ($first_donator_info->get('is_metadata')) {
+      foreach my $tag (@tagstoget) {
+        my $v = $first_donator_info->get($tag);
+        if (blessed $v) {
+          # create a clone; we don't want to accidentally adjust the $info
+          # member by adjusting the $new_info member
+          $v = clone($v);
+        }
+        my $current = $new_info->get($tag);
+        if (defined $current
+            and (not(defined $v)
+                 or $v ne $current)) {
+          $new_info->set( $tag, $v );
+        }
+      }
+    }
+  }
+
   # determine final camera ID.
 
   # user-specified camera ID?
@@ -1064,7 +1145,7 @@ sub determine_new_values_for_file {
     push @messages, ' Camera ID set by user (--cameraid).';
     $extra_info->set( 'explicit_change', 1 ) if $can_change;
   } else {
-    $camera_id = $info->get('CameraID');
+    $camera_id = $info->get('camera_id');
 
     if ( not( defined $camera_id ) ) {
       ($camera_id, my $donator) =
@@ -1076,7 +1157,7 @@ sub determine_new_values_for_file {
           // fallback_camera_id($file);
         $camera_id = $self->camera_id_from_fallback($fallback_camera_id);
         if ( defined $camera_id ) {
-          push @messages, ' Using fallback camera ID.';
+          push @messages, ' Got camera ID via fallback.';
         }
       }
     }
@@ -1089,7 +1170,12 @@ sub determine_new_values_for_file {
   my $timesource_letter;    # letter to identify time source in report
 
   my $create_time = $new_info->get('CreateDate');
-  if (not defined $create_time) {
+  if (defined $create_time) {
+    if (not $create_time->has_timezone_offset
+        and $info->get('supposedly_utc')) {
+      $create_time->set_timezone_offset(0); # assume UTC
+    }
+  } else {
     ($create_time, my $donator) =
       $self->get_from_targets('CreateDate', $donator_files);
     if (defined $create_time) {
@@ -1248,8 +1334,7 @@ sub determine_new_values_for_file {
 
   # determine the camera offset
 
-  if ($can_change
-      and $timesource_letter ne 'n'
+  if ($timesource_letter ne 'n'
       and defined($create_time)
       and defined($target_time)
       and defined ($camera_id)) {
@@ -1548,14 +1633,14 @@ sub exportgpx {
   foreach my $file ( sort keys %{ $self->{new_info} } ) {
     my $new_info = $self->{new_info}->{$file};
     next unless defined( my $longitude = $new_info->get('GPSLongitude') );
+    # get GPSDateTime, not FileModifyDate, because of GPS fix lag
+    next unless defined( my $time = $new_info->get('GPSDateTime') );
 
     ++$count;
 
     my $latitude = $new_info->get('GPSLatitude');
     my $altitude = $new_info->get('GPSAltitude');
-
-    # get GPSDateTime, not FileModifyDate, because of GPS fix lag
-    my $time = $new_info->get('GPSDateTime')->display_utc;
+    $time = $time->display_utc;
 
     $minlat = $latitude
       if not( defined $minlat )
@@ -1790,16 +1875,17 @@ sub get_image_info {
   my $info = new Image::Synchronize::GroupedInfo;
 
   {
-    my $image_info = $self->backend->ImageInfo(
-      $file,
-      @all_tags,
-      {
+    my $image_info = $self->backend->ImageInfo
+      (
+       $file,
+       @all_tags,
+       {
         PrintConv => 0,
         defined( $self->option('fastscan') )
         ? ( FastScan => $self->option('fastscan') )
         : (),
       }
-    );
+     );
 
     if ( ( $image_info->{MIMEType} // '' ) =~ m|^image/| ) {
       $info->set( 'file_type', 'image' );
@@ -1984,17 +2070,21 @@ sub get_image_info_from_metadata_file {
 }
 
 # extract the image number from the C<$file> name.  The image number
-# is the last sequence of digits in the file name, excluding the
-# directory part and the file extension part, but only if that
-# sequence has exactly four digits.  The file extension begins at the
-# first '.' in the file name.
+# is found as follows: (1) remove the directory part and the file name
+# extension from the file name, where the file name extension begins
+# at the last period '.'; (2) remove the part after the last digit;
+# (3) remove the part up to and including the last letter; (4)
+# concatenate the digits that remain.  Some examples that yield image
+# number 1234: IMG_1234.JPG IMG_1234-extra.txt foo6x1.2_3.4-y.mov
 sub get_image_number {
   my ($file) = @_;
-  $file = file($file)->basename;    # remove directory part, if any
-  $file =~ s/\.(.*)$//;             # remove file extension, if any
-
-  my ($number) = $file =~ /(\d+)(?:\D*)$/;
+  my $file2 = file($file)->basename; # remove directory part, if any
+  $file2 =~ s/\.([^.]*)$//;          # remove file extension, if any
+  $file2 =~ s/(\d)\D*$/$1/;          # (2)
+  $file2 =~ s/^.*?[[:alpha:]]([^[:alpha:]]*)$/$1/; # (3)
+  my $number = join('', split /\D+/, $file2);
   return unless defined $number;
+  return if $number eq '';
   return $number + 0;
 }
 
@@ -2163,6 +2253,68 @@ sub initialize_own_xmp_namespace {
   $self;
 }
 
+sub enhance_image_info {
+  my ($self, $file, $info) = @_;
+
+  # TODO: remove this when the author no longer needs it to transition
+  # from exiftime to imsync
+  if ( defined $info->get('ExiftimeVersion') ) {
+    log_warn("ExiftimeVersion found in $file.\n");
+  }
+
+  my $count_essential_gps_tags = 0;
+  foreach (qw(GPSDateTime GPSLongitude GPSLatitude)) {
+    ++$count_essential_gps_tags if defined $info->get($_);
+  }
+  if (  $count_essential_gps_tags
+        and $count_essential_gps_tags < 3 ) {
+    log_warn(<<EOD);
+File '$file' has some but not all of GPSDateTime,
+GPSLongitude, GPSLatitude.  Ignoring its GPS information.
+EOD
+    $info->delete($_)
+      foreach qw(GPSLatitude GPSLongitude GPSAltitude GPSDateTime);
+  }
+
+  $info->set( 'supposedly_utc', 1 ) if is_supposedly_utc($info);
+
+  # determine the camera ID.
+
+  my $camera_id;
+  {
+    my $embedded_camera_id = $info->get('CameraID');
+
+    if (defined $embedded_camera_id
+        and not $self->option('force', 0)) {
+      # no --force was applied, so just reuse the embedded
+      # camera ID
+      $camera_id = $embedded_camera_id;
+    } else {
+      # construct a camera ID from the embedded information
+      $camera_id = camera_id($info);
+    }
+  }
+
+  # there may not be sufficient information to deduce a camera
+  # ID in the preferred way; also deduce a fallback camera ID
+  # that is always available
+  my $fallback_camera_id = fallback_camera_id( $file );
+
+  if (defined $camera_id
+      and $camera_id eq $fallback_camera_id) {
+    $camera_id = undef;
+  }
+
+  if ( defined $camera_id ) {
+    $info->set( 'camera_id', $camera_id );
+
+    # remember for later, so we can hopefully substitute real
+    # camera IDs for some fallback ones.
+    ++$self->{fallback_to_camera_id}->{$fallback_camera_id}->{$camera_id};
+  }
+  $info->set( 'fallback_camera_id', $fallback_camera_id );
+}
+
 #   $ims->inspect_files(@files);
 #
 # Inspects the @files.  The files are inspected but not modified,
@@ -2188,7 +2340,7 @@ sub inspect_files {
 
   my %gpx_files;
 
-  my $fallback_to_camera_id = $self->{fallback_to_camera_id} = {};
+  $self->{fallback_to_camera_id} = {};
 
   # Now process the files.
   foreach my $file (@files) {
@@ -2216,58 +2368,7 @@ sub inspect_files {
         and $group ne 'File';
 
       if (is_image_or_movie($info)) {
-        # TODO: remove this when the author no longer needs it to
-        # transition from exiftime to imsync
-        if ( defined $info->get('ExiftimeVersion') ) {
-          log_warn("ExiftimeVersion found in $file.\n");
-        }
-
-        my $count_essential_gps_tags = 0;
-        foreach (qw(GPSDateTime GPSLongitude GPSLatitude)) {
-          ++$count_essential_gps_tags if defined $info->get($_);
-        }
-        if (  $count_essential_gps_tags
-              and $count_essential_gps_tags < 3 )
-        {
-          log_warn(<<EOD);
-File '$file' has some but not all of GPSDateTime,
-GPSLongitude, GPSLatitude.  Ignoring its GPS information.
-EOD
-          $info->delete($_)
-            foreach qw(GPSLatitude GPSLongitude GPSAltitude GPSDateTime);
-        }
-
-        $info->set( 'supposedly_utc', 1 ) if is_supposedly_utc($info);
-
-        # determine the camera ID
-        my $camera_id = $info->get('CameraID');    # embedded camera ID
-        if ( defined $camera_id ) {
-
-          # the embedded camera ID may have the |U prefix that
-          # indicates that the embedded creation timestamp is
-          # supposedly in UTC; omit that part
-          $camera_id = base_camera_id($camera_id);
-        }
-        else {
-          # no embedded camera ID; attempt to construct one from the
-          # embedded information
-          $camera_id = camera_id( $info );
-        }
-
-        # there may not be sufficient information to deduce a camera
-        # ID in the preferred way; also deduce a fallback camera ID
-        # that is always available
-        my $fallback_camera_id = fallback_camera_id( $file );
-
-        if ( defined $camera_id ) {
-          $info->set( 'camera_id', $camera_id );
-
-          # remember for later, so we can hopefully substitute real
-          # camera IDs for some fallback ones.
-          ++$fallback_to_camera_id->{$fallback_camera_id}->{$camera_id};
-        }
-        $info->set( 'fallback_camera_id', $fallback_camera_id );
-
+        $self->enhance_image_info($file, $info);
         ++$count_image_files;
         ++$count_gps_times if defined $info->{GPSDateTime};
       } else {
@@ -2285,6 +2386,7 @@ EOD
         if ($type) {
           my $metainfo = get_image_info_from_metadata_file($file);
           if (defined $metainfo) {
+            $self->enhance_image_info($file, $metainfo);
             my @tags = $metainfo->tags;
             if (@tags) {
               log_message(2, { name => $file }, " Is a $type metadata file.\n" );
@@ -2438,7 +2540,8 @@ my %convert_for_writing = (
 
 sub set_file_modification_time {
   my ($self, $file, $time_utc) = @_;
-  return $self->backend->SetFileTime($file, undef, $time_utc);
+  utime undef, $time_utc, $file;
+#  return $self->backend->SetFileTime($file, undef, $time_utc);
 }
 
 #   $et->modify_file($file);
@@ -2651,14 +2754,25 @@ sub modify_file {
       # whether Daylight Savings Time is in effect when this code is
       # executed).
       #
-      # Fortunately, the author of Image::ExifTool has faced the same
-      # problem, so we can use Image::ExifTool functionality to work
-      # around it.  We directly call the Image::ExifTool functionality
-      # that sets the file modification time.
+      # The author of Image::ExifTool faced and overcame the same
+      # problem, and using the resulting Image::ExifTool functionality
+      # worked for me on Windows 10 but no longer on Windows 11.
+      #
+      # Then I found Win32::UTCFileTime, which allows overriding utime
+      # with a version that hopefully works on Windows 11.
 
+      my $cur_mt = -M $file;
       my $fmt = $new_info->get('FileModifyDate');
       my $success = $self->set_file_modification_time($file, $fmt->time_utc);
 
+      if ($success) {
+        my $new_mt = -M $file;
+        if ($new_mt == $cur_mt) {
+          log_message( 4, { name => $file },
+                       sub { " Setting FileModifyDate of '$file' to '$fmt' FAILED\n" } );
+          $success = 0;
+        }
+      }
       if ($success) {
         log_message( 4, { name => $file },
                     sub { " Set FileModifyDate of '$file' to '$fmt'\n" } );
@@ -3003,6 +3117,7 @@ sub process_user_times {
                               $/x
       )
     {    # multi-unit offset
+      # TODO: support timezone offset
       $value = ( $+{year} // 0 ) * 365;
       $value = ( $value + ( $+{day} // 0 ) ) * 24;
       $value = ( $value + ( $+{hour} // 0 ) ) * 60;
@@ -3021,6 +3136,7 @@ sub process_user_times {
       }
     }
     elsif ( $rhs =~ /^(\d+:\d+(?::\d+)?)$/ ) {    # clock time
+      # TODO: support timezone offset
       my $createdate = $info->get('CreateDate');
       if ( defined $createdate ) {
         $value = Image::Synchronize::Timestamp->new( $rhs, $createdate );
@@ -3988,6 +4104,19 @@ sub file_from_dto {
   } else {
     return $dto_timestamp;
   }
+}
+
+sub normalize_options {
+  my @args;
+  foreach (@_) {
+    if (my ($prefix, $opt, $suffix) = /^(-+)([-_\w]+)(.*)/) {
+      $opt =~ tr/-_//d;
+      push @args, "$prefix$opt$suffix";
+    } else {
+      push @args, $_;
+    }
+  }
+  return @args;
 }
 
 1;

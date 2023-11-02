@@ -1,9 +1,11 @@
 package App::Oozie::Util::Plugin;
-$App::Oozie::Util::Plugin::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
 use parent qw( Exporter );
+
+our $VERSION = '0.015'; # VERSION
 
 use File::Spec::Functions qw(
     catdir
@@ -18,22 +20,22 @@ our @EXPORT_OK = qw(
 );
 
 sub find_plugins {
-    my $base_class = shift || die "Please specify a base class name";
+    my $base_class = shift || die 'Please specify a base class name';
     my $fext       = shift || 'pm';
 
     (my $base_path = $base_class) =~ s{::}{/}xmsg;
 
     my @found = find_files_in_inc( $base_path, $fext );
     my %action_to_class = map {
-        lc( $_->{name} ) => $base_class . '::' . $_->{name}
+        lc( $_->{name} ) => $base_class . q{::} . $_->{name}
     } @found;
 
     return \%action_to_class;
 }
 
 sub find_files_in_inc {
-    my $base_path = shift || die "base_path not specified";
-    my $fext      = shift || die "File exrentension not specified";
+    my $base_path = shift || die 'base_path not specified';
+    my $fext      = shift || die 'File exrentension not specified';
 
     my $re_file_extension = qr{
         [.] $fext
@@ -44,8 +46,7 @@ sub find_files_in_inc {
     for my $path ( @INC ) {
         my $test = catdir $path, $base_path;
         next if ! -d $test || ! -e _;
-        opendir my $DIR, $test or die "Can't opendir $test: $!";
-        my @wanted;
+        opendir my $DIR, $test or die sprintf q{Can't opendir %s: %s}, $test, $!;
         while ( my $file = readdir $DIR ) {
             my $fp = catfile $test, $file;
             next if    $seen_path{ $fp }++
@@ -67,7 +68,7 @@ sub find_files_in_inc {
 }
 
 sub load_plugin {
-    my $class = shift || die "No class specified for loading";
+    my $class = shift || die 'No class specified for loading';
     eval qq{
         require $class;
         1;
@@ -92,7 +93,7 @@ App::Oozie::Util::Plugin
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

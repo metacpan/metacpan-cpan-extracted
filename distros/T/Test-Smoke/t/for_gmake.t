@@ -221,9 +221,13 @@ SKIP: {
     my $makefile = get_smoke_mk_ok($smoke_mk);
     skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
-    like( $makefile, '/^BUILDOPT\t\+=\s*-DPERL_COPY_ON_WRITE\n
-                       #+\ CHANGE THESE ONLY IF YOU MUST\ #+
-    /mx', "-Accflags= is translated to BUILDOPT = \$(BUILDOPT)" );
+    like(
+        $makefile,
+        qr/^BUILDOPTEXTRA\t\:=\s*-DPERL_COPY_ON_WRITE\n
+           BUILDOPT\s*:=\ \$\(BUILDOPTEXTRA\) 
+        /mx,
+        "-Accflags= is translated to BUILDOPTEXTRA := ..."
+    );
 }
 
 ok( my_unlink( $smoke_mk ), "Remove makefile" );
@@ -236,11 +240,13 @@ SKIP: {
     my $makefile = get_smoke_mk_ok($smoke_mk);
     skip "Can't read from '$smoke_mk': $!", 1 if !defined($makefile);
 
-    like( $makefile, '/^BUILDOPT\t\+=\s*-DPERL_COPY_ON_WRITE\n
-                        BUILDOPT\t\+=\s*-DPERL_POLLUTE\n
-                        #+\ CHANGE THESE ONLY IF YOU MUST\ #+
-    /mx', "-Accflags= is translated to BUILDOPT = \$(BUILDOPT)" )
-    or BAIL_OUT("souhaeosnthseontuhsn");
+    like(
+        $makefile,
+        qr/^BUILDOPTEXTRA\t\:=\s*-DPERL_COPY_ON_WRITE \s+ -DPERL_POLLUTE\n
+            BUILDOPT\t:=\ \$\(BUILDOPTEXTRA\)
+        /mx,
+        "2 x -Accflags= is translated to BUILDOPTEXTRA := ..."
+    );
 }
 
 # Testing: -Duseithreads -Uuseimpsys

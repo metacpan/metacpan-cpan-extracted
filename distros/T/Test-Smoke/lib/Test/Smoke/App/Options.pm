@@ -2,7 +2,7 @@ package Test::Smoke::App::Options;
 use warnings;
 use strict;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Test::Smoke::App::AppOption;
 
@@ -135,6 +135,7 @@ sub reporter_config { # needed for sending out reports
             showcfg(),
             locale(),
             defaultenv(),
+            perlio_only(),
             is56x(),
             skip_tests(),
             harnessonly(),
@@ -204,6 +205,7 @@ sub runsmoke_config { # runsmoke.pl
             jsnfile(),
             cfg(),
             defaultenv(),
+            perlio_only(),
             force_c_locale(),
             harness3opts(),
             harnessonly(),
@@ -923,6 +925,19 @@ sub perl5opt {
         helptext   => "What value should be used for PERL5OPT in the jcl wrapper?\n",
         configtext => "\$PERL5OPT will be set to this value during the smoke\n"
                     . "\t(Make empty, with single space, to not set it.)",
+    );
+}
+
+sub perlio_only {
+    return $opt->new(
+        name       => 'perlio_only',
+        option     => '!',
+        default    => 0,
+        helptext   => "Do not set the test suite environment to stdio.",
+        configtext => "Run the test suite without \$ENV{PERLIO}=='stdio'?",
+        configtype => 'prompt_yn',
+        configalt  => sub { [qw/ N y /] },
+        configdft  => sub {'n'},
     );
 }
 

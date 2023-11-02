@@ -1,0 +1,680 @@
+Changes log for Perl extension SQL::Statement
+
+Version 1.405, released June 17, 2013
+-------------------------------------------------
+[Bug fixes]
+* INSERT now expands incomplete rows (Thanks to H.Merijn Brand)
+
+Version 1.404, released May 23, 2013
+-------------------------------------------------
+[Bug fixes]
+* re-enable cleanup test_output* after test done
+* recommend Text::Soundex and do soundex-test only when have it,
+  because it's going to be removed from core for Perl 5.19 (thank Merijn)
+
+Version 1.403, released May 22, 2013
+-------------------------------------------------
+[Bug fixes]
+* fix documentation (rt#84889 - thanks Xavier Guimard and Florian,
+  rt#85257 - thanks Andreas Koenig)
+
+Version 1.402, released December 19, 2012
+-------------------------------------------------
+
+[Misc]
+* add Math::Complex 1.56 as recommendation (RT#81926, Sam Ferencik)
+* add Math::BigInt 1.88 as recommendation (RT#81927, Sam Ferencik)
+* clarify Test::Simple 1.90 is required for building (RT#81925, Sam Ferencik)
+
+[Bug fixes]
+* fix leaking reference to open tables outside SQL::Statement::execute
+  (fixes RT#81523)
+* looks_like_number identifies 'nan' as number sometimes (add regex to
+  t/06virtual.t)
+
+Version 1.401, released October 29, 2012
+-------------------------------------------------
+
+[Misc]
+* Switch to 3-digited minor version
+
+[Bug fixes]
+* undo literal replaces in subqueries before passing them to the
+  child parser
+* Fix doc typo RT#76764 (STEFFENW) - thanks Steffen
+* Fix typo documented in RT#71914 (reported by Ze'ev Atlas,
+  fixed by H.Merijn Brand) - thanks Ze'ev and Merijn
+* Fix DROP TABLE behaviour and error detection
+
+[Improvements]
+* Improve documentation/tests for multiple JOIN's from RT#69573
+  (from BBYRD) with modifications
+* Filling in the SQL92 gaps for functions (BBYRD) from RT#72638
+  with minor modifications - thanks Brendan
+
+Version 1.33, released February 05th, 2011
+----------------------------------------------
+
+[Bug fixes]
+* Move test dependencies to (unreleased) Bundle::Test::SQL::Statement
+  to avoid circular dependencies
+
+Version 1.32, released January 19th, 2011
+----------------------------------------------
+
+[Bug fixes]
+* Fixed invalid check for escaped single quotes
+* Fixed unpermitted modification of array source for table creation
+  (CREATE TABLE AS IMPORT(?),[[..],[..]])
+* Fixing alias used in ORDER BY (RT#61384, thanks jvm)
+* Fixing ORDER BY behavior for multiple sort columns
+  (slower, but guaranteed correct)
+
+[Improvements]
+* renamed fetch-method into fetch_row (keep fetch() as alias) and
+  add a fetch_rows() to fetch all rows at once
+* Different accessors for direction of ORDER BY clause query part
+  and it's boolean equivalent "desc" (0 or 1, respectively)
+* Add a lot of Pure-Perl DBD's as build dependency for testing
+  (skip DBD::AnyData for now, because it seems to be broken - check
+  for next release)
+
+[Misc]
+* Bump requirement of DBI to 1.616
+* switch for fully external DBD tests from DBD::XBase to DBD::SQLite
+* Document another limitation (lacking implicit creating temp table
+  during processing a query using the same table with different aliases
+  twice)
+
+Version 1.31, released August 16th, 2010
+----------------------------------------------
+
+[Bug fixes]
+* Fix misbehaviour of DELETE/UPDATE for tables with only basic capabilities
+  and no matching where clause (reported by H.Merijn Brand and Drew ...)
+* Fix some column identifier splits to respect quoted tables
+
+[Improvements]
+* Optimized some core routines between 25% and 50%.
+
+Version 1.30, released August 1st, 2010
+----------------------------------------------
+
+[Bug fixes]
+* remove blib directory from distfile
+
+Version 1.29, released August 1st, 2010
+----------------------------------------------
+
+[Bug fixes]
+* add some getters as documented in SQL::Statement::Structure
+  (fixes RT#59834, thanks John Wiersba)
+* add missing import of function croak to SQL::Statement::Term::ColumnValue
+* fix assignment of parser result (doesn't run with perl-5.13.3)
+
+Version 1.28, released July 15th, 2010
+----------------------------------------------
+
+[Improvements]
+* Introduce new "capability" method for SQL::Statement and SQL::Eval::Table
+  + Add capability for "insert_new_row" to allow DBD::DBM to fix PK
+    constrain on INSERT statements.
+* Performance of IMPORT feature improved (thanks to Sven Probst, RT#57322)
+
+[Bug fixes]
+* expect every table object being derived from SQL::Eval::Table
+* rewrite DELETE and UPDATE command based on table capabilities
+* add abstract methods for all methods derived classes must override
+  (this means, open_table for SQL::Statement deriveds must be overridden
+   and all data access methods of tables - see SQL::Eval::Table for details)
+* Tests are fixed to use TEMP TABLES explicitely when required
+* check for invalid column names fixed
+* Don't let depreciated parser structures stay alive in SQL::Statement when
+  reusing the Parser
+
+[Documentation]
+* Method documentation of SQL::Statement and SQL::Eval::Table are improved
+* Add a Roadmap describing future plans for SQL::Statement (in addition to
+  DBD::File::Roadmap).
+* POD spelling fixes provided by H.Merijn Brand and Pod::Spell::CommonMistakes
+  (thanks Tux)
+* POD grammar fixes and reasonable sentences created by Martin Evans 
+
+[Things that may break your code]
+* SQL::Statement 1.28 is expected not to work proper in combination with
+  DBI 1.611 and below
+* SQL::Statement::ColumnValue expects now every table being derived from
+  SQL::Eval::Table
+
+Version 1.27, release May 06th, 2010
+----------------------------------------------
+
+[Bug fixes]
+* use originally given table name for open_table() on SELECT, too
+  (all other command still use the originally given name)
+* warn/die -> carp/croak
+* fix delete_one_row & update_one_row ability using
+
+[Documentation]
+* Apply spelling fix patch from Ansgar Burchardt (RT#56475)
+
+Version 1.26, release April 09th, 2010
+----------------------------------------------
+
+[Bug fixes]
+* Handle NULL columns in concatenation as empty strings
+
+[Improvements]
+* Change regex's in parser to use \p{Word} instead of \w to allow unicode
+  support
+
+[Documentation]
+* Make clear, that identifiers are handled case insensetive and there is
+  a real good solution provided by DBI which allows to live great with
+  that behaviour.
+
+Version 1.25, release March 15th, 2010
+----------------------------------------------
+
+[Bug fixes]
+* Keep org_table_names with schema information to allow derived
+  table classes to handle as it seems reasonable there
+* Separate columns with "\0" in multi-column aggregation to be able to
+  difference between ('1','1foo') and ('11','foo')
+
+[Misc]
+* More resources added to META.yml
+
+Version 1.24, release March 15th, 2010
+----------------------------------------------
+
+[Misc]
+* Ignore *.rej in MANIFEST.SKIP (fixes RT #52081 reported by
+  Lars Thegler)
+
+[Bug fixes]
+* Add missing import of _INSTANCE in SQL::Statement::Function::NumericEval
+  fixes RT #52356 - reported by Detlef Pilzecker)
+* Fix wrongly discarded DISTINCT clause (RT#53186)
+
+[Improvements]
+* Fix parsing errors of plain numbers (RT#16931)
+* Fix parsing errors of nested calculation / functions (RT#16931, RT#52356)
+* Rewrite result calculation of aggregation functions (simplify code, speed up)
+* Upgrade Makefile.PL (patch from Alexandr Ciornii) to handle different
+  EU::MM versions and abilities properly
+* Update documentation to show how 'column_defs' and SQL::Statement::Term
+  instances shall be used
+* Introduce SQL::Dialect::Role providing ini-style data access to SQL::Dialects
+  (patch from Michael Schwern)
+
+[Things that may break your code]
+* SQL::Parser now didn't deliver a struct containing 'column_names',
+  'computed_columns' and 'set_functions' - it's combined into one member
+  'column_defs'.
+* Minimum required perl version is now 5.8 - upcoming next version of DBI
+  requires perl 5.8, too - and I could simplify some code that's why
+
+Version 1.23, release November 20th, 2009
+----------------------------------------------
+
+[Misc]
+* Applied patch from Marc Espie which fixes several orthographic
+  errors in SQL::Statement::Syntax documentation.
+* Added a fixed version of test reported via RT #34121
+
+[Bug fixes]
+* Fix an issue in UPDATE command which 'shift's the values from
+  the list of parameters which causes there're no more parameters
+  left after first row get's updated (Fixes RT #50788)
+* Fix aggregate function handling of new code since 1.21_01
+* Correct handling of DISTINCT in aggregate functions
+
+[Improvements]
+* Add support for tables/columns starting with '_' for CSV and AnyData,
+  which is usually forbidden by ANSI SQL
+* Add support for inserting multiple lines with one statement
+  (fixes RT #31730)
+* Handle ANSI 'IS NULL' and CVS/AnyData 'IS NULL' different
+
+[Things that may break your code]
+* row_value now expects up to two arguments
+
+Version 1.22, release October 10th, 2009
+----------------------------------------------
+
+[Misc]
+* Add missing changelog - no code changes
+
+Version 1.21, release October 10th, 2009
+----------------------------------------------
+
+[Misc]
+* remove version dependency to check previously installed version
+* add DBD::File as "Test" requirement
+
+Version 1.21_8, release October 5th, 2009
+----------------------------------------------
+
+[Bug fixes]
+* Add additional test for bug-fix in 1.21_7 to t/18bigjoin.t
+
+[Misc]
+* Correct some typo's in POD
+
+Version 1.21_7, not public released
+----------------------------------------------
+
+[Bug fixes]
+* Don't fail for non-existent columns introduced by functions
+  in joins
+
+Version 1.21_6, release September 24th, 2009
+----------------------------------------------
+
+[Bug fixes]
+* Don't abort Makefile.PL when in automated smoke tests
+
+Version 1.21_5, release September 23th, 2009
+----------------------------------------------
+
+[Bug fixes]
+* table order isn't wrongly used in order of appearance when SQL::Parser
+  couldn't determine an order
+* Some internal fixes
+
+[Misc]
+* Updated dependency to Params::Util to non-leaking 1.00
+* Note dependency to Carp and Data::Dumper
+* rely on version to compare versions
+* Update POD for terms
+* Update
+
+Version 1.21_4, release September 21th, 2009
+----------------------------------------------
+
+[Bug fixes]
+* modify regex to match types to fix problems with Perl 5.6.2
+* add DESTROY methods to ensure clean up
+* fix lower casing internal table names when joining tables
+* replace parameter shifting by assigning @_ to the list of parameters
+
+Version 1.21_3, release September 17th, 2009
+----------------------------------------------
+
+[Things that may break your code]
+* When someone accesses the where_clause attribute of the SQL::Statement
+  instance - be aware that now IN and BETWEEN can be native entries
+
+[Bug fixes]
+* convert operation to upper case when surely initialized
+
+[Improvements]
+* IN and BETWEEN are now native operations - they are not expanded
+  to OR'ed equalize operations anymore
+
+Version 1.21_2, release September 15th, 2009
+----------------------------------------------
+
+[Things that may break your code]
+* modify behavior for unquoted identifiers - they're converted and
+  returned lower cased now (instead upper cased as in 1.21_1)
+  Fixes bug RT #48502
+
+Version 1.21_1, release July 30th, 2009
+------------------------------------------
+
+[Things that may break your code]
+* removed SQL::Statement::Column
+* don't instantiate SQL::Statement::Functions objects
+* Reworked internal column and function handling to reduce code complexity
+* rows and columns aren't setable from outside a table or eval object
+  anymore
+
+[Bug fixes and other changes]
+* Fixed bugs:
+  + RT #47292: Test failures with recent DBI
+  + RT #44512: Patch for CREATE TABLE parsing
+  + RT #42676: tests 16 failed
+
+Version 1.20, released March 5th, 2009
+------------------------------------------
+
+* Fixed Makefile in MANIFEST (reported by Havard Eidnes in RT #43586)
+* Fixed invalid label FETCHROW used (reported by Michael in RT #42982)
+* separated update_one_row and update_specific_row method names for tables
+  to avoid confusion
+
+Version 1.19, released February 6th, 2009
+------------------------------------------
+
+* Fixed OUTER JOIN behavior
+* Added version info to all *.pm files to allow CPAN::Reporter find updates
+* Correct META-Files
+* Fixed reported bugs:
+
+
+Version 1.18_02, no public release
+-----------------------------------
+
+Additional (profiled) optimizations for complicated where clauses
+
+Version 1.18_01, released January 12th, 2009
+---------------------------------------------
+
+No code changes within SQL::Statement - but deliver and execute additional
+tests.
+
+Version 1.17, released January 12th, 2009
+------------------------------------------
+
+* Fixed reported bugs:
+  * RT#42263: GROUP BY doesn't group on multiple columns
+
+Version 1.16_04, released 4 January, 2009
+------------------------------------------
+
+* added tests to prove valid quoting (most of them fail)
+* Reformat the source
+* add some (profiled) tweaks as removing useless regex to speed up SELECT
+* Fixed Bugs:
+  * 14217	Does not correctly handle SQL statements with comments
+  * 15686	Join syntax is case-sensitive, and common columns in natural
+                joins are "ambiguous" [patch]
+  * 13080	Cannot update a field based on its previous value
+  * 26058	functions on computed columns aliased to the underlying column
+                name are not called
+
+Version 1.16_03, released 1 January, 2009
+------------------------------------------
+
+* removed *.orig and *.rej relics
+
+Version 1.16_02, released 1 January, 2009
+------------------------------------------
+
+* Changing join_2_tables to reduce memory usage when joining a lot of tables
+
+* Fixed Bugs:
+  * 15688   Columns aliased with double quotes are a fatal error
+  * 16579   Speed optimizations
+  * 30590   Bug in SQL::Statement::is_number()
+  * 41875   Bug in synopsis example
+
+Version 1.16_01, released 1 January, 2009
+------------------------------------------
+
+* With this release, I'd like to welcome Jens Rehsack as co-maintainer of
+  the SQL::Statement and SQL::Parser modules. Jens has added in some
+  great improvements.
+  Thanks Jens! -- Jeff
+
+* Adding a lot of join tests (once from Jeff, 48 from
+  PostgreSQL official handbook) - no error of them will be corrected in the
+  first run
+  Thanks to Alexander Breibach <alexander.breibach@gmx.de> -- Jens
+
+Version 1.15, released 2 February, 2006
+----------------------------------------
+* fixed placeholder bug in SQL::Statement::UPDATE
+  thanks for bug report Tanktalus
+
+Version 1.14, released 21 April, 2005
+----------------------------------------
+ * fixed circular dependency in tests (one mistakenly required AnyData)
+
+Version 1.13, released 18 April, 2005
+----------------------------------------
+ * pod fixes
+
+Version 1.12, released 18 April, 2005
+----------------------------------------
+ * added support for GROUP BY
+   (several people sent suggestions for this in the past, please email me
+   so I can credit you, sorry I lost the names)
+
+ * added support for true LIMIT - if a LIMIT clause is specified and
+   no ORDER BY clause is specified, the SELECT will stop searching
+   when the limit is reached;  with an ORDER BY clause it will still
+   search the entire table because we can only ORDER a set;  using
+   LIMIT without an ORDER BY will greatly increase speed
+
+ * added support for CREATE/DROP keyword|operator|type|function
+
+ * optimized process_predicate to only look up scalars once
+
+ * completely re-wrote the POD
+
+ * fixed bug in primary key search optimization
+   thanks for bug report and test scripts: Jim Lambert, <jimlambrtATmac.com>
+
+ * fixed problem with all_cols slowing inserts
+   thanks for patch and test Cosimo Streppone <cosimoATcpan.org>
+
+ * cleaned up case of temp table column names
+   thanks for bug report: Dan Wright
+
+ * added a META.YML and extra tests
+
+Version 1.11, released 28 March, 2005
+----------------------------------------
+ * fixed bug in "CREATE TABLE AS ..."
+
+Version 1.10, released 27 March, 2005
+----------------------------------------
+ * added support for CREATE TABLE AS SELECT ... and CREATE TABLE AS IMPORT()
+
+ * added support for in-memory tables and heterogeneous operations,
+   see the SQL::Parser docs
+
+ * added many new built-in functions see SQL::Statement::Functions.pm
+
+ * added support for user-defined functions, see SQL::Statement::Functions.pm
+
+ * added support for column name aliases
+       thanks for patch, Robert Rothenberg
+
+ * added support for comparison to empty string (e.g. WHERE col1='')
+   currently returns the same as WHERE col1 IS NULL
+       thanks for patch, cpanATgoess.org
+
+ * fixed bug in S::P::clean_sql() newline-handling,
+       thanks for patch Steffen G., steffenATkonzeptloses.de
+
+ * fixed bug in  SQL::Parser::feature()
+       thanks for patch, chromatic
+
+ * the word "INTO" is now optional in "INSERT INTO tblname ..."
+ * the word "FROM" is now optional in "DELETE FROM tblname ..."
+       thanks for suggestion, gipeol@sci.kun.nl
+
+ * optimized portions of eval_where, process_predicate, and is_matched
+   HUGE thanks Dan Wright and Dean Arnold for patches
+
+ * HUGE thanks to Dean Arnold for all the following which should clean up
+   a number of bugs in parentheses parsing and in the predicates IN and
+   BETWEEN as well as speed things up considerably
+
+	SQL::Parser changes:
+	- removed recursion from get_in(), get_btwn()
+	- fixed paren scan and argument separator scan in get_in()
+	- optimized get_in/get_btwn code
+	- made get_in/get_btwn OO methods to support
+		being overridden by subclasses
+	- added transform_syntax() abstract method
+		to permit subclasses to add their own
+		syntax extensions
+	- rewrite of parens_search() to fixed predicate
+		paren processing, remove recursion, and optimize
+		code
+	- rewrite of non_parens_search() to fixed predicate
+		paren processing and optimize code
+	- rewrite of PREDICATE to optimize code; moved
+		operator regex construction to dialect
+		initialization
+	- change undo_string_funcs(), undo_math_funcs(),
+		nongroup_numeric(), nongroup_string()
+		to remove scoped recursion
+	- fixed nongroup_numeric() for case insensitive
+		operator match
+	- fixed nongroup_string, undo_string_funcs() to
+		include user defined funcs
+	- fixed ROW_VALUE's scan for user defined function
+		argument separator scan
+
+     * fixed function detection regex in SQL::Parser::ROW_VALUE
+ 	to accomodate arbitrary spacing
+
+     * fixed SQL::Parser::SELECT_LIST()/extract_column_list()
+ 	to support concat operator '||' expressions
+
+     * added following functions to SQL::Statement::Functions:
+ 	- COALESCE
+ 	- NVL (same as COALESCE)
+ 	- DECODE (same as Oracle DECODE)
+ 	- CONCAT
+ 	- REPLACE/SUBSTITUTE
+
+     * fixed/adapted SQL::Statement::get_row_value(),
+	SQL::Statement::SELECT(), for join'ed
+ 	resultsets
+
+
+Version 1.09, released 22 April, 2004
+-------------------------------------
+ * fixed parens parsing bug reported by Dan Wright, thanks!
+
+
+Version 1.08, released 20 April, 2004
+-------------------------------------
+
+ * fixed bug in JOIN handling introduced in 1.06
+
+
+Version 1.07, released 20 April, 2004
+-------------------------------------
+
+ * fixed infinite recursion bug with empty IN() predicate
+   thanks chromatic, for the patch
+
+ * fixed case issues with table aliases in joins
+   thanks chromatic, for bug report
+
+Version 1.06, released 18 April, 2004
+-------------------------------------
+
+ * column and table name hashes now default to case sensitive
+
+ * where() method now supported as per the docs
+
+
+Version 1.005, released 26 October, 2002
+------------------------------------------
+
+ * added support for MySQL-like "DROP TABLE IF EXISTS"
+
+ * fixed bug in dotted column names e.g. tableA.colB
+
+ * fixed bug in MAX and MIN (thanks Michael Kovacs,
+   mkovacs@turing.une.edu.au)
+
+ * fixed bug in ORDER BY (when col names not in SELECT list)
+   Thanks Janet Goldstein <jgold@cidr.jhmi.edu>
+
+
+Version 1.004, released 13 March, 2002
+------------------------------------------
+
+ * added support for delimited identifiers (inside double quotes);
+   these are case sensitive and can contain spaces and other
+   special chars
+
+ * added support for two forms of escaping single quotes inside
+   quoted values: 'O\'Brien' or  'O''Brien'
+
+ * added support for  both C-Style and SQL-Style double-hypen
+   comments,  e.g.  /* comment */ or -- comment
+
+ * added GetInfo.pm for use with $dbh->get_info()
+
+ * updated the readme file
+
+ * fixed bug in update that refers to its own columns
+   (e.g. SET num = num + 2)
+
+ * fixed bug in MIN and MAX when used with strings
+   Thanks Dean Kopesky <dean.kopesky@reuters.com>
+
+Version 1.003, released 01 March, 2002
+------------------------------------------
+
+ * identifiers (names of columns, tables, and table name
+   aliases) are now all case insensitive as required by the SQL
+   standard. all older versions including the XS versions used
+   case sensitive column names
+
+ * added numerous examples to test.pl
+
+ * improved and/or fixed bugs in:
+
+   * placeholder support
+     Thanks Achim Grolms <Achim.Grolms@fujitsu-siemens.com>
+
+   * ORDER BY clause
+     Thanks Jan Stocker <jstocker@tzi.de>
+
+   * LIKE/CLIKE/RLIKE/IN predicates
+     Thanks Udo Beckmann <Udo.Beckmann@trinkaus.de>
+
+   * table name aliases in explicit joins
+
+Version 1.002, released 5 February, 2002
+----------------------------------------
+
+ * added backwards compatiblity: both SQL::Statement and
+   SQL::Parser now work in perl version 5.004 and above.
+
+ * changed defaults for DBD::CSV so it now accepts new SQL
+   without adding extra flags to scripts
+
+ * added support for SQL comments
+
+ * added support for temporary tables and on commit clauses in
+   CREATE statements and drop behaviour flags in DROP statements
+   (SQL::Parser only, not supported by SQL::Statement)
+
+ * fixed bugs in qualified column names (e.g. tableA.*), and in
+   joins using ON or WHERE
+
+Version 1.001, released January 17,2002
+---------------------------------------
+
+Fixed bug in UPDATE that caused the new value to be a hash
+rather than a scalar.
+
+Version 1.0, released January 15, 2002
+--------------------------------------
+
+This is the first CPAN release of the pure perl version of the
+module.  It was previously released in an XS version by Jochen
+Wiedman who has turned over maintenance of it to me.
+
+The new Pure Perl version of SQL::Statement supports everything
+supported by the XS version and, additionally, at least partial
+support for the following features that are not supported at all
+by the XS version:
+
+ * Explicit and implicit joins
+ * Table name aliases
+ * Set functions
+ * String functions
+ * String concatenation
+ * Numeric expressions
+ * IN predicate
+ * BETWEEN predicate
+ * Alphabetic comparison in WHERE clauses
+ * Ordering of text that looks like a number
+ * Verbose error messages for both Parsing and Execution errors
+
+
+

@@ -391,11 +391,12 @@ push_ok();
 $c2 = $commit = $c->describe_commit;
 ok( defined($commit), 'empty branch merge commit exists' );
 is( $commit->branch, 'master' );
-is( $commit->log, "Merge branch 'allnew'" );
+my $mergemsg = $git->command_oneline('log', '-1', '--format=format:%s');
+is( $commit->log, $mergemsg );
 
 TestBot->expect( 'dummy/#test 12test/03€ 05master '
         . $c2->id
-        . ' 06Test U. Ser (06ser) Merge branch \'allnew\' * 14http://scm.host.org/€/master/?commit='
+        . ' 06Test U. Ser (06ser) ' . $mergemsg . ' * 14http://scm.host.org/€/master/?commit='
         . $c2->id
         . '' );
 

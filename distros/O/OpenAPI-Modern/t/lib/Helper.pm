@@ -17,6 +17,16 @@ use Mojo::Message::Request;
 use Mojo::Message::Response;
 use Test2::API 'context_do';
 
+use Test::More 0.96;
+use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
+use Test::Deep;
+use JSON::Schema::Modern;
+use JSON::Schema::Modern::Document::OpenAPI;
+use OpenAPI::Modern;
+use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
+use constant { true => JSON::PP::true, false => JSON::PP::false };
+use YAML::PP 0.005;
+
 # type can be
 # 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
 # 'mojo': classes of type Mojo::URL, Mojo::Headers, Mojo::Message::Request, Mojo::Message::Response

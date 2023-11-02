@@ -74,11 +74,11 @@ run_perlscript($scriptpath->canonpath,"-o",$odt_outpath->canonpath);
   note "chdir $tdir";
   chdir $tdir or die "$tdir : $!";
 
-  my @cmd = ($lopath, "--convert-to", "txt", $odt_outpath);
-  note "system @cmd";
+  my @cmd = ($lopath, "--convert-to", "txt:Text (encoded):UTF8", $odt_outpath);
+  note "> system @cmd";
   is (system(@cmd), 0, "0 exit status");
 }
-my $got_text = $txt_outpath->slurp_utf8;
+my $got_text = $txt_outpath->slurp_utf8; # now always writes .txt in UTF-8
 
 # Don't care about different wrapping
 #$got_text =~ s/\s+//sg;
@@ -93,6 +93,9 @@ my $got_text = $txt_outpath->slurp_utf8;
 # before the first table title "Alphabetical List of Family Names".
 $got_text =~ s/\A.*?(?=Alphabetical)//s;
 $ref_text =~ s/\A.*?(?=Alphabetical)//s;
+
+# $got_text may have CRLF line endings on Windows.
+$got_text =~ s/\R/\n/sg;  # change to just LF
 
 sub fold($) { local $_ = shift; s/([^\n]{76})/$1\n/sg; $_ }
 

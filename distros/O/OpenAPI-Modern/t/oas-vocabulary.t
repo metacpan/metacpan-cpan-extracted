@@ -7,15 +7,12 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
 use Test::JSON::Schema::Acceptance 1.014;
-use Test::File::ShareDir -share => { -dist => { 'OpenAPI-Modern' => 'share' } };
-use File::ShareDir 'dist_dir';
 use Path::Tiny;
 use Config;
-use JSON::Schema::Modern;
-use JSON::Schema::Modern::Document::OpenAPI;
+
+use lib 't/lib';
+use Helper;
 
 my $accepter = Test::JSON::Schema::Acceptance->new(
   include_optional => 1,
@@ -61,6 +58,11 @@ $accepter->acceptance(
     $result;
   },
   @ARGV ? (tests => { file => \@ARGV }) : (),
+  todo_tests => [
+    # this was added to the schema in https://github.com/OAI/OpenAPI-Specification/pulls/3137 but
+    # needs to be backed out because these keywords need not be adjacent to 'discriminator'.
+    { file => 'discriminator.json', test_description => 'missing oneOf, anyOf, allOf' },
+  ],
 );
 
 path('t/results/oas-vocabulary.txt')->spew_utf8($accepter->results_text)

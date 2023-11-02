@@ -12,23 +12,23 @@ our %EXPORT_TAGS = ( 'all' => [ qw() ] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use Data::TreeDumper ;
 
-use Gtk2 -init;
+use Gtk3 -init;
 use Glib ':constants';
 
-use base qw(Gtk2::TreeView Exporter);
+use base qw(Gtk3::TreeView Exporter);
 
 sub new 
 {
 my $class = shift;
 my %args = (data => undef, @_);
 
-my $self = bless Gtk2::TreeView->new, $class;
+my $self = bless Gtk3::TreeView->new, $class;
 
-$self->insert_column_with_attributes(0, 'Data', Gtk2::CellRendererText->new, text => 0);
+$self->insert_column_with_attributes(0, 'Data', Gtk3::CellRendererText->new, text => 0);
 $self->set_data ($args{data}, $args{dumper_setup}) if exists $args{data} ;
 $self->set_title ($args{title});
 
@@ -54,10 +54,10 @@ return $self;
 sub _do_context_menu 
 {
 	my ($self, $event) = @_;
-	my $menu = Gtk2::Menu->new;
+	my $menu = Gtk3::Menu->new;
 	foreach my $method ('expand_all', 'collapse_all') {
 		my $label = join ' ', map { ucfirst $_ } split /_/, $method;
-		my $item = Gtk2::MenuItem->new ($label);
+		my $item = Gtk3::MenuItem->new ($label);
 		$menu->append ($item);
 		$item->show;
 		$item->signal_connect (activate => sub {
@@ -71,7 +71,7 @@ sub set_data
 {
 my ($self, $data, $dumper_setup) = @_;
 
-my $model = Gtk2::TreeStore->new ('Glib::String');
+my $model = Gtk3::TreeStore->new ('Glib::String');
 
 DumpTree
 	(
@@ -85,7 +85,7 @@ DumpTree
 		# data needed by the renderer
 		, PREVIOUS_LEVEL => 0
 		, MODEL => $model
-		, PARENT => [Gtk2::TreePath->new_from_string()]
+		, PARENT => [Gtk3::TreePath->new()]
 		}
 	) ;
 
@@ -175,7 +175,7 @@ __END__
 
 =head1 NAME
 
-Data::TreeDumper::Renderer::GTK - Gtk2::TreeView renderer for B<Data::TreeDumper>
+Data::TreeDumper::Renderer::GTK - Gtk3::TreeView renderer for B<Data::TreeDumper>
 
 =head1 SYNOPSIS
 
@@ -186,26 +186,17 @@ Data::TreeDumper::Renderer::GTK - Gtk2::TreeView renderer for B<Data::TreeDumper
   			dumper_setup => {DISPLAY_PERL_SIZE => 1}
   			);
   			
-  $treedumper->modify_font(Gtk2::Pango::FontDescription->from_string ('monospace'));
+  $treedumper->modify_font(Gtk3::Pango::FontDescription->from_string ('monospace'));
   $treedumper->expand_all;
   
   # some boilerplate to get the widget onto the screen...
-  my $window = Gtk2::Window->new;
+  my $window = Gtk3::Window->new;
   
-  my $scroller = Gtk2::ScrolledWindow->new;
+  my $scroller = Gtk3::ScrolledWindow->new;
   $scroller->add ($treedumper);
   
   $window->add ($scroller);
   $window->show_all;
-
-=head1 HIERARCHY
-
-  Glib::Object
-  +----Gtk2::Object
-        +----Gtk2::Widget
-              +----Gtk2::Container
-                    +----Gtk2::TreeView
-                          +----Data::TreeDumper::Renderer::GTK
 
 =head1 DESCRIPTION
 

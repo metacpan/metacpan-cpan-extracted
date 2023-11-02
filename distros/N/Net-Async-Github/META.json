@@ -87,43 +87,47 @@
    "provides" : {
       "Net::Async::Github" : {
          "file" : "lib/Net/Async/Github.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Github::Branch" : {
          "file" : "lib/Net/Async/Github/Branch.pm",
-         "version" : "0.011"
+         "version" : "0.012"
+      },
+      "Net::Async::Github::Comment" : {
+         "file" : "lib/Net/Async/Github/Comment.pm",
+         "version" : "0.012"
       },
       "Net::Async::Github::Common" : {
          "file" : "lib/Net/Async/Github/Common.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Github::Plan" : {
          "file" : "lib/Net/Async/Github/Plan.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Github::PullRequest" : {
          "file" : "lib/Net/Async/Github/PullRequest.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Github::RateLimit" : {
          "file" : "lib/Net/Async/Github/RateLimit.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Github::RateLimit::Core" : {
          "file" : "lib/Net/Async/Github/RateLimit/Core.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Github::Repository" : {
          "file" : "lib/Net/Async/Github/Repository.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Github::Team" : {
          "file" : "lib/Net/Async/Github/Team.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       },
       "Net::Async::Github::User" : {
          "file" : "lib/Net/Async/Github/User.pm",
-         "version" : "0.011"
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -138,13 +142,14 @@
          "web" : "https://github.com/team-at-cpan/Net-Async-Github"
       }
    },
-   "version" : "0.011",
+   "version" : "0.012",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
-      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>"
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "Tom Molesworth <tom@deriv.com>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

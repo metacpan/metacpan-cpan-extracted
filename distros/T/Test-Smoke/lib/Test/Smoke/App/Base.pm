@@ -117,6 +117,7 @@ sub configfile_option {
     return Test::Smoke::App::AppOption->new(
         name     => 'configfile',
         option   => 'config|c=s',
+        default  => 'smokecurrent',
         helptext => "Set the name/prefix of the configfile\n",
     );
 }

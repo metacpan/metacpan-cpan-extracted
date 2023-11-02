@@ -1,0 +1,5 @@
+nuggets   25.50
+fritter   22.00
+pizza     33.00
+sodavand  20.00
+total:   100.50

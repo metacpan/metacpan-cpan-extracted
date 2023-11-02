@@ -1,3 +1,4 @@
+1.005 - Portabilty fixes; odfedit mail-merge syntax changes.
 1.003 - Export & document $token_re and parse_token()
 1.002 - Portability tweak for Windows
 1.001 - Provide MM_SUBST constant (instead of using Hr_SUBST)

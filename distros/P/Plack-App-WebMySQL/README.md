@@ -6,10 +6,36 @@ Web based MySQL interface.
 
 ## Install
 
+### Environment
+
+Run MariaDb:
+
+    docker run --detach --env MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=1 -p 3306:3306 mariadb:latest
+
+Install MariaDB client libraries:
+
+    brew install mariadb
+
+Configure perl:
+
+    plenv install `cat .perl-version`
+    plenv local
+    plenv install-cpanm
+    cpanm local::lib Module::Build::Pluggable::CPANfile
+
+### App
+
+Install:
+
     perl Build.PL
-    ./Build installdeps
+    ./Build installdeps --cpan_client 'cpanm --notest'
+
+Run tests:
+
+    ./Build test
 
 ## Usage
+
 As a module:
 
     use Plack::App::WebMySQL;
@@ -18,9 +44,9 @@ As a module:
 Standalone:
 
     plackup
-    
-The browse to [http://localhost:5000/app](http://localhost:5000/)
-    
+
+Then browse to [http://localhost:5000/app](http://localhost:5000/)
+
 ## Customising
 
 Any of the html files in the `cgi-bin/webmysql/templates` subdirectory may be modified. Please do not rename them or alter the comments in the page

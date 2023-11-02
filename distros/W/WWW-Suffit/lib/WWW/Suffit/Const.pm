@@ -1,6 +1,7 @@
 package WWW::Suffit::Const;
 use strict;
 use utf8;
+use feature ':5.16';
 
 =encoding utf8
 
@@ -10,7 +11,7 @@ WWW::Suffit::Const - The Suffit constants
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =head1 SYNOPSIS
 
@@ -23,6 +24,14 @@ This module contains constants definitions
 =head2 TAGS
 
 =over 8
+
+=item B<:DIR>
+
+Exports FHS DIR constants
+
+See L<See https://www.pathname.com/fhs/pub/fhs-2.3.html>,
+L<http://www.gnu.org/software/autoconf/manual/html_node/Installation-Directory-Variables.html>,
+L<Sys::Path>
 
 =item B<:GENERAL>
 
@@ -84,31 +93,23 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/$VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS/;
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 use base qw/Exporter/;
 
+use Config qw//;
+use File::Spec qw//;
+
 use constant {
-    PROJECTNAME         => 'Suffit',
-    PROJECTNAMEL        => 'suffit',
-    PROJECT_ABSTRACT    => 'The Suffit core library',
     DEFAULT_URL         => 'http://localhost',
 
     # System constants
     IS_TTY              => (-t STDOUT) ? 1 : 0,
     IS_ROOT             => ($> == 0) ? 1 : 0,
 
-    # UID/GID for daemons
-    USERNAME            => 'suffit',
-    GROUPNAME           => 'suffit',
-
-    # Directories
-    DATADIR             => 'suffit',
-    HTMLDIR             => 'suffit',
-
     # Date and time formats
     DATE_FORMAT         => '%Y-%m-%d', # See strftime(3)
-    DATETIME_FORMAT     => '%Y-%m-%dT%H:%M:%SZ', # See strftime(3)
+    DATETIME_FORMAT     => '%Y-%m-%dT%H:%M:%S', # See strftime(3)
 
     # Session
     SESSION_EXPIRATION  => 3600, # 1 hour
@@ -130,6 +131,7 @@ use constant {
     EMAIL_REGEXP        => qr/^[a-zA-Z0-9.!#$%&'*+\/\=?^_`{|}~\-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
 
     # MIME Content Types
+    CONTENT_TYPE_HTML   => "text/html; charset=utf-8",
     CONTENT_TYPE_TXT    => "text/plain; charset=utf-8",
     CONTENT_TYPE_JSON   => "application/json",
 
@@ -155,9 +157,7 @@ use constant {
 %EXPORT_TAGS = (
     'GENERAL' => [qw/
         IS_TTY IS_ROOT
-        PROJECTNAME PROJECTNAMEL PROJECT_ABSTRACT
         DEFAULT_URL
-        DATADIR HTMLDIR
         DATE_FORMAT DATETIME_FORMAT
     /],
     'SESSION' => [qw/
@@ -169,7 +169,7 @@ use constant {
         PRIVATEKEYFILE PUBLICKEYFILE DIGEST_ALGORITHMS DEFAULT_ALGORITHM
     /],
     'MIME' => [qw/
-        CONTENT_TYPE_TXT CONTENT_TYPE_JSON
+        CONTENT_TYPE_HTML CONTENT_TYPE_TXT CONTENT_TYPE_JSON
     /],
     'MISC' => [qw/
         USERNAME_REGEXP EMAIL_REGEXP
@@ -181,6 +181,11 @@ use constant {
         SERVER_TIMEOUT SERVER_UPGRADE_TIMEOUT
         SERVER_MAX_CLIENTS SERVER_MAX_REQUESTS
         SERVER_ACCEPTS SERVER_SPARE SERVER_WORKERS
+    /],
+    'DIR' => [qw/
+        PREFIX LOCALSTATEDIR SYSCONFDIR SRVDIR
+        BINDIR SBINDIR DATADIR DOCDIR LOCALEDIR MANDIR LOCALBINDIR
+        CACHEDIR LOGDIR SPOOLDIR RUNDIR LOCKDIR SHAREDSTATEDIR WEBDIR
     /],
 );
 
@@ -194,6 +199,42 @@ use constant {
 @EXPORT_OK = (
         map {@{$_}} values %EXPORT_TAGS
     );
+
+#
+# Filesystem Hierarchy Standard
+#
+# See http://www.gnu.org/software/autoconf/manual/html_node/Installation-Directory-Variables.html
+# See https://www.pathname.com/fhs/pub/fhs-2.3.html
+#
+my $prefix = $Config::Config{'prefix'} // '';
+my $bindir = $Config::Config{'bin'} // File::Spec->catdir($prefix, 'bin');
+my $localstatedir = $prefix eq '/usr' ? '/var' : File::Spec->catdir($prefix, 'var');
+my $sysconfdir = $prefix eq '/usr' ? '/etc' : File::Spec->catdir($prefix, 'etc');
+my $srvdir = $prefix eq '/usr' ? '/srv' : File::Spec->catdir($prefix, 'srv');
+
+# Root dirs
+*PREFIX = sub { $prefix };                  # prefix              /usr
+*LOCALSTATEDIR = sub { $localstatedir };    # localstatedir       /var
+*SYSCONFDIR = sub { $sysconfdir };          # sysconfdir          /etc
+*SRVDIR = sub { $srvdir };                  # srvdir              /srv
+
+# Prefix related dirs
+*BINDIR = sub { $bindir };                                                              # bindir    /usr/bin
+*SBINDIR = sub { state $sbindir = File::Spec->catdir($prefix, 'sbin') };                # sbindir   /usr/sbin
+*DATADIR = sub { state $datadir = File::Spec->catdir($prefix, 'share') };               # datadir   /usr/share
+*DOCDIR = sub { state $docdir = File::Spec->catdir($prefix, 'share', 'doc') };          # docdir    /usr/share/doc
+*LOCALEDIR = sub { state $localedir = File::Spec->catdir($prefix, 'share', 'locale') }; # localedir /usr/share/locale
+*MANDIR = sub { state $mandir = File::Spec->catdir($prefix, 'share', 'man') };          # mandir    /usr/share/man
+*LOCALBINDIR = sub { state $localbindir = File::Spec->catdir($prefix, 'local', 'bin') };# localbindir  /usr/local/bin
+
+# Local State related Dirs
+*CACHEDIR = sub { state $cachedir = File::Spec->catdir($localstatedir, 'cache') };      # cachedir  /var/cache
+*LOGDIR = sub { state $logdir = File::Spec->catdir($localstatedir, 'log') };            # logdir    /var/log
+*SPOOLDIR = sub { state $spooldir = File::Spec->catdir($localstatedir, 'spool') };      # spooldir  /var/spool
+*RUNDIR = sub { state $rundir = File::Spec->catdir($localstatedir, 'run') };            # rundir    /var/run
+*LOCKDIR = sub { state $lockdir = File::Spec->catdir($localstatedir, 'lock') };         # lockdir   /var/lock
+*SHAREDSTATEDIR = sub { state $sharedstatedir = File::Spec->catdir($localstatedir, 'lib') }; # sharedstatedir  /var/lib
+*WEBDIR = sub { state $webdir =  File::Spec->catdir($localstatedir, 'www') };           # webdir    /var/www
 
 1;
 

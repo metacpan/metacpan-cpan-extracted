@@ -3,7 +3,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2017,2018,2019 Slaven Rezic. All rights reserved.
+# Copyright (C) 2017,2018,2019,2023 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -15,11 +15,11 @@ package TestUtil;
 
 use strict;
 use warnings;
-our $VERSION = '0.042';
+our $VERSION = '0.043';
 
 use Exporter 'import';
 our @EXPORT = qw(get_sudo module_exists is_dir_eq);
-our @EXPORT_OK = qw(skip_utime_atime_unreliable signal_kill_num);
+our @EXPORT_OK = qw(signal_kill_num);
 
 use Doit::Log;
 
@@ -101,23 +101,6 @@ sub is_dir_eq ($$;$) {
 	} else {
 	    Test::More::is($dir1, $dir2, $testname); # fails;
 	}
-    }
-}
-
-sub skip_utime_atime_unreliable (&) {
-    my($code) = @_;
- SKIP: {
-	# see https://github.com/eserte/Doit/issues/1
-	# (actually one would need to test also if
-	# the file system operated on is mounted with
-	# noatime)
-	Test::More::skip("atime not reliable on this system", 1)
-	    if $^O eq 'netbsd';
-	# See http://www.cpantesters.org/cpan/report/e0265104-b2d4-11e8-bafc-fcd8acac9ab4
-	# Also perl5's t/io/fs.t skips atime tests on haiku.
-	Test::More::skip("atime not set on this system", 1)
-	    if $^O eq 'haiku';
-	$code->();
     }
 }
 

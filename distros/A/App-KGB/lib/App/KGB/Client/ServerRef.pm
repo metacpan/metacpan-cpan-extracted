@@ -1,7 +1,7 @@
 # vim: ts=4:sw=4:et:ai:sts=4
 #
 # KGB - an IRC bot helping collaboration
-# Copyright © 2008 Martín Ferrari
+# Copyright © 2008 Martina Ferrari
 # Copyright © 2009,2010,2012 Damyan Ivanov
 #
 # This program is free software; you can redistribute it and/or modify it under

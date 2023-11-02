@@ -39,12 +39,12 @@ my %WriteMakefileArgs = (
     "Plack::Middleware::ReverseProxy" => 0,
     "Plack::Response" => 0,
     "Plack::Test" => 0,
+    "Test2::V0" => 0,
     "Test::Differences" => 0,
     "Test::More" => 0,
-    "Test::Most" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.5.0",
+  "VERSION" => "v0.5.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,9 +69,9 @@ my %FallbackPrereqs = (
   "Plack::Response" => 0,
   "Plack::Test" => 0,
   "Ref::Util" => 0,
+  "Test2::V0" => 0,
   "Test::Differences" => 0,
   "Test::More" => 0,
-  "Test::Most" => 0,
   "Time::Seconds" => 0,
   "parent" => 0,
   "strict" => 0,

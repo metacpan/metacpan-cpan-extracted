@@ -1,0 +1,399 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>File::Takeput - Slurp style file IO with locking.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SUBROUTINES-AND-VARIABLES">SUBROUTINES AND VARIABLES</a></li>
+  <li><a href="#CONFIGURATION">CONFIGURATION</a>
+    <ul>
+      <li><a href="#CONFIGURATION-OPTIONS">CONFIGURATION OPTIONS</a>
+        <ul>
+          <li><a href="#OPTIONAL-NAMED-PARAMETERS">1. OPTIONAL NAMED PARAMETERS</a></li>
+          <li><a href="#SET-AND-RESET-SUBROUTINES">2. SET AND RESET SUBROUTINES</a></li>
+          <li><a href="#USE-STATEMENT">3. USE STATEMENT</a></li>
+          <li><a href="#DEFAULT-CONFIGURATION">4. DEFAULT CONFIGURATION</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><a href="#ERROR-HANDLING">ERROR HANDLING</a></li>
+  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
+  <li><a href="#KNOWN-ISSUES">KNOWN ISSUES</a></li>
+  <li><a href="#TODO">TODO</a></li>
+  <li><a href="#SEE-ALSO">SEE ALSO</a></li>
+  <li><a href="#LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>File::Takeput - Slurp style file IO with locking.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>0.30</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    use File::Takeput;
+
+    # Lock some file and read its content.
+    my @content1 = take(&#39;some_file_name.csv&#39;);
+
+    # Read content of some other file.
+    # Retry for up to 2.5 seconds if it is already locked.
+    my @content2 = grab(&#39;some_other_file_name.log&#39; , patience =&gt; 2.5);
+
+    # Append some data to that other file.
+    append(&#39;some_other_file_name.log&#39;)-&gt;(@some_data);
+
+    # Read content of some third file as a single string.
+    my ($content3) = grab(&#39;some_third_file_name.html&#39; , separator =&gt; undef);
+
+    # Write content back to the first file after editing it.
+    # The locks will be released right afterwards.
+    $content1[$_] =~ s/,/;/g for (0..$#content1);
+    put(&#39;some_file_name.csv&#39;)-&gt;(@content1);</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Slurp style file IO with locking. The purpose of Takeput is to make it pleasant for you to script file IO. Slurp style is both user friendly and very effective if you can have your files in memory.</p>
+
+<p>The other major point of Takeput is locking. Takeput is careful to help your script be a good citizen in a busy filesystem. All its file operations respect and set flock locking.</p>
+
+<p>If your script misses a lock and does not release it, the lock will be released when your script terminates.</p>
+
+<p>Encoding is often part of file IO operations, but Takeput keeps out of that. It reads and writes file content just as strings of bytes, in a sort of line-based binmode. Use some other module if you need decoding and encoding. For example:</p>
+
+<pre><code>    use File::Takeput;
+    use Encode;
+
+    my @article = map {decode(&#39;iso-8859-1&#39;,$_)} grab &#39;article.latin-1&#39;;</code></pre>
+
+<h1 id="SUBROUTINES-AND-VARIABLES">SUBROUTINES AND VARIABLES</h1>
+
+<p>Imported by default: <a href="#append-filename---data">append</a>, <a href="#grab-filename">grab</a>, <a href="#pass-filename">pass</a>, <a href="#plunk-filename---data">plunk</a>, <a href="#put-filename---data">put</a>, <a href="#take-filename">take</a></p>
+
+<p>Imported on demand: <a href="#fgrab-filename">fgrab</a>, <a href="#fpass-filename">fpass</a>, <a href="#ftake-filename">ftake</a>, <a href="#reset">reset</a>, <a href="#set-settings">set</a></p>
+
+<dl>
+
+<dt id="append-filename---data">append( $filename )-&gt;( @data )</dt>
+<dd>
+
+<p>Appends @data to the $filename file.</p>
+
+</dd>
+<dt id="grab-filename">grab( $filename )</dt>
+<dd>
+
+<p>Reads and returns the content of the $filename file. Will never change the content of $filename, or create the file.</p>
+
+<p>Reading an empty file will return a list with one element, the empty string. If a false value is returned instead, it is because &quot;grab&quot; could not read the file.</p>
+
+</dd>
+<dt id="pass-filename">pass( $filename )</dt>
+<dd>
+
+<p>Releases the lock on the $filename file.</p>
+
+<p>The content of the file will normally be the same as when the lock was taken with the &quot;take&quot; subroutine. This is useful when a lock was taken, but it later turned out that there was nothing to write to the file.</p>
+
+<p>There are two caveats. If the &quot;create&quot; configuration parameter is true, the file might have been created when it was taken, so it has been changed in that sense. And of course flock locks are only advisory, so other processes can ignore the locks and change the file while it is taken.</p>
+
+</dd>
+<dt id="plunk-filename---data">plunk( $filename )-&gt;( @data )</dt>
+<dd>
+
+<p>Overwrites the $filename file with @data.</p>
+
+</dd>
+<dt id="put-filename---data">put( $filename )-&gt;( @data )</dt>
+<dd>
+
+<p>Overwrites the taken $filename file, with @data, and releases the lock on it.</p>
+
+<p>Setting the <a href="#create">&quot;create&quot; configuration parameter</a> on this call will not work. Set it on the &quot;take&quot; call instead.</p>
+
+</dd>
+<dt id="take-filename">take( $filename )</dt>
+<dd>
+
+<p>Sets a lock on the $filename file, reads and returns its content.</p>
+
+<p>The &quot;take&quot; call has write intention, because it is the first part of an operation. The second part is a call A call to &quot;put&quot; or &quot;pass&quot;.</p>
+
+<p>Opening an empty file will return a list with one element, the empty string. If a false value is returned instead, it is because &quot;take&quot; could not read the file.</p>
+
+</dd>
+<dt id="fgrab-filename">fgrab( $filename )</dt>
+<dd>
+
+<p>A functional version of the &quot;grab&quot; subroutine.</p>
+
+</dd>
+<dt id="fpass-filename">fpass( $filename )</dt>
+<dd>
+
+<p>A functional version of the &quot;pass&quot; subroutine.</p>
+
+</dd>
+<dt id="ftake-filename">ftake( $filename )</dt>
+<dd>
+
+<p>A functional version of the &quot;take&quot; subroutine.</p>
+
+<p>Note that &quot;take&quot;s twin, &quot;put&quot;, also returns a function. With these you can separate the file operations from their definitions. As you can with filehandles. This is true for all the functional subroutines. Here is an example using &quot;ftake&quot; and &quot;put&quot;, where they are sent as parameters.</p>
+
+<pre><code>    sub changecurr($r,$w,$x) {
+        $w-&gt;( map {s/((\d*\.)?\d+)/$x*$1/ger} $r-&gt;() );
+        };
+
+    my $r = ftake(&#39;wednesday.csv&#39; , patience =&gt; 5);
+    my $w = put(&#39;wednesday.csv&#39;);
+    my $rate = current_rate(&#39;GBP&#39;);
+    changecurr($r,$w,$rate);</code></pre>
+
+</dd>
+<dt id="reset">reset</dt>
+<dd>
+
+<p>Sets the default configuration parameters back to the Takeput defaults.</p>
+
+</dd>
+<dt id="set-settings">set( %settings )</dt>
+<dd>
+
+<p>Customize the default values by setting parameters as in %settings. Can be reset by calling &quot;reset&quot;.</p>
+
+</dd>
+</dl>
+
+<h1 id="CONFIGURATION">CONFIGURATION</h1>
+
+<p>There are eight configuration parameters.</p>
+
+<dl>
+
+<dt id="create">create</dt>
+<dd>
+
+<p>A scalar. If true the subroutines that have write intention, will create the file if it does not exist. If false, they will just fail if the file does not exist.</p>
+
+<p>Be careful with this parameter. For example if a process renames the file while another process is waiting for the lock, that other process will open the file with the new name when it gets the lock. If it plunks, it is not to a file with the name it was called with, but to the file with this new name. Maybe not what is wanted...</p>
+
+<p>The &quot;create&quot; parameter is ignored by &quot;put&quot;. Use it on &quot;take&quot; instead, if you want this functionality.</p>
+
+</dd>
+<dt id="error">error</dt>
+<dd>
+
+<p>A ref to a subroutine that is called if Takeput runs into a runtime error. It will be called without parameters. The $@ variable will be set just prior to the subroutine call, and the subroutines return value will be passed on back to your script. An example:</p>
+
+<pre><code>    use Logger::Syslog qw(warning);
+    use File::Takeput error =&gt; sub {warning &#39;commit.pl: &#39;.$@; die;};
+
+    my @data = take(&#39;transaction.data&#39; , patience =&gt; 10);
+    do_stuff [@data];
+    put(&#39;transaction.data&#39;)-&gt;(@data);</code></pre>
+
+<p>If you just need non-fatal warnings, here is a simple error handler you can use:</p>
+
+<pre><code>    use File::Takeput error =&gt; sub {print STDERR &quot;$@\n&quot;; undef;};</code></pre>
+
+<p>If the value of &quot;error&quot; is undef, Takeput will not make these calls.</p>
+
+</dd>
+<dt id="exclusive">exclusive</dt>
+<dd>
+
+<p>A scalar. If true Takeput will take an exclusive lock on read operations. If false it will just take a shared lock on them, as it normally does.</p>
+
+</dd>
+<dt id="flatten">flatten</dt>
+<dd>
+
+<p>A scalar. If true Takeput will flatten the file content and return it as a string. If false it will return an array.</p>
+
+<p>Normally you would also set &quot;separator&quot; to undef, when you set &quot;flatten&quot; to true. For example:</p>
+
+<pre><code>    use YAML::XS qw(Load Dump);                            # Working with YAML.
+
+    File::Takeput::set(separator =&gt; undef , flatten =&gt; 1); # Because of this...
+    my $fancy_data = Load grab(&#39;my_file.yaml&#39;);            # ...this will work.</code></pre>
+
+<p>Note that with &quot;flatten&quot; set to true, reading an empty file returns the empty string, which counts as false. Failing to read a file returns undef. So test for definedness to not be tricked by this.</p>
+
+</dd>
+<dt id="newline">newline</dt>
+<dd>
+
+<p>A string that replaces the &quot;separator&quot; string at the end of each line when reading from a file. When writing to a file the replacement is the other way around. Then &quot;separator&quot; will replace &quot;newline&quot;.</p>
+
+<p>If either the &quot;newline&quot; value or the &quot;separator&quot; value is undef, no replacements will be done.</p>
+
+</dd>
+<dt id="patience">patience</dt>
+<dd>
+
+<p>The time in seconds that a call will wait for a lock to be released. The value can be fractional.</p>
+
+<p>If &quot;patience&quot; is set to 0, there will be no waiting.</p>
+
+</dd>
+<dt id="separator">separator</dt>
+<dd>
+
+<p>The string defining the end of a line. It is used in read operations to split the data into lines. Note that the value is read as a bytestring. So take care if you use a special separator in combination with an unusual encoding.</p>
+
+<p>Setting this parameter does not change the value of $/ or vice versa.</p>
+
+<p>The &quot;separator&quot; value cannot be an empty string. If it is undef the data is seen as a single string.</p>
+
+</dd>
+<dt id="unique">unique</dt>
+<dd>
+
+<p>A scalar. If true Takeput will fail opening a file if it already exists. This can be used to avoid race conditions.</p>
+
+<p>Only used by calls with write intention.</p>
+
+<p>If &quot;unique&quot; is true, calls will work as if &quot;create&quot; is true and &quot;patience&quot; is 0, no matter what they are set to.</p>
+
+</dd>
+</dl>
+
+<h2 id="CONFIGURATION-OPTIONS">CONFIGURATION OPTIONS</h2>
+
+<p>You have a number of options for setting the configuration parameters.</p>
+
+<dl>
+
+<dt id="In-a-file-operation-call-as-optional-named-parameters">1. In a file operation call, as optional named parameters.</dt>
+<dd>
+
+</dd>
+<dt id="In-a-statement-by-calling-set-or-reset">2. In a statement by calling &quot;set&quot; or &quot;reset&quot;.</dt>
+<dd>
+
+</dd>
+<dt id="Directly-in-the-use-statement-of-your-script">3. Directly in the use statement of your script.</dt>
+<dd>
+
+</dd>
+<dt id="Default-configuration">4. Default configuration.</dt>
+<dd>
+
+</dd>
+</dl>
+
+<p>If a parameter is set in more than one way, the most specific setting wins out. In the list above, the item with the lowest number wins out.</p>
+
+<h3 id="OPTIONAL-NAMED-PARAMETERS">1. OPTIONAL NAMED PARAMETERS</h3>
+
+<p>All the file operation subroutines can take the configuration parameters as optional named parameters. That means that you can set them per call. The place to write them is after the filename parameter. Example:</p>
+
+<pre><code>    my @text = grab &#39;windows_file.txt&#39; , separator =&gt; &quot;\r\n&quot; , newline =&gt; &quot;\n&quot;;</code></pre>
+
+<h3 id="SET-AND-RESET-SUBROUTINES">2. SET AND RESET SUBROUTINES</h3>
+
+<p>The two subroutines &quot;set&quot; and &quot;reset&quot; will customize the default values of the configuration parameters, so that subsequent file operations are using those defaults.</p>
+
+<p>You use &quot;set&quot; to set the values, and &quot;reset&quot; to set the values back to the Takeput defaults. Think of it as assignment statements. If there are multiple calls, the last one is the one that is in effect.</p>
+
+<p>Customized defaults are limited to the namespace in which you set them.</p>
+
+<h3 id="USE-STATEMENT">3. USE STATEMENT</h3>
+
+<p>Another way to customize the default values is in the use statement that imports Takeput. For example:</p>
+
+<pre><code>    use File::Takeput separator =&gt; &quot;\n&quot;;</code></pre>
+
+<p>When you do it like this, the values are set at compile-time. Because of that, Takeput will die on any errors that those settings will give rise to.</p>
+
+<p>Note that customized defaults are limited to the namespace in which you set them.</p>
+
+<h3 id="DEFAULT-CONFIGURATION">4. DEFAULT CONFIGURATION</h3>
+
+<p>The Takeput defaults are:</p>
+
+<p><code>create</code>: undef (false)</p>
+
+<p><code>error</code>: undef</p>
+
+<p><code>exclusive</code>: undef (false)</p>
+
+<p><code>flatten</code>: undef (false)</p>
+
+<p><code>newline</code>: undef</p>
+
+<p><code>patience</code>: 0</p>
+
+<p><code>separator</code>: $/ (at compile time)</p>
+
+<p><code>unique</code>: undef (false)</p>
+
+<h1 id="ERROR-HANDLING">ERROR HANDLING</h1>
+
+<p>Takeput will die on compile-time errors, but not on runtime errors. In case of a runtime error it might or might not issue a warning. But it will always write an error message in $@ and return an error value.</p>
+
+<p>That said, you have the option of changing how runtime errors are handled, by using the <a href="#error">&quot;error&quot; configuration parameter</a>.</p>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<p>Cwd</p>
+
+<p>Exporter</p>
+
+<p>Fcntl</p>
+
+<p>File::Basename</p>
+
+<p>Scalar::Util</p>
+
+<p>Time::HiRes</p>
+
+<h1 id="KNOWN-ISSUES">KNOWN ISSUES</h1>
+
+<p>No known issues.</p>
+
+<h1 id="TODO">TODO</h1>
+
+<p>Decide on empty string &quot;separator&quot;. It ought to give a list of bytes, but readline gives an unintuitive list. It would be a mess with the line ending transformations.</p>
+
+<p>An empty string will be an invalid value for now.</p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="https://metacpan.org/pod/Encode">Encode</a></p>
+
+<p><a href="https://metacpan.org/pod/File::Slurp">File::Slurp</a></p>
+
+<p><a href="https://metacpan.org/pod/File::Slurper">File::Slurper</a></p>
+
+<h1 id="LICENSE-COPYRIGHT">LICENSE &amp; COPYRIGHT</h1>
+
+<p>(c) 2023 Bj&oslash;rn Hee</p>
+
+<p>Licensed under the Apache License, version 2.0</p>
+
+<p>https://www.apache.org/licenses/LICENSE-2.0.txt</p>
+
+
+</body>
+
+</html>
+
+

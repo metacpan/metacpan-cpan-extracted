@@ -1,5 +1,5 @@
 package App::Bitcoin::PaperWallet;
-$App::Bitcoin::PaperWallet::VERSION = '1.11';
+$App::Bitcoin::PaperWallet::VERSION = '1.12';
 use v5.12;
 use warnings;
 
@@ -10,17 +10,12 @@ use Encode qw(encode);
 
 sub get_addresses
 {
-	my ($key, $count) = @_;
-	$count //= 4;
+	my ($key, $purpose, $count) = @_;
 
 	my @addrs;
-	my $priv = $key->derive_key_bip44(purpose => 49, index => 0)->get_basic_key;
-	my $addr = $priv->get_public_key->get_compat_address;
-	push @addrs, $addr;
-
-	for my $ind (1 .. $count - 1) {
-		my $priv = $key->derive_key_bip44(purpose => 84, index => $ind)->get_basic_key;
-		my $addr = $priv->get_public_key->get_segwit_address;
+	for my $ind (0 .. $count - 1) {
+		my $priv = $key->derive_key_bip44(purpose => $purpose, index => $ind)->get_basic_key;
+		my $addr = $priv->get_public_key->get_address;
 		push @addrs, $addr;
 	}
 
@@ -29,18 +24,28 @@ sub get_addresses
 
 sub generate
 {
-	my ($class, $entropy, $pass, $address_count) = @_;
+	my ($class, $entropy, $pass, $opts) = @_;
+	my $compat_addresses = $opts->{compat_addresses} // 1;
+	my $segwit_addresses = $opts->{segwit_addresses} // 3;
+	my $entropy_length = $opts->{entropy_length} // 256;
+
+	# warn about possible problem with entropy
+	warn "WARNING: entered entropy is too short, this wallet is insecure!\n"
+		if defined $entropy && length $entropy < 30;
 
 	my $mnemonic = defined $entropy
-		? mnemonic_from_entropy(sha256(encode 'UTF-8', $entropy))
-		: generate_mnemonic(256)
+		? mnemonic_from_entropy(substr sha256(encode 'UTF-8', $entropy), 0, $entropy_length / 8)
+		: generate_mnemonic($entropy_length)
 	;
 
 	my $key = btc_extprv->from_mnemonic($mnemonic, $pass);
 
 	return {
 		mnemonic => $mnemonic,
-		addresses => [get_addresses($key, $address_count)],
+		addresses => [
+			get_addresses($key, 49 => $compat_addresses),
+			get_addresses($key, 84 => $segwit_addresses),
+		],
 	};
 }
 
@@ -56,7 +61,9 @@ App::Bitcoin::PaperWallet - Generate printable cold storage of bitcoins
 
 	use App::Bitcoin::PaperWallet;
 
-	my $hash = App::Bitcoin::PaperWallet->generate($entropy, $password, $address_count // 4);
+	my $hash = App::Bitcoin::PaperWallet->generate($entropy, $password, {
+		entropy_length => 128,
+	});
 
 	my $mnemonic = $hash->{mnemonic};
 	my $addresses = $hash->{addresses};
@@ -73,7 +80,7 @@ L<paper-wallet> for the main script of this distribution.
 
 =head2 generate
 
-	my $hash = App::Bitcoin::PaperWallet->generate($entropy, $password, $address_count // 4);
+	my $hash = $class->generate($entropy, $password, \%opts);
 
 Not exported, should be used as a class method. Returns a hash containing two
 keys: C<mnemonic> (string) and C<addresses> (array reference of strings).
@@ -89,9 +96,24 @@ someone obtained physical access to your mnemonic. Using a hard, long password
 increases the possibility you will not be able to claim your bitcoins in the
 future.
 
-Optional C<$address_count> is the number of addresses that will be generated
-(default 4). The first address is always SegWit compat address, while the rest
-are SegWit native addresses.
+C<\%opts> can take following values:
+
+=over
+
+=item * C<compat_addresses>
+
+A number of segwit compat (purpose 49) addresses to generate, 1 by default.
+
+=item * C<segwit_addresses>
+
+A number of segwit native (purpose 84) addresses to generate, 3 by default.
+
+=item * C<entropy_length>
+
+A number between 128 and 256 with intervals of 32. 128 will generate 12 words
+while 256 will generate 24 words. 256 by default.
+
+=back
 
 =head1 CAVEATS
 
@@ -120,6 +142,10 @@ funds to the wallet.
 
 =item
 
+Version 1.12 changed the way optional parameters to L<generate> are provided.
+
+=item
+
 Versions 1.01 and older generated addresses with invalid derivation paths.
 Funds in these wallets won't be visible in most HD wallets, and have to be
 swept by revealing their private keys in tools like
@@ -141,6 +167,8 @@ L<Bitcoin::Crypto>
 =head1 AUTHOR
 
 Bartosz Jarzyna, E<lt>bbrtj.pro@gmail.comE<gt>
+
+Consider supporting: L<https://bbrtj.eu/support>
 
 =head1 COPYRIGHT AND LICENSE
 

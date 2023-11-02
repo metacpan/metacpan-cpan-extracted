@@ -30,7 +30,7 @@ as possible.
 
 =head2 Where is Test::Smoke?
 
-On CPAN and L<http://search.cpan.org/dist/Test-Smoke>
+On CPAN and L<http://metacpan.org/pod/Test::Smoke>
 
 =head2 What are these configuration files about?
 
@@ -74,7 +74,7 @@ perls:
 
 =over 4
 
-=item * with C<< $ENV{PERLIO}=stdio >> (allways)
+=item * with C<< $ENV{PERLIO}=stdio >> (always)
 
 =item * with C<< $ENV{PERLIO}=perlio >> (unless -Uuseperlio)
 

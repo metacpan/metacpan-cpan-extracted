@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(check_datetime check_entity check_language
 	check_lexeme check_property check_sense);
 
-our $VERSION = 0.31;
+our $VERSION = 0.33;
 
 sub check_datetime {
 	my ($self, $key) = @_;
@@ -469,6 +469,14 @@ L<Readonly>.
 
 Wikibase datatypes.
 
+=item L<Mo::utils>
+
+Mo utilities.
+
+=item L<Mo::utils::Language>
+
+Mo language utilities.
+
 =back
 
 =head1 REPOSITORY
@@ -489,6 +497,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.31
+0.33
 
 =cut

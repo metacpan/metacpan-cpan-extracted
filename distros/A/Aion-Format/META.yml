@@ -1,0 +1,55 @@
+---
+abstract: 'Perl extension for formatting numbers, colorizing output and so on'
+author:
+  - 'Yaroslav O. Kosmina LL<mailto:dart@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Aion-Format
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Aion::Format:
+    file: lib/Aion/Format.pm
+    version: v0.0.2
+  Aion::Format::Html:
+    file: lib/Aion/Format/Html.pm
+  Aion::Format::Json:
+    file: lib/Aion/Format/Json.pm
+  Aion::Format::Url:
+    file: lib/Aion/Format/Url.pm
+requires:
+  Data::Printer: '0'
+  JSON::XS: '4.03'
+  List::Util: '0'
+  POSIX: '0'
+  Term::ANSIColor: '0'
+  common::sense: '0'
+  config: '1.3'
+  perl: v5.22.0
+resources:
+  bugtracker: https://github.com/darviarush/perl-aion-format/issues
+  homepage: https://github.com/darviarush/perl-aion-format
+  repository: https://github.com/darviarush/perl-aion-format.git
+version: 0.0.2
+x_authority: cpan:DART
+x_contributors:
+  - 'Yaroslav O. Kosmina <dart@cpan.org>'
+  - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

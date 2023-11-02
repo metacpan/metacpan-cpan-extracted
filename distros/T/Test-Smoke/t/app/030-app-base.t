@@ -280,7 +280,7 @@ With newline single value
 Show configuration requested:
   Option              | Value
 ----------------------+--------------------------------------------
-  configfile          | ?
+  configfile          | smokecurrent
   verbose             | 1
     EODUMP
     is($exitval, 0, "ExitValue 0");

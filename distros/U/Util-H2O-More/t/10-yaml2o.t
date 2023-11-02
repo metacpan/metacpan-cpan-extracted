@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 use Test::Exception;
 use File::Temp      qw/tempfile/;
-use Util::H2O::More qw/yaml2o/;
+use Util::H2O::More qw/yaml2h2o yaml2o/;
 
 my $YAML = <<EOYAML;
 ---
@@ -38,20 +38,40 @@ L I C
 MR DUCKS
 EONOTYAML
 
-dies_ok { yaml2o $NOT_YAML_OR_FILE } q{yaml2o passed something this is not a file name nor clearly not YAML.};
+{
+    dies_ok { yaml2h2o $NOT_YAML_OR_FILE } q{yaml2h2o passed something this is not a file name nor clearly not YAML.};
 
-my ( $dbconfig1, $devices1 ) = yaml2o $YAML;
+    my ( $dbconfig1, $devices1 ) = yaml2h2o $YAML;
 
-is $dbconfig1->database->host,        q{localhost}, q{YAML string parsed and objectified as expected};
-is $devices1->devices->copter1->port, 80,           q{YAML string parsed and objectified as expected};
+    is $dbconfig1->database->host,        q{localhost}, q{YAML string parsed and objectified as expected};
+    is $devices1->devices->copter1->port, 80,           q{YAML string parsed and objectified as expected};
 
-my ( $fh, $filename ) = tempfile( SUFFIX => '.yaml' );
+    my ( $fh, $filename ) = tempfile( SUFFIX => '.yaml' );
 
-print $fh $YAML;
+    print $fh $YAML;
 
-my ( $dbconfig2, $devices2 ) = yaml2o $YAML;
+    my ( $dbconfig2, $devices2 ) = yaml2h2o $YAML;
 
-is $dbconfig2->database->host,        q{localhost}, q{YAML file parsed and objectified as expected};
-is $devices2->devices->copter1->port, 80,           q{YAML file parsed and objectified as expected};
+    is $dbconfig2->database->host,        q{localhost}, q{YAML file parsed and objectified as expected};
+    is $devices2->devices->copter1->port, 80,           q{YAML file parsed and objectified as expected};
+}
+
+{
+    dies_ok { yaml2o $NOT_YAML_OR_FILE } q{yaml2o passed something this is not a file name nor clearly not YAML.};
+
+    my ( $dbconfig1, $devices1 ) = yaml2o $YAML;
+
+    is $dbconfig1->database->host,        q{localhost}, q{YAML string parsed and objectified as expected};
+    is $devices1->devices->copter1->port, 80,           q{YAML string parsed and objectified as expected};
+
+    my ( $fh, $filename ) = tempfile( SUFFIX => '.yaml' );
+
+    print $fh $YAML;
+
+    my ( $dbconfig2, $devices2 ) = yaml2o $YAML;
+
+    is $dbconfig2->database->host,        q{localhost}, q{YAML file parsed and objectified as expected};
+    is $devices2->devices->copter1->port, 80,           q{YAML file parsed and objectified as expected};
+}
 
 done_testing;

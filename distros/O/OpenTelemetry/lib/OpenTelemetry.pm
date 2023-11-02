@@ -1,74 +1,114 @@
 package OpenTelemetry;
-# ABSTRACT: supporting for application process monitoring, as defined by opentelemetry.io
+# ABSTRACT: A Perl implementation of the OpenTelemetry standard
 
 use strict;
 use warnings;
+use experimental qw( isa signatures );
 
-our $VERSION = '0.001';
-our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
+our $VERSION = '0.011';
 
-no indirect;
-use utf8;
+use Mutex;
+use OpenTelemetry::Common;
+use OpenTelemetry::Context;
+use OpenTelemetry::Propagator::None;
+use OpenTelemetry::Trace::TracerProvider;
+use OpenTelemetry::X;
+use Scalar::Util 'refaddr';
+use Ref::Util 'is_coderef';
+use Sentinel;
 
-=encoding utf8
+use Log::Any;
 
-=head1 NAME
+use Exporter::Shiny qw(
+    otel_context_with_span
+    otel_current_context
+    otel_error_handler
+    otel_handle_error
+    otel_logger
+    otel_propagator
+    otel_span_from_context
+    otel_tracer_provider
+);
 
-OpenTelemetry - support for L<https://opentelemetry.io> application tracing
+my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
+sub logger { $logger }
+sub _generate_otel_logger { \&logger }
 
-=head1 DESCRIPTION
+{
+    my $lock = Mutex->new;
+    my $instance = OpenTelemetry::Trace::TracerProvider->new;
 
-OpenTelemetry is due to become the successor to the OpenTracing initiative.
-It includes additional functionality relating to metrics,
-and at the time of writing is an evolving specification.
+    my $set = sub ( $new ) {
+        die OpenTelemetry::X->create(
+            Invalid => 'Global tracer provider must be a subclass of OpenTelemetry::Trace::TracerProvider, got instead ' . ( ref $new || 'a plain scalar' ),
+        ) unless $new isa OpenTelemetry::Trace::TracerProvider;
 
-Current status of the official spec can be tracked here:
+        $lock->enter( sub { $instance = $new });
+    };
 
-L<https://github.com/open-telemetry/opentelemetry-specification/blob/master/README.md>
+    sub _generate_otel_tracer_provider {
+        my $x = sub :lvalue { sentinel get => sub { $instance }, set => $set };
+    }
 
-Note that the L<https://opentracing.io> specification is currently more widely supported,
-but eventually L<OpenTracing::Any> and L<OpenTelemetry::Any>
-should be able to coëxist in a codebase and support collectors
-for either system.
+    sub tracer_provider :lvalue { sentinel get => sub { $instance }, set => $set }
+}
 
-For metrics, see L<Metrics::Any>.
+{
+    my $lock = Mutex->new;
+    my $instance = OpenTelemetry::Propagator::None->new;
 
-=cut
+    my $set = sub ( $new ) {
+        die OpenTelemetry::X->create(
+            Invalid => 'Global propagator must implement the OpenTelemetry::Propagator role, got instead ' . ( ref $new || 'a plain scalar' ),
+        ) unless $new && $new->DOES('OpenTelemetry::Propagator');
+
+        $lock->enter( sub { $instance = $new });
+    };
+
+    sub _generate_otel_propagator {
+        my $x = sub :lvalue { sentinel get => sub { $instance }, set => $set };
+    }
+
+    sub propagator :lvalue { sentinel get => sub { $instance }, set => $set }
+}
+
+sub _generate_otel_current_context {
+    my $sub = sub :lvalue { OpenTelemetry::Context->current };
+}
+
+sub _generate_otel_context_with_span {
+    sub { OpenTelemetry::Trace->context_with_span(@_) };
+}
+
+sub _generate_otel_span_from_context {
+    sub { OpenTelemetry::Trace->span_from_context(@_) };
+}
+
+{
+    my $lock = Mutex->new;
+    my $instance = sub (%args) {
+        my $error = join ' - ', grep defined,
+            @args{qw( message exception )};
+
+        $logger->error("OpenTelemetry error: $error");
+    };
+
+    my $set = sub ( $new ) {
+        die OpenTelemetry::X->create(
+            Invalid => 'Global error handler must be a code reference, got instead ' . ( ref $new || 'a plain scalar' ),
+        ) unless is_coderef $new;
+
+        $lock->enter( sub { $instance = $new });
+    };
+
+    sub _generate_otel_error_handler {
+        my $x = sub :lvalue { sentinel get => sub { $instance }, set => $set };
+    }
+
+    sub error_handler :lvalue { sentinel get => sub { $instance }, set => $set }
+
+    sub _generate_otel_handle_error { sub {  $instance->(@_); return } }
+    sub                handle_error { shift; $instance->(@_); return   }
+}
 
 1;
-
-__END__
-
-=head1 SEE ALSO
-
-=head2 Tools and specifications
-
-=over 4
-
-=item * L<https://opentelemtry.io> - the new standard
-
-=item * L<https://opentracing.io> - if you want something that works today
-
-=back
-
-=head2 Other modules
-
-Some perl modules of relevance:
-
-=over 4
-
-=item * L<OpenTracing::Manual> - this is an independent Moo-based implementation, probably worth a look
-if you're working mostly with synchronous code.
-
-=item * L<NewRelic::Agent> - support for NewRelic's APM system
-
-=back
-
-=head1 AUTHOR
-
-Tom Molesworth C<< TEAM@cpan.org >>
-
-=head1 LICENSE
-
-Copyright Tom Molesworth 2020. Licensed under the same terms as Perl itself.
-

@@ -1,0 +1,4034 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 2,
+          "raw" => "\t- Added option --init_option to add options at initialization time.\n",
+          "style" => "-",
+          "text" => "Added option --init_option to add options at initialization time."
+        },
+        {
+          "line" => 3,
+          "raw" => "\t- Added option --init_my_cnf to load \$sandbox_dir/my.sandbox.cnf during\n\tinitialization instead of --no-defaults.\n",
+          "style" => "-",
+          "text" => "Added option --init_my_cnf to load \$sandbox_dir/my.sandbox.cnf during initialization instead of --no-defaults."
+        },
+        {
+          "line" => 5,
+          "raw" => "\t- Added option --init_use_cnf to load a custom options file during\n\tinitialization instead of --no-defaults.\n",
+          "style" => "-",
+          "text" => "Added option --init_use_cnf to load a custom options file during initialization instead of --no-defaults."
+        }
+      ],
+      "line" => 1,
+      "note" => "02-Nov-2016",
+      "raw" => "3.2.03\t02-Nov-2016\n",
+      "version" => "3.2.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 8,
+          "raw" => "\t- Fixed download parameter for make_sandbox_from_url\n",
+          "style" => "-",
+          "text" => "Fixed download parameter for make_sandbox_from_url"
+        }
+      ],
+      "line" => 7,
+      "note" => "12-Sep-2016",
+      "raw" => "3.2.02\t12-Sep-2016\n",
+      "version" => "3.2.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 10,
+          "raw" => "\t- Added early check for USER, HOME, and PWD variables.\n",
+          "style" => "-",
+          "text" => "Added early check for USER, HOME, and PWD variables."
+        },
+        {
+          "line" => 11,
+          "raw" => "\t- Added early check for spaces in HOME variable.\n",
+          "style" => "-",
+          "text" => "Added early check for spaces in HOME variable."
+        },
+        {
+          "line" => 12,
+          "raw" => "\t- Fixed wrong server_id when using both --slaveof and --check_port\n",
+          "style" => "-",
+          "text" => "Fixed wrong server_id when using both --slaveof and --check_port"
+        },
+        {
+          "line" => 13,
+          "raw" => "\t- Added test for server_id with --check_port\n",
+          "style" => "-",
+          "text" => "Added test for server_id with --check_port"
+        },
+        {
+          "line" => 14,
+          "raw" => "\t- Updated make_sandbox_from_url to use MySQL 8.0 remote builds (when\n\t  available)\n",
+          "style" => "-",
+          "text" => "Updated make_sandbox_from_url to use MySQL 8.0 remote builds (when available)"
+        },
+        {
+          "line" => 16,
+          "raw" => "\t- Added remote catalog to make_sandbox_from_url\n",
+          "style" => "-",
+          "text" => "Added remote catalog to make_sandbox_from_url"
+        }
+      ],
+      "line" => 9,
+      "note" => "10-Sep-2016",
+      "raw" => "3.2.01\t10-Sep-2016\n",
+      "version" => "3.2.01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 18,
+          "raw" => "\t- Add compatibility with MySQL 8.0.0\n",
+          "style" => "-",
+          "text" => "Add compatibility with MySQL 8.0.0"
+        },
+        {
+          "line" => 19,
+          "raw" => "\t- Adapt tests to use MySQL 8.0.0\n",
+          "style" => "-",
+          "text" => "Adapt tests to use MySQL 8.0.0"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 21,
+              "raw" => "\t\t- plugin_mysqlx : installs the X-plugin permanently\n",
+              "style" => "-",
+              "text" => "plugin_mysqlx : installs the X-plugin permanently"
+            },
+            {
+              "line" => 22,
+              "raw" => "\t\t- mysqlx_port : with the above option, sets the X-plugin port\n",
+              "style" => "-",
+              "text" => "mysqlx_port : with the above option, sets the X-plugin port"
+            }
+          ],
+          "line" => 20,
+          "raw" => "\t- Added options:\n",
+          "style" => "-",
+          "text" => "Added options:"
+        },
+        {
+          "line" => 23,
+          "raw" => "\t- Changed mysqlsh script to use --sql or --js options.\n",
+          "style" => "-",
+          "text" => "Changed mysqlsh script to use --sql or --js options."
+        }
+      ],
+      "line" => 17,
+      "note" => "28-Aug-2016",
+      "raw" => "3.2.00\t28-Aug-2016\n",
+      "version" => "3.2.00"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 25,
+          "raw" => "\t- added --master_ip to make_replication_sandbox\n",
+          "style" => "-",
+          "text" => "added --master_ip to make_replication_sandbox"
+        }
+      ],
+      "line" => 24,
+      "note" => "21-Aug-2016",
+      "raw" => "3.1.13\t21-Aug-2016\n",
+      "version" => "3.1.13"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 27,
+          "raw" => "\t- added syntax for make_sandbox get:#.# (invokes make_sandbox_from_url)\n",
+          "style" => "-",
+          "text" => "added syntax for make_sandbox get:#.# (invokes make_sandbox_from_url)"
+        },
+        {
+          "line" => 28,
+          "raw" => "\t- Added check for wrong requested version in make_sandbox_from_url\n",
+          "style" => "-",
+          "text" => "Added check for wrong requested version in make_sandbox_from_url"
+        },
+        {
+          "line" => 29,
+          "raw" => "\t- removed duplicate function from test_sandbox\n",
+          "style" => "-",
+          "text" => "removed duplicate function from test_sandbox"
+        }
+      ],
+      "line" => 26,
+      "note" => "07-Aug-2016",
+      "raw" => "3.1.12\t07-Aug-2016\n",
+      "version" => "3.1.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 31,
+          "raw" => "\t- Added make_sandbox_from_url to the installation list\n",
+          "style" => "-",
+          "text" => "Added make_sandbox_from_url to the installation list"
+        },
+        {
+          "line" => 32,
+          "raw" => "\t- Use https for GitHub URLs (contributed by D. Van Eeden)\n",
+          "style" => "-",
+          "text" => "Use https for GitHub URLs (contributed by D. Van Eeden)"
+        }
+      ],
+      "line" => 30,
+      "note" => "11-Jul-2016",
+      "raw" => "3.1.11\t11-Jul-2016\n",
+      "version" => "3.1.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 34,
+          "raw" => "\t- Fixed a test error that made the package not-installable\n",
+          "style" => "-",
+          "text" => "Fixed a test error that made the package not-installable"
+        }
+      ],
+      "line" => 33,
+      "note" => "10-Jul-2016",
+      "raw" => "3.1.10\t10-Jul-2016\n",
+      "version" => "3.1.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 36,
+          "raw" => "\t- Added make_sandbox_from_url, which installs a sandbox from the web\n",
+          "style" => "-",
+          "text" => "Added make_sandbox_from_url, which installs a sandbox from the web"
+        },
+        {
+          "line" => 37,
+          "raw" => "\t- Fixed a warning about negative length of options (only fires in recent\n\t  versions of Perl)\n",
+          "style" => "-",
+          "text" => "Fixed a warning about negative length of options (only fires in recent versions of Perl)"
+        },
+        {
+          "line" => 39,
+          "raw" => "\t- Cleaned up test execution for environments where it can't run properly.\n",
+          "style" => "-",
+          "text" => "Cleaned up test execution for environments where it can't run properly."
+        }
+      ],
+      "line" => 35,
+      "note" => "08-Jul-2016",
+      "raw" => "3.1.09\t08-Jul-2016\n",
+      "version" => "3.1.09"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 41,
+          "raw" => "\t- Fixed major issue with XPlugin installation. The grants script was\n\t  removing the account created by the X-plugin. Now this account is\n\t  whitelisted. (https://bugs.mysql.com/bug.php?id=81257)\n",
+          "style" => "-",
+          "text" => "Fixed major issue with XPlugin installation. The grants script was removing the account created by the X-plugin. Now this account is whitelisted. (https://bugs.mysql.com/bug.php?id=81257)"
+        },
+        {
+          "line" => 44,
+          "raw" => "\t- Fixed minor naming in MANIFEST\n",
+          "style" => "-",
+          "text" => "Fixed minor naming in MANIFEST"
+        },
+        {
+          "line" => 45,
+          "raw" => "\t- Fixed compatibility issues in deploy_to_remote_sandboxes.sh\n",
+          "style" => "-",
+          "text" => "Fixed compatibility issues in deploy_to_remote_sandboxes.sh"
+        }
+      ],
+      "line" => 40,
+      "note" => "04-Jun-2016",
+      "raw" => "3.1.08\t04-Jun-2016\n",
+      "version" => "3.1.08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 47,
+          "raw" => "\t- Added support for \$NOPASSWORD variable in ./use script. When this\n\tvariable is enabled, the client runs without a password. Useful to call it\n\tbefore grants are loaded.\n",
+          "style" => "-",
+          "text" => "Added support for \$NOPASSWORD variable in ./use script. When this variable is enabled, the client runs without a password. Useful to call it before grants are loaded."
+        },
+        {
+          "line" => 50,
+          "raw" => "\t- Added option to install plugin right after the installation\n\t  --load_plugin=plugin_name[=filename]\n",
+          "style" => "-",
+          "text" => "Added option to install plugin right after the installation --load_plugin=plugin_name[=filename]"
+        },
+        {
+          "line" => 52,
+          "raw" => "\t- Added options to execute SQL before and after loading grants\n\t  --pre_grants_sql --pre_grants_file --post_grants_sql --post_grants_file\n",
+          "style" => "-",
+          "text" => "Added options to execute SQL before and after loading grants --pre_grants_sql --pre_grants_file --post_grants_sql --post_grants_file"
+        },
+        {
+          "line" => 54,
+          "raw" => "\t- Similar options can execute shell commands \n\t  --pre_start_exec --pre_grants_exec --post_grants_exec\n",
+          "style" => "-",
+          "text" => "Similar options can execute shell commands --pre_start_exec --pre_grants_exec --post_grants_exec"
+        },
+        {
+          "line" => 56,
+          "raw" => "\t- Added test cases for the above options\n",
+          "style" => "-",
+          "text" => "Added test cases for the above options"
+        }
+      ],
+      "line" => 46,
+      "note" => "15-May-2016",
+      "raw" => "3.1.07\t15-May-2016\n",
+      "version" => "3.1.07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 58,
+          "raw" => "\t- Added explicit return code to test_replication script\n",
+          "style" => "-",
+          "text" => "Added explicit return code to test_replication script"
+        },
+        {
+          "line" => 59,
+          "raw" => "\t- Enables sbtool to remove incomplete group sandboxes\n",
+          "style" => "-",
+          "text" => "Enables sbtool to remove incomplete group sandboxes"
+        },
+        {
+          "line" => 60,
+          "raw" => "\t- Test_Helper now cleans environment variables before starting a test\n",
+          "style" => "-",
+          "text" => "Test_Helper now cleans environment variables before starting a test"
+        },
+        {
+          "line" => 61,
+          "raw" => "\t- Added temporary support for mysqlsh\n",
+          "style" => "-",
+          "text" => "Added temporary support for mysqlsh"
+        },
+        {
+          "line" => 62,
+          "raw" => "\t- merge contribution by kaiwangchen to fix make_sandbox_from source and\n\tmake_sandbox with mysqld-debug\n",
+          "style" => "-",
+          "text" => "merge contribution by kaiwangchen to fix make_sandbox_from source and make_sandbox with mysqld-debug"
+        },
+        {
+          "line" => 64,
+          "raw" => "\t- Added --gtid option dor make_sandbox, make_replication_sandbox, and\n\tmake_multiple_sandbox \n",
+          "style" => "-",
+          "text" => "Added --gtid option dor make_sandbox, make_replication_sandbox, and make_multiple_sandbox"
+        }
+      ],
+      "line" => 57,
+      "note" => "09-May-2016",
+      "raw" => "3.1.06\t09-May-2016\n",
+      "version" => "3.1.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 67,
+          "raw" => "\t- Fixed mismatch in version checking to determnine whether to use\n\tmysql_install_db or mysqld --initialize\n",
+          "style" => "-",
+          "text" => "Fixed mismatch in version checking to determnine whether to use mysql_install_db or mysqld --initialize"
+        },
+        {
+          "line" => 69,
+          "raw" => "\t- Updated copyright notice\n",
+          "style" => "-",
+          "text" => "Updated copyright notice"
+        },
+        {
+          "line" => 70,
+          "raw" => "\t- Added test for installation method used\n",
+          "style" => "-",
+          "text" => "Added test for installation method used"
+        },
+        {
+          "line" => 71,
+          "raw" => "\t- Added test for generated UUID\n",
+          "style" => "-",
+          "text" => "Added test for generated UUID"
+        },
+        {
+          "line" => 72,
+          "raw" => "\t- Merged pull request from Alexandr Ciornii : \"Display repository URL\n\t  on MetaCPAN\"\n",
+          "style" => "-",
+          "text" => "Merged pull request from Alexandr Ciornii : \"Display repository URL on MetaCPAN\""
+        }
+      ],
+      "line" => 66,
+      "note" => "17-Jan-2016",
+      "raw" => "3.1.05\t17-Jan-2016 \n",
+      "version" => "3.1.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 75,
+          "raw" => "\t- Fixed wrong version comparison (affects usage of MySQL 5.7.10)\n",
+          "style" => "-",
+          "text" => "Fixed wrong version comparison (affects usage of MySQL 5.7.10)"
+        },
+        {
+          "line" => 76,
+          "raw" => "\t- Changed tests to use smarter version comparison\n",
+          "style" => "-",
+          "text" => "Changed tests to use smarter version comparison"
+        }
+      ],
+      "line" => 74,
+      "note" => "07-Dec-2015",
+      "raw" => "3.1.04\t07-Dec-2015 \n",
+      "version" => "3.1.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 78,
+          "raw" => "\t- Increased timeout for 'start' script, needed when restart requires \n\ta longer time.\n",
+          "style" => "-",
+          "text" => "Increased timeout for 'start' script, needed when restart requires a longer time."
+        }
+      ],
+      "line" => 77,
+      "note" => "04-Dec-2015",
+      "raw" => "3.1.03\t04-Dec-2015 \n",
+      "version" => "3.1.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 81,
+          "raw" => "\t- Fixed error in UUID generation for server-id=110\n",
+          "style" => "-",
+          "text" => "Fixed error in UUID generation for server-id=110"
+        },
+        {
+          "line" => 82,
+          "raw" => "\t- Merged change by Mark Leith to preserve mysql.sys user\n",
+          "style" => "-",
+          "text" => "Merged change by Mark Leith to preserve mysql.sys user"
+        },
+        {
+          "line" => 83,
+          "raw" => "\t- Adapted privileges test for the above change\n",
+          "style" => "-",
+          "text" => "Adapted privileges test for the above change"
+        }
+      ],
+      "line" => 80,
+      "note" => "21-Nov-2015",
+      "raw" => "3.1.02\t21-Nov-2015 \n",
+      "version" => "3.1.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 85,
+          "raw" => "\t- Removed message that should only appear with debug\n",
+          "style" => "-",
+          "text" => "Removed message that should only appear with debug"
+        },
+        {
+          "line" => 86,
+          "raw" => "\t- Modified Makefile.PL to generate correct licensing metadata\n",
+          "style" => "-",
+          "text" => "Modified Makefile.PL to generate correct licensing metadata"
+        },
+        {
+          "line" => 87,
+          "raw" => "\t- Added port info to replication status and check-slaves (Thanks to Mark\n\tLeith)\n",
+          "style" => "-",
+          "text" => "Added port info to replication status and check-slaves (Thanks to Mark Leith)"
+        },
+        {
+          "line" => 89,
+          "raw" => "\t- Changed 'create schema' to 'create' database to allow installation in\n\tMySQL 4.1 (thanks to Dani\303\253l van Eeden)\n",
+          "style" => "-",
+          "text" => "Changed 'create schema' to 'create' database to allow installation in MySQL 4.1 (thanks to Dani\303\253l van Eeden)"
+        },
+        {
+          "line" => 91,
+          "raw" => "\t- Updated sbtool to prevent deletion of the whole sandboxes directory\n",
+          "style" => "-",
+          "text" => "Updated sbtool to prevent deletion of the whole sandboxes directory"
+        },
+        {
+          "line" => 92,
+          "raw" => "\t- Minor changes to semi-sync plugin test\n",
+          "style" => "-",
+          "text" => "Minor changes to semi-sync plugin test"
+        },
+        {
+          "line" => 93,
+          "raw" => "\t- Added debug message in make_sandbox_from_source\n",
+          "style" => "-",
+          "text" => "Added debug message in make_sandbox_from_source"
+        },
+        {
+          "line" => 94,
+          "raw" => "\t- Tested with MySQL 5.7.9 and MariaDB 10.1.6\n",
+          "style" => "-",
+          "text" => "Tested with MySQL 5.7.9 and MariaDB 10.1.6"
+        }
+      ],
+      "line" => 84,
+      "note" => "04-Oct-2015",
+      "raw" => "3.1.01\t04-Oct-2015 \n",
+      "version" => "3.1.01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 96,
+          "raw" => "\t- Migrated repository to github (github.com/datacharmer/mysql-sandbox)\n",
+          "style" => "-",
+          "text" => "Migrated repository to github (github.com/datacharmer/mysql-sandbox)"
+        },
+        {
+          "line" => 97,
+          "raw" => "\t- Changed license to Apache 2.0\n",
+          "style" => "-",
+          "text" => "Changed license to Apache 2.0"
+        },
+        {
+          "line" => 98,
+          "raw" => "\t- Limited workaround for bug#77732 to MySQL 5.7.8 only\n",
+          "style" => "-",
+          "text" => "Limited workaround for bug#77732 to MySQL 5.7.8 only"
+        },
+        {
+          "line" => 99,
+          "raw" => "\t- Added usability feature for Server-UUID. Whenever server-id is used, the\n\tserver-uuid is converted into an easy-to-read string of numbers\n",
+          "style" => "-",
+          "text" => "Added usability feature for Server-UUID. Whenever server-id is used, the server-uuid is converted into an easy-to-read string of numbers"
+        },
+        {
+          "line" => 101,
+          "raw" => "\t- Simplified './clear' script. Does not attempt to remove stored routines.\n\tMakes the intrusive mysqldump that was running with load_grants\n\tunnecessary\n",
+          "style" => "-",
+          "text" => "Simplified './clear' script. Does not attempt to remove stored routines. Makes the intrusive mysqldump that was running with load_grants unnecessary"
+        },
+        {
+          "line" => 104,
+          "raw" => "\t- Changed location for MySQL history in group sandboxes to be shared\n\tbetween single ones. \n",
+          "style" => "-",
+          "text" => "Changed location for MySQL history in group sandboxes to be shared between single ones."
+        }
+      ],
+      "line" => 95,
+      "note" => "22-Aug-2015",
+      "raw" => "3.1.00\t22-Aug-2015 \n",
+      "version" => "3.1.00"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 107,
+          "raw" => "\t- Added MYSQL_EDITOR variable to ./use script\n",
+          "style" => "-",
+          "text" => "Added MYSQL_EDITOR variable to ./use script"
+        },
+        {
+          "line" => 108,
+          "raw" => "\t- Added ./mycli script to invoke the mycli command\n\t <http://github.com/dbcli/mycli>\n",
+          "style" => "-",
+          "text" => "Added ./mycli script to invoke the mycli command <http://github.com/dbcli/mycli>"
+        }
+      ],
+      "line" => 106,
+      "note" => "07-Aug-2015",
+      "raw" => "3.0.66\t07-Aug-2015 \n",
+      "version" => "3.0.66"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 111,
+          "raw" => "\t- Added show_relaylog script, similar to show_binlog\n",
+          "style" => "-",
+          "text" => "Added show_relaylog script, similar to show_binlog"
+        }
+      ],
+      "line" => 110,
+      "note" => "06-Aug-2015",
+      "raw" => "3.0.65\t06-Aug-2015 \n",
+      "version" => "3.0.65"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 113,
+          "raw" => "\t- Fixed quoting error in show_binlog script\n",
+          "style" => "-",
+          "text" => "Fixed quoting error in show_binlog script"
+        }
+      ],
+      "line" => 112,
+      "note" => "05-Aug-2015",
+      "raw" => "3.0.64\t05-Aug-2015 \n",
+      "version" => "3.0.64"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 115,
+          "raw" => "\t- Modified test add_option.sb.pl so that it can also run on MySQL 5.0\n",
+          "style" => "-",
+          "text" => "Modified test add_option.sb.pl so that it can also run on MySQL 5.0"
+        },
+        {
+          "line" => 116,
+          "raw" => "\t- modified sandbox script json_in_db to use type JSON when version >=\n\t5.7.8\n",
+          "style" => "-",
+          "text" => "modified sandbox script json_in_db to use type JSON when version >= 5.7.8"
+        },
+        {
+          "line" => 118,
+          "raw" => "\t- Simplified grants.mysql and show_binlogs scripts\n",
+          "style" => "-",
+          "text" => "Simplified grants.mysql and show_binlogs scripts"
+        }
+      ],
+      "line" => 114,
+      "note" => "04-Aug-2015",
+      "raw" => "3.0.63\t04-Aug-2015 \n",
+      "version" => "3.0.63"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 120,
+          "raw" => "\t- Added default name for relay log files.\n",
+          "style" => "-",
+          "text" => "Added default name for relay log files."
+        },
+        {
+          "line" => 121,
+          "raw" => "\t- Added 'show_binlog' and 'add_option' scripts in each sandbox\n",
+          "style" => "-",
+          "text" => "Added 'show_binlog' and 'add_option' scripts in each sandbox"
+        },
+        {
+          "line" => 122,
+          "raw" => "\t- improved tests by getting all the version components from a single\n\tfunction call\n",
+          "style" => "-",
+          "text" => "improved tests by getting all the version components from a single function call"
+        },
+        {
+          "line" => 124,
+          "raw" => "\t- Added GTID initialization options for MySQL 5.6, 5.7, and MariaDB 10\n",
+          "style" => "-",
+          "text" => "Added GTID initialization options for MySQL 5.6, 5.7, and MariaDB 10"
+        },
+        {
+          "line" => 125,
+          "raw" => "\t- Added GTID enabling test for MySQL 5.6 and 5.7\n",
+          "style" => "-",
+          "text" => "Added GTID enabling test for MySQL 5.6 and 5.7"
+        },
+        {
+          "line" => 126,
+          "raw" => "\t- added and improved more tests\n",
+          "style" => "-",
+          "text" => "added and improved more tests"
+        }
+      ],
+      "line" => 119,
+      "note" => "02-Aug-2015",
+      "raw" => "3.0.62\t02-Aug-2015\n",
+      "version" => "3.0.62"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 128,
+          "raw" => "\t- Simplified workaround for Bug#77732. No defaults are changed.\n\tThe only addition is a GRANT SELECT on a given table to the replication\n\tuser for MySQL 5.7.6+\n",
+          "style" => "-",
+          "text" => "Simplified workaround for Bug#77732. No defaults are changed. The only addition is a GRANT SELECT on a given table to the replication user for MySQL 5.7.6+"
+        },
+        {
+          "line" => 131,
+          "raw" => "\t- Removed unnecessary FLUSH PRIVILEGES\n",
+          "style" => "-",
+          "text" => "Removed unnecessary FLUSH PRIVILEGES"
+        }
+      ],
+      "line" => 127,
+      "note" => "27-Jul-2015",
+      "raw" => "3.0.61\t27-Jul-2015\n",
+      "version" => "3.0.61"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 133,
+          "raw" => "\t- Changed installation method for MySQL 5.7.6 and later. \n\tUsing 'mysqld --initialize' instead of deprecated mysql_install_db.\n\tInstallation for earlier MySQL versions and MariaDB still use\n\tmysql_install_db.\n",
+          "style" => "-",
+          "text" => "Changed installation method for MySQL 5.7.6 and later. Using 'mysqld --initialize' instead of deprecated mysql_install_db. Installation for earlier MySQL versions and MariaDB still use mysql_install_db."
+        },
+        {
+          "line" => 137,
+          "raw" => "\t- Due to the above change, low_level_make_sandbox will now filter the\n\t\"error\" message in the output for the text '[Warning]'. If an \"error\"\n\tappears as warning, the installation is not halted.\n",
+          "style" => "-",
+          "text" => "Due to the above change, low_level_make_sandbox will now filter the \"error\" message in the output for the text '[Warning]'. If an \"error\" appears as warning, the installation is not halted."
+        },
+        {
+          "line" => 140,
+          "raw" => "\t- Incompatible change: when using --force to install on top of an existing\n\tsandbox, the old data directory is copied to 'old_data' instead of being\n\toverwritten. This is due to the different behavior of 'mysqld --initialize' \n\tthat does not support initializing an existing data directory.\n",
+          "style" => "-",
+          "text" => "Incompatible change: when using --force to install on top of an existing sandbox, the old data directory is copied to 'old_data' instead of being overwritten. This is due to the different behavior of 'mysqld --initialize' that does not support initializing an existing data directory."
+        },
+        {
+          "line" => 144,
+          "raw" => "\t- Added more tests. Improved a few of the existing ones.\n",
+          "style" => "-",
+          "text" => "Added more tests. Improved a few of the existing ones."
+        },
+        {
+          "line" => 145,
+          "raw" => "\t- Fixed test for user privileges that was broken in 5.7.6+\n",
+          "style" => "-",
+          "text" => "Fixed test for user privileges that was broken in 5.7.6+"
+        }
+      ],
+      "line" => 132,
+      "note" => "25-Jul-2015",
+      "raw" => "3.0.60\t25-Jul-2015\n",
+      "version" => "3.0.60"
+    },
+    {
+      "entries" => [],
+      "line" => 146,
+      "note" => "to 3.0.59 not released",
+      "raw" => "3.0.57\tto 3.0.59 not released\n",
+      "version" => "3.0.57"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 148,
+          "raw" => "\t- Adjusted credis date\n",
+          "style" => "-",
+          "text" => "Adjusted credis date"
+        }
+      ],
+      "line" => 147,
+      "note" => "20-Jul-2015",
+      "raw" => "3.0.56\t20-Jul-2015\n",
+      "version" => "3.0.56"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 150,
+          "raw" => "\t- Fixed issue with the latest script added to the test suite.\n",
+          "style" => "-",
+          "text" => "Fixed issue with the latest script added to the test suite."
+        }
+      ],
+      "line" => 149,
+      "note" => "19-Jul-2015",
+      "raw" => "3.0.55\t19-Jul-2015\n",
+      "version" => "3.0.55"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 152,
+          "raw" => "\t- Added test_replication script to test both regular and circular\n\treplication. It is also used in the test suite\n",
+          "style" => "-",
+          "text" => "Added test_replication script to test both regular and circular replication. It is also used in the test suite"
+        }
+      ],
+      "line" => 151,
+      "note" => "19-Jul-2015",
+      "raw" => "3.0.54\t19-Jul-2015\n",
+      "version" => "3.0.54"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 155,
+          "raw" => "\t- Improved workaround for Bug#77732. Deployments with --master would only\n\twork within the test suite, but would fail in standalone installations.\n",
+          "style" => "-",
+          "text" => "Improved workaround for Bug#77732. Deployments with --master would only work within the test suite, but would fail in standalone installations."
+        }
+      ],
+      "line" => 154,
+      "note" => "16-Jul-2015",
+      "raw" => "3.0.53\t16-Jul-2015\n",
+      "version" => "3.0.53"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 159,
+              "raw" => "\t  -- https://bugs.mysql.com/bug.php?id=77732 --\n",
+              "style" => "--",
+              "text" => "https://bugs.mysql.com/bug.php?id=77732 --"
+            }
+          ],
+          "line" => 158,
+          "raw" => "\t- Added a workaround for Bug#77732 in MySQL 5.7.8 \n",
+          "style" => "-",
+          "text" => "Added a workaround for Bug#77732 in MySQL 5.7.8"
+        }
+      ],
+      "line" => 157,
+      "note" => "15-Jul-2015",
+      "raw" => "3.0.52\t15-Jul-2015\n",
+      "version" => "3.0.52"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 161,
+          "raw" => "\t- Added ability of opening tarball with name like 123456.mysql*.tar.gz\n",
+          "style" => "-",
+          "text" => "Added ability of opening tarball with name like 123456.mysql*.tar.gz"
+        },
+        {
+          "line" => 162,
+          "raw" => "\t- Added many tests for tarball name checking\n",
+          "style" => "-",
+          "text" => "Added many tests for tarball name checking"
+        }
+      ],
+      "line" => 160,
+      "note" => "14-Jul-2015",
+      "raw" => "3.0.51\t14-Jul-2015\n",
+      "version" => "3.0.51"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 164,
+          "raw" => "\t- Fixed issue with the 'clear' script in MySQL 5.7.7. Since a new default\n\tdatabase was added ('sys') and the clear command did not know about it, \n\tthe new database was being removed.\n",
+          "style" => "-",
+          "text" => "Fixed issue with the 'clear' script in MySQL 5.7.7. Since a new default database was added ('sys') and the clear command did not know about it, the new database was being removed."
+        }
+      ],
+      "line" => 163,
+      "note" => "11-Apr-2015",
+      "raw" => "3.0.50\t11-Apr-2015\n",
+      "version" => "3.0.50"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 168,
+          "raw" => "\t- Fixed version detection to support also MySLQL 5.7.7 and MySQL 5.7.8.\n\t  A more resilient patch will follow.\n\t  Notice that, due to a change (possibly a bug) in MySQL 5.7.7, circular\n\t  replication and in general any topology containing a relay slave may fail.\n",
+          "style" => "-",
+          "text" => "Fixed version detection to support also MySLQL 5.7.7 and MySQL 5.7.8. A more resilient patch will follow. Notice that, due to a change (possibly a bug) in MySQL 5.7.7, circular replication and in general any topology containing a relay slave may fail."
+        }
+      ],
+      "line" => 167,
+      "note" => "08-Apr-2015",
+      "raw" => "3.0.49\t08-Apr-2015\n",
+      "version" => "3.0.49"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 173,
+          "raw" => "\t- Added provisional support for MySQL 5.7.6 (changed syntax for SET\n\tPASSWORD but keep using deprecated mysql_install_db)\n",
+          "style" => "-",
+          "text" => "Added provisional support for MySQL 5.7.6 (changed syntax for SET PASSWORD but keep using deprecated mysql_install_db)"
+        }
+      ],
+      "line" => 172,
+      "note" => "09-Mar-2015",
+      "raw" => "3.0.48\t09-Mar-2015\n",
+      "version" => "3.0.48"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 176,
+          "raw" => "\t- Added support for MySQL with data dictionary (5.7.5 labs edition)\n",
+          "style" => "-",
+          "text" => "Added support for MySQL with data dictionary (5.7.5 labs edition)"
+        }
+      ],
+      "line" => 175,
+      "note" => "19-Oct-2014",
+      "raw" => "3.0.47\t19-Oct-2014\n",
+      "version" => "3.0.47"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 178,
+          "raw" => "\t- Modified smoke test in test_sandbox to check correctly older and newer versions\n",
+          "style" => "-",
+          "text" => "Modified smoke test in test_sandbox to check correctly older and newer versions"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 180,
+              "raw" => "\t\t- added creation of 'test' database\n",
+              "style" => "-",
+              "text" => "added creation of 'test' database"
+            },
+            {
+              "line" => 181,
+              "raw" => "\t\t- moved lower_case_table_names to the my.sandbox.cnf file (mysql_install_db does not support this option)\n",
+              "style" => "-",
+              "text" => "moved lower_case_table_names to the my.sandbox.cnf file (mysql_install_db does not support this option)"
+            },
+            {
+              "line" => 182,
+              "raw" => "\t\t- allow for changed syntax --insecure instead of --skip-random-password\n",
+              "style" => "-",
+              "text" => "allow for changed syntax --insecure instead of --skip-random-password"
+            },
+            {
+              "line" => 183,
+              "raw" => "\t\t- removed tmpdir from options to mysql_install_db\n",
+              "style" => "-",
+              "text" => "removed tmpdir from options to mysql_install_db"
+            }
+          ],
+          "line" => 179,
+          "raw" => "\t- Changes to allow installation of MySQL 5.7.5:\n",
+          "style" => "-",
+          "text" => "Changes to allow installation of MySQL 5.7.5:"
+        },
+        {
+          "line" => 184,
+          "raw" => "\t- Updated test_sandbox to avoid a 'skip-innodb' test with MariaDB 10.x\n",
+          "style" => "-",
+          "text" => "Updated test_sandbox to avoid a 'skip-innodb' test with MariaDB 10.x"
+        },
+        {
+          "line" => 185,
+          "raw" => "\t- Updated test_sandbox to detect correctly MariaDB versions\n",
+          "style" => "-",
+          "text" => "Updated test_sandbox to detect correctly MariaDB versions"
+        }
+      ],
+      "line" => 177,
+      "note" => "25-Sep-2014",
+      "raw" => "3.0.46\t25-Sep-2014\n",
+      "version" => "3.0.46"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 187,
+          "raw" => "\t- Fixing bug#1361851 \"start/stop/status scripts don't actually check if\n\t  running\"\n",
+          "style" => "-",
+          "text" => "Fixing bug#1361851 \"start/stop/status scripts don't actually check if running\""
+        },
+        {
+          "line" => 189,
+          "raw" => "\t- Fixing freshly submitted but long overdue Bug#1362014 \n\t  \"Sandbox scripts can't deal with stale PID files\"\n",
+          "style" => "-",
+          "text" => "Fixing freshly submitted but long overdue Bug#1362014 \"Sandbox scripts can't deal with stale PID files\""
+        }
+      ],
+      "line" => 186,
+      "note" => "30-Aug-2014",
+      "raw" => "3.0.45\t30-Aug-2014\n",
+      "version" => "3.0.45"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 192,
+          "raw" => "    - Fixing bug#1313672 : MySQL Sandbox can't install with MySQL 5.7.4\n",
+          "style" => "-",
+          "text" => "Fixing bug#1313672 : MySQL Sandbox can't install with MySQL 5.7.4"
+        },
+        {
+          "line" => 193,
+          "raw" => "    - Removed some deprecated options that were removed in latest version of\n\tMySQL\n",
+          "style" => "-",
+          "text" => "Removed some deprecated options that were removed in latest version of MySQL"
+        }
+      ],
+      "line" => 191,
+      "note" => "29-Apr-2014",
+      "raw" => "3.0.44\t29-Apr-2014\n",
+      "version" => "3.0.44"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 196,
+          "raw" => "\t- Fixed bug#1155517 The \"my\" scripts excludes mysql_upgrade from\n\t--default-options incorrectly \n",
+          "style" => "-",
+          "text" => "Fixed bug#1155517 The \"my\" scripts excludes mysql_upgrade from --default-options incorrectly"
+        },
+        {
+          "line" => 198,
+          "raw" => "\t- Also added mysql_config_editor to the scripts that should not get\n\tdefaults-options\n",
+          "style" => "-",
+          "text" => "Also added mysql_config_editor to the scripts that should not get defaults-options"
+        }
+      ],
+      "line" => 195,
+      "note" => "24-Oct-2013",
+      "raw" => "3.0.43\t24-Oct-2013\n",
+      "version" => "3.0.43"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 201,
+          "raw" => "\t- Fixed bug in sb renaming. The new name was not updated in the MANIFEST\n",
+          "style" => "-",
+          "text" => "Fixed bug in sb renaming. The new name was not updated in the MANIFEST"
+        }
+      ],
+      "line" => 200,
+      "note" => "30-Sep-2013",
+      "raw" => "3.0.42\t30-Sep-2013\n",
+      "version" => "3.0.42"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 203,
+          "raw" => "\t- INCOMPATIBLE CHANGE: Renamed 'sb' to 'msb' to avoid name clashes in\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE: Renamed 'sb' to 'msb' to avoid name clashes in"
+        },
+        {
+          "line" => 204,
+          "raw" => "\t- INCOMPATIBLE CHANGE: Renamed 'sb' to 'msb' to avoid name clashes in\n\tLinux distributions\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE: Renamed 'sb' to 'msb' to avoid name clashes in Linux distributions"
+        }
+      ],
+      "line" => 202,
+      "note" => "30-Sep-2013",
+      "raw" => "3.0.41\t30-Sep-2013\n",
+      "version" => "3.0.41"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 207,
+          "raw" => "\t- enhanced deploy_to_remote_sandboxes.sh with the ability of using a\n\ttemplate my.cnf for remote deployment (-y file-name)\n",
+          "style" => "-",
+          "text" => "enhanced deploy_to_remote_sandboxes.sh with the ability of using a template my.cnf for remote deployment (-y file-name)"
+        }
+      ],
+      "line" => 206,
+      "note" => "12-Jul-2013",
+      "raw" => "3.0.40\t12-Jul-2013\n",
+      "version" => "3.0.40"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 210,
+          "raw" => "\t- added server_id option to deploy_to_remote_sandboxes\n",
+          "style" => "-",
+          "text" => "added server_id option to deploy_to_remote_sandboxes"
+        },
+        {
+          "line" => 211,
+          "raw" => "\t- added info about group directory to multiple sandbox 'start/stop/clear'\n\tscripts\n",
+          "style" => "-",
+          "text" => "added info about group directory to multiple sandbox 'start/stop/clear' scripts"
+        },
+        {
+          "line" => 213,
+          "raw" => "\t- added ruby connection info to connection.json\n",
+          "style" => "-",
+          "text" => "added ruby connection info to connection.json"
+        },
+        {
+          "line" => 214,
+          "raw" => "\t- Fixed display bug in credits (were reported twice in replication README)\n",
+          "style" => "-",
+          "text" => "Fixed display bug in credits (were reported twice in replication README)"
+        }
+      ],
+      "line" => 209,
+      "note" => "29-May-2013",
+      "raw" => "3.0.39\t29-May-2013\n",
+      "version" => "3.0.39"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 216,
+          "raw" => "\t- Fixed typos and formatting in embedded docs.\n",
+          "style" => "-",
+          "text" => "Fixed typos and formatting in embedded docs."
+        }
+      ],
+      "line" => 215,
+      "note" => "05-May-2013",
+      "raw" => "3.0.38\t05-May-2013\n",
+      "version" => "3.0.38"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 218,
+          "raw" => "\t- Added connection samples (for PHP, Perl, Python, Java, shell) to 'connection.json'\n",
+          "style" => "-",
+          "text" => "Added connection samples (for PHP, Perl, Python, Java, shell) to 'connection.json'"
+        },
+        {
+          "line" => 219,
+          "raw" => "\t- Added validation tests for JSON contents\n",
+          "style" => "-",
+          "text" => "Added validation tests for JSON contents"
+        }
+      ],
+      "line" => 217,
+      "note" => "05-May-2013",
+      "raw" => "3.0.37\t05-May-2013\n",
+      "version" => "3.0.37"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 222,
+              "raw" => "\t  - Added connection.json to each sandbox (simple or multiple) The file\n\t  contains information to use the sandbox with third party applications.\n",
+              "style" => "-",
+              "text" => "Added connection.json to each sandbox (simple or multiple) The file contains information to use the sandbox with third party applications."
+            },
+            {
+              "line" => 224,
+              "raw" => "\t  - Added default_connection.json to each sandbox (it has only the default\n\t  items from connection.json)\n",
+              "style" => "-",
+              "text" => "Added default_connection.json to each sandbox (it has only the default items from connection.json)"
+            },
+            {
+              "line" => 226,
+              "raw" => "\t  - Added README file to each sandbox (simple or multiple)\n",
+              "style" => "-",
+              "text" => "Added README file to each sandbox (simple or multiple)"
+            }
+          ],
+          "line" => 221,
+          "raw" => "\t- IMPORTANT CHANGES:\n",
+          "style" => "-",
+          "text" => "IMPORTANT CHANGES:"
+        },
+        {
+          "line" => 227,
+          "raw" => "\t- enhanced check_slaves. It now includes \"show master status\";\n",
+          "style" => "-",
+          "text" => "enhanced check_slaves. It now includes \"show master status\";"
+        },
+        {
+          "line" => 228,
+          "raw" => "\t- Fixed bug in circular replication: enable_gtid was not created;\n",
+          "style" => "-",
+          "text" => "Fixed bug in circular replication: enable_gtid was not created;"
+        },
+        {
+          "line" => 229,
+          "raw" => "\t- Added 25 more integrity tests;\n",
+          "style" => "-",
+          "text" => "Added 25 more integrity tests;"
+        },
+        {
+          "line" => 230,
+          "raw" => "\t- Changed default version for testing. It now looks for MySQL 5.5.31\n",
+          "style" => "-",
+          "text" => "Changed default version for testing. It now looks for MySQL 5.5.31"
+        }
+      ],
+      "line" => 220,
+      "note" => "04-May-2013",
+      "raw" => "3.0.36\t04-May-2013\n",
+      "version" => "3.0.36"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 232,
+          "raw" => "\t- Fixed bug in the 'check_slaves' script created with circular replication\n",
+          "style" => "-",
+          "text" => "Fixed bug in the 'check_slaves' script created with circular replication"
+        },
+        {
+          "line" => 233,
+          "raw" => "\t- Fixed bug in 'clear_all' script created in circular replication\n",
+          "style" => "-",
+          "text" => "Fixed bug in 'clear_all' script created in circular replication"
+        },
+        {
+          "line" => 234,
+          "raw" => "\t- added 50 new integrity tests to test_sandbox\n",
+          "style" => "-",
+          "text" => "added 50 new integrity tests to test_sandbox"
+        }
+      ],
+      "line" => 231,
+      "note" => "03-May-2013",
+      "raw" => "3.0.35\t03-May-2013\n",
+      "version" => "3.0.35"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 236,
+          "raw" => "\t- Added option --bind_address, to define how MySQL::Sandbox servers\n\tconnect to TCP/IP\n",
+          "style" => "-",
+          "text" => "Added option --bind_address, to define how MySQL::Sandbox servers connect to TCP/IP"
+        },
+        {
+          "line" => 238,
+          "raw" => "\t- Fixed bug with handling 5.7 builds. Replicated systems did not create\n\tthe script enable_gtid \t(BUG#1171977)\n",
+          "style" => "-",
+          "text" => "Fixed bug with handling 5.7 builds. Replicated systems did not create the script enable_gtid \t(BUG#1171977)"
+        },
+        {
+          "line" => 240,
+          "raw" => "\t- The changes made by enable_gtid are now durable (Bug#1171986)\n",
+          "style" => "-",
+          "text" => "The changes made by enable_gtid are now durable (Bug#1171986)"
+        },
+        {
+          "line" => 241,
+          "raw" => "\t- Fixed various patterns that prevented MariaDB 10.0 builds from being\n\trecognized.\n",
+          "style" => "-",
+          "text" => "Fixed various patterns that prevented MariaDB 10.0 builds from being recognized."
+        },
+        {
+          "line" => 243,
+          "raw" => "\t- Fixed bug in test_sandbox, where warning messages were mixed with the\n\ttest output in MYSQL 5.5.30+\n",
+          "style" => "-",
+          "text" => "Fixed bug in test_sandbox, where warning messages were mixed with the test output in MYSQL 5.5.30+"
+        },
+        {
+          "line" => 245,
+          "raw" => "\t- Fixed bug in test_sandbox, where a test that skips innodb was being\n\twrongly applied to MySQL 5.7\n",
+          "style" => "-",
+          "text" => "Fixed bug in test_sandbox, where a test that skips innodb was being wrongly applied to MySQL 5.7"
+        },
+        {
+          "line" => 247,
+          "raw" => "\t- Added 10.0 among supported versions\n",
+          "style" => "-",
+          "text" => "Added 10.0 among supported versions"
+        },
+        {
+          "line" => 248,
+          "raw" => "\t- Added documentation about remote sandboxes (in MySQL::Sandbox::Recipes)\n",
+          "style" => "-",
+          "text" => "Added documentation about remote sandboxes (in MySQL::Sandbox::Recipes)"
+        },
+        {
+          "line" => 249,
+          "raw" => "\t- Added a test that checks if enable_gtid is created when needed.\n",
+          "style" => "-",
+          "text" => "Added a test that checks if enable_gtid is created when needed."
+        }
+      ],
+      "line" => 235,
+      "note" => "29-Apr-2013",
+      "raw" => "3.0.34\t29-Apr-2013\n",
+      "version" => "3.0.34"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 251,
+          "raw" => "\t- Fixed Bug #1167794 '--log option deprecated'\n",
+          "style" => "-",
+          "text" => "Fixed Bug #1167794 '--log option deprecated'"
+        },
+        {
+          "line" => 252,
+          "raw" => "\t- fixed minot working issue in deploy_to_remote_sandboxes.sh\n",
+          "style" => "-",
+          "text" => "fixed minot working issue in deploy_to_remote_sandboxes.sh"
+        }
+      ],
+      "line" => 250,
+      "note" => "11-Apr-2013",
+      "raw" => "3.0.33\t11-Apr-2013\n",
+      "version" => "3.0.33"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 254,
+          "raw" => "\t- Fixed minor bug in deploy_to_remote_sandboxes.sh\n",
+          "style" => "-",
+          "text" => "Fixed minor bug in deploy_to_remote_sandboxes.sh"
+        },
+        {
+          "line" => 255,
+          "raw" => "\t- Added deploy_to_remote_sandboxes.sh to the list of scripts to install\n",
+          "style" => "-",
+          "text" => "Added deploy_to_remote_sandboxes.sh to the list of scripts to install"
+        }
+      ],
+      "line" => 253,
+      "note" => "12-Mar-2013",
+      "raw" => "3.0.32\t12-Mar-2013\n",
+      "version" => "3.0.32"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 257,
+          "raw" => "\t- Fixed Bug#1133186 make_sandbox_from_source does not recognize version\n",
+          "style" => "-",
+          "text" => "Fixed Bug#1133186 make_sandbox_from_source does not recognize version"
+        },
+        {
+          "line" => 258,
+          "raw" => "\t- removed diagnostic lines that printed MySQL version and temporary\n\tdirectory\n",
+          "style" => "-",
+          "text" => "removed diagnostic lines that printed MySQL version and temporary directory"
+        },
+        {
+          "line" => 260,
+          "raw" => "\t- removed diagnostic lines that printed ports and directories being\n\tsearched when the option --check_port was used\n",
+          "style" => "-",
+          "text" => "removed diagnostic lines that printed ports and directories being searched when the option --check_port was used"
+        },
+        {
+          "line" => 262,
+          "raw" => "\t- added bin/deploy_to_remote_sandboxes.sh, which installs sandboxes to\n\tremote hosts\n",
+          "style" => "-",
+          "text" => "added bin/deploy_to_remote_sandboxes.sh, which installs sandboxes to remote hosts"
+        }
+      ],
+      "line" => 256,
+      "note" => "08-Mar-2013",
+      "raw" => "3.0.31\t08-Mar-2013\n",
+      "version" => "3.0.31"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 265,
+          "raw" => "\t- Fixed Bug#1116760 Uninitalized \$ENV{\"SANDBOX_BINARY\"} \n",
+          "style" => "-",
+          "text" => "Fixed Bug#1116760 Uninitalized \$ENV{\"SANDBOX_BINARY\"}"
+        },
+        {
+          "line" => 266,
+          "raw" => "\t- Removed obnoxious warning introduced in MySQL 5.5.30 when using\n\tmysqldump\n",
+          "style" => "-",
+          "text" => "Removed obnoxious warning introduced in MySQL 5.5.30 when using mysqldump"
+        }
+      ],
+      "line" => 264,
+      "note" => "06-Feb-2013",
+      "raw" => "3.0.30\t06-Feb-2013\n",
+      "version" => "3.0.30"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 269,
+          "raw" => "\t- fixed bug#1103918 (affects sandboxes using MySQL 4.1)\n",
+          "style" => "-",
+          "text" => "fixed bug#1103918 (affects sandboxes using MySQL 4.1)"
+        }
+      ],
+      "line" => 268,
+      "note" => "24-Jan-2013",
+      "raw" => "3.0.29\t24-Jan-2013\n",
+      "version" => "3.0.29"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 271,
+          "raw" => "\t- changed initialization scripts to avoid most of the annoying messages\n\tthat MySQL 5.6 creates during tests \n",
+          "style" => "-",
+          "text" => "changed initialization scripts to avoid most of the annoying messages that MySQL 5.6 creates during tests"
+        },
+        {
+          "line" => 273,
+          "raw" => "\t- Added script to enable GTID in MySQL 5.6\n",
+          "style" => "-",
+          "text" => "Added script to enable GTID in MySQL 5.6"
+        }
+      ],
+      "line" => 270,
+      "note" => "06-Jan-2013",
+      "raw" => "3.0.28\t06-Jan-2013\n",
+      "version" => "3.0.28"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 276,
+              "raw" => "\t  # improved 'clear' and 'start' scripts to handle innodb tables in the\n\t  'mysql' database\n",
+              "style" => "#",
+              "text" => "improved 'clear' and 'start' scripts to handle innodb tables in the 'mysql' database"
+            },
+            {
+              "line" => 278,
+              "raw" => "\t  # fixed usage of deprecated features in tests \n",
+              "style" => "#",
+              "text" => "fixed usage of deprecated features in tests"
+            },
+            {
+              "line" => 279,
+              "raw" => "\t  # removed obnoxious listing when data directory is created\n",
+              "style" => "#",
+              "text" => "removed obnoxious listing when data directory is created"
+            }
+          ],
+          "line" => 275,
+          "raw" => "\t- added compatibility features to use MySQL 5.6\n",
+          "style" => "-",
+          "text" => "added compatibility features to use MySQL 5.6"
+        }
+      ],
+      "line" => 274,
+      "note" => "05-Jan-2013",
+      "raw" => "3.0.27\t05-Jan-2013\n",
+      "version" => "3.0.27"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 281,
+          "raw" => "\t- Removed dependency on table mysql.host, which can't be found anymore in\n\t\tMySQL 5.6.7\n",
+          "style" => "-",
+          "text" => "Removed dependency on table mysql.host, which can't be found anymore in MySQL 5.6.7"
+        }
+      ],
+      "line" => 280,
+      "note" => "30-Sep-2012",
+      "raw" => "3.0.26\t30-Sep-2012\n",
+      "version" => "3.0.26"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 284,
+          "raw" => "\t- fixed typos and credits. (Thanks to Mateusz Kijowski for noticing)\n",
+          "style" => "-",
+          "text" => "fixed typos and credits. (Thanks to Mateusz Kijowski for noticing)"
+        }
+      ],
+      "line" => 283,
+      "note" => "01-Feb-2012",
+      "raw" => "3.0.25\t01-Feb-2012\n",
+      "version" => "3.0.25"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 286,
+          "raw" => "\t- added --master option to low_level_make_sandbox (enables binlogs and\n\tserver-ID)\n",
+          "style" => "-",
+          "text" => "added --master option to low_level_make_sandbox (enables binlogs and server-ID)"
+        },
+        {
+          "line" => 288,
+          "raw" => "\t- added --slaveof option to low_level_make_sandbox (creates a slave of\n\tanother sandbox or regular server)\n",
+          "style" => "-",
+          "text" => "added --slaveof option to low_level_make_sandbox (creates a slave of another sandbox or regular server)"
+        },
+        {
+          "line" => 290,
+          "raw" => "\t- added tests for the above ones\n",
+          "style" => "-",
+          "text" => "added tests for the above ones"
+        }
+      ],
+      "line" => 285,
+      "note" => "17-Dec-2011",
+      "raw" => "3.0.24\t17-Dec-2011\n",
+      "version" => "3.0.24"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 294,
+              "raw" => "\t- Added arguments to deal with node options in replication and multiple\n\tsandbox. --node_options, --slave_options, --master_options,\n\t--one_slave_options, --one_node_options\n",
+              "style" => "-",
+              "text" => "Added arguments to deal with node options in replication and multiple sandbox. --node_options, --slave_options, --master_options, --one_slave_options, --one_node_options"
+            },
+            {
+              "line" => 297,
+              "raw" => "\t- added --high_performance option to low_level_make_sandbox: adds the following features to the\n\tconfiguration file:\n        innodb-thread-concurrency=0\n        sync_binlog=0\n        innodb-log-buffer-size=50M\n        innodb-additional-mem-pool-size=100M\n        max-connections=350\n        max_allowed_packet=48M\n        innodb_buffer_pool_size=512M\n        innodb-log-file-size=50M\n        innodb-flush-method=O_DIRECT\n \n",
+              "style" => "-",
+              "text" => "added --high_performance option to low_level_make_sandbox: adds the following features to the configuration file: innodb-thread-concurrency=0 sync_binlog=0 innodb-log-buffer-size=50M innodb-additional-mem-pool-size=100M max-connections=350 max_allowed_packet=48M innodb_buffer_pool_size=512M innodb-log-file-size=50M innodb-flush-method=O_DIRECT"
+            }
+          ],
+          "line" => 292,
+          "raw" => "    - fixed bug in prefixed version names (e.g.: now you can use make_sandbox\n\tps5.1.57 or mp5.2.10)\n",
+          "style" => "-",
+          "text" => "fixed bug in prefixed version names (e.g.: now you can use make_sandbox ps5.1.57 or mp5.2.10)"
+        }
+      ],
+      "line" => 291,
+      "note" => "13-Dec-2011",
+      "raw" => "3.0.23\t13-Dec-2011\n",
+      "version" => "3.0.23"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 310,
+          "raw" => "\t- Add support for directories named after a prefixed version (my5.1.56,\n\tps5.1.56, giuseppe_5.1.56, etc)\n",
+          "style" => "-",
+          "text" => "Add support for directories named after a prefixed version (my5.1.56, ps5.1.56, giuseppe_5.1.56, etc)"
+        }
+      ],
+      "line" => 309,
+      "note" => "26-Oct-2011",
+      "raw" => "3.0.22\t26-Oct-2011\n",
+      "version" => "3.0.22"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 313,
+          "raw" => "\t- Added test to MANIFEST (and to tarball). Forgotten in previous version\n",
+          "style" => "-",
+          "text" => "Added test to MANIFEST (and to tarball). Forgotten in previous version"
+        }
+      ],
+      "line" => 312,
+      "note" => "10-Oct-2011",
+      "raw" => "3.0.21\t10-Oct-2011\n",
+      "version" => "3.0.21"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 315,
+          "raw" => "\t- Fixed bug in make_sandbox. \"--add_prefix\" did not work in combination\n\twith \"--export_binaries\"\n",
+          "style" => "-",
+          "text" => "Fixed bug in make_sandbox. \"--add_prefix\" did not work in combination with \"--export_binaries\""
+        },
+        {
+          "line" => 317,
+          "raw" => "\t- changed port checking tests to not depend on a specific MySQL version\n",
+          "style" => "-",
+          "text" => "changed port checking tests to not depend on a specific MySQL version"
+        }
+      ],
+      "line" => 314,
+      "note" => "10-Oct-2011",
+      "raw" => "3.0.20\t10-Oct-2011\n",
+      "version" => "3.0.20"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 319,
+          "raw" => "\t- INCOMPATIBLE CHANGE: make_sandbox now requires '--' before adding\n\toptions supported by low_level_make_sandbox\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE: make_sandbox now requires '--' before adding options supported by low_level_make_sandbox"
+        },
+        {
+          "line" => 321,
+          "raw" => "\t- INCOMPATIBLE CHANGE: the option --export_binaries for make_sandbox must\n\tbe inserted BEFORE the tarball name\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE: the option --export_binaries for make_sandbox must be inserted BEFORE the tarball name"
+        },
+        {
+          "line" => 323,
+          "raw" => "\t- make_sandbox now recognizes Percona and MariaDB binaries \n",
+          "style" => "-",
+          "text" => "make_sandbox now recognizes Percona and MariaDB binaries"
+        },
+        {
+          "line" => 324,
+          "raw" => "\t- make_sandbox accepts the option --add_prefix=NAME, which will be added\n\tto the version number of the rename expanded tarball. (e.g.\n\t--add_prefix=yell mysql-5.1.8-linux.tar.gz will create yell5.1.58)\n",
+          "style" => "-",
+          "text" => "make_sandbox accepts the option --add_prefix=NAME, which will be added to the version number of the rename expanded tarball. (e.g. --add_prefix=yell mysql-5.1.8-linux.tar.gz will create yell5.1.58)"
+        }
+      ],
+      "line" => 318,
+      "note" => "09-Oct-2011",
+      "raw" => "3.0.19\t09-Oct-2011\n",
+      "version" => "3.0.19"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 328,
+          "raw" => "\t- fixed CPAN Ticket 70470 MySQL::Sandbox - make_sandbox warns with Perl 5.14 and 5.14.1\n",
+          "style" => "-",
+          "text" => "fixed CPAN Ticket 70470 MySQL::Sandbox - make_sandbox warns with Perl 5.14 and 5.14.1"
+        },
+        {
+          "line" => 329,
+          "raw" => "\t- Fixed report-port in replication. The port used was the master's, but it\n\tshould be the slave's\n",
+          "style" => "-",
+          "text" => "Fixed report-port in replication. The port used was the master's, but it should be the slave's"
+        }
+      ],
+      "line" => 327,
+      "note" => "08-Oct-2011",
+      "raw" => "3.0.18\t08-Oct-2011\n",
+      "version" => "3.0.18"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 332,
+          "raw" => "\t- incompatible change: default mask for msandbox user is now '127.%'\n\tinstead of '%'. You can resume the old mask with --remote_access='%'\n",
+          "style" => "-",
+          "text" => "incompatible change: default mask for msandbox user is now '127.%' instead of '%'. You can resume the old mask with --remote_access='%'"
+        },
+        {
+          "line" => 334,
+          "raw" => "\t- added low privilege users msandbox_ro (SELECT EXECUTE), msandbox_rw (SELECT INSERT\n\tUPDATE CREATE DROP LOCK EXECUTE), and rsandbox (REPLICATION SLAVE)\n",
+          "style" => "-",
+          "text" => "added low privilege users msandbox_ro (SELECT EXECUTE), msandbox_rw (SELECT INSERT UPDATE CREATE DROP LOCK EXECUTE), and rsandbox (REPLICATION SLAVE)"
+        },
+        {
+          "line" => 336,
+          "raw" => "\t- fixed bug in test_smoke (assumed 2 directories after cleaning, but 5.5\n\thas also performance_schema)\n",
+          "style" => "-",
+          "text" => "fixed bug in test_smoke (assumed 2 directories after cleaning, but 5.5 has also performance_schema)"
+        }
+      ],
+      "line" => 331,
+      "note" => "07-Jan-2011",
+      "raw" => "3.0.17\t07-Jan-2011\n",
+      "version" => "3.0.17"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 339,
+          "raw" => "\t- fixed bug in TestHelper (wrong assumption on all directories in\n\t\$SANDBOX_BINARIES containing MySQL files)\n",
+          "style" => "-",
+          "text" => "fixed bug in TestHelper (wrong assumption on all directories in \$SANDBOX_BINARIES containing MySQL files)"
+        },
+        {
+          "line" => 341,
+          "raw" => "\t- added information to check_slaves to report master logfile and position\n",
+          "style" => "-",
+          "text" => "added information to check_slaves to report master logfile and position"
+        }
+      ],
+      "line" => 338,
+      "note" => "30-Dec-2010",
+      "raw" => "3.0.16\t30-Dec-2010\n",
+      "version" => "3.0.16"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 343,
+          "raw" => "\t- added a 'msb' script to each sandbox, to mimick the mysql.server script\n",
+          "style" => "-",
+          "text" => "added a 'msb' script to each sandbox, to mimick the mysql.server script"
+        },
+        {
+          "line" => 344,
+          "raw" => "\t- fixed test visualization bug for Mac OSX with case insensitive storage\n",
+          "style" => "-",
+          "text" => "fixed test visualization bug for Mac OSX with case insensitive storage"
+        },
+        {
+          "line" => 345,
+          "raw" => "\t- fixed algorithm to convert version number to ports\n",
+          "style" => "-",
+          "text" => "fixed algorithm to convert version number to ports"
+        },
+        {
+          "line" => 346,
+          "raw" => "\t- fixed test suite for MySQL 5.5 (can't disable innodb for testing)\n",
+          "style" => "-",
+          "text" => "fixed test suite for MySQL 5.5 (can't disable innodb for testing)"
+        }
+      ],
+      "line" => 342,
+      "note" => "23-Dec-2010",
+      "raw" => "3.0.15\t23-Dec-2010\n",
+      "version" => "3.0.15"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 348,
+          "raw" => "\t- Added a 'rsandbox' user with REPLICATION SLAVE grants for replication\n\t  systems\n",
+          "style" => "-",
+          "text" => "Added a 'rsandbox' user with REPLICATION SLAVE grants for replication systems"
+        }
+      ],
+      "line" => 347,
+      "note" => "31-Aug-2010 (not released)",
+      "raw" => "3.0.14\t31-Aug-2010 (not released)\n",
+      "version" => "3.0.14"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 351,
+          "raw" => "\t- fixed minor problems in the test suite about testing on Windows\n",
+          "style" => "-",
+          "text" => "fixed minor problems in the test suite about testing on Windows"
+        },
+        {
+          "line" => 352,
+          "raw" => "\t- added a prototype for MySQL Cluster integration\n",
+          "style" => "-",
+          "text" => "added a prototype for MySQL Cluster integration"
+        }
+      ],
+      "line" => 350,
+      "note" => "28-Jun-2010 (not released)",
+      "raw" => "3.0.13\t28-Jun-2010 (not released)\n",
+      "version" => "3.0.13"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 354,
+          "raw" => "\t- Fixed bug in test_sandbox. When a test evaluates only the result code\n\t  and there is no output from a failing command, test_result was not able\n\t  to detect the failure.\n",
+          "style" => "-",
+          "text" => "Fixed bug in test_sandbox. When a test evaluates only the result code and there is no output from a failing command, test_result was not able to detect the failure."
+        },
+        {
+          "line" => 357,
+          "raw" => "\t- fixed bug in test_sandbox. Due to a change in behavior in the mysql\n\t  client, where './use -B -N' with a \\G terminated query  does not\n\t  show the headers since 5.1.43, We need to take into account the pre \n\t  and post fix behaviors in the test.\n",
+          "style" => "-",
+          "text" => "fixed bug in test_sandbox. Due to a change in behavior in the mysql client, where './use -B -N' with a \\G terminated query  does not show the headers since 5.1.43, We need to take into account the pre and post fix behaviors in the test."
+        },
+        {
+          "line" => 361,
+          "raw" => "\t- Integrated set_plugins into sbtool\n",
+          "style" => "-",
+          "text" => "Integrated set_plugins into sbtool"
+        },
+        {
+          "line" => 362,
+          "raw" => "\t- Updated documentation\n",
+          "style" => "-",
+          "text" => "Updated documentation"
+        },
+        {
+          "line" => 363,
+          "raw" => "\t- added tests for innodb plugin installation\n",
+          "style" => "-",
+          "text" => "added tests for innodb plugin installation"
+        },
+        {
+          "line" => 364,
+          "raw" => "\t- added tests for semi-synch plugin installation\n",
+          "style" => "-",
+          "text" => "added tests for semi-synch plugin installation"
+        },
+        {
+          "line" => 365,
+          "raw" => "\t- Fixed bug in 'stop' script. It did not accept \$MYCLIENT_OPTION\n",
+          "style" => "-",
+          "text" => "Fixed bug in 'stop' script. It did not accept \$MYCLIENT_OPTION"
+        },
+        {
+          "line" => 366,
+          "raw" => "\t- Fixed bug#487864 - tar was using '--help' instead of '--version' to\n\t  detect the supported version.\n",
+          "style" => "-",
+          "text" => "Fixed bug#487864 - tar was using '--help' instead of '--version' to detect the supported version."
+        },
+        {
+          "line" => 368,
+          "raw" => "\t- Fixed bug in sbtool. It did not display credits in the help.\n",
+          "style" => "-",
+          "text" => "Fixed bug in sbtool. It did not display credits in the help."
+        },
+        {
+          "line" => 369,
+          "raw" => "\t- Added test to skip testing on Windows.\n",
+          "style" => "-",
+          "text" => "Added test to skip testing on Windows."
+        },
+        {
+          "line" => 370,
+          "raw" => "\t- added instrumentation to all MySQL Sandbox scripts. If you set the\n\t  \$SBINSTR environment variable with the name of a file, all sandbox\n\t  scripts will write an entry to that file with their run time params.\n",
+          "style" => "-",
+          "text" => "added instrumentation to all MySQL Sandbox scripts. If you set the \$SBINSTR environment variable with the name of a file, all sandbox scripts will write an entry to that file with their run time params."
+        }
+      ],
+      "line" => 353,
+      "note" => "29-May-2010",
+      "raw" => "3.0.12\t29-May-2010\n",
+      "version" => "3.0.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 374,
+          "raw" => "\t- Fixed bug in ./clear script. In version 5.5 and bigger, it erased\n\t  the performance_schema database, which should not be removed. If it\n\t  exists, its tables are now truncated.\n",
+          "style" => "-",
+          "text" => "Fixed bug in ./clear script. In version 5.5 and bigger, it erased the performance_schema database, which should not be removed. If it exists, its tables are now truncated."
+        },
+        {
+          "line" => 377,
+          "raw" => "\t- Fixed bug in ./clear script. The removal of databases was not\n\t  executed in a clean mode.\n",
+          "style" => "-",
+          "text" => "Fixed bug in ./clear script. The removal of databases was not executed in a clean mode."
+        },
+        {
+          "line" => 379,
+          "raw" => "\t- Added a script to install plugins in ./drafts \n",
+          "style" => "-",
+          "text" => "Added a script to install plugins in ./drafts"
+        }
+      ],
+      "line" => 373,
+      "note" => "24-May-2010",
+      "raw" => "3.0.11\t24-May-2010\n",
+      "version" => "3.0.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 381,
+          "raw" => "\t- Fixed the help() function. It displayed an example that was only\n\tappropriate for a single sandbox, but not for group ones.\n",
+          "style" => "-",
+          "text" => "Fixed the help() function. It displayed an example that was only appropriate for a single sandbox, but not for group ones."
+        }
+      ],
+      "line" => 380,
+      "note" => "04-May-2010",
+      "raw" => "3.0.10\t04-May-2010\n",
+      "version" => "3.0.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 384,
+          "raw" => "\t- added a check in the 'start' script to verify that mysqld_safe exists\n\t  and can run properly.\n",
+          "style" => "-",
+          "text" => "added a check in the 'start' script to verify that mysqld_safe exists and can run properly."
+        },
+        {
+          "line" => 386,
+          "raw" => "\t- Added an exit code to the 'start' script to alert when the server does\n\t  not start\n",
+          "style" => "-",
+          "text" => "Added an exit code to the 'start' script to alert when the server does not start"
+        },
+        {
+          "line" => 388,
+          "raw" => "\t- added help to make_sandbox_from_installed. Added /usr/sbin as source\n\tdirectory\n",
+          "style" => "-",
+          "text" => "added help to make_sandbox_from_installed. Added /usr/sbin as source directory"
+        },
+        {
+          "line" => 390,
+          "raw" => "\t- added instructions to the 'clear' script to remove functions and plugins \n",
+          "style" => "-",
+          "text" => "added instructions to the 'clear' script to remove functions and plugins"
+        }
+      ],
+      "line" => 383,
+      "note" => "25-Mar-2010",
+      "raw" => "3.0.09\t25-Mar-2010\n",
+      "version" => "3.0.09"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 392,
+          "raw" => "\t- Fixed make_sandbox_from_source failure due to changes in modified \n\t  configure.in (Thanks to Padraig O'Sullivan for noticing)\n",
+          "style" => "-",
+          "text" => "Fixed make_sandbox_from_source failure due to changes in modified configure.in (Thanks to Padraig O'Sullivan for noticing)"
+        },
+        {
+          "line" => 394,
+          "raw" => "\t- modified the \"USING\" file, which now includes the Sandbox version\n",
+          "style" => "-",
+          "text" => "modified the \"USING\" file, which now includes the Sandbox version"
+        },
+        {
+          "line" => 395,
+          "raw" => "\t- Changed default test version from 5.0.77 to 5.0.86\n",
+          "style" => "-",
+          "text" => "Changed default test version from 5.0.77 to 5.0.86"
+        }
+      ],
+      "line" => 391,
+      "note" => "17-Feb-2010",
+      "raw" => "3.0.08\t17-Feb-2010\n",
+      "version" => "3.0.08"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 397,
+          "raw" => "\t- Fixed bud in make_multiple_custom_sandbox. With some versions of bash,\n\t  it broke on tests with \"use_all\"\n",
+          "style" => "-",
+          "text" => "Fixed bud in make_multiple_custom_sandbox. With some versions of bash, it broke on tests with \"use_all\""
+        },
+        {
+          "line" => 399,
+          "raw" => "\t- fixed bug on symlink access on some platforms.\n",
+          "style" => "-",
+          "text" => "fixed bug on symlink access on some platforms."
+        },
+        {
+          "line" => 400,
+          "raw" => "\t- Fixed Bug#504789 export_binaries fails on some OS when crossing file systems\n",
+          "style" => "-",
+          "text" => "Fixed Bug#504789 export_binaries fails on some OS when crossing file systems"
+        }
+      ],
+      "line" => 396,
+      "note" => "08-Jan-2010",
+      "raw" => "3.0.07\t08-Jan-2010\n",
+      "version" => "3.0.07"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 402,
+          "raw" => "\t- Fixed bug in prompt definition. A stray quote was added at the start of\n\teach user-defined prompt.\n",
+          "style" => "-",
+          "text" => "Fixed bug in prompt definition. A stray quote was added at the start of each user-defined prompt."
+        },
+        {
+          "line" => 404,
+          "raw" => "\t- Fixed Bug#456949 \"each sandbox should have a dedicated temporary\n\tdirectory\".\n",
+          "style" => "-",
+          "text" => "Fixed Bug#456949 \"each sandbox should have a dedicated temporary directory\"."
+        },
+        {
+          "line" => 406,
+          "raw" => "\t- Fixed Bug#439226 \"sandbox_action script uses wrong version of Perl\"\n",
+          "style" => "-",
+          "text" => "Fixed Bug#439226 \"sandbox_action script uses wrong version of Perl\""
+        },
+        {
+          "line" => 407,
+          "raw" => "\t- Improved documentation to resolve Bug#392996 \"make install Sandbox.pm path\n\tissues\".\n",
+          "style" => "-",
+          "text" => "Improved documentation to resolve Bug#392996 \"make install Sandbox.pm path issues\"."
+        },
+        {
+          "line" => 409,
+          "raw" => "\t- added 'status' script to sandboxes\n",
+          "style" => "-",
+          "text" => "added 'status' script to sandboxes"
+        },
+        {
+          "line" => 410,
+          "raw" => "\t- fixed db_user definition, which could write trail character to the\n\toption file.\n",
+          "style" => "-",
+          "text" => "fixed db_user definition, which could write trail character to the option file."
+        }
+      ],
+      "line" => 401,
+      "note" => "03-Jan-2010",
+      "raw" => "3.0.06\t03-Jan-2010\n",
+      "version" => "3.0.06"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 413,
+          "raw" => "\t- Fixed Bug#428274 make_sandbox fails on Mac OSX 10.6 \"snow Leopard\"\n",
+          "style" => "-",
+          "text" => "Fixed Bug#428274 make_sandbox fails on Mac OSX 10.6 \"snow Leopard\""
+        },
+        {
+          "entries" => [
+            {
+              "line" => 416,
+              "raw" => "\t- Added a dedicated history file per each sandbox (Thanks to Gerardo Narvaja\n\t  for suggesting it) \n",
+              "style" => "-",
+              "text" => "Added a dedicated history file per each sandbox (Thanks to Gerardo Narvaja for suggesting it)"
+            },
+            {
+              "line" => 418,
+              "raw" => "\t- fixed bug in make_sandbox when dealing with a non-standard answer to the\n\t\"which\" Unix utility\n",
+              "style" => "-",
+              "text" => "fixed bug in make_sandbox when dealing with a non-standard answer to the \"which\" Unix utility"
+            },
+            {
+              "line" => 420,
+              "raw" => "\t- added error checking for 'bash' to low_level_make_sandbox\n",
+              "style" => "-",
+              "text" => "added error checking for 'bash' to low_level_make_sandbox"
+            },
+            {
+              "line" => 421,
+              "raw" => "\t- improved error checking for mysql_install_db script\n",
+              "style" => "-",
+              "text" => "improved error checking for mysql_install_db script"
+            },
+            {
+              "line" => 422,
+              "raw" => "\t- renamed 'sandbox' tool -> 'msandbox' to prevent clash\n\t  with existing tool in Linux distros\n",
+              "style" => "-",
+              "text" => "renamed 'sandbox' tool -> 'msandbox' to prevent clash with existing tool in Linux distros"
+            },
+            {
+              "line" => 424,
+              "raw" => "\t- Added \"--no_run\" option to low_level_make_sandbox, to stop\n\t  the server when using the \"--load_grants\" option. The purpose is \n\t  to end the command without leaving any running sub-process.\n",
+              "style" => "-",
+              "text" => "Added \"--no_run\" option to low_level_make_sandbox, to stop the server when using the \"--load_grants\" option. The purpose is to end the command without leaving any running sub-process."
+            }
+          ],
+          "line" => 414,
+          "raw" => "    - Increased starting timeout from 20 to 60, because some recent versions\n\t  of MySQL are quite slower to start.\n",
+          "style" => "-",
+          "text" => "Increased starting timeout from 20 to 60, because some recent versions of MySQL are quite slower to start."
+        }
+      ],
+      "line" => 412,
+      "note" => "12-Sep-2009",
+      "raw" => "3.0.05   12-Sep-2009\n",
+      "version" => "3.0.05"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 428,
+          "raw" => "\t- fixed bug in test_sandbox. A \"\$\" sign in a directory name was not\n\t  escaped properly\n",
+          "style" => "-",
+          "text" => "fixed bug in test_sandbox. A \"\$\" sign in a directory name was not escaped properly"
+        },
+        {
+          "line" => 430,
+          "raw" => "\t- added the \"--no_show\" option to low_level_make_sandbox\n",
+          "style" => "-",
+          "text" => "added the \"--no_show\" option to low_level_make_sandbox"
+        },
+        {
+          "line" => 431,
+          "raw" => "\t- fixed a bug in the \"sb\" script. Calling it in \"create mode\" did\n\t  fail if \$SANDBOX_HOME does not exist yet.\n",
+          "style" => "-",
+          "text" => "fixed a bug in the \"sb\" script. Calling it in \"create mode\" did fail if \$SANDBOX_HOME does not exist yet."
+        }
+      ],
+      "line" => 427,
+      "note" => "14-Jun-2009",
+      "raw" => "3.0.04   14-Jun-2009\n",
+      "version" => "3.0.04"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 434,
+          "raw" => "\t- added the 'sb' shortcut script to create and invoke sandboxes easily.\n",
+          "style" => "-",
+          "text" => "added the 'sb' shortcut script to create and invoke sandboxes easily."
+        }
+      ],
+      "line" => 433,
+      "note" => "11-Jun-2009",
+      "raw" => "3.0.03   11-Jun-2009\n",
+      "version" => "3.0.03"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 436,
+          "raw" => "\t- Added a check for all scripts, to prevent MySQL::Sandbox \n\t  from running as root without explicit awareness\n",
+          "style" => "-",
+          "text" => "Added a check for all scripts, to prevent MySQL::Sandbox from running as root without explicit awareness"
+        }
+      ],
+      "line" => 435,
+      "note" => "30-May-2009",
+      "raw" => "3.0.02   30-May-2009\n",
+      "version" => "3.0.02"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 439,
+          "raw" => "\t- Fixed Bug#381044 \"my\" script fails on some executables\n",
+          "style" => "-",
+          "text" => "Fixed Bug#381044 \"my\" script fails on some executables"
+        },
+        {
+          "line" => 440,
+          "raw" => "\t- moved function \"exists_in_path\" to MySQL::Sandbox module\n",
+          "style" => "-",
+          "text" => "moved function \"exists_in_path\" to MySQL::Sandbox module"
+        }
+      ],
+      "line" => 438,
+      "note" => "28-May-2009",
+      "raw" => "3.0.01   28-May-2009\n",
+      "version" => "3.0.01"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 442,
+          "raw" => "\t- GA release\n",
+          "style" => "-",
+          "text" => "GA release"
+        },
+        {
+          "line" => 443,
+          "raw" => "\t- no code modification. Same codebase as 2.0.99f\n",
+          "style" => "-",
+          "text" => "no code modification. Same codebase as 2.0.99f"
+        },
+        {
+          "line" => 444,
+          "raw" => "\t- completed cookbook (41 recipes in MySQL::Sandbox::Recipes)\n",
+          "style" => "-",
+          "text" => "completed cookbook (41 recipes in MySQL::Sandbox::Recipes)"
+        },
+        {
+          "line" => 445,
+          "raw" => "\t- added script_templates directory (No modification in current version,\n\t  just preparation for 3.1.xx)\n",
+          "style" => "-",
+          "text" => "added script_templates directory (No modification in current version, just preparation for 3.1.xx)"
+        },
+        {
+          "line" => 447,
+          "raw" => "\t- added drafts directory\n",
+          "style" => "-",
+          "text" => "added drafts directory"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 449,
+              "raw" => "\t- fixed bug in make_sandbox_from_installed. Some system use /lib64 \n\t  instead of /lib \n",
+              "style" => "-",
+              "text" => "fixed bug in make_sandbox_from_installed. Some system use /lib64 instead of /lib"
+            },
+            {
+              "line" => 451,
+              "raw" => "\t- added more recipes to MySQL::Sandbox::Recipes\n",
+              "style" => "-",
+              "text" => "added more recipes to MySQL::Sandbox::Recipes"
+            }
+          ],
+          "line" => 448,
+          "raw" => "2.0.99f  03-May-2009\n",
+          "style" => "",
+          "text" => "2.0.99f  03-May-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 453,
+              "raw" => "\t- added make_sandbox_from_installed to install from binaries already\n\t  installed via packages such as .deb, .rpm. \n",
+              "style" => "-",
+              "text" => "added make_sandbox_from_installed to install from binaries already installed via packages such as .deb, .rpm."
+            },
+            {
+              "line" => 455,
+              "raw" => "\t- added sample perl test script to MANIFEST. Missed during the previous release\n",
+              "style" => "-",
+              "text" => "added sample perl test script to MANIFEST. Missed during the previous release"
+            },
+            {
+              "line" => 456,
+              "raw" => "\t- added MySQL::Sandbox::Recipes, a cookbook with short How-To tutorials\n",
+              "style" => "-",
+              "text" => "added MySQL::Sandbox::Recipes, a cookbook with short How-To tutorials"
+            },
+            {
+              "line" => 457,
+              "raw" => "\t- cleaned up tests. Added 8 more test to check replication parameters\n",
+              "style" => "-",
+              "text" => "cleaned up tests. Added 8 more test to check replication parameters"
+            }
+          ],
+          "line" => 452,
+          "raw" => "2.0.99e  03-May-2009\n",
+          "style" => "",
+          "text" => "2.0.99e  03-May-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 459,
+              "raw" => "\t- Added user defined test in Perl, in addition to the ones written in\n\t  the test_sandbox script language\n",
+              "style" => "-",
+              "text" => "Added user defined test in Perl, in addition to the ones written in the test_sandbox script language"
+            },
+            {
+              "line" => 461,
+              "raw" => "\t- Updated documentation\n",
+              "style" => "-",
+              "text" => "Updated documentation"
+            }
+          ],
+          "line" => 458,
+          "raw" => "2.0.99d  02-May-2009\n",
+          "style" => "",
+          "text" => "2.0.99d  02-May-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 463,
+              "raw" => "\t- Fixed conceptual bug in \"start\" and \"restart\". Group sandboxes\n\t  were not allowing it\n",
+              "style" => "-",
+              "text" => "Fixed conceptual bug in \"start\" and \"restart\". Group sandboxes were not allowing it"
+            },
+            {
+              "line" => 465,
+              "raw" => "\t- added \"restart_all\" in group sandboxes\n",
+              "style" => "-",
+              "text" => "added \"restart_all\" in group sandboxes"
+            },
+            {
+              "line" => 466,
+              "raw" => "\t- Added 18 new tests to check the above problem\n",
+              "style" => "-",
+              "text" => "Added 18 new tests to check the above problem"
+            },
+            {
+              "line" => 467,
+              "raw" => "\t- Added documentation about port checking and parameters accepted by\n\t'start' and 'restart'\n",
+              "style" => "-",
+              "text" => "Added documentation about port checking and parameters accepted by 'start' and 'restart'"
+            }
+          ],
+          "line" => 462,
+          "raw" => "2.0.99c  01-May-2009\n",
+          "style" => "",
+          "text" => "2.0.99c  01-May-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 470,
+              "raw" => "\t- added group port checking to make_replication_sandbox and\n\t  make_multiple_sandbox\n",
+              "style" => "-",
+              "text" => "added group port checking to make_replication_sandbox and make_multiple_sandbox"
+            },
+            {
+              "line" => 472,
+              "raw" => "\t- added 2 new tests to the test suite to test singkle and group\n\t  port checking\n",
+              "style" => "-",
+              "text" => "added 2 new tests to the test suite to test singkle and group port checking"
+            },
+            {
+              "line" => 474,
+              "raw" => "\t- added documentation on port checking\n",
+              "style" => "-",
+              "text" => "added documentation on port checking"
+            }
+          ],
+          "line" => 469,
+          "raw" => "2.0.99b  26-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.99b  26-Apr-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 476,
+              "raw" => "\t- fixed bug in make_replication_sandbox and make_multiple_sandbox. If a\n\tgroup sandbox was the first to be created under \$SANDBOX_HOME, it failed.\n",
+              "style" => "-",
+              "text" => "fixed bug in make_replication_sandbox and make_multiple_sandbox. If a group sandbox was the first to be created under \$SANDBOX_HOME, it failed."
+            },
+            {
+              "line" => 478,
+              "raw" => "\t- added check_replication.sb as user defined sample test\n",
+              "style" => "-",
+              "text" => "added check_replication.sb as user defined sample test"
+            }
+          ],
+          "line" => 475,
+          "raw" => "2.0.99a  12-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.99a  12-Apr-2009"
+        }
+      ],
+      "line" => 441,
+      "note" => "09-May-2009",
+      "raw" => "3.0.00   09-May-2009\n",
+      "version" => "3.0.00"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 480,
+          "raw" => "\t- implemented user defined test modules\n",
+          "style" => "-",
+          "text" => "implemented user defined test modules"
+        },
+        {
+          "line" => 481,
+          "raw" => "\t- fixed some documentation glitches\n",
+          "style" => "-",
+          "text" => "fixed some documentation glitches"
+        },
+        {
+          "line" => 482,
+          "raw" => "\t- Added documentation about user defined tests\n",
+          "style" => "-",
+          "text" => "Added documentation about user defined tests"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 484,
+              "raw" => "\t- added script make_sandbox_from_source, which will create\n\t  a sandbox from a build directory\n",
+              "style" => "-",
+              "text" => "added script make_sandbox_from_source, which will create a sandbox from a build directory"
+            },
+            {
+              "line" => 486,
+              "raw" => "\t- Extended maximum port to 64000\n",
+              "style" => "-",
+              "text" => "Extended maximum port to 64000"
+            },
+            {
+              "line" => 487,
+              "raw" => "\t- added MySQL versions 5.[2345] as accepted for a Sandbox\n",
+              "style" => "-",
+              "text" => "added MySQL versions 5.[2345] as accepted for a Sandbox"
+            }
+          ],
+          "line" => 483,
+          "raw" => "2.0.98i 09-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.98i 09-Apr-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 489,
+              "raw" => "\t- Changed test_sandbox to use IPC::Open3 instead of qx, when\n\t  available. This will make the 'make test' output more readable.\n",
+              "style" => "-",
+              "text" => "Changed test_sandbox to use IPC::Open3 instead of qx, when available. This will make the 'make test' output more readable."
+            },
+            {
+              "line" => 491,
+              "raw" => "    - added Test_Helper.pm to the test suite\n",
+              "style" => "-",
+              "text" => "added Test_Helper.pm to the test suite"
+            }
+          ],
+          "line" => 488,
+          "raw" => "2.0.98h 08-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.98h 08-Apr-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 493,
+              "raw" => "\t- added --master_node option to sbtool\n",
+              "style" => "-",
+              "text" => "added --master_node option to sbtool"
+            },
+            {
+              "line" => 494,
+              "raw" => "\t- added 'preserve' and 'unpreserve' options to sbtool\n",
+              "style" => "-",
+              "text" => "added 'preserve' and 'unpreserve' options to sbtool"
+            },
+            {
+              "line" => 495,
+              "raw" => "\t- made test_sandbox TAP compatible\n",
+              "style" => "-",
+              "text" => "made test_sandbox TAP compatible"
+            },
+            {
+              "line" => 496,
+              "raw" => "\t- updated the test suite\n",
+              "style" => "-",
+              "text" => "updated the test suite"
+            },
+            {
+              "line" => 497,
+              "raw" => "\t- written the documentation on sbtool to MySQL::Sandbox POD\n",
+              "style" => "-",
+              "text" => "written the documentation on sbtool to MySQL::Sandbox POD"
+            }
+          ],
+          "line" => 492,
+          "raw" => "2.0.98g 07-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.98g 07-Apr-2009"
+        },
+        {
+          "entries" => [
+            {
+              "entries" => [
+                {
+                  "line" => 500,
+                  "raw" => "\t- introduced --export_binaries to make_sandbox\n",
+                  "style" => "-",
+                  "text" => "introduced --export_binaries to make_sandbox"
+                },
+                {
+                  "line" => 501,
+                  "raw" => "\t- added 03_test_sandbox.t, which uses test_sandbox within\n\t  the test suite\n",
+                  "style" => "-",
+                  "text" => "added 03_test_sandbox.t, which uses test_sandbox within the test suite"
+                },
+                {
+                  "line" => 503,
+                  "raw" => "\t- fixed bug in sbtool. Moving sandbox failed becaus of wrong regular\n",
+                  "style" => "-",
+                  "text" => "fixed bug in sbtool. Moving sandbox failed becaus of wrong regular"
+                },
+                {
+                  "entries" => [
+                    {
+                      "line" => 505,
+                      "raw" => "\t- added a test suite for sbtool to test_sandbox \n\t  test_sandbox --tests=sbtool\n",
+                      "style" => "-",
+                      "text" => "added a test suite for sbtool to test_sandbox test_sandbox --tests=sbtool"
+                    }
+                  ],
+                  "line" => 504,
+                  "raw" => "      expression\n",
+                  "style" => "",
+                  "text" => "expression"
+                }
+              ],
+              "line" => 499,
+              "raw" => "    - added 'delete' action to sbtool\n",
+              "style" => "-",
+              "text" => "added 'delete' action to sbtool"
+            }
+          ],
+          "line" => 498,
+          "raw" => "2.0.98f 06-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.98f 06-Apr-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 508,
+              "raw" => "\t- fixed error in low_level_make_sandbox --interactive. Array values\n\t  were not preserved correctly wit a default\n",
+              "style" => "-",
+              "text" => "fixed error in low_level_make_sandbox --interactive. Array values were not preserved correctly wit a default"
+            },
+            {
+              "line" => 510,
+              "raw" => "\t- implemented interactive confirmation for group sandboxes\n",
+              "style" => "-",
+              "text" => "implemented interactive confirmation for group sandboxes"
+            }
+          ],
+          "line" => 507,
+          "raw" => "2.0.98e 02-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.98e 02-Apr-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 512,
+              "raw" => "\t- Deprecated \"query_analyzer\" option :)\n",
+              "style" => "-",
+              "text" => "Deprecated \"query_analyzer\" option :)"
+            },
+            {
+              "line" => 513,
+              "raw" => "\t- moved the POD to MySQL::Sandbox\n",
+              "style" => "-",
+              "text" => "moved the POD to MySQL::Sandbox"
+            },
+            {
+              "line" => 514,
+              "raw" => "\t- produced mew README from the POD\n",
+              "style" => "-",
+              "text" => "produced mew README from the POD"
+            },
+            {
+              "line" => 515,
+              "raw" => "\t- implemented --no_check_port (to use as a safeguard with group sandboxes)\n",
+              "style" => "-",
+              "text" => "implemented --no_check_port (to use as a safeguard with group sandboxes)"
+            }
+          ],
+          "line" => 511,
+          "raw" => "2.0.98d 01-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.98d 01-Apr-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 517,
+              "raw" => "\t- added query_analyzer option\n",
+              "style" => "-",
+              "text" => "added query_analyzer option"
+            }
+          ],
+          "line" => 516,
+          "raw" => "2.0.98c 01-Apr-2009\n",
+          "style" => "",
+          "text" => "2.0.98c 01-Apr-2009"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 519,
+              "raw" => "\t- taken most function from sbtool to MySQL::Sandbox module\n",
+              "style" => "-",
+              "text" => "taken most function from sbtool to MySQL::Sandbox module"
+            },
+            {
+              "line" => 520,
+              "raw" => "\t- implemented --check_port for single sandboxes\n",
+              "style" => "-",
+              "text" => "implemented --check_port for single sandboxes"
+            },
+            {
+              "line" => 521,
+              "raw" => "\t- fixed bug#352222 \"report-port incorrect with --master-master\"\n",
+              "style" => "-",
+              "text" => "fixed bug#352222 \"report-port incorrect with --master-master\""
+            },
+            {
+              "line" => 522,
+              "raw" => "\t- cleaned up code for parse_options in all scripts\n",
+              "style" => "-",
+              "text" => "cleaned up code for parse_options in all scripts"
+            },
+            {
+              "line" => 523,
+              "raw" => "\t- enhanced test case with some tests for the script correctness\n",
+              "style" => "-",
+              "text" => "enhanced test case with some tests for the script correctness"
+            }
+          ],
+          "line" => 518,
+          "raw" => "2.0.98b 31-Mar-2009\n",
+          "style" => "",
+          "text" => "2.0.98b 31-Mar-2009"
+        }
+      ],
+      "line" => 479,
+      "note" => "11-Apr-2009",
+      "raw" => "2.0.99  11-Apr-2009\n",
+      "version" => "2.0.99"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 525,
+          "raw" => "\t- Preparation for version 3.0\n",
+          "style" => "-",
+          "text" => "Preparation for version 3.0"
+        },
+        {
+          "line" => 526,
+          "raw" => "\t- refactoring code to use with ExtUtilis::MakeMaker and install a proper\n\t  Perl module \n",
+          "style" => "-",
+          "text" => "refactoring code to use with ExtUtilis::MakeMaker and install a proper Perl module"
+        },
+        {
+          "line" => 528,
+          "raw" => "\t- updated README\n",
+          "style" => "-",
+          "text" => "updated README"
+        },
+        {
+          "line" => 529,
+          "raw" => "\t- fixed sandbox_action to support 'send_kill'\n",
+          "style" => "-",
+          "text" => "fixed sandbox_action to support 'send_kill'"
+        },
+        {
+          "line" => 530,
+          "raw" => "\t- added \$VERSION to both modules \n",
+          "style" => "-",
+          "text" => "added \$VERSION to both modules"
+        }
+      ],
+      "line" => 524,
+      "note" => "29-Mar-2009",
+      "raw" => "2.0.98 29-Mar-2009\n",
+      "version" => "2.0.98"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 532,
+          "raw" => "\t- added change_port script to installed sandboxes\n",
+          "style" => "-",
+          "text" => "added change_port script to installed sandboxes"
+        },
+        {
+          "line" => 533,
+          "raw" => "\t- added 'port' operation to sbtool\n",
+          "style" => "-",
+          "text" => "added 'port' operation to sbtool"
+        },
+        {
+          "line" => 534,
+          "raw" => "\t- added --new_port option to sbtool\n",
+          "style" => "-",
+          "text" => "added --new_port option to sbtool"
+        }
+      ],
+      "line" => 531,
+      "note" => "22-Mar-2009",
+      "raw" => "2.0.18 22-Mar-2009\n",
+      "version" => "2.0.18"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 536,
+          "raw" => "\t- improved sbtool error checking\n",
+          "style" => "-",
+          "text" => "improved sbtool error checking"
+        },
+        {
+          "line" => 537,
+          "raw" => "\t- improved sbtool built-in help\n",
+          "style" => "-",
+          "text" => "improved sbtool built-in help"
+        },
+        {
+          "line" => 538,
+          "raw" => "\t- added \"report-port\" to replication slave setup\n",
+          "style" => "-",
+          "text" => "added \"report-port\" to replication slave setup"
+        }
+      ],
+      "line" => 535,
+      "note" => "15-Mar-2009",
+      "raw" => "2.0.17 15-Mar-2009\n",
+      "version" => "2.0.17"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 540,
+          "raw" => "\t- added 'copy' option to sbtool, to clone a sandbox data directory into another.\n",
+          "style" => "-",
+          "text" => "added 'copy' option to sbtool, to clone a sandbox data directory into another."
+        }
+      ],
+      "line" => 539,
+      "note" => "14-Mar-2009",
+      "raw" => "2.0.16 14-Mar-2009\n",
+      "version" => "2.0.16"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 542,
+          "raw" => "\t- added \"report-host\" option to slave creation\n",
+          "style" => "-",
+          "text" => "added \"report-host\" option to slave creation"
+        },
+        {
+          "line" => 543,
+          "raw" => "\t- fixed server_id for values larger than 10. Instead of folding from 109\n\t  to 100, it was doing 109 to 1010.\n",
+          "style" => "-",
+          "text" => "fixed server_id for values larger than 10. Instead of folding from 109 to 100, it was doing 109 to 1010."
+        }
+      ],
+      "line" => 541,
+      "note" => "09-Mar-2009",
+      "raw" => "2.0.15 09-Mar-2009\n",
+      "version" => "2.0.15"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 546,
+          "raw" => "\t- added sbtool, a multi purpose program to do administrative tasks\n\t  with the sandbox. Supported operations: port list, replication tree,\n\t  moving single and multiple sandboxes\n",
+          "style" => "-",
+          "text" => "added sbtool, a multi purpose program to do administrative tasks with the sandbox. Supported operations: port list, replication tree, moving single and multiple sandboxes"
+        }
+      ],
+      "line" => 545,
+      "note" => "19-Feb-2009",
+      "raw" => "2.0.15 19-Feb-2009\n",
+      "version" => "2.0.15"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 550,
+          "raw" => "\t- added code to the \"clear\" script to truncate the table logs if they\n\t  exist\n",
+          "style" => "-",
+          "text" => "added code to the \"clear\" script to truncate the table logs if they exist"
+        },
+        {
+          "line" => 552,
+          "raw" => "\t- improved error messages when using wrong directories or tarballs\n",
+          "style" => "-",
+          "text" => "improved error messages when using wrong directories or tarballs"
+        },
+        {
+          "line" => 553,
+          "raw" => "\t- added a \"change_paths\" script to change the sandbox paths quickly\n\t  when moving the sandbox to a new location.\n",
+          "style" => "-",
+          "text" => "added a \"change_paths\" script to change the sandbox paths quickly when moving the sandbox to a new location."
+        }
+      ],
+      "line" => 549,
+      "note" => "08-Feb-2009",
+      "raw" => "2.0.14 08-Feb-2009\n",
+      "version" => "2.0.14"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 556,
+          "raw" => "\t- added parameters to \"start\" and \"restart\" scripts. If you pass an option,\n\t  it will be passed directly to mysqld_safe. e.g. \"start --log=mylog.log\"\n",
+          "style" => "-",
+          "text" => "added parameters to \"start\" and \"restart\" scripts. If you pass an option, it will be passed directly to mysqld_safe. e.g. \"start --log=mylog.log\""
+        },
+        {
+          "line" => 558,
+          "raw" => "\t- fixed bug in test_sandbox.pl. Using \"ls -d /path/*/\" doesn't work on\n\t  Solaris. Replaced with a more robust routine.\n",
+          "style" => "-",
+          "text" => "fixed bug in test_sandbox.pl. Using \"ls -d /path/*/\" doesn't work on Solaris. Replaced with a more robust routine."
+        },
+        {
+          "line" => 560,
+          "raw" => "\t- Allow the unpacking of tarballs to work on Solaris if \"gtar\" is found.\n",
+          "style" => "-",
+          "text" => "Allow the unpacking of tarballs to work on Solaris if \"gtar\" is found."
+        }
+      ],
+      "line" => 555,
+      "note" => "27-Jan-2009",
+      "raw" => "2.0.13 27-Jan-2009\n",
+      "version" => "2.0.13"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 562,
+          "raw" => "\t- Fixed small bug in 'clear' script. When the server is not responsive,\n\t  it was calling the wrong 'kill' script\n",
+          "style" => "-",
+          "text" => "Fixed small bug in 'clear' script. When the server is not responsive, it was calling the wrong 'kill' script"
+        },
+        {
+          "line" => 564,
+          "raw" => "\t- Applied Greg Haase patch to fix a bug in --datadir_from=dir:xxxx\n",
+          "style" => "-",
+          "text" => "Applied Greg Haase patch to fix a bug in --datadir_from=dir:xxxx"
+        }
+      ],
+      "line" => 561,
+      "note" => "16-Oct-2008",
+      "raw" => "2.0.12 16-Oct-2008\n",
+      "version" => "2.0.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 566,
+          "raw" => "\t- Fixed bug#278394, \"character '-' in database names\" (added backticks to\n\t'clear' script)\n",
+          "style" => "-",
+          "text" => "Fixed bug#278394, \"character '-' in database names\" (added backticks to 'clear' script)"
+        },
+        {
+          "line" => 568,
+          "raw" => "\t- added a command to change read attributes inside expanded tarballs\n\t  to avoid a possible failure in MySQL test suite, should a user run it\n",
+          "style" => "-",
+          "text" => "added a command to change read attributes inside expanded tarballs to avoid a possible failure in MySQL test suite, should a user run it"
+        }
+      ],
+      "line" => 565,
+      "note" => "05-Oct-2008",
+      "raw" => "2.0.11 05-Oct-2008\n",
+      "version" => "2.0.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 571,
+          "raw" => "\t- fixed minor bug in make_multiple_sandbox and make_replication_sandbox\n\t  when passing additional parameters. No space were added at the end.\n\t  Further parameters were glued together, resulting in a startup error.\n",
+          "style" => "-",
+          "text" => "fixed minor bug in make_multiple_sandbox and make_replication_sandbox when passing additional parameters. No space were added at the end. Further parameters were glued together, resulting in a startup error."
+        },
+        {
+          "line" => 574,
+          "raw" => "\t- added NODE_OPTIONS to work in make_replication_sandbox (it adds options\n\t  to both MASTER_OPTIONS and SLAVE_OPTIONS)\n",
+          "style" => "-",
+          "text" => "added NODE_OPTIONS to work in make_replication_sandbox (it adds options to both MASTER_OPTIONS and SLAVE_OPTIONS)"
+        }
+      ],
+      "line" => 570,
+      "note" => "27-Aug-2008",
+      "raw" => "2.0.10 27-Aug-2008\n",
+      "version" => "2.0.10"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 578,
+              "raw" => "\t  - removed \"log-error\" from default file\n",
+              "style" => "-",
+              "text" => "removed \"log-error\" from default file"
+            },
+            {
+              "line" => 579,
+              "raw" => "\t  - added this option conditionally only if major version > 4\n",
+              "style" => "-",
+              "text" => "added this option conditionally only if major version > 4"
+            }
+          ],
+          "line" => 577,
+          "raw" => "\t- fixed bug#260265 \"installation fails with log-error option and version < 5\"\n",
+          "style" => "-",
+          "text" => "fixed bug#260265 \"installation fails with log-error option and version < 5\""
+        }
+      ],
+      "line" => 576,
+      "note" => "22-Aug-2008",
+      "raw" => "2.0.9 22-Aug-2008\n",
+      "version" => "2.0.9"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 581,
+          "raw" => "\t- fixed problem with \"~\" not being expanded as \$HOME\n",
+          "style" => "-",
+          "text" => "fixed problem with \"~\" not being expanded as \$HOME"
+        },
+        {
+          "line" => 582,
+          "raw" => "\t- fixed problem with not existent path for tarball\n",
+          "style" => "-",
+          "text" => "fixed problem with not existent path for tarball"
+        },
+        {
+          "line" => 583,
+          "raw" => "\t- fixed bug#258523 Mysql Sandbox looks for tar.gz in wrong location\n\t  in make_replication_sandbox, make_sandbox, make_multiple_sandbox,\n\t  make_multiple_custom_sandbox, and in the test suite\n",
+          "style" => "-",
+          "text" => "fixed bug#258523 Mysql Sandbox looks for tar.gz in wrong location in make_replication_sandbox, make_sandbox, make_multiple_sandbox, make_multiple_custom_sandbox, and in the test suite"
+        },
+        {
+          "line" => 586,
+          "raw" => "\t- fixed minor problem in MyScripts.pm. log-slow-queries was misspelled,\n\t  although commented.\n",
+          "style" => "-",
+          "text" => "fixed minor problem in MyScripts.pm. log-slow-queries was misspelled, although commented."
+        }
+      ],
+      "line" => 580,
+      "note" => "16-Aug-2008",
+      "raw" => "2.0.8 16-Aug-2008\n",
+      "version" => "2.0.8"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 589,
+          "raw" => "\t- added shortcut option \"--circular=N\" to make_replication_sandbox\n\t  corresponding to \"--topology=circular --how_many_nodes=N\"\n",
+          "style" => "-",
+          "text" => "added shortcut option \"--circular=N\" to make_replication_sandbox corresponding to \"--topology=circular --how_many_nodes=N\""
+        },
+        {
+          "line" => 591,
+          "raw" => "\t- added Falcon creation to smoke test (if version >= 6)\n",
+          "style" => "-",
+          "text" => "added Falcon creation to smoke test (if version >= 6)"
+        }
+      ],
+      "line" => 588,
+      "note" => "06-Aug-2008",
+      "raw" => "2.0.7 06-Aug-2008\n",
+      "version" => "2.0.7"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 593,
+          "raw" => "\t- added \"check_slaves\" script to replication sandboxes\n",
+          "style" => "-",
+          "text" => "added \"check_slaves\" script to replication sandboxes"
+        }
+      ],
+      "line" => 592,
+      "note" => "20-Jul-2008",
+      "raw" => "2.0.6 20-Jul-2008\n",
+      "version" => "2.0.6"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 595,
+          "raw" => "\t- added named error log to configuration file\n",
+          "style" => "-",
+          "text" => "added named error log to configuration file"
+        },
+        {
+          "line" => 596,
+          "raw" => "\t- add removal of *.err-old files in \"clear\" script\n",
+          "style" => "-",
+          "text" => "add removal of *.err-old files in \"clear\" script"
+        },
+        {
+          "line" => 597,
+          "raw" => "\t- Fixed bug in circular replication. Unnecessary initialization\n\t  after stop_all. Added the same check used in standard replication\n",
+          "style" => "-",
+          "text" => "Fixed bug in circular replication. Unnecessary initialization after stop_all. Added the same check used in standard replication"
+        },
+        {
+          "line" => 599,
+          "raw" => "\t- fixed bug in circular replication. start_all and\n\t  set_circular_replication.sh were not stopping and starting the\n\t  slaves in the righ order.\n",
+          "style" => "-",
+          "text" => "fixed bug in circular replication. start_all and set_circular_replication.sh were not stopping and starting the slaves in the righ order."
+        },
+        {
+          "line" => 602,
+          "raw" => "\t- improved 'stop' script. If the server is a slave, calls \"stop slave\"\n\t  before closing down.\n",
+          "style" => "-",
+          "text" => "improved 'stop' script. If the server is a slave, calls \"stop slave\" before closing down."
+        }
+      ],
+      "line" => 594,
+      "note" => "14-Jul-2008",
+      "raw" => "2.0.5 14-Jul-2008\n",
+      "version" => "2.0.5"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 605,
+          "raw" => "\t- fixed bug in test suite. Parameter passing to check routine \n",
+          "style" => "-",
+          "text" => "fixed bug in test suite. Parameter passing to check routine"
+        },
+        {
+          "line" => 606,
+          "raw" => "      was often failing on negative tests. Added subroutine prototype\n\t  to fix the problem.\n",
+          "style" => "",
+          "text" => "was often failing on negative tests. Added subroutine prototype to fix the problem."
+        }
+      ],
+      "line" => 604,
+      "note" => "12-Jul-2008",
+      "raw" => "2.0.4 12-Jul-2008\n",
+      "version" => "2.0.4"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 610,
+              "raw" => "\t  - fixed race condition while checking the pid file\n",
+              "style" => "-",
+              "text" => "fixed race condition while checking the pid file"
+            },
+            {
+              "line" => 611,
+              "raw" => "\t  - added cleanup of extracted binary with smoke test\n",
+              "style" => "-",
+              "text" => "added cleanup of extracted binary with smoke test"
+            },
+            {
+              "line" => 612,
+              "raw" => "\t  - added stricter check for InnoDB tables\n",
+              "style" => "-",
+              "text" => "added stricter check for InnoDB tables"
+            }
+          ],
+          "line" => 609,
+          "raw" => "\t- Fixed smoke test bugs in test suite.\n",
+          "style" => "-",
+          "text" => "Fixed smoke test bugs in test suite."
+        },
+        {
+          "line" => 613,
+          "raw" => "\t- added some replication tests to test suite\n",
+          "style" => "-",
+          "text" => "added some replication tests to test suite"
+        }
+      ],
+      "line" => 608,
+      "note" => "12-Jul-2008",
+      "raw" => "2.0.3 12-Jul-2008\n",
+      "version" => "2.0.3"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 616,
+              "raw" => "\t  - When started with --force and --load grants, it said that it \n\t    failed to comply. In fact, the grants were already loaded.\n",
+              "style" => "-",
+              "text" => "When started with --force and --load grants, it said that it failed to comply. In fact, the grants were already loaded."
+            },
+            {
+              "line" => 618,
+              "raw" => "\t  - when started with --force, it invokes \$sandbox_dir/start\n\t    without checking if such script exists\n",
+              "style" => "-",
+              "text" => "when started with --force, it invokes \$sandbox_dir/start without checking if such script exists"
+            }
+          ],
+          "line" => 615,
+          "raw" => "\t- Fixed minor bugs in low_level_make_sandbox. \n",
+          "style" => "-",
+          "text" => "Fixed minor bugs in low_level_make_sandbox."
+        }
+      ],
+      "line" => 614,
+      "note" => "6-Jul-2008",
+      "raw" => "2.0.2 6-Jul-2008\n",
+      "version" => "2.0.2"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 621,
+          "raw" => "\t- fixed minor bug on test suite. It fails on Solaris with \"ps -ea\". Changed\n\t  to \"ps -ef\"\n",
+          "style" => "-",
+          "text" => "fixed minor bug on test suite. It fails on Solaris with \"ps -ea\". Changed to \"ps -ef\""
+        },
+        {
+          "line" => 623,
+          "raw" => "\t- added README.wiki\n",
+          "style" => "-",
+          "text" => "added README.wiki"
+        },
+        {
+          "line" => 624,
+          "raw" => "\t- added \"smoke\" test to test suite\n",
+          "style" => "-",
+          "text" => "added \"smoke\" test to test suite"
+        },
+        {
+          "line" => 625,
+          "raw" => "\t- added --no_confirm to all single sandbox testing\n",
+          "style" => "-",
+          "text" => "added --no_confirm to all single sandbox testing"
+        }
+      ],
+      "line" => 620,
+      "note" => "5-Jul-2008",
+      "raw" => "2.0.1 5-Jul-2008\n",
+      "version" => "2.0.1"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 627,
+          "raw" => "\t- fixed minor bug in generated scripts. Removed bash-specific operator\n\t\"==\"\n",
+          "style" => "-",
+          "text" => "fixed minor bug in generated scripts. Removed bash-specific operator \"==\""
+        }
+      ],
+      "line" => 626,
+      "note" => "2-Jul-2008",
+      "raw" => "2.0.0 2-Jul-2008\n",
+      "version" => "2.0.0"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 630,
+          "raw" => "\t- Fixed bug in test suite. Process count was not taking into account the\n\t  pre-test processes.\n",
+          "style" => "-",
+          "text" => "Fixed bug in test suite. Process count was not taking into account the pre-test processes."
+        },
+        {
+          "line" => 632,
+          "raw" => "\t- Fixed bug in test suite. Portability. ps was being used with non\n\t  portable options.\n",
+          "style" => "-",
+          "text" => "Fixed bug in test suite. Portability. ps was being used with non portable options."
+        },
+        {
+          "entries" => [
+            {
+              "line" => 635,
+              "raw" => "\t- added \$SANDBOX_BINARY environment variable, to replace default\n \t  \$HOME/opt/mysql\n",
+              "style" => "-",
+              "text" => "added \$SANDBOX_BINARY environment variable, to replace default \$HOME/opt/mysql"
+            },
+            {
+              "line" => 637,
+              "raw" => "\t- fixed error message of make_sandbox when invoked without options\n",
+              "style" => "-",
+              "text" => "fixed error message of make_sandbox when invoked without options"
+            },
+            {
+              "line" => 638,
+              "raw" => "\t- added a check in make_sandbox to make sure that we are using GNU tar.\n",
+              "style" => "-",
+              "text" => "added a check in make_sandbox to make sure that we are using GNU tar."
+            }
+          ],
+          "line" => 634,
+          "raw" => "    - added --prompt_body option to low_level_make_sandbox\n",
+          "style" => "-",
+          "text" => "added --prompt_body option to low_level_make_sandbox"
+        }
+      ],
+      "line" => 629,
+      "note" => "1-Jul-2008",
+      "raw" => "1.99.10 1-Jul-2008\n",
+      "version" => "1.99.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 640,
+          "raw" => "\t- Fixed bug #244236 (low_level_make_sandbox accepts unnecessary arguments)\n",
+          "style" => "-",
+          "text" => "Fixed bug #244236 (low_level_make_sandbox accepts unnecessary arguments)"
+        },
+        {
+          "line" => 641,
+          "raw" => "\t- Fixed bug in low_level_make_sandbox. sandbox_home was not checked\n\t  for correctness. It is a simple name, and it should not accept \n\t  full paths.\n",
+          "style" => "-",
+          "text" => "Fixed bug in low_level_make_sandbox. sandbox_home was not checked for correctness. It is a simple name, and it should not accept full paths."
+        },
+        {
+          "line" => 644,
+          "raw" => "\t- INCOMPATIBLE CHANGE\n\t  home_directory was not supposed to be home. Its name is misleading, and\n\t  thus it was changed to upper_directory.\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE home_directory was not supposed to be home. Its name is misleading, and thus it was changed to upper_directory."
+        },
+        {
+          "line" => 647,
+          "raw" => "\t- Fixed typos in README\n",
+          "style" => "-",
+          "text" => "Fixed typos in README"
+        },
+        {
+          "line" => 648,
+          "raw" => "\t- Initial fix for bug #239630 (possible failure on non-GNU tar)\n",
+          "style" => "-",
+          "text" => "Initial fix for bug #239630 (possible failure on non-GNU tar)"
+        },
+        {
+          "line" => 649,
+          "raw" => "\t- fixed script names in \"sandbox\" script\n",
+          "style" => "-",
+          "text" => "fixed script names in \"sandbox\" script"
+        },
+        {
+          "line" => 650,
+          "raw" => "    - (Thanks to John Embretsen for most of the reports on today's changes)\n",
+          "style" => "-",
+          "text" => "(Thanks to John Embretsen for most of the reports on today's changes)"
+        }
+      ],
+      "line" => 639,
+      "note" => "30-Jun-2008",
+      "raw" => "1.99.9 30-Jun-2008\n",
+      "version" => "1.99.9"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 652,
+          "raw" => "\t- INCOMPATIBLE CHANGE\n\t  \$HOME/sandboxes is now the default SANDBOX_HOME, which users\n\t  however can override.\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE \$HOME/sandboxes is now the default SANDBOX_HOME, which users however can override."
+        },
+        {
+          "line" => 655,
+          "raw" => "\t- INCOMPATIBLE CHANGE\n\t  \"multi_cmd\" was renamed \"use_all\" for name consistency\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE \"multi_cmd\" was renamed \"use_all\" for name consistency"
+        },
+        {
+          "line" => 657,
+          "raw" => "\t- added a call to low_level_make_sandbox --help when \n\t  make_sandbox is invoked without the proper syntax.\n",
+          "style" => "-",
+          "text" => "added a call to low_level_make_sandbox --help when make_sandbox is invoked without the proper syntax."
+        },
+        {
+          "line" => 659,
+          "raw" => "\t- README has been completely rewritten\n",
+          "style" => "-",
+          "text" => "README has been completely rewritten"
+        },
+        {
+          "line" => 660,
+          "raw" => "\t- added a ./docs directory with the README.pod source for README\n",
+          "style" => "-",
+          "text" => "added a ./docs directory with the README.pod source for README"
+        },
+        {
+          "line" => 661,
+          "raw" => "\t- added POD to ./sandbox script, to show the documentation\n\t  when called as \"./sandbox manual|help\"\n",
+          "style" => "-",
+          "text" => "added POD to ./sandbox script, to show the documentation when called as \"./sandbox manual|help\""
+        }
+      ],
+      "line" => 651,
+      "note" => "29-Jun-2008",
+      "raw" => "1.99.8 29-Jun-2008\n",
+      "version" => "1.99.8"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 664,
+          "raw" => "\t- added configurable options for test suite\n\t  users can now choose which versions and which tests to run\n\t  from the command line\n",
+          "style" => "-",
+          "text" => "added configurable options for test suite users can now choose which versions and which tests to run from the command line"
+        },
+        {
+          "line" => 667,
+          "raw" => "\t- removed deprecated test_sandbox.sh\n",
+          "style" => "-",
+          "text" => "removed deprecated test_sandbox.sh"
+        },
+        {
+          "line" => 668,
+          "raw" => "\t- moved test suite to ./tests directory\n",
+          "style" => "-",
+          "text" => "moved test suite to ./tests directory"
+        },
+        {
+          "line" => 669,
+          "raw" => "\t- added tests/README\n",
+          "style" => "-",
+          "text" => "added tests/README"
+        },
+        {
+          "line" => 670,
+          "raw" => "\t- improved \"stop\" script by combining it with the \"kill\" script\n",
+          "style" => "-",
+          "text" => "improved \"stop\" script by combining it with the \"kill\" script"
+        },
+        {
+          "line" => 671,
+          "raw" => "\t- adjusted make_dist script to use the ./test directory\n",
+          "style" => "-",
+          "text" => "adjusted make_dist script to use the ./test directory"
+        },
+        {
+          "line" => 672,
+          "raw" => "\t- improved test suite with the ability of running from one or more\n\t  tarballs instead of the default directories ([\$HOME]/opt/mysql)\n",
+          "style" => "-",
+          "text" => "improved test suite with the ability of running from one or more tarballs instead of the default directories ([\$HOME]/opt/mysql)"
+        }
+      ],
+      "line" => 663,
+      "note" => "28-Jun-2008",
+      "raw" => "1.99.7 28-Jun-2008\n",
+      "version" => "1.99.7"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 675,
+          "raw" => "\t- enhanced the \"clear\" script. Now it removes all databases form the\n\t  data directory, first trying via SQL, then using the OS.\n",
+          "style" => "-",
+          "text" => "enhanced the \"clear\" script. Now it removes all databases form the data directory, first trying via SQL, then using the OS."
+        },
+        {
+          "line" => 677,
+          "raw" => "\t- added tests to the test suite to check on this feature\n",
+          "style" => "-",
+          "text" => "added tests to the test suite to check on this feature"
+        }
+      ],
+      "line" => 674,
+      "note" => "28-Jun-2008",
+      "raw" => "1.99.6 28-Jun-2008\n",
+      "version" => "1.99.6"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 679,
+          "raw" => "\t- INCOMPATIBLE CHANGE\n\t  make_sandbox renamed low_level_make_sandbox\n\t  easy_sandbox renamed make_sandbox\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE make_sandbox renamed low_level_make_sandbox easy_sandbox renamed make_sandbox"
+        },
+        {
+          "line" => 682,
+          "raw" => "\t- fixed bug in make_replication_sandbox (base port was not isolated)\n",
+          "style" => "-",
+          "text" => "fixed bug in make_replication_sandbox (base port was not isolated)"
+        },
+        {
+          "line" => 683,
+          "raw" => "\t- added test for circular replication\n",
+          "style" => "-",
+          "text" => "added test for circular replication"
+        },
+        {
+          "line" => 684,
+          "raw" => "\t- improved testing for number of processes in the test suite\n",
+          "style" => "-",
+          "text" => "improved testing for number of processes in the test suite"
+        },
+        {
+          "line" => 685,
+          "raw" => "\t- added circular replication features to make_multiple_sandbox \n\t  with options --master_master and --circular (this should not be\n\t  used directly)\n",
+          "style" => "-",
+          "text" => "added circular replication features to make_multiple_sandbox with options --master_master and --circular (this should not be used directly)"
+        },
+        {
+          "line" => 688,
+          "raw" => "\t- added circular replication features to make_replication_sandbox\n\t  with options --master_master and --topology={standard|circular} .\n\t  This feature uses make_multiple_sandbox internally. \n",
+          "style" => "-",
+          "text" => "added circular replication features to make_replication_sandbox with options --master_master and --topology={standard|circular} . This feature uses make_multiple_sandbox internally."
+        },
+        {
+          "line" => 691,
+          "raw" => "\t- circular replication uses a separate directory name and port\n",
+          "style" => "-",
+          "text" => "circular replication uses a separate directory name and port"
+        },
+        {
+          "line" => 692,
+          "raw" => "\t- fixed bug in make_multiple_sandbox. It did not use the \$SANDBOX_HOME\n\t  directory.\n",
+          "style" => "-",
+          "text" => "fixed bug in make_multiple_sandbox. It did not use the \$SANDBOX_HOME directory."
+        }
+      ],
+      "line" => 678,
+      "note" => "27-Jun-2008",
+      "raw" => "1.99.5 27-Jun-2008\n",
+      "version" => "1.99.5"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 695,
+          "raw" => "\t- added more extensive test suite in Perl \n",
+          "style" => "-",
+          "text" => "added more extensive test suite in Perl"
+        },
+        {
+          "line" => 696,
+          "raw" => "\t- fixed bug in make_multiple_custom_sandbox (install directory was not set\n\t  when calling easy_sandbox)\n",
+          "style" => "-",
+          "text" => "fixed bug in make_multiple_custom_sandbox (install directory was not set when calling easy_sandbox)"
+        }
+      ],
+      "line" => 694,
+      "note" => "21-Jun-2008",
+      "raw" => "1.99.4 21-Jun-2008\n",
+      "version" => "1.99.4"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 699,
+          "raw" => "\t- INCOMPATIBLE CHANGE\n\t  all Perl script names were changed to make them more intuitive\n\t\tinstall.pl -> make_sandbox\n\t\texpress_install.pl -> easy_sandbox\n\t\tset_replication.pl -> make_replication_sandbox\n\t\tset_many -> make_multiple_sandbox\n\t\tset_custom_many.pl -> make_multiple_custom_sandbox\n",
+          "style" => "-",
+          "text" => "INCOMPATIBLE CHANGE all Perl script names were changed to make them more intuitive install.pl -> make_sandbox express_install.pl -> easy_sandbox set_replication.pl -> make_replication_sandbox set_many -> make_multiple_sandbox set_custom_many.pl -> make_multiple_custom_sandbox"
+        },
+        {
+          "line" => 706,
+          "raw" => "\t- created a './sandbox' script that lists all applications and eventually\n\t  executes the one that is passed as argument\n",
+          "style" => "-",
+          "text" => "created a './sandbox' script that lists all applications and eventually executes the one that is passed as argument"
+        },
+        {
+          "line" => 708,
+          "raw" => "\t- mapped \"stop\" script to faster and safer \"kill\" script\n",
+          "style" => "-",
+          "text" => "mapped \"stop\" script to faster and safer \"kill\" script"
+        },
+        {
+          "line" => 709,
+          "raw" => "\t- replaced \"sleep 3\" with a loop + timeout in shell scripts\n",
+          "style" => "-",
+          "text" => "replaced \"sleep 3\" with a loop + timeout in shell scripts"
+        },
+        {
+          "line" => 710,
+          "raw" => "\t- removed \"sleep\" commands from Perl scripts\n",
+          "style" => "-",
+          "text" => "removed \"sleep\" commands from Perl scripts"
+        },
+        {
+          "line" => 711,
+          "raw" => "\t- fixed bug in get_help() : parse_options were not passed to the \$msb object\n",
+          "style" => "-",
+          "text" => "fixed bug in get_help() : parse_options were not passed to the \$msb object"
+        }
+      ],
+      "line" => 698,
+      "note" => "21-Jun-2008",
+      "raw" => "1.99.3 21-Jun-2008\n",
+      "version" => "1.99.3"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 713,
+          "raw" => "\t- fixed minor bug. mysql_install_db script in some cases is\n\t  found in the \"bin\" directory rather than \"scripts\"\n",
+          "style" => "-",
+          "text" => "fixed minor bug. mysql_install_db script in some cases is found in the \"bin\" directory rather than \"scripts\""
+        },
+        {
+          "line" => 715,
+          "raw" => "\t- added ability to log start operations into a log file\n",
+          "style" => "-",
+          "text" => "added ability to log start operations into a log file"
+        }
+      ],
+      "line" => 712,
+      "note" => "20-Jun-2008",
+      "raw" => "1.99.2 20-Jun-2008\n",
+      "version" => "1.99.2"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 717,
+          "raw" => "\t- added \"kill\" script to each sandbox\n",
+          "style" => "-",
+          "text" => "added \"kill\" script to each sandbox"
+        },
+        {
+          "line" => 718,
+          "raw" => "\t- replace call to \"stop\" with \"kill\" in \"clear\" script\n",
+          "style" => "-",
+          "text" => "replace call to \"stop\" with \"kill\" in \"clear\" script"
+        }
+      ],
+      "line" => 716,
+      "note" => "19-Jun-2008",
+      "raw" => "1.99.1 19-Jun-2008\n",
+      "version" => "1.99.1"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 720,
+          "raw" => "\t- Started new development branch for Sandbox 2.0\n",
+          "style" => "-",
+          "text" => "Started new development branch for Sandbox 2.0"
+        },
+        {
+          "line" => 721,
+          "raw" => "\t- added MySandbox.pm module, to use the same routines across scripts\n",
+          "style" => "-",
+          "text" => "added MySandbox.pm module, to use the same routines across scripts"
+        }
+      ],
+      "line" => 719,
+      "note" => "15-Jun-2008",
+      "raw" => "1.99.0 15-Jun-2008\n",
+      "version" => "1.99.0"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 723,
+          "raw" => "\t- added support for default options file (\$HOME/.msandboxrc)\n",
+          "style" => "-",
+          "text" => "added support for default options file (\$HOME/.msandboxrc)"
+        },
+        {
+          "line" => 724,
+          "raw" => "\t- fixed minor bug in set_replication.pl. Added #master to multi_cmd\n",
+          "style" => "-",
+          "text" => "fixed minor bug in set_replication.pl. Added #master to multi_cmd"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 726,
+              "raw" => "\t- fixed bug related to location of sample option files. The installer\n\t  was only looking under \"./support-files\" while recent packaging use\n\t  \"./share/mysql\"\n",
+              "style" => "-",
+              "text" => "fixed bug related to location of sample option files. The installer was only looking under \"./support-files\" while recent packaging use \"./share/mysql\""
+            }
+          ],
+          "line" => 725,
+          "raw" => "      output.\n",
+          "style" => "",
+          "text" => "output."
+        },
+        {
+          "entries" => [
+            {
+              "line" => 730,
+              "raw" => "\t- added the execution of a \"./clear\" command when \"--force\" was used\n\t  to avoid overwriting a running server.\n",
+              "style" => "-",
+              "text" => "added the execution of a \"./clear\" command when \"--force\" was used to avoid overwriting a running server."
+            },
+            {
+              "line" => 732,
+              "raw" => "\t- cleaned up current_changes to contain only not empty options\n",
+              "style" => "-",
+              "text" => "cleaned up current_changes to contain only not empty options"
+            },
+            {
+              "line" => 733,
+              "raw" => "\t- created a basic test suite (not in distribution yet, only in RCS)\n",
+              "style" => "-",
+              "text" => "created a basic test suite (not in distribution yet, only in RCS)"
+            }
+          ],
+          "line" => 729,
+          "raw" => "    - fixed Bug#240121, with a collision between my_file and replication.\n",
+          "style" => "-",
+          "text" => "fixed Bug#240121, with a collision between my_file and replication."
+        }
+      ],
+      "line" => 722,
+      "note" => "15-Jun-2008",
+      "raw" => "1.22 15-Jun-2008\n",
+      "version" => "1.22"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 735,
+          "raw" => "\t- added SANDBOX_HOME environmental variable to override \$HOME\n",
+          "style" => "-",
+          "text" => "added SANDBOX_HOME environmental variable to override \$HOME"
+        },
+        {
+          "line" => 736,
+          "raw" => "\t- default sandbox home is now \$HOME/sandboxes (if exists) or else\n\t  it is \$HOME, as before\n",
+          "style" => "-",
+          "text" => "default sandbox home is now \$HOME/sandboxes (if exists) or else it is \$HOME, as before"
+        },
+        {
+          "line" => 738,
+          "raw" => "\t- added scripts to start/stop/clear/use all sandboxes at once (if\n\t  \$SANDBOX_HOME != \$HOME)\n",
+          "style" => "-",
+          "text" => "added scripts to start/stop/clear/use all sandboxes at once (if \$SANDBOX_HOME != \$HOME)"
+        }
+      ],
+      "line" => 734,
+      "note" => "09-Jun-2008",
+      "raw" => "1.21 09-Jun-2008\n",
+      "version" => "1.21"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 741,
+          "raw" => "\t- Added set_custom_many.pl to install different versions of the server\n\t  in one go. (Thanks to Ronald Bradford for the idea)\n",
+          "style" => "-",
+          "text" => "Added set_custom_many.pl to install different versions of the server in one go. (Thanks to Ronald Bradford for the idea)"
+        },
+        {
+          "line" => 743,
+          "raw" => "\t- enhanced \"multi_cmd\" to say which server is running\n",
+          "style" => "-",
+          "text" => "enhanced \"multi_cmd\" to say which server is running"
+        },
+        {
+          "line" => 744,
+          "raw" => "\t- added support for MYCLIENT_OPTION user variable to pass\n\t  options to the client (./use and ./multi_cmd)\n",
+          "style" => "-",
+          "text" => "added support for MYCLIENT_OPTION user variable to pass options to the client (./use and ./multi_cmd)"
+        }
+      ],
+      "line" => 740,
+      "note" => "11-Apr-2008",
+      "raw" => "1.20 11-Apr-2008\n",
+      "version" => "1.20"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 747,
+          "raw" => "\t- changed installer files so that they can be called from \n\t  outside the installation directory.\n",
+          "style" => "-",
+          "text" => "changed installer files so that they can be called from outside the installation directory."
+        }
+      ],
+      "line" => 746,
+      "note" => "06-Apr-2008",
+      "raw" => "1.19 06-Apr-2008\n",
+      "version" => "1.19"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 750,
+          "raw" => "\t- Fixed bug in set_many and set_replication. Undefined group directory \n\t  when setting custom port\n",
+          "style" => "-",
+          "text" => "Fixed bug in set_many and set_replication. Undefined group directory when setting custom port"
+        },
+        {
+          "line" => 752,
+          "raw" => "\t- Added help to ./express_install\n",
+          "style" => "-",
+          "text" => "Added help to ./express_install"
+        }
+      ],
+      "line" => 749,
+      "note" => "02-Apr-2008",
+      "raw" => "1.18 02-Apr-2008 \n",
+      "version" => "1.18"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 754,
+          "raw" => "\t- fixed minor bug in \"clear: script. It did not remove subdirectories in\n\t  test db\n",
+          "style" => "-",
+          "text" => "fixed minor bug in \"clear: script. It did not remove subdirectories in test db"
+        },
+        {
+          "line" => 756,
+          "raw" => "\t- fixed minor bug on the choice od source dir. If \$HOME/opt/mysql exists,\n\t  it is preferred to /opt/mysql\n",
+          "style" => "-",
+          "text" => "fixed minor bug on the choice od source dir. If \$HOME/opt/mysql exists, it is preferred to /opt/mysql"
+        }
+      ],
+      "line" => 753,
+      "note" => "16-Mar-2008 (not released)",
+      "raw" => "1.17 16-Mar-2008 (not released)\n",
+      "version" => "1.17"
+    },
+    {
+      "entries" => [
+        {
+          "entries" => [
+            {
+              "line" => 760,
+              "raw" => "\t- added removal of general log files and falcon files with \n\t  the \"clear\" command.\n",
+              "style" => "-",
+              "text" => "added removal of general log files and falcon files with the \"clear\" command."
+            }
+          ],
+          "line" => 759,
+          "raw" => "    - added stronger check on the result of mysql_install_db.\n",
+          "style" => "-",
+          "text" => "added stronger check on the result of mysql_install_db."
+        }
+      ],
+      "line" => 758,
+      "note" => "04-Jan-2008 (not released)",
+      "raw" => "1.16 04-Jan-2008 (not released)\n",
+      "version" => "1.16"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 763,
+          "raw" => "\t- fixed bug in grants.mysql. Removed anonymous users \n\t  from mysql.db\n",
+          "style" => "-",
+          "text" => "fixed bug in grants.mysql. Removed anonymous users from mysql.db"
+        },
+        {
+          "line" => 765,
+          "raw" => "\t- added \$HOME/opt/mysql as possible default for binaries.\n",
+          "style" => "-",
+          "text" => "added \$HOME/opt/mysql as possible default for binaries."
+        },
+        {
+          "line" => 766,
+          "raw" => "\t- added proxy_start script to start a MySQL Proxy instance\n\t  using the sandboxed server\n\n",
+          "style" => "-",
+          "text" => "added proxy_start script to start a MySQL Proxy instance using the sandboxed server"
+        }
+      ],
+      "line" => 762,
+      "note" => "09-Dec-2007",
+      "raw" => "1.15 09-Dec-2007\n",
+      "version" => "1.15"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 770,
+          "raw" => "\t- added a set_many.pl command to create several servers\n\t  not in replication\n",
+          "style" => "-",
+          "text" => "added a set_many.pl command to create several servers not in replication"
+        },
+        {
+          "line" => 772,
+          "raw" => "\t- fixed bug in replication ports assignment. Two replication\n\t  systems using adjacent versions (e.g. 5.1.22 and 5.1.23) would\n\t  have clashing port numbers.\n\n",
+          "style" => "-",
+          "text" => "fixed bug in replication ports assignment. Two replication systems using adjacent versions (e.g. 5.1.22 and 5.1.23) would have clashing port numbers."
+        }
+      ],
+      "line" => 769,
+      "note" => "24-Oct-2007",
+      "raw" => "1.14 24-Oct-2007\n",
+      "version" => "1.14"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 777,
+          "raw" => "\t- (INCOMPATIBLE CHANGE) removed '.sh' suffix from all scripts\n",
+          "style" => "-",
+          "text" => "(INCOMPATIBLE CHANGE) removed '.sh' suffix from all scripts"
+        },
+        {
+          "line" => 778,
+          "raw" => "\t- added version differentiation to replication port and\n\t  directory. Instead of being always the same, now they \n\t  are based on the version number, unless modified by\n\t  the user.\n",
+          "style" => "-",
+          "text" => "added version differentiation to replication port and directory. Instead of being always the same, now they are based on the version number, unless modified by the user."
+        },
+        {
+          "line" => 782,
+          "raw" => "\t- added a multi_cmd script to the replication system,\n\t  to send a query to each node.\n",
+          "style" => "-",
+          "text" => "added a multi_cmd script to the replication system, to send a query to each node."
+        },
+        {
+          "line" => 784,
+          "raw" => "\t- added a 'my' script to call mysql* tools\n",
+          "style" => "-",
+          "text" => "added a 'my' script to call mysql* tools"
+        },
+        {
+          "line" => 785,
+          "raw" => "\t- fixed bug about using 6.0 binaries on Mac OS X (dynamic library\n\t  path requires a different environment variable)\n",
+          "style" => "-",
+          "text" => "fixed bug about using 6.0 binaries on Mac OS X (dynamic library path requires a different environment variable)"
+        },
+        {
+          "line" => 787,
+          "raw" => "\t- fixed bug in replication. After a \"clear_all\", the replication\n\t  did not start again. Added a \"initialize_slaves\" script that\n\t  get called by \"start_all\" if a clear_all was called.\n\n",
+          "style" => "-",
+          "text" => "fixed bug in replication. After a \"clear_all\", the replication did not start again. Added a \"initialize_slaves\" script that get called by \"start_all\" if a clear_all was called."
+        }
+      ],
+      "line" => 776,
+      "note" => "23-Oct-2007",
+      "raw" => "1.13 23-Oct-2007\n",
+      "version" => "1.13"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 792,
+          "raw" => "\t- hidden mysql_install_db output on successful execution\n",
+          "style" => "-",
+          "text" => "hidden mysql_install_db output on successful execution"
+        },
+        {
+          "line" => 793,
+          "raw" => "\t- fixed argument handling bug in replication scripts\n\n",
+          "style" => "-",
+          "text" => "fixed argument handling bug in replication scripts"
+        }
+      ],
+      "line" => 791,
+      "note" => "17-Oct-2007",
+      "raw" => "1.12 17-Oct-2007\n",
+      "version" => "1.12"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 796,
+          "raw" => "\t- all shell scripts are now created from install.pl (not copied)\n",
+          "style" => "-",
+          "text" => "all shell scripts are now created from install.pl (not copied)"
+        },
+        {
+          "line" => 797,
+          "raw" => "\t- changed default username, password, and sandbox directory name\n",
+          "style" => "-",
+          "text" => "changed default username, password, and sandbox directory name"
+        },
+        {
+          "line" => 798,
+          "raw" => "\t- forbid using a relative path of tarball\n\n",
+          "style" => "-",
+          "text" => "forbid using a relative path of tarball"
+        }
+      ],
+      "line" => 795,
+      "note" => "16-Oct-2007",
+      "raw" => "1.11 16-Oct-2007\n",
+      "version" => "1.11"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 801,
+          "raw" => "\t- fixed bug on mysql_install_db usage \n\n",
+          "style" => "-",
+          "text" => "fixed bug on mysql_install_db usage"
+        }
+      ],
+      "line" => 800,
+      "note" => "16-Oct-2007 (not released)",
+      "raw" => "1.10 16-Oct-2007 (not released)\n",
+      "version" => "1.10"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 804,
+          "raw" => "\t- deprecated the 'archive' method of installation and removed\n\t  the compressed data directories\n",
+          "style" => "-",
+          "text" => "deprecated the 'archive' method of installation and removed the compressed data directories"
+        },
+        {
+          "line" => 806,
+          "raw" => "\t- express_install can now expand a server tarball.\n",
+          "style" => "-",
+          "text" => "express_install can now expand a server tarball."
+        },
+        {
+          "line" => 807,
+          "raw" => "\t- added support for replicated servers (set_replication.pl)\n\t  using CHANGE MASTER TO rather than replication options\n",
+          "style" => "-",
+          "text" => "added support for replicated servers (set_replication.pl) using CHANGE MASTER TO rather than replication options"
+        },
+        {
+          "line" => 809,
+          "raw" => "\t- added 'load_grants' option to install.pl\n",
+          "style" => "-",
+          "text" => "added 'load_grants' option to install.pl"
+        },
+        {
+          "line" => 810,
+          "raw" => "\t- added 'prompt_prefix' option to install.pl\n",
+          "style" => "-",
+          "text" => "added 'prompt_prefix' option to install.pl"
+        },
+        {
+          "line" => 811,
+          "raw" => "\t- fixed bug about client library not being available due\n\t  to LD_LIBRARY_PATH not set\n\n",
+          "style" => "-",
+          "text" => "fixed bug about client library not being available due to LD_LIBRARY_PATH not set"
+        }
+      ],
+      "line" => 803,
+      "note" => "15-Oct-2007 (not released)",
+      "raw" => "1.9 15-Oct-2007 (not released)\n",
+      "version" => "1.9"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 815,
+          "raw" => "\t- Added support for MySQL 6.0\n\n",
+          "style" => "-",
+          "text" => "Added support for MySQL 6.0"
+        }
+      ],
+      "line" => 814,
+      "note" => "14-Sep-2007",
+      "raw" => "1.8 14-Sep-2007\n",
+      "version" => "1.8"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 818,
+          "raw" => "    - Added support for Mysql 5.2-alpha\n\n",
+          "style" => "-",
+          "text" => "Added support for Mysql 5.2-alpha"
+        }
+      ],
+      "line" => 817,
+      "note" => "05-Jul-2006 (not released)",
+      "raw" => "1.7 05-Jul-2006 (not released)\n",
+      "version" => "1.7"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 821,
+          "raw" => "    - Added 'my_clause' command line option to define my.cnf file parameters;\n",
+          "style" => "-",
+          "text" => "Added 'my_clause' command line option to define my.cnf file parameters;"
+        },
+        {
+          "line" => 822,
+          "raw" => "    - changed interactive routine to allow multi-item options;\n",
+          "style" => "-",
+          "text" => "changed interactive routine to allow multi-item options;"
+        },
+        {
+          "line" => 823,
+          "raw" => "    - changed the shell scripts to be less bash specific. the sandbox\n      should be now more cross-platform than before.\n      During the installation, if bash is not found, then tcsh is used.\n",
+          "style" => "-",
+          "text" => "changed the shell scripts to be less bash specific. the sandbox should be now more cross-platform than before. During the installation, if bash is not found, then tcsh is used."
+        },
+        {
+          "line" => 826,
+          "raw" => "    - new Tutorial available at http://datacharmer.org/#tutorials\n",
+          "style" => "-",
+          "text" => "new Tutorial available at http://datacharmer.org/#tutorials"
+        },
+        {
+          "entries" => [
+            {
+              "line" => 828,
+              "raw" => "        -- clear.sh was using \$HOME directory instead of _HOME_DIR_\n",
+              "style" => "--",
+              "text" => "clear.sh was using \$HOME directory instead of _HOME_DIR_"
+            },
+            {
+              "line" => 829,
+              "raw" => "        -- install_version calculated by express_install.pl could be lower\n           than 1024.\n",
+              "style" => "--",
+              "text" => "install_version calculated by express_install.pl could be lower than 1024."
+            },
+            {
+              "line" => 831,
+              "raw" => "        -- install_version was added twice when loading options from\n           'current_options.conf' (Thanks to Imran Chaudhry for reporting it)\n\n",
+              "style" => "--",
+              "text" => "install_version was added twice when loading options from 'current_options.conf' (Thanks to Imran Chaudhry for reporting it)"
+            }
+          ],
+          "line" => 827,
+          "raw" => "    - bugs fixed:\n",
+          "style" => "-",
+          "text" => "bugs fixed:"
+        }
+      ],
+      "line" => 820,
+      "note" => "27-May-2006",
+      "raw" => "1.6 27-May-2006\n",
+      "version" => "1.6"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 835,
+          "raw" => "    - added 'back' and 'quit' keywords in interactive mode\n",
+          "style" => "-",
+          "text" => "added 'back' and 'quit' keywords in interactive mode"
+        },
+        {
+          "line" => 836,
+          "raw" => "    - added express_install.pl, to install quickly from a binary package\n",
+          "style" => "-",
+          "text" => "added express_install.pl, to install quickly from a binary package"
+        },
+        {
+          "line" => 837,
+          "raw" => "    - Bug fixed. 'start.sh' and 'stop.sh' scripts where using\n\t  the actual \$HOME dorectory instead of the user's defined\n\t  _HOME_DIR_\n\n",
+          "style" => "-",
+          "text" => "Bug fixed. 'start.sh' and 'stop.sh' scripts where using the actual \$HOME dorectory instead of the user's defined _HOME_DIR_"
+        }
+      ],
+      "line" => 834,
+      "note" => "24-May-2006",
+      "raw" => "1.5 24-May-2006\n",
+      "version" => "1.5"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 842,
+          "raw" => "    - added support for 3.23, 4.0 and 4.1 installs\n",
+          "style" => "-",
+          "text" => "added support for 3.23, 4.0 and 4.1 installs"
+        },
+        {
+          "line" => 843,
+          "raw" => "    - default install is now 5.0\n",
+          "style" => "-",
+          "text" => "default install is now 5.0"
+        },
+        {
+          "line" => 844,
+          "raw" => "    - default addition of version to sandbox directory name\n",
+          "style" => "-",
+          "text" => "default addition of version to sandbox directory name"
+        },
+        {
+          "line" => 845,
+          "raw" => "    - added option \"no_ver_after_name\" to control the above change\n\n",
+          "style" => "-",
+          "text" => "added option \"no_ver_after_name\" to control the above change"
+        }
+      ],
+      "line" => 841,
+      "note" => "17-May-2006 (not released)",
+      "raw" => "1.4 17-May-2006 (not released)\n",
+      "version" => "1.4"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 848,
+          "raw" => "    - added \"interactive\" option to install through a sort of a wizard \n",
+          "style" => "-",
+          "text" => "added \"interactive\" option to install through a sort of a wizard"
+        },
+        {
+          "line" => 849,
+          "raw" => "    - added current_options.conf  to record the options used for installing\n",
+          "style" => "-",
+          "text" => "added current_options.conf  to record the options used for installing"
+        },
+        {
+          "line" => 850,
+          "raw" => "    - fix bug in configuration file\n\n",
+          "style" => "-",
+          "text" => "fix bug in configuration file"
+        }
+      ],
+      "line" => 847,
+      "note" => "05-May-2006",
+      "raw" => "1.3 05-May-2006\n",
+      "version" => "1.3"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 853,
+          "raw" => "    - minor bug fixes \n\n",
+          "style" => "-",
+          "text" => "minor bug fixes"
+        }
+      ],
+      "line" => 852,
+      "note" => "02-May-2006",
+      "raw" => "1.2 02-May-2006\n",
+      "version" => "1.2"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 856,
+          "raw" => "    - added multiple sources for data directory\n\n",
+          "style" => "-",
+          "text" => "added multiple sources for data directory"
+        }
+      ],
+      "line" => 855,
+      "note" => "19-Apr-2006",
+      "raw" => "1.1 19-Apr-2006\n",
+      "version" => "1.1"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 859,
+          "raw" => "    - initial release.\n",
+          "style" => "-",
+          "text" => "initial release."
+        }
+      ],
+      "line" => 858,
+      "note" => "18-Apr-2006",
+      "raw" => "1.0 18-Apr-2006\n",
+      "version" => "1.0"
+    }
+  ]
+}

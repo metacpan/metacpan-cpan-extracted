@@ -1,5 +1,12 @@
 Revision history for Music-MelodicDevice-Transposition
 
+0.0601 2023-10-25 16:42:50
+    - Improve documentation.
+    - Improve tests a bit.
+
+0.0600 2023-10-25 16:16:38
+    - Add (and default to) a notes list attribute.
+
 0.0502 2022-06-16 21:12:32
     - Use Music::PitchNum instead of Music::Note.
 

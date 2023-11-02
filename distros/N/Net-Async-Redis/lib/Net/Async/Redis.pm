@@ -9,7 +9,7 @@ use parent qw(
     IO::Async::Notifier
 );
 
-our $VERSION = '4.001';
+our $VERSION = '4.002';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -1153,14 +1153,15 @@ Called when the socket is closed.
 
 sub notify_close {
     my ($self) = @_;
+    # Also clear our connection future so that the next request is triggered appropriately
+    my $conn = delete $self->{connection};
+    $self->{connection}->fail if $self->{connection} and not $self->{connection}->is_ready;
+
     # If we think we have an existing connection, it needs removing:
     # there's no guarantee that it's in a usable state.
     if(my $stream = delete $self->{stream}) {
         $stream->close_now;
     }
-
-    # Also clear our connection future so that the next request is triggered appropriately
-    delete $self->{connection};
 
     # Clear out anything in the pending queue - we normally wouldn't expect anything to
     # have ready status here, but no sense failing on a failure. Note that we aren't

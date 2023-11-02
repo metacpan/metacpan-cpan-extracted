@@ -1,0 +1,9 @@
+Revision history for Dist-Zilla-App-Command-podpreview
+
+        * fixed use of smartmatch (warns as experimental in 5.18) (ether)
+
+0.002   01/04/2011
+        * Fix error in pod
+
+0.001   01/04/2011
+        * Initial upload to CPAN

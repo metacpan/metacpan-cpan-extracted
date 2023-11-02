@@ -1,18 +1,23 @@
 package App::Oozie::Deploy::Validate::Spec::Coordinator;
-$App::Oozie::Deploy::Validate::Spec::Coordinator::VERSION = '0.010';
+
 use 5.014;
 use strict;
 use warnings;
+
+our $VERSION = '0.015'; # VERSION
+
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
 use Moo;
 use MooX::Options;
 use List::MoreUtils qw( uniq );
 use App::Oozie::Types::Common qw( IsFile );
+use App::Oozie::Constants qw( EMPTY_STRING );
 
 with qw(
     App::Oozie::Role::Log
     App::Oozie::Role::Fields::Generic
+    App::Oozie::Role::Validate::XML
 );
 
 sub verify {
@@ -52,8 +57,14 @@ sub verify {
             my($h, $key) = @_;
             return if $key ne 'property';
 
+            $self->validate_xml_property(
+                \$validation_errors,
+                \$total_errors,
+                $h->{property},
+            );
+
             for my $property ( @{ $h->{property} } ) {
-              my $property_name = defined($property->{name})? $property->{name} : "";
+              my $property_name = defined($property->{name})? $property->{name} : EMPTY_STRING;
               #if ($property_name eq 'startDate' || $property_name eq 'endDate') {
               if (exists $blacklist{$property_name}) {
                  push @restricted_properties, $h->{$key};
@@ -100,7 +111,7 @@ App::Oozie::Deploy::Validate::Spec::Coordinator
 
 =head1 VERSION
 
-version 0.010
+version 0.015
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package Test::Smoke::Util::Execute;
 use warnings;
 use strict;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Cwd;
 
@@ -61,6 +61,36 @@ sub new {
     return bless $self, $class;
 }
 
+=head2 $executer->full_command()
+
+Create the full command as pass to C<qx()>.
+
+=head3 Arguments
+
+None
+
+=head3 Returns
+
+A string with quotes around the elements/arguments that need them.
+
+=cut
+
+sub full_command {
+    my $self = shift;
+
+    my $command = join(
+        " ",
+        map {
+            /^(["'])(.*)\1$/
+                ? qq/"$2"/
+                : /\s/
+                    ? qq/"$_"/
+                    : $_
+        } $self->{command}, $self->arguments(@_)
+    );
+    return $command;
+}
+
 =head2 $executer->run()
 
 Run the command with backticks.
@@ -80,12 +110,7 @@ If any error occured, C<< $self->exitcode >> is set.
 sub run {
     my $self = shift;
 
-    my $command = join(
-        " ",
-        map {
-            / / ? qq/"$_"/ : $_
-        } $self->{command}, $self->arguments(@_)
-    );
+    my $command = $self->full_command(@_);
     $self->log_debug("In pwd(%s) running:", cwd());
     $self->log_info("qx[%s]\n", $command);
 

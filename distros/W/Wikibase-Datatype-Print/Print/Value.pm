@@ -8,6 +8,7 @@ use Error::Pure qw(err);
 use Readonly;
 use Wikibase::Datatype::Print::Value::Globecoordinate;
 use Wikibase::Datatype::Print::Value::Item;
+use Wikibase::Datatype::Print::Value::Lexeme;
 use Wikibase::Datatype::Print::Value::Monolingual;
 use Wikibase::Datatype::Print::Value::Property;
 use Wikibase::Datatype::Print::Value::Quantity;
@@ -17,7 +18,7 @@ use Wikibase::Datatype::Print::Value::Time;
 
 Readonly::Array our @EXPORT_OK => qw(print);
 
-our $VERSION = 0.13;
+our $VERSION = 0.16;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -32,6 +33,8 @@ sub print {
 		$ret = Wikibase::Datatype::Print::Value::Globecoordinate::print($obj, $opts_hr);
 	} elsif ($type eq 'item') {
 		$ret = Wikibase::Datatype::Print::Value::Item::print($obj, $opts_hr);
+	} elsif ($type eq 'lexeme') {
+		$ret = Wikibase::Datatype::Print::Value::Lexeme::print($obj, $opts_hr);
 	} elsif ($type eq 'monolingualtext') {
 		$ret = Wikibase::Datatype::Print::Value::Monolingual::print($obj, $opts_hr);
 	} elsif ($type eq 'property') {
@@ -117,6 +120,7 @@ L<Exporter>,
 L<Readonly>,
 L<Wikibase::Datatype::Print::Value::Globecoordinate>,
 L<Wikibase::Datatype::Print::Value::Item>,
+L<Wikibase::Datatype::Print::Value::Lexeme>,
 L<Wikibase::Datatype::Print::Value::Monolingual>,
 L<Wikibase::Datatype::Print::Value::Property>,
 L<Wikibase::Datatype::Print::Value::Quantity>,
@@ -152,6 +156,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.13
+0.16
 
 =cut

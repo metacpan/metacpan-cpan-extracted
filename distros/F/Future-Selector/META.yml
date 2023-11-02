@@ -1,0 +1,28 @@
+---
+abstract: 'manage a collection of pending futures'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Future-Selector
+provides:
+  Future::Selector:
+    file: lib/Future/Selector.pm
+    version: '0.02'
+requires:
+  Future::AsyncAwait: '0'
+  Object::Pad: '0.800'
+  Scalar::Util: '0'
+  perl: '5.026'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

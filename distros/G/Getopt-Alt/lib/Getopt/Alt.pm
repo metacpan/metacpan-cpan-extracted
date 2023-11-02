@@ -9,9 +9,9 @@ package Getopt::Alt;
 use Moose;
 use warnings;
 use version;
-use Carp;
-use English qw/ -no_match_vars /;
-use List::Util qw/uniq/;
+use Carp                qw/longmess/;
+use English             qw/ -no_match_vars /;
+use List::Util          qw/uniq/;
 use Getopt::Alt::Option qw/build_option/;
 use Getopt::Alt::Exception;
 use Try::Tiny;
@@ -24,11 +24,9 @@ use overload (
     'bool' => sub { 1 },
 );
 
-Moose::Exporter->setup_import_methods(
-    as_is => [qw/get_options/],
-);
+Moose::Exporter->setup_import_methods( as_is => [qw/get_options/], );
 
-our $VERSION = version->new('0.5.4');
+our $VERSION = version->new('0.5.5');
 our $EXIT    = 1;
 
 has options => (
@@ -44,12 +42,12 @@ has opt => (
 has default => (
     is      => 'rw',
     isa     => 'HashRef',
-    default => sub {{}},
+    default => sub { {} },
 );
 has files => (
     is      => 'rw',
     isa     => 'ArrayRef[Str]',
-    default => sub {[]},
+    default => sub { [] },
 );
 has bundle => (
     is      => 'rw',
@@ -62,29 +60,29 @@ has ignore_case => (
     default => 1,
 );
 has help_package => (
-    is      => 'rw',
-    isa     => 'Str',
+    is  => 'rw',
+    isa => 'Str',
 );
 has help_packages => (
-    is      => 'rw',
-    isa     => 'HashRef[Str]',
+    is  => 'rw',
+    isa => 'HashRef[Str]',
 );
 has help_pre => (
-    is      => 'rw',
-    isa     => 'CodeRef',
+    is  => 'rw',
+    isa => 'CodeRef',
 );
 has help_post => (
-    is      => 'rw',
-    isa     => 'CodeRef',
+    is  => 'rw',
+    isa => 'CodeRef',
 );
 has helper => (
-    is      => 'rw',
-    isa     => 'Bool',
+    is  => 'rw',
+    isa => 'Bool',
 );
 has cmd => (
-    is      => 'rw',
-    isa     => 'Str',
-    clearer => 'clear_cmd',
+    is            => 'rw',
+    isa           => 'Str',
+    clearer       => 'clear_cmd',
     documentation => 'The found sub-command',
 );
 has sub_command => (
@@ -101,7 +99,7 @@ DOC
 has aliases => (
     is            => 'rw',
     isa           => 'HashRef[ArrayRef]',
-    default       => sub {{}},
+    default       => sub { {} },
     documentation => 'Stores the list of aliases sub-commands can have',
 );
 has default_sub_command => (
@@ -125,8 +123,8 @@ has name => (
     default => sub { path($0)->basename },
 );
 has config => (
-    is      => 'rw',
-    isa     => 'HashRef',
+    is        => 'rw',
+    isa       => 'HashRef',
     predicate => 'has_config',
 );
 has conf_prefix => (
@@ -135,17 +133,17 @@ has conf_prefix => (
     default => '.',
 );
 has conf_section => (
-    is      => 'rw',
-    isa     => 'Str',
+    is        => 'rw',
+    isa       => 'Str',
     predicate => 'has_conf_section',
 );
 
 my $count = 1;
 around BUILDARGS => sub {
-    my ($orig, $class, @params) = @_;
+    my ( $orig, $class, @params ) = @_;
     my %param;
 
-    if (ref $params[0] eq 'HASH' && ref $params[1] eq 'ARRAY') {
+    if ( ref $params[0] eq 'HASH' && ref $params[1] eq 'ARRAY' ) {
         %param  = %{ $params[0] };
         @params = @{ $params[1] };
     }
@@ -154,29 +152,27 @@ around BUILDARGS => sub {
     }
 
     if ( !exists $param{helper} || $param{helper} ) {
-        unshift @params, (
-            'help',
-            'man',
-            'version',
+        unshift @params,
+          (
+            'help', 'man', 'version',
             'auto_complete|auto-complete=i',
             'auto_complete_list|auto-complete-list!',
-        );
+          );
     }
 
-    if ( @params ) {
-        $param{options} = _build_option_class(
-            $param{options} || 'Getopt::Alt::Dynamic',
-            @params,
-        );
+    if (@params) {
+        $param{options} =
+          _build_option_class( $param{options} || 'Getopt::Alt::Dynamic',
+            @params, );
 
-        if (0 && $param{sub_command} && ref $param{sub_command} eq 'HASH') {
+        if ( 0 && $param{sub_command} && ref $param{sub_command} eq 'HASH' ) {
 
             # build up all the sub command options
-            for my $sub (keys %{ $param{sub_command} }) {
-                $param{sub_command}{$sub} = _build_option_class(
-                    $param{options},
+            for my $sub ( keys %{ $param{sub_command} } ) {
+                $param{sub_command}{$sub} =
+                  _build_option_class( $param{options},
                     $param{sub_command}{$sub},
-                );
+                  );
             }
         }
     }
@@ -185,17 +181,15 @@ around BUILDARGS => sub {
 };
 
 sub _build_option_class {
-    my ($base_class, @params) = @_;
+    my ( $base_class, @params ) = @_;
 
     # construct a class of options passing
     my $class_name = 'Getopt::Alt::Dynamic::A' . $count++;
-    my $option_class = Moose::Meta::Class->create(
-        $class_name,
-        superclasses => [ $base_class ],
-    );
+    my $option_class =
+      Moose::Meta::Class->create( $class_name, superclasses => [$base_class], );
 
     while ( my $option = shift @params ) {
-        build_option($option_class, $option);
+        build_option( $option_class, $option );
     }
 
     return $class_name;
@@ -206,27 +200,33 @@ sub BUILD {
 
     my $basename = $self->name;
     my $prefix   = $self->conf_prefix;
-    my $conf = Config::Any->load_stems({
-        stems   => [
-            "$prefix$basename",
-            File::HomeDir->my_home . "/$prefix$basename", "/etc/$basename",
-        ],
-        use_ext => 1,
-    });
+    my $conf     = eval {
+        Config::Any->load_stems(
+            {
+                stems => [
+                    "$prefix$basename",
+                    File::HomeDir->my_home . "/$prefix$basename",
+                    "/etc/$basename",
+                ],
+                use_ext => 1,
+            }
+        );
+    } || [];
 
     $conf = {
-        map { %$_ }
-        map { values %$_    }
-        reverse @{ $conf }
+        map   { %$_ }
+          map { values %$_ }
+          reverse @{$conf}
     };
 
-    # perlcritic is confused here combining hashes is not the same as comma separated arguments
-    $self->default({ %{$self->default}, %$conf, });  ## no critic
+# perlcritic is confused here combining hashes is not the same as comma separated arguments
+    $self->default( { %{ $self->default }, %$conf, } );    ## no critic
     $self->config($conf);
 
-    if ($conf->{aliases}) {
-        for my $alias (keys %{ $conf->{aliases} }) {
-            $self->aliases->{$alias} = [ split /\s+/xms, $conf->{aliases}{$alias} ];
+    if ( $conf->{aliases} ) {
+        for my $alias ( keys %{ $conf->{aliases} } ) {
+            $self->aliases->{$alias} =
+              [ split /\s+/xms, $conf->{aliases}{$alias} ];
         }
     }
 
@@ -234,19 +234,20 @@ sub BUILD {
 }
 
 sub get_options {
-    my @args = @_;
+    my @args   = @_;
     my $caller = caller;
 
     if ( @args > 2 && ref $args[0] eq 'HASH' && ref $args[1] ne 'ARRAY' ) {
         my $options = shift @args;
-        @args = ( { default => $options}, [ @args ] );
+        @args = ( { default => $options }, [@args] );
     }
 
     my $self;
     try {
         $self = __PACKAGE__->new(@args);
 
-        $self->help_package($caller) if !$self->help_package || $self->help_package eq __PACKAGE__;
+        $self->help_package($caller)
+          if !$self->help_package || $self->help_package eq __PACKAGE__;
 
         $self->process();
     }
@@ -258,7 +259,8 @@ sub get_options {
         warn $_;
         $self = __PACKAGE__->new();
 
-        $self->help_package($caller) if !$self->help_package || $self->help_package eq __PACKAGE__;
+        $self->help_package($caller)
+          if !$self->help_package || $self->help_package eq __PACKAGE__;
 
         $self->_show_help(1);
     };
@@ -269,43 +271,44 @@ sub get_options {
 }
 
 sub process {
-    my ($self, @args) = @_;
+    my ( $self, @args ) = @_;
     my $passed_args = scalar @args;
     @args = $passed_args ? @args : @ARGV;
     $self->clear_opt;
     $self->clear_cmd;
-    $self->files([]);
+    $self->files( [] );
 
     my @args_orig = @args;
-    my $class = $self->options;
+    my $class     = $self->options;
     $self->opt( $class->new( %{ $self->default } ) );
     my @errors;
 
-    ARG:
-    while (my $arg = shift @args) {
+  ARG:
+    while ( my $arg = shift @args ) {
         my $action = '';
         try {
-            my ($long, $short, $arg_data);
+            my ( $long, $short, $arg_data );
             if ( $arg =~ /^-- (\w[^=\s]+) (?:= (.*) )?/xms ) {
-                $long = $1;
+                $long     = $1;
                 $arg_data = $2;
             }
             elsif ( $arg =~ /^- (\w) =? (.*)/xms ) {
-                $short = $1;
-                $arg_data  = $2;
+                $short    = $1;
+                $arg_data = $2;
             }
             elsif ( $arg eq '--' ) {
-                if ( $self->auto_complete && $self->opt->auto_complete &&
-                    path($0)->basename eq path($args[0])->basename
-                ) {
+                if (   $self->auto_complete
+                    && $self->opt->auto_complete
+                    && path($0)->basename eq path( $args[0] )->basename )
+                {
                     shift @args;
                 }
 
-                if ( $self->opt->auto_complete
+                if (   $self->opt->auto_complete
                     && $self->sub_command
-                    && $self->has_auto_complete_shortener
-                ) {
-                    @args = $self->auto_complete_shortener->($self, @args);
+                    && $self->has_auto_complete_shortener )
+                {
+                    @args = $self->auto_complete_shortener->( $self, @args );
                 }
                 push @{ $self->files }, @args;
                 die "last\n";
@@ -315,38 +318,42 @@ sub process {
                 die $self->sub_command ? "last\n" : "next\n";
             }
 
-            my ($opt, $new_value) = $self->best_option( $long, $short );
-            if (defined $new_value) {
-                $long = $opt->name;
+            my ( $opt, $new_value ) = $self->best_option( $long, $short );
+            if ( defined $new_value ) {
+                $long  = $opt->name;
                 $short = undef;
                 ($arg_data) = $arg =~ /^--?(\d+)$/;
             }
             $opt->value( $self->opt->{ $opt->name } );
 
-            my ($value, $used) = $opt->process( $long, $short, $arg_data, \@args );
+            my ( $value, $used ) =
+              $opt->process( $long, $short, $arg_data, \@args );
             my $opt_name = $opt->name;
-            if ( $self->opt->auto_complete && $opt_name eq 'auto_complete_list' ) {
+            if (   $self->opt->auto_complete
+                && $opt_name eq 'auto_complete_list' )
+            {
                 print join ' ', $self->list_options;
                 $EXIT ? exit 0 : return;
             }
-            $self->opt->{$opt->name} = $value;
+            $self->opt->{ $opt->name } = $value;
 
             if ( !$used && $short && defined $arg_data && length $arg_data ) {
                 unshift @args, '-' . $arg_data;
             }
-            if ($self->has_conf_section
+            if (   $self->has_conf_section
                 && $self->conf_section
                 && $self->conf_section eq $opt_name
-                && @args_orig
-            ) {
+                && @args_orig )
+            {
                 $self->opt(
                     $class->new(
                         %{ $self->default },
-                        %{ $self->config->{$self->conf_section}{$value} },
+                        %{ $self->config->{ $self->conf_section }{$value} },
                     )
                 );
+
                 # restart the process
-                @args = @args_orig;
+                @args      = @args_orig;
                 @args_orig = ();
             }
         }
@@ -355,8 +362,9 @@ sub process {
                 $action = 'next';
             }
             elsif ( $_ eq "last\n" ) {
-                # last means we have found a sub command we should see if it is an alias
-                if ($self->aliases->{$arg}) {
+
+        # last means we have found a sub command we should see if it is an alias
+                if ( $self->aliases->{$arg} ) {
                     $self->files->[-1] = shift @{ $self->aliases->{$arg} };
                     my @new_args = @{ $self->aliases->{$arg} };
                     unshift @args, @new_args;
@@ -380,68 +388,77 @@ sub process {
     }
 
     if ( $self->has_sub_command ) {
-        shift @{ $self->files } if @{ $self->files } && $self->files->[0] eq '--';
+        shift @{ $self->files }
+          if @{ $self->files } && $self->files->[0] eq '--';
 
-        if ( ! @{ $self->files } && @args ) {
-            $self->files([ @args ]);
+        if ( !@{ $self->files } && @args ) {
+            $self->files( [@args] );
         }
 
-        $self->cmd( shift @{ $self->files } ) if ! $self->cmd && @{ $self->files };
+        $self->cmd( shift @{ $self->files } )
+          if !$self->cmd && @{ $self->files };
     }
     if ( !$passed_args && $self->files ) {
-        @ARGV = ( @{ $self->files }, @args );  ## no critic
+        @ARGV = ( @{ $self->files }, @args );    ## no critic
     }
 
     if ( $self->has_sub_command ) {
-        if ( ref $self->sub_command eq 'HASH'
-            && (
-                ! $self->has_auto_complete
-                || ( $self->cmd && $self->sub_command->{ $self->cmd } )
-            )
-        ) {
-            if ( ! $self->sub_command->{$self->cmd} ) {
+        if (
+            ref $self->sub_command eq 'HASH'
+            && ( !$self->has_auto_complete
+                || ( $self->cmd && $self->sub_command->{ $self->cmd } ) )
+          )
+        {
+            if ( !$self->sub_command->{ $self->cmd } ) {
                 warn 'Unknown command "' . $self->cmd . "\"!\n";
                 die Getopt::Alt::Exception->new(
                     message => "Unknown command '$self->cmd'",
-                    help => 1,
+                    help    => 1,
                 ) if !$self->help_package;
-                $self->_show_help(1, 'Unknown command "' . $self->cmd . "\"!\n");
+                $self->_show_help( 1,
+                    'Unknown command "' . $self->cmd . "\"!\n" );
             }
 
-            if ( ref $self->sub_command->{$self->cmd} eq 'ARRAY' ) {
+            if ( ref $self->sub_command->{ $self->cmd } eq 'ARRAY' ) {
+
                 # make a copy of the sub command
-                my $sub = [ @{$self->sub_command->{$self->cmd}} ];
+                my $sub = [ @{ $self->sub_command->{ $self->cmd } } ];
+
                 # check the style
-                my $options  = @$sub == 2
-                    && ref $sub->[0] eq 'HASH'
-                    && ref $sub->[1] eq 'ARRAY' ? shift @$sub : {};
+                my $options =
+                     @$sub == 2
+                  && ref $sub->[0] eq 'HASH'
+                  && ref $sub->[1] eq 'ARRAY' ? shift @$sub : {};
                 my $opt_args = %$options ? $sub->[0] : $sub;
 
                 # build sub command object
                 my $sub_obj = Getopt::Alt->new(
                     {
-                        helper  => $self->helper,
-                        %{ $options },  ## no critic
-                        options => $self->options, # inherit this objects options
-                        default => { %{ $self->opt }, %{ $options->{default} || {} } },
+                        helper => $self->helper,
+                        %{$options},         ## no critic
+                        options =>
+                          $self->options,    # inherit this objects options
+                        default =>
+                          { %{ $self->opt }, %{ $options->{default} || {} } },
                     },
                     $opt_args
                 );
                 local @ARGV = ();
                 if ( $self->opt->auto_complete ) {
-                    push @args, '--auto-complete', $self->opt->auto_complete, '--';
+                    push @args, '--auto-complete', $self->opt->auto_complete,
+                      '--';
                 }
                 $sub_obj->process(@args);
                 $self->opt( $sub_obj->opt );
                 $self->files( $sub_obj->files );
             }
         }
-        elsif ( $self->sub_command =~ /^[A-Z].*::$/
-            && (
-                ! $self->has_auto_complete
-                || ( $self->cmd && $self->sub_command->{ $self->cmd } )
-            )
-        ) {
+        elsif (
+            $self->sub_command =~ /^[A-Z].*::$/
+            && ( !$self->has_auto_complete
+                || ( $self->cmd && $self->sub_command->{ $self->cmd } ) )
+          )
+        {
             # object based subcommands
             my $run = $self->sub_module_method || 'run';
         }
@@ -449,12 +466,12 @@ sub process {
 
     if ( $self->help_package ) {
         if ( $self->opt->{version} ) {
-             my ($name)  = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
-             my $version = defined $main::VERSION ? $main::VERSION : 'undef';
-             die Getopt::Alt::Exception->new(
-                 message => "$name Version = $version\n",
-                 help => 1,
-             );
+            my ($name) = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+            my $version = defined $main::VERSION ? $main::VERSION : 'undef';
+            die Getopt::Alt::Exception->new(
+                message => "$name Version = $version\n",
+                help    => 1,
+            );
         }
         elsif ( $self->opt->{man} ) {
             $self->_show_help(2);
@@ -463,9 +480,9 @@ sub process {
             $self->_show_help(1);
         }
         elsif ( $self->auto_complete && $self->opt->auto_complete ) {
-            $self->complete(\@errors);
+            $self->complete( \@errors );
         }
-        elsif ( $self->sub_command && ! $self->cmd ) {
+        elsif ( $self->sub_command && !$self->cmd ) {
             $self->_show_help(1);
         }
     }
@@ -474,11 +491,12 @@ sub process {
 }
 
 sub complete {
-    my ($self, $errors) = @_;
+    my ( $self, $errors ) = @_;
 
     if ( $self->sub_command && ref $self->sub_command && !$self->cmd ) {
         my $cmd = shift @ARGV;
-        my @sub_command = grep { $cmd ? /$cmd/ : 1 } sort keys %{ $self->sub_command };
+        my @sub_command =
+          grep { $cmd ? /$cmd/ : 1 } sort keys %{ $self->sub_command };
         print join ' ', @sub_command;
     }
     elsif ( $ARGV[-1] && $ARGV[-1] =~ /^-/xms ) {
@@ -487,7 +505,7 @@ sub complete {
     }
     else {
         # run the auto complete method
-        $self->auto_complete->($self, $self->opt->auto_complete, $errors);
+        $self->auto_complete->( $self, $self->opt->auto_complete, $errors );
     }
 
     # exit here as auto complete should stop processing
@@ -502,25 +520,25 @@ sub list_options {
 
     for my $name ( $meta->get_attribute_list ) {
         my $opt = $meta->get_attribute($name);
-        for my $name (@{ $opt->names }) {
+        for my $name ( @{ $opt->names } ) {
 
             # skip auto-complete commands (they are hidden options)
-            next if grep {$name eq $_}
-                qw/auto_complete auto-complete auto_complete_list auto-complete-list/;
-            push @names, $name
+            next
+              if grep { $name eq $_ }
+              qw/auto_complete auto-complete auto_complete_list auto-complete-list/;
+            push @names, $name;
         }
     }
 
-    return map {
-            length $_ == 1 ? "-$_" : "--$_"
-        }
-        uniq sort { lc $a cmp lc $b } @names;
+    return
+      map { length $_ == 1 ? "-$_" : "--$_" }
+      uniq sort { lc $a cmp lc $b } @names;
 }
 
 sub best_option {
-    my ($self, $long, $short, $has_no) = @_;
+    my ( $self, $long, $short, $has_no ) = @_;
 
-    if ($has_no && $long) {
+    if ( $has_no && $long ) {
         $long =~ s/^no-//xms;
     }
 
@@ -529,45 +547,53 @@ sub best_option {
     for my $name ( $meta->get_attribute_list ) {
         my $opt = $meta->get_attribute($name);
 
-        return ($opt, undef) if $long && $opt->name eq $long;
+        return ( $opt, undef ) if $long && $opt->name eq $long;
 
-        for my $name (@{ $opt->names }) {
-            return ($opt, undef) if defined $long && $name eq $long;
-            return ($opt, undef) if defined $short && $name eq $short;
+        for my $name ( @{ $opt->names } ) {
+            return ( $opt, undef ) if defined $long  && $name eq $long;
+            return ( $opt, undef ) if defined $short && $name eq $short;
         }
     }
 
-    if (($long && $long =~ /^\d+$/xms) || (defined $short && $short =~ /^\d$/xms)) {
+    if (   ( $long && $long =~ /^\d+$/xms )
+        || ( defined $short && $short =~ /^\d$/xms ) )
+    {
         $meta = $self->opt->meta;
         for my $name ( $meta->get_attribute_list ) {
             my $opt = $meta->get_attribute($name);
-            return ($opt, $long || $short) if $opt->number;
+            return ( $opt, $long || $short ) if $opt->number;
         }
     }
 
-    return $self->best_option($long, $short, 1) if !$has_no;
+    return $self->best_option( $long, $short, 1 ) if !$has_no;
 
     if ( $self->help_package ) {
-        die [ Getopt::Alt::Exception->new(
-                message => "Unknown option '" . ($long ? "--$long" : "-$short") . "'\n",
-                option  => ($long ? "--$long" : "-$short"),
-            ) ];
+        die [
+            Getopt::Alt::Exception->new(
+                message => "Unknown option '"
+                  . ( $long ? "--$long" : "-$short" ) . "'\n",
+                option => ( $long ? "--$long" : "-$short" ),
+            )
+        ];
     }
     else {
-        die [ Getopt::Alt::Exception->new(
+        die [
+            Getopt::Alt::Exception->new(
                 help    => 1,
-                message => "Unknown option '" . ($long ? "--$long" : "-$short") . "'\n",
-                option  => ($long ? "--$long" : "-$short"),
-            ) ];
+                message => "Unknown option '"
+                  . ( $long ? "--$long" : "-$short" ) . "'\n",
+                option => ( $long ? "--$long" : "-$short" ),
+            )
+        ];
     }
 }
 
 sub _show_help {
-    my ($self, $verbosity, $msg) = @_;
+    my ( $self, $verbosity, $msg ) = @_;
 
     my %input;
     if ( $self->help_packages && $self->cmd ) {
-        my $package = $self->help_packages->{$self->cmd};
+        my $package = $self->help_packages->{ $self->cmd };
         if ($package) {
             $package =~ s{::}{/}gxms;
             $package .= '.pm';
@@ -578,7 +604,7 @@ sub _show_help {
     elsif ( $self->help_package && $self->help_package ne "1" ) {
         my $help = $self->help_package;
         if ( !-f $help ) {
-            $help  .= '.pm';
+            $help .= '.pm';
             $help =~ s{::}{/}gxms;
         }
         %input = ( -input => $INC{$help} );
@@ -609,7 +635,7 @@ Getopt::Alt - Command line option passing with with lots of features
 
 =head1 VERSION
 
-This documentation refers to Getopt::Alt version 0.5.4.
+This documentation refers to Getopt::Alt version 0.5.5.
 
 =head1 SYNOPSIS
 
@@ -914,7 +940,7 @@ file to get auto-completion.
     }
     complete -F _eg eg
 
-B<Note>: This is different from version 0.5.4 and earlier
+B<Note>: This is different from version 0.5.5 and earlier
 
 =head1 DIAGNOSTICS
 

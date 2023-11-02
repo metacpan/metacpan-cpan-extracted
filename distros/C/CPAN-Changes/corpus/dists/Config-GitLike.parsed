@@ -1,0 +1,323 @@
+{
+  "raw_preamble" => "",
+  "releases" => [
+    {
+      "date" => "2013-08-04",
+      "entries" => [
+        {
+          "line" => 3,
+          "raw" => "* Switch from the deprecated Any::Moose to Moo\n\n",
+          "style" => "*",
+          "text" => "Switch from the deprecated Any::Moose to Moo"
+        }
+      ],
+      "line" => 1,
+      "raw" => "1.11 2013-08-04\n\n",
+      "raw_date" => "2013-08-04",
+      "version" => "1.11"
+    },
+    {
+      "date" => "2012-11-07",
+      "entries" => [
+        {
+          "line" => 7,
+          "raw" => "* Provide and API got accessing the original key that a value was set\n  with, in a case-preserving way.  If the case of the key in a file\n  matters, it is now possible to determine.\n",
+          "style" => "*",
+          "text" => "Provide and API got accessing the original key that a value was set with, in a case-preserving way.  If the case of the key in a file matters, it is now possible to determine."
+        },
+        {
+          "line" => 10,
+          "raw" => "* The 'name' value passed to the 'callback' parameter is now no longer\n  forced to lower-case, as a consequence.\n\n",
+          "style" => "*",
+          "text" => "The 'name' value passed to the 'callback' parameter is now no longer forced to lower-case, as a consequence."
+        }
+      ],
+      "line" => 5,
+      "raw" => "1.10 2012-11-07\n\n",
+      "raw_date" => "2012-11-07",
+      "version" => "1.10"
+    },
+    {
+      "date" => "2012-08-10",
+      "entries" => [
+        {
+          "line" => 15,
+          "raw" => "* Multiple bug fixes concerning filters, including empty filters,\n  valueless keys, and applying filters to single values.\n",
+          "style" => "*",
+          "text" => "Multiple bug fixes concerning filters, including empty filters, valueless keys, and applying filters to single values."
+        },
+        {
+          "line" => 17,
+          "raw" => "* Add \"human\" argument to get_all and get_regexp, to match get\n",
+          "style" => "*",
+          "text" => "Add \"human\" argument to get_all and get_regexp, to match get"
+        },
+        {
+          "line" => 18,
+          "raw" => "* Add an add_comment method\n",
+          "style" => "*",
+          "text" => "Add an add_comment method"
+        },
+        {
+          "line" => 19,
+          "raw" => "* Add an encoding attribute, which adds the appropriate layer on file\n  I/O\n",
+          "style" => "*",
+          "text" => "Add an encoding attribute, which adds the appropriate layer on file I/O"
+        },
+        {
+          "line" => 21,
+          "raw" => "* Enforce that all keys must have sections, as git 1.7.4.4 began doing\n\n",
+          "style" => "*",
+          "text" => "Enforce that all keys must have sections, as git 1.7.4.4 began doing"
+        }
+      ],
+      "line" => 13,
+      "raw" => "1.09 2012-08-10\n\n",
+      "raw_date" => "2012-08-10",
+      "version" => "1.09"
+    },
+    {
+      "date" => "2012-02-15",
+      "entries" => [
+        {
+          "line" => 25,
+          "raw" => "* Fix loading of user_file, broken in dcdd01f, due to unexpanded ~\n  (alexmv, clkao\@clkao.org)\n\n",
+          "style" => "*",
+          "text" => "Fix loading of user_file, broken in dcdd01f, due to unexpanded ~ (alexmv, clkao\@clkao.org)"
+        }
+      ],
+      "line" => 23,
+      "raw" => "1.08 2012-02-15\n\n",
+      "raw_date" => "2012-02-15",
+      "version" => "1.08"
+    },
+    {
+      "date" => "2011-10-25",
+      "entries" => [
+        {
+          "line" => 30,
+          "raw" => "* Fix a spelling mistake in Config::GitLike::Cascaded\n  (gregoa\@debian.org, forwarded by carnil\@debian.org)\n\n",
+          "style" => "*",
+          "text" => "Fix a spelling mistake in Config::GitLike::Cascaded (gregoa\@debian.org, forwarded by carnil\@debian.org)"
+        }
+      ],
+      "line" => 28,
+      "raw" => "1.07 2011-10-25\n\n",
+      "raw_date" => "2011-10-25",
+      "version" => "1.07"
+    },
+    {
+      "date" => "2011-10-12",
+      "entries" => [
+        {
+          "line" => 35,
+          "raw" => "* Allow calling ->load_file as a class method, for simple use cases\n  (alexmv)\n",
+          "style" => "*",
+          "text" => "Allow calling ->load_file as a class method, for simple use cases (alexmv)"
+        },
+        {
+          "line" => 37,
+          "raw" => "* Fix a parsing bug when quoted strings directly adjoined to unquoted\n  strings (alexmv)\n",
+          "style" => "*",
+          "text" => "Fix a parsing bug when quoted strings directly adjoined to unquoted strings (alexmv)"
+        },
+        {
+          "line" => 39,
+          "raw" => "* Calling ->load_file on a nonexistant file no longer sets ->is_loaded\n  (alexmv)\n",
+          "style" => "*",
+          "text" => "Calling ->load_file on a nonexistant file no longer sets ->is_loaded (alexmv)"
+        },
+        {
+          "line" => 41,
+          "raw" => "* Document that getters implicitly call ->load (alexmv)\n",
+          "style" => "*",
+          "text" => "Document that getters implicitly call ->load (alexmv)"
+        },
+        {
+          "line" => 42,
+          "raw" => "* Make ->dump implicitly call ->load as well (alexmv)\n",
+          "style" => "*",
+          "text" => "Make ->dump implicitly call ->load as well (alexmv)"
+        },
+        {
+          "line" => 43,
+          "raw" => "* Minor POD fixes (alexmv, spang)\n\n",
+          "style" => "*",
+          "text" => "Minor POD fixes (alexmv, spang)"
+        }
+      ],
+      "line" => 33,
+      "raw" => "1.06 2011-10-12\n\n",
+      "raw_date" => "2011-10-12",
+      "version" => "1.06"
+    },
+    {
+      "date" => "2011-01-07",
+      "entries" => [
+        {
+          "line" => 47,
+          "raw" => "* support Module::Install::ExtraTests 0.007 (sunnavy)\n",
+          "style" => "*",
+          "text" => "support Module::Install::ExtraTests 0.007 (sunnavy)"
+        },
+        {
+          "line" => 48,
+          "raw" => "* properly set is => 'rw' in inherited classes (trs, alexmv)\n",
+          "style" => "*",
+          "text" => "properly set is => 'rw' in inherited classes (trs, alexmv)"
+        },
+        {
+          "line" => 49,
+          "raw" => "* silence lc warnings on undef under perl 5.12 (iarnell\@gmail.com)\n\n",
+          "style" => "*",
+          "text" => "silence lc warnings on undef under perl 5.12 (iarnell\@gmail.com)"
+        }
+      ],
+      "line" => 45,
+      "raw" => "1.05 2011-01-07\n\n",
+      "raw_date" => "2011-01-07",
+      "version" => "1.05"
+    },
+    {
+      "date" => "2010-04-03",
+      "entries" => [
+        {
+          "line" => 53,
+          "raw" => "* The functionality of Config::GitLike::Cascaded has been folded into\n  Config::GitLike as a \"cascade\" option, and the subpackage is now\n  deprecated. (alexmv)\n",
+          "style" => "*",
+          "text" => "The functionality of Config::GitLike::Cascaded has been folded into Config::GitLike as a \"cascade\" option, and the subpackage is now deprecated. (alexmv)"
+        },
+        {
+          "line" => 56,
+          "raw" => "* Config::GitLike::Git->new->load(\"/path/to/git\") when the path is\n  lacking a \".git\", or is a bare repository, now works. (alexmv)\n",
+          "style" => "*",
+          "text" => "Config::GitLike::Git->new->load(\"/path/to/git\") when the path is lacking a \".git\", or is a bare repository, now works. (alexmv)"
+        },
+        {
+          "line" => 58,
+          "raw" => "* Fixed a bug wherein the home directory config file would be loaded\n  twice, causing all values to be multiple, if that was your cwd.\n  Reported by rjbs. (alexmv)\n",
+          "style" => "*",
+          "text" => "Fixed a bug wherein the home directory config file would be loaded twice, causing all values to be multiple, if that was your cwd. Reported by rjbs. (alexmv)"
+        },
+        {
+          "line" => 61,
+          "raw" => "* Allow explicitly calling ->load_file without previously having\n  called ->load (alexmv)\n\n",
+          "style" => "*",
+          "text" => "Allow explicitly calling ->load_file without previously having called ->load (alexmv)"
+        }
+      ],
+      "line" => 51,
+      "raw" => "1.04 - 2010-04-03\n\n",
+      "raw_date" => "2010-04-03",
+      "version" => "1.04"
+    },
+    {
+      "date" => "2010-01-03",
+      "entries" => [
+        {
+          "line" => 66,
+          "raw" => "* Filter without replace_all should only replace the _first_ match (alexmv)\n",
+          "style" => "*",
+          "text" => "Filter without replace_all should only replace the _first_ match (alexmv)"
+        },
+        {
+          "line" => 67,
+          "raw" => "* Having a matching filter with multiple and not replace_all does mean\n  replacement (alexmv)\n",
+          "style" => "*",
+          "text" => "Having a matching filter with multiple and not replace_all does mean replacement (alexmv)"
+        },
+        {
+          "line" => 69,
+          "raw" => "* Fix a test that failed because multiple now works, and we're too smart\n  (alexmv)\n",
+          "style" => "*",
+          "text" => "Fix a test that failed because multiple now works, and we're too smart (alexmv)"
+        },
+        {
+          "line" => 71,
+          "raw" => "* Fix for when ->set_multiple called with no arguments (alexmv)\n\n",
+          "style" => "*",
+          "text" => "Fix for when ->set_multiple called with no arguments (alexmv)"
+        }
+      ],
+      "line" => 64,
+      "raw" => "1.03 - 2010-01-03\n\n",
+      "raw_date" => "2010-01-03",
+      "version" => "1.03"
+    },
+    {
+      "date" => "2009-08-19",
+      "entries" => [
+        {
+          "line" => 75,
+          "raw" => "* Bugfixes and extra tests for escaped \\ and \" in subsections (sunnavy)\n",
+          "style" => "*",
+          "text" => "Bugfixes and extra tests for escaped \\ and \" in subsections (sunnavy)"
+        },
+        {
+          "line" => 76,
+          "raw" => "* win32 fixes (sunnavy)\n",
+          "style" => "*",
+          "text" => "win32 fixes (sunnavy)"
+        },
+        {
+          "line" => 77,
+          "raw" => "* auto-escape \\ and \" in subsections on set (sunnavy)\n\n",
+          "style" => "*",
+          "text" => "auto-escape \\ and \" in subsections on set (sunnavy)"
+        }
+      ],
+      "line" => 73,
+      "raw" => "1.02 - 2009-08-19\n\n",
+      "raw_date" => "2009-08-19",
+      "version" => "1.02"
+    },
+    {
+      "date" => "2009-08-11",
+      "entries" => [
+        {
+          "line" => 81,
+          "raw" => "* Fix breakage under Mouse due to Moose references\n",
+          "style" => "*",
+          "text" => "Fix breakage under Mouse due to Moose references"
+        },
+        {
+          "line" => 82,
+          "raw" => "* New Config::GitLike::Git module for loading config\n  files from the git locations\n",
+          "style" => "*",
+          "text" => "New Config::GitLike::Git module for loading config files from the git locations"
+        },
+        {
+          "line" => 84,
+          "raw" => "* various cleanups of Makefile.PL\n",
+          "style" => "*",
+          "text" => "various cleanups of Makefile.PL"
+        },
+        {
+          "line" => 85,
+          "raw" => "* remove extraneous dep Regexp::Common\n\n",
+          "style" => "*",
+          "text" => "remove extraneous dep Regexp::Common"
+        }
+      ],
+      "line" => 79,
+      "raw" => "1.01 - 2009-08-11\n\n",
+      "raw_date" => "2009-08-11",
+      "version" => "1.01"
+    },
+    {
+      "date" => "2009-07-08",
+      "entries" => [
+        {
+          "line" => 89,
+          "raw" => "* Initial release\n",
+          "style" => "*",
+          "text" => "Initial release"
+        }
+      ],
+      "line" => 87,
+      "raw" => "1.00 - 2009-07-08\n\n",
+      "raw_date" => "2009-07-08",
+      "version" => "1.00"
+    }
+  ]
+}

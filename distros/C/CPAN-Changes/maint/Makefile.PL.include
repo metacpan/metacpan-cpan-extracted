@@ -1,12 +1,13 @@
-BEGIN { -e 'Distar' or system("git clone git://git.shadowcat.co.uk/p5sagit/Distar.git") }
+BEGIN { -e 'Distar' or system qw(git clone https://github.com/p5sagit/Distar.git) }
 use lib 'Distar/lib';
 use Distar 0.001;
 
 use ExtUtils::MakeMaker 6.57_10 ();
 
-author 'Brian Cassidy <bricas@cpan.org>';
+author 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>';
 
 manifest_include bin => qr/.*/;
+manifest_include corpus => qr/.*/;
 manifest_include 't/corpus' => qr/.*/;
 
 1;

@@ -25,11 +25,33 @@ Filterコマンドはモジュール宣言(`-Mtee`)に続き、2つのダッシ�
 
 **--discrete**オプションを使用する場合、入出力データの行数は同一である必要はない。
 
+# VERSION
+
+Version 0.9901
+
 # OPTIONS
 
 - **--discrete**
 
     一致した部品に対して、個別に新しいコマンドを起動する。
+
+- **--fillup**
+
+    空白でない一連の行を、filterコマンドに渡す前に1行にまとめる。幅の広い文字の間の改行文字は削除され、その他の改行文字は空白に置き換えられる。
+
+- **--blockmatch**
+
+    通常、指定された検索パターンにマッチする領域が外部コマンドに送られる。このオプションが指定されると、マッチした領域ではなく、それを含むブロック全体が処理される。
+
+    例えば、パターン`foo`を含む行を外部コマンドに送るには、行全体にマッチするパターンを指定する必要がある：
+
+        greple -Mtee cat -n -- '^.*foo.*\n'
+
+    しかし、**--blockmatch**オプションを使えば、次のように簡単に実行できる：
+
+        greple -Mtee cat -n -- foo
+
+    **--blockmatch** オプションをつけると、このモジュールは [teip(1)](http://man.he.net/man1/teip) の **-g** オプションのような動作をする。
 
 # WHY DO NOT USE TEIP
 
@@ -47,11 +69,7 @@ Filterコマンドはモジュール宣言(`-Mtee`)に続き、2つのダッシ�
 
 このように**Mtee**モジュールと組み合わせて**deepl**コマンドを呼び出すと、DeepLサービスによって翻訳することができる。
 
-    greple -Mtee deepl text --to JA - -- --discrete ...
-
-**deepl**は一行入力に適しているので、コマンド部分をこのように変更することができる。
-
-    sh -c 'perl -00pE "s/\s+/ /g" | deepl text --to JA -'
+    greple -Mtee deepl text --to JA - -- --fillup ...
 
 ただし、この場合は専用モジュール [App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl) の方が効果的である。実は、**tee**モジュールの実装のヒントは**xlate**モジュールからきている。
 
@@ -82,7 +100,24 @@ Filterコマンドはモジュール宣言(`-Mtee`)に続き、2つのダッシ�
       b) accompany the distribution with the
          machine-readable source of the
          Package with your modifications.
-    
+
+`--discrete` オプションを使うと時間がかかる。そこで、`--separate ' \r'`オプションと`ansifold`を併用することで、NLの代わりにCR文字を使って1行を生成することができる。
+
+    greple -Mtee ansifold -rsw40 --prefix '     ' --separate '\r' --
+
+その後、[tr(1)](http://man.he.net/man1/tr)コマンドなどでCRをNLに変換する。
+
+    ... | tr '\r' '\n'
+
+# EXAMPLE 3
+
+ヘッダ行以外から文字列を grep したい場合を考えてみよう。例えば、`docker image ls`コマンドから画像を検索したいが、ヘッダ行は残しておきたい場合である。以下のコマンドで可能である。
+
+    greple -Mtee grep perl -- -Mline -L 2: --discrete --all
+
+オプション`-Mline -L 2:`は2行目から最後の行を検索し、`grep perl`コマンドに送る。オプション`--discrete`が必要だが、これは一度しか呼ばれないので、性能上の欠点はない。
+
+この場合、`teip -l 2- -- grep` は出力行数が入力行数より少ないのでエラーになる。しかし、結果は非常に満足のいくものである :)
 
 # INSTALL
 
@@ -101,6 +136,10 @@ Filterコマンドはモジュール宣言(`-Mtee`)に続き、2つのダッシ�
 [https://github.com/tecolicom/Greple](https://github.com/tecolicom/Greple)
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)を使用する。
+
+# BUGS
+
+`--fillup` オプションは韓国語テキストでは正しく動作しないかもしれない。
 
 # AUTHOR
 

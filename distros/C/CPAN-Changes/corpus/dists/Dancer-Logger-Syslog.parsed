@@ -1,0 +1,61 @@
+{
+  "preamble" => "Revision history for Dancer-Logger-Syslog",
+  "raw_preamble" => "Revision history for Dancer-Logger-Syslog\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "    * Call 'openlog()' in all child processes. (GH#4, Sam Crawley)\n\n",
+          "style" => "*",
+          "text" => "Call 'openlog()' in all child processes. (GH#4, Sam Crawley)"
+        }
+      ],
+      "line" => 3,
+      "note" => "April 22nd, 2013",
+      "raw" => "0.4 April 22nd, 2013\n",
+      "version" => "0.4"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 7,
+          "raw" => "    * Add 'info' in the log levels. (GH#2, Sam Crawley)\n",
+          "style" => "*",
+          "text" => "Add 'info' in the log levels. (GH#2, Sam Crawley)"
+        },
+        {
+          "line" => 8,
+          "raw" => "    * Facility can be set via config. (GH#1, Sam Crawley)\n\n",
+          "style" => "*",
+          "text" => "Facility can be set via config. (GH#1, Sam Crawley)"
+        }
+      ],
+      "line" => 6,
+      "note" => "April 14th, 2013",
+      "raw" => "0.3  April 14th, 2013\n",
+      "version" => "0.3"
+    },
+    {
+      "entries" => [],
+      "line" => 10,
+      "note" => "October 5th, 2010",
+      "raw" => "0.2   October 5th, 2010\n    \n",
+      "version" => "0.2"
+    },
+    {
+      "entries" => [
+        {
+          "line" => 13,
+          "raw" => "    * First version, released on an unsuspecting world.\n",
+          "style" => "*",
+          "text" => "First version, released on an unsuspecting world."
+        }
+      ],
+      "line" => 12,
+      "note" => "Jan 29th, 2010",
+      "raw" => "0.1   Jan 29th, 2010\n",
+      "version" => "0.1"
+    }
+  ]
+}

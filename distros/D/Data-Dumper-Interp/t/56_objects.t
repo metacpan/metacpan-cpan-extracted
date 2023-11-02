@@ -83,18 +83,34 @@ is(vis $gobj,q!bless({},'main::GObj')! , "Gobj: Objects handling disabled");
 #is(vis *{ $gobj }{ARRAY},q!["array","via","virtual","glob"]! , "*{Gobj}{ARRAY} basic test");
 #is(vis *{ $gobj }{HASH},q!{hash_via_virtual_glob => 123}!, "*{Gobj}{HASH} basic test");
 
-$Data::Dumper::Interp::Objects = 1;
-is (vis \@$hvobj, '[0,1,2,3,4,5,6,7,8,9]', "\@{HVObj} again");
-is (vis \%$hvobj, '{a => 111,b => 222,c => 333}', "\%{HVObj} again");
-is (vis $hvobj, '(main::HVObj)[0,1,2,3,4,5,6,7,8,9]', "HVObj: Objects handling enabled");
-is (vis $hobj, '(main::HObj){a => 111,b => 222,c => 333}', "HObj: Objects handling enabled");
-is (hvis(%$hobj), '(a => 111,b => 222,c => 333)', "\%HObj: Objects handling enabled");
-is (vis $sobj, q<(main::SObj)\\"virtual value">, "SObj: Objects handling enabled");
-is (vis $$sobj, q<"virtual value">, "\$SObj: Objects handling enabled");
-like(Data::Dumper::Interp->new()->Deparse(1)->vis($cobj),
-     qr/^\(main::CObj\)sub\s*{.*['"]from virtual coderef['"]\s*;?\s*}$/,
-     "Cobj: Objects handling enabled");
-is(vis $gobj, q!(main::GObj)\*::GObj::Global! , "Gobj: Objects handling enabled");
+foreach (0,1) {
+  my ($desc, $HVcn, $Hcn, $Ccn, $Scn, $Gcn);
+  if ($_) {
+    $Data::Dumper::Interp::Objects
+      = {show_overloaded_classname => 0, objects => 1};
+    $HVcn = $Hcn = $Ccn = $Scn = $Gcn = "";
+    $desc = "Objects enabled but not showing overloaded classnames";
+  } else {
+    $Data::Dumper::Interp::Objects = 1;
+    $HVcn = '(main::HVObj)';
+    $Hcn  = '(main::HObj)';
+    $Ccn  = '(main::CObj)';
+    $Scn  = '(main::SObj)';
+    $Gcn  = '(main::GObj)';
+    $desc = "Objects enabled";
+  }
+  is (vis \@$hvobj, '[0,1,2,3,4,5,6,7,8,9]', "\@{HVObj} again");
+  is (vis \%$hvobj, '{a => 111,b => 222,c => 333}', "\%{HVObj} again");
+  is (vis $hvobj, $HVcn.'[0,1,2,3,4,5,6,7,8,9]', "HVObj: $desc");
+  is (vis $hobj, $Hcn.'{a => 111,b => 222,c => 333}', "HObj: $desc");
+  is (hvis(%$hobj), '(a => 111,b => 222,c => 333)', "\%HObj: $desc");
+  is (vis $sobj, $Scn.q<\\"virtual value">, "SObj: $desc");
+  is (vis $$sobj, q<"virtual value">, "\$SObj: $desc");
+  like(Data::Dumper::Interp->new()->Deparse(1)->vis($cobj),
+       qr/^\Q${Ccn}\Esub\s*{.*['"]from virtual coderef['"]\s*;?\s*}$/,
+       "Cobj: $desc");
+  is(vis $gobj, $Gcn.q!\*::GObj::Global! , "Gobj: $desc");
+}
 
 done_testing();
 exit 0;

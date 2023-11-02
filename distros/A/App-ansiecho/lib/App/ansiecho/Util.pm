@@ -1,6 +1,10 @@
-package App::ansiecho;
+package App::ansiecho::Util;
 use v5.14;
 use warnings;
+
+use Encode;
+use Exporter 'import';
+our @EXPORT_OK = qw(decode_argv unescape);
 
 use charnames ':full';
 
@@ -11,8 +15,9 @@ sub decode_argv {
     @_;
 }
 
-sub safe_backslash {
-    $_[0] =~ s{
+sub unescape {
+    local *_ = @_ > 0 ? \$_[0] : \$_;
+    s{
 	( \\ x\{[0-9a-f]+\}
 	| \\ x[0-9a-f]{2}
 	| \\ N\{[\ \w]+\}

@@ -1,0 +1,190 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::SDK::Resource - Represents the entity producing OpenTelemetry data
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry::SDK::Resource;
+
+    # Read default attributes, or pass them to the constructor
+    my $resource = OpenTelemetry::SDK::Resource->new(
+        attributes => \%attributes,
+    );
+
+    # Merge resources into new ones
+    my $new $resource->merge($other);
+
+=head1 DESCRIPTION
+
+This module provides an immutable resource class that represents the entity
+that produces the telemetry data. The entity is represented as a set of
+L<attributes|OpenTelemetry::Attributes> with specific meanings as described
+in the
+L<"Semantic Conventions"|https://github.com/open-telemetry/semantic-conventions/blob/main/docs/resource/README.md>
+OpenTelemetry section of the OpenTelemetry specification.
+
+When loading the OpenTelemetry::SDK, it will install a global
+L<OpenTelemetry::SDK::Trace::TracerProvider> that will be linked to an
+instance of this resource class. This link cannot be modified after the
+tracer provider has been created, and it will be propagated to any
+L<OpenTelemetry::SDK::Trace::Tracer> it provides, and any
+L<OpenTelemetry::SDK::Trace::Span> objects created by those tracers.
+
+=head1 CONFIGURATION
+
+As with the L<OpenTelemetry::SDK> more generally, the resource will capture
+data about the environment it is running in. This will include aspects like
+the version of Perl it is running under, as well as the version of the SDK
+that is in use.
+
+Apart from this automatic detection, resource attributes will be read from
+those provided to the constructor (see below) and from the
+L<OpenTelemetry::SDK/OTEL_RESOURCE_ATTRIBUTES> environment variable.
+Attributes provided via this variable take precedence over those automatically
+detected, and those provided to the constructor take precedence over any
+other.
+
+The value of this environment variable will consist of a list of key/value
+pairs which are expected to be represented in a format matching that of the
+L<W3C Baggage|https://w3c.github.io/baggage>, but without the
+semicolon-delimited metadata: C<key1=value1,key2=value2>.
+
+Values outside the "baggage-octet" range (ASCII except control characters,
+whitespace, double-quote, comma, semicolon and backslash) must be
+percent-encoded. Any that are not will be ignored, and a warning will be
+logged.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::Attributes> role. Please consult
+that module's documentation for details on the behaviours it provides.
+
+=head2 new
+
+    $resource = OpenTelemetry::SDK::Resource->new(
+        attributes => \%attributes, # optional
+        schema_url => $schema_url,  # optional
+    );
+
+Construct a new resource instance. Takes a schema URL and a list of
+user-provided attributes. If no schema URL is provided, the resource's
+schema URL will be left empty.
+
+In addition to the attributes provided by the user, and those read from
+the L<OTEL_RESOURCE_ATTRIBUTES|/CONFIGURATION> environment variable, the
+constructed resource will automatically detect the following standard
+attributes, and set them to the values described:
+
+=over
+
+=item C<telemetry.sdk.name>
+
+Hard-coded to C<opentelemetry>.
+
+=item C<telemetry.sdk.language>
+
+Hard-coded to C<perl>.
+
+=item C<telemetry.sdk.version>
+
+The C<$VERSION> string for L<OpenTelemetry::SDK>.
+
+=item C<process.pid>
+
+The value of L<$$|https://perldoc.perl.org/perlvar#$$>.
+
+=item C<process.command>
+
+The value of L<$0|https://perldoc.perl.org/perlvar#$0>.
+
+=item C<process.executable.path>
+
+The value of L<$^X|https://perldoc.perl.org/perlvar#$^X>.
+
+=item C<process.command_args>
+
+An array reference with a copy of L<@ARGV|https://perldoc.perl.org/perlvar#@ARGV>.
+
+=item C<process.executable.name>
+
+The basename of L<$^X|https://perldoc.perl.org/perlvar#$^X>.
+
+=item C<process.runtime.name>
+
+Hard-coded to C<perl>.
+
+=item C<process.runtime.version>
+
+The stringified value of L<$^V|https://perldoc.perl.org/perlvar#$^V>.
+
+=back
+
+As explained in the L</CONFIGURATION> section above, user-provided
+attributes will take precedence over those that are automatically
+detected, and those that are read from the environment.
+
+=head2 empty
+
+    $resource = OpenTelemetry::SDK::Resource->empty(
+        attributes => \%attributes, # optional
+        schema_url => $schema_url,  # optional
+    );
+
+Accepts the same parameters as L</new>, but returns a resource with no
+additional automatic attribute detection.
+
+=head2 merge
+
+    $new = $resource->merge($another_resource);
+
+Create a new resource that is the result of merging the original one
+with the attributes in the one provided. This is useful when merging
+resources that come from different sources.
+
+The newly created merged resource will have all the attributes that
+exist on any of the two resources. If an attribute exists on both,
+then the values in the updating resource will take precedence, even
+if that value is empty.
+
+The schema URL will be determined following the rules below:
+
+=over
+
+=item * If it was originally empty, the new one will be used
+
+=item * If it was empty on the new one, the original will be kept
+
+=item * If both have the same URL, that one will be used
+
+=item * If they are both set but differ, the original will be kept
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Attributes>
+
+=item L<OpenTelemetry::SDK>
+
+=item L<OpenTelemetry::SDK::Trace::Span>
+
+=item L<OpenTelemetry::SDK::Trace::TracerProvider>
+
+=item L<OpenTelemetry::SDK::Trace::Tracer>
+
+=item L<W3C Baggage|https://w3c.github.io/baggage>
+
+=item L<OpenTelemetry Resource Semantic Conventions|https://github.com/open-telemetry/semantic-conventions/blob/main/docs/resource/README.md>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

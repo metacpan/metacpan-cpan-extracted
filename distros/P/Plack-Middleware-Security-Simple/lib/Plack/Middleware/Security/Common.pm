@@ -33,7 +33,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.11.0';
+our $VERSION = 'v0.11.1';
 
 
 
@@ -216,7 +216,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.11.0
+version v0.11.1
 
 =head1 SYNOPSIS
 

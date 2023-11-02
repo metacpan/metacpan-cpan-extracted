@@ -1,0 +1,20 @@
+{
+  "preamble" => "Revision history for App-lookup",
+  "raw_preamble" => "Revision history for App-lookup\n\n",
+  "releases" => [
+    {
+      "entries" => [
+        {
+          "line" => 4,
+          "raw" => "        First version, released on an unsuspecting world.\n\n",
+          "style" => "",
+          "text" => "First version, released on an unsuspecting world."
+        }
+      ],
+      "line" => 3,
+      "note" => "Date/time",
+      "raw" => "0.01    Date/time\n",
+      "version" => "0.01"
+    }
+  ]
+}

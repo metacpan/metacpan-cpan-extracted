@@ -4,7 +4,7 @@
       "L<philiprbrenan@gmail.com|mailto:philiprbrenan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,7 @@
    "provides" : {
       "Data::Table::Text" : {
          "file" : "lib/Data/Table/Text.pm",
-         "version" : "20230616"
+         "version" : "20231025"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "url" : "https://github.com/philiprbrenan/DataTableText"
       }
    },
-   "version" : "20230616",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "20231025",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

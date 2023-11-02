@@ -5,15 +5,16 @@ use 5.008;
 use strict;
 use warnings;
 
-use URI ();
-use LWP::UserAgent ();
 use Carp qw( croak carp );
+use Cwd 'getcwd';
 use FindBin ();
 use JSON::XS ();
-use YAML::XS ();
+use LWP::UserAgent ();
 use POSIX ();
+use URI ();
+use YAML::XS ();
 
-our $VERSION = '1.15'; # VERSION
+our $VERSION = '1.16'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
@@ -89,7 +90,10 @@ sub import {
         else {
             my ( $success, @errors );
 
-            for my $this_location ( _locations() ) {
+            my @locations = _locations();
+            my $cwd       = getcwd();
+
+            for my $this_location ( @locations, map {"$cwd/$_"} @locations ) {
                 my $error = do {
                     local $@;
                     eval {
@@ -105,6 +109,7 @@ sub import {
                 }
                 else {
                     $success = 1;
+                    $conf->{config_app}{root_dir} = $cwd if ( index( $this_location, $cwd ) == 0 );
                     last;
                 }
             }
@@ -124,6 +129,21 @@ sub import {
 
         return $self;
     }
+}
+
+sub find {
+    my $class = shift;
+
+    my $self;
+    local $@;
+    eval {
+        $self = $class->new(@_);
+    };
+    if ($@) {
+        return;
+    }
+
+    return $self;
 }
 
 sub get {
@@ -171,6 +191,8 @@ sub _location_fetch {
     $conf->{config_app}{root_dir} ||= $root_dir if ($root_dir);
 
     my $include = $root_dir . '/' . ( ( ref $location ) ? $$location : $location );
+    $include =~ s|/+|/|g;
+
     unless ( grep { $_ eq $include } @{ $conf->{config_app}{includes} } ) {
         push( @{ $conf->{config_app}{includes} }, $include );
     }
@@ -392,7 +414,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.15
+version 1.16
 
 =for markdown [![test](https://github.com/gryphonshafer/Config-App/workflows/test/badge.svg)](https://github.com/gryphonshafer/Config-App/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Config-App/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Config-App)
@@ -403,14 +425,14 @@ version 1.15
     use Config::App 'lib';
     use Config::App ();
 
-    # seeks initial conf file "config/app.yaml" (then others) at or above cwd
+    # seeks initial conf file "config/app.yaml" (then others)
     my $conf = Config::App->new;
 
-    # seeks initial conf file "conf/settings.yaml" at or above cwd
+    # seeks initial conf file "conf/settings.yaml"
     $ENV{CONFIGAPPINIT} = 'conf/settings.yaml';
     my $conf2 = Config::App->new;
 
-    # seeks initial conf file "settings/conf.yaml" at or above cwd
+    # seeks initial conf file "settings/conf.yaml"
     my $conf3 = Config::App->new('settings/conf.yaml');
 
     # pulls initial conf file from URL
@@ -427,6 +449,9 @@ version 1.15
     my $new_full_conf_as_data_structure = $conf->conf({
         change => { some => { conf => 1138 } }
     });
+
+    # same as new() except will silently return undef on failure
+    my $conf5 = Config::App->find;
 
 =head1 DESCRIPTION
 
@@ -590,12 +615,11 @@ The following are the supported methods of this module:
 The constructor will return an object that can be used to query and alter the
 derived cascaded configuration.
 
-    # seeks initial conf file "config/app.yaml" (then others) at or above cwd
+    # seeks initial conf file "config/app.yaml" (then others)
     my $conf = Config::App->new;
 
-By default, with no parameters passed, the
-constructor assumes the initial configuration file is, in order, one of the
-following:
+By default, with no parameters passed, the constructor assumes the initial
+configuration file is, in order, one of the following:
 
 =over 4
 
@@ -631,13 +655,13 @@ C<app.yaml>
 
 You can stipulate an initial configuration file to the constructor:
 
-    # seeks initial conf file "settings/conf.json" at or above cwd
+    # seeks initial conf file "settings/conf.json"
     my $conf = Config::App->new('settings/conf.json');
 
 You can also alternatively set an enviornment variable that will identify the
 initial configuration file:
 
-    # seeks initial conf file "conf/settings.yaml" at or above cwd
+    # seeks initial conf file "conf/settings.yaml"
     $ENV{CONFIGAPPINIT} = 'conf/settings.yaml';
     my $conf = Config::App->new;
 
@@ -651,6 +675,11 @@ the constructor.
 
     my $conf_0 = Config::App->new( 'file_0.yaml', 1 );
     my $conf_1 = Config::App->new( 'file_1.yaml', 1 );
+
+=head2 find
+
+This is the same thing as C<new()> except if unable to find a configuration
+file, it will silently return C<undef>.
 
 =head2 get
 

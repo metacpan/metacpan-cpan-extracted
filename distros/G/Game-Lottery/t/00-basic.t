@@ -4,7 +4,7 @@ use Test2::V0;
 use Test2::Bundle::More;
 use Test2::Tools::Exception qw/dies lives/;
 # use Data::Dumper;
-use Data::Printer;
+# use Data::Printer;
 use ok 'Game::Lottery';
 
 my ($lowball,$highball) = (1,1);

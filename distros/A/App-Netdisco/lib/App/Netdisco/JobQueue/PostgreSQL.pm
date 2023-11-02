@@ -39,6 +39,7 @@ sub jq_warm_thrusters {
     my $deferrals = setting('workers')->{'max_deferrals'} - 1;
     $rs->search({
       backend => setting('workers')->{'BACKEND'},
+      device => { '!=' => '255.255.255.255' },
       deferrals => { '>' => $deferrals },
     }, { for => 'update' }, )->update({ deferrals => $deferrals });
 
@@ -46,6 +47,14 @@ sub jq_warm_thrusters {
       backend => setting('workers')->{'BACKEND'},
       actionset => { -value => [] }, # special syntax for matching empty ARRAY
       deferrals => 0,
+    })->delete;
+
+    # also clean out any previous backend hint
+    # primeskiplist action will then run to recreate it
+    $rs->search({
+      backend => setting('workers')->{'BACKEND'},
+      device => '255.255.255.255',
+      actionset => { -value => [] }, # special syntax for matching empty ARRAY
     })->delete;
   });
 }
@@ -112,7 +121,8 @@ sub jq_getsome {
           job => $job->id,
           -exists => $jobs->search({
             job => { '>' => $job->id },
-            status => { -like => 'queued-%' },
+            status => 'queued',
+            backend => { '!=' => undef },
             started => \[q/> (LOCALTIMESTAMP - ?::interval)/, setting('jobs_stale_after')],
             %job_properties,
           })->as_query,
@@ -131,7 +141,8 @@ sub jq_getsome {
 sub jq_locked {
   my @returned = ();
   my $rs = schema(vars->{'tenant'})->resultset('Admin')->search({
-    status  => ('queued-'. setting('workers')->{'BACKEND'}),
+    status  => 'queued',
+    backend => setting('workers')->{'BACKEND'},
     started => \[q/> (LOCALTIMESTAMP - ?::interval)/, setting('jobs_stale_after')],
   });
 
@@ -147,7 +158,7 @@ sub jq_queued {
   return schema(vars->{'tenant'})->resultset('Admin')->search({
     device => { '!=' => undef},
     action => $job_type,
-    status => { -like => 'queued%' },
+    status => 'queued',
   })->get_column('device')->all;
 }
 
@@ -161,7 +172,8 @@ sub jq_lock {
     my $updated = schema(vars->{'tenant'})->resultset('Admin')
       ->search({ job => $job->id, status => 'queued' }, { for => 'update' })
       ->update({
-          status  => ('queued-'. setting('workers')->{'BACKEND'}),
+          status  => 'queued',
+          backend => setting('workers')->{'BACKEND'},
           started => \"LOCALTIMESTAMP",
       });
 
@@ -205,7 +217,7 @@ sub jq_defer {
       # lock db row and update to show job is available
       schema(vars->{'tenant'})->resultset('Admin')
         ->search({ job => $job->id }, { for => 'update' })
-        ->update({ status => 'queued', started => undef, log => $job->log });
+        ->update({ status => 'queued', backend => undef, started => undef, log => $job->log });
     });
     $happy = true;
   }
@@ -257,10 +269,43 @@ sub jq_complete {
 
 sub jq_log {
   return schema(vars->{'tenant'})->resultset('Admin')->search({
-    'me.action' => { '-not_like' => 'hook::%' },
-    -or => [
-      { 'me.log' => undef },
-      { 'me.log' => { '-not_like' => 'duplicate of %' } },
+    (param('backend') ? ('me.backend' => param('backend')) : ()),
+    (param('action') ? ('me.action' => param('action')) : ()),
+    (param('device') ? (
+      -or => [
+        { 'me.device' => param('device') },
+        { 'target.ip' => param('device') },
+      ],
+    ) : ()),
+    (param('username') ? ('me.username' => param('username')) : ()),
+    (param('status') ? (
+      (param('status') eq 'Running') ? (
+      -and => [
+        { 'me.backend' => { '!=' => undef } },
+        { 'me.status'  => 'queued' },
+      ],
+      ) : (
+      'me.status' => lc(param('status'))
+      )
+    ) : ()),
+    (param('duration') ? (
+      -bool => [
+        -or => [
+          {
+            'me.finished' => undef,
+            'me.started'  => { '<' => \[q{(CURRENT_TIMESTAMP - ? ::interval)}, param('duration') .' minutes'] },
+          },
+          -and => [
+            { 'me.started'  => { '!=' => undef } },
+            { 'me.finished' => { '!=' => undef } },
+            \[ q{ (me.finished - me.started) > ? ::interval }, param('duration') .' minutes'],
+          ],
+        ],
+      ],
+    ) : ()),
+    'me.log' => [
+      { '=' => undef },
+      { '-not_like' => 'duplicate of %' },
     ],
   }, {
     prefetch => 'target',

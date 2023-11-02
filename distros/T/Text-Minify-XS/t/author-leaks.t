@@ -10,12 +10,12 @@ BEGIN {
   }
 }
 
-use Test::More 1.302183;
-use Test::Exception 0.41;
+use Test2::V0;
+use Test2::Tools::Warnings qw( warning );
 use Test::LeakTrace;
-use Test::Warnings qw/ warning /;
 
-use_ok "Text::Minify::XS", "minify";
+
+use Text::Minify::XS qw( minify );
 
 no_leaks_ok {
     minify("");
