@@ -1,0 +1,112 @@
+NAME
+    Set::Streak - Routines related to streaks (longest item appearance in
+    consecutive sets)
+
+VERSION
+    This document describes version 0.003 of Set::Streak (from Perl
+    distribution Set-Streak), released on 2023-11-24.
+
+FUNCTIONS
+  gen_longest_streaks_table
+    Usage:
+
+     gen_longest_streaks_table(%args) -> any
+
+    Generate ranking table of longest streaks.
+
+    This routine can be used to generate a ranking table of longest streaks,
+    represented by sets. You supply a list (arrayref) of "sets", each set
+    representing a period. The routine will rank the items that appear the
+    longest in consecutive sets (periods).
+
+    For example, let's generate a table for longest daily CPAN releases for
+    November 2023 up until today (assume today is the Nov 5th), the input
+    will be:
+
+     [
+       [qw/PERLANCAR DART JJATRIA NERDVANA LEEJO CUKEBOT RSCHUPP JOYREX TANIGUCHI OODLER OLIVER JV/],     # period 1 (first): list of CPAN authors releasing something on Nov 1, 2023
+       [qw/SKIM PERLANCAR BURAK BDFOY SUKRIA AJNN YANGAK CCELSO SREZIC/],                                 # period 2: list of CPAN authors releasing something on Nov 2, 2023
+       [qw/JGNI DTUCKWELL SREZIC WOUTER LSKATZ SVW RAWLEYFOW DJERIUS PERLANCAR CRORAA EINHVERFR ASPOSE/], # period 3: list of CPAN authors releasing something on Nov 3, 2023
+       [qw/JGNI LEONT LANCEW NKH MDOOTSON SREZIC PERLANCAR DROLSKY JOYREX JRM DAMI PRBRENAN DCHURCH/],    # period 4: list of CPAN authors releasing something on Nov 4, 2023
+       [qw/JGNI JRM TEAM LICHTKIND JJATRIA JDEGUEST PERLANCAR SVW DRCLAW PLAIN SUKRIA RSCHUPP/],          # period 5 (current): list of CPAN authors releasing something on Nov 5, 2023
+     ]
+
+    The result of the routine will be like:
+
+     [
+       { item => "PERLANCAR", len => 5, start => 1, status => "ongoing" },
+       { item => "SREZIC", len => 3, start => 2, status => "might-break" },
+       { item => "JGNI", len => 3, start => 3, status => "ongoing" },
+       { item => "JRM", len => 2, start => 4, status => "ongoing" },
+       { item => "CUKEBOT", len => 1, start => 1, status => "broken" },
+       { item => "DART", len => 1, start => 1, status => "broken" },
+       { item => "JJATRIA", len => 1, start => 1, status => "broken" },
+       ...
+     ]
+
+    Sorting is done by "len" (descending) first, then by "start"
+    (ascending), then by "item" (ascending).
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   exclude_broken => *bool*
+
+        Whether to exclude broken streaks.
+
+        Streak status is either: "ongoing" (item still appear in current
+        period), "might-break" (does not yet appear in current period, but
+        current period is assumed to have not ended yet, later update might
+        still see item appearing), or "broken" (no longer appear after its
+        beginning period sometime in the past periods).
+
+        If you set this option to true, streaks that have the status of
+        "broken" are not returned.
+
+    *   sets* => *aoaos*
+
+        (No description)
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Set-Streak>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Set-Streak>.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Set-Streak>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

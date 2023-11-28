@@ -9,22 +9,24 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-   perl Build.PL
-   ./Build
-   ./Build test
-   ./Build install
+   perl Makefile.PL
+   make
+   make test
+   make install
 
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Module::Build    (For installation only)
-    Test::More       (For testing only)
+    ExtUtils::MakeMaker   (For installation only)
+    Test::More            (For testing only)
     Carp
     File::ShareDir
+    strict
     URI::file
     version
+    warnings
 
 
 SUPPORT AND DOCUMENTATION
@@ -34,19 +36,9 @@ perldoc command.
 
     perldoc XML::Catalogs
 
-You can also look for information at:
+You can also find it online at this location:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Catalogs
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/XML-Catalogs
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/XML-Catalogs
-
-    Search CPAN
-        http://search.cpan.org/dist/XML-Catalogs
+    https://metacpan.org/dist/XML-Catalogs
 
 
 COPYRIGHT AND LICENCE

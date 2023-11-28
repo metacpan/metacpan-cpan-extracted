@@ -8,11 +8,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
 use Test::Fatal;
-use JSON::Schema::Modern;
 
 use lib 't/lib';
 use Helper;
@@ -69,7 +65,7 @@ subtest 'simple validation' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/format',
-          error => 'not a uuid',
+          error => 'not a valid uuid',
         },
       ],
     },
@@ -176,12 +172,12 @@ subtest 'override a format sub' => sub {
         {
           instanceLocation => '/0/mult_5',
           keywordLocation => '/items/properties/mult_5/format',
-          error => 'not a mult_5',
+          error => 'not a valid mult_5',
         },
         {
           instanceLocation => '/0/uuid',
           keywordLocation => '/items/properties/uuid/format',
-          error => 'not a uuid',
+          error => 'not a valid uuid',
         },
         {
           instanceLocation => '/0',
@@ -241,7 +237,7 @@ subtest 'different formats after document creation' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/format',
-          error => 'not a mult_5',
+          error => 'not a valid mult_5',
         },
       ],
     },
@@ -268,7 +264,7 @@ subtest 'toggle validate_formats after adding schema' => sub {
           instanceLocation => '',
           keywordLocation => '/format',
           absoluteKeywordLocation => 'http://localhost:1234/ipv4#/format',
-          error => 'not an ipv4',
+          error => 'not a valid ipv4',
         },
       ],
     },
@@ -291,7 +287,7 @@ subtest 'toggle validate_formats after adding schema' => sub {
           instanceLocation => '',
           keywordLocation => '/format',
           absoluteKeywordLocation => 'http://localhost:1234/ipv4#/format',
-          error => 'not an ipv4',
+          error => 'not a valid ipv4',
         },
       ],
     },
@@ -339,7 +335,7 @@ subtest 'custom metaschemas' => sub {
           instanceLocation => '',
           keywordLocation => '/format',
           absoluteKeywordLocation => 'https://schema/ipv4/false#/format',
-          error => 'not an ipv4',
+          error => 'not a valid ipv4',
         },
       ],
     },
@@ -363,7 +359,7 @@ subtest 'custom metaschemas' => sub {
           instanceLocation => '',
           keywordLocation => '/format',
           absoluteKeywordLocation => 'https://schema/ipv4/true#/format',
-          error => 'not an ipv4',
+          error => 'not a valid ipv4',
         },
       ],
     },
@@ -460,7 +456,7 @@ subtest 'format: pure_integer' => sub {
         {
           instanceLocation => '/2',
           keywordLocation => '/items/format',
-          error => 'not a pure_integer',
+          error => 'not a valid pure_integer',
         },
         {
           instanceLocation => '',
@@ -493,7 +489,7 @@ subtest 'format: pure_integer' => sub {
         {
           instanceLocation => '/2',
           keywordLocation => '/items/format',
-          error => 'not a pure_integer',
+          error => 'not a valid pure_integer',
         },
         {
           instanceLocation => '',

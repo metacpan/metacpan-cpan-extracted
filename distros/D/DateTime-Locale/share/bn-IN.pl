@@ -129,7 +129,7 @@
     "\N{U+0996}\N{U+09cd}\N{U+09b0}\N{U+09bf}\N{U+0983}",
   ],
   era_wide => [
-    "\N{U+0996}\N{U+09cd}\N{U+09b0}\N{U+09bf}\N{U+09b8}\N{U+09cd}\N{U+099f}\N{U+09aa}\N{U+09c2}\N{U+09b0}\N{U+09cd}\N{U+09ac}",
+    "\N{U+0996}\N{U+09cd}\N{U+09b0}\N{U+09bf}\N{U+0983}\N{U+09aa}\N{U+09c2}\N{U+0983}",
     "\N{U+0996}\N{U+09cd}\N{U+09b0}\N{U+09bf}\N{U+09b7}\N{U+09cd}\N{U+099f}\N{U+09be}\N{U+09ac}\N{U+09cd}\N{U+09a6}",
   ],
   first_day_of_week => 7,
@@ -272,5 +272,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 43,
+  version => 44,
 }

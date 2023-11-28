@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigRat;
@@ -61,3 +61,37 @@ subtest '$y = Math::BigRat -> as_int("3.5");' => sub {
     is(ref($y), 'Math::BigInt', 'class of $y');
     is($y, "3", 'value of $y');
 };
+
+note("as_int() preserves all instance variables");
+
+Math::BigInt -> upgrade(undef);
+Math::BigFloat -> downgrade(undef);
+Math::BigFloat -> upgrade(undef);
+
+$x = Math::BigRat -> new("3");
+
+$x -> accuracy(2);
+$y = $x -> as_int();
+
+subtest '$x = Math::BigRat -> new("3"); $x -> accuracy(2); $y = $x -> as_int()'
+  => sub {
+      plan tests => 4;
+      is($x -> accuracy(), 2, 'accuracy of $x');
+      is($x -> precision(), undef, 'precision of $x');
+      is($y -> accuracy(), $x -> accuracy(), 'accuracy of $y');
+      is($y -> precision(), $x -> precision(), 'precision of $y');
+  };
+
+$x -> precision(2);
+$y = $x -> as_int();
+
+subtest '$x = Math::BigRat -> new("3"); $x -> precision(2); $y = $x -> as_int()'
+  => sub {
+      plan tests => 4;
+      is($x -> accuracy(), undef, 'accuracy of $x');
+      is($x -> precision(), 2, 'precision of $x');
+      is($y -> accuracy(), $x -> accuracy(), 'accuracy of $y');
+      is($y -> precision(), $x -> precision(), 'precision of $y');
+  };
+
+done_testing();

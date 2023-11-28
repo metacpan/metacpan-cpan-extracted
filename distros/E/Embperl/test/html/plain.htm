@@ -20,8 +20,8 @@ $e = [+ $e || '' +] <BR>
 
 ARRAY @d = [+ do { my @tmp1 = @d; "@tmp1" } +] num = [+ @d +] <BR>
 ARRAY @x = [+ do { my @tmp1 = %x; "@tmp1" } +] num = [+ @x +]  <BR>
-HASH  %a = [+ do { my @tmp1 = %a; my @tmp11 = sort @tmp1 ; "@tmp11" } +]  num = [+ keys %a +] <BR>
-HASH  %y = [+ do { my @tmp2 = %y; my @tmp21 = sort @tmp2 ; "@tmp21" } +]  num = [+ keys %y +] <BR>
+HASH  %a = [+ do { my @tmp1 = %a; my @tmp11 = sort @tmp1 ; "@tmp11" } +]  num = [+ 0+keys %a +] <BR>
+HASH  %y = [+ do { my @tmp2 = %y; my @tmp21 = sort @tmp2 ; "@tmp21" } +]  num = [+ 0+keys %y +] <BR>
 
 
 First of all assign a value:
@@ -40,8 +40,8 @@ Now lets look what we are getting from this:<BR>
 
 ARRAY @d = [+ "@d" +] num = [+ @d +] <BR>
 ARRAY @x = [+ "@x" +] num = [+ @x +]  <BR>
-HASH  %a = [+ do { my @tmp1 = %a; my @tmp11 = sort @tmp1 ; "@tmp11" } +]  num = [+ keys %a +] <BR>
-HASH  %y = [+ do { my @tmp2 = %y; my @tmp21 = sort @tmp2 ; "@tmp21" } +]  num = [+ keys %y +] <BR>
+HASH  %a = [+ do { my @tmp1 = %a; my @tmp11 = sort @tmp1 ; "@tmp11" } +]  num = [+ 0+keys %a +] <BR>
+HASH  %y = [+ do { my @tmp2 = %y; my @tmp21 = sort @tmp2 ; "@tmp21" } +]  num = [+ 0+keys %y +] <BR>
 
 And now a and b together: [+ "$a$b" +]<P>
 

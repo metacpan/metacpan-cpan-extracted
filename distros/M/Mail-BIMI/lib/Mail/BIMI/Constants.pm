@@ -1,10 +1,10 @@
 package Mail::BIMI::Constants;
 # ABSTRACT: Setup system wide constants
-our $VERSION = '3.20230913'; # VERSION
+our $VERSION = '3.20231123'; # VERSION
 use 5.20.0;
 use strict;
 use warnings;
-use base 'Exporter';
+use parent 'Exporter';
 
 use constant LOGOTYPE_OID          => '1.3.6.1.5.5.7.1.12';
 use constant USAGE_OID             => '1.3.6.1.5.5.7.3.31';
@@ -29,7 +29,7 @@ Mail::BIMI::Constants - Setup system wide constants
 
 =head1 VERSION
 
-version 3.20230913
+version 3.20231123
 
 =head1 REQUIRES
 
@@ -37,9 +37,9 @@ version 3.20230913
 
 =item * L<Exporter|Exporter>
 
-=item * L<base|base>
-
 =item * L<constant|constant>
+
+=item * L<parent|parent>
 
 =item * L<strict|strict>
 

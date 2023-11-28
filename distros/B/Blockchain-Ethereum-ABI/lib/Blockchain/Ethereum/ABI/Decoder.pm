@@ -1,4 +1,10 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad ':experimental(init_expr)';
 # ABSTRACT: ABI utility for decoding ethereum contract arguments
 
@@ -6,7 +12,7 @@ package Blockchain::Ethereum::ABI::Decoder;
 class Blockchain::Ethereum::ABI::Decoder;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.013';          # VERSION
+our $VERSION   = '0.015';          # VERSION
 
 use Carp;
 
@@ -57,7 +63,7 @@ Blockchain::Ethereum::ABI::Decoder - ABI utility for decoding ethereum contract 
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 

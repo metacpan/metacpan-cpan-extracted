@@ -66,7 +66,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "multidimensional" => 0
   },
-  "VERSION" => "6.007",
+  "VERSION" => "6.009",
   "test" => {
     "TESTS" => "t/*.t"
   }

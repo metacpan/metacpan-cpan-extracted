@@ -14,7 +14,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION ='0.88';
+our $VERSION ='0.89';
 
 my ( $btype1, $btype2, $btype3, $btype4) = ( 1, 2, 3, 4 );
 
@@ -22,6 +22,7 @@ my $israspberry = 0;
 my $israspberry2 = 0;
 my $israspberry3 = 0;
 my $israspberry4 = 0;
+my $israspberry5 = 0;
 my $hasdevicetree = 0;
 my $homedir = '/tmp';
 
@@ -149,6 +150,71 @@ my @_alt_func_names_2711 =
     [ 'SD0_DAT3'        , 'PWM0_1'          , 'PCM_DOUT'        , 'SD1_DAT3'        , 'ARM_TMS'         , '-'               ], # 53
 );
 
+my @_alt_func_names_2712 =
+(
+    # BANK 0
+    #  spi0,           dpi,         uart1,          i2c0,           _,             gpio,           proc_rio,       pio,          spi2),
+    [ 'SPI0_SIO[3]',  'DPI_PCLK',  'UART1_TX',     'I2C0_SDA',     '-',           'SYS_RIO[0]',   'PROC_RIO[0]',  'PIO[0]',      'SPI2_CSn[0]' ], #  0
+    [ 'SPI0_SIO[2]',  'DPI_DE',    'UART1_RX',     'I2C0_SCL',     '-',           'SYS_RIO[1]',   'PROC_RIO[1]',  'PIO[1]',      'SPI2_SIO[1]' ], #  1
+    [ 'SPI0_CSn[3]',  'DPI_VSYNC', 'UART1_CTS',    'I2C1_SDA',     'UART0_IR_RX', 'SYS_RIO[2]',   'PROC_RIO[2]',  'PIO[2]',      'SPI2_SIO[0]' ], #  2
+    [ 'SPI0_CSn[2]',  'DPI_HSYNC', 'UART1_RTS',    'I2C1_SCL',     'UART0_IR_TX', 'SYS_RIO[3]',   'PROC_RIO[3]',  'PIO[3]',      'SPI2_SCLK'   ], #  3
+    [ 'GPCLK[0]',     'DPI_D[0]',  'UART2_TX',     'I2C2_SDA',     'UART0_RI',    'SYS_RIO[4]',   'PROC_RIO[4]',  'PIO[4]',      'SPI3_CSn[0]' ], #  4
+    [ 'GPCLK[1]',     'DPI_D[1]',  'UART2_RX',     'I2C2_SCL',     'UART0_DTR',   'SYS_RIO[5]',   'PROC_RIO[5]',  'PIO[5]',      'SPI3_SIO[1]' ], #  5
+    [ 'GPCLK[2]',     'DPI_D[2]',  'UART2_CTS',    'I2C3_SDA',     'UART0_DCD',   'SYS_RIO[6]',   'PROC_RIO[6]',  'PIO[6]',      'SPI3_SIO[0]' ], #  6
+    [ 'SPI0_CSn[1]',  'DPI_D[3]',  'UART2_RTS',    'I2C3_SCL',     'UART0_DSR',   'SYS_RIO[7]',   'PROC_RIO[7]',  'PIO[7]',      'SPI3_SCLK'   ], #  7
+    [ 'SPI0_CSn[0]',  'DPI_D[4]',  'UART3_TX',     'I2C0_SDA',     '-',           'SYS_RIO[8]',   'PROC_RIO[8]',  'PIO[8]',      'SPI4_CSn[0]' ], #  8  
+    [ 'SPI0_SIO[1]',  'DPI_D[5]',  'UART3_RX',     'I2C0_SCL',     '-',           'SYS_RIO[9]',   'PROC_RIO[9]',  'PIO[9]',      'SPI4_SIO[0]' ], #  9
+    [ 'SPI0_SIO[0]',  'DPI_D[6]',  'UART3_CTS',    'I2C1_SDA',     '-',           'SYS_RIO[10]',  'PROC_RIO[10]', 'PIO[10]',     'SPI4_SIO[1]' ], # 10
+    [ 'SPI0_SCLK',    'DPI_D[7]',  'UART3_RTS',    'I2C1_SCL',     '-',           'SYS_RIO[11]',  'PROC_RIO[11]', 'PIO[11]',     'SPI4_SCLK',  ], # 11
+    [ 'PWM0[0]',      'DPI_D[8]',  'UART4_TX',     'I2C2_SDA',     'AUDIO_OUT_L', 'SYS_RIO[12]',  'PROC_RIO[12]', 'PIO[12]',     'SPI5_CSn[0]' ], # 12
+    [ 'PWM0[1]',      'DPI_D[9]',  'UART4_RX',     'I2C2_SCL',     'AUDIO_OUT_R', 'SYS_RIO[13]',  'PROC_RIO[13]', 'PIO[13]',     'SPI5_SIO[1]' ], # 13
+    [ 'PWM0[2]',      'DPI_D[10]', 'UART4_CTS',    'I2C3_SDA',     'UART0_TX',    'SYS_RIO[14]',  'PROC_RIO[14]', 'PIO[14]',     'SPI5_SIO[0]' ], # 14
+    [ 'PWM0[3]',      'DPI_D[11]', 'UART4_RTS',    'I2C3_SCL',     'UART0_RX',    'SYS_RIO[15]',  'PROC_RIO[15]', 'PIO[15]',     'SPI5_SCLK'   ], # 15
+    [ 'SPI1_CSn[2]',  'DPI_D[12]', 'MIPI0_DSI_TE', '-',            'UART0_CTS',   'SYS_RIO[16]',  'PROC_RIO[16]', 'PIO[16]',      '-'          ], # 16
+    [ 'SPI1_CSn[1]',  'DPI_D[13]', 'MIPI1_DSI_TE', '-',            'UART0_RTS',   'SYS_RIO[17]',  'PROC_RIO[17]', 'PIO[17]',      '-'          ], # 17
+    [ 'SPI1_CSn[0]',  'DPI_D[14]', 'I2S0_SCLK',    'PWM0[2]',      'I2S1_SCLK',   'SYS_RIO[18]',  'PROC_RIO[18]', 'PIO[18]',     'GPCLK[1]'    ], # 18
+    [ 'SPI1_SIO[1]',  'DPI_D[15]', 'I2S0_WS',      'PWM0[3]',      'I2S1_WS',     'SYS_RIO[19]',  'PROC_RIO[19]', 'PIO[19]',     '-'           ], # 19
+    [ 'SPI1_SIO[0]',  'DPI_D[16]', 'I2S0_SDI[0]',  'GPCLK[0]',     'I2S1_SDI[0]', 'SYS_RIO[20]',  'PROC_RIO[20]', 'PIO[20]',     '-'           ], # 20
+    [ 'SPI1_SCLK',    'DPI_D[17]', 'I2S0_SDO[0]',  'GPCLK[1]',     'I2S1_SDO[0]', 'SYS_RIO[21]',  'PROC_RIO[21]', 'PIO[21]',     '-'           ], # 21
+    [ 'SDIO0_CLK',    'DPI_D[18]', 'I2S0_SDI[1]',  'I2C3_SDA',     'I2S1_SDI[1]', 'SYS_RIO[22]',  'PROC_RIO[22]', 'PIO[22]',     '-'           ], # 22
+    [ 'SDIO0_CMD',    'DPI_D[19]', 'I2S0_SDO[1]',  'I2C3_SCL',     'I2S1_SDO[1]', 'SYS_RIO[23]',  'PROC_RIO[23]', 'PIO[23]',     '-'           ], # 23
+    [ 'SDIO0_DAT[0]', 'DPI_D[20]', 'I2S0_SDI[2]',  '-',            'I2S1_SDI[2]', 'SYS_RIO[24]',  'PROC_RIO[24]', 'PIO[24]',     'SPI2_CSn[1]' ], # 24
+    [ 'SDIO0_DAT[1]', 'DPI_D[21]', 'I2S0_SDO[2]',  'AUDIO_IN_CLK', 'I2S1_SDO[2]', 'SYS_RIO[25]',  'PROC_RIO[25]', 'PIO[25]',     'SPI3_CSn[1]' ], # 25
+    [ 'SDIO0_DAT[2]', 'DPI_D[22]', 'I2S0_SDI[3]',  'AUDIO_IN_DAT', 'I2S1_SDI[3]', 'SYS_RIO[26]',  'PROC_RIO[26]', 'PIO[26]',     'SPI5_CSn[1]' ], # 26
+    [ 'SDIO0_DAT[3]', 'DPI_D[23]', 'I2S0_SDO[3]',  'AUDIO_IN_DAT', 'I2S1_SDO[3]', 'SYS_RIO[27]',  'PROC_RIO[27]', 'PIO[27]',     'SPI1_CSn[1]' ], # 27
+    
+    # BANK 1
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 28
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 29
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 30
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 31
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 32
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 33
+   
+    # BANK 2
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 34
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 35
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 36
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 37
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 38
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 39
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 40
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 41
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 42
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 43
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 44
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 45
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 46
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 47
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 48
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 49
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 50
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 51
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 52
+    [ '-',            '-',         '-',            '-',            '-',           '-',            '-',            '-',           '-'           ], # 53
+    
+);
+
 my $_alt_function_names;
 my $_alt_function_names_version;
 
@@ -201,6 +267,7 @@ my %_revinfostash = (
         '1' => 'BCM2836',
         '2' => 'BCM2837',
         '3' => 'BCM2711',
+        '4' => 'BCM2712',
     },
     processor_info => {
         'BCM2835' => {
@@ -223,6 +290,12 @@ my %_revinfostash = (
         },
         'BCM2711' => {
             arm                 => 'Cortex-A72',
+            cores               => 4,
+            architecture_width  => 64,
+            raspios_supported   => [ 'armhf', 'arm64' ],
+        },
+        'BCM2712' => {
+            arm                 => 'Cortex-A76',
             cores               => 4,
             architecture_width  => 64,
             raspios_supported   => [ 'armhf', 'arm64' ],
@@ -251,6 +324,8 @@ my %_revinfostash = (
         '19' => 'Raspberry Pi Model 400',               # 13
         '20' => 'Raspberry Pi Compute Module 4',        # 14
         '21' => 'Raspberry Pi Compute Module 4S',       # 15
+        '22' => 'UNKOWN Rasberry Pi Model 22',          # 16
+        '23' => 'Rasberry Pi 5',                        # 17
     },
     board_type => {
         '0'  => $btype2,
@@ -275,6 +350,8 @@ my %_revinfostash = (
         '19' => $btype3,
         '20' => $btype4,
         '21' => $btype4,
+        '22' => $btype3,
+        '23' => $btype3,
     },
     release => {
         '0'  => 'Q1 2013',
@@ -299,6 +376,8 @@ my %_revinfostash = (
         '19' => 'Q4 2020',
         '20' => 'Q4 2020',
         '21' => 'Q4 2020',
+        '22' => 'unknown',
+        '23' => 'Q4 2023',
     },
     extended_release => {
         'a03111' => 'Q2 2019', #	4B	1.1	1GB	Sony UK
@@ -338,6 +417,8 @@ sub is_raspberry_3 { return $israspberry3; }
 
 sub is_raspberry_4 { return $israspberry4; }
 
+sub is_raspberry_5 { return $israspberry5; }
+
 sub has_device_tree { return $hasdevicetree; }
 
 sub home_directory { return $homedir; }
@@ -352,6 +433,8 @@ sub release_date { return $_config->{release}; }
 
 sub processor { return $_config->{processor}; }
 
+sub has_rp1 { return ( $israspberry5 ) ? 1 : 0; }
+
 sub hardware { return $_config->{hardware}; }
 
 sub model_name { return $_config->{modelname}; }
@@ -361,6 +444,8 @@ sub revision { return $_config->{revision}; }
 sub memory { return $_config->{memory}; }
 
 sub serial_number { return $_config->{serial}; }
+
+sub short_serial_number { return $_config->{short_serial}; }
 
 sub get_alt_function_names { return $_alt_function_names; }
 
@@ -421,7 +506,9 @@ sub _configure {
     }
     
     my $hardware = ($_cpuinfostash{Hardware}) ?  $_cpuinfostash{Hardware} : 'BCM2709';
-    my $serial = ($_cpuinfostash{Serial}) ?  $_cpuinfostash{Serial} : 'UNKNOWN';
+    my $serial = ($_cpuinfostash{Serial}) ?  $_cpuinfostash{Serial} : 'SERIALNONOTFOUND';
+    my $short_serial = $serial;
+    $short_serial =~ s/^(.{8})(.{8})$/$2/;
     my $board_type = ( $hardware eq 'BCM2708' ) ? 2 : 3;
     my $defaultkey = ( $board_type == 3  ) ? 'unknownex' : 'unknown';
     my $rev = ($_cpuinfostash{Revision}) ?  lc( $_cpuinfostash{Revision} ) : $defaultkey;
@@ -483,13 +570,20 @@ sub _configure {
             $binfo->{processor_info} = $_revinfostash{processor_info}->{$binfo->{processor}};
             
             $israspberry2 = ( $s_raspberry_type == 4 ) ? 1 : 0;
+            
             $israspberry3 = ( $s_raspberry_type == 8  ||
                               $s_raspberry_type == 10 ||
                               $s_raspberry_type == 13 ||
                               $s_raspberry_type == 14 ||
                               $s_raspberry_type == 16 ||
                               $s_raspberry_type == 18 ) ? 1 : 0;
-            $israspberry4 = ( $s_raspberry_type == 17 ) ? 1 : 0;
+            
+            $israspberry4 = ( $s_raspberry_type == 17 ||
+                              $s_raspberry_type == 19 ||
+                              $s_raspberry_type == 20 ||
+                              $s_raspberry_type == 21 ) ? 1 : 0;
+            
+            $israspberry5 = ( $s_raspberry_type == 23 ) ? 1 : 0;
             
             $_config = { %$binfo };
         } else {
@@ -513,8 +607,12 @@ sub _configure {
     
     $_config->{hardware} = $hardware;
     $_config->{serial}  = $serial;
+    $_config->{short_serial}  = $short_serial;
     
-    if($_config->{processor} eq 'BCM2711' ) {
+    if($_config->{processor} eq 'BCM2712' ) {
+        $_alt_function_names = \@_alt_func_names_2712;
+        $_alt_function_names_version = 3;
+    } elsif($_config->{processor} eq 'BCM2711' ) {
         $_alt_function_names = \@_alt_func_names_2711;
         $_alt_function_names_version = 2;
     } else {
@@ -524,8 +622,6 @@ sub _configure {
     
     return;
 }
-
-
 
 sub new {
     my $class = shift;
@@ -560,6 +656,7 @@ sub dump_board_info {
     $dump .= qq(Description      : $description\n);
     $dump .= qq(Revision         : $_config->{revision}\n);
     $dump .= qq(Serial Number    : $_config->{serial}\n);
+    $dump .= qq(Short Serial No  : $_config->{short_serial}\n);
     $dump .= qq(GPIO Header Type : $_config->{board_type}\n);
     $dump .= qq(Revision Number  : $_config->{revisionnumber}\n);
     my $devtree = ( has_device_tree() ) ? 'Yes' : 'No';
@@ -569,6 +666,7 @@ sub dump_board_info {
     $dump .= q(Is Raspberry 2   : ) . (($israspberry2) ? 'Yes' : 'No' ) . qq(\n);
     $dump .= q(Is Raspberry 3   : ) . (($israspberry3) ? 'Yes' : 'No' ) . qq(\n);
     $dump .= q(Is Raspberry 4   : ) . (($israspberry4) ? 'Yes' : 'No' ) . qq(\n);
+    $dump .= q(Is Raspberry 5   : ) . (($israspberry5) ? 'Yes' : 'No' ) . qq(\n);
     
     $dump .= q(Alt Function Map : Version ) . alt_func_version() . qq(\n);
     

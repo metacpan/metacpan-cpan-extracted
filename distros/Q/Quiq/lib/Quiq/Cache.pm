@@ -44,7 +44,7 @@ Die Datenstruktur darf ein Objekt (also geblesst) oder zirkulär sein.
 Die Cachdatei ist $duration Sekunden gültig. Danach ist sie
 ungültig und wird neu berechnet.
 
-Die Aufrufe L<read|"read() - Lies Daten aus Cachdatei">() und L<write|"write() - Schreibe Daten auf Cachdatei">() haben keine Wirkung, wenn
+Die Aufrufe L<read|"read() - Lies Daten aus Cachedatei">() und L<write|"write() - Schreibe Daten auf Cachdatei">() haben keine Wirkung, wenn
 C<$condition> wahr ist. Damit kann das Caching für bestimmte
 Fälle abgschaltet werden.
 
@@ -81,7 +81,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.212';
+our $VERSION = '1.213';
 
 use Quiq::Digest;
 use Quiq::Path;
@@ -124,7 +124,7 @@ Die zur Bildung des Hash herangezogenen Werte.
 
 =item -inactive => $bool (default: 0)
 
-Wenn wahr, ist der Cache inaktiv, d.h. $c->L<read|"read() - Lies Daten aus Cachdatei">() liefert immer
+Wenn wahr, ist der Cache inaktiv, d.h. $c->L<read|"read() - Lies Daten aus Cachedatei">() liefert immer
 C<undef> und $c->L<write|"write() - Schreibe Daten auf Cachdatei">() hat keine Wirkung.
 
 =item -prefix => $str (Default: '')
@@ -170,7 +170,7 @@ sub new {
 
 =head2 Objektmethoden
 
-=head3 read() - Lies Daten aus Cachdatei
+=head3 read() - Lies Daten aus Cachedatei
 
 =head4 Synopsis
 
@@ -262,7 +262,7 @@ sub write {
 
 =head1 VERSION
 
-1.212
+1.213
 
 =head1 AUTHOR
 

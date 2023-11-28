@@ -33,7 +33,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.29';
+our $VERSION = '0.36';
 
 use App::LXC::Container::Texts;
 
@@ -452,6 +452,53 @@ sub depends_on($$$)
 
 #########################################################################
 
+=head2 libraries_used - find package of executable
+
+    internal object-oriented implementation of the function
+    L<App::LXC::Container::Data::libraries_used>
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub libraries_used($$)
+{
+    _check_singleton(shift);
+    my ($executable) = @_;
+    -f $executable  or  fatal 'internal_error__1', 'not a file: ' . $executable;
+
+    # 1st check for non-standard interpreter to avoid security issues (see
+    # man-page of ldd under "Security"):
+    open my $file, '-|', 'file', $executable;	# Note that file never fails!
+    my $info = join("\n", <$file>);
+    close $file;
+    my @libraries = ();
+    unless ($info =~
+	    m|^$executable:\s.*\sinterpreter\s[a-z/0-9]+\bld-linux[-a-z0-9]*\.so|
+	    or
+	    $info =~ m|^$executable:\s.*\sLSB shared object,|)
+    {
+	error('bad_ldd_interpreter__1', $executable);
+	return @libraries;
+    }
+
+    # now call ldd:
+    open my $ldd, '-|', 'ldd', $executable;	# doesn't fail in a useful way
+    local $_;
+    while (<$ldd>)
+    {
+	next unless s/\s+\(0x[0-9a-f]+\)\r?\n?$//;
+	s/^.+\s=>\s//;
+	s/^\s+//;
+	next unless m|^/|;
+	$_ = abs_path($_);
+	push @libraries, $_ if $_;
+    }
+    close $ldd;
+    return @libraries;
+}
+
+#########################################################################
+
 =head2 package_of - find package of file
 
     internal object-oriented implementation of the function
@@ -469,7 +516,7 @@ sub package_of($$)
 
 #########################################################################
 
-=head2 paths_of - find package of file
+=head2 paths_of - get list of paths of package
 
     internal object-oriented implementation of the function
     L<App::LXC::Container::Data::paths_of>

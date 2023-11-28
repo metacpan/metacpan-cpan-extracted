@@ -19,9 +19,9 @@
 # or
 #	wget -nc --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global.zip
 #	wget -nc --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global-sa.zip
-# Remove all the data you're not going to use, I only keep au, ca, us
 #	unzip openaddr-collected-global.zip
 #	unzip openaddr-collected-global-sa.zip
+# Remove all the data you're not going to use, I only keep au, ca, us
 #	echo ?? | sed 's/ /\n/g' | egrep -v '(au|ca|us)' | xargs rm -rf
 #	rm -rf summary
 
@@ -403,6 +403,17 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20902,
 		}, {
+			'LAT' => 39.010801,
+			'LON' => -77.041771,
+			'NAME' => 'CVS',
+			'NUMBER' => 9520,
+			'STREET' => 'GEORGIA AVE',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910
+		}, {
 			'NAME' => 'FOREST GLEN MEDICAL CENTER',
 			'LAT' => 39.016042,
 			'LON' => -77.042148,
@@ -519,8 +530,8 @@ my %known_places = (	# Places I've checked with my GPS
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20910,
 		}, {
-			'LAT' => 39.010436,
-			'LON' => -77.048550,
+			'LAT' => 39.010447,
+			'LON' => -77.048548,
 			'NUMBER' => 9411,
 			'STREET' => 'WARREN ST',
 			'CITY' => 'SILVER SPRING',
@@ -560,6 +571,16 @@ my %known_places = (	# Places I've checked with my GPS
 			'STATE' => 'MD',
 			'COUNTRY' => 'US',
 			'POSTCODE' => 20851
+		}, {
+			'LAT' => 39.015394,
+			'LON' => -77.048357,
+			'NUMBER' => 2225,
+			'STREET' => 'FOREST GLEN RD',
+			'CITY' => 'SILVER SPRING',
+			'COUNTY' => 'MONTGOMERY',
+			'STATE' => 'MD',
+			'COUNTRY' => 'US',
+			'POSTCODE' => 20910
 		}, {
 			'LAT' => 39.0147541,
 			'LON' => -77.05466857,
@@ -1045,7 +1066,7 @@ if(!-d $oa) {
 # $dbh->do('CREATE TABLE cities(sequence INTEGER, city VARCHAR, county VARCHAR, state VARCHAR NOT NULL, country CHAR(2) NOT NULL)');
 # $dbh->do('CREATE TABLE openaddresses(md5 CHAR(16), lat DECIMAL, lon DECIMAL, name VARCHAR, number VARCHAR, street VARCHAR, city INTEGER, FOREIGN KEY (city) REFERENCES cities(sequence))');
 if((DEBUG&DEBUG_ALL) && (MAX_INSERT_COUNT != 1)) {
-	warn "MAX_INSERT_COUNT not set to 1 in DEBUG mode";
+	warn 'MAX_INSERT_COUNT not set to 1 in DEBUG mode';
 }
 
 if($dbh) {
@@ -2075,8 +2096,12 @@ sub create_tree_from_git {
 
 	foreach my $dir(<"$where/*/.git">) {
 		my($d1, $d2) = fileparse($dir);	# File::BaseName
+		print "Changing directory to $d2\n" if(DEBUG&DEBUG_ALL);
 		chdir $d2;
-		open(my $fin, '-|', 'git ls-tree -r master --name-only');
+		# Some call the main branch master, some call it main
+		# So use HEAD
+		# open(my $fin, '-|', 'git ls-tree -r master --name-only');
+		open(my $fin, '-|', 'git ls-tree -r HEAD --name-only');
 		while(my $line = <$fin>) {
 			chomp $line;
 			my $file = File::Spec->catfile($d2, $line);

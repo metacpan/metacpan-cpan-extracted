@@ -1,11 +1,9 @@
 package Error::Pure::Output::Tags::HTMLCustomPage;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use HTTP::Headers::Fast;
 use Readonly;
 
@@ -14,8 +12,7 @@ Readonly::Array our @EXPORT_OK => qw(err_pretty);
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $SPACE => q{ };
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Pretty print.
 sub err_pretty {
@@ -81,6 +78,7 @@ Error::Pure::Output::Tags::HTMLCustomPage - Error::Pure HTML output helper.
 =head1 SYNOPSIS
 
  use Error::Pure::Output::Tags::HTMLCustomPage qw(err_pretty);
+
  err_pretty($tags_obj, $encoding, $content_type, $xml_version, $tags_structure_ar);
 
 =head1 SUBROUTINES
@@ -95,11 +93,11 @@ Error::Pure::Output::Tags::HTMLCustomPage - Error::Pure HTML output helper.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=error_as_html_indent.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Tags::HTMLCustomPage qw(err_pretty);
  use Tags::Output::Indent;
 
@@ -141,11 +139,11 @@ Error::Pure::Output::Tags::HTMLCustomPage - Error::Pure HTML output helper.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=error_as_html_raw.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Tags::HTMLCustomPage qw(err_pretty);
  use Tags::Output::Raw;
 
@@ -178,6 +176,7 @@ Error::Pure::Output::Tags::HTMLCustomPage - Error::Pure HTML output helper.
 
 =head1 DEPENDENCIES
 
+L<Exporter>,
 L<HTTP::Headers::Fast>,
 L<Readonly>.
 
@@ -193,21 +192,22 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-Output-Tags-HTMLCustomPage>
+L<https://github.com/michal-josef-spacek/Error-Pure-Output-Tags-HTMLCustomPage>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

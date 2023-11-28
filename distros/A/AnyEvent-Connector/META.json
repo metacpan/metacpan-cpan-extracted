@@ -4,13 +4,13 @@
       "Toshio Ito <toshioito@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4216",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AnyEvent-Connector",
    "no_index" : {
@@ -60,6 +60,6 @@
          "web" : "https://github.com/debug-ito/AnyEvent-Connector"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -22,17 +22,16 @@ requires 'Error::Pure' => 0.13;
 requires 'Text::CharWidth' => 0;
 requires 'Unicode::Char' => 0;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Unicode-Block';
-resources 'homepage' => 'https://github.com/tupinek/Unicode-Block';
-resources 'repository' => 'git://github.com/tupinek/Unicode-Block';
-test_requires 'Encode' => 0;
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Unicode-Block/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Unicode-Block';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Unicode-Block';
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0.13;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Cert;
 # ABSTRACT: Class to model a VMC Cert
-our $VERSION = '3.20230913'; # VERSION
+our $VERSION = '3.20231123'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -157,7 +157,7 @@ Mail::BIMI::VMC::Cert - Class to model a VMC Cert
 
 =head1 VERSION
 
-version 3.20230913
+version 3.20231123
 
 =head1 DESCRIPTION
 

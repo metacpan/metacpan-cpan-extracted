@@ -5,6 +5,10 @@ Created:      2019-10-28
 Home page:    <https://metacpan.org/release/JSONLD/>
 Bug tracker:  <https://github.com/kasei/perl-jsonld/issues>
 
+0.006  2023-11-18
+
+ - (Update) Fix utf-8 decoding of remote context data (#6).
+
 0.005  2020-12-12
 
  - (Update) Fix package metadata (#4).

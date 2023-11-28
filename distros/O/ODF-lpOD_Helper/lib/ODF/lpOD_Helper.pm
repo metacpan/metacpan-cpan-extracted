@@ -87,7 +87,7 @@ ODF::lpOD_Helper enables transparent Unicode support,
 provides higher-level multi-segment text search & replace methods,
 and works around ODF::lpOD bugs and limitations.
 
-Styles may be specified with a high-level notation and
+Styles and hyperlinks may be specified with a high-level notation and
 the necessary span and style objects are automatically created
 and fonts registered.
 
@@ -96,8 +96,8 @@ and fonts registered.
 package ODF::lpOD_Helper;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.007'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-10-14'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.009'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-11-16'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Data::Dumper::Interp 6.004 qw/visnew
@@ -644,6 +644,15 @@ Fonts are automatically registered.
 To use an existing (or to-be-created) ODF Style, use
 
   [style_name => "name of style"]
+
+Additionally, a text segment may be made into a hyperlink with these
+pseudo-properties, which must appear before any others:
+
+  hyperlink       => "https://..."
+  visited_style   => "stylename"     # optional
+  unvisited_style => "stylename"     # optional
+
+Regular format properties may follow (or not).
 
 =cut
 
@@ -1450,12 +1459,40 @@ sub ODF::lpOD::Element::Hinsert_content {
   while (@content) {
     local $_ = shift @content;
     if (ref) {
-      my $tprops = $_;
-      my $stylename;
-      if (@$tprops == 2 && $tprops->[0] =~ /^style[-_ ]name$/) {
-        $stylename = $tprops->[1];
-      } else {
-        my $ts = $doc->Hautomatic_style('text', @$tprops) // oops;
+      my $props = $_;
+      my ($stylename, %hyperlink_params);
+      # Sort of a hack: The hyperlink options must preceed all others!
+      # (because we don't know what the single-item abbreviations are here)
+      while (@$props) {
+        if ($props->[0] eq "hyperlink") {
+          $hyperlink_params{url} = (splice @$props, 0, 2)[1];
+          next;
+        }
+        if ($props->[0] =~ /^visited([-_ ])style\g{-1}name$/) {
+          $hyperlink_params{"visited style name"} = (splice @$props, 0, 2)[1];
+          next;
+        }
+        if ($props->[0] =~ /^unvisited([-_ ])style\g{-1}name$/) {
+          $hyperlink_params{"style name"} = (splice @$props, 0, 2)[1];
+          next;
+        }
+        if ($props->[0] eq "title") {
+          $hyperlink_params{"title"} = (splice @$props, 0, 2)[1];
+          next;
+        }
+        if ($props->[0] eq "name") {
+          $hyperlink_params{"name"} = (splice @$props, 0, 2)[1];
+          next;
+        }
+        if ($props->[0] =~ /^style[-_ ]name$/) {
+          $stylename = (splice @$props, 0, 2)[1];
+          croak "Other properties not allowed with 'style-name'"
+            if @$props;
+        }
+        last;
+      }
+      unless ($stylename) {
+        my $ts = $doc->Hautomatic_style('text', @$props) // oops;
         $stylename = $ts->get_name;
       }
       my $vtext = shift(@content)
@@ -1465,6 +1502,11 @@ sub ODF::lpOD::Element::Hinsert_content {
       my $span = $container_para->insert_element('text:span', position => LAST_CHILD);
       $span->set_attribute('style-name', $stylename);
       $span->ODF::lpOD::TextElement::set_text($vtext);
+      if (%hyperlink_params) {
+        my $url = delete $hyperlink_params{url} // croak "No hyperlink 'url'";
+        # Example in ODF::lpOD::TextElement
+        $span->set_hyperlink(filter => '.*', url => $url);
+      }
     } else {
       my $vtext = $_;
       # Create a temporary orphan paragraph so we can use

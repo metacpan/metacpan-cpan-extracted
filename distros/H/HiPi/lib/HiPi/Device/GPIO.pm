@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Device::GPIO
 # Description:   Wrapper for GPIO
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -14,13 +14,15 @@ use warnings;
 use parent qw( HiPi::Device );
 use Carp;
 use HiPi qw( :rpi );
+use HiPi::RaspberryPi;
 use HiPi::Device::GPIO::Pin;
 use Fcntl;
 
-our $VERSION ='0.81';
+our $VERSION ='0.90';
 
 my $sysroot = '/sys/class/gpio';
 
+my $pinoffset = ( HiPi::RaspberryPi::has_rp1() ) ? 399 : 0;
 
 sub new {
     my ($class, %userparams) = @_;
@@ -45,10 +47,11 @@ sub export_pin {
 
 sub unexport_pin {
     my( $class, $pinno ) = @_;
-    my $pinroot = qq(${sysroot}/gpio${pinno});
+    my $syspin = $pinno + $pinoffset;
+    my $pinroot = qq(${sysroot}/gpio${syspin});
     return if !-d $pinroot;
     # unexport the pin
-    system( qq(/bin/echo $pinno > ${sysroot}/unexport) ) and croak qq(failed to unexport pin $pinno : $!);
+    system( qq(/bin/echo $syspin > ${sysroot}/unexport) ) and croak qq(failed to unexport pin $pinno : $!);
 }
 
 sub unexport_all {
@@ -67,7 +70,8 @@ sub unexport_all {
 
 sub pin_status {
     my($class, $pinno) = @_;
-    my $pinroot = qq(${sysroot}/gpio${pinno});
+    my $syspin = $pinno + $pinoffset;
+    my $pinroot = qq(${sysroot}/gpio${syspin});
     return (-d $pinroot ) ? DEV_GPIO_PIN_STATUS_EXPORTED : DEV_GPIO_PIN_STATUS_NONE;    
 }
 
@@ -210,11 +214,32 @@ sub get_pin_interrupt {
     return $edge;
 }
 
+sub set_pin_schmitt {
+    warn q(HiPi::Device::GPIO does not support schmitt actions);
+    return undef;
+}
+
+sub get_pin_schmitt {
+    warn q(HiPi::Device::GPIO does not support schmitt actions);
+    return undef;
+}
+
+sub set_pin_slew {
+    warn q(HiPi::Device::GPIO does not support slew actions);
+    return undef;
+}
+
+sub get_pin_slew {
+    warn q(HiPi::Device::GPIO does not support slew actions);
+    return undef;
+}
+
 sub _do_export {
     my ($class, $pinno ) = @_;
-    my $pinroot = qq(${sysroot}/gpio${pinno});
+    my $syspin = $pinno + $pinoffset;
+    my $pinroot = qq(${sysroot}/gpio${syspin});
     return $pinroot if -d $pinroot;
-    system(qq(/bin/echo $pinno > ${sysroot}/export)) and croak qq(failed to export pin $pinno : $!);
+    system(qq(/bin/echo $syspin > ${sysroot}/export)) and croak qq(failed to export pin $pinno : $!);
         
     # We have to wait for the system to export the pin correctly.
     # Max 10 seconds

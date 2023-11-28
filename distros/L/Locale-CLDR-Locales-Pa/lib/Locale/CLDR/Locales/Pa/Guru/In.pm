@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Pa::Guru::In - Package for language Punjabi
 
 package Locale::CLDR::Locales::Pa::Guru::In;
 # This file auto generated from Data\common\main\pa_Guru_IN.xml
-#	on Fri 13 Oct  9:33:10 am GMT
+#	on Sat  4 Nov  6:19:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

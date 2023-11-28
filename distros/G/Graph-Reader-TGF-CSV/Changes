@@ -1,3 +1,13 @@
+0.03 2023-11-24T21:26:36+01:00
+ - Fix bugtracker.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.02 2015-10-29T16:32:14+01:00
  - Fix LICENSE file.
  - Improve LICENSE AND COPYRIGHT section in doc.

@@ -1,0 +1,33 @@
+---
+abstract: "Parse Pg's test_decoding messages"
+author:
+  - 'Chris Travers <chris.travers@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PGObject-Util-LogRep-TestDecoding
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  Moo: '0'
+  Parse::RecDescent: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  parent: '0'
+  perl: '5.034'
+  strict: '0'
+  warnings: '0'
+version: v0.1.4
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,8 @@
+0.09 2023-11-25T16:02:35+01:00
+ - Rename example files to better names.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.08 2022-05-04T15:01:23+02:00
  - Fix test on Windows.
 

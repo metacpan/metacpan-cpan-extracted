@@ -1,7 +1,8 @@
 /*###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,8 +12,7 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: epnames.h 1578075 2014-03-16 14:01:14Z richter $
-#
+
 ###################################################################################*/
 
 /*
@@ -325,9 +325,6 @@
 #ifndef sv_count
 #define sv_count PL_sv_count
 #endif
-#ifndef sv_objcount
-#define sv_objcount PL_sv_objcount
-#endif
 #ifndef op_mask
 #define op_mask PL_op_mask
 #endif
@@ -347,7 +344,7 @@
 
 #endif
 
-#define SvGETMAGIC_P4(x)
+#define SvGETMAGIC_P4(x) SvGETMAGIC(x)
 
 
 #else  /* PERL_VERSION > 5 */

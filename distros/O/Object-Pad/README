@@ -646,10 +646,13 @@ KEYWORDS
     Field initialier expressions were originally experimental, but since
     version 0.800 no longer emit experimental warnings.
 
-    Since version 0.76 expressions that are purely compiletime constants
-    (either as single scalars or entire lists of constants) are no longer
-    considered experimental. They can be used without silencing the
-    warning.
+    Since version 0.806 fields already declared in a class are visible
+    during the initialisation expression of later fields, and their
+    assigned value can be used here. If the earlier field had a :param
+    declaration, it will have been assigned from the value passed to the
+    constructor. Note however that all ADJUST blocks happen after field
+    initialisation expressions, so any modified values set in such blocks
+    will not be visible at this time.
 
     Control flow that attempts to leave a field initialiser expression or
     block is not permitted. This includes any return expression, any

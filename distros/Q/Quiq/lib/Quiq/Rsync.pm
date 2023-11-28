@@ -61,9 +61,10 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.212';
+our $VERSION = '1.213';
 
 use Quiq::Option;
+use Quiq::Path;
 use File::Rsync ();
 
 # -----------------------------------------------------------------------------
@@ -158,14 +159,24 @@ sub exec {
         -print => \$print,
     );
 
-    my $rsy = File::Rsync->new(
-        -archive => 1,
-        -verbose => 1,
-        -delete => 1,
-        -dry_run => $dryRun,
+    # my $rsy = File::Rsync->new(
+    #     -archive => 1,
+    #     -verbose => 1,
+    #     -delete => 1,
+    #     -dry_run => $dryRun,
+    #     src => $src,
+    #     dest => $dest,
+    # );
+
+    my $rsy = File::Rsync->new({
+        'path-to-rsync' => Quiq::Path->findProgram('rsync'),
+        archive => 1,
+        verbose => 1,
+        delete => 1,
+        dry_run => $dryRun,
         src => $src,
         dest => $dest,
-    );
+    });
 
     my $output = '';
     if (!$rsy->exec) {
@@ -226,7 +237,7 @@ sub exec {
 
 =head1 VERSION
 
-1.212
+1.213
 
 =head1 AUTHOR
 

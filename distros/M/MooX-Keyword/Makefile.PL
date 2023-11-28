@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   	'Moo' => '0'
     },
     PREREQ_PM => {
-        'MooX::ReturnModifiers' => '1.000000',
+        'MooX::ReturnModifiers' => '1.000001',
     	'Anonymous::Object' => '0.07'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

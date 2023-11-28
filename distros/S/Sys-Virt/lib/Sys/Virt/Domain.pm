@@ -1353,6 +1353,7 @@ over point. The C<downtime> parameter is measured in milliseconds.
 The C<$flags> parameter is currently unused and defaults to zero.
 
 =item $downtime = $dom->migrate_get_max_downtime($flags=0)
+
 Get the current value of the maximum downtime allowed during a
 migration of a guest. The returned <downtime> value is measured
 in milliseconds. The C<$flags> parameter is currently unused and

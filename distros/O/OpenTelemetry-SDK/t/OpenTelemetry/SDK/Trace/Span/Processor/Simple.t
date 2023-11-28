@@ -7,12 +7,15 @@ use Test2::Tools::OpenTelemetry;
 use Object::Pad ':experimental(init_expr)';
 
 class Local::Test :does(OpenTelemetry::Exporter) {
+    use Future::AsyncAwait;
+
     field $calls :reader = [];
     method $log { push @$calls, [ @_ ] }
 
-    method export      { $self->$log( export      => @_ ); 1 }
-    method shutdown    { $self->$log( shutdown    => @_ ); 1 }
-    method force_flush { $self->$log( force_flush => @_ ); 1 }
+    method export { $self->$log( export=> @_ ); 1 }
+
+    async method shutdown    { $self->$log( shutdown    => @_ ); 1 }
+    async method force_flush { $self->$log( force_flush => @_ ); 1 }
 }
 
 like dies { CLASS->new },

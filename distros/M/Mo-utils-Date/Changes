@@ -1,0 +1,8 @@
+0.02 2023-11-14T21:32:20+01:00
+ - Add check_date_dmy().
+ - Fix test dependencies.
+ - Improve ERRORS section in doc.
+ - Rename example file to name like in Mo::utils.
+
+0.01 2023-11-14T08:47:19+01:00
+ - First version. Moved from MARC::Convert::Wikidata::Object::Utils.

@@ -1,0 +1,3 @@
+# .perlcriticrc
+theme = community
+severity = 1

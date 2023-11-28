@@ -1,0 +1,75 @@
+NAME
+
+    WebService::Readwise - Perl module to interact with Readwise.io API
+
+VERSION
+
+    version 0.002
+
+SYNOPSIS
+
+        use WebService::Readwise;
+        my $readwise = WebService::Readwise->new(token => 'readwise_token_foo');
+        my $highlights = $readwise->highlights;
+        say 'First highlight: ' . $highlights->{results}[0]{text};
+
+DESCRIPTION
+
+    Access the https://readwise.io/api_deets API.
+
+ATTRIBUTES
+
+ token( $token )
+
+    API token from readwise.io.
+
+    Obtain thihs from https://readwise.io/access_token
+
+    If not provided can be obtained from WEBSERVICE_READWISE_TOKEN
+    environment variable
+
+ base_url( $url )
+
+    URL for the Readwise API.
+
+    Defaults if not specified
+
+ http( )
+
+    Provides HTTP::Tiny object. Used to get data from API.
+
+METHODS
+
+ auth( )
+
+    Returns 204 if you have a valid token
+
+    Makes a GET request to https://readwise.io/api/v2/auth/
+
+ export( pageCursor => $cursor)
+
+    Returns data structure containing a paginated record of all your
+    Readwise data.
+
+    Optionally,the pageCursor parameter can be used to retrieve
+    additionalpages of results
+
+    Makes a GET request to https://readwise.io/api/v2/export/
+
+ highlights( )
+
+    Returns array of highlights
+
+    Makes a GET request to https://readwise.io/api/v2/highlight/
+
+AUTHOR
+
+    Lance Wicks <lw@judocoach.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2023 by Lance Wicks.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

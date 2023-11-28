@@ -1,12 +1,8 @@
 package Perinci::Tx::Manager;
 
-our $DATE = '2017-07-10'; # DATE
-our $VERSION = '0.57'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
 use DBI;
@@ -23,6 +19,11 @@ use UUID::Random;
 require Perinci::Access::Schemeless;
 package
     Perinci::Access::Schemeless;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-17'; # DATE
+our $DIST = 'Perinci-Tx-Manager'; # DIST
+our $VERSION = '0.580'; # VERSION
 
 sub actionmeta_get_code_and_meta { +{
     applies_to => ['function'],
@@ -817,7 +818,7 @@ sub _cleanup {
         my @tx_ids = map {$_->[0]}
             @{ $dbh->selectall_arrayref("SELECT ser_id FROM tx") // []};
         for my $tx_id (@dirs) {
-            next if $tx_id ~~ @tx_ids;
+            next if grep { $tx_id eq $_ } @tx_ids;
             log_trace("Deleting %s ...", "$dir/$tx_id");
             remove "$dir/$tx_id";
         }
@@ -988,13 +989,7 @@ sub _wrap {
             $self->_rollback_dbh;
             return [484, "No such transaction"];
         }
-        my $ok;
-        # 'str' ~~ $aryref doesn't seem to work?
-        if (ref($wargs{tx_status}) eq 'ARRAY') {
-            $ok = $cur_tx->{status} ~~ @{$wargs{tx_status}};
-        } else {
-            $ok = $cur_tx->{status} ~~ $wargs{tx_status};
-        }
+        my $ok = grep { $cur_tx->{status} eq $_ } @{$wargs{tx_status}};
         unless ($ok) {
             $self->_rollback_dbh;
             return $self->_resp_incorrect_tx_status($cur_tx);
@@ -1391,7 +1386,7 @@ Perinci::Tx::Manager - A Rinci transaction manager
 
 =head1 VERSION
 
-This document describes version 0.57 of Perinci::Tx::Manager (from Perl distribution Perinci-Tx-Manager), released on 2017-07-10.
+This document describes version 0.580 of Perinci::Tx::Manager (from Perl distribution Perinci-Tx-Manager), released on 2023-11-17.
 
 =head1 SYNOPSIS
 
@@ -1400,9 +1395,9 @@ This document describes version 0.57 of Perinci::Tx::Manager (from Perl distribu
 =head1 DESCRIPTION
 
 This class implements transaction and undo manager (TM), as specified by
-L<Rinci::function::Transaction> and L<Riap::Transaction>. It is meant to be
-instantiated by L<Perinci::Access::Schemeless>, but will also be passed to
-transactional functions to save undo/redo data.
+L<Rinci::Transaction> and L<Riap::Transaction>. It is meant to be instantiated
+by L<Perinci::Access::Schemeless>, but will also be passed to transactional
+functions to save undo/redo data.
 
 It uses SQLite database to store transaction list and undo/redo data as well as
 transaction data directory to provide trash_dir/tmp_dir for functions that
@@ -1613,14 +1608,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Tx
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Tx-Manager>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Tx-Manager>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Rinci::Transaction>
@@ -1631,11 +1618,43 @@ L<Perinci::Access::Schemeless>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Tx-Manager>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

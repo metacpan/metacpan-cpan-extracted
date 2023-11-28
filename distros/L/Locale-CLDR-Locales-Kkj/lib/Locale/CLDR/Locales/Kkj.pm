@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kkj - Package for language Kako
 
 package Locale::CLDR::Locales::Kkj;
 # This file auto generated from Data\common\main\kkj.xml
-#	on Fri 13 Oct  9:23:35 am GMT
+#	on Sat  4 Nov  6:09:48 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

@@ -27,7 +27,7 @@ Il n'est pas nécessaire que les lignes de données d'entrée et de sortie soien
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # OPTIONS
 
@@ -39,19 +39,25 @@ Version 0.9901
 
     Combine une séquence de lignes non vides en une seule ligne avant de les transmettre à la commande de filtrage. Les caractères de nouvelle ligne entre les caractères larges sont supprimés et les autres caractères de nouvelle ligne sont remplacés par des espaces.
 
-- **--blockmatch**
+- **--blocks**
 
     Normalement, la zone correspondant au modèle de recherche spécifié est envoyée à la commande externe. Si cette option est spécifiée, ce n'est pas la zone correspondant au motif de recherche qui sera traitée, mais l'ensemble du bloc qui la contient.
 
     Par exemple, pour envoyer à la commande externe des lignes contenant le motif `foo`, vous devez spécifier le motif correspondant à la ligne entière :
 
-        greple -Mtee cat -n -- '^.*foo.*\n'
+        greple -Mtee cat -n -- '^.*foo.*\n' --all
 
-    Mais avec l'option **--blockmatch**, cela peut être fait aussi simplement que suit :
+    Mais avec l'option **--blocks**, cela peut être fait aussi simplement que suit :
 
-        greple -Mtee cat -n -- foo
+        greple -Mtee cat -n -- foo --blocks
 
-    Avec l'option **--blockmatch**, ce module se comporte plus comme l'option **-g** de [teip(1)](http://man.he.net/man1/teip).
+    Avec l'option **--blocs**, ce module se comporte plus comme l'option **-g** de [teip(1)](http://man.he.net/man1/teip). Sinon, le comportement est similaire à celui de [teip(1)](http://man.he.net/man1/teip) avec l'option **-o**.
+
+    N'utilisez pas l'option **--blocks** avec l'option **--all**, car le bloc sera la totalité des données.
+
+- **--squeeze**
+
+    Combine deux ou plusieurs caractères de retour à la ligne consécutifs en un seul.
 
 # WHY DO NOT USE TEIP
 

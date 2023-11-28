@@ -6,13 +6,19 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'App/LocaleCodesUtils.pm'
+    'App/LocaleCodesUtils.pm',
+    'App/LocaleCodesUtils/ListCountries.pm',
+    'App/LocaleCodesUtils/ListCurrencies.pm',
+    'App/LocaleCodesUtils/ListLanguages.pm',
+    'App/LocaleCodesUtils/ListScripts.pm'
 );
 
 my @scripts = (
+    'script/country-code2code',
+    'script/language-code2code',
     'script/list-countries',
     'script/list-currencies',
     'script/list-languages',

@@ -38,7 +38,7 @@ sub new {
         $self->{'x_pos'} = $self->GetPosition->x;
         $self->{'y_pos'} = $self->GetPosition->y;
 
-        if (exists $self->{'data'}{'new'}) {
+        if (exists $self->{'flag'}{'new'}) {
             $self->{'dc'}->Blit (0, 0, $self->{'size'}{'x'} + $self->{'x_pos'},
                                        $self->{'size'}{'y'} + $self->{'y_pos'} + $self->{'menu_size'},
                                        $self->paint( Wx::PaintDC->new( $self ), $self->{'size'}{'x'}, $self->{'size'}{'y'} ), 0, 0);
@@ -54,14 +54,27 @@ sub new {
     return $self;
 }
 
-sub set_data {
-    my( $self, $data ) = @_;
-    return unless ref $data eq 'HASH';
-    $self->{'data'} = $data;
-    $self->{'data'}{'new'} = 1;
+sub draw {
+    my( $self, $settings ) = @_;
+    return unless $self->set_settings( $settings );
+    $self->Refresh;
 }
 
-sub set_sketch_flag { $_[0]->{'data'}{'sketch'} = 1 }
+sub sketch {
+    my( $self, $settings ) = @_;
+    return unless $self->set_settings( $settings );
+    $self->{'flag'}{'sketch'} = 1;
+    $self->Refresh;
+}
+
+sub set_settings {
+    my( $self, $data ) = @_;
+    return unless ref $data eq 'HASH';
+    $self->GetParent->{'progress'}->reset;
+    $self->{'data'} = $data;
+    $self->{'flag'}{'new'} = 1;
+}
+
 
 sub paint {
     my( $self, $dc, $width, $height ) = @_; # my $t = Benchmark->new;
@@ -103,7 +116,7 @@ sub paint {
     $max_freq = abs $fr if $max_freq < abs $fr;
 
     my $step_in_circle = $self->{'data'}{'line'}{'density'} * $self->{'data'}{'line'}{'density'} * $max_freq;
-    my $t_iter =         exists $self->{'data'}{'sketch'}
+    my $t_iter =         exists $self->{'flag'}{'sketch'}
                ? 5 * $step_in_circle
                : $self->{'data'}{'line'}{'length'} * $step_in_circle;
 
@@ -241,7 +254,7 @@ sub paint {
                         ' + ($y * App::GUI::Harmonograph::Function::'.$self->{'data'}{'mod'}{'r22_function'}.
                             '('.$var_names{ $self->{'data'}{'mod'}{'r22_var'} }.')));'."\n" if $dtr;
 
-    $code .= ($self->{'data'}{'line'}{'connect'} or exists $self->{'data'}{'sketch'})
+    $code .= $self->{'data'}{'line'}{'connect'}
            ? '  $dc->DrawLine( $cx + $x_old, $cy + $y_old, $cx + $x, $cy + $y);'."\n"
            : '  $dc->DrawPoint( $cx + $x, $cy + $y );'."\n";
     $code .= '  $tx += $dtx;'."\n"                          if $dtx;
@@ -287,15 +300,14 @@ sub paint {
 
     $code .= ' $dc->SetPen( Wx::Pen->new( Wx::Colour->new( @{$color[++$color_index]} ),'.
              ' $thickness, &Wx::wxPENSTYLE_SOLID)) unless $_ % $color_change_time;' if $cflow->{'type'} ne 'no' and @color;
-    $code .= '  $progress->add_percentage( $_ / $t_iter * 100, $color[$color_index] ) unless $_ % $step_in_circle;'."\n" unless defined $self->{'data'}{'sketch'};
-    $code .= '  ($x_old, $y_old) = ($x, $y);'."\n" if ($self->{'data'}{'line'}{'connect'} or exists $self->{'data'}{'sketch'});
+    $code .= '  $progress->add_percentage( $_ / $t_iter * 100, $color[$color_index] ) unless $_ % $step_in_circle;'."\n" unless defined $self->{'flag'}{'sketch'};
+    $code .= '  ($x_old, $y_old) = ($x, $y);'."\n" if ($self->{'data'}{'line'}{'connect'} or exists $self->{'flag'}{'sketch'});
     $code .= '}';
 
     eval $code; # say $code;
     die "bad iter code - $@ : $code" if $@; # say "comp: ",timestr( timediff( Benchmark->new(), $t) );
 
-    delete $self->{'data'}{'new'};
-    delete $self->{'data'}{'sketch'};
+    delete $self->{'flag'};
     $dc;
 }
 

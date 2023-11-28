@@ -1,5 +1,7 @@
 Revision history for Template-Plugin-Filter-PlantUML
 
+0.02    Nov 11, 2023
+	Second Version, compatible with UML::PlantUML::Encoder version 0.03
 0.01    May 22, 2019
         First version, uploaded to GitHub. Expecting Peer Reviews.
 

@@ -155,7 +155,7 @@ SEE ALSO
         Install the Curses::UI modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Curses-UI-Volume>
+    <https://github.com/michal-josef-spacek/Curses-UI-Volume>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -163,10 +163,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2014-2022 Michal Josef Špaček
+    © 2014-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Asa::Any::Tz - Package for language Asu
 
 package Locale::CLDR::Locales::Asa::Any::Tz;
 # This file auto generated from Data\common\main\asa_TZ.xml
-#	on Fri 13 Oct  9:05:50 am GMT
+#	on Sat  4 Nov  5:52:46 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

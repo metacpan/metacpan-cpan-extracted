@@ -6,7 +6,7 @@ use Gnuplot::Builder::Script;
 use Gnuplot::Builder::Dataset;
 use Gnuplot::Builder::Process;
 
-our $VERSION = "0.31";
+our $VERSION = "0.32";
 
 our @EXPORT = our @EXPORT_OK = qw(gscript gfunc gfile gdata ghelp gwait);
 
@@ -293,6 +293,23 @@ Arrange dataset options in valid order.
 
     $dataset = gfile('data.txt', with => "linespoints", using => "1:3"); ## NG!
     $dataset = gfile('data.txt', using => "1:3", with => "linespoints"); ## OK
+
+=item *
+
+Encode wide characters appropriately.
+
+    use utf8;
+    use Gnuplot::Builder::Process;
+    
+    ## Let Gnuplot::Builder automatically encode input data for gnuplot process
+    $Gnuplot::Builder::Process::ENCODING = 'utf8';
+    
+    $script->set(title => '"日本語のタイトル"');
+    $script->plot('sin(x)');
+
+Otherwise, a warning like C<Wide character in print> would appear. See also: L<Gnuplot::Builder::Process/$ENCODING>.
+
+
 
 =back
 

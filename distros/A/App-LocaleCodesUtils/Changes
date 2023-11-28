@@ -1,3 +1,10 @@
+0.004   2023-08-06  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLIs: language-code2code, country-code2code.
+
+        - Split list-* backend modules to improve startup.
+
+
 0.003   2020-03-02  Released-By: PERLANCAR; Urgency: medium
 
 	[list-countries]

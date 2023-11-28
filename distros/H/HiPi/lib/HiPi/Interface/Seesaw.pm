@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::Seesaw
 # Description  : Module for Adafruit seesaw breakouts
-# Copyright    : Copyright (c) 2020 Mark Dootson
+# Copyright    : Copyright (c) 2020-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -34,7 +34,7 @@ my @initaccessors = ( qw(
                     _neopixel_buffer _neopixel_pixels 
                      ) );
 
-__PACKAGE__->create_accessors( qw(  address devicename board delay pinmap ) );
+__PACKAGE__->create_accessors( qw(  address devicename board action_delay reset_delay pinmap ) );
 
 __PACKAGE__->create_accessors( @initaccessors );
 
@@ -48,7 +48,8 @@ sub new {
     my %params = (
         devicename   => ( $pi->board_type == RPI_BOARD_TYPE_1 ) ? '/dev/i2c-0' : '/dev/i2c-1',
         device       => undef,
-        delay   => 500,
+        action_delay => 500,
+        reset_delay  => 500,
         reset   => 0,
         pinmap => {
             gpio => {
@@ -89,6 +90,12 @@ sub new {
     # get user params
     foreach my $key( keys (%userparams) ) {
         $params{$key} = $userparams{$key};
+    }
+    
+    ## handle legacy delay param
+    if (exists($params{delay})) {
+        $params{action_delay} = $params{delay};
+        delete($params{delay});
     }
     
     unless(defined($params{device})) {
@@ -251,7 +258,7 @@ sub _map_pin_mask {
 
 sub read_register {
     my($self, $regbase, $regmember, $numbytes, $delay) = @_;
-    $delay //= $self->delay;
+    $delay //= $self->action_delay;
     $self->device->i2c_write($regbase, $regmember);
     $self->sleep_microseconds( $delay );
     my @vals = $self->device->i2c_read( $numbytes );
@@ -332,7 +339,7 @@ sub get_option_names {
 sub software_reset {
     my $self = shift;
     $self->write_register(SEESAW_STATUS_BASE, SEESAW_STATUS_SWRST, 0xFF);
-    $self->sleep_milliseconds($self->delay);
+    $self->sleep_milliseconds( $self->reset_delay );
     $self->_init;
     return;
 }
@@ -366,7 +373,7 @@ sub gpio_set_pin_mode {
     } else {
         croak 'Invalid mode for gpio_set_pin_mode';
     }
-    $self->sleep_microseconds( $self->delay );
+    $self->sleep_microseconds( $self->action_delay );
     return;
 }
 
@@ -415,7 +422,7 @@ sub gpio_enable_interrupt {
     }
     my @bytes = $self->_get_pin_mask( @pins );
     $self->write_register(SEESAW_GPIO_BASE, SEESAW_GPIO_INTENSET, @bytes);
-    $self->sleep_microseconds( $self->delay );
+    $self->sleep_microseconds( $self->action_delay );
     return;
 }
 
@@ -426,7 +433,7 @@ sub gpio_disable_interrupt {
     }
     my @bytes = $self->_get_pin_mask( @pins );
     $self->write_register(SEESAW_GPIO_BASE, SEESAW_GPIO_INTENCLR, @bytes);
-    $self->sleep_microseconds( $self->delay );
+    $self->sleep_microseconds( $self->action_delay );
     return;
 }
 
@@ -525,7 +532,7 @@ sub neopixel_show {
     return unless($self->_neopixel_pin);
     $self->_flush_neopixel_buffer();
     $self->write_register( SEESAW_NEOPIXEL_BASE, SEESAW_NEOPIXEL_SHOW );
-    $self->sleep_microseconds($self->delay);
+    $self->sleep_microseconds($self->action_delay);
 }
 
 sub neopixel_clear {
@@ -641,14 +648,24 @@ sub adc_read_percent {
 #---------------------------------------------------------
 
 sub eeprom_read {
-    my($self, $address) = @_;
+    my($self, $address, $numbytes) = @_;
+    
+    $numbytes ||= 1;
+    
     if ( $address < 0 || $address > EEPROM_MAX_ADDRESS ) {
         carp sprintf(qq(invalid eeprom address 0x%X - must be in the range 0x00 to 0x3E), $address);
         return;
     }
     
-    my( $val) = $self->read_register( SEESAW_EEPROM_BASE, $address, 1 );
-    return $val;
+    my $max_write_bytes = 1 + ( EEPROM_MAX_ADDRESS - $address );
+    
+    if ( $numbytes > $max_write_bytes ) {
+        carp sprintf(qq(too may bytes specified '%s' to read from  eeprom 0x%X - must be in the range 0x00 to 0x3E), $numbytes, $address);
+        return;
+    }
+    
+    my @vals = $self->read_register( SEESAW_EEPROM_BASE, $address, $numbytes );
+    return wantarray ? @vals : $vals[0];
 }
 
 sub eeprom_write {
@@ -656,13 +673,14 @@ sub eeprom_write {
     
     if ( $address < 0 || $address > EEPROM_MAX_ADDRESS ) {
         carp sprintf(qq(invalid eeprom address 0x%X - must be in the range 0x00 to 0x3E), $address);
-        return;
+        return 0;
     }
     
     my $numvalues = scalar @values;
-    my $maxvalues = EEPROM_I2C_ADDRESS - $address;
+        
+    my $max_write_bytes = 1 + ( EEPROM_MAX_ADDRESS - $address );
     
-    if ( $numvalues > $maxvalues) {
+    if ( $numvalues > $max_write_bytes) {
         carp q(Too many values for eeprom write would overwrite I2C address.);
         return 0;
     }

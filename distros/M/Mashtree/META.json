@@ -61,6 +61,6 @@
          "web" : "https://github.com/lskatz/mashtree"
       }
    },
-   "version" : "v1.4.0",
+   "version" : "v1.4.6",
    "x_serialization_backend" : "JSON::PP version 2.94"
 }

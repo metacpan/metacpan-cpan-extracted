@@ -19,8 +19,9 @@ examples/microdotphat/sine_wave.pl
 examples/microdotphat/thermal.pl
 examples/microdotphat/tiny_font.pl
 examples/microdotphat/vertical_text.pl
-examples/mihome.pl
 examples/pantilt.pl
+examples/rfm69_test_listen.pl
+examples/rfm69_test_send.pl
 examples/seesaw/info.pl
 examples/seesaw/interrupt.pl
 examples/seesaw/neopixel.pl
@@ -151,6 +152,7 @@ lib/HiPi/Interface/EPaper/Waveshare/EPD296X128B.pm
 lib/HiPi/Interface/HobbyTronicsADC.pm
 lib/HiPi/Interface/HobbyTronicsBackpackV2.pm
 lib/HiPi/Interface/HopeRF69.pm
+lib/HiPi/Interface/HopeRF69/Dummy.pm
 lib/HiPi/Interface/HTADCI2C.pm
 lib/HiPi/Interface/HTBackpackV2.pm
 lib/HiPi/Interface/IS31FL3730.pm
@@ -181,6 +183,7 @@ lib/HiPi/Interface/TMP102.pm
 lib/HiPi/Interface/ZeroSeg.pm
 lib/HiPi/Pin.pm
 lib/HiPi/RaspberryPi.pm
+lib/HiPi/RF/Message.pm
 lib/HiPi/RF/OpenThings.pm
 lib/HiPi/RF/OpenThings/Message.pm
 lib/HiPi/Utils.pm
@@ -193,9 +196,9 @@ MANIFEST.SKIP
 META.json
 META.yml
 mylib/include/compat.h
-mylib/include/local-i2c-dev.h
 mylib/include/ppport.h
 README
+RP1.xs
 script/hipi-energenie
 SPI.xs
 t/000-load.t

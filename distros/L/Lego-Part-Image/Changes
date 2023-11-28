@@ -1,3 +1,17 @@
+0.06 2023-11-25T11:24:40+01:00
+ - Add support for bricklink.com.
+ - Fix LegoCom URL.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite to use of =head2 in doc.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.05 2015-09-24T00:21:23+02:00
  - Add tests for image_url() methods.
  - Move author tests to xt/ directory.

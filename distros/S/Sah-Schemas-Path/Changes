@@ -1,3 +1,24 @@
+0.025   2023-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: filename::default_only_file_not_dir_in_curdir.
+
+
+0.024   2023-11-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: filename::{,exists::}default_only_file_in_curdir,
+          dirname::{,exists::}default_only_subdir_in_curdir.
+
+
+0.023   2023-11-18  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas: {dir,file,path}name::unix::dirname.
+
+
+0.022   2023-10-29  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schema: dirname::default_curdir_abs.
+
+
 0.021   2023-10-29  Released-By: PERLANCAR; Urgency: medium
 
         - Add schema: dirname::default_curdir.

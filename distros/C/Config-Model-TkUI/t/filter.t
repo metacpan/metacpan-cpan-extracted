@@ -2,7 +2,7 @@ use Test::More ;
 use Test::Log::Log4perl;
 use Config::Model 2.137;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
-use YAML::XS qw/LoadFile/;
+use YAML::PP qw/LoadFile/;
 
 use Config::Model::Tk::Filter qw/apply_filter/;
 
@@ -11,8 +11,6 @@ use warnings;
 
 
 my ($model, $trace, $args) = init_test('show','filter=s');
-
-note("You can play with the widget if you run this test with '--show' option");
 
 my $wr_root = setup_test_dir;
 my $cmu ;
@@ -52,6 +50,11 @@ $model->create_config_class(
             type       => 'hash',
             index_type  => 'string',
             @element
+        },
+        a_string => {
+            type => 'leaf',
+            value_type => "uniline",
+            default => "blah",
         },
         check_list => {
             type       => 'check_list',

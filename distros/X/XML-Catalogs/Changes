@@ -1,0 +1,22 @@
+Revision history for XML-Catalogs
+
+1.6.0   2023-11-26
+        - Switched to ExtUtils::MakeMaker.
+        - Updated the URLs of support resources.
+
+1.4.0   2023-11-26
+        - Document the need for `load_ext_dtd => 1`.
+        - Use `load_ext_dtd => 1` in the tests.
+
+1.0.3   2011-03-28
+        - Specified license more explicitly.
+
+1.0.2   2010-04-27
+        - Added an XML::LibXML version test.
+
+1.0.1   2010-04-18
+        - Fixed bad markup (POD) in documentation.
+        - Added POD tests.
+
+1.0.0   2010-02-26
+        - Initial version.

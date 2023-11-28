@@ -1,0 +1,97 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::OS::Signal {
+  use Go;
+  use Go::Channel;
+  use Sys::Signal;
+  use Sys::IO::Constant as IO;
+  use Sys;
+  use Errno;
+  use Thread;
+  use Go::Sync::WaitGroup;
+  
+  INIT {
+    my $fds = [-1, -1];
+    
+    Sys->pipe($fds);
+    
+    $READ_FD = $fds->[0];
+    
+    my $write_fd = $fds->[1];
+    
+    unless (Sys::OS->is_windows) {
+      Sys->fcntl($READ_FD, IO->F_SETFL, IO->O_NONBLOCK);
+    }
+    
+    Sys::Signal->SET_SIG_GO_WRITE_FD($write_fd);
+  }
+  
+  our $READ_FD : int;
+  
+  static method ignore : void ($signal : int) {
+    Sys::Signal->signal($signal, Sys::Signal->SIG_IGN);
+  }
+  
+  static method notify : void ($channel : Go::Channel, $signal : int) {
+    
+    unless ($channel) {
+      die "\$channel must be defined.";
+    }
+    
+    Sys::Signal->signal($signal, Sys::Signal->SIG_GO);
+    
+    Go->go([$channel : Go::Channel] method : void () {
+      my $buffer = (mutable string)new_string_len 4;
+      
+      my $use_thread = 0;
+      if (Sys::OS->is_windows) {
+        $use_thread = 1;
+      }
+      
+      if ($use_thread) {
+        
+        my $wg = Go::Sync::WaitGroup->new;
+        
+        $wg->add(1);
+        
+        my $thread = Thread->new([$wg : Go::Sync::WaitGroup, $buffer : mutable string] method : void () {
+          Fn->defer([$wg : Go::Sync::WaitGroup] method : void () {
+            $wg->done;
+          });
+          
+          Sys::IO->read($READ_FD, $buffer, 4);
+        });
+        
+        $wg->wait;
+        
+        $thread->join;
+      }
+      else {
+        while (1) {
+          eval { Sys::IO->read($READ_FD, $buffer, 4); }
+          
+          if ($@) {
+            if (Errno->errno == Errno->EWOULDBLOCK || Errno->errno == Errno->EINTR) {
+              Go->gosched_io_read($READ_FD);
+            }
+            else {
+              die $@;
+            }
+          }
+          else {
+            last;
+          }
+        }
+      }
+      
+      my $numbers = new int [1];
+      
+      Fn->memcpy($numbers, 0, $buffer, 0, 4);
+      
+      my $got_signal = $numbers->[0];
+      
+      $channel->write($got_signal);
+    });
+  }
+}

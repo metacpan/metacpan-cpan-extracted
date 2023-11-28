@@ -1,0 +1,94 @@
+Object::PadX::Role::AutoJSON
+
+This module creates an automatic serialization function named "TO_JSON"
+on your Object::Pad classes. The purpose of which is to automatically
+look up all fields in the object and give them out to be serialized by a
+JSON module. It also provides a series of attributes, ":JSONExclude" and
+such, to allow you to do some basic customization of how the fields will
+be output, without affecting how the fields themselves work.
+
+  IMPORTS
+
+  use Object::PadX::Role::AutoJSON '-toplevel';
+
+  class Foo :does(AutoJSON) {
+    ...
+  }
+
+This is the only import right now, it creates a top level namespace role
+AutoJSON for lazy people (like me). This is a bad idea, don't do it it
+pollutes this globally since there is no such thing as lexical role
+imports.
+
+  ATTRIBUTES
+
+*   :JSONExclude
+
+    This attribute on a field tells the serializier to ignore the field
+    and never output it. This is useful for internal fields or fields to
+    other objects that shouldn't be kept as part of the object when
+    serializing, such as a database handle or private information.
+
+*   :JSONKey(name)
+
+    This attribute lets you change the name that is output when
+    serializing, so that you can use a more descriptive name on the
+    class but give a shorter one when serializing, or to help multiple
+    classes look the same when output as JSON even if they're different
+    internally.
+
+*   :JSONNull
+
+    Normally fields that have no value will be excluded from output, to
+    prevent accidental nulls being given and breaking other
+    expectations. This attribute lets you force those fields to be
+    output when appropriate.
+
+*   :JSONBool
+
+    This attribute forces the value to be re-interpreted as a boolean
+    value, regardless of how perl sees it. This way you can get a proper
+    'true' and 'false' in the resulting JSON without having to massage
+    the value yourself through other means.
+
+*   :JSONNum
+
+    This attribute forces the value to be re-interpreted as a numeric
+    value, regardless of how perl sees it. This will help handle
+    dual-vars or places where a number came as a string and perl
+    wouldn't care but JSON does.
+
+*   :JSONStr
+
+    This attribute forces the value to be re-interpreted as a string
+    value, regardless of how perl sees it. That way numbers, or other
+    value types that were present will be properly stringified, such as
+    nested objects that override stringification.
+
+*   :JSONList(type)
+
+    This attribute forces the list in the field to have all of it's
+    elements processed as "type". Where "type" is one of "JSONNum",
+    "JSONStr", or "JSONBool". See above for any notes about each type,
+    they match the attributes
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+LICENSE
+
+This module is available under the Artistic 2.0 License

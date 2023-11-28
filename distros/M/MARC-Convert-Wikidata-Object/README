@@ -26,6 +26,7 @@ SYNOPSIS
      my $narrators_ar = $obj->narrators;
      my $number_of_pages = $obj->number_of_pages;
      my $oclc = $obj->oclc;
+     my $photographers_ar = $obj->photographers;
      my $publication_date = $obj->publication_date;
      my $publishers_ar = $obj->publishers;
      my $series_ar = $obj->series;
@@ -166,6 +167,13 @@ METHODS
 
             Default value is undef.
 
+    *       "photographers"
+
+            List of photographers. Reference to array with
+            MARC::Convert::Wikidata::Object::People instances.
+
+            Default value is reference to blank array.
+
     *       "publication_date"
 
             Publication date.
@@ -245,7 +253,7 @@ METHODS
   "compilers"
      my $compilers_ar = $obj->compilers;
 
-    Get reference to array with compiler objects.
+    Get list of compilers.
 
     Returns reference to array of MARC::Convert::Wikidata::Object::People
     instances.
@@ -282,7 +290,10 @@ METHODS
   "editors"
      my $editors_ar = $obj->editors;
 
-    TODO
+    Get list of editors.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
 
   "end_time"
      my $end_time = $obj->end_time;
@@ -301,12 +312,18 @@ METHODS
   "illustrators"
      my $illustrators_ar = $obj->illustrators;
 
-    TODO
+    Get list of illustrators.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
 
   "isbns"
      my $isbns_ar = $obj->isbns;
 
-    TODO
+    Get list of ISBNs.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::ISBN
+    instances.
 
   "issn"
      my $issn = $obj->issn;
@@ -348,6 +365,14 @@ METHODS
 
     Returns string.
 
+  "photographers"
+     my $photographers_ar = $obj->photographers;
+
+    Get reference to array with photographers objects.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
+
   "publication_date"
      my $publication_date = $obj->publication_date;
 
@@ -356,7 +381,7 @@ METHODS
   "publishers"
      my $publishers_ar = $obj->publishers;
 
-    TODO
+    Get list of publishing houses.
 
     Returns reference to array of MARC::Convert::Wikidata::Object::Publisher
     instances.
@@ -386,12 +411,17 @@ METHODS
   "title"
      my $title = $obj->title;
 
-    TODO
+    Get title.
+
+    Returns string.
 
   "translators"
      my $translators_ar = $obj->translators;
 
-    TODO
+    Get list of translators.
+
+    Returns reference to array of MARC::Convert::Wikidata::Object::People
+    instances.
 
 ERRORS
      new():
@@ -517,5 +547,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.03
 

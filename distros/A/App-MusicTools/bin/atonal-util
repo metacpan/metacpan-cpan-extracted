@@ -560,33 +560,37 @@ sub findin {
     GetOptionsFromArray(
         \@args, @Std_Opts,
         'exclude=s'    => \my $excludes,
-        'pitchset|P=s' => \my $base_input,
+        'pitchset|P=s' => \my @base_input,
         'root=s'       => \my $root_pitch
     ) or print_help();
 
     die "error: atonal-util findin needs --pitchset=... option\n"
-      if !defined $base_input;
+      unless @base_input;
 
     $Lyu->chrome('flats') if $Flag_Flat;
 
-    my $ps_base;
-    if ( $base_input =~ m/^\d-/ ) {
-        $ps_base = $Atu->forte2pcs($base_input);
-        die "unknown Forte Number '$base_input'\n" if !defined $ps_base;
-    } else {
-        $ps_base = args2pitchset( split /[ ,]/, $base_input );
-    }
-    my $desired = args2pitchset(@args);
-    my %excludes;
-    @excludes{ $Lyu->notes2pitches( split /[, ]+/, $excludes ) } = ()
-      if defined $excludes;
-    $root_pitch = $Lyu->notes2pitches($root_pitch) if defined $root_pitch;
+    for my $bi (@base_input) {
+        say "PS $bi" if @base_input > 1;
 
-    if ( @$desired > @$ps_base ) {
-        die "cannot desire more than is present\n";
-    }
+        my $ps_base;
+        if ( $bi =~ m/^\d-/ ) {
+            $ps_base = $Atu->forte2pcs($bi);
+            die "unknown Forte Number '$bi'\n" if !defined $ps_base;
+        } else {
+            $ps_base = args2pitchset( split /[ ,]/, $bi );
+        }
+        my $desired = args2pitchset(@args);
+        my %excludes;
+        @excludes{ $Lyu->notes2pitches( split /[, ]+/, $excludes ) } = ()
+          if defined $excludes;
+        $root_pitch = $Lyu->notes2pitches($root_pitch) if defined $root_pitch;
 
-    _findps( $ps_base, $desired, $root_pitch, \%excludes );
+        if ( @$desired > @$ps_base ) {
+            die "cannot desire more than is present\n";
+        }
+
+        _findps( $ps_base, $desired, $root_pitch, \%excludes );
+    }
 }
 
 sub _findps {
@@ -617,7 +621,10 @@ sub _findps {
 
             @pitches = $Lyu->p2ly(@pitches) if $Flag_Lyout;
 
-            printf "%s\tT(%d)\t%-${ps_width}s%s\n", $fnum, $i, join( ',', @pitches ), $tstr;
+            my $s = sprintf "%s\tT(%d)\t%-${ps_width}s%s", $fnum, $i,
+              join( ',', @pitches ), $tstr;
+            $s =~ s/\s+$//;
+            say $s;
         }
     }
 
@@ -1569,6 +1576,18 @@ I<--exclude>, omits results containing the listed pitches. With I<--root>,
 limits matches to those with the named root pitch.
 
   $ atonal-util findin --exclude=c,ees --pitchset=5-25 d fis a
+
+Another use is for what some call "concatenated chords"; one might have
+an exercise to write a melody where the previous note or two is used to
+form a new triad (major/minor, or also diminished and augmented) so may
+want to know what other chords are usable given a note or two:
+
+  $ atonal-util findin -P 3-11 c
+  ...
+  $ atonal-util findin -P 3-10 -P 3-11 -P 3-12 des f
+  ...
+
+Atonality, however, may not exactly match harmonic requirements.
 
 =head2 B<fnums> [ I<--tension=cope> ]
 

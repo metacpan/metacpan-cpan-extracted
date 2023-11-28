@@ -1,0 +1,3 @@
+Build with:
+
+: PERL5OPT="-MFile::ShareDir -MDateTime -MText::CSV_XS -MModule::Load::Util -MTableData::Munge::Reverse -Mall=of,TableData::Perl::CPAN::Release::Static::*" dzil build

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sw::Any::Tz - Package for language Swahili
 
 package Locale::CLDR::Locales::Sw::Any::Tz;
 # This file auto generated from Data\common\main\sw_TZ.xml
-#	on Fri 13 Oct  9:43:06 am GMT
+#	on Sat  4 Nov  6:25:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

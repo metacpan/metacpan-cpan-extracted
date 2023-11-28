@@ -1,6 +1,6 @@
 package CodeGen::Cpppp::AntiCharacter;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 # ABSTRACT: AntiCharacters combine with characters to produce nothing
 
 use v5.20;
@@ -55,10 +55,6 @@ __END__
 =head1 NAME
 
 CodeGen::Cpppp::AntiCharacter - AntiCharacters combine with characters to produce nothing
-
-=head1 VERSION
-
-version 0.002
 
 =head1 SYNOPSIS
 
@@ -123,6 +119,10 @@ string assuming the anticharacter will never match.
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
+
+=head1 VERSION
+
+version 0.003
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,21 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Select::Case {
+  allow Go::Select;
+  
+  use Go::Channel;
+  
+  has channel : Go::Channel;
+  
+  has value : object;
+  
+  has is_write : byte;
+  
+  private static method new : Go::Select::Case () {
+    
+    my $self = new Go::Select::Case;
+    
+    return $self;
+  }
+}

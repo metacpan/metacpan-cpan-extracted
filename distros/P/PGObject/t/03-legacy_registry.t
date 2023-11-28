@@ -12,6 +12,8 @@ use Test::More tests => 14;
 use PGObject;
 use Test::Exception;
 
+$SIG{__WARN__} = sub {}; # all these warn as deprecated which is the point
+
 
 lives_ok(sub {PGObject->register_type(pg_type => 'foo', perl_class => 'Foo') },      "Basic type registration");
 lives_ok(sub {PGObject->register_type(pg_type => 'foo', perl_class => 'Foo')},

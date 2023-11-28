@@ -1,0 +1,176 @@
+# ===================================================== #
+#
+# Please keep alphabetical order of the policies to
+# ease reading this file.
+#
+# You can test the policies manually, but it will
+# also be an author test under dzil
+#
+#    perlcritic --profile perlcritic.rc --quiet lib
+#
+# Some policies are temporarily disabled until
+# some refactoring happens.
+#
+# You can also de-duplicate the entries in here:
+#
+#    cat perlcritic.rc | perl -anE 'chomp; next if $_!~ m{^\[};s/[\[\]]//g;s/\-//; $n{$_}++ }{ for(keys %n){next if $n{$_}<2; say $_,"\t" ,$n{$_}}'
+# ===================================================== #
+
+# ================= Configuration ===================== #
+
+severity = brutal
+verbose  = [%p] %m at line %l, column %c. (Severity: %s) - %f - %r\n
+
+# ===================== Enable ======================== #
+
+[BuiltinFunctions::ProhibitShiftRef]
+[BuiltinFunctions::ProhibitUniversalCan]
+[BuiltinFunctions::ProhibitUniversalIsa]
+[BuiltinFunctions::RequireBlockGrep]
+[BuiltinFunctions::RequireBlockMap]
+[BuiltinFunctions::RequireGlobFunction]
+[ClassHierarchies::ProhibitAutoloading]
+[ClassHierarchies::ProhibitExplicitISA]
+[ClassHierarchies::ProhibitOneArgBless]
+[CodeLayout::ProhibitTrailingWhitespace]
+[ControlStructures::ProhibitLabelsWithSpecialBlockNames]
+[ControlStructures::ProhibitUnlessBlocks]
+[ControlStructures::ProhibitUnreachableCode]
+[ControlStructures::ProhibitUntilBlocks]
+[ErrorHandling::RequireCheckingReturnValueOfEval]
+[InputOutput::ProhibitBarewordDirHandles]
+[InputOutput::ProhibitBarewordFileHandles]
+[InputOutput::ProhibitExplicitStdin]
+[InputOutput::ProhibitInteractiveTest]
+[InputOutput::ProhibitJoinedReadline]
+[InputOutput::ProhibitOneArgSelect]
+[InputOutput::ProhibitReadlineInForLoop]
+[InputOutput::ProhibitTwoArgOpen]
+[InputOutput::RequireBriefOpen]
+[InputOutput::RequireCheckedClose]
+[InputOutput::RequireCheckedOpen]
+[Miscellanea::ProhibitFormats]
+[Miscellanea::ProhibitTies]
+[Miscellanea::ProhibitUnrestrictedNoCritic]
+[Miscellanea::ProhibitUselessNoCritic]
+[Modules::ProhibitExcessMainComplexity]
+[Modules::RequireBarewordIncludes]
+[Modules::RequireEndWithOne]
+[Modules::RequireFilenameMatchesPackage]
+[NamingConventions::ProhibitAmbiguousNames]
+[Objects::ProhibitIndirectSyntax]
+[References::ProhibitDoubleSigils]
+[RegularExpressions::ProhibitCaptureWithoutTest]
+[RegularExpressions::ProhibitComplexRegexes]
+[RegularExpressions::ProhibitEscapedMetacharacters]
+[RegularExpressions::ProhibitFixedStringMatches]
+[RegularExpressions::ProhibitUnusedCapture]
+
+# /xms
+[RegularExpressions::RequireDotMatchAnything]
+[RegularExpressions::RequireExtendedFormatting]
+[RegularExpressions::RequireLineBoundaryMatching]
+
+[Subroutines::ProhibitAmpersandSigils]
+[Subroutines::ProhibitBuiltinHomonyms]
+[Subroutines::ProhibitExcessComplexity]
+[Subroutines::ProhibitExplicitReturnUndef]
+[Subroutines::ProhibitNestedSubs]
+[Subroutines::ProhibitReturnSort]
+[Subroutines::ProhibitSubroutinePrototypes]
+[Subroutines::RequireArgUnpacking]
+[Subroutines::RequireFinalReturn]
+[TestingAndDebugging::ProhibitNoWarnings]
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+[TestingAndDebugging::RequireUseStrict]
+[TestingAndDebugging::RequireUseWarnings]
+[ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+[ValuesAndExpressions::ProhibitComplexVersion]
+[ValuesAndExpressions::ProhibitEmptyQuotes]
+[ValuesAndExpressions::ProhibitEscapedCharacters]
+[ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+[ValuesAndExpressions::ProhibitMagicNumbers]
+[ValuesAndExpressions::ProhibitMismatchedOperators]
+[ValuesAndExpressions::ProhibitMixedBooleanOperators]
+[ValuesAndExpressions::ProhibitNoisyQuotes]
+[ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters]
+[ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]
+[ValuesAndExpressions::ProhibitVersionStrings]
+[ValuesAndExpressions::RequireConstantVersion]
+[ValuesAndExpressions::RequireNumberSeparators]
+[ValuesAndExpressions::RequireQuotedHeredocTerminator]
+[ValuesAndExpressions::RequireUpperCaseHeredocTerminator]
+[Variables::ProhibitAugmentedAssignmentInDeclaration]
+[Variables::ProhibitConditionalDeclarations]
+[Variables::ProhibitMatchVars]
+[Variables::ProhibitPerl4PackageNames]
+[Variables::ProhibitReusedNames]
+[Variables::ProhibitUnusedVariables]
+[Variables::RequireLexicalLoopIterators]
+
+# =============== Configurable Policies =============== #
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[InputOutput::RequireCheckedSyscalls]
+exclude_functions = print say
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[RegularExpressions::RequireBracesForMultiline]
+allow_all_brackets = 1
+
+[Subroutines::ProhibitManyArgs]
+max_arguments = 8
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[Variables::ProhibitPackageVars]
+packages = Data::Dumper File::Find FindBin Log::Log4perl Config
+
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV %INC $|
+
+# ============= Permanently disable these ============= #
+
+[-BuiltinFunctions::ProhibitComplexMappings]
+# keep being explicit
+[-BuiltinFunctions::ProhibitUselessTopic]
+[-BuiltinFunctions::ProhibitStringyEval]
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-CodeLayout::RequireTidyCode]
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitYadaOperator]
+[-Documentation::RequirePackageMatchesPodName]
+[-Documentation::RequirePodSections]
+[-ErrorHandling::RequireCarping]
+[-InputOutput::ProhibitBacktickOperators]
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-Modules::ProhibitAutomaticExportation]
+[-Modules::ProhibitMultiplePackages]
+[-Modules::RequireExplicitPackage]
+[-NamingConventions::Capitalization]
+# keep being explicit
+[-RegularExpressions::ProhibitUselessTopic]
+# we don't want to match unicode
+[-RegularExpressions::ProhibitEnumeratedClasses]
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitImplicitNewlines]
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+[-ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+[-Variables::ProhibitPunctuationVars]
+[-Variables::RequireInitializationForLocalVars]
+
+# Clashes with the quoted subs in type definitions.
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+
+# not sure if we'd need this
+[-BuiltinFunctions::ProhibitBooleanGrep]
+
+# need to run tests only under `dzil test`, if this is enabled
+# as the repo versions only have the placeholder for a version.
+[-Modules::RequireVersionVar]

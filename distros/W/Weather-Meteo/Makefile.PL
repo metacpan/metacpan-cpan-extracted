@@ -22,7 +22,7 @@ if($ENV{AUTHOR_TESTING}) {
 
 my $test_requires = {
 	'autodie' => 0,
-	'Geo::Location::Point' => 0.08,
+	'Geo::Location::Point' => 0.09,
 	'IPC::System::Simple' => 0,	# http://www.cpantesters.org/cpan/report/0b994acc-7a03-11e8-a944-5f7713bf8fb6
 	'Test::Carp' => 0,
 	'Test::Compile' => 0,

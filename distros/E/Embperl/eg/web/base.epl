@@ -40,10 +40,12 @@ $http_headers_out{'content-type'} = 'text/html' ;
            .cPodH1ContentLink   {[+ $base12 +] font-weight: bold;}
            .cPodH2ContentLink   {[+ $base10 +]}
 
-           .cPodH1              {[+ $base18 +] padding-left: 15px; padding-right: 15px; background: #fefcad; color: #000000; font-weight: bold; }
-           .cPodH1Link          {[+ $base12 +] padding-left: 15px; padding-right: 15px; background: #fefcad; color: #000000; text-align: right ;}
+           .cPodH1              {[+ $base18 +] padding-left: 15px; padding-right: 15px; background: #D2E9F5; color: #000000; font-weight: bold; }
+           .cPodH1Link          {[+ $base12 +] padding-left: 15px; padding-right: 15px; background: #D2E9F5; color: #000000; text-align: right ;}
            .cPodH2              {[+ $base14 +] padding-left: 15px; padding-right: 15px; background: #D2E9F5; color: #000000; font-weight: bold; }
            .cPodH2Link          {[+ $base10 +] padding-left: 15px; padding-right: 15px; background: #D2E9F5; color: #000000; font-weight: bold; }
+           .cPodH3              {[+ $base12 +] padding-left: 15px; padding-right: 15px; background: #dddddd; color: #000000; font-weight: bold; }
+           .cPodH3Link          {[+ $base10 +] padding-left: 15px; padding-right: 15px; background: #dddddd; color: #000000; font-weight: bold; }
            .cTopLink            {[+ $base10 +] }
 
            .cListOnlyText       {[+ $base12 +]  }
@@ -97,16 +99,13 @@ $http_headers_out{'content-type'} = 'text/html' ;
             h1 small {
                 color: #f00;
             }
-
-
-
         </style>
     </head>
-    <body bgcolor="#ffffff" style="position: relative; width: 1020px; margin-left: auto; margin-right: auto; border: 1px solid black; padding: 5px; margin-top: 10px">
+    <body bgcolor="#ffffff" style="position: relative; width: 1020px; margin-left: auto; margin-right: auto; border: 0px solid black; padding: 5px; margin-top: 10px">
         [- Execute ('header.epl') -]
         <table width="100%" cellspacing="0" cellpadding="0" border="0">
             <tr>
-                <td valign="top">[- Execute ('menuleft.epl') -]</td>
+                <td valign="top" class="menu-items">[- Execute ('menuleft.epl') -]</td>
                 <td valign="top" width="90%" class="cContent">[- Execute ('content.epl') -]</td>
             </tr>
         </table>

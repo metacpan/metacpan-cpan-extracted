@@ -5,6 +5,7 @@ use App::Netdisco::Worker::Plugin;
 use aliased 'App::Netdisco::Worker::Status';
 
 use App::Netdisco::Transport::SNMP ();
+use App::Netdisco::Util::Permission 'acl_matches';
 use Dancer::Plugin::DBIC 'schema';
 use Encode;
 
@@ -38,7 +39,7 @@ register_worker({ phase => 'main', driver => 'snmp' }, sub {
   my $device = $job->device;
   return unless $device->in_storage;
 
-  if (not setting('store_modules')) {
+  if (acl_matches($device, 'skip_modules') or not setting('store_modules')) {
       schema('netdisco')->txn_do($clean, $device);
       return Status->info(
         sprintf ' [%s] modules - store_modules is disabled (added one pseudo for chassis)',
@@ -100,13 +101,13 @@ register_worker({ phase => 'main', driver => 'snmp' }, sub {
   }
 
   foreach my $m (@modules){
-    unless (!$m->{parent} || $seen_idx{$m->{parent}}){
+    if ($m->{parent} and not exists $seen_idx{ $m->{parent} }){
       # Some combined devices like Nexus with FEX or ASR with Satellites can return invalid
       # EntityMIB trees. This workaround relocates entitites with invalid parents to the root 
       # of the tree, so they are at least visible in the Modules tab (see #710)
       
       info sprintf ' [%s] Entity %s (%s) has invalid parent %s - attaching as root entity instead',
-          $device->ip, $m->{index}, $m->{name}, $m->{parent}; 
+          $device->ip, ($m->{index} || '"unknown index"'), ($m->{name} || '"unknown name"'), $m->{parent};
       $m->{parent} = undef;
     }
   }

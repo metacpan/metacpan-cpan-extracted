@@ -14,7 +14,8 @@ use File::Temp qw(tempdir);
 use Test::More 0.98;
 use Test::Perinci::Tx::Manager qw(test_tx_action);
 
-my $tmpdir = tempdir(CLEANUP=>1);
+my $tmpdir = tempdir(CLEANUP=>$ENV{DEBUG} ? 0:1);
+if ($ENV{DEBUG}) { diag "tmpdir=$tmpdir (not cleaning up)" }
 $CWD = $tmpdir;
 $ENV{HOME} = $tmpdir;
 make_path "$tmpdir/.local/share/Trash/info", "$tmpdir/.local/share/Trash/files";
@@ -67,10 +68,4 @@ test_tx_action(
 );
 
 DONE_TESTING:
-done_testing();
-if (Test::More->builder->is_passing) {
-    #diag "all tests successful, deleting test data dir";
-    $CWD = "/";
-} else {
-    diag "there are failing tests, not deleting test data dir $tmpdir";
-}
+done_testing;

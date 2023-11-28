@@ -11,7 +11,7 @@ use File::Copy;
 use File::Path qw( make_path );
 use File::Spec;
 use File::Temp qw( tempdir );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny qw( capture_stdout );
 
 use Test::More;
 require CPAN::Mini;
@@ -69,24 +69,19 @@ $rv = $self->identify_distros( {
 } );
 
 {
-    my ($stdout, $stderr);
-    capture(
-        sub {
-            $rv = $self->visit( {
-                action  => sub {
-                    my $distro = shift @_;
-                    if ( -f 'Makefile.PL' ) {
-                        say "$distro has Makefile.PL";
-                    }
-                    if ( -f 'Build.PL' ) {
-                        say "$distro has Build.PL";
-                    }
-                },
-            } );
-        },
-        \$stdout,
-        \$stderr,
-    );
+    my $stdout = capture_stdout {
+        $rv = $self->visit( {
+            action  => sub {
+                my $distro = shift @_;
+                if ( -f 'Makefile.PL' ) {
+                    say "$distro has Makefile.PL";
+                }
+                if ( -f 'Build.PL' ) {
+                    say "$distro has Build.PL";
+                }
+            },
+        } );
+    };
     ok( $rv, "'visit()' returned true value" );
     like($stdout,
         qr/List-Compare-.*?\.tar\.gz has Makefile\.PL/s,
@@ -96,25 +91,20 @@ $rv = $self->identify_distros( {
 
 note("Case 3:  Success:  'quiet' option");
 {
-    my ($stdout, $stderr);
-    capture(
-        sub {
-            $rv = $self->visit( {
-                action  => sub {
-                    my $distro = shift @_;
-                    if ( -f 'Makefile.PL' ) {
-                        say "$distro has Makefile.PL";
-                    }
-                    if ( -f 'Build.PL' ) {
-                        say "$distro has Build.PL";
-                    }
-                },
-                quiet => 1,
-            } );
-        },
-        \$stdout,
-        \$stderr,
-    );
+    my $stdout = capture_stdout {
+        $rv = $self->visit( {
+            action  => sub {
+                my $distro = shift @_;
+                if ( -f 'Makefile.PL' ) {
+                    say "$distro has Makefile.PL";
+                }
+                if ( -f 'Build.PL' ) {
+                    say "$distro has Build.PL";
+                }
+            },
+            quiet => 1,
+        } );
+    };
     ok( $rv, "'visit()' returned true value" );
     like($stdout,
         qr/List-Compare-.*?\.tar\.gz has Makefile\.PL/s,
@@ -146,25 +136,20 @@ like( $@, qr/$pattern/,
 
 note("Case 7:  Success:  visit() called with 'action_args'");
 {
-    my ($stdout, $stderr);
-    capture(
-        sub {
-            $rv = $self->visit( {
-                action  => sub {
-                    my $distro = shift @_;
-                    if ( -f 'Makefile.PL' ) {
-                        say "$distro has Makefile.PL";
-                    }
-                    if ( -f 'Build.PL' ) {
-                        say "$distro has Build.PL";
-                    }
-                },
-                action_args => [ 1 .. 3 ],
-            } );
-        },
-        \$stdout,
-        \$stderr,
-    );
+    my $stdout = capture_stdout {
+        $rv = $self->visit( {
+            action  => sub {
+                my $distro = shift @_;
+                if ( -f 'Makefile.PL' ) {
+                    say "$distro has Makefile.PL";
+                }
+                if ( -f 'Build.PL' ) {
+                    say "$distro has Build.PL";
+                }
+            },
+            action_args => [ 1 .. 3 ],
+        } );
+    };
     ok( $rv, "'visit()' returned true value" );
     like($stdout,
         qr/List-Compare-.*?\.tar\.gz has Makefile\.PL/s,
@@ -240,24 +225,19 @@ like($@, qr/$pattern/,
     } );
     ok( $rv, "'identify_distros() returned true value" );
     {
-        my ($stdout, $stderr);
-        capture(
-            sub {
-                $rv = $self->visit( {
-                    action  => sub {
-                        my $distro = shift @_;
-                        if ( -f 'Makefile.PL' ) {
-                            say "$distro has Makefile.PL";
-                        }
-                        if ( -f 'Build.PL' ) {
-                            say "$distro has Build.PL";
-                        }
-                    },
-                } );
-            },
-            \$stdout,
-            \$stderr,
-        );
+        my $stdout = capture_stdout {
+            $rv = $self->visit( {
+                action  => sub {
+                    my $distro = shift @_;
+                    if ( -f 'Makefile.PL' ) {
+                        say "$distro has Makefile.PL";
+                    }
+                    if ( -f 'Build.PL' ) {
+                        say "$distro has Build.PL";
+                    }
+                },
+            } );
+        };
         ok( $rv, "'visit()' returned true value" );
         like($stdout,
             qr/\.tar\.gz has Makefile\.PL/s,

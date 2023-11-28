@@ -1,0 +1,297 @@
+# PODNAME: Neo4j::Driver::Types
+# ABSTRACT: Type mapping from Neo4j to Perl and vice versa
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Driver::Types - Type mapping from Neo4j to Perl and vice versa
+
+=head1 VERSION
+
+version 0.41
+
+=head1 MAPPING
+
+Neo4j values can have a variety of types, and mapping these types
+onto Perl types and vice versa isn't always straight-forward.
+L<Neo4j::Driver> is designed to use the L<Neo4j::Types> system
+as far as possible.
+
+When this driver returns values from queries, Neo4j types are
+represented by the Perl types shown in the following list.
+
+=over
+
+=item Structural values
+
+=over
+
+=item * L<Neo4j::Types::Node>
+
+=item * L<Neo4j::Types::Relationship>
+
+=item * L<Neo4j::Types::Path>
+
+=back
+
+=item Temporal and spatial values
+
+=over
+
+=item * L<Neo4j::Types::DateTime>
+
+=item * L<Neo4j::Types::Duration>
+
+=item * L<Neo4j::Types::Point>
+
+=back
+
+=item Simple property values
+
+=over
+
+=item * scalar C<"A"> E<ndash> strings
+
+=item * scalar C<123> E<ndash> float and integer numbers
+
+=item *
+L<builtin::true|builtin/"true"> / L<builtin::false|builtin/"false">
+E<ndash> booleans
+
+=back
+
+=item Constructed values
+
+=over
+
+=item * hash ref  C<{ ... }> E<ndash> Neo4j maps
+
+=item * array ref C<[ ... ]> E<ndash> Neo4j lists
+
+=back
+
+=item Null values
+
+=over
+
+=item * C<undef>
+
+=back
+
+=item Byte arrays
+
+=over
+
+=item * L<Neo4j::Types::ByteArray>
+
+=back
+
+=back
+
+In principle, you can also use values of these Perl types as
+query parameters, and they will be correctly recognised by Neo4j.
+However, Neo4j doesn't accept structural values (nodes /
+relationships) as query parameters. See below for further
+limitations that depend on the network protocol.
+
+Perl "distinguished" core boolean values
+(L<builtin::true|builtin/"true"> and
+L<builtin::false|builtin/"false">) are only available
+starting with Perl v5.36. On older Perls, L<JSON::PP>::true
+and L<JSON::PP>::false are used instead. These are blessed
+objects overloaded to evaluate correctly in boolean context.
+Additionally, C<\1> and C<\0> are accepted as literal booleans
+in query parameters.
+
+=head1 USAGE NOTES
+
+=over
+
+=item Element IDs and legacy numeric IDs
+
+Neo4j is in the process of replacing legacy S<numeric IDs>
+with S<element IDs>. On S<Neo4j 5> and newer, S<numeric IDs>
+may not be reliably available and methods like C<id()>
+may issue a warning in the C<deprecated> category.
+Use C<element_id()> on S<Neo4j 5> instead.
+
+=item Representation of nodes and relationships
+
+Node and relationship objects are not in a one-to-one relation
+with nodes and relationships in a Neo4j graph. If the same
+Neo4j entity is fetched multiple times, then multiple distinct
+objects will be created by the driver. If your intention is to
+verify that S<e. g.> two node objects in Perl describe the
+same node in the Neo4j database, you need to compare their
+S<element IDs>.
+
+=item Perl number / string coercions
+
+A Perl scalar may internally be represented as a number
+or a string (see L<perldata/Scalar values>). Perl usually
+auto-converts one into the other based on the context in which
+the scalar is used. However, Perl cannot know the context
+of a Neo4j query parameter, because queries are just opaque
+strings to Perl. Most often your scalars will already have the
+correct internal flavour. A typical example for a situation
+in which this is I<not> the case are numbers parsed out of
+strings using regular expressions. If necessary, you can force
+conversion of such values into the correct type by using
+L<JSON::Types> or with simple unary coercions like this:
+
+ $number =  0 + $scalar;
+ $string = '' . $scalar;
+
+=item Properties hash reference
+
+The C<properties()> method of node and relationship objects
+currently makes a new defensive copy of the properties hash
+each time it's called. S<Version 1.xx> of the driver will
+change this to give a reference to the internal hash instead,
+providing a significant performance increase. Until then,
+you might consider caching the hash ref locally.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+=head2 Bolt networking
+
+For connecting to a Neo4j server using the Bolt protocol, this
+driver will by default use L<Neo4j::Bolt>. The following bugs
+and limitations related to types are known for the latest
+released version of L<Neo4j::Bolt> at time of this writing:
+
+=over
+
+=item *
+Query parameters containing an empty list or empty map will
+be converted to a Cypher C<null> value
+(L<perlbolt#19|https://github.com/majensen/perlbolt/issues/19>).
+
+=item *
+With L<Neo4j::Bolt> version 0.01, the value of node or
+relationship properties named C<_end>, C<_node>, C<_labels>,
+C<_relationship>, C<_start>, or C<_type> may not be returned
+correctly. Note that support for all L<Neo4j::Bolt> versions
+earlier than 0.4201 will be phased out entirely soon.
+
+=back
+
+The following additional issues currently exist with Bolt, but
+L<Neo4j::Bolt> S<version 0.5000> is expected to resolve them:
+
+=over
+
+=item *
+L<builtin::true|builtin/"true"> and
+L<builtin::false|builtin/"false"> are not yet
+supported in query parameters. Use C<\1> and C<\0>
+or L<JSON::PP::Boolean> instead.
+
+=item *
+Byte arrays are not yet supported as query parameters.
+Byte arrays are coded as unblessed strings in Bolt results.
+
+=item *
+Temporal and spatial values are not yet supported.
+
+=back
+
+=head2 Jolt networking
+
+For connecting to a Neo4j server (S<version 4.2> and later)
+using the HTTP or HTTPS protocol, this driver will by default
+use its built-in Jolt networking. The following bugs and
+limitations related to types are known for Jolt in this
+version of L<Neo4j::Driver>:
+
+=over
+
+=item *
+L<builtin::true|builtin/"true"> and
+L<builtin::false|builtin/"false"> are not yet
+supported in query parameters. Use C<\1> and C<\0>
+or L<JSON::PP::Boolean> instead.
+
+=item *
+Byte arrays are not supported as query parameters.
+Byte arrays are coded as unblessed strings in Jolt results.
+
+=item *
+Temporal and spatial values are not yet supported.
+
+=back
+
+=head2 JSON networking
+
+For connecting to a Neo4j server earlier than S<version 4.2>
+using the HTTP or HTTPS protocol, L<Neo4j::Driver> will by
+default use its built-in JSON networking. The following bugs
+and limitations related to types are known for JSON:
+
+=over
+
+=item *
+L<builtin::true|builtin/"true"> and
+L<builtin::false|builtin/"false"> are not yet
+supported in query parameters. Use C<\1> and C<\0>
+or L<JSON::PP::Boolean> instead.
+
+=item *
+Byte arrays are not supported as query parameters.
+Byte arrays are coded as lists of integers in JSON results.
+
+=item *
+Temporal and spatial values are not supported.
+
+=item *
+The value of node or relationship properties named C<_meta>
+may not be returned correctly.
+
+=item *
+Fields in records containing maps or lists may be returned with
+incorrect type or meta data due to a bug in the Neo4j server
+(L<neo4j#12306|https://github.com/neo4j/neo4j/issues/12306>).
+
+=item *
+The C<labels> of nodes and C<type> of relationships that are
+returned as part of a Neo4j path are unavailable, because that
+information is not provided by the Neo4j server
+(L<neo4j#12613|https://github.com/neo4j/neo4j/issues/12613>).
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+L<Neo4j::Driver>
+
+=item *
+L<Neo4j::Types>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

@@ -27,11 +27,11 @@ resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Pod-Example/is
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Pod-Example';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Pod-Example';
 test_requires 'English' => 0;
-test_requires 'File::Object' => 0.05;
+test_requires 'File::Object' => 0.16;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.13';
+version '0.14';
 
 # Run.
 WriteAll();

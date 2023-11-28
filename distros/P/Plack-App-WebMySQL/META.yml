@@ -18,7 +18,7 @@ name: Plack-App-WebMySQL
 provides:
   Plack::App::WebMySQL:
     file: lib/Plack/App/WebMySQL.pm
-    version: '4.0'
+    version: '4.01'
   Plack::App::WebMySQL::General:
     file: lib/Plack/App/WebMySQL/General.pm
   Plack::App::WebMySQL::Key:
@@ -42,5 +42,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thedumbterminal/Plack-App-WebMySQL
-version: '4.0'
+version: '4.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

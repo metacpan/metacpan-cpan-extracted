@@ -28,3 +28,6 @@ Revision history for MooX-ValidateSubs
 
 1.012006 23/05/2022
 	Improve test coverage to 95.4%
+
+1.012007 2023/11/12
+        - Use MooX::ReturnModifers sub to extend package with validate_subs

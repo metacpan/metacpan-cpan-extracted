@@ -2,25 +2,89 @@
 package Math::Ryu;
 use warnings;
 use strict;
+use Config;
+BEGIN {
+  # In this BEGIN{} block we check for the presence of a
+  # perl bug that can set the POK flag when it should not.
+  use B qw(svref_2object);
+
+  if($] < 5.035010) {
+    my %flags;
+    {
+      no strict 'refs';
+      for my $flag (qw(
+        SVf_IOK
+        SVf_NOK
+        SVf_POK
+        SVp_IOK
+        SVp_NOK
+        SVp_POK
+                )) {
+        if (defined &{'B::'.$flag}) {
+          $flags{$flag} = &{'B::'.$flag};
+        }
+      }
+    }
+
+    my $test_nv = 1.3;
+    my $buggery = "$test_nv";
+    my $flags = B::svref_2object(\$test_nv)->FLAGS;
+    my $fstr = join ' ', sort grep $flags & $flags{$_}, keys %flags;
+
+    if($fstr =~ /SVf_POK/) {
+      $Math::Ryu::PV_NV_BUG = 1;
+    }
+    else {
+      $Math::Ryu::PV_NV_BUG = 0;
+    }
+  } # close if{} block
+  else {
+    $Math::Ryu::PV_NV_BUG = 0;
+  }
+};  # close BEGIN{} block
+
+use constant PV_NV_BUG => $Math::Ryu::PV_NV_BUG;
+use constant IVSIZE    => $Config{ivsize};
 
 require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 #$VERSION = eval $VERSION;
 DynaLoader::bootstrap Math::Ryu $VERSION;
 
 my @tagged = qw(
-    d2s s2d
-    d2s_buffered_n d2s_buffered d2fixed_buffered_n d2fixed_buffered
-    d2fixed d2fixed d2exp_buffered_n d2exp_buffered d2exp
-    );
+  d2s s2d
+  d2s_buffered_n d2s_buffered d2fixed_buffered_n d2fixed_buffered
+  d2fixed d2fixed d2exp_buffered_n d2exp_buffered d2exp
+  n2s
+  );
 
 @Math::Ryu::EXPORT = ();
 @Math::Ryu::EXPORT_OK = @tagged;
 %Math::Ryu::EXPORT_TAGS = (all => \@tagged);
 
 sub dl_load_flags {0} # Prevent DynaLoader from complaining and croaking
+
+sub n2s {
+  my $arg = shift;
+  my $ref = ref($arg);
+  die "n2s() does not currently handle  \"$ref\" references"
+    if $ref;
+  return "$arg" if _SvIOK($arg);
+  if(PV_NV_BUG && _SvPOK($arg)) {
+    # perl might have set the POK flag when it should not
+    return d2s($arg) if (_SvNOK($arg) && !_SvIOKp($arg));
+  }
+  return d2s($arg) if _SvNOK($arg);
+  # $arg is neither integer nor float nor reference.
+  # If the numified $arg fits into an IV, return the
+  # stringification of that value.
+  # Else, return d2s($arg), which will coerce $arg
+  # to an NV.
+  return "$arg" if _SvIOK($arg + 0);
+  return d2s($arg);
+}
 
 1;

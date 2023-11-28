@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::TaskData
+# AsposeCellsCloud::Object::TaskData 
 
 ## Load the model package
 ```perl
@@ -8,8 +8,7 @@ use AsposeCellsCloud::Object::TaskData;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**tasks** | [**ARRAY[TaskDescription]**](TaskDescription.md) |  | [optional] 
+**Tasks** | **ARRAY[TaskDescription]** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

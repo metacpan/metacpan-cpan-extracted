@@ -1,0 +1,98 @@
+# PODNAME: Neo4j::Types
+# ABSTRACT: Common Neo4j type system
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Types - Common Neo4j type system
+
+=head1 VERSION
+
+version 2.00
+
+=head1 DESCRIPTION
+
+Packages in this distribution represent Cypher types for use
+with the Neo4j graph database system.
+As a user of a Neo4j driver distribution supporting these types,
+you can find details on the available methods for each type and
+their behaviour in the documentation of the individual modules.
+
+=over
+
+=item * L<Neo4j::Types::B<Node>>
+
+=item * L<Neo4j::Types::B<Relationship>>
+
+=item * L<Neo4j::Types::B<Path>>
+
+=item * L<Neo4j::Types::ByteArray>
+
+=item * L<Neo4j::Types::DateTime>
+
+=item * L<Neo4j::Types::Duration>
+
+=item * L<Neo4j::Types::Point>
+
+=back
+
+The module L<Neo4j::Types> itself contains no code, but you can
+C<use> it as a shortcut to load all the modules listed above.
+
+Additionally, generic implementations are offered for those
+types which Neo4j allows to be used as a query parameter.
+See L<Neo4j::Types::Generic> for details.
+
+Given a Perl scalar, you can determine whether it represents
+a specific type of Neo4j value by using the C<isa> operator.
+
+ use v5.36;
+ $is_node = $value isa Neo4j::Types::Node;
+ 
+ # Older versions of Perl:
+ use Scalar::Util 'blessed';
+ $is_node = blessed $value && $value->isa( 'Neo4j::Types::Node' );
+
+Version 2 of Neo4j::Types is targeting Perl v5.16 and newer.
+Patches will be accepted to address issues with Perl versions
+as old as v5.10.1 as long as practical.
+
+=head1 IMPLEMENTOR GUIDANCE
+
+The Neo4j Cypher Manual describes a variety of types.
+For a discussion of typical ways to implement these in Perl,
+see L<Neo4j::Types::ImplementorNotes>.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Neo4j::Bolt>
+
+=item * L<Neo4j::Driver>
+
+=item * "Values and types" in the L<Neo4j Cypher Manual|https://neo4j.com/docs/cypher-manual/current/>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

@@ -11,7 +11,7 @@ The created packages can be installed with CPANPLUS, dpkg or rpm.
     $ cd ~/rpmbuild/RPMS/noarch
     $ sudo rpm -i perl-Some-Module-1.0-1.noarch.rpm
 
-    $ cd ~/.cpanplus/5.34.0/build/XXXX
+    $ cd ~/.cpanplus/5.36.1/build/XXXX
     $ sudo dpkg -i libsome-module-perl_1.0-1cpanplus_all.deb
 
 ## DEPENDENCIES
@@ -31,7 +31,7 @@ On Debian-based systems, the following packages are required:
 On RPM-based systems, install the following packages:
 
 * perl
-* perl-generators (if available)
+* perl-devel and perl-generators (if available)
 * rpm-build
 * gcc
 * make
@@ -52,7 +52,7 @@ Type the following command to see the module usage information:
 
 ## LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2023 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

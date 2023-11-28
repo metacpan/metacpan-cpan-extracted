@@ -296,7 +296,7 @@ Sub::Exporter::Cookbook - useful, demonstrative, or stupid Sub::Exporter tricks
 
 =head1 VERSION
 
-version 0.990
+version 0.991
 
 =head1 OVERVIEW
 

@@ -7,6 +7,11 @@ file_cleaner_by_du - Removes files based on disk space usage till it drops below
 =head1 SYNOPSIS
 
 file_cleaner_by_du B<-p> <path> B<-d> <du> [B<-m> <min_files>] [B<--pretty>] [B<--dry_run>]
+[B<-q>] [B<-w> <file>] [B<--pid>] [B<--pid_name> <name>] [B<--pid_dir> <dir>]
+
+file_cleaner_by_du --version
+
+file_cleaner_by_du --help
 
 =head1 DESCRIPTION
 
@@ -67,24 +72,49 @@ Optional minimum number of files to keep regardless of disk usage.
 
 Pretty print the results.
 
-=head2 -v | -version
+=head2 --version
 
 Print version.
 
-=head2 -h | --help
+=head2 --help
 
 Print help,
+
+=head2 --pid
+
+Use a PID file.
+
+=head2 --pid_name <pid name>
+
+Append this to the the name of the pid file created. If specified with a
+value of 'foo' then the file would be 'file_cleaner_by_du-foo.pid
+
+=head2 --pid_dir <pid dir>
+
+Dir to create the pid file under.
+
+Default: /var/run
+
+=head2 -w <file>
+
+Write the results out to this file.
+
+=head2 -q
+
+Don't print the results out.
 
 =cut
 
 use strict;
 use warnings;
-use Getopt::Long qw(:config pass_through);
+use Getopt::Long;
 use JSON;
 use App::FileCleanerByDiskUage;
+use File::Slurp;
+use Pod::Usage;
 
 sub version {
-	print 'file_cleaner_by_du v. '.$App::FileCleanerByDiskUage::VERSION."\n";
+	print 'file_cleaner_by_du v. ' . $App::FileCleanerByDiskUage::VERSION . "\n";
 }
 
 my $help;
@@ -95,17 +125,25 @@ my $ignore;
 my $min_files;
 my $pretty;
 my $dry_run;
+my $use_pid;
+my $pid_name;
+my $pid_dir;
+my $write_file;
+my $be_quiet;
 GetOptions(
-	'd=s'     => \$du,
-	'p=s'     => \@path,
-	'i=s'     => \$ignore,
-	'm=s'     => \$min_files,
-	'help'    => \$help,
-	'h'       => \$help,
-	'version' => \$version,
-	'v'       => \$version,
-	'pretty'  => \$pretty,
-	'dry_run' => \$dry_run,
+	'd=s'        => \$du,
+	'p=s'        => \@path,
+	'i=s'        => \$ignore,
+	'm=s'        => \$min_files,
+	'help'       => \$help,
+	'version'    => \$version,
+	'pretty'     => \$pretty,
+	'dry_run'    => \$dry_run,
+	'pid'        => \$use_pid,
+	'pid_name=s' => \$pid_name,
+	'pid_dir=s'  => \$pid_dir,
+	'w=s'        => \$write_file,
+	'q'          => \$be_quiet,
 );
 
 if ($version) {
@@ -117,40 +155,41 @@ if ($version) {
 if ($help) {
 	&version;
 
-	print '
+	print "\n\n";
 
-
--d <du>        Target disk usage.
-
--p <path>      The path to operate on. This may be specified more than once. Only the first is used for getting usage, so it shoudld not cross partitions.
-
--i <regex>     Optional ignore regex.
-
--i <min files> Optional minimum number of files to keep regardless of disk usage.
-
---pretty       Pretty print the results.
-
---dry_run      Do not actually delete anything. Instead just check if what it would delete is writable by the current user.
-
--v             Print version.
---version      Print version.
-
--h             Print help.
---help         Print help,
-
-';
-
-	exit 255;
-} ## end if ($help)
-
-my $results
-	= App::FileCleanerByDiskUage->clean( path => \@path, du => $du, min_files => $min_files, dry_run => $dry_run );
-
-if ( !$pretty ) {
-	print encode_json($results) . "\n";
-} else {
-	print JSON->new->utf8->canonical(1)->pretty(1)->encode($results);
+	pod2usage( -exitval => 255, -verbose => 2 );
 }
+
+my $results = App::FileCleanerByDiskUage->clean(
+	path      => \@path,
+	du        => $du,
+	min_files => $min_files,
+	dry_run   => $dry_run,
+	use_pid   => $use_pid,
+	pid_name  => $pid_name,
+	pid_dir   => $pid_dir,
+);
+
+my $rendered_results;
+if ( !$be_quiet ) {
+	if ( !$pretty ) {
+		$rendered_results = encode_json($results) . "\n";
+	} else {
+		$rendered_results = JSON->new->utf8->canonical(1)->pretty(1)->encode($results);
+	}
+	print $rendered_results;
+}
+
+if ( defined($write_file) ) {
+	if ($be_quiet) {
+		if ( !$pretty ) {
+			$rendered_results = encode_json($results) . "\n";
+		} else {
+			$rendered_results = JSON->new->utf8->canonical(1)->pretty(1)->encode($results);
+		}
+	}
+	write_file( $write_file, { atomic => 1 }, $rendered_results );
+} ## end if ( defined($write_file) )
 
 if ( $results->{unlink_failed_count} > 0 ) {
 	exit 1;

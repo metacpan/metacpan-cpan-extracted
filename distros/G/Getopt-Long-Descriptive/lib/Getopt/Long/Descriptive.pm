@@ -1,13 +1,13 @@
 use strict;
 use warnings;
-package Getopt::Long::Descriptive 0.111;
+package Getopt::Long::Descriptive 0.112;
 # ABSTRACT: Getopt::Long, but simpler and more powerful
 
 use v5.12;
 
 use Carp qw(carp croak);
 use File::Basename ();
-use Getopt::Long 2.33;
+use Getopt::Long 2.55;
 use List::Util qw(first);
 use Params::Validate 0.97 qw(:all);
 use Scalar::Util ();
@@ -445,10 +445,6 @@ sub _build_describe_options {
 
     my %opt_count;
     $opt_count{$_}++ for @options;
-    my @redundant = sort grep {; $opt_count{$_} > 1 } keys %opt_count;
-
-    warn "Getopt::Long::Descriptive was configured with these ambiguous options: @redundant\n"
-      if @redundant;
 
     my $short = join q{},
       sort  { lc $a cmp lc $b or $a cmp $b }
@@ -731,7 +727,7 @@ Getopt::Long::Descriptive - Getopt::Long, but simpler and more powerful
 
 =head1 VERSION
 
-version 0.111
+version 0.112
 
 =head1 SYNOPSIS
 
@@ -772,13 +768,13 @@ features.
 
 =head1 PERL VERSION
 
-This library should run on perls released even a long time ago.  It should work
-on any version of perl released in the last five years.
+This library should run on perls released even a long time ago.  It should
+work on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
-for any reason, and there is no promise that patches will be accepted to lower
-the minimum required perl.
+for any reason, and there is no promise that patches will be accepted to
+lower the minimum required perl.
 
 =head1 FUNCTIONS
 

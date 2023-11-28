@@ -1,0 +1,268 @@
+=head1 NAME
+
+Chipcard::PCSC - Smart card reader interface library
+
+=head1 SYNOPSIS
+
+ my $hContext = new Chipcard::PCSC();
+
+ @ReadersList = $hContext->ListReaders ();
+
+ $hContext->GetStatusChange(\@readers_states, $timeout);
+
+ $apdu = Chipcard::PCSC::array_to_ascii(@apdu);
+
+ @apdu = Chipcard::PCSC::ascii_to_array($apdu);
+
+ $hContext = undef;
+
+=head1 DESCRIPTION
+
+The PCSC module implements the Chipcard::PCSC class. Objects of this
+class are used to communicate with the PCSC-lite daemon (see F<pcscd(1)>
+for more information).
+
+PC/SC represents an abstraction layer to smart card readers. It provides
+a communication layer with a wide variety of smart card readers through
+a standardized API.
+
+A PCSC object can be used to communicate with more than one reader
+through Chipcard::PCSC::Card objects. Please read
+L<Chipcard::PCSC::Card> for extended information on how to talk to a
+smart card reader.
+
+A PCSC object uses the following property:
+C<$pcsc_object-E<gt>{hContext}> the context returned by the pcsc library
+
+=head1 CONSTRUCTORS
+
+The following methods can be used to construct a PCSC object:
+
+=over 4
+
+=item *
+ B<$hContext = new Chipcard::PCSC($scope, $remote_host);>
+
+=over 4
+
+=item *
+
+C<$scope> is the scope of the connection to the PC/SC daemon. It can be
+any of the following:
+
+ $Chipcard::PCSC::SCARD_SCOPE_USER     (not used by PCSClite);
+ $Chipcard::PCSC::SCARD_SCOPE_TERMINAL (not used by PCSClite);
+ $Chipcard::PCSC::SCARD_SCOPE_SYSTEM   Services on the local machine;
+ $Chipcard::PCSC::SCARD_SCOPE_GLOBAL   Services on a remote host.
+
+=item *
+
+C<$remote_host> is the host name of the remote machine to contact. It is
+only used when C<$scope> is equal to
+C<$Chipcard::PCSC::SCARD_SCOPE_GLOBAL>. A null value means F<localhost>.
+
+=back
+
+=item *
+ B<$hContext = new Chipcard::PCSC($scope);>
+
+This method is equivalent to:
+
+ $hContext = new Chipcard::PCSC($scope, 0);
+
+=item *
+ B<$hContext = new Chipcard::PCSC();>
+
+This method is equivalent to:
+
+ $hContext = new Chipcard::PCSC($Chipcard::PCSC::SCARD_SCOPE_SYSTEM, 0);
+
+=back
+
+=head1 CONSTRUCTION FAILURE
+
+Chipcard::PCSC constructors return an C<undef> value when the object can
+not be created. C<$Chipcard::PCSC::errno> can be used to get more
+information about the error.  (See section L<ERROR HANDLING> below for
+more information)
+
+=head1 Chipcard::PCSC METHODS
+
+Here is a list of all the methods that can be used with a PCSC object.
+
+=over 4
+
+=item *
+ B<hContext-E<gt>ListReaders( $group );>
+
+This method returns the available readers in the given C<$group>. If
+omitted, C<$group> defaults to a null value meaning "all groups". Please
+note that as of this writing, C<$group> can safely be omitted as it is
+not used by PCSClite.
+
+The return value upon successful completion is an array of strings: one
+string by available reader. If an error occurred, the undef value is
+returned and C<$Chipcard::PCSC::errno> should be used to get more
+information about the error.  (See section L<ERROR HANDLING> below for
+more information). The following example describes the use of
+L<ListReaders>:
+
+ $hContext = new Chipcard::PCSC();
+ die ("Can't create the PCSC object: $Chipcard::PCSC::errno\n")
+ 	unless (defined $hContext);
+
+ @ReadersList = $hContext->ListReaders ();
+ die ("Can't get readers' list: $Chipcard::PCSC::errno\n")
+ 	unless (defined($ReadersList[0]));
+
+ $, = "\n  ";
+ print @ReadersList . "\n";
+
+=item *
+ B<$hContext-E<gt>GetStatusChange(\@readers_states, $timeout);>
+
+The method C<$hContext-E<gt>GetStatusChange(\@readers_states, $timeout)>
+uses a reference to a list of hashes. 
+
+ # create the list or readers to watch
+ map { push @readers_states, ({'reader_name'=>"$_"}) } @ReadersList;
+
+ @StatusResult = $hContext->GetStatusChange(\@readers_states);
+
+The keys of the hash are: 'reader_name', 'current_state', 'event_state'
+and 'ATR'.
+
+To detect a status change you have to first get the status and then copy
+the 'event_state' in the 'current_state'. The method will return when
+both states are different or a timeout occurs.
+
+ @StatusResult = $hContext->GetStatusChange(\@readers_states);
+ foreach $reader (@readers_states)
+ {
+   $reader->{current_state} = $reader->{event_state};
+ }
+ @StatusResult = $hContext->GetStatusChange(\@readers_states);
+
+=item *
+ B<$hContext-E<gt>GetStatusChange(\@readers_states);>
+
+This method is equivalent to:
+
+ $hContext->GetStatusChange(\@readers_states, 0xFFFFFFFF);
+
+The timeout is set to infinite.
+
+=item *
+ B<$apdu_ref = Chipcard::PCSC::ascii_to_array($apdu);>
+
+The method C<Chipcard::PCSC::Card::Transmit()> uses references to arrays
+as in and out parameters. The C<Chipcard::PCSC::ascii_to_array()> is used
+to transform an APDU in ASCII format to a reference to an array in the
+good format.
+
+Example:
+
+ $SendData = Chipcard::PCSC::ascii_to_array("00 A4 01 00 02 01 00");
+
+=item *
+ B<$apdu = Chipcard::PCSC::array_to_ascii($apdu_ref);>
+
+This method is used to convert the result of a
+C<Chipcard::PCSC::Card::Transmit()> into ASCII format.
+
+Example:
+
+ $RecvData = $hCard->Transmit($SendData);
+ print Chipcard::PCSC::array_to_ascii($RecvData);
+
+=back
+
+=head1 ERROR HANDLING
+
+All functions from PCSC objects save the return value in a global
+variable called C<$Chipcard::PCSC::errno>. This variable therefore holds
+the latest status of PCSC.
+
+It is a double-typed magical variable that behaves just like C<$!>. This
+means that it both holds a numerical value describing the error and the
+corresponding string.  The numerical value may change from a system to
+another as it depends on the PCSC library...
+
+Here is a small example of how to use it:
+
+ $hContext = new Chipcard::PCSC();
+ die ("Can't create the PCSC object: $Chipcard::PCSC::errno\n")
+     unless (defined $hContext);
+
+In case the last call was successful, C<$Chipcard::PCSC::errno> contains
+the C<SCARD_S_SUCCESS> status. Here is a list of all possible error
+codes.  They are defined as read-only variables with in the PCSC module:
+
+ $Chipcard::PCSC::SCARD_S_SUCCESS
+ $Chipcard::PCSC::SCARD_E_CANCELLED
+ $Chipcard::PCSC::SCARD_E_CANT_DISPOSE
+ $Chipcard::PCSC::SCARD_E_CARD_UNSUPPORTED
+ $Chipcard::PCSC::SCARD_E_DUPLICATE_READER
+ $Chipcard::PCSC::SCARD_E_INSUFFICIENT_BUFFER
+ $Chipcard::PCSC::SCARD_E_INVALID_ATR
+ $Chipcard::PCSC::SCARD_E_INVALID_HANDLE
+ $Chipcard::PCSC::SCARD_E_INVALID_PARAMETER
+ $Chipcard::PCSC::SCARD_E_INVALID_TARGET
+ $Chipcard::PCSC::SCARD_E_INVALID_VALUE
+ $Chipcard::PCSC::SCARD_E_NO_MEMORY
+ $Chipcard::PCSC::SCARD_E_NO_SERVICE
+ $Chipcard::PCSC::SCARD_E_NO_SMARTCARD
+ $Chipcard::PCSC::SCARD_E_NOT_READY
+ $Chipcard::PCSC::SCARD_E_NOT_TRANSACTED
+ $Chipcard::PCSC::SCARD_E_PCI_TOO_SMALL
+ $Chipcard::PCSC::SCARD_E_PROTO_MISMATCH
+ $Chipcard::PCSC::SCARD_E_READER_UNAVAILABLE
+ $Chipcard::PCSC::SCARD_E_READER_UNSUPPORTED
+ $Chipcard::PCSC::SCARD_E_SERVICE_STOPPED
+ $Chipcard::PCSC::SCARD_E_SHARING_VIOLATION
+ $Chipcard::PCSC::SCARD_E_SYSTEM_CANCELLED
+ $Chipcard::PCSC::SCARD_E_TIMEOUT
+ $Chipcard::PCSC::SCARD_E_UNKNOWN_CARD
+ $Chipcard::PCSC::SCARD_E_UNKNOWN_READER
+ $Chipcard::PCSC::SCARD_E_UNSUPPORTED_FEATURE
+
+ $Chipcard::PCSC::SCARD_W_REMOVED_CARD
+ $Chipcard::PCSC::SCARD_W_RESET_CARD
+ $Chipcard::PCSC::SCARD_W_SECURITY_VIOLATION
+ $Chipcard::PCSC::SCARD_W_UNPOWERED_CARD
+ $Chipcard::PCSC::SCARD_W_UNRESPONSIVE_CARD
+ $Chipcard::PCSC::SCARD_W_UNSUPPORTED_CARD
+
+PCSClite users will also be able to use the following (PCSClite
+specific) codes:
+
+ $Chipcard::PCSC::SCARD_INSERTED
+ $Chipcard::PCSC::SCARD_REMOVED
+ $Chipcard::PCSC::SCARD_RESET
+ $Chipcard::PCSC::SCARD_SCOPE_GLOBAL
+
+In addition, the wrapper defines:
+
+ $Chipcard::PCSC::SCARD_P_ALREADY_CONNECTED
+ $Chipcard::PCSC::SCARD_P_NOT_CONNECTED
+
+=head1 SEE ALSO
+
+F<pcscd(1)> manpage has useful information about PC/SC lite.
+L<Chipcard::PCSC::Card> manpage gives information about how to
+communicate with a reader and the smart card inside it.
+
+=head1 COPYRIGHT
+
+(C) Lionel VICTOR & Ludovic ROUSSEAU, 2001-2004, GNU GPL
+(C) Ludovic ROUSSEAU, 2005-2008, GNU GPL
+
+=head1 AUTHORS / ACKNOWLEDGEMENT
+
+ Lionel VICTOR <lionel.victor@unforgettable.com>
+               <lionel.victor@free.fr>
+
+ Ludovic ROUSSEAU <ludovic.rousseau@free.fr>
+
+=cut
+

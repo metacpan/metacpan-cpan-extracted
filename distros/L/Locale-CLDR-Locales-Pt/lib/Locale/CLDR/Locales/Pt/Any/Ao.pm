@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Pt::Any::Ao - Package for language Portuguese
 
 package Locale::CLDR::Locales::Pt::Any::Ao;
 # This file auto generated from Data\common\main\pt_AO.xml
-#	on Fri 13 Oct  9:34:20 am GMT
+#	on Sat  4 Nov  6:20:30 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

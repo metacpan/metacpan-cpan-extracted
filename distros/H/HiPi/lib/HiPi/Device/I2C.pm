@@ -1,8 +1,7 @@
 #########################################################################################
 # Package        HiPi::Device::I2C
 # Description:   Wrapper for I2C communucation
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -24,15 +23,19 @@ use Try::Tiny;
 use constant {
     I2C_BCM2708 => 1,
     I2C_BCM2835 => 2,
+    I2C_RP1     => 3
 };
 
-our $VERSION ='0.81';
+our $VERSION ='0.90';
 
 __PACKAGE__->create_accessors( qw ( fh fno address busmode readmode ) );
 
 XSLoader::load('HiPi::Device::I2C', $VERSION) if HiPi::is_raspberry_pi();
 
 my $modvers = ( -e '/sys/module/i2c_bcm2708' ) ? I2C_BCM2708 : I2C_BCM2835;
+if ( HiPi::RaspberryPi::has_rp1() ) {
+    $modvers = I2C_RP1;
+}
 
 my $combined_param_path = '/sys/module/i2c_bcm2708/parameters/combined';
 my $baudrate_param_path = '/sys/module/i2c_bcm2708/parameters/baudrate';
@@ -40,7 +43,8 @@ my $baudrate_param_path = '/sys/module/i2c_bcm2708/parameters/baudrate';
 sub get_required_module_options {
     my $moduleoptions = [
         [ qw( i2c_bcm2708 i2c_dev ) ], # older i2c modules
-        [ qw( i2c_bcm2385 i2c_dev ) ], # recent i2c modules
+        [ qw( i2c_bcm2385 i2c_dev ) ], # pre pi 5 i2c modules
+        [ qw( i2c_designware_platform i2c_dev) ] # pi 5 i2c modules
     ];
     return $moduleoptions;
 }
@@ -53,7 +57,8 @@ sub get_device_list {
     for (my $i = 0; $i < @i2cdevs; $i++) {
         $i2cdevs[$i] = '/dev/' . $i2cdevs[$i];
     }
-    return @i2cdevs;
+    my @sorted = sort @i2cdevs;
+    return @sorted;
 }
 
 sub _get_i2c_node_name {
@@ -66,7 +71,7 @@ sub _get_i2c_node_name {
 sub get_baudrate {
     my ($class) = @_;
     
-    if ( $modvers == I2C_BCM2835 ) {
+    if ( $modvers == I2C_BCM2835 || $modvers == I2C_RP1 ) {
         my $sysfile = '/sys/class/i2c-adapter/i2c-1/of_node/clock-frequency';
         my $sysfile0 = '/sys/class/i2c-adapter/i2c-0/of_node/clock-frequency';
         
@@ -84,7 +89,7 @@ sub get_baudrate {
             chomp $baudrate;
             return hex($baudrate);
         } else {
-            return 0;
+            return 100_000;
         }
     } else {
         my $baudrate = qx(/bin/cat $baudrate_param_path);
@@ -98,12 +103,18 @@ sub get_baudrate {
 }
 
 sub get_driver {
-    return ( $modvers == I2C_BCM2835 ) ? 'i2c_bcm2835' : 'i2c_bcm2708';
+    if ( $modvers == I2C_BCM2708 ) {
+        return 'i2c_bcm2708';
+    } elsif( $modvers == I2C_BCM2835 ) {
+        return 'i2c_bcm2835';
+    } else {
+        return 'i2c_designware_platform';
+    }
 }
 
 sub get_combined {
     my ($class) = @_;
-    return 'Y' if $modvers == I2C_BCM2835;
+    return 'Y' if $modvers != I2C_BCM2708;
     my $combined = qx(/bin/cat $combined_param_path);
     if($?) {
         carp q(Unable to determine combined setting);
@@ -118,7 +129,7 @@ sub set_combined {
     $newval //= 'N';
     $newval = uc($newval);
     croak('Usage HiPi::Device::I2C->set_combined( "Y|N" )') unless ( $newval =~ /^Y|N$/ );
-    return 'Y' if $modvers == I2C_BCM2835;
+    return 'Y' if $modvers != I2C_BCM2708;
     qx(/bin/echo $newval > $combined_param_path);
     return $newval;
 }

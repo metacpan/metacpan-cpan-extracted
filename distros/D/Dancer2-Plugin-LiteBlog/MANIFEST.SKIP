@@ -1,5 +1,7 @@
 dist/*
 
+*dup*
+
 # Avoid version control files:
 \B\.git\b
 .gitignore

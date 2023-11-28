@@ -177,3 +177,9 @@ All dates are in ISO 8601 Format
     Fixed for-cash rounding problem
     Fix warning in plural rules where fraction is used
     Fix typo in POD documentation
+
+0.34.2 2023-10-13
+    Swapped bignum to bigfloat as bignum was causing problems with other modules
+    
+0.34.3 2023-11-05
+    Fixes to Bundles to allow languages ane regions to co-exist

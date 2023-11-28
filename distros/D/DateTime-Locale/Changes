@@ -1,8 +1,13 @@
+1.40     2023-11-04
+
+- Rebuilt all locale data with the data from CLDR 44.0.1.
+
+
 1.39     2023-05-28
 
 - Fixed parsing of the 'el-polyton' locale code. This had the same issue as
   'be-tarask', which was fixed in 1.36. This is now fixed in such a way that
-  similar language+variant codes will be parsed correctly in the
+  similar `$language-$variant` codes will be parsed correctly in the
   future. Reported by @yvanzo. GH #37.
 
 

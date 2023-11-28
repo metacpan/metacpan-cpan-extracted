@@ -16,7 +16,7 @@ __END__
 
 =head1 NAME
 
-	PayProp::API::Public::Client::Exception::Response - Response exception.
+PayProp::API::Public::Client::Exception::Response - Response exception.
 
 =head1 SYNOPSIS
 
@@ -30,27 +30,47 @@ __END__
 
 =head1 DESCRIPTION
 
-	Throw C<PayProp::API::Public::Client::Exception::Response> exception.
+Throw C<PayProp::API::Public::Client::Exception::Response> exception.
 
 =head1 AUTHOR
 
-	Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
 
-	Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-	Copyright 2023- PayProp
+Copyright 2023- PayProp
 
 =head1 LICENSE
 
-	This library is free software; you can redistribute it and/or modify
-	it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
-	If you would like to contribute documentation
-	or file a bug report then please raise an issue / pull request:
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
 
-	L<https://github.com/Humanstate/api-client-public-module>
+L<https://github.com/Humanstate/api-client-public-module>
+
+=head1 AUTHOR
+
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2023- PayProp
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
+
+L<https://github.com/Humanstate/api-client-public-module>
 
 =cut
 

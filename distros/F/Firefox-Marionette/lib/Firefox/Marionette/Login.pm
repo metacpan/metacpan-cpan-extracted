@@ -3,7 +3,7 @@ package Firefox::Marionette::Login;
 use strict;
 use warnings;
 
-our $VERSION = '1.46';
+our $VERSION = '1.49';
 
 sub _NUMBER_OF_MILLISECONDS_IN_A_SECOND { return 1000 }
 
@@ -131,7 +131,7 @@ Firefox::Marionette::Login - Represents a login from the Firefox Password Manage
 
 =head1 VERSION
 
-Version 1.46
+Version 1.49
 
 =head1 SYNOPSIS
 
@@ -242,6 +242,10 @@ returns the HTTP Realm for which the login was requested. When an HTTP server se
 =head2 times_used
 
 returns the number of times the login was submitted in a form or used to begin an HTTP auth session.
+
+=head2 TO_JSON
+
+required to allow L<JSON serialisation|https://metacpan.org/pod/JSON#OBJECT-SERIALISATION> to work correctly.  This method should not need to be called directly.
 
 =head2 user
 

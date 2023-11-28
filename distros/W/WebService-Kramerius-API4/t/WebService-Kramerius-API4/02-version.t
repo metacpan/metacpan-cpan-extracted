@@ -1,9 +1,9 @@
 use strict;
 use warnings;
 
-use WebService::Kramerius::API4;
 use Test::More 'tests' => 2;
 use Test::NoWarnings;
+use WebService::Kramerius::API4;
 
 # Test.
-is($WebService::Kramerius::API4::VERSION, 0.01, 'Version.');
+is($WebService::Kramerius::API4::VERSION, 0.02, 'Version.');

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bn::Any::In - Package for language Bangla
 
 package Locale::CLDR::Locales::Bn::Any::In;
 # This file auto generated from Data\common\main\bn_IN.xml
-#	on Fri 13 Oct  9:07:41 am GMT
+#	on Sat  4 Nov  5:54:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

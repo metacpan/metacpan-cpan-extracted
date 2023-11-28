@@ -1,0 +1,86 @@
+{
+   "abstract" : "Interface to HAFAS itinerary services",
+   "author" : [
+      "Copyright (C) 2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Travel-Routing-DE-HAFAS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Compile" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor" : "0.16",
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Digest::MD5" : "0",
+            "Getopt::Long" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Travel::Status::DE::HAFAS" : "0",
+            "Travel::Status::DE::HAFAS::Message" : "4.19",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurp" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Travel::Routing::DE::HAFAS" : {
+         "file" : "lib/Travel/Routing/DE/HAFAS.pm",
+         "version" : "0.01"
+      },
+      "Travel::Routing::DE::HAFAS::Connection" : {
+         "file" : "lib/Travel/Routing/DE/HAFAS/Connection.pm",
+         "version" : "0.01"
+      },
+      "Travel::Routing::DE::HAFAS::Connection::Section" : {
+         "file" : "lib/Travel/Routing/DE/HAFAS/Connection/Section.pm",
+         "version" : "0.01"
+      },
+      "Travel::Routing::DE::HAFAS::Location" : {
+         "file" : "lib/Travel/Routing/DE/HAFAS/Location.pm",
+         "version" : "0.01"
+      },
+      "Travel::Routing::DE::HAFAS::Utils" : {
+         "file" : "lib/Travel/Routing/DE/HAFAS/Utils.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/derf/Travel-Routing-DE-HAFAS"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

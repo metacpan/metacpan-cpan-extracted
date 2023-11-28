@@ -4,9 +4,9 @@ use strict;
 use Moo::Role;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-05'; # DATE
+our $DATE = '2023-11-06'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.560'; # VERSION
+our $VERSION = '0.561'; # VERSION
 
 1;
 # ABSTRACT: Role for Org::Element::* classes
@@ -23,7 +23,7 @@ Org::ElementRole - Role for Org::Element::* classes
 
 =head1 VERSION
 
-This document describes version 0.560 of Org::ElementRole (from Perl distribution Org-Parser), released on 2023-08-05.
+This document describes version 0.561 of Org::ElementRole (from Perl distribution Org-Parser), released on 2023-11-06.
 
 =head1 HOMEPAGE
 

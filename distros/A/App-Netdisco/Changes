@@ -1,4 +1,52 @@
+2.070003 - 2023-11-24
+
+  [BUG FIXES]
+
+  * do not use 'DISTINCT' when a 'GROUP BY' is present (DBIx::Class dies)
+
+2.070002 - 2023-11-21
+
+  [ENHANCEMENTS]
+
+  * #1126 acl skip_modules for problematic Entity MIB per device ACL
+
+  [BUG FIXES]
+
+  * #1124 netdisco-do --force --enqueue -d bigfile.txt does not work
+  * #1127 uninitialized value in Worker/Plugin/Discover/Entities.pm line 109
+  * #1129 no longer clear device_skip with empty job queue
+  * #1130 port control tick for new users should be dropdown
+
+2.070001 - 2023-11-15
+
+  [BUG FIXES]
+
+  * add ieee-oui-import to deployed scripts
+
+2.070000 - 2023-11-14
+
+  [NEW FEATURES]
+
+  * #1111 Support for OUI28/MA-M and OUI36/MA-S (replace oui with manufacturer)
+
+2.069000 - 2023-11-12
+
+  [NEW FEATURES]
+
+  * #1009 neighbour map depth and/or until end of lldp chains
+  * #1118 user configurable external links from node search and device details
+  * #1119 accept filename (of devices) to -d parameter on netdisco-do
+
+  [ENHANCEMENTS]
+
+  * FortiOS.pm pagination support
+  * #1112 API method for device neighbors
+
 2.068001 - 2023-11-01
+
+  [ENHANCEMENTS]
+
+  * installation instruction for SLES
 
   [BUG FIXES]
 

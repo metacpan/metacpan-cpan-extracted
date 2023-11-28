@@ -1,36 +1,26 @@
-use strict;
-use warnings;
-
-use Test::More tests => 8;
-use XML::Sig;
 use File::Which;
+use Test::Lib;
+use Test::XML::Sig;
 
-my $sig = XML::Sig->new( { x509 => 1 , key => 't/ecdsa.private.pem', cert => 't/ecdsa.public.pem' } );
+
+my $xmlsec = get_xmlsec_features;
+
+my $sig = XML::Sig->new(
+    { x509 => 1, key => 't/ecdsa.private.pem', cert => 't/ecdsa.public.pem' });
 isa_ok( $sig, 'XML::Sig' );
 
 my $signed = $sig->sign('<foo ID="123"></foo>');
 ok($signed, "XML Signed Sucessfully using ecdsa key");
 
-$sig = XML::Sig->new( );
-my $is_valid = $sig->verify( $signed );
-ok( $is_valid == 1, "XML::Sig signed Validated using X509Certificate");
-
-ok( (open XML, '>', 't/tmp.xml'), "File opened for write");
-print XML $signed;
-close XML;
+$sig = XML::Sig->new();
+ok($sig->verify($signed), "XML::Sig signed Validated using X509Certificate");
 
 SKIP: {
-    skip "xmlsec1 not installed", 1 unless which('xmlsec1');
+    skip "xmlsec1 not installed", 1 unless $xmlsec->{installed};
+    test_xmlsec1_ok("ECDSA Response is verified using xmlsec1",
+        $signed,
+        qw(--verify --trusted-pem t/ecdsa.public.pem --id-attr:ID "foo"));
 
-    my $verify_response = `xmlsec1 --verify --trusted-pem t/ecdsa.public.pem --id-attr:ID "foo" t/tmp.xml 2>&1`;
-    ok( $verify_response =~ m/OK/, "ECDSA Response is verified using xmlsec1" )
-        or warn "calling xmlsec1 failed: '$verify_response'\n";
-    if ($verify_response =~ m/OK/) {
-        unlink 't/tmp.xml';
-    } else{
-        print $signed;
-        die;
-    }
 }
 
 $sig = XML::Sig->new( { key => 't/ecdsa.private.pem' } );
@@ -40,7 +30,6 @@ $signed = $sig->sign('<foo ID="123"></foo>');
 ok($signed, "XML Signed Sucessfully using ecdsa key");
 
 $sig = XML::Sig->new( );
-$is_valid = $sig->verify( $signed );
-ok( $is_valid == 1, "XML::Sig signed Validated using ECDSAKey");
+ok($sig->verify($signed), "XML::Sig signed Validated using ECDSAKey");
 
 done_testing;

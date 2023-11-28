@@ -1,5 +1,5 @@
 package Form::Tiny::Path;
-$Form::Tiny::Path::VERSION = '2.21';
+$Form::Tiny::Path::VERSION = '2.22';
 use v5.10;
 use strict;
 use warnings;

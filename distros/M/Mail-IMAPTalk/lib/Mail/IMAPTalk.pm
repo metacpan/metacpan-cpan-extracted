@@ -1,5 +1,5 @@
 package Mail::IMAPTalk;
-$Mail::IMAPTalk::VERSION = '4.04';
+
 =head1 NAME
 
 Mail::IMAPTalk - IMAP client interface with lots of features
@@ -122,6 +122,8 @@ sub import {
 
   goto &Exporter::import;
 }
+
+our $VERSION = '4.06';
 # }}}
 
 # Use modules {{{
@@ -280,6 +282,12 @@ string which specifies what to do with the value item of the hash.
 
 The string/data in the value is sent as an IMAP literal
 regardless of the actual data in the string/data.
+
+=item * 'Binary'
+
+The string/data in the value is sent as an IMAP literal8
+regardless of the actual data in the string/data.
+(see RFC 3516)
 
 =item * 'Quote'
 
@@ -498,6 +506,13 @@ Passed as the second parameter to the C<set_root_folder()> method.
 If supplied, passed along with RootFolder to the C<set_root_folder()>
 method.
 
+=item B<NoLiteralPlus>
+
+If set, this avoids ever sending literal+ non-synchronising literals.
+The default is off (false value).  Use this if you're dealing with a
+buggy server that doesn't handle literal+ correctly.  Also turns off
+RFC7888 "literal-" support.
+
 =back
 
 Examples:
@@ -559,7 +574,7 @@ sub new {
     $SocketOpts{PeerHost} = $Self->{Server} = $Args{Server} || die "No Server name given";
     $SocketOpts{PeerPort} = $Self->{Port} = $Args{Port} || $DefaultPort;
 
-    $Socket = ${SocketClass}->new(%SocketOpts) || return undef;
+    $Socket = ($Args{NewSocketCB} || sub { shift->new(@_) })->($SocketClass, %SocketOpts) || return undef;
 
     # Force flushing after every write to the socket
     my $ofh = select($Socket); $| = 1; select ($ofh);
@@ -588,6 +603,7 @@ sub new {
   $Self->{Pedantic} = $Args{Pedantic};
   $Self->{PreserveINBOX} = $Args{PreserveINBOX};
   $Self->{UseCompress} = $Args{UseCompress};
+  $Self->{NoLiteralPlus} = $Args{NoLiteralPlus};
 
   # Do this now, so we trace greeting line as well
   $Self->set_tracing($AlwaysTrace);
@@ -597,6 +613,12 @@ sub new {
     $Self->{CmdId} = "*";
     my ($CompletionResp, $DataResp) = $Self->_parse_response('');
     return undef if $CompletionResp !~ /^ok/i;
+
+    # At this point, the cached "remainder" should be the banner greeting.  We'll
+    # save this into the ServerGreeting cache entry so we can refer to it later,
+    # if we want to.  This is fairly fragile, so may need reworking later.
+    # -- rjbs, 2023-08-11
+    $Self->{Cache}{ServerGreeting} = $Self->{Cache}{remainder};
   }
 
   # Start counter when sending commands
@@ -642,101 +664,147 @@ If C<$AsUser> is supplied, an attempt will be made to login on behalf of that us
 sub login {
   my $Self = shift;
   my ($User, $Pwd, $AsUser) = @_;
-  my $PwdArr = { 'Quote' => $Pwd };
 
-  # Clear cached capability responses and the like
-  delete $Self->{Cache};
+  # In some cases, we need to use the AUTHENTICATE command instead
+  #  of plain login
+  my $UseAuthenticate;
+  $UseAuthenticate ||= $AsUser;
+  $UseAuthenticate ||= $Self->capability->{logindisabled};
+  # https://tools.ietf.org/html/rfc6855#section-5
+  # https://tools.ietf.org/html/rfc4422
+  $UseAuthenticate ||= $Pwd =~ /[^\x00-\x7f]/;
 
-  # If we don't to authenticate on behalf of a user and the server can support
-  # the standard IMAP LOGIN command, then just use that
-  if (!$AsUser && !$Self->capability->{logindisabled}) {
-    $Self->_imap_cmd("login", 0, "", $User, $PwdArr)
+  if (!$UseAuthenticate) {
+    $Self->_imap_cmd("login", 0, "", $User, { Quote => $Pwd })
       || return undef;
+
+    # Set to authenticated if successful
+    $Self->state(Authenticated);
+
+    return $Self->_post_auth()
   }
 
   # Otherwise we'll need to do a true SASL auth
   else {
     require Authen::SASL;
-    require MIME::Base64;
 
     my @Mechanisms = map { m/auth=(.+)/ ? uc $1 : () } keys %{$Self->capability};
-    my $SendFirst = $Self->capability->{'sasl-ir'};
+
+    # Only keep stuff we can handle (e.g. not GSSAPI, NTLM, etc)
+    my %KnownMechanisms = map { $_ => 1 } qw(PLAIN LOGIN DIGEST-MD5);
+    # LOGIN doesn't support authname
+    delete $KnownMechanisms{LOGIN} if $AsUser;
+    @Mechanisms = grep { $KnownMechanisms{uc $_} } @Mechanisms;
 
     my $SASL = Authen::SASL->new(
       mechanism => join(' ', @Mechanisms),
       callback  => {
         user     => $User,
-        pass     => $Pwd,
+        pass     => Encode::encode_utf8($Pwd),
         authname => $AsUser,
       },
     );
 
-    my $SASLClient = eval { $SASL->client_new };
-    if ($@) {
-      die "IMAPTalk: Couldn't create SASL client: $@"
-    }
-    my $InitialResponse = $SASLClient->client_start;
-    unless (defined $InitialResponse) {
-      die "IMAPTalk: Couldn't start SASL handshake: ".$SASL->error;
-    }
-
-    my $PostCommand = sub {
-      $Self->{ReadLine} = undef;
-
-      if ($InitialResponse && !$SendFirst) {
-        # Need to send initial response (SASL-IR not available)
-
-        my $Resp = $Self->_next_atom();
-        if (!$Resp || $Resp ne '+') {
-          die "IMAPTalk: Did not get '+' response";
-        }
-
-        # Consume anything left on the wire. Shouldn't be necessary, but...
-        $Self->_remaining_atoms();
-
-        $Self->_imap_socket_out(MIME::Base64::encode_base64($InitialResponse, '') . LB);
-      }
-
-      while ($SASLClient->need_step) {
-
-        # The server response will either be '+ <challenge>' or '<tag> NO'. So
-        # we read the line and if its not a SASL challenge, we put the whole
-        # line back onto the buffer and bail, letting the normal command
-        # response handler deal with it.
-        my $Line = $Self->_imap_socket_read_line;
-        unless ($Line =~ m/^\+/) {
-          substr($Self->{ReadBuf}, 0, 0, $Line . LB);
-          $Self->{ReadLine} = undef;
-          last;
-        }
-
-        # It's a challenge line, put it on the regular line buffer so we can
-        # use the atom parser
-        $Self->{ReadLine} = $Line;
-
-        # Consume the leading '+'
-        $Self->_next_atom();
-
-        # A SASL challenge. Decode and take a step
-        my ($EncChallenge) = @{$Self->_remaining_atoms()};
-        my $Challenge = MIME::Base64::decode_base64($EncChallenge);
-
-        my $Response = $SASLClient->client_step($Challenge);
-        unless (defined $Response) {
-          die "IMAPTalk: Couldn't continue SASL handshake: ".$SASL->error;
-        }
-        $Self->_imap_socket_out(MIME::Base64::encode_base64($Response, '') . LB);
-      }
-    };
-
-    my %ParseMode = (PostCommand => $PostCommand);
-    $Self->_imap_cmd(
-      \%ParseMode, "authenticate", 0, '',
-      $SASLClient->mechanism,
-      ($SendFirst && $InitialResponse) ? MIME::Base64::encode_base64($InitialResponse, '') : ())
-
-      || return undef;
+    return $Self->authenticate($SASL);
   }
+}
+
+=item I<authenticate($Sasl)>
+
+Attempt to authenticate using the given Authen::SASL object
+
+=cut
+sub authenticate {
+  my ($Self, $SASL) = @_;
+
+  require MIME::Base64;
+
+  delete $Self->{Cache}->{sasl};
+  my @Mechanisms = map { m/auth=(.+)/ ? uc $1 : () } keys %{$Self->capability};
+  my $SendFirst = $Self->capability->{'sasl-ir'};
+
+  my $SASLClient = eval { $SASL->client_new('imap', $Self->{Server}) };
+  if ($@) {
+    $@ = "IMAPTalk: Couldn't create SASL client (@Mechanisms): $@";
+    return undef;
+  }
+  $Self->{Cache}->{sasl_mechanism} = lc $SASL->mechanism;
+  my $InitialResponse = $SASLClient->client_start;
+  unless (defined $InitialResponse) {
+    $@ = "IMAPTalk: Couldn't start SASL handshake (@Mechanisms): " . $SASL->error;
+    return undef;
+  }
+  my @NextResponse = $InitialResponse ? MIME::Base64::encode_base64($InitialResponse, '') : ();
+
+  # The AUTHENTICATE protocol is a bit messy because it changes the stream from
+  #  IMAP like (atoms, lists, literals, etc) to back/forth line based.
+  # We use _imap_cmd to send the command, but then use PostCommand to process
+  #  line by line until we resync back into IMAP mode when we fall out
+
+  my $PostCommand = sub {
+    # Force reading of a new line
+    $Self->{ReadLine} = undef;
+
+    while (1) {
+      my $Line = $Self->_imap_socket_read_line;
+
+      # Line started with a +, time to do a SASL client step
+      if ($Line =~ m{^\+\s*(\S*)}) {
+        my $Challenge = $1 ? MIME::Base64::decode_base64("$1") : "";
+
+        # If no saved step (e.g. client_start above and no sasl-ir), build a next step
+        if (!@NextResponse) {
+          my $Response = "";
+          if ($SASLClient->need_step) {
+            $Response = $SASLClient->client_step($Challenge);
+            unless (defined $Response) {
+              die "IMAPTalk: Couldn't continue SASL handshake (@Mechanisms): " . $SASL->error;
+            }
+          } else {
+            $Self->{Cache}->{sasl} = "Unexpected + challenge during SASL handshake (@Mechanisms): " . $Challenge;
+            # In this case, we send an empty line back to move back to IMAP parsing state
+          }
+
+          push @NextResponse, MIME::Base64::encode_base64($Response, '');
+        }
+
+        $Self->_imap_socket_out(shift(@NextResponse) . LB);
+
+      # Line didn't start with a +, assume it's an IMAP tagged response
+      } else {
+        if (@NextResponse) {
+          $Self->{Cache}->{sasl} = "Expected + during intial SASL handshake (@Mechanisms): " . $Line;
+        } elsif ($SASLClient->need_step) {
+          $Self->{Cache}->{sasl} = "IMAPTalk: Expected + during SASL handshake (@Mechanisms): " . $Line;
+        }
+
+        # Assume it's the tagged response line, add back to read buffer and fall
+        #  out to normal response processing loop
+        substr($Self->{ReadBuf}, 0, 0, $Line . LB);
+        $Self->{ReadLine} = undef;
+        last;
+      }
+    }
+  };
+
+  my %ParseMode = (PostCommand => $PostCommand);
+  $Self->_imap_cmd(
+    \%ParseMode, "authenticate", 0, '',
+    $SASLClient->mechanism,
+    $SendFirst ? splice @NextResponse : (),
+  ) || return undef;
+
+  # Set to authenticated if successful
+  $Self->state(Authenticated);
+
+  return $Self->_post_auth();
+}
+
+sub _post_auth {
+  my $Self = shift;
+
+  # Clear any cached capability response
+  $Self->clear_response_code('capability');
 
   if ($Self->{UseCompress} && $Self->_require_capability('compress=deflate') && require 'Compress/Zlib.pm') {
     if ($Self->_imap_cmd("compress", 0, "", "deflate")) {
@@ -748,8 +816,16 @@ sub login {
     }
   }
 
-  # Set to authenticated if successful
-  $Self->state(Authenticated);
+  unless ($Self->{NoLiteralPlus}) {
+    # see RFC7888 for the definition of literal+ and literal-.
+    if ($Self->_require_capability('literal+')) {
+      $Self->{Cache}{LiteralPlus} = 1;
+    }
+
+    if ($Self->_require_capability('literal-')) {
+      $Self->{Cache}{LiteralPlus} = 2;
+    }
+  }
 
   return 1;
 }
@@ -898,6 +974,7 @@ sub is_open {
 
     # See if there's any data to read
     local $Self->{Timeout} = 0;
+    local $Self->{UseBlocking} = 0;
 
     # If no sockets with data, must be blocked, so must be connected
     my $Atom = eval { $Self->_next_atom(); };
@@ -993,41 +1070,6 @@ sub set_root_folder {
   $Self->{AltRootRegexp} = $AltRootRegexp;
   $Self->{Separator} = $Separator;
 
-  # We map canonical IMAP INBOX to nicer looking Inbox,
-  #  but have to be careful if the root is INBOX as well
-
-  # INBOX             -> Inbox (done in _fix_folder_name)
-  # INBOX.blah        -> blah
-  # INBOX.inbox       -> INBOX.inbox
-  # INBOX.Inbox       -> INBOX.Inbox
-  # INBOX.inbox.inbox -> INBOX.inbox.inbox
-  # INBOX.Inbox.blah  -> Inbox.blah
-  # user.xyz          -> user.xyz
-
-  # RootFolderMatch
-  # If folder passed in doesn't match this, then prepend $RootFolder . $Separator
-  # eg prepend inbox. if folder !/^inbox(\.inbox)*$|^user$|^user\./
-
-  # UnrootFolderMatch
-  # If folder returned matches this, strip $RootFolder . $Separator
-  # eg strip inbox. if folder /^inbox\.(?!inbox(\.inbox)*)/
-
-  my ($RootFolderMatch, $UnrootFolderMatch);
-  if ($RootFolder) {
-    # Note the /i on the end to make this case-insensitive
-    $RootFolderMatch = qr/\Q${RootFolder}\E(?:\Q${Separator}${RootFolder}\E)*/i;
-    $UnrootFolderMatch = qr/^\Q${RootFolder}${Separator}\E(?!${RootFolderMatch}$)/;
-
-    if ($AltRootRegexp) {
-      $RootFolderMatch = qr/^${RootFolderMatch}$|^(?:${AltRootRegexp}(?:\Q${Separator}\E|$))/;
-    } else {
-      $RootFolderMatch = qr/^${RootFolderMatch}$/;
-    }
-  }
-
-  @$Self{qw(RootFolderMatch UnrootFolderMatch)}
-    = ($RootFolderMatch, $UnrootFolderMatch);
-
   return 1;
 }
 
@@ -1046,21 +1088,41 @@ sub _set_separator {
   return $Self->set_root_folder($Self->{RootFolder}, $Separator, $Self->{AltRootRegexp});
 }
 
-=item I<literal_handle_control(optional $FileHandle)>
+=item I<literal_handle_control(optional $FileHandle or sub { })>
 
 Sets the mode whether to read literals as file handles or scalars.
 
-You should pass a filehandle here that any literal will be read into. To
-turn off literal reads into a file handle, pass a 0.
+There's three options here:
+  * undef/0 - always read literals into a scalar in memory
+  * filehandle - always read literals into the given filehandle
+     note: you'll need to make sure you're 'fetch' call only
+     returns a single literal, so you won't want to do
+     much more than ->fetch($uid, "rfc822")
+  * sub - whenever we parse an imap response and encounter a
+     literal, call this sub, and if it returns a filehandle read
+     into that filehandle, otherwise read into a scalar in memory
+
+If a sub is used, when called it's passed two arguments:
+  * bytes - the size of the literal in bytes
+  * previous atom - if parsing a list response, the previous
+     atom that was parsed. Useful when parsing "fetch" responses
+     since you get key/value type list in the fetch response
 
 Examples:
 
   # Read rfc822 text of message 3 into file
   # (note that the file will have /r/n line terminators)
-  open(F, ">messagebody.txt");
-  $IMAP->literal_handle_control(\*F);
+  open(my $fh, ">messagebody.txt");
+  $IMAP->literal_handle_control($fh);
   $IMAP->fetch(3, 'rfc822');
   $IMAP->literal_handle_control(0);
+
+  # Read the full rfc822 content into a filehandle, but the headers into a scalar
+  $IMAP->literal_handle_control(sub { lc $_[1] eq 'rfc822' ? scalar File::Temp::tempfile() : undef });
+  my $res = $IMAP->fetch(3, [ qw(rfc822 rfc822.header) ]);
+  $IMAP->literal_handle_control(0);
+  my $filehandle = $res->{3}->{rfc822};
+  my $hdrstxt = $res->{3}->{'rfc822.header'};
 
 =cut
 sub literal_handle_control {
@@ -1094,7 +1156,7 @@ sub release_socket {
   delete $Self->{CompressInflate};
   delete $Self->{CompressDeflate};
 
-  $Self->_trace("A: Release socket, fileno=" . fileno($Socket) . "\n")
+  $Self->_trace("A: Release socket, fileno=" . (eval { fileno($Socket) } // 'none') . "\n")
     if $Self->{Trace};
 
   # Set into no connection state
@@ -1320,6 +1382,46 @@ sub unicode_folders {
   return $Self->{Cache}->{UnicodeFolders} || 0;
 }
 
+=item I<get_select_state()>
+
+Returns an opaque value that represents the current selected
+state and folder. You can call select, unselect, etc
+and then later call set_select_state(...) to return
+to the previous selected state.
+
+=cut
+sub get_select_state {
+  my $Self = shift;
+  return {
+    'state' => $Self->state,
+    current_folder => $Self->{CurrentFolder},
+    current_folder_mode => $Self->{CurrentFolderMode},
+  };
+}
+
+=item I<set_select_state($state)>
+
+Restores selected state to a value returned from get_select_state
+
+=cut
+sub set_select_state {
+  my ($Self, $State) = @_;
+
+  if ($State->{state} == Unconnected) {
+    return $Self->logout;
+  } elsif ($State->{state} == Authenticated) {
+    return $Self->state == Selected ? $Self->unselect : 1;
+  } elsif ($State->{state} == Selected) {
+    if ($State->{current_folder_mode} eq 'read-write') {
+      return $Self->select($State->{current_folder});
+    } elsif ($State->{current_folder_mode} eq 'read-only') {
+      return $Self->examine($State->{current_folder});
+    }
+  }
+  $@ = "Could not restore select state to $State->{state}";
+  return undef;
+}
+
 =back
 =cut
 
@@ -1426,6 +1528,70 @@ See C<select()> for more details.
 =cut
 sub examine {
   return $_[0]->select($_[1], ReadOnly => 1);
+}
+
+=item I<select_with_state($FolderName)>
+
+Perform the standard IMAP 'select' command to select a folder.
+This returns hashref of uidnext, uidvalidity and messagecount when successful
+and an undef otherwise.
+
+=cut
+
+sub select_with_state {
+  my ($Self, $Folder, %Opts) = @_;
+
+  # We need UIDVALIDITY & UIDNEXT here to check for new messages, but different
+  #  servers have different problems
+  # * Most servers return UIDNEXT in an unsolicited response from SELECT
+  #   (but not all, e.g. courrier)
+  # * You can explicitly STATUS for these, but some servers return a bogus
+  #   result if the mailbox isn't selected (e.g. imap.mail.us-west-2.awsapps.com)
+  # * RFC3501 says "the STATUS command SHOULD NOT be used on the currently
+  #   selected mailbox", and some servers return a BAD error result if you do
+  # * And to top if off, some servers don't recognise lowercase versions
+  #   of the status items, so we always send them UPPERCASE
+
+  # Ensure we are not in a selected state.
+  $Self->unselect();
+
+  my $State = $Self->status($Folder, [qw(MESSAGES UIDVALIDITY UIDNEXT)]);
+  # Have seen some servers return a NO response followed by STATUS+OK,
+  #  which unfortunately ends up as a string result
+  if (!$State || ref $State ne 'HASH') {
+    my $Error = $State || $@;
+
+    return (undef, $Error);
+  }
+
+  # Just for sanity, make sure these are all cleared before select
+  #  because it may or may not return any of these
+  $Self->clear_response_code($_) for (qw(uidnext uidvalidity exists));
+
+  my $Res = $Self->select($Folder, %Opts);
+  return (undef, "Failed to select folder on IMAP server: $@") unless ($Res);
+
+  my $r_msgcount    = $Self->get_response_code('exists');
+  my $r_uidvalidity = $Self->get_response_code('uidvalidity');
+  my $r_uidnext     = $Self->get_response_code('uidnext');
+
+  # Prefer SELECT unsolicited response code versions if present
+  my $msgcount    = $r_msgcount    // $State->{messages};
+  my $uidvalidity = $r_uidvalidity // $State->{uidvalidity};
+  my $uidnext     = $r_uidnext     // $State->{uidnext};
+
+  return (undef, "Remote server did not return message count")
+    unless defined $msgcount;
+  return (undef, "Remote server did not return uidvalidity")
+    unless defined $uidvalidity;
+  return (undef, "Remote server did not return uidnext")
+    unless defined $uidnext;
+
+  return {
+    messagecount => $msgcount,
+    uidnext      => $uidnext,
+    uidvalidity  => $uidvalidity,
+  };
 }
 
 =item I<create($FolderName)>
@@ -1864,23 +2030,26 @@ response string (eg 'bad', 'no', etc)
 sub multistatus {
   my ($Self, $Items, @FolderList) = @_;
 
-  # Send all commands at once
-  my $CmdBuf = "";
-  my $FirstId = $Self->{CmdId};
+  my %Resp;
   $Items = ref($Items) ? $Self->_send_data({}, "", $Items) : " " . $Items;
 
-  for (@FolderList) {
-    $CmdBuf .= $Self->{CmdId}++ . " status " . ${_quote($Self->_fix_folder_name($_))} . $Items . LB;
-  }
-  $Self->_imap_socket_out($CmdBuf);
+  while (my @Batch = splice(@FolderList, 0, 64)) {
+    # Send all commands at once
+    my $CmdBuf = "";
+    my $FirstId = $Self->{CmdId};
 
-  # Parse responses
-  my %Resp;
-  $Self->{CmdId} = $FirstId;
-  for (@FolderList) {
-    my ($CompletionResp, $DataResp) = $Self->_parse_response("status");
-    $Resp{$_} = ref($DataResp) ? $DataResp : \$CompletionResp;
-    $Self->{CmdId}++;
+    for (@Batch) {
+      $CmdBuf .= $Self->{CmdId}++ . " status " . ${_quote($Self->_fix_folder_name($_))} . $Items . LB;
+    }
+    $Self->_imap_socket_out($CmdBuf);
+
+    # Parse responses
+    $Self->{CmdId} = $FirstId;
+    for (@Batch) {
+      my ($CompletionResp, $DataResp) = $Self->_parse_response("status");
+      $Resp{$_} = ref($DataResp) ? $DataResp : \$CompletionResp;
+      $Self->{CmdId}++;
+    }
   }
 
   return \%Resp;
@@ -2231,15 +2400,22 @@ easier to handle as an error condition.
 =cut
 sub fetch {
   my $Self = shift;
-
   my $ParseMode = ref($_[0]) eq 'HASH' ? shift : {};
+  my ($Ids, @Rest) = @_;
 
   # Are we fetching one uid
   my $FetchOne = !ref($_[0]) && $_[0] =~ /^\d+$/ && $_[0];
 
   # Clear any existing fetch responses and call the fetch command
   $Self->{Responses}->{fetch} = undef;
-  my $FetchRes = $Self->_imap_cmd($ParseMode, "fetch", 1, "fetch", _fix_message_ids(+shift), @_);
+  my $FetchRes = $Self->_imap_cmd(
+    $ParseMode,
+    "fetch",
+    1,
+    "fetch",
+    $Self->make_sequence_set($Ids),
+    @Rest,
+  );
 
   # Single message fetch with no data returns
   my $NoFetchData = ref($FetchRes) && !%$FetchRes;
@@ -2263,7 +2439,7 @@ to another.
 =cut
 sub copy {
   my $Self = shift;
-  my $Uids = _fix_message_ids(+shift);
+  my $Uids = $Self->make_sequence_set(+shift);
   my $FolderName = $Self->_fix_folder_name(+shift);
   $Self->cb_folder_changed($FolderName);
   return $Self->_imap_cmd("copy", 1, "", $Uids, $FolderName, @_);
@@ -2320,7 +2496,9 @@ Examples:
 
 =cut
 sub search {
-  return (+shift)->_imap_cmd("search", 1, "search", _fix_message_ids(+shift), @_);
+  my ($Self) = shift;
+
+  return $Self->_imap_cmd("search", 1, "search", $Self->make_sequence_set(+shift), @_);
 }
 
 =item I<store($MsgIdSet, $FlagOperation, $Flags)>
@@ -2337,7 +2515,7 @@ Examples:
 sub store {
   my $Self = shift;
   $Self->cb_folder_changed($Self->{CurrentFolder});
-  return $Self->_imap_cmd("store", 1, "fetch", _fix_message_ids(+shift), @_);
+  return $Self->_imap_cmd("store", 1, "fetch", $Self->make_sequence_set(+shift), @_);
 }
 
 =item I<expunge()>
@@ -2360,7 +2538,7 @@ Perform IMAP uid expunge command as per RFC 2359.
 sub uidexpunge {
   my $Self = shift;
   $Self->cb_folder_changed($Self->{CurrentFolder});
-  return $Self->_imap_cmd("uid expunge", 0, "", _fix_message_ids(+shift));
+  return $Self->_imap_cmd("uid expunge", 0, "", $Self->make_sequence_set(+shift));
 }
 
 =item I<sort($SortField, $CharSet, @SearchCriteria)>
@@ -2409,7 +2587,7 @@ sub fetch_flags {
   my $Self = shift;
 
   my $Cmd = $Self->{Uid} ? 'uid fetch' : 'fetch';
-  $Self->_send_cmd($Cmd, _fix_message_ids(+shift), '(flags)');
+  $Self->_send_cmd($Cmd, $Self->make_sequence_set(+shift), '(flags)');
 
   my $Tag = '';
   my ($MsgId, $Resp, %FetchRes);
@@ -2462,7 +2640,7 @@ sub fetch_meta {
   my $Self = shift;
 
   my $Cmd = $Self->{Uid} ? 'uid fetch' : 'fetch';
-  $Self->_send_cmd($Cmd, _fix_message_ids(+shift), '(' . join(" ", @_) . ')');
+  $Self->_send_cmd($Cmd, $Self->make_sequence_set(+shift), '(' . join(" ", @_) . ')');
 
   my $Tag = '';
   my ($MsgId, $Resp, %FetchRes);
@@ -2498,7 +2676,7 @@ sub fetch_meta {
 
 sub move {
   my $Self = shift;
-  my $Uids = _fix_message_ids(+shift);
+  my $Uids = $Self->make_sequence_set(+shift);
   my $FolderName = $Self->_fix_folder_name(+shift);
   $Self->cb_folder_changed($FolderName);
   return $Self->_imap_cmd("move", 1, "", $Uids, $FolderName, @_);
@@ -2506,7 +2684,7 @@ sub move {
 
 sub xmove {
   my $Self = shift;
-  my $Uids = _fix_message_ids(+shift);
+  my $Uids = $Self->make_sequence_set(+shift);
   my $FolderName = $Self->_fix_folder_name(+shift);
   $Self->cb_folder_changed($FolderName);
   return $Self->_imap_cmd("xmove", 1, "", $Uids, $FolderName, @_);
@@ -2533,297 +2711,12 @@ Run the xannotator command on the given message id's
 =cut
 sub xrunannotator {
   my $Self = shift;
-  return $Self->_imap_cmd("xrunannotator", 1, "fetch", _fix_message_ids(+shift), @_);
-}
-
-=item I<xconvfetch($CIDs, $ChangedSince, $Items)>
-
-Use the server XCONVFETCH command to fetch information about messages
-in a conversation.
-
-CIDs can be a single CID or an array ref of CIDs.
-
-  my $Res = $IMAP->xconvfetch('2fc2122a109cb6c8', 0, '(uid cid envelope)')
-  $Res = {
-    state => { CID => [ HighestModSeq ], ... }
-    folders => [ [ FolderName, UidValidity ], ..., ],
-    found => [ [ FolderIndex, Uid, { Details } ], ... ],
-  }
-
-Note: FolderIndex is an integer index into the folders list
-
-=cut
-sub xconvfetch {
-  my $Self = shift;
-  my $CID = shift;
-
-  my %Results;
-  $Results{found} = \my @Fetch;
-  $Results{folders} = \my @Folders;
-
-  my %FolderMap;
-
-  my %Callbacks = (
-    xconvmeta => sub {
-      my ($CID, $Data) = @{$_[1]};
-      my $Res = _parse_list_to_hash($Data);
-      $Results{state}{$CID} = [ $Res->{modseq} ];
-    },
-
-    fetch => sub {
-      my (undef, $Fetch) = @_;
-      my ($FolderName, $UidValidity, $Uid) = delete @$Fetch{qw(folder uidvalidity uid)};
-      $FolderName = $Self->_unfix_folder_name($FolderName);
-      if (!exists $FolderMap{$FolderName}) {
-        my $FolderIndex = scalar @Folders;
-        push @Folders, [ $FolderName, $UidValidity ];
-        $FolderMap{$FolderName} = $FolderIndex;
-      }
-      push @Fetch, [ $FolderMap{$FolderName}, int($Uid), $Fetch ];
-    }
-  );
-
-  $Self->_imap_cmd("xconvfetch", 0, \%Callbacks, $CID, @_)
-    || return undef;
-
-  return \%Results;
-}
-
-=item I<xconvmeta($CIDs, $Items)>
-
-Use the server XCONVMETA command to fetch information about
-a conversation.
-
-CIDs can be a single CID or an array ref of CIDs.
-
-  my $Res = $IMAP->xconvmeta('2fc2122a109cb6c8', '(senders exists unseen)')
-  $Res = {
-    CID1 => { senders => { name => ..., email => ... }, exists => ..., unseen => ..., ...  },
-    CID2 => { ...  },
-  }
-
-=cut
-sub xconvmeta {
-  my ($Self, $CIDs, $Args) = @_;
-
-  # Fix folder names in passed folderexists and folderunseen arguments
-  $Self->_find_arg($Args, 'folderexists', sub { $_ = $Self->_fix_folder_name($_) for @$_; });
-  $Self->_find_arg($Args, 'folderunseen', sub { $_ = $Self->_fix_folder_name($_) for @$_; });
-
-  my %Results;
-
-  my %Callbacks = (
-    xconvmeta => sub {
-      my (undef, $Data) = @_;
-      my $Res = _parse_list_to_hash($Data->[1]);
-      my %ResHash;
-      foreach my $Item (keys %$Res) {
-        if (lc($Item) eq 'senders') {
-          $ResHash{senders} = [
-            map {
-              _decode_utf8($_->[0]);
-              {
-               name => $_->[0],
-               email => "$_->[2]\@$_->[3]",
-              }
-            } @{$Res->{$Item}} ];
-        }
-        elsif (lc($Item) eq 'count') {
-          my %FolderCount = @{$Res->{$Item}};
-          $ResHash{count} = { map {
-             $Self->_unfix_folder_name($_) => int($FolderCount{$_})
-          } keys %FolderCount };
-        }
-        elsif (lc($Item) eq 'folderexists') {
-          my %FolderExists = @{$Res->{$Item}};
-          $ResHash{folderexists} = { map { 
-             $Self->_unfix_folder_name($_) => int($FolderExists{$_})
-          } keys %FolderExists };
-        }
-        elsif (lc($Item) eq 'folderunseen') {
-          my %FolderUnseen = @{$Res->{$Item}};
-          $ResHash{folderunseen} = { map { 
-             $Self->_unfix_folder_name($_) => int($FolderUnseen{$_})
-          } keys %FolderUnseen };
-        }
-        else {
-          $ResHash{lc($Item)} = int($Res->{$Item} // 0); # numeric
-        }
-
-      }
-      $Results{$Data->[0]} = \%ResHash;
-    },
-  );
-
-  $Self->_imap_cmd("xconvmeta", 0, \%Callbacks, $CIDs, $Args)
-    || return undef;
-
-  return \%Results;
-}
-
-=item I<xconvsort($Sort, $Window, $Charset, @SearchParams)>
-
-Use the server XCONVSORT command to fetch exemplar conversation
-messages in a mailbox.
-
-  my $Res = $IMAP->xconvsort( [ qw(reverse arrival) ], [ 'conversations', position => [1, 10] ], 'utf-8', 'ALL')
-  $Res = {
-    sort => [ Uid, ... ],
-    position => N,
-    highestmodseq => M,
-    uidvalidity => V,
-    uidnext => U,
-    total => R,
-  }
-
-=cut
-sub xconvsort {
-  my ($Self, $Sort, $Window, @Search) = @_;
-
-  my %Callbacks = (responseitem => 'sort');
-  my $Res = $Self->_imap_cmd("xconvsort", 0, \%Callbacks, $Sort, $Window, @Search)
-    || return undef;
-
-  my %Results;
-  $Results{'sort'} = $Res if ref($Res);
-  for (qw(position highestmodseq uidvalidity uidnext total)) {
-    $Results{$_} = delete $Self->{Cache}->{$_};
-  }
-
-  return \%Results;
-}
-
-=item I<xconvupdates($Sort, $Window, $Charset, @SearchParams)>
-
-Use the server XCONVUPDATES command to find changed exemplar
-messages
-
-  my $Res = $IMAP->xconvupdates( [ qw(reverse arrival) ], [ 'conversations', changedsince => [ $mod_seq, $uid_next ] ], 'utf-8', 'ALL');
-  $Res = {
-    added => [ [ Uid, Pos ], ... ],
-    removed => [ Uid, ... ],
-    changed => [ CID, ... ],
-    highestmodseq => M,
-    uidvalidity => V,
-    uidnext => U,
-    total => R,
-  }
-
-=cut
-sub xconvupdates {
-  my ($Self, $Sort, $Window, @Search) = @_;
- 
-  my %Results;
-
-  my %Callbacks = (
-    added => sub { $Results{added} = $_[1]; },
-    removed => sub { $Results{removed} = $_[1]; },
-    changed => sub { $Results{changed} = $_[1]; },
-  );
-
-  my $Res = $Self->_imap_cmd("xconvupdates", 0, \%Callbacks, $Sort, $Window, @Search)
-    || return undef;
-
-  for (qw(highestmodseq uidvalidity uidnext total)) {
-    $Results{$_} = delete $Self->{Cache}->{$_};
-  }
-
-  return \%Results;
-}
-
-=item I<xconvmultisort($Sort, $Window, $Charset, @SearchParams)>
-
-Use the server XCONVMULTISORT command to fetch messages across
-all mailboxes
-
-  my $Res = $IMAP->xconvmultisort( [ qw(reverse arrival) ], [ 'conversations', postion => [1,10] ], 'utf-8', 'ALL')
-  $Res = {
-    folders => [ [ FolderName, UidValidity ], ... ],
-    sort => [ FolderIndex, Uid ], ... ],
-    position => N,
-    highestmodseq => M,
-    total => R,
-  }
-
-Note: FolderIndex is an integer index into the folders list
-
-=cut
-sub xconvmultisort {
-  my ($Self, $Sort, $Window, @Search) = @_;
-
-  $Self->_find_arg(\@Search, 'folder', sub { $_ = $Self->_fix_folder_name($_) });
-  $Self->_find_arg($Window, 'multianchor', sub { $_->[1] = $Self->_fix_folder_name($_->[1]) });
-
-  my ($FolderList, $SortList);
-
-  my %Callbacks = (xconvmulti => sub { ($FolderList, $SortList) = @{$_[1]}; });
-  my $Res = $Self->_imap_cmd("xconvmultisort", 0, \%Callbacks, $Sort, $Window, @Search)
-    || return undef;
-
-  $_->[0] = $Self->_unfix_folder_name($_->[0]) for @$FolderList;
-
-  my %Results;
-  $Results{'folders'} = $FolderList;
-  $Results{'sort'} = $SortList;
-  for (qw(position highestmodseq total)) {
-    $Results{$_} = delete $Self->{Cache}->{$_};
-  }
-
-  return \%Results;
-}
-
-=item I<xsnippets($Items, $Charset, @SearchParams)>
-
-Use the server XSNIPPETS command to fetch message search snippets
-
-  my $Res = $IMAP->xsnippets( [ [ FolderName, UidValidity, [ Uid, ... ] ], ... ], 'utf-8', 'ALL')
-  $Res = {
-    folders => [ [ FolderName, UidValidity ], ... ],
-    snippets => [
-      [ FolderIndex, Uid, Location, Snippet ],
-      ...
-    ]
-  ]
-
-Note: FolderIndex is an integer index into the folders list
-
-=cut
-sub xsnippets {
-  my ($Self, $Items, @Search) = @_;
-
-  $Self->_find_arg(\@Search, 'folder', sub { $_ = $Self->_fix_folder_name($_) });
-
-  # Fix folder names passed in items argument
-  $_->[0] = $Self->_fix_folder_name($_->[0]) for @$Items;
-
-  my %Results;
-  $Results{snippets} = \my @Snippets;
-  $Results{folders} = \my @Folders;
-
-  my %FolderMap;
-
-  my %Callbacks = (snippet => sub {
-    my ($FolderName, $UidValidity, $Uid, $Location, $Snippet) = @{$_[1]};
-    $FolderName = $Self->_unfix_folder_name($FolderName);
-    if (!exists $FolderMap{$FolderName}) {
-      my $FolderIndex = scalar @Folders;
-      push @Folders, [ $FolderName, $UidValidity ];
-      $FolderMap{$FolderName} = $FolderIndex;
-    }
-    eval { $Snippet = decode("utf-8", $Snippet) };
-    $Snippet =~ s/\x{fffd}//g; # Remove any bogus replacement chars, ugly display
-    push @Snippets, [ $FolderMap{$FolderName}, int($Uid), $Location, $Snippet ];
-  });
-
-  my $Res = $Self->_imap_cmd("xsnippets", 0, \%Callbacks, $Items, @Search)
-    || return undef;
-
-  return \%Results;
+  return $Self->_imap_cmd("xrunannotator", 1, "fetch", $Self->make_sequence_set(+shift), @_);
 }
 
 sub xwarmup {
   my $Self = shift;
-  $Self->_find_arg($_[1], 'uids', sub { $_ = _fix_message_ids($_) });
+  $Self->_find_arg($_[1], 'uids', sub { $_ = $Self->make_sequence_set($_) });
   return $Self->_imap_cmd("xwarmup", 0, "", $Self->_fix_folder_name(+shift), @_);
 }
 
@@ -2960,8 +2853,9 @@ sub find_message {
   my (%MsgComponents);
 
   my %KnownTextParts = (
-    plain => 'text', text => 'text', enriched => 'text',
-    html => 'html',
+    plain => 'text',
+    text  => 'text',
+    html  => 'html',
     'application/octet-stream' => 'text'
   );
 
@@ -2983,16 +2877,17 @@ sub find_message {
 
     # Parts we want to treat as "text"
     my $IsInline = 0;
-    # Text component of type we understand that isn't an attachment or has a filename
+    # Text component of type we understand that isn't an attachment
     $IsInline = 1 if $MT eq 'text' &&
                      $KnownTextParts{$ST} &&
-                     $DT ne 'attachment' &&
-                     !$CD->{filename} &&
-                     !$CD->{'filename*'};
+                     $DT ne 'attachment';
     # Bah, PGP has application/octet-stream inside an application/pgp-encrypted part
     $IsInline = 1 if $MTT eq 'application/octet-stream' &&
                      $InsideEnc &&
                      $CD->{filename} =~ /encrypted/;
+    # If not the first part and has filename, assume attachment
+    $IsInline = 0 if $Pos > 0 &&
+                     ($CD->{filename} || $CD->{'filename*'});
 
     if ($IsInline) {
       # Map to just text or html type
@@ -3223,6 +3118,52 @@ sub obliterate {
   }
 
   return 1;
+}
+
+=item I<make_sequence_set($MessageIds)>
+
+    my $SetSeq = $IMAP->make_sequence_set($Ids);
+
+This method returns a reference to a C<sequence-set> string suitable for use in
+IMAP commands.  A reference is returned instead of a string so that the
+result can be passed directly to IMAP-generating methods and the sequence set
+will not be quoted.  (This quoting is especially problematic when quoting a
+range like C<1:*>).
+
+=cut
+sub make_sequence_set {
+  my ($Self, $Item) = @_;
+
+  # If the item is an array reference, turn into a comma separated of items
+  if (ref $Item && ref $Item eq 'ARRAY') {
+    my @Src = sort { $a <=> $b } @$Item;
+    push @Src, 0; # end marker to make the logic below simpler
+    my @Dest;
+    my $Start;
+    my $Prev;
+    while (defined (my $Single = shift @Src)) {
+      if (defined $Prev and $Single == $Prev + 1) {
+        $Start = $Prev unless defined $Start;
+      }
+      else {
+        if (defined $Start) {
+          push @Dest, "$Start:$Prev";
+          $Start = undef;
+        }
+        elsif (defined $Prev) {
+          push @Dest, $Prev;
+        }
+      }
+      $Prev = $Single;
+    }
+    # Make scalar ref, so we don't quote
+    $Item = \join(',', @Dest);
+  }
+
+  # We don't want to quote 1:* because Cyrus won't like it.  But we probably
+  # don't want to quote *any* range, really, so we always return a reference.
+  $Item = \"$Item" unless ref $Item;
+  return $Item;
 }
 
 =back
@@ -3564,7 +3505,7 @@ Would have the result:
       }
     }
   }
-         
+
 =cut
 
 =head1 INTERNAL METHODS
@@ -3704,7 +3645,7 @@ sub _send_data {
 
   my ($AddSpace, $NextAddSpace) = (1, 1);
   foreach my $Arg (@Args) {
-    my ($IsQuote, $IsLiteral, $IsFile) = ($Opts->{Quote}, 0, 0);
+    my ($IsQuote, $IsLiteral, $IsFile, $IsBinary) = ($Opts->{Quote}, 0, 0, 0);
 
     # --- Determine value type and appropriate output
 
@@ -3724,13 +3665,16 @@ sub _send_data {
         } elsif (exists $Arg->{Literal}) {
           $IsLiteral = 1;
           $Arg = ref($Arg->{Literal}) ?  $Arg->{Literal} : \$Arg->{Literal};
+        } elsif (exists $Arg->{Binary}) {
+          $IsLiteral = $IsBinary = 1;
+          $Arg = ref($Arg->{Binary}) ?  $Arg->{Binary} : \$Arg->{Binary};
         } elsif (exists $Arg->{Raw}) {
           $AddSpace = !$Arg->{NoSpace};
           $NextAddSpace = !$Arg->{NoNextSpace};
           $IsQuote = 0;
           $Arg = $Arg->{Raw};
         } else {
-          die "Unknown hash arg type: " . (keys %$Arg)[0];
+          Carp::confess "Unknown hash arg type: " . (keys %$Arg)[0];
         }
       }
 
@@ -3803,13 +3747,22 @@ sub _send_data {
       }
 
       # Add to line buffer and send
-      $LineBuffer .= ($AddSpace ? " " : "") . "{" . $LiteralSize . "}" . LB;
+      my $Plus = '';
+      # enable Literal+ if it's supported
+      if ($Self->{Cache}{LiteralPlus}) {
+        # see RFC7888 - literal- only supports < 4096 octet literals
+        $Plus = '+' if ($Self->{Cache}{LiteralPlus} == 1 or $LiteralSize < 4096);
+      }
+      $LineBuffer .=
+        ($AddSpace ? " " : "") .
+        ($IsBinary ? "~" : "") .
+        "{" . $LiteralSize . $Plus . "}" . LB;
       $Self->_imap_socket_out($LineBuffer);
 
       $LineBuffer = "";
 
-      # Wait for "+ go ahead" response
-      my $GoAhead = $Self->_imap_socket_read_line();
+      # Wait for "+ go ahead" response unless $Plus is set
+      my $GoAhead = $Plus eq '+' ? $Plus : $Self->_imap_socket_read_line();
       if ($GoAhead =~ /^\+/) {
         if (!$IsFile) {
           $Self->_imap_socket_out(ref($Arg) ? $$Arg : $Arg);
@@ -3901,7 +3854,7 @@ sub _parse_response {
 
       # Parse fetch response into perl structure
       my $Fetch;
-      if ($Res2 eq 'fetch') {
+      if ($Res2 eq 'fetch' || $Res2 eq 'uidfetch') {
         $Fetch = _parse_fetch_result($Self->_next_atom(), \%ParseMode);
       }
 
@@ -3918,6 +3871,11 @@ sub _parse_response {
         # Store the result in our response hash
         my $FetchRes = ($DataResp{fetch}->{$Res1} ||= {});
         %$FetchRes = (%$FetchRes, %$Fetch);
+      } elsif ($Res2 eq 'uidfetch') {
+        # number is a UID in this mode
+        # Store the result in our response hash
+        my $FetchRes = ($DataResp{fetch}->{$Res1} ||= {});
+        %$FetchRes = (%$FetchRes, %$Fetch, uid => $Res1);
 
       } else {
         # Don't know other response types, just store the atom
@@ -3932,7 +3890,7 @@ sub _parse_response {
       my $Line = $DataResp{remainder} = $Self->_remaining_line();
 
       # Extract items inside [...]
-      if ($Line =~ /\[(.*)\] ?(.*)$/) {
+      if ($Line =~ /^\[(.*)\] ?(.*)$/) {
         $Self->{ReadLine} = $1;
         $DataResp{remainder} = $2;
 
@@ -3969,7 +3927,7 @@ sub _parse_response {
         $DataResp{$Res1}->{$Name} = $StatusRes;
       }
 
-    } elsif ($Res1 eq 'flags' || $Res1 eq 'thread' || $Res1 eq 'namespace' || $Res1 eq 'myrights') {
+    } elsif ($Res1 eq 'flags' || $Res1 eq 'thread' || $Res1 eq 'namespace' || $Res1 eq 'myrights' || $Res1 eq 'vanished' || $Res1 eq 'id') {
       $DataResp{$Res1} = $Self->_remaining_atoms();
 
     } elsif ($Res1 eq 'xlist' || $Res1 eq 'list' || $Res1 eq 'lsub') {
@@ -3994,8 +3952,8 @@ sub _parse_response {
     } elsif ($Res1 eq 'capability' || $Res1 eq 'enabled') {
       $DataResp{$Res1} = { map { lc($_) => 1 } @{$Self->_remaining_atoms() || []} };
 
-    } elsif ($Res1 eq 'vanished') {
-      $DataResp{$Res1} = $Self->_remaining_atoms();
+    } elsif ($Res1 eq 'mailboxid') {
+      $DataResp{$Res1} = $Self->_next_atom();
 
     } elsif ($Res1 eq 'appenduid') {
       $DataResp{$Res1} = [ $Self->_next_atom(), $Self->_next_atom() ];
@@ -4077,7 +4035,7 @@ If not, it sets the internal last error, $@ and returns undef.
 sub _require_capability {
   my ($Self, $Capability) = @_;
   my $Caps = $Self->capability() || {};
-  if (!exists $Caps->{$Capability}) {
+  if (!exists $Caps->{lc $Capability}) {
     $Self->{LastError} = $@ = "IMAP server has no $Capability capability";
     return undef;
   }
@@ -4202,9 +4160,9 @@ sub _next_atom {
         $$AtomRef = $CurAtom;
       }
     }
-    
-    # Bracket?
-    elsif ($Line =~ m/\G\(/gc) {
+
+    # Bracket? (be postel kind to extra spaces)
+    elsif ($Line =~ m/\G\( */gc) {
       # Begin a new sub-array
       my $CurAtom = [];
       # Add to current atom. If there's a stack, must be within a bracket
@@ -4241,7 +4199,7 @@ sub _next_atom {
       $CurAtom = undef;
       if ($Self->{LiteralControl}) {
         if (ref($Self->{LiteralControl}) eq 'CODE') {
-          $CurAtom = $Self->{LiteralControl}->($Bytes);
+          $CurAtom = $Self->{LiteralControl}->($Bytes, @AtomStack ? (@$AtomRef ? $AtomRef->[-1] : undef) : $$AtomRef);
         } else {
           $CurAtom = $Self->{LiteralControl};
         }
@@ -4373,6 +4331,7 @@ sub _fill_imap_read_buffer {
     return 1 if !$Append && length($Self->{ReadBuf});
   }
 
+  TryReadAgain:
   # Wait for data to become available, signals can interrupt
   # select() calls, so loop until definitely past $Timeout time
   my @ReadList;
@@ -4404,8 +4363,14 @@ sub _fill_imap_read_buffer {
   my $IsBlocking = $Self->{Socket}->blocking();
   $Self->{Socket}->blocking(0) if !$Blocking;
   my $BytesRead = $Self->{Socket}->sysread($Buffer, 16384);
+  my $WasEAGAIN = !$BytesRead && $!{EAGAIN};
   $Self->{Socket}->blocking($IsBlocking) if !$Blocking;
   CORE::select(undef, undef, undef, 0.25) if $Self->{go_slow};
+
+  # Some servers seem to return weird TCP packets that cause
+  #  select() to think there's data, but read() returns 0 bytes.
+  #  In that case, repeat the read attempt again
+  goto TryReadAgain if $WasEAGAIN;
 
   # The select told us there was data, if there wasn't
   # any, it means the other end closed the connection
@@ -4557,7 +4522,7 @@ have to copy the contents of our buffer first.
 
 The number of bytes specified must be available on the IMAP socket,
 if the function runs out of data it will 'die' with an error.
- 
+
 =cut
 sub _copy_imap_socket_to_handle {
   my ($Self, $OutHandle, $NBytes) = @_;
@@ -4586,12 +4551,12 @@ sub _copy_imap_socket_to_handle {
   # Done
   return 1;
 }
-  
+
 =item I<_quote($String)>
 
 Returns an IMAP quoted version of a string. This place "..." around the
 string, and replaces any internal " with \".
- 
+
 =cut
 sub _quote {
   # Replace " and \ with \" and \\ and surround with "..."
@@ -4659,7 +4624,7 @@ sub _fix_folder_name {
   return '' if $FolderName eq '';
 
   # Map nicer looking Inbox to canonical INBOX
-  return 'INBOX' if ($FolderName eq 'Inbox' and not $Self->{PreserveINBOX});
+  return $Self->{PreserveINBOX} ? 'INBOX' : $FolderName if lc $FolderName eq 'inbox';
 
   # Handle select of special-use folder (cyrus feature)
   return $FolderName if $FolderName =~ m{^\\};
@@ -4668,14 +4633,34 @@ sub _fix_folder_name {
 
   return $FolderName if $Opts{Wildcard} && $FolderName =~ /[\*\%]/;
 
-  my $RootFolderMatch = $Self->{RootFolderMatch}
-    || return $FolderName;
+  # INBOX             <- INBOX
+  # INBOX.blah        <- blah
+  # INBOX.blah.bar    <- blah.bar
+  # INBOX.INBOX       <- INBOX.INBOX
+  # INBOX.INBOX.blah  <- INBOX.blah
+  # INBOX.Inbox       <- INBOX.Inbox
+  # INBOX.Inbox.foo   <- INBOX.Inbox.foo
+  # INBOX.Inbox.inbox <- INBOX.Inbox.inbox
+  # user.xyz          <- user.xyz
+  # RESTORED.foo      <- RESTORED.foo
+  # INBOX.RESTORED.foo <- INBOX.RESTORED.foo
 
-  # If no root folder, just return passed in folder
-  return $FolderName if $FolderName =~ $RootFolderMatch;
+  my $AltRootRegexp = $Self->{AltRootRegexp};
+  return $FolderName if $AltRootRegexp && $FolderName =~ /^$AltRootRegexp/;
 
-  my ($RootFolder, $Separator) = @$Self{'RootFolder', 'Separator'};
-  return !$RootFolder ? $FolderName : $RootFolder . $Separator . $FolderName;
+  my $RootFolder = $Self->{RootFolder} || return $FolderName;
+  my $Separator = $Self->{Separator};
+
+  my ($Root, $Sub, $Rest) = split /\Q${Separator}\E/, $FolderName, 3;
+  if ($Root eq $RootFolder) {
+    return $FolderName if !$Sub;
+    return $FolderName if $Sub eq $RootFolder && !$Rest;
+    return $FolderName if lc $Sub eq lc $RootFolder && $Sub ne $RootFolder;
+    return $FolderName if !$AltRootRegexp;
+    return $FolderName if "$Sub$Separator" =~ /^(?:$AltRootRegexp)/;
+  }
+
+  return $RootFolder . $Separator . $FolderName;
 }
 
 =item I<_fix_folder_encoding($FolderName)>
@@ -4704,85 +4689,47 @@ with the C<set_root_prefix()> call.
 sub _unfix_folder_name {
   my ($Self, $FolderName) = @_;
 
-  my $UFM = $Self->{UnrootFolderMatch};
-  $FolderName =~ s/^$UFM// if $UFM;
-
   # Map canonical INBOX to nicer looking Inbox
-  $FolderName = "Inbox" if ($FolderName eq "INBOX" && not $Self->{PreserveINBOX});
+  return $Self->{PreserveINBOX} ? $FolderName : "Inbox" if lc $FolderName eq 'inbox';
 
   my $UnicodeFolders = $Self->unicode_folders();
-  if ( $UnicodeFolders && ( $FolderName =~ m{&} ) )
-  {
+  if ($UnicodeFolders && $FolderName =~ m{&}) {
     $FolderName = Encode::decode( 'IMAP-UTF-7', $FolderName );
   }
 
-  return $FolderName;
-}
+  # INBOX             -> INBOX
+  # INBOX.blah        -> blah
+  # INBOX.blah.bar    -> blah.bar
+  # INBOX.INBOX       -> INBOX.INBOX
+  # INBOX.INBOX.blah  -> INBOX.blah
+  # INBOX.Inbox       -> INBOX.Inbox
+  # INBOX.Inbox.foo   -> INBOX.Inbox.foo
+  # INBOX.Inbox.inbox -> INBOX.Inbox.inbox
+  # user.xyz          -> user.xyz
+  # RESTORED.foo      -> RESTORED.foo
+  # INBOX.RESTORED.foo -> INBOX.RESTORED.foo
 
-=item I<_fix_message_ids($MessageIds)>
+  my $AltRootRegexp = $Self->{AltRootRegexp};
+  return $FolderName if $AltRootRegexp && $FolderName =~ /^$AltRootRegexp/;
 
-Used by IMAP commands to handle a number of different ways that message
-IDs can be specified.
+  # Special case empty name (e.g. getmetadata for global data);
+  return $FolderName if $FolderName eq '';
 
-=item I<Method arguments>
+  my $RootFolder = $Self->{RootFolder} || return $FolderName;
+  my $Separator = $Self->{Separator};
 
-=over 4
-
-=item B<$MessageIds>
-
-String or array ref which specified the message IDs or UIDs.
-
-=back
-
-The $MessageIds parameter may take the following forms:
-
-=over 4
-
-=item B<array ref>
-
-Array is turned into a string of comma separated ID numbers.
-
-=item B<1:*>
-
-Normally a * would result in the message ID string being quoted.
-This ensure that such a range string is not quoted because some
-servers (e.g. cyrus) don't like.
-
-=back
-
-=cut
-sub _fix_message_ids {
-  my $Item = shift;
-  # If the item is an array reference, turn into a comma separated of items
-  if (ref($Item) eq 'ARRAY') {
-    my @Src = sort { $a <=> $b } @$Item;
-    push @Src, 0; # end marker to make the logic below simpler
-    my @Dest;
-    my $Start;
-    my $Prev;
-    while (defined (my $Single = shift @Src)) {
-      if (defined $Prev and $Single == $Prev + 1) {
-        $Start = $Prev unless defined $Start;
-      }
-      else {
-        if (defined $Start) {
-          push @Dest, "$Start:$Prev";
-          $Start = undef;
-        }
-        elsif (defined $Prev) {
-          push @Dest, $Prev;
-        }
-      }
-      $Prev = $Single;
-    }
-    # Make scalar ref, so we don't quote
-    $Item = \join(',', @Dest);
+  my ($Root, $Sub, $Rest) = split /\Q${Separator}\E/, $FolderName, 3;
+  if ($Root eq $RootFolder) {
+    return $FolderName if !$Sub;
+    return $FolderName if $Sub eq $RootFolder && !$Rest;
+    return $FolderName if lc $Sub eq lc $RootFolder && $Sub ne $RootFolder;
+    return $FolderName if !$AltRootRegexp;
+    return $FolderName if "$Sub$Separator" =~ /^(?:$AltRootRegexp)/;
   }
-  # If the item ends in a *, don't put "'s around it. This is
-  # a hack so "1:*" doesn't end up with quotes that cyrus doesn't like
-  $Item = \"$Item" if !ref($Item) && $Item =~ /\*$/;
-  return $Item;
+
+  return $Rest ? $Sub . $Separator . $Rest : $Sub;
 }
+
 
 =item I<_parse_email_address($EmailAddressList)>
 
@@ -4792,7 +4739,7 @@ from an IMAP fetch (envelope) call into a single RFC 822 email string
 finally return to the user.
 
 This is used to parse an envelope structure returned from a fetch call.
-  
+
 See the documentation section 'FETCH RESULTS' for more information.
 
 =cut
@@ -5183,6 +5130,54 @@ sub DESTROY {
 }
 
 =back
+=cut
+
+=head1 GMAIL, OFFICE 365, YAHOO and XOAUTH2
+
+GMail, Office 365 and Yahoo are all moving to OAUTH authentication using
+the XOAUTH2 SASL mechanism. At the moment, there doesn't appear to be
+a XOAUTH2 I<Authen::SASL> module on CPAN. If you need to authenticate
+with those systems, you should be able to use this simple module.
+
+  package Authen::SASL::Perl::XOAUTH2;
+
+  use strict;
+  use warnings
+  use parent qw(Authen::SASL::Perl);
+
+  sub _order { 1 }
+  sub _secflags { () }
+  sub mechanism { 'XOAUTH2' }
+
+  sub client_start {
+    my $self = shift;
+
+    $self->{error} = undef;
+    $self->{need_step} = 0;
+
+    my ($user, $auth, $access_token) = map {
+      my $v = $self->_call($_);
+      defined($v) ? $v : ''
+    } qw(user auth access_token);
+
+    return "user=$user\001auth=$auth $access_token\001\001";
+  }
+
+  1;
+
+And then authenticate using:
+
+  my $sasl = Authen::SASL->new(
+    mechanism => 'XOAUTH2',
+    callback => {
+      user => $username,
+      auth => 'Bearer',
+      access_token => $token,
+    }
+  );
+
+  $login_res = $connection->authenticate($sasl);
+
 =cut
 
 =head1 SEE ALSO

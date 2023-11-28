@@ -4,71 +4,84 @@ package File::LoadLines;
 
 use warnings;
 use strict;
-use base 'Exporter';
+use Exporter qw(import);
 our @EXPORT = qw( loadlines );
+our @EXPORT_OK = qw( loadblob );
 use Encode;
 use Carp;
 use utf8;
 
 =head1 NAME
 
-File::LoadLines - Load lines from file
+File::LoadLines - Load lines from files and network 
 
 =cut
 
-our $VERSION = '1.021';
+our $VERSION = '1.040';
 
 =head1 SYNOPSIS
 
     use File::LoadLines;
-
     my @lines = loadlines("mydata.txt");
-    ...
+
+    use File::LoadLines qw(loadblob);
+    my $img = loadblob("https://img.shields.io/badge/Language-Perl-blue");
 
 =head1 DESCRIPTION
 
 File::LoadLines provides an easy way to load the contents of a text
-file into an array of lines. It is intended for relatively small files
+file into an array of lines. It is intended for small to moderate size files
 like config files that are often produced by weird tools (and users).
 
-It automatically handles ASCII, Latin-1 and UTF-8 text.
+It will transparantly fetch data from the network if the provided file
+name is a URL.
+
+File::LoadLines automatically handles ASCII, Latin-1 and UTF-8 text.
 When the file has a BOM, it handles UTF-8, UTF-16 LE and BE, and
 UTF-32 LE and BE.
 
 Recognized line terminators are NL (Unix, Linux), CRLF (DOS, Windows)
 and CR (Mac)
 
+Function loadblob(), exported on depand, fetches the content and
+returns it without processing, equivalent to File::Slurp and ilk.
+
 =head1 EXPORT
 
-=head2 loadlines
+By default the function loadlines() is exported.
 
 =head1 FUNCTIONS
 
 =head2 loadlines
 
-    my @lines = loadlines("mydata.txt");
-    my @lines = loadlines("mydata.txt", $options);
+    @lines = loadlines("mydata.txt");
+    @lines = loadlines("mydata.txt", $options);
 
-Basically, the file is opened, read, decoded and split into lines
+The file is opened, read, decoded and split into lines
 that are returned in the result array. Line terminators are removed.
 
 In scalar context, returns an array reference.
 
 The first argument may be the name of a file, an opened file handle,
-or a reference to a string that contains the data.
+or a reference to a string that contains the data. If the file name
+starts with C<"http:"> or C<"https:"> the data will be retrieved using
+LWP.
 
 The second argument can be used to influence the behaviour.
 It is a hash reference of option settings.
 
 Note that loadlines() is a I<slurper>, it reads the whole file into
-memory and requires temporarily memory for twice the size of the
-file.
+memory and, for splitting, requires temporarily memory for twice the
+size of the file.
 
 =over
 
 =item split
 
 Enabled by default.
+
+The data is split into lines and returned as an array (in list
+context) or as an array reference (in scalar context).
 
 If set to zero, the data is not split into lines but returned as a
 single string.
@@ -77,8 +90,9 @@ single string.
 
 Enabled by default.
 
-If set to zero, the line terminators are not removed from the
-resultant lines.
+Line terminators are removed from the resultant lines.
+
+If set to zero, the line terminators are not removed.
 
 =item encoding
 
@@ -87,6 +101,22 @@ data if it cannot automatically detect the encoding.
 
 If you pass an options hash, File::LoadLines will set C<encoding> to
 the encoding it detected and used for this file data.
+
+=item blob
+
+If specified, the data read is not touched but returned exactly as read.
+
+C<blob> overrules C<split> and C<chomp>.
+
+=item fail
+
+If specified, it should be either C<"hard"> or C<"soft">.
+
+If C<"hard">, read errors are signalled using croak exceptions.
+This is the default.
+
+If set to C<"soft">, loadlines() will return an empty result and set
+the error message in the options hash with key C<"error">.
 
 =back
 
@@ -97,8 +127,9 @@ sub loadlines {
     croak("Missing filename.\n") unless defined $filename;
     croak("Invalid options.\n")  if (defined $options && (ref($options) ne "HASH"));
 
-    $options->{split} //= 1;
-    $options->{chomp} //= 1;
+    $options->{blob}  //= 0;
+    $options->{split} //= !$options->{blob};
+    $options->{chomp} //= !$options->{blob};
 
     my $data;			# slurped file data
     my $encoded;		# already encoded
@@ -120,6 +151,21 @@ sub loadlines {
 	$filename = "__STDIN__";
 	$data = do { local $/; <STDIN> };
     }
+    elsif ( $filename =~ /^https?:/ ) {
+	require LWP::UserAgent;
+	my $ua = LWP::UserAgent->new( timeout => 20 );
+	my $res = $ua->get($filename);
+	if ( $res->is_success ) {
+	    $data = $res->decoded_content;
+	}
+	elsif ( $options->{fail} eq "soft" ) {
+	    $options->{error} = $res->status_line;
+	    return;
+	}
+	else {
+	    croak("$filename: ", $res->status_line);
+	}
+    }
     else {
 	my $name = $filename;
 	$filename = decode_utf8($name);
@@ -131,21 +177,31 @@ sub loadlines {
 	      ( $fn, Win32API::File::FILE_READ_DATA(), 0, [],
 		Win32API::File::OPEN_EXISTING(), 0, []);
 	    croak("$filename: $^E (Win32)\n") if $^E;
-	    Win32API::File::OsFHandleOpen( 'FILE', $fh, "r")
-	      or croak("$filename: $!\n");
+	    unless ( Win32API::File::OsFHandleOpen( 'FILE', $fh, "r") ) {
+		$options->{error} = "$!", return if $options->{fail} eq "soft";
+		croak("$filename: $!\n");
+	    }
 	    $data = do { local $/; readline(\*FILE) };
 	    # warn("$filename³: len=", length($data), "\n");
+	    close(FILE);
 	}
 	else {
-	    open( my $f, '<', $filename )
-	      or croak("$filename: $!\n");
+	    my $f;
+	    unless ( open( $f, '<', $filename ) ) {
+		$options->{error} = "$!", return if $options->{fail} eq "soft";
+		croak("$filename: $!\n");
+	    }
 	    $data = do { local $/; <$f> };
 	}
     }
     $options->{_filesource} = $filename if $options;
 
     my $name = encode_utf8($filename);
-    if ( $encoded ) {
+    if ( $options->{blob} ) {
+	# Do not touch.
+	$options->{encoding} = 'Blob';
+    }
+    elsif ( $encoded ) {
 	# Nothing to do, already dealt with.
 	$options->{encoding} = 'Perl';
     }
@@ -204,6 +260,11 @@ sub loadlines {
 	}
     }
 
+    # This can be used to add line continuation or comment stripping.
+    if ( $options->{strip} ) {
+	$data =~ s/$options->{strip}//g;
+    }
+
     return $data unless $options->{split};
 
     # Split in lines;
@@ -215,11 +276,31 @@ sub loadlines {
 	push( @lines, $1 ) while $data =~ /(.*?)(?:\r\n|\n|\r)/g;
     }
     else {
-	# We need to maintain trailing newlines.
 	push( @lines, $1 ) while $data =~ /(.*?(?:\r\n|\n|\r))/g;
+	# In case the last line has no terminator.
+	push( @lines, $1 ) if $data =~ /(?:\r\n|\n|\r)([^\r\n]+)\z/;
     }
     undef $data;
     return wantarray ? @lines : \@lines;
+}
+
+=head2 loadblob
+
+    use File::LoadLines qw(loadblob);
+    $rawdata = loadblob("raw.dat");
+    $rawdata = loadblob("raw.dat", $options);
+
+This is equivalent to calling loadlines() with C<< blob=>1 >> in the options.
+
+=cut
+
+sub loadblob {
+    my ( $filename, $options ) = @_;
+    croak("Missing filename.\n") unless defined $filename;
+    croak("Invalid options.\n")
+      if defined($options) && ref($options) ne "HASH";
+    $options //= {};
+    loadlines( $filename, { blob => 1, %$options } );
 }
 
 =head1 SEE ALSO
@@ -237,6 +318,10 @@ to decode and unpack:
 
     open( my $data, '<', \$contents );
     $lines = loadlines( $data, $options );
+
+There is no hard requirement on LWP. If you want to use transparent
+fetching of data over the network please make sure LWP::UserAgent is
+available.
 
 =head1 AUTHOR
 
@@ -256,7 +341,7 @@ GitHub.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2018,2020 Johan Vromans, all rights reserved.
+Copyright 2018,2020,2023 Johan Vromans, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package LaTeX::ToUnicode;
 BEGIN {
-  $LaTeX::ToUnicode::VERSION = '0.53';
+  $LaTeX::ToUnicode::VERSION = '0.54';
 }
 #ABSTRACT: Convert LaTeX commands to Unicode (simplistically)
 
@@ -22,11 +22,15 @@ our $endcw = qr/(?<=[a-zA-Z])(?=[^a-zA-Z]|$)\s*/;
 # all we need for is debugging being on and off. And it's pretty random
 # what gets output.
 my $debug = 0;
+
 sub debuglevel { $debug = shift; }
 sub _debug {
   return unless $debug;
-  my ($pkgname,$filename,$line,$subr) = caller(1);
-  warn @_, " at $filename:$line (${pkgname}::$subr)\n";
+  # The backtrace info is split between caller(0) and caller(1), sigh.
+  # We don't need the package name, it's included in $subr in practice.
+  my (undef,$filename,$line,undef) = caller(0);
+  my (undef,undef,undef,$subr) = caller(1);
+  warn @_, " at $filename:$line ($subr)\n";
 }
 
 # The main conversion function.
@@ -114,8 +118,17 @@ sub convert {
     # 
     if (! $options{entities}) {
       # Convert our \x strings from Tables.pm to the binary characters.
-      # Assume no more than four hex digits.
-      $string =~ s/\\x\{(.{1,4})\}/ pack('U*', hex($1))/eg;
+      
+      # As an extra-special case, we want to preserve the translation of
+      # \{ and \} as 007[bd] entities even if the --entities option is
+      # not give; otherwise they'd get eliminated like all other braces.
+      # Use a temporary cs \xx to keep them marked, and don't use braces
+      # to delimit the argument since they'll get deleted.
+      $string =~ s/\\x\{(007[bd])\}/\\xx($1)/g;
+      
+      # Convert all other characters to characters.
+      # Assume exactly four hex digits, since we wrote Tables.pm that way.
+      $string =~ s/\\x\{(....)\}/ pack('U*', hex($1))/eg;
 
     } elsif ($options{entities}) {
       # Convert the XML special characters that appeared in the input,
@@ -176,9 +189,15 @@ sub convert {
       warn "LaTeX::ToUnicode::convert:   please report as bug.\n";
     }
     
-    # Drop all braces.
+    # Drop all remaining braces.
     $string =~ s/[{}]//g;
     
+    if (! $options{entities}) {
+      # With all the other braces gone, now we can convert the preserved
+      # brace entities from \{ and \} to actual braces.
+      $string =~ s/\\xx\((007[bd])\)/ pack('U*', hex($1))/eg;
+    }
+
     # Backslashes might remain. Don't remove them, as it makes for a
     # useful way to find unhandled commands.
 
@@ -325,7 +344,7 @@ sub _convert_accents {
     $string =~ s/(\\(.)\s*(\\?\w{1,1}))/        $tbl{$2}{$3} || $1/eg; # \"a
     $string =~ s/(\\(.)\s*\{(\\?\w{1,2})\})/    $tbl{$2}{$3} || $1/eg; # \"{a}
     
-    # second the alphabetic commands, like \c. They have be handled
+    # second the alphabetic commands, like \c. They have to be handled
     # differently because \cc is not \c{c}! The only difference in the
     # regular expressions is using $endcw instead of just \s*.
     # 
@@ -413,16 +432,18 @@ sub _convert_markups {
     
     # HTML is different.
     return _convert_markups_html($string) if $options->{html};
-    # Ok, we'll "convert" to plain text by removing the markup commands.
+    
+    # Not HTML, so here we'll "convert" to plain text by removing the
+    # markup commands.
 
-    # we can do all markup commands at once.
+    # we can do all the markup commands at once.
     my $markups = join('|', keys %LaTeX::ToUnicode::Tables::MARKUPS);
     
     # Remove \textMARKUP{...}, leaving just the {...}
     $string =~ s/\\text($markups)$endcw//g;
 
-    # Similarly remove \MARKUPshape. 
-    $string =~ s/\\($markups)shape$endcw//g;
+    # Similarly remove \MARKUPshape, plus remove \upshape.
+    $string =~ s/\\($markups|up)shape$endcw//g;
 
     # Remove braces and \command in: {... \MARKUP ...}
     $string =~ s/(\{[^{}]+)\\(?:$markups)$endcw([^{}]+\})/$1$2/g;
@@ -516,7 +537,7 @@ LaTeX::ToUnicode - Convert LaTeX commands to Unicode
 
 =head1 VERSION
 
-version 0.53
+version 0.54
 
 =head1 SYNOPSIS
 

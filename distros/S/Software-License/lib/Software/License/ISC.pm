@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Software::License::ISC;
-$Software::License::ISC::VERSION = '0.104004';
+package Software::License::ISC 0.104005;
+
 use parent 'Software::License';
 # ABSTRACT: The ISC License
 
@@ -23,7 +23,7 @@ Software::License::ISC - The ISC License
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 PERL VERSION
 
@@ -41,7 +41,7 @@ lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

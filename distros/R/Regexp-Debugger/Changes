@@ -270,3 +270,12 @@ Revision history for Regexp-Debugger
 
     - Removed spurious Data::Dumper debugging statement 
       (thanks, Tomasz!)
+
+
+0.002007  Sat Nov 18 11:05:18 2023
+
+    - Improved documentation of configuration options (they're single-line)
+      (thanks, OnlineCop)
+
+    - Removed dependency on smartmatching
+      (thanks Gregor)

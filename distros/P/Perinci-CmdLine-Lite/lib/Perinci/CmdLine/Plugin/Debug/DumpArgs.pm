@@ -10,25 +10,36 @@ use parent 'Perinci::CmdLine::PluginBase';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-24'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.928'; # VERSION
+our $VERSION = '1.929'; # VERSION
 
 sub meta {
     return {
         summary => 'Dump command-line arguments ($r->{args}), by default after argument validation',
         conf => {
+            dumper => {
+                schema => ['str*', in=>['Data::Dump::Color', 'Data::Dmp']],
+                default => 'Data::Dump::Color',
+            },
         },
         tags => ['category:debugging'],
     };
 }
 
 sub after_validate_args {
-    require Data::Dump::Color;
-
     my ($self, $r) = @_;
 
-    Data::Dump::Color::dd($r->{args});
+    my $dumper = $self->{dumper} || 'Data::Dump::Color';
+    if ($dumper eq 'Data::Dmp') {
+        require Data::Dmp;
+        local $Data::Dmp::OPT_DEPARSE = 1;
+        Data::Dmp::dd($r->{args});
+    } else {
+        require Data::Dump::Color;
+        Data::Dump::Color::dd($r->{args});
+    }
+
     [200, "OK"];
 }
 
@@ -47,7 +58,7 @@ Perinci::CmdLine::Plugin::Debug::DumpArgs - Dump command-line arguments ($r->{ar
 
 =head1 VERSION
 
-This document describes version 1.928 of Perinci::CmdLine::Plugin::Debug::DumpArgs (from Perl distribution Perinci-CmdLine-Lite), released on 2022-11-24.
+This document describes version 1.929 of Perinci::CmdLine::Plugin::Debug::DumpArgs (from Perl distribution Perinci-CmdLine-Lite), released on 2023-11-23.
 
 =head1 SYNOPSIS
 
@@ -112,7 +123,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

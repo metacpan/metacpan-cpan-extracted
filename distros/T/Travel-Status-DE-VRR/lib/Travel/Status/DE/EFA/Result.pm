@@ -6,11 +6,11 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 Travel::Status::DE::EFA::Result->mk_ro_accessors(
 	qw(countdown date delay destination is_cancelled info key line lineref
-	  mot occupancy operator platform platform_db platform_name sched_date sched_time time train_no type)
+	  mot occupancy operator platform platform_db platform_name sched_date sched_time time train_type train_name train_no type)
 );
 
 my @mot_mapping = qw{
@@ -133,7 +133,7 @@ departure received by Travel::Status::DE::EFA
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 DESCRIPTION
 
@@ -253,6 +253,15 @@ Scheduled departure time (HH:MM).
 =item $departure->time
 
 Actual departure time (HH:MM).
+
+=item $departure->train_type
+
+Train type, e.g. "ICE". Typically only defined for long-distance trains.
+
+=item $departure->train_name
+
+Train name, e.g. "ICE International" or "InterCityExpresS" or "Deichgraf".
+Typically only defined for long-distance trains.
 
 =item $departure->train_no
 

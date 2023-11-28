@@ -137,6 +137,26 @@ int M_RYU__has_uint128(void) {
     return _has_uint128();
 }
 
+int _SvIOK(SV * sv) {
+    if(SvIOK(sv)) return 1;
+    return 0;
+}
+
+int _SvNOK(SV * sv) {
+    if(SvNOK(sv)) return 1;
+    return 0;
+}
+
+int _SvPOK(SV * sv) {
+    if(SvPOK(sv)) return 1;
+    return 0;
+}
+
+int _SvIOKp(SV * sv) {
+    if(SvIOKp(sv)) return 1;
+    return 0;
+}
+
 /* End d2exp */
 
 
@@ -252,4 +272,20 @@ _sis_perl_version ()
 int
 M_RYU__has_uint128 ()
 
+
+int
+_SvIOK (sv)
+	SV *	sv
+
+int
+_SvNOK (sv)
+	SV *	sv
+
+int
+_SvPOK (sv)
+	SV *	sv
+
+int
+_SvIOKp (sv)
+	SV *	sv
 

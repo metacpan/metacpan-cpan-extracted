@@ -1,14 +1,12 @@
-use 5;
 
 package XML::Catalogs::HTML;
 
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.0.3');
+use version; our $VERSION = qv('v1.6.0');
 
-use XML::Catalogs qw( );
-our @ISA = 'XML::Catalogs';
+use parent 'XML::Catalogs';
 
 1;
 
@@ -21,7 +19,7 @@ XML::Catalogs::HTML - Catalog of HTML and XHTML DTDs
 
 =head1 VERSION
 
-Version 1.0.3
+Version 1.6.0
 
 
 =head1 SYNOPSIS
@@ -83,6 +81,9 @@ XML::LibXML will use the local DTDs when parsing
 HTML and XHTML documents. This only affects the
 current process.
 
+To have any effect, XML::LibXML's
+C<< load_ext_dtd => 1 >> option must be used.
+
 This mechanism does not stop working when XML::LibXML's
 C<< no_network => 1 >> option is used.
 
@@ -122,36 +123,44 @@ Returns the file path of the catalog.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-XML-Catalogs-HTML at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-Catalogs-HTML>.
+Please report any bugs or feature requests using L<https://github.com/ikegami/perl-XML-Catalogs-HTML/issues>.
 I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
 
 
-=head1 SUPPORT
+=head1 DOCUMENTATION AND SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc XML::Catalogs::HTML
 
-You can also look for information at:
+You can also find it online at this location:
 
-=over 4
+=over
 
-=item * Search CPAN
+=item * L<https://metacpan.org/dist/XML-Catalogs-HTML>
 
-L<http://search.cpan.org/dist/XML-Catalogs-HTML>
+=back
 
-=item * RT: CPAN's request tracker
+If you need help, the following are great resources:
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Catalogs-HTML>
+=over
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * L<https://stackoverflow.com/|StackOverflow>
 
-L<http://annocpan.org/dist/XML-Catalogs-HTML>
+=item * L<http://www.perlmonks.org/|PerlMonks>
 
-=item * CPAN Ratings
+=item * You may also contact the author directly.
 
-L<http://cpanratings.perl.org/d/XML-Catalogs-HTML>
+=back
+
+
+=head1 REPOSITORY
+
+=over
+
+=item * Web: L<https://github.com/ikegami/perl-XML-Catalogs-HTML>
+
+=item * git: L<https://github.com/ikegami/perl-XML-Catalogs-HTML.git>
 
 =back
 
@@ -163,14 +172,6 @@ Eric Brine, C<< <ikegami@adaelis.com> >>
 
 =head1 COPYRIGHT & LICENSE
 
-The .dtd and .ent files included in this distrubution are
-covered by Copyright. See the individual files for the notice.
-The may be distributed unmodified. See
-L<http://www.w3.org/Consortium/Legal/2002/copyright-documents-20021231>
-for the exact terms.
-
-For everything else, the following applies:
-
 No rights reserved.
 
 The author has dedicated the work to the Commons by waiving all of his
@@ -180,9 +181,6 @@ law.
 
 Works under CC0 do not require attribution. When citing the work, you should
 not imply endorsement by the author.
-
-Feel free to use this module as a model for your own
-XML::Catalogs::* module.
 
 
 =cut

@@ -44,6 +44,7 @@ struct ClassMeta {
 
   SuspendedCompCVBuffer initfields_compcv; /* temporary PL_compcv + associated state during initfields */
   OP *initfields_lines;                    /* temporary OP_LINESEQ to contain the initfield ops */
+  FIELDOFFSET next_fieldix_for_initfields; /* how many fields have we seen so far? */
 
   SuspendedCompCVBuffer adjust_compcv; /* temporary PL_compcv + associated state during true-block ADJUSTs */
   CV *adjust_methodscope;              /* temporary CV used during compilation of ADJUST blocks */

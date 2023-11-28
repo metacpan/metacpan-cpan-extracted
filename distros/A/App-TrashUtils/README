@@ -2,8 +2,8 @@ NAME
     App::TrashUtils - Utilities related to desktop trash
 
 VERSION
-    This document describes version 0.003 of App::TrashUtils (from Perl
-    distribution App-TrashUtils), released on 2023-08-06.
+    This document describes version 0.004 of App::TrashUtils (from Perl
+    distribution App-TrashUtils), released on 2023-08-07.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -94,13 +94,17 @@ FUNCTIONS
   trash_list_trashes
     Usage:
 
-     trash_list_trashes() -> [$status_code, $reason, $payload, \%result_meta]
+     trash_list_trashes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
     List trash directories.
 
     This function is not exported.
 
-    No arguments.
+    Arguments ('*' denotes required arguments):
+
+    *   home_only => *bool*
+
+        (No description)
 
     Returns an enveloped result (an array).
 

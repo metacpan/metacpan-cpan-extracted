@@ -5,8 +5,6 @@ use Wx::AUI;
 
 package App::GUI::Harmonograph::Frame;
 use base qw/Wx::Frame/;
-use App::GUI::Harmonograph::Dialog::Function;
-use App::GUI::Harmonograph::Dialog::Interface;
 use App::GUI::Harmonograph::Dialog::About;
 use App::GUI::Harmonograph::Frame::Part::Board;
 use App::GUI::Harmonograph::Frame::Part::ColorBrowser;
@@ -16,8 +14,8 @@ use App::GUI::Harmonograph::Frame::Part::Pendulum;
 use App::GUI::Harmonograph::Frame::Part::PenLine;
 use App::GUI::Harmonograph::Frame::Part::ModMatrix;
 use App::GUI::Harmonograph::Widget::ProgressBar;
-use App::GUI::Harmonograph::Settings;
-use App::GUI::Harmonograph::Config;
+use App::GUI::Harmonograph::Settings; # file IO for parameters of image
+use App::GUI::Harmonograph::Config;   # file IO for program config: dirs, color set store
 
 sub new {
     my ( $class, $parent, $title ) = @_;
@@ -29,7 +27,6 @@ sub new {
     $self->{'config'} = App::GUI::Harmonograph::Config->new();
     Wx::ToolTip::Enable( $self->{'config'}->get_value('tips') );
     Wx::InitAllImageHandlers();
-    $self->{'saved'} = 0;
     $self->{'title'} = $title;
 
     # create GUI parts
@@ -178,8 +175,6 @@ sub new {
     Wx::Event::EVT_MENU( $self, 11500, sub { $self->Close });
     Wx::Event::EVT_MENU( $self, 12300, sub { $self->draw });
     Wx::Event::EVT_MENU( $self, 12400, sub { $self->save_image_dialog });
-    Wx::Event::EVT_MENU( $self, 13100, sub { $self->{'dialog'}{'function'}->ShowModal });
-    Wx::Event::EVT_MENU( $self, 13200, sub { $self->{'dialog'}{'interface'}->ShowModal });
     Wx::Event::EVT_MENU( $self, 13300, sub { $self->{'dialog'}{'about'}->ShowModal });
 
     # GUI layout assembly
@@ -281,6 +276,23 @@ sub new {
     $self;
 }
 
+sub update_recent_settings_menu {
+    my ($self) = @_;
+    my $recent = $self->{'config'}->get_value('last_settings');
+    return unless ref $recent eq 'ARRAY';
+    my $set_menu_ID = 11300;
+    $self->{'setting_menu'}->Destroy( $set_menu_ID );
+    my $Recent_ID = $set_menu_ID + 1;
+    $self->{'recent_menu'} = Wx::Menu->new();
+    for (reverse @$recent){
+        my $path = $_;
+        $self->{'recent_menu'}->Append($Recent_ID, $path);
+        Wx::Event::EVT_MENU( $self, $Recent_ID++, sub { $self->open_setting_file( $path ) });
+    }
+    $self->{'setting_menu'}->Insert( 2, $set_menu_ID, '&Recent', $self->{'recent_menu'}, 'recently saved settings' );
+
+}
+
 sub init {
     my ($self) = @_;
     $self->{'pendulum'}{$_}->init() for qw/x y z r/;
@@ -290,7 +302,7 @@ sub init {
     $self->{'progress'}->set_color( { red => 20, green => 20, blue => 110 } );
     $self->sketch( );
     $self->SetStatusText( "all settings are set to default", 1);
-    $self->{'saved'} = 0;
+    $self->set_settings_save(1);
 }
 
 sub get_data {
@@ -317,88 +329,37 @@ sub set_data {
     $self->{ $_ }->set_data( $data->{ $_ } ) for qw/color_flow line/;
 }
 
-sub open_settings_dialog {
-    my ($self) = @_;
-    my $dialog = Wx::FileDialog->new ( $self, "Select a settings file to load", $self->{'config'}->get_value('open_dir'), '',
-                   ( join '|', 'INI files (*.ini)|*.ini', 'All files (*.*)|*.*' ), &Wx::wxFD_OPEN );
-    return if $dialog->ShowModal == &Wx::wxID_CANCEL;
-    my $path = $dialog->GetPath;
-    my $ret = $self->open_setting_file ( $path );
-    if (not ref $ret) { $self->SetStatusText( $ret, 0) }
-    else {
-        my $dir = App::GUI::Harmonograph::Settings::extract_dir( $path );
-        $self->{'config'}->set_value('save_dir', $dir);
-        $self->SetStatusText( "loaded settings from ".$dialog->GetPath, 1);
-    }
-}
-
-sub write_settings_dialog {
-    my ($self) = @_;
-    my $dialog = Wx::FileDialog->new ( $self, "Select a file name to store data",$self->{'config'}->get_value('write_dir'), '',
-               ( join '|', 'INI files (*.ini)|*.ini', 'All files (*.*)|*.*' ), &Wx::wxFD_SAVE );
-    return if $dialog->ShowModal == &Wx::wxID_CANCEL;
-    my $path = $dialog->GetPath;
-    #my $i = rindex $path, '.';  #$path = substr($path, 0, $i - 1 ) if $i > -1;
-    $path .= '.ini' unless lc substr ($path, -4) eq '.ini';
-    return if -e $path and
-              Wx::MessageDialog->new( $self, "\n\nReally overwrite the settings file?", 'Confirmation Question',
-                                      &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
-    $self->write_settings_file( $path );
-    my $dir = App::GUI::Harmonograph::Settings::extract_dir( $path );
-    $self->{'config'}->set_value('write_dir', $dir);
-}
-
-sub save_image_dialog {
-    my ($self) = @_;
-    my @wildcard = ( 'SVG files (*.svg)|*.svg', 'PNG files (*.png)|*.png', 'JPEG files (*.jpg)|*.jpg');
-    my $wildcard = '|All files (*.*)|*.*';
-    my $default_ending = $self->{'config'}->get_value('file_base_ending');
-    $wildcard = ($default_ending eq 'jpg') ? ( join '|', @wildcard[2,1,0]) . $wildcard :
-                ($default_ending eq 'png') ? ( join '|', @wildcard[1,0,2]) . $wildcard :
-                                             ( join '|', @wildcard[0,1,2]) . $wildcard ;
-    my @wildcard_ending = ($default_ending eq 'jpg') ? (qw/jpg png svg/) :
-                          ($default_ending eq 'png') ? (qw/png svg jpg/) :
-                                                       (qw/svg jpg png/) ;
-
-    my $dialog = Wx::FileDialog->new ( $self, "select a file name to save image", $self->{'config'}->get_value('save_dir'), '', $wildcard, &Wx::wxFD_SAVE );
-    return if $dialog->ShowModal == &Wx::wxID_CANCEL;
-    my $path = $dialog->GetPath;
-    return if -e $path and
-              Wx::MessageDialog->new( $self, "\n\nReally overwrite the image file?", 'Confirmation Question',
-                                      &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
-    my $file_ending = lc substr ($path, -4);
-    unless ($dialog->GetFilterIndex == 3 and # filter set to all endings
-            ($file_ending eq '.jpg' or $file_ending eq '.png' or $file_ending eq '.svg')){
-            $path .= '.' . $wildcard_ending[$dialog->GetFilterIndex];
-    }
-    my $ret = $self->write_image( $path );
-    if ($ret){ $self->SetStatusText( $ret, 0 ) }
-    else     { $self->{'config'}->set_value('save_dir', App::GUI::Harmonograph::Settings::extract_dir( $path )) }
-}
-
 sub draw {
     my ($self) = @_;
     $self->SetStatusText( "drawing .....", 0 );
-    $self->{'progress'}->reset;
     $self->{'progress'}->set_color( $self->{'color'}{'start'}->get_data );
-    $self->{'board'}->set_data( $self->get_data );
-    $self->{'board'}->Refresh;
+    $self->{'board'}->draw( $self->get_data );
     $self->SetStatusText( "done complete drawing", 0 );
 }
 
 sub sketch {
     my ($self) = @_;
     $self->SetStatusText( "sketching a preview .....", 0 );
-    $self->{'progress'}->reset;
-    $self->{'board'}->set_data( $self->get_data );
-    $self->{'board'}->set_sketch_flag( );
-    $self->{'board'}->Refresh;
+    $self->{'board'}->sketch( $self->get_data );
     $self->SetStatusText( "done sketching a preview", 0 );
     if ($self->{'saved'}){
-        $self->SetTitle($self->{'title'}.'*');
         $self->inc_base_counter();
-        $self->{'saved'} = 0;
+        $self->set_settings_save(0);
     }
+}
+
+sub write_image {
+    my ($self, $file)  = @_;
+    $self->{'board'}->save_file( $file );
+    $file = App::GUI::Harmonograph::Settings::shrink_path( $file );
+    $self->SetStatusText( "saved image under: $file", 0 );
+    $self->set_settings_save(1);
+}
+
+sub set_settings_save {
+    my ($self, $status)  = @_;
+    $self->{'saved'} = $status;
+    $self->SetTitle( $self->{'title'} .($self->{'saved'} ? '': ' *'));
 }
 
 sub update_base_name {
@@ -449,6 +410,64 @@ sub base_path {
 
 }
 
+sub open_settings_dialog {
+    my ($self) = @_;
+    my $dialog = Wx::FileDialog->new ( $self, "Select a settings file to load", $self->{'config'}->get_value('open_dir'), '',
+                   ( join '|', 'INI files (*.ini)|*.ini', 'All files (*.*)|*.*' ), &Wx::wxFD_OPEN );
+    return if $dialog->ShowModal == &Wx::wxID_CANCEL;
+    my $path = $dialog->GetPath;
+    my $ret = $self->open_setting_file ( $path );
+    if (not ref $ret) { $self->SetStatusText( $ret, 0) }
+    else {
+        my $dir = App::GUI::Harmonograph::Settings::extract_dir( $path );
+        $self->{'config'}->set_value('open_dir', $dir);
+        $self->SetStatusText( "loaded settings from ".$dialog->GetPath, 1);
+    }
+}
+
+sub write_settings_dialog {
+    my ($self) = @_;
+    my $dialog = Wx::FileDialog->new ( $self, "Select a file name to store data",$self->{'config'}->get_value('write_dir'), '',
+               ( join '|', 'INI files (*.ini)|*.ini', 'All files (*.*)|*.*' ), &Wx::wxFD_SAVE );
+    return if $dialog->ShowModal == &Wx::wxID_CANCEL;
+    my $path = $dialog->GetPath;
+    $path .= '.ini' unless lc substr ($path, -4) eq '.ini';
+    return if -e $path and
+              Wx::MessageDialog->new( $self, "\n\nReally overwrite the settings file?", 'Confirmation Question',
+                                      &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
+    $self->write_settings_file( $path );
+    my $dir = App::GUI::Harmonograph::Settings::extract_dir( $path );
+    $self->{'config'}->set_value('write_dir', $dir);
+}
+
+sub save_image_dialog {
+    my ($self) = @_;
+    my @wildcard = ( 'SVG files (*.svg)|*.svg', 'PNG files (*.png)|*.png', 'JPEG files (*.jpg)|*.jpg');
+    my $wildcard = '|All files (*.*)|*.*';
+    my $default_ending = $self->{'config'}->get_value('file_base_ending');
+    $wildcard = ($default_ending eq 'jpg') ? ( join '|', @wildcard[2,1,0]) . $wildcard :
+                ($default_ending eq 'png') ? ( join '|', @wildcard[1,0,2]) . $wildcard :
+                                             ( join '|', @wildcard[0,1,2]) . $wildcard ;
+    my @wildcard_ending = ($default_ending eq 'jpg') ? (qw/jpg png svg/) :
+                          ($default_ending eq 'png') ? (qw/png svg jpg/) :
+                                                       (qw/svg jpg png/) ;
+
+    my $dialog = Wx::FileDialog->new ( $self, "select a file name to save image", $self->{'config'}->get_value('save_dir'), '', $wildcard, &Wx::wxFD_SAVE );
+    return if $dialog->ShowModal == &Wx::wxID_CANCEL;
+    my $path = $dialog->GetPath;
+    return if -e $path and
+              Wx::MessageDialog->new( $self, "\n\nReally overwrite the image file?", 'Confirmation Question',
+                                      &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
+    my $file_ending = lc substr ($path, -4);
+    unless ($dialog->GetFilterIndex == 3 or # filter set to all endings
+            ($file_ending eq '.jpg' or $file_ending eq '.png' or $file_ending eq '.svg')){
+            $path .= '.' . $wildcard_ending[$dialog->GetFilterIndex];
+    }
+    my $ret = $self->write_image( $path );
+    if ($ret){ $self->SetStatusText( $ret, 0 ) }
+    else     { $self->{'config'}->set_value('save_dir', App::GUI::Harmonograph::Settings::extract_dir( $path )) }
+}
+
 sub open_setting_file {
     my ($self, $file ) = @_;
     my $data = App::GUI::Harmonograph::Settings::load( $file );
@@ -460,6 +479,7 @@ sub open_setting_file {
         $self->SetStatusText( "loaded settings from ".$file, 1) ;
         $self->{'config'}->add_setting_file( $file );
         $self->update_recent_settings_menu();
+        $self->set_settings_save( 1 );
         $data;
     } else {
          $self->SetStatusText( $data, 0);
@@ -474,35 +494,8 @@ sub write_settings_file {
         $self->{'config'}->add_setting_file( $file );
         $self->update_recent_settings_menu();
         $self->SetStatusText( "saved settings into file $file", 1 );
+        $self->set_settings_save( 1 );
     }
-    $self->{'saved'} = 1;
-    $self->SetTitle( $self->{'title'} );
-}
-
-sub update_recent_settings_menu {
-    my ($self) = @_;
-    my $recent = $self->{'config'}->get_value('last_settings');
-    return unless ref $recent eq 'ARRAY';
-    my $set_menu_ID = 11300;
-    $self->{'setting_menu'}->Destroy( $set_menu_ID );
-    my $Recent_ID = $set_menu_ID + 1;
-    $self->{'recent_menu'} = Wx::Menu->new();
-    for (@$recent){
-        my $path = $_;
-        $self->{'recent_menu'}->Append($Recent_ID, $path);
-        Wx::Event::EVT_MENU( $self, $Recent_ID++, sub { $self->open_setting_file( $path ) });
-    }
-    $self->{'setting_menu'}->Insert( 2, $set_menu_ID, '&Recent', $self->{'recent_menu'}, 'recently saved settings' );
-
-}
-
-sub write_image {
-    my ($self, $file)  = @_;
-    $self->{'board'}->save_file( $file );
-    $file = App::GUI::Harmonograph::Settings::shrink_path( $file );
-    $self->SetStatusText( "saved image under: $file", 0 );
-    $self->{'saved'} = 1;
-    $self->SetTitle($self->{'title'});
 }
 
 1;

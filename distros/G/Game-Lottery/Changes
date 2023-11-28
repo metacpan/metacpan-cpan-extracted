@@ -1,3 +1,4 @@
-1.00	Initial Trial Release
-1.02	Initial Release (1.01 had an indexing failure)
-1.03  Add anti-collision protection (against picking the same numbers)
+1.04    add support for custom games to script, script help converted to pod::usage.
+1.03    Add anti-collision protection (against picking the same numbers)
+1.02    Initial Release (1.01 had an indexing failure)
+1.00    Initial Trial Release

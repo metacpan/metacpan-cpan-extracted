@@ -3,9 +3,9 @@ package Sah::Schemas::Path;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 1;
 # ABSTRACT: Schemas related to filesystem path
@@ -22,7 +22,7 @@ Sah::Schemas::Path - Schemas related to filesystem path
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::Schemas::Path (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 DESCRIPTION
 
@@ -79,10 +79,33 @@ rule. This schema's completion by default only includes directories.
 Directory name, default to current directory.
 
 Note: be careful when using this schema for actions that are destructive,
-because a user can perform those actions without giving an argument (e.g. a
-C<delete-files-in> script). It is safer to use this schema to perform a
-non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by
-default.
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-files-in> script). It is safer to use this schema when performing a
+non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
+
+
+=item * L<dirname::default_curdir_abs|Sah::Schema::dirname::default_curdir_abs>
+
+Directory name, default to current directory (absolutified).
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-files-in> script). It is safer to use this schema when performing a
+non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
+
+
+=item * L<dirname::default_only_subdir_in_curdir|Sah::Schema::dirname::default_only_subdir_in_curdir>
+
+Directory name, defaults to only subdirectory in current directory (if there is one).
+
+This is like the C<dirname> schema but with a default value of "only subdirectory
+in the current directory". That is, if the current directory has a single
+subdirectory and nothing else.
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-files-in> script). It is safer to use this schema when performing a
+non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
 
 
 =item * L<dirname::exists|Sah::Schema::dirname::exists>
@@ -91,6 +114,20 @@ Directory name, must exist on filesystem.
 
 This is like the C<dirname> schema but with an extra check that the path must
 already exist.
+
+
+=item * L<dirname::exists::default_only_subdir_in_curdir|Sah::Schema::dirname::exists::default_only_subdir_in_curdir>
+
+Directory name, must exist on the filesystem, defaults to only subdirectory in current directory (if there is one).
+
+This is like the C<dirname::exists> schema but with a default value of "only
+subdirectory in the current directory". That is, if the current directory has a
+single subdirectory and nothing else.
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-files-in> script). It is safer to use this schema when performing a
+non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
 
 
 =item * L<dirname::not_exists|Sah::Schema::dirname::not_exists>
@@ -108,6 +145,15 @@ Filesystem directory name on a Unix system.
 This is like the C<dirname> schema but with extra checks relevant to the Unix,
 (e.g. a path element cannot be longer than 255 characters) and prefilters (e.g.
 multipile consecutive slashes C<//> will be normalized into a single one C</>).
+
+
+=item * L<dirname::unix::basename|Sah::Schema::dirname::unix::basename>
+
+Filesystem base directory name on a Unix system.
+
+This is like the C<dirname::unix> schema but not allowing parent directory parts.
+Difference with C<filename::unix::basename> and C<pathname::unix::basename>: the
+completion rule.
 
 
 =item * L<dirname::unix::exists|Sah::Schema::dirname::unix::exists>
@@ -149,12 +195,66 @@ What's the difference between this schema and C<dirname>? The default completion
 rule. C<dirname>'s completion only includes directories and not files.
 
 
+=item * L<filename::default_only_file_in_curdir|Sah::Schema::filename::default_only_file_in_curdir>
+
+File name, defaults to only file in current directory (if there is one).
+
+This is like the C<filename> schema but with a default value of "only file in the
+current directory". That is, if the current directory has a single plain file
+and nothing else.
+
+Difference with C<filename::default_only_file_not_subdir_in_subdir> schema: the
+other schema ignores subdirectories. Thus, if a directory only contains C<file1>
+and C<subdir1>, then that other schema will return C<file1> but this schema will
+not return a default value.
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-file> script). It is safer to use this schema when performing a
+non=destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
+default.
+
+
+=item * L<filename::default_only_file_not_dir_in_curdir|Sah::Schema::filename::default_only_file_not_dir_in_curdir>
+
+File name, defaults to only file in current directory (if there is one) (subdirectories ignored).
+
+This is like the C<filename> schema but with a default value of "only file in the
+current directory". That is, if the current directory has a single plain file
+and nothing else (subdirectories are ignored).
+
+Difference with C<filename::default_only_file_in_subdir> schema: the other schema
+does not ignore subdirectories. Thus, if a directory only contains C<file1> and
+C<subdir1>, then that other schema will not return C<file1> but this schema will.
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-file> script). It is safer to use this schema when performing a
+non=destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
+default.
+
+
 =item * L<filename::exists|Sah::Schema::filename::exists>
 
 File name, must exist on filesystem.
 
 This is like the C<filename> schema but with an extra check that the path must
 already exist.
+
+
+=item * L<filename::exists::default_only_file_in_curdir|Sah::Schema::filename::exists::default_only_file_in_curdir>
+
+File name, must exist on the filesystem, defaults to only file in current directory (if there is one).
+
+This is like the C<filename::exists> schema but with a default value of "only
+file in the current directory". That is, if the current directory has a single
+plain file and nothing else.
+
+Note: be careful when using this schema for actions that are destructive,
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-file> script). It is safer to use this schema when performing a
+non=destructive action (e.g. C<checksum>) and/or operate in dry-run mode by
+default.
 
 
 =item * L<filename::not_exists|Sah::Schema::filename::not_exists>
@@ -172,6 +272,15 @@ Filesystem file name on a Unix system.
 This is like the C<filename> schema but with extra checks relevant to the Unix,
 (e.g. a path element cannot be longer than 255 characters) and prefilters (e.g.
 multipile consecutive slashes C<//> will be normalized into a single one C</>).
+
+
+=item * L<filename::unix::basename|Sah::Schema::filename::unix::basename>
+
+Filesystem base file name on a Unix system.
+
+This is like the C<filename::unix> schema but not allowing directory parts.
+Difference with C<dirname::unix::basename> and C<pathname::unix::basename>: the
+completion rule.
 
 
 =item * L<filename::unix::exists|Sah::Schema::filename::unix::exists>
@@ -244,6 +353,15 @@ Filesystem path name on a Unix system.
 This is like the C<pathname> schema but with extra checks relevant to the Unix,
 (e.g. a path element cannot be longer than 255 characters) and prefilters (e.g.
 multipile consecutive slashes C<//> will be normalized into a single one C</>).
+
+
+=item * L<pathname::unix::basename|Sah::Schema::pathname::unix::basename>
+
+Filesystem base path name on a Unix system.
+
+This is like the C<filename::unix> schema but not allowing directory parts.
+Difference with C<dirname::unix::basename> and C<filename::unix::basename>: the
+completion rule.
 
 
 =item * L<pathname::unix::exists|Sah::Schema::pathname::unix::exists>

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bm::Any::Ml - Package for language Bambara
 
 package Locale::CLDR::Locales::Bm::Any::Ml;
 # This file auto generated from Data\common\main\bm_ML.xml
-#	on Fri 13 Oct  9:07:19 am GMT
+#	on Sat  4 Nov  5:54:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

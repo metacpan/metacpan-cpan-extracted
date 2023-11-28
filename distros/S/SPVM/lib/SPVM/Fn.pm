@@ -37,16 +37,6 @@ The Fn class of L<SPVM> has methods for numbers, strings, general utilities.
   my $int_max = Fn->INT_MAX();
   my $long_max = Fn->LONG_MAX();
 
-=head1 Enumerations
-
-=head2 GET_CODE_POINT_ERROR_OVER_STRING_RANGE
-
-Returns -1. The return type is the C<int> type.
-
-=head2 GET_CODE_POINT_ERROR_INVALID_UTF8
-
-Returns -2. The return type is the C<int> type.
-
 =head1 Class Methods
 
 =head2 BYTE_MAX
@@ -340,15 +330,15 @@ Parses the UTF-8 character at the value reffered by $offset_ref of $string and r
 
 The offset is updated to the position of the next UTF-8 character.
 
-If the offset is greater than the length of the string, return the value of L</"GET_CODE_POINT_ERROR_OVER_STRING_RANGE">.
-
-If the UTF-8 character is invalid, return the value of L</"GET_CODE_POINT_ERROR_INVALID_UTF8">.
-
 Exceptions:
 
 $string must be defined. Otherwise an exception is thrown.
 
 $offset must be greater than or equal to 0. Otherwise an exception is thrown.
+
+The value of $offset must be less than the length of $string. Otherwise an exception is thrown.
+
+If an invalid UTF-8 is gotten, an exception is thrown set C<eval_error_id> to the basic type ID of the L<Error::Unicode::InvalidUTF8|SPVM::Error::Unicode::InvalidUTF8> class.
 
 =head2 hex
 
@@ -1157,6 +1147,40 @@ Gets the count of the memory blocks allocated by the L<new_memory_block|SPVM::Do
 C<static method to_address : string ($object : object);>
 
 Gets the address of an object $object as a string.
+
+=head2 check_option_names
+
+C<static method check_option_names : void ($options : object[], $available_option_names : string[]);>
+
+Checks if the options $options that contain name-value pairs has the available option names $available_option_names.
+
+If $options is undef, nothing is done.
+
+If the check is ok, nothing is done. Otherwise the following exception is thrown.
+
+The "%s" option is not available.
+
+%s is an option name.
+
+Examples:
+
+  my $options = {foo => 1, bar => 2};
+  
+  my $available_option_names = ["foo", "bar", "baz"];
+  
+  Fn->check_option_names($options, $available_option_names);
+
+=head2 get_basic_type_id
+
+  static method get_basic_type_id : int ($basic_type_name : string);
+
+Gets the basic type ID of the basic type $basic_type_name.
+
+Exceptions:
+
+$basic_type_name must be defined. Otherwise an exception is thrwon.
+
+If the basic type is not found, an exception is thrwon.
 
 =head1 Copyright & License
 

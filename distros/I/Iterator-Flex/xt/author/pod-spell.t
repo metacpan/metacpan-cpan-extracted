@@ -58,6 +58,7 @@ Self
 Sequence
 Serialization
 Smithsonian
+Stack
 State
 Throw
 Using

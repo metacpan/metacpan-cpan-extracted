@@ -27,7 +27,7 @@ SYNOPSIS
         use HTML::Object fatal_error => 1, try_catch => 1;
 
 VERSION
-        v0.2.3
+        v0.2.10
 
 DESCRIPTION
     This module is yet another HTML parser, manipulation and query
@@ -70,6 +70,17 @@ DESCRIPTION
 METHODS
   new
     Instantiate a new HTML::Object object.
+
+    You need to instantiate a new object prior to parse any new document. It
+    cannot be re-used to parse another document, or if you really wanted to,
+    you would first need to unset "document" and unset "current_parent":
+
+        $p->document( undef );
+        $p->current_parent( undef );
+
+    But, it is just as fast to do:
+
+        $p = HTML::Object->new;
 
   add_comment
     This is a parser method called that will add a comment to the stack of

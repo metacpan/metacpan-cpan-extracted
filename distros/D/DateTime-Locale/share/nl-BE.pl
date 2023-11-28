@@ -59,10 +59,10 @@
   date_format_long => "d MMMM y",
   date_format_medium => "d MMM y",
   date_format_short => "d/MM/y",
-  datetime_format_full => "{1} {0}",
-  datetime_format_long => "{1} {0}",
-  datetime_format_medium => "{1} {0}",
-  datetime_format_short => "{1} {0}",
+  datetime_format_full => "{1}, {0}",
+  datetime_format_long => "{1}, {0}",
+  datetime_format_medium => "{1}, {0}",
+  datetime_format_short => "{1}, {0}",
   day_format_abbreviated => [
     "ma",
     "di",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

@@ -1,5 +1,9 @@
 Revision history for String-Tagged-Terminal
 
+0.07    2023-11-24
+        [CHANGES]
+         * Added `->parse_terminal` constructor
+
 0.06    2023-02-06
         [CHANGES]
          * Support the new `sizepos` Formatting tag, implemented using

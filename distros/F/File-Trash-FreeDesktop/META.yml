@@ -4,6 +4,7 @@ author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
   Cwd: '0'
+  File::MoreUtil: '0.625'
   File::Path: '2.09'
   File::Slurper: '0'
   File::Spec: '0'
@@ -25,12 +26,12 @@ name: File-Trash-FreeDesktop
 provides:
   File::Trash::FreeDesktop:
     file: lib/File/Trash/FreeDesktop.pm
-    version: '0.205'
+    version: '0.207'
 requires:
   Fcntl: '0'
   File::HomeDir::FreeDesktop: '0'
-  File::MoreUtil: '0.625'
   File::Remove: '0'
+  File::Util::Test: '0.628'
   List::Util: '1.54'
   Log::ger: '0.038'
   String::Wildcard::Bash: '0.044'
@@ -44,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDesktop
   homepage: https://metacpan.org/release/File-Trash-FreeDesktop
   repository: git://github.com/perlancar/perl-File-Trash-FreeDesktop.git
-version: '0.205'
+version: '0.207'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -124,7 +125,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.608'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

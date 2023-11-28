@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# mockup file for unit tests of App::LXC::Container:
+#
+# Author: Thomas Dorner
+# Copyright (C) 2023-2023 by Thomas Dorner
+
+Die() { echo "${0##*/}: $*" >&2; exit 2; }
+
+[ $# -eq 1 ]  ||  Die 'missing or surplus parameter(s)'
+
+case $1 in
+    /bin/ls|*/t/tmp/usr/bin/3ls)
+	echo \
+	    "$1: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV),"\
+	    'dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2,'\
+	    'BuildID[sha1]=15dfff3239aa7c3b16a71e6b2e3b6e4009dab998,'\
+	    'for GNU/Linux 3.2.0, stripped'
+	;;
+    /usr/lib/x86_64-linux-gnu/libc.so.6)
+	echo \
+	    "$1: ELF 64-bit LSB shared object, x86-64, version 1 (GNU/Linux),"\
+	    'dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2,'\
+	    'BuildID[sha1]=51657f818beb1ae70372216a99b7412b8a100a20,'\
+	    'for GNU/Linux 3.2.0, stripped'
+	;;
+    */t/tmp/usr/bin/1chromium)
+	echo "$1: empty"
+	;;
+    */t/tmp/home/no-executable)
+	echo "$1: ASCII text"
+	;;
+    */t/tmp/home/fake-lib)
+	echo "$1: ELF 64-bit LSB shared object, ..."
+	;;
+    *)
+	Die "unexpected file '$1'"
+esac

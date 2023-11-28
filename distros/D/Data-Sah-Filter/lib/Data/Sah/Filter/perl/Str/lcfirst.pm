@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-21'; # DATE
+our $DATE = '2023-08-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 sub meta {
     +{
@@ -50,7 +50,7 @@ Data::Sah::Filter::perl::Str::lcfirst - Convert first character of string to low
 
 =head1 VERSION
 
-This document describes version 0.021 of Data::Sah::Filter::perl::Str::lcfirst (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
+This document describes version 0.022 of Data::Sah::Filter::perl::Str::lcfirst (from Perl distribution Data-Sah-Filter), released on 2023-08-16.
 
 =head1 SYNOPSIS
 

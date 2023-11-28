@@ -1252,7 +1252,7 @@ use Test::More;
       'class MyClass2 extends MyClass { use Point; use Point3D; method main : void ($point : Point) {} }',
       'class MyClass { use Point; use Point3D; method main : void ($point : Point3D) {} }',
     ];
-    compile_not_ok($source, q|The type of the 1th argument of the "main" method in the "MyClass2" class must be able to be assigned to the type of the 1th argument of the "main" method in the "MyClass" class.|);
+    compile_not_ok($source, q|The 1th argument of the "main" method in the "MyClass2" class which argument type is "Point" must be able to be assigned to the 1th argument of the "main" method in the "MyClass" class which argument type is "Point3D".|);
   }
 }
 
@@ -1268,14 +1268,14 @@ use Test::More;
   }
   {
     my $source = 'class MyClass  { interface Stringable; static method to_string : string ($self : Stringable) {} }';
-    compile_not_ok($source, q|The "to_string" method in the "MyClass" class must be an instance method. This is defined as an interface method in the "Stringable" interface.|);
+    compile_not_ok($source, q|The "to_string" method in the "MyClass" class must be an instance method, which is defined as an interface method in the "Stringable" interface.|);
   }
   {
     my $source = [
       'class MyClass { interface MyInterface; method foo : void ($arg1 : int, $arg2 : long) {} }',
       'class MyInterface : interface_t { required method foo : void ($arg1 : int, $arg2 : int); }',
     ];
-    compile_not_ok($source, q|The type of the 2th argument of the "foo" method in the "MyClass" class must be able to be assigned to the type of the 2th argument of the "foo" method in the "MyInterface" interface|);
+    compile_not_ok($source, q|The 2th argument of the "foo" method in the "MyClass" class which argument type is "long" must be able to be assigned to the 2th argument of the "foo" method in the "MyInterface" interface which argument type is "int".|);
   }
   {
     my $source = [
@@ -1289,7 +1289,7 @@ use Test::More;
       'class MyClass { interface MyInterface; method foo : object () {} }',
       'class MyInterface : interface_t { required method foo : MyClass  (); }',
     ];
-    compile_not_ok($source, q|The return type of the "foo" method in the "MyClass" class must be able to be assigned to the return type of the "foo" method in the "MyInterface" interface|);
+    compile_not_ok($source, q|The return type of the "foo" method in the "MyClass" class which return type is "object" must be able to be assigned to the return type of the "foo" method in the "MyInterface" interface which return type is "MyClass".|);
   }
   {
     my $source = [
@@ -1303,7 +1303,7 @@ use Test::More;
       'class MyClass { use Point; use Point3D; interface MyInterface; method foo : Point () {} }',
       'class MyInterface : interface_t { required method foo : Point3D  (); }',
     ];
-    compile_not_ok($source, q|The return type of the "foo" method in the "MyClass" class must be able to be assigned to the return type of the "foo" method in the "MyInterface" interface|);
+    compile_not_ok($source, q|The return type of the "foo" method in the "MyClass" class which return type is "Point" must be able to be assigned to the return type of the "foo" method in the "MyInterface" interface which return type is "Point3D".|);
   }
 
   {
@@ -1311,7 +1311,7 @@ use Test::More;
       'class MyClass { use Point; use Point3D; interface MyInterface; method foo : int () {} }',
       'class MyInterface : interface_t { required method foo : long  (); }',
     ];
-    compile_not_ok($source, q|The return type of the "foo" method in the "MyClass" class must be able to be assigned to the return type of the "foo" method in the "MyInterface" interface|);
+    compile_not_ok($source, q|The return type of the "foo" method in the "MyClass" class which return type is "int" must be able to be assigned to the return type of the "foo" method in the "MyInterface" interface which return type is "long".|);
   }
   {
     {
@@ -1429,5 +1429,22 @@ use Test::More;
     ];
     compile_not_ok($source, 'The right operand of the . operator must be the string type or the byte[] type');
   }
+
+  {
+  
+    my $source = <<'EOS';
+class MyClass { 
+  static method main : int () { 
+    my $array = 1;
+    for my $element (@$array) {
+      
+    }
+  }
+}
+EOS
+    
+    compile_not_ok($source, q|line 4|);
+  }
+
 }
 done_testing;

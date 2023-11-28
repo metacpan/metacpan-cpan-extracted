@@ -23,6 +23,8 @@ use TestUtil qw(signal_kill_num);
 my $KILL = signal_kill_num;
 my $KILLrx = qr{$KILL};
 
+my $enable_coredump_tests = $ENV{GITHUB_ACTIONS} || $ENV{DOIT_TEST_WITH_COREDUMP};
+
 my $r = Doit->init;
 
 is $r->system($^X, '-e', 'exit 0'), 1;
@@ -92,14 +94,17 @@ if ($^O eq 'MSWin32') {
 }
 
 SKIP: {
-    skip "No BSD::Resource available", 1
+    my $no_tests = 3;
+    skip "Coredump tests unreliable and not enabled everywhere", $no_tests
+	if !$enable_coredump_tests;
+    skip "No BSD::Resource available", $no_tests
 	if !eval { require BSD::Resource; 1 };
-    skip "coredumps disabled", 1
+    skip "coredumps disabled", $no_tests
 	if BSD::Resource::getrlimit(BSD::Resource::RLIMIT_CORE()) < 4096; # minimum of 4k needed on linux to actually do coredumps
     eval { $r->system($^X, '-e', 'kill ABRT => $$') };
-    like $@, qr{^Command died with signal 6, with coredump};
-    is $@->{signalnum}, 6;
-    is $@->{coredump}, 'with';
+    like $@, qr{^Command died with signal 6, with coredump}, 'error message with coredump';
+    is $@->{signalnum}, 6, 'expected signalnum';
+    is $@->{coredump}, 'with', 'expected coredump value ("with")';
 }
 
 {

@@ -44,7 +44,6 @@ my %WriteMakefileArgs = (
         'JSON'                  => '4.05',
         'List::Util'            => '1.56',
         'Module::Generic'       => 'v0.32.4',
-        'Nice::Try'             => 'v1.3.4',
         'POSIX'                 => 0,
         'Promise::Me'           => 'v0.4.7',
         'Scalar::Util'          => '1.60',

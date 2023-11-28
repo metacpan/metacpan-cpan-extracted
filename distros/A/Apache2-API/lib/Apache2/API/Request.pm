@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/06/14
+## Modified 2023/10/21
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -51,12 +52,11 @@ BEGIN
     use HTTP::AcceptLanguage;
     use JSON ();
     use Module::Generic::HeaderValue;
-    use Nice::Try;
     use Scalar::Util;
     use URI;
     use URI::Escape;
     use Want;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -124,11 +124,13 @@ sub init
             CORE::length( $payload ) )
         {
             my $json_data = '';
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 $json_data = $json->decode( $payload );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
                 return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Json data provided is malformed." }) );
             }
@@ -421,7 +423,9 @@ sub data
         }
     }
     
-    try
+    # try-catch
+    local $@;
+    eval
     {
         # This is set during the init() phase
         my $charset = $self->charset;
@@ -433,10 +437,10 @@ sub data
         {
             $payload = Encode::decode_utf8( $payload, Encode::FB_CROAK );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Error while decoding payload received from http client: $e" }) );
+        return( $self->error({ code => Apache2::Const::HTTP_BAD_REQUEST, message => "Error while decoding payload received from http client: $@" }) );
     }
     $self->{data} = $payload;
     $self->{_data_processed}++;
@@ -562,14 +566,16 @@ sub headers_as_json
     my $self = shift( @_ );
     my $ref = $self->headers_as_hashref;
     my $json;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         # Non-utf8 encoded, because this resulting data may be sent over http or stored in a database which would typically encode data on the fly, and double encoding will damage data
         $json = $self->json->encode( $ref );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occured while encoding the headers hash reference into json: $e" ) );
+        return( $self->error( "An error occured while encoding the headers hash reference into json: $@" ) );
     }
     return( $json );
 }
@@ -892,13 +898,15 @@ sub remote_addr
 #     if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
 #     {
 #         my $addr;
-#         try
+#         # try-catch
+#         local $@;
+#         eval
 #         {
 #             $addr = $serv->useragent_addr;
-#         }
-#         catch( $e )
+#         };
+#         if( $@ )
 #         {
-#             warn( "Unable to get the remote addr with the method useragent_addr: $e\n" );
+#             warn( "Unable to get the remote addr with the method useragent_addr: $@\n" );
 #             return( $self->pass_error );
 #         }
 #     }
@@ -908,16 +916,19 @@ sub remote_addr
 #     }
     my $c = $self->connection;
     my $coderef = $c->can( 'client_addr' ) // $c->can( 'remote_addr' );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         $coderef->( $c, shift( @_ ) ) if( @_ );
         return( $coderef->( $c ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        warn( "Unable to get the remote addr with the method ", ( $c->can( 'client_addr' ) ? 'client_addr' : 'remote_addr' ), ": $e\n" );
+        warn( "Unable to get the remote addr with the method ", ( $c->can( 'client_addr' ) ? 'client_addr' : 'remote_addr' ), ": $@\n" );
         return;
     }
+    return( $rv );
 }
 
 sub remote_host { return( shift->_try( 'connection', 'get_remote_host', @_ ) ); }
@@ -936,13 +947,15 @@ sub remote_ip
 #     if( version->parse( "v$vers" ) > version->parse( 'v2.2' ) )
 #     {
 #         my $ip;
-#         try
+#         # try-catch
+#         local $@;
+#         eval
 #         {
 #             $ip = $serv->useragent_ip;
-#         }
-#         catch( $e )
+#         };
+#         if( $@ )
 #         {
-#             warn( "Unable to get the remote ip with the method useragent_ip: $e\n" );
+#             warn( "Unable to get the remote ip with the method useragent_ip: $@\n" );
 #         }
 #         $ip = $self->env( 'REMOTE_ADDR' ) if( !CORE::length( $ip ) );
 #         return( $ip ) if( CORE::length( $ip ) );
@@ -954,19 +967,22 @@ sub remote_ip
 #     }
     my $c = $self->connection;
     my $coderef = $c->can( 'client_ip' ) // $c->can( 'remote_ip' );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         $coderef->( $c, shift( @_ ) ) if( @_ );
         my $ip = $coderef->( $c );
         $ip = $self->env( 'REMOTE_ADDR' ) if( !CORE::length( $ip ) );
         return( $ip ) if( CORE::length( $ip ) );
         return( '' );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        warn( "Unable to get the remote addr with the method ", ( $c->can( 'client_ip' ) ? 'client_ip' : 'remote_ip' ), ": $e\n" );
+        warn( "Unable to get the remote addr with the method ", ( $c->can( 'client_ip' ) ? 'client_ip' : 'remote_ip' ), ": $@\n" );
         return;
     }
+    return( $rv );
 }
 
 sub remote_port { return( shift->env( 'REMOTE_PORT', @_ ) ); }
@@ -1034,15 +1050,17 @@ sub server_version
     my $vers = '';
     if( $self->mod_perl )
     {
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $desc = Apache2::ServerUtil::get_server_description();
             if( $desc =~ /\bApache\/([\d\.]+)/ )
             {
                 $vers = $1;
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
         }
     }
@@ -1111,7 +1129,10 @@ sub subnet_of
     my $self = shift( @_ );
     my( $ip, $mask ) = @_;
     my $ipsub;
-    try
+    # try-catch
+    local $@;
+    my $error;
+    eval
     {
         if( $ip && $mask )
         {
@@ -1123,12 +1144,13 @@ sub subnet_of
         }
         else
         {
-            return( $self->error( "No ip address or block was provided to evaluate current ip against" ) );
+            $error = "No ip address or block was provided to evaluate current ip against";
         }
-    }
-    catch( $e )
+    };
+    return( $self->error( $error ) ) if( defined( $error ) );
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to create a APR::IpSubnet object with ip \"$ip\" and mask \"$mask\": $e" ) );
+        return( $self->error( "An error occurred while trying to create a APR::IpSubnet object with ip \"$ip\" and mask \"$mask\": $@" ) );
     }
     return( $ipsub->test( $self->remote_addr ) );
 }
@@ -1295,15 +1317,18 @@ sub _try
     my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
     # my $r = Apache2::RequestUtil->request;
     my $r = $self->request;
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( $self->$pack->$meth() ) if( !scalar( @_ ) );
         return( $self->$pack->$meth( @_ ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $e" ) );
+        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $@" ) );
     }
+    return( $rv );
 }
 
 # NOTE: sub FREEZE is inherited
@@ -1602,7 +1627,7 @@ Apache2::API::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

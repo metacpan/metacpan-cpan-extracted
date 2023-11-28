@@ -7,10 +7,12 @@
         <br>
         #]
         <br>
-	[- Execute ({inputfile => '*', syntax => 'Text'}) -]</td>
+        [- Execute ({inputfile => '*', syntax => 'Text'}) -]</td>
+        [#
         <td valign="top" align="left" width="152" class="cContentNews">
         [- Execute ('news.epl') -] 
         </td>
+        #]
     </tr>
 </table>
 

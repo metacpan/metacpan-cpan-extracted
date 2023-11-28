@@ -1,8 +1,32 @@
+1.213 2023-11.19
+================
+
+[Quiq::Array]
+* asString(): Alias asLine() hinzugefügt
+
+[Quiq::Cache]
+* Doku bearbeitet
+
+[Quiq::Object]
+* Doku bearbeitet
+
+[Quiq::Path]
+* read(): Option -sloppy hinzugefügt
+
+[Quiq::PhotoStorage]
+* add(): Behandlung von Dateiendung .gif ergänzt
+
+[Quiq::TeX::Code]
+* c(): Optionsverarbeitung mit -sloppy=>1 ergänzt
+
+[Quiq::Rsync]
+* exec(): an neue Version von File::Rsync angepasst
+
 1.212 2023-08-18
 ================
 
 [Quiq::Converter]
-* germonMoneyAmount(): Methode hinzugefügt
+* germanMoneyAmount(): Methode hinzugefügt
 
 [Quiq::Path]
 * Doku-Fehler korrigiert

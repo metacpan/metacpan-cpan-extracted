@@ -1,5 +1,5 @@
 #
-# $Id: euc-jp2k.ucm,v 0.03 2015/06/05 03:57:30 dankogai Exp dankogai $
+# $Id: euc-jp2k.ucm,v 0.03 2015/06/05 03:57:30 dankogai Exp $
 #
 <code_set_name> "euc-jisx0213"
 <mb_cur_min> 1

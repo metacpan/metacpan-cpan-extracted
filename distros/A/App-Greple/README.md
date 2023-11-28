@@ -5,7 +5,7 @@ greple - extensible grep with lexical expression and region control
 
 # VERSION
 
-Version 9.0101
+Version 9.0902
 
 # SYNOPSIS
 
@@ -18,12 +18,13 @@ Version 9.0101
       -r, --must pattern   pattern cannot be compromised
       -t, --may  pattern   pattern may be exist
       -v, --not  pattern   pattern not to be matched
-          --re   pattern   regular expression
+      -E, --re   pattern   regular expression
           --fe   pattern   fixed expression
       -f, --file file      file contains search pattern
       --select index       select indexed pattern from -f file
     MATCH
-      -i                   ignore case
+      -i, --ignore-case    ignore case
+      -G, --capture-group  match capture groups rather than whole pattern
       --need=[+-]n         required positive match count
       --allow=[+-]n        acceptable negative match count
       --matchcount=n[,m]   required match count for each block
@@ -84,13 +85,12 @@ Version 9.0101
       --pf=filter          post process filter command
       --noif               disable default input filter
     RUNTIME FUNCTION
-      --print=func         print function
-      --continue           continue after print function
-      --callback=func      callback function for matched string
       --begin=func         call function before search
       --end=func           call function after search
       --prologue=func      call function before command execution
       --epilogue=func      call function after command execution
+      --postgrep=func      call function after each grep operation
+      --callback=func      callback function for matched string
     OTHER
       --usage[=expand]     show this message
       --exit=n             command exit status
@@ -117,9 +117,9 @@ Version 9.0101
 ### AND
 
 **greple** can take multiple search patterns with the `-e` option, but
-unlike the [egrep(1)](http://man.he.net/man1/egrep) command, it will searches them in an AND
-context.  For example, the next command print lines those containing
-all of `foo` and `bar` and `baz`.
+unlike the [egrep(1)](http://man.he.net/man1/egrep) command, it will search them in AND context.
+For example, the next command print lines those containing all of
+`foo` and `bar` and `baz`.
 
     greple -e foo -e bar -e baz ...
 
@@ -171,17 +171,17 @@ optional.  Next command is equivalent to the above example.
 ## LEXICAL EXPRESSION
 
 **greple** takes the first argument as a search pattern specified by
-`--le` option.  In `--le` pattern, you can set multiple keywords in
-a single parameter.  Each keyword is separated by spaces, and the
-first character describe the type.
+`--le` option.  In the `--le` pattern, you can set multiple keywords
+in a single parameter.  Each keyword is separated by spaces, and the
+first letter describes its type.
 
     none  And pattern            : --and  -e
     +     Required pattern       : --must -r
     -     Negative match pattern : --not  -v
     ?     Optional pattern       : --may  -t
 
-Just like internet search engine, you can simply provide `foo bar
-baz` to search lines including all words.
+Just like internet search engines, you can simply provide `foo bar
+baz` to search lines including all of them.
 
     greple 'foo bar baz'
 
@@ -198,10 +198,10 @@ Japanese.  Japanese text can be separated by newline almost any place
 in the text.  So the search pattern may spread out onto multiple
 lines.
 
-As for ascii word list, space character in the pattern matches any
-kind of space including newline.  Next example will search the word
-sequence of `foo`, `bar` and `baz`, even they spread out to
-multiple lines.
+As for the ASCII word list, the space character in the pattern matches
+any type of space, including newlines.  The next example will search
+for the word sequence of `foo`, `bar` and `baz`, even if they are
+spread over lines.
 
     greple -e 'foo bar baz'
 
@@ -281,7 +281,7 @@ but this command is finally translated into following option list.
         ! -iname *.tar ! -iname *.tbz  ! -iname *.tgz ! -iname *.pdf
         -print -- pattern
 
-## INCLUDED MODUES
+## INCLUDED MODULES
 
 This release include some sample modules.  Read document in each
 modules for detail.  You can read the document by `--man` option or
@@ -330,9 +330,10 @@ Other modules are available at CPAN, or git repository
 
 ## PATTERNS
 
-If no specific option is given, **greple** takes the first argument as
-a search pattern specified by `--le` option.  All of these patterns
-can be specified multiple times.
+If no positive pattern option is given (i.e. other than `--not` and
+`--may`), **greple** takes the first argument as a search pattern
+specified by `--le` option.  All of these patterns can be specified
+multiple times.
 
 Command itself is written in Perl, and any kind of Perl style regular
 expression can be used in patterns.  See [perlre(1)](http://man.he.net/man1/perlre) for detail.
@@ -360,6 +361,13 @@ For example, if you want to search repeated characters, use
     lines contains `foo` and `bar`, and highlight `baz` if exists.
 
         greple -e foo -e bar -t baz
+
+    Since it does not affect the bare pattern argument, you can add the
+    highlighting word to the end of the command argument as follows.
+
+        greple foo file
+        greple foo file -t bar
+        greple foo file -t bar -t baz
 
 - **-r** _pattern_, **--must**=_pattern_
 
@@ -400,7 +408,7 @@ As for Asian wide characters, pattern is cooked as zero or more white
 spaces can be allowed between any characters.  So Japanese string
 pattern `日本語` will be converted to `日\s*本\s*語`.
 
-If you don't want these conversion, use `--re` option.
+If you don't want these conversion, use `-E` (or `--re`) option.
 
 - **-x** _pattern_, **--le**=_pattern_
 
@@ -409,9 +417,9 @@ If you don't want these conversion, use `--re` option.
     start with `-` means **negative** pattern, `?` means **optional**, and
     `+` does **required**.
 
-    Next example print lines which contain `foo` and `yabba`, and none
-    of `bar` and `dabba`, with highlighting `baz` and `doo` if they
-    exist.
+    The next example prints lines which containing `foo` and `yabba`,
+    and none of `bar` and `dabba`, with highlighting `baz` and `doo`
+    if they exist.
 
         greple --le='foo -bar ?baz yabba -dabba ?doo'
 
@@ -422,7 +430,7 @@ If you don't want these conversion, use `--re` option.
         ?  Optional pattern
         &  Function call (see next section)
 
-- `-x` \[**+?-**\]**&**_function_, `--le`=\[**+?-**\]**&**_function_
+- **-x** \[**+?-**\]**&**_function_, **--le**=\[**+?-**\]**&**_function_
 
     If the pattern start with ampersand (`&`), it is treated as a
     function, and the function is called instead of searching pattern.
@@ -444,18 +452,31 @@ If you don't want these conversion, use `--re` option.
     called with four arguments (start position, end position, index,
     matched string) and expected to return replacement string.
 
-- **--re**=_pattern_
+- **-E** _pattern_, **--re**=_pattern_
 
     Specify regular expression.  No special treatment for space and wide
     characters.
 
 - **--fe**=_pattern_
 
-    Specify the fixed string pattern, like fgrep.
+    Specify the fixed string pattern, like [fgrep(1)](http://man.he.net/man1/fgrep).
 
 - **-i**, **--ignore-case**
 
     Ignore case.
+
+- **-G**, **--capture-group**
+
+    Normally, **greple** searches for strings that match the entire
+    pattern.  Even if it contains a capturing groups, they do not affect
+    the search target.  When this option is given, strings corresponding
+    to individual capture groups are searched, not the entire pattern.  If
+    the pattern does not contain any capturing groups, it matches the
+    entire pattern.
+
+    For each match, a corresponding capture group number is assigned as an
+    index (0 for entire match).  This will cause the strings corresponding
+    to each capture group to be displayed in a different color.
 
 - **--need**=_n_
 - **--allow**=_n_
@@ -505,35 +526,48 @@ If you don't want these conversion, use `--re` option.
 
 - **-f** _file_, **--file**=_file_
 
-    Specify the file which contains search pattern.  When file contains
-    multiple lines, patterns are mixed together by OR context.
+    Specifies the file containing the search pattern. If there are
+    multiple lines in the file, each pattern is combined by an OR context.
+    So the file:
+
+        A
+        B
+        C
+
+    makes the pattern as `A|B|C`.
 
     Blank line and the line starting with sharp (#) character is ignored.
     Two slashes (//) and following string are taken as a comment and
     removed with preceding spaces.
 
-    When multiple files specified, each file produces individual pattern.
+    In more detail, each of these patterns are evaluated under `(?^m)`
+    flags.  This is a situation where only the `m` (Multiline) flag is
+    enabled in the default environment. So if you enable some flags in a
+    pattern, they are only valid within itself.
+
+    If multiple files are specified, a separate group pattern is generated
+    for each file.
 
     If the file name is followed by `[index]` string, it is treated as
     specified by `--select` option.  Next two commands are equivalent.
 
-        greple -f pattern_file'[1,5:7]'
+        greple -f pattern_file'[2,7:9]'
 
-        greple -f pattern_file --select 1,5:7
+        greple -f pattern_file --select 2,7:9
 
     See [App::Greple::subst](https://metacpan.org/pod/App%3A%3AGreple%3A%3Asubst) module.
 
 - **--select**=_index_
 
-    When you want to choose specific pattern in the pattern file provided
-    by `-f` option, use `--select` option.  _index_ is number list
+    When you want to choose specific line in the pattern file provided by
+    `-f` option, use `--select` option.  _index_ is number list
     separated by comma (,) character and each number is interpreted by
     [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3ANumbers) module.  Take a look at the module document for
     detail.
 
-    Next command use 1st and 5,6,7th pattern in the file.
+    Next command use 2nd and 7,8,9th lines in the pattern file.
 
-        greple -f pattern_file --select 1,5:7
+        greple -f pattern_file --select 2,7:9
 
 ## STYLES
 
@@ -1255,34 +1289,6 @@ If you don't want these conversion, use `--re` option.
 
 ## RUNTIME FUNCTIONS
 
-- **--print**=_function_
-- **--print**=_sub{...}_
-
-    Specify user defined function executed before data print.  Text to be
-    printed is replaced by the result of the function.  Arbitrary function
-    can be defined in `.greplerc` file or module.  Matched data is placed
-    in variable `$_`.  Filename is passed by `&FILELABEL` key, as
-    described later.
-
-    It is possible to use multiple `--print` options.  In that case,
-    second function will get the result of the first function.  The
-    command will print the final result of the last function.
-
-- **--continue**
-
-    When `--print` option is given, **greple** will immediately print the
-    result returned from print function and finish the cycle.  Option
-    `--continue` forces to continue normal printing process after print
-    function called.  So please be sure that all data being consistent.
-
-- **--callback**=_function_(_..._)
-
-    Callback function is called before printing every matched pattern with
-    four labeled parameters: **start**, **end**, **index** and **match**,
-    which corresponds to start and end position in the text, pattern
-    index, and the matched string.  Matched string in the text is replaced
-    by returned string from the function.
-
 - **--begin**=_function_(_..._)
 - **--begin**=_function_=_..._
 
@@ -1330,6 +1336,25 @@ If you don't want these conversion, use `--re` option.
     and after processing.  During the execution, file is not opened and
     therefore, file name is not given to those functions.
 
+- **--postgrep**=_function_(_..._)
+- **--postgrep**=_function_=_..._
+
+    Specify the function called after each search operation.  Funciton is
+    called with `App::Greple::Grep` object which cotains all information
+    about the search.  This interface highly depends on the internal
+    structure, so use with the utmost cation.
+
+- **--callback**=_function_(_..._)
+
+    Callback function is called before printing every matched pattern with
+    four labeled parameters: **start**, **end**, **index** and **match**,
+    which corresponds to start and end position in the text, pattern
+    index, and the matched string.  Matched string in the text is replaced
+    by returned string from the function.
+
+    Multiple functions can be specified, and if there are multiple search
+    patterns, they are applied in order and cyclically.
+
 - **-M**_module_::_function(...)_
 - **-M**_module_::_function=..._
 
@@ -1338,6 +1363,30 @@ If you don't want these conversion, use `--re` option.
     you don't have to export it.  Because it is called only once at the
     beginning of command execution, before starting file processing,
     `FILELABEL` parameter is not given exceptionally.
+
+- **--print**=_function_
+- **--print**=_sub{...}_
+
+    Specify user defined function executed before data print.  Text to be
+    printed is replaced by the result of the function.  Arbitrary function
+    can be defined in `.greplerc` file or module.  Matched data is placed
+    in variable `$_`.  Filename is passed by `&FILELABEL` key, as
+    described later.
+
+    It is possible to use multiple `--print` options.  In that case,
+    second function will get the result of the first function.  The
+    command will print the final result of the last function.
+
+    This option and next **--continue** are no more recommended to use
+    because **--colormap** and **--callback** functions are more simple and
+    powerful.
+
+- **--continue**
+
+    When `--print` option is given, **greple** will immediately print the
+    result returned from print function and finish the cycle.  Option
+    `--continue` forces to continue normal printing process after print
+    function called.  So please be sure that all data being consistent.
 
 For these run-time functions, optional argument list can be set in the
 form of `key` or `key=value`, connected by comma.  These arguments

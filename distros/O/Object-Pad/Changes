@@ -1,5 +1,10 @@
 Revision history for Object-Pad
 
+0.806   2023-11-14
+        [CHANGES]
+         * Allow field initialiser expressions to see the values of other
+           fields already declared
+
 0.805   2023-10-20
         [CHANGES]
          * Added an experimental feature to compose all ADJUST blocks into a

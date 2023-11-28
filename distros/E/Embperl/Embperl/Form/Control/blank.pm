@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -36,7 +37,7 @@ __EMBPERL__
 $]<table class="ef-element ef-element-width-[+ $self -> {width_percent} +] ef-element-[+ $self -> {type} || 'blank' +] [+ ' ' . $self -> {state} +]">
   <tr>
     [#<td class="ef-label-box ef-label-box-width-100">[+ $self->{text} +]</td>#]
-    <td class="ef-control-box ef-control-box-width-100">[+ $self->{text} +]</td>
+    <td class="ef-control-box ef-control-box-width-100"><div [+ do { local $escmode = 0 ; $self -> get_std_control_attr($req, '', 'readonly') } +] _ef_divname="[+ $self -> {name} +]">[+ $self->{text} +]</div></td>
   </tr>
 </table>[$endsub$]
 

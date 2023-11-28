@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Schema::Failsafe;
 
-our $VERSION = '0.036'; # VERSION
+our $VERSION = 'v0.37.0'; # VERSION
 
 sub register {
     my ($self, %args) = @_;

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test2::V0;
+use Test2::V0 0.000149; # is_refcount
 
 use Future::Buffer;
 
@@ -20,7 +20,12 @@ ok( !@next_fill_f, 'fill not yet invoked before any ->read_atmost' );
 
 # A ->read_atmost call invokes fill to provide data
 {
+   is_oneref( $buf, '$buf has refcount 1 before generating fill future' );
+
    my $read_f = $buf->read_atmost( 128 );
+
+   # one in $buf, one in the on_cancel of $read_f
+   is_refcount( $buf, 2, '$buf has refcount 2 after generating fill future' );
 
    ok( @next_fill_f, 'fill invoked after ->read_atmost' );
    ok( !$read_f->is_ready, '->read_atmost not yet ready' );
@@ -102,6 +107,16 @@ ok( !@next_fill_f, 'fill not yet invoked before any ->read_atmost' );
 
    my $f = $buf->read_atmost( 1 );
    isa_ok( $f, [ "Some::Future::Subclass" ], '$f' );
+}
+
+# immediate fill futures
+{
+   my $buf = Future::Buffer->new(
+      fill => sub { Future->done( "ABCDE" ); },
+   );
+
+   is( $buf->read_atmost( 5 )->get, "ABCDE", 'immediate fill future 1' );
+   is( $buf->read_atmost( 5 )->get, "ABCDE", 'immediate fill future 2' );
 }
 
 done_testing;

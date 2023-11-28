@@ -83,7 +83,7 @@ __END__
 
 =head1 NAME
 
-	PayProp::API::Public::Client::Exception::Base - Base module for exceptions.
+PayProp::API::Public::Client::Exception::Base - Base module for exceptions.
 
 =head1 SYNOPSIS
 
@@ -109,26 +109,26 @@ __END__
 
 =head1 DESCRIPTION
 
-	*DO NOT INSTANTIATE THIS MODULE DIRECTLY*
+*DO NOT INSTANTIATE THIS MODULE DIRECTLY*
 
-	This is a base exception module from which specific exceptions are extended. For new exception
-	types use this module as a parent.
+This is a base exception module from which specific exceptions are extended. For new exception
+types use this module as a parent.
 
-	See C<PayProp::API::Public::Client::Exception::*> for examples.
+See C<PayProp::API::Public::Client::Exception::*> for examples.
 
 =head1 METHODS
 
 =head2 error_class
 
-	Can be optionally overridden in C<PayProp::API::Public::Client::Exception::*>.
+Can be optionally overridden in C<PayProp::API::Public::Client::Exception::*>.
 
 =head2 error_fields
 
-	Can be optionally overridden in C<PayProp::API::Public::Client::Exception::*>.
+Can be optionally overridden in C<PayProp::API::Public::Client::Exception::*>.
 
 =head2 throw
 
-	Main method to call to throw an exception from C<PayProp::API::Public::Client::Exception::*>.
+Main method to call to throw an exception from C<PayProp::API::Public::Client::Exception::*>.
 
 	my $Exception = PayProp::API::Public::Client::Exception::Custom->throw('I am an exception!');
 
@@ -143,44 +143,44 @@ __END__
 
 =head2 errors
 
-	Return instances of C<PayProp::API::Public::Client::Error::*>, if defined.
+Return instances of C<PayProp::API::Public::Client::Error::*>, if defined.
 
 	my $errors = PayProp::API::Public::Client::Exception::Custom->errors;
 
 =head2 status_code
 
-	Return exception status code, if defined.
+Return exception status code, if defined.
 
 	my $status_code = PayProp::API::Public::Client::Exception::Custom->status_code;
 
 =head2 Fields
 
-	To be extended for additional fields to be available on C<PayProp::API::Public::Client::Exception::*>.
+To be extended for additional fields to be available on C<PayProp::API::Public::Client::Exception::*>.
 
 =head2 to_hashref
 
-	Convert C<PayProp::API::Public::Client::Exception::*> to hashref, in place for easier debugging.
+Convert C<PayProp::API::Public::Client::Exception::*> to hashref, in place for easier debugging.
 
 	my $error_ref = PayProp::API::Public::Client::Exception::Custom->to_hashref;
 
 =head1 AUTHOR
 
-	Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
 
-	Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-	Copyright 2023- PayProp
+Copyright 2023- PayProp
 
 =head1 LICENSE
 
-	This library is free software; you can redistribute it and/or modify
-	it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
-	If you would like to contribute documentation
-	or file a bug report then please raise an issue / pull request:
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
 
-	L<https://github.com/Humanstate/api-client-public-module>
+L<https://github.com/Humanstate/api-client-public-module>
 
 =cut

@@ -1,3 +1,28 @@
+0.2.6   2023-11-25  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - [doc] Forgot to document convert_row_* methods in table.
+
+
+0.2.5   2023-11-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add two provided methods to TableDataRole::Spec::Basic:
+          convert_row_arrayref_to_hashref, convert_row_hashref_to_arrayref.
+
+
+0.2.4   2023-08-27  Released-By: PERLANCAR; Urgency: medium
+
+        - Specify that get_column_names() & get_column_count() should not
+          reset iterator.
+
+        - Add role: Spec::GetRowByPos.
+
+        - [doc] Document in the table which methods resets the iterator;.
+
+        - [doc] Add FAQ item on picking random rows.
+
+
 0.2.3   2023-04-19  Released-By: PERLANCAR; Urgency: low
 
         - No spec changes.

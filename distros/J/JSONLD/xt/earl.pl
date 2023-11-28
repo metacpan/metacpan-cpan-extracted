@@ -15,8 +15,7 @@ sub init_earl {
 	
 	my $out		= '';
 	open( my $fh, '>', \$out );
-# 	my $earl	= {out => \$out, fh => $fh, name => $name, version => $v_id, subject => "my:$v_id" };
-	my $earl	= {out => \$out, fh => $fh, name => $name, version => $v_id, subject => "my:project" };
+	my $earl	= {out => \$out, fh => $fh, name => $name, version => $v_id, subject => "my:$v_id" };
 	my $w3c	= DateTime::Format::W3CDTF->new;
 	my $dt	= $w3c->format_datetime(DateTime->now);
 	
@@ -44,11 +43,6 @@ my:project
 	doap:developer <http://kasei.us/about/#greg> ;
 	doap:programming-language "Perl" ;
 	doap:release my:$v_id ;
-	doap:repository [
-		a doap:GitRepository ;
-		doap:browse <https://github.com/kasei/perl-jsonld/> ;
-		doap:location <https://github.com/kasei/perl-jsonld.git> ;
-	]
 	.
 
 my:$v_id a doap:Version ;

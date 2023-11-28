@@ -116,7 +116,10 @@ documentation.  This is intended and not a bug!
 
 Some CPAN smoke testers fail some of the test scripts (notably #11, #14, #20
 and #41) when the size of their virtual terminal is too small (height less
-than 12 lines)
+than 12 lines).  This seems to be especially for script #41 some FreeBSD
+systems, where `stty -a` reports 0 rows/columns.  (Outside of
+`[Curses::UI](https://metacpan.org/pod/Curses%3A%3AUI)` the module now uses a default size of 24 x 80 in those
+cases.)
 
 # METHODS
 

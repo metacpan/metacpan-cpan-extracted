@@ -458,7 +458,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
             char *end;
             double double_value = strtod(version_string, &end);
             if (*end != '\0') {
-              SPVM_COMPILER_error(compiler, "A version string must be able to be parsed by the \"strtod\" C function.\n  at %s line %d", compiler->current_file, compiler->current_line);
+              SPVM_COMPILER_error(compiler, "A version string must be able to be parsed by the \"strtod\" C function.\n  at %s line %d", op_decl->file, op_decl->line);
               break;
             }
           }
@@ -553,8 +553,8 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_return);
           SPVM_OP_insert_child(compiler, op_block, op_block->last, op_statements);
           
-          SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
-          SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, compiler->current_file, compiler->current_line);
+          SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
+          SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, op_decl->file, op_decl->line);
           SPVM_OP_insert_child(compiler, op_list_attributes, op_list_attributes->first, op_attribute_static);
           
           SPVM_OP_build_method_definition(compiler, op_method, op_name_method, op_return_type, op_args, op_list_attributes, op_block, NULL, 0, 0);
@@ -620,8 +620,8 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_assign);
           SPVM_OP_insert_child(compiler, op_block, op_block->last, op_statements);
           
-          SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
-          SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, compiler->current_file, compiler->current_line);
+          SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
+          SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, op_decl->file, op_decl->line);
           SPVM_OP_insert_child(compiler, op_list_attributes, op_list_attributes->first, op_attribute_static);
           
           op_method = SPVM_OP_build_method_definition(compiler, op_method, op_name_method, op_return_type, op_args, op_list_attributes, op_block, NULL, 0, 0);
@@ -885,12 +885,17 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
     const char* method_name = op_name_method->uv.name;
     
     int32_t must_have_block;
-    if (type->basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE) {
+    if (method->is_native) {
       must_have_block = 0;
     }
     else {
-      if (method->is_native) {
-        must_have_block = 0;
+      if (type->basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE) {
+        if (method->is_class_method) {
+          must_have_block = 1;
+        }
+        else {
+          must_have_block = 0;
+        }
       }
       else {
         must_have_block = 1;
@@ -932,13 +937,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       SPVM_COMPILER_error(compiler, "The anon method must be an instance method.\n  at %s line %d", method->op_method->file, method->op_method->line);
     }
     
-    if (type->basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE) {
-      // Method having interface_t attribute must be method
-      if (method->is_class_method) {
-        SPVM_COMPILER_error(compiler, "The method defined in the interface must be an instance method.\n  at %s line %d", method->op_method->file, method->op_method->line);
-      }
-    }
-    else if (type->basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS) {
+    if (type->basic_type->category == SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS) {
       if (method->is_required) {
         SPVM_COMPILER_error(compiler, "The method defined in the class cannnot have the method attribute \"required\".\n  at %s line %d", method->op_method->file, method->op_method->line);
       }
@@ -1162,8 +1161,8 @@ SPVM_OP* SPVM_OP_build_enumeration_value(SPVM_COMPILER* compiler, SPVM_OP* op_na
   SPVM_TYPE* return_type = op_constant->uv.constant->type;
   SPVM_OP* op_return_type = SPVM_OP_new_op_type(compiler, return_type->unresolved_basic_type_name, return_type->basic_type, return_type->dimension, return_type->flag, op_name->file, op_name->line);
   
-  SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
-  SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, compiler->current_file, compiler->current_line);
+  SPVM_OP* op_list_attributes = SPVM_OP_new_op_list(compiler, op_name->file, op_name->line);
+  SPVM_OP* op_attribute_static = SPVM_OP_new_op_attribute(compiler, SPVM_ATTRIBUTE_C_ID_STATIC, op_name->file, op_name->line);
   SPVM_OP_insert_child(compiler, op_list_attributes, op_list_attributes->first, op_attribute_static);
   
   // Build method
@@ -1466,8 +1465,8 @@ SPVM_OP* SPVM_OP_build_method_definition(SPVM_COMPILER* compiler, SPVM_OP* op_me
     method->args_length = args_length;
     method->required_args_length = required_args_length;
   }
-
-  // Capture variables
+  
+  // Fields of anon method
   if (op_anon_method_fields) {
     SPVM_OP* op_anon_method_field = op_anon_method_fields->first;
     while ((op_anon_method_field = SPVM_OP_sibling(compiler, op_anon_method_field))) {
@@ -1480,7 +1479,7 @@ SPVM_OP* SPVM_OP_build_method_definition(SPVM_COMPILER* compiler, SPVM_OP* op_me
   while ((op_arg = SPVM_OP_sibling(compiler, op_arg))) {
     SPVM_LIST_push(method->var_decls, op_arg->uv.var->var_decl);
   }
-
+  
   // return type
   method->return_type = op_return_type->uv.type;
   
@@ -1506,7 +1505,37 @@ SPVM_OP* SPVM_OP_build_method_definition(SPVM_COMPILER* compiler, SPVM_OP* op_me
   if (op_block) {
 
     SPVM_OP* op_list_statement = op_block->first;
-
+   
+    if (op_anon_method_fields) {
+      SPVM_OP* op_anon_method_field = op_anon_method_fields->first;
+      while ((op_anon_method_field = SPVM_OP_sibling(compiler, op_anon_method_field))) {
+        SPVM_FIELD* field = op_anon_method_field->uv.field;
+          
+        if (field->is_decl_var_in_anon_method) {
+          
+          const char* var_name = field->op_anon_method_field_default->uv.var->name;
+          
+          // my $foo = $self->{foo};
+          
+          SPVM_OP* op_name_var = SPVM_OP_new_op_name(compiler, var_name, op_list_statement->file, op_list_statement->last->line + 1);
+          SPVM_OP* op_var = SPVM_OP_build_var(compiler, op_name_var);
+          SPVM_OP* op_var_decl = SPVM_OP_new_op_var_decl(compiler, op_list_statement->file, op_list_statement->last->line + 1);
+          op_var = SPVM_OP_build_var_decl(compiler, op_var_decl, op_var, NULL, NULL);
+          
+          SPVM_OP* op_var_name_invocant = SPVM_OP_new_op_name(compiler, "$self", op_list_statement->file, op_list_statement->last->line + 1);
+          SPVM_OP* op_var_self_invocant = SPVM_OP_new_op_var(compiler, op_var_name_invocant);
+          SPVM_OP* op_name_field_access = SPVM_OP_new_op_name(compiler, field->name, op_list_statement->file, op_list_statement->last->line + 1);
+          SPVM_OP* op_field_access = SPVM_OP_new_op_field_access(compiler, op_list_statement->file, op_list_statement->last->line + 1);
+          SPVM_OP_build_field_access(compiler, op_field_access, op_var_self_invocant, op_name_field_access);
+          
+          SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_list_statement->file, op_list_statement->last->line + 1);
+          SPVM_OP_build_assign(compiler, op_assign, op_var, op_field_access);
+          
+          SPVM_OP_insert_child(compiler, op_list_statement, op_list_statement->first, op_assign);
+        }
+      }
+    }
+    
     // Add variable declarations before the first of the statements
     for (int32_t i = method->args_length - 1; i >= 0; i--) {
       SPVM_VAR_DECL* arg_var_decl = SPVM_LIST_get(method->var_decls, i);
@@ -1584,7 +1613,7 @@ SPVM_OP* SPVM_OP_build_anon_method(SPVM_COMPILER* compiler, SPVM_OP* op_method) 
   SPVM_OP* op_class = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS, op_method->file, op_method->line);
   
   SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, op_method->file, op_method->line);
-  SPVM_OP* op_list_definitions = SPVM_OP_new_op_list(compiler, compiler->current_file, compiler->current_line);
+  SPVM_OP* op_list_definitions = SPVM_OP_new_op_list(compiler, op_method->file, op_method->line);
   SPVM_OP_insert_child(compiler, op_list_definitions, op_list_definitions->last, op_method);
   SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, op_list_definitions);
   
@@ -1626,9 +1655,23 @@ SPVM_OP* SPVM_OP_build_anon_method(SPVM_COMPILER* compiler, SPVM_OP* op_method) 
   return op_anon_method;
 }
 
-SPVM_OP* SPVM_OP_build_anon_method_field_definition(SPVM_COMPILER* compiler, SPVM_OP* op_field_definition, SPVM_OP* op_default) {
+SPVM_OP* SPVM_OP_build_anon_method_field_definition(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* op_name_field, SPVM_OP* op_attributes, SPVM_OP* op_type, SPVM_OP* op_default) {
+  
+  int32_t is_decl_var_in_anon_method = 0;
+  if (!op_name_field) {
+    
+    assert(op_default->id == SPVM_OP_C_ID_VAR);
+    
+    op_name_field = SPVM_OP_new_op_name(compiler, op_default->uv.var->name + 1, op_default->file, op_default->line);
+    
+    is_decl_var_in_anon_method = 1;
+  }
+  
+  SPVM_OP* op_field_definition = SPVM_OP_build_field_definition(compiler, op_field, op_name_field, op_attributes, op_type);
   
   op_field_definition->uv.field->op_anon_method_field_default = op_default;
+  
+  op_field_definition->uv.field->is_decl_var_in_anon_method = is_decl_var_in_anon_method;
   
   return op_field_definition;
 }
@@ -1846,7 +1889,7 @@ SPVM_OP* SPVM_OP_build_foreach_statement(SPVM_COMPILER* compiler, SPVM_OP* op_fo
   
   // @$.array
   SPVM_OP* op_var_array_for_length = SPVM_OP_clone_op_var(compiler, op_var_array_orig);
-  SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, compiler->current_file, compiler->current_line);
+  SPVM_OP* op_array_length = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_LENGTH, op_for->file, op_for->line);
   SPVM_OP_build_array_length(compiler, op_array_length, op_var_array_for_length);
   
   // my $.array_length
@@ -1867,7 +1910,7 @@ SPVM_OP* SPVM_OP_build_foreach_statement(SPVM_COMPILER* compiler, SPVM_OP* op_fo
   // $.array->[$.i]
   SPVM_OP* op_var_init_for_array_access = SPVM_OP_clone_op_var(compiler, op_var_init_orig);
   SPVM_OP* op_var_array_for_array_access = SPVM_OP_clone_op_var(compiler, op_var_array_orig);
-  SPVM_OP* op_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_ACCESS, compiler->current_file, compiler->current_line);
+  SPVM_OP* op_array_access = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ARRAY_ACCESS, op_for->file, op_for->line);
   op_array_access = SPVM_OP_build_array_access(compiler, op_array_access, op_var_array_for_array_access, op_var_init_for_array_access);
   
   // my $element = $.array->[$.i]

@@ -66,13 +66,13 @@
   datetime_format_medium => "{1}, {0}",
   datetime_format_short => "{1}, {0}",
   day_format_abbreviated => [
-    "H\N{U+00eb}n",
-    "Mar",
-    "M\N{U+00eb}r",
-    "Enj",
-    "Pre",
-    "Sht",
-    "Die",
+    "h\N{U+00eb}n",
+    "mar",
+    "m\N{U+00eb}r",
+    "enj",
+    "pre",
+    "sht",
+    "die",
   ],
   day_format_narrow => [
     "h",
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss\N{U+202f}a",
   time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => 43,
+  version => 44,
 }

@@ -1,11 +1,12 @@
 package Chrome::DevToolsProtocol::Target;
-use 5.010; # for //
+use 5.020; # for signatures
 use strict;
 use warnings;
 use Moo;
-use Filter::signatures;
+
 no warnings 'experimental::signatures';
 use feature 'signatures';
+
 use Future;
 use Future::HTTP;
 use Carp qw(croak carp);
@@ -16,7 +17,9 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use PerlX::Maybe;
 
-our $VERSION = '0.71';
+with 'MooX::Role::EventEmitter';
+
+our $VERSION = '0.72';
 our @CARP_NOT;
 
 =head1 NAME
@@ -98,16 +101,17 @@ has 'receivers' => (
     default => sub { {} },
 );
 
-=item B<on_message>
+=back
+
+=head1 EVENTS
+
+=over 4
+
+=item B<message>
 
 A callback invoked for every message
 
 =cut
-
-has 'on_message' => (
-    is => 'rw',
-    default => undef,
-);
 
 has '_one_shot' => (
     is => 'ro',
@@ -457,7 +461,7 @@ sub on_response( $self, $connection, $message ) {
             $handled++;
         };
 
-        if( $self->on_message ) {
+        if( $self->has_subscribers('message') ) {
             if( $self->transport->_log->is_trace ) {
                 $self->log( 'trace', "Dispatching", $response );
             } else {
@@ -469,7 +473,7 @@ sub on_response( $self, $connection, $message ) {
                     $self->log( 'debug', sprintf "Dispatching '%s'", $response->{method} );
                 };
             };
-            $self->on_message->( $response );
+            $self->emit('message', $response );
 
             $handled++;
         };

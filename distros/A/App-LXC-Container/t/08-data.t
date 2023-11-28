@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd;
 
-use Test::More tests => 39;
+use Test::More tests => 42;
 use Test::Output;
 
 #####################################
@@ -28,6 +28,7 @@ use constant T_PATH => map { s|/[^/]+$||; $_ } Cwd::abs_path($0);
 use constant TMP_PATH => T_PATH . '/tmp';
 
 do(T_PATH . '/functions/sub_perl.pl');
+do(T_PATH . '/functions/files_directories.pl');
 
 BEGIN {
     delete $ENV{DISPLAY};
@@ -121,11 +122,46 @@ my $re1b = qr{Can't locate App/LXC/Container/Data/Nonexistingdistribution.+\n};
 my $re1c = qr{$re__e\n};
 my $re2 = qr{unknown OS: Non-existing-distribution - .+$re__e};
 check_singleton('os-release-unknown', qr{^$re1a$re1b$re1c$re2$});
+$ENV{PATH} = T_PATH . '/mockup:' . $ENV{PATH};
+
+# libraries_used:
+chmod 0755, T_PATH . '/mockup/ldd'
+    or  die "can't chmod 0755 ", T_PATH . '/mockup/ldd';
+
+eval {   App::LXC::Container::Data::libraries_used('/');   };
+like($@,
+     qr{^INTERNAL ERROR .*: not a file: /$re_data_tail},
+     'libraries_used on / fails');
+
+_setup_file('/home/no-executable');
+stderr_like
+{
+    eval {
+	App::LXC::Container::Data::libraries_used(TMP_PATH .
+						  '/home/no-executable');
+    };
+}
+    qr{^bad interpreter .* use ld-linux.so for dynamic linkage$re_data_tail},
+    'libraries_used on simple file fails';
+_remove_file('/home/no-executable');
+
+_setup_file('/home/fake-lib');
+my @libs = ();
+eval {
+    @libs =
+	App::LXC::Container::Data::libraries_used(TMP_PATH . '/home/fake-lib');
+};
+like(join(' - ', $@, @libs), qr{^$},
+     'libraries_used on fake library runs as excepted');
+_remove_file('/home/fake-lib');
+
+# switch back to real ldd:
+chmod 0644, T_PATH . '/mockup/ldd'
+    or  die "can't chmod 0644 ", T_PATH . '/mockup/ldd';
 
 #########################################################################
 # All tests here trigger code paths in Data/Debian.pm not triggered by the
 # other tests:
-$ENV{PATH} = T_PATH . '/mockup:' . $ENV{PATH};
 reset_dpkg_status(T_PATH . '/mockup-files/dpkg.status');
 my $singleton = App::LXC::Container::Data::_singleton;
 defined $singleton->{STATUS}  and  die '$singleton->{STATUS} already set';

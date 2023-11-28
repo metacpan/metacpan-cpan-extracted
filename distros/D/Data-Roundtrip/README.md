@@ -4,7 +4,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 # VERSION
 
-Version 0.24
+Version 0.25
 
 # SYNOPSIS
 
@@ -726,7 +726,8 @@ Several Monks at [PerlMonks.org ](https://metacpan.org/pod/%20https%3A#PerlMonks
 (The EXPORT section among other suggestions)
 - [jwkrahn](https://perlmonks.org/?node_id=540414)
 - [leszekdubiel](https://perlmonks.org/?node_id=1164259)
-- [marto](https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763)
+- [marto](https://perlmonks.org/?node_id=324763)
+- [Haarg](https://perlmonks.org/?node_id=306692)
 - and an anonymous monk
 - CPAN member Slaven Rezić (SREZIC) for testing
 the code and reporting numerous problems.

@@ -1,4 +1,4 @@
-use strict;
+#~ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
@@ -6,9 +6,9 @@ WriteMakefile (
  	NAME			=> 'RundeckAPI',
 	AUTHOR			=> q{Xavier Humbert <xavier.humbert@ac-nancy-metz.fr>},
 	VERSION_FROM	=> 'lib/RundeckAPI.pm',
-	ABSTRACT		=> 'Queries Rundeck\'s REST API',
+	ABSTRACT		=> 'Queries Rundeck REST API',
 	LICENSE			=> 'GPL',
-	PL_FILES		=> {'script/main.pl'},
+	PL_FILES		=> {},
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -18,7 +18,7 @@ WriteMakefile (
 		'HTTP::Cookies'			=> 5.833,
 		'REST::Client'			=> 272,
 		'Scalar::Util'			=> 1.27,
-		'JSON'					=> 2.15
+		'JSON'					=> 2.15,
 	},
 	TEST_REQUIRES => {
 			'Test::More'		=> 0.98,

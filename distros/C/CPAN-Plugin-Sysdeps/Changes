@@ -1,5 +1,9 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.72  2023-11-04
+	- mapping update (a.o. from zhmylove)
+	- CI changes
+
 0.71  2023-08-26
 	- mapping update (a.o. from Corion)
 	- fallback detection for debian:bookworm and ubuntu:jammy

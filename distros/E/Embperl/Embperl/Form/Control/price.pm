@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -35,26 +36,24 @@ sub init
     my ($self) = @_ ;
 
     $self -> {use_comma} = 1 if (!defined $self -> {use_comma}) ;
-    $self->{unit}      = '€' if (!defined ($self->{unit} ));
+    $self -> {unit}      = 'euro' if (!defined ($self->{unit} ));
+    $self -> {decimals}  = 2 if (!defined ($self->{decimals} ));
     
     return $self ;
     }
-    
+
 # ------------------------------------------------------------------------------------------
 #
-#   init_data - daten aufteilen
+#   get_display_text - returns the text that should be displayed
 #
 
-sub init_data
+sub get_display_text
     {
-    my ($self, $req, $parentctrl, $force) = @_ ;
+    my ($self, $req, $val, $compact) = @_ ;
     
-    my $fdat  = $req -> {docdata} || \%fdat ;
-    delete $self -> {unit} if ($parentctrl) ;
-    my $name    = $self->{name} ;
-    my $val     = $fdat->{$name} ;
-    return if ($val eq '' || (!$force && $req -> {"ef_price_init_done_$name"})) ;
-
+    $val = $self -> get_value ($req) if (!defined ($val)) ;
+    
+    my $decimals = $self -> {decimals} ;
     my $sep ;
     my $dec ;
     my $int ;
@@ -82,10 +81,19 @@ sub init_data
     
     $int[0] =~ s/^0+// ;
     $int[0] = '0' if (@int == 1 && !$int[0]) ;
-    $frac   = substr ($frac . '00', 0, 2) ;
-    $fdat->{$name} = ($minus?'-':'') . join ($sep, @int) . $dec . $frac ;
-    $req -> {"ef_price_init_done_$name"} = 1 ;
+    $frac   = substr ($frac . '00000', 0, $decimals) ;
+    my $result = ($minus?'-':'') . join ($sep, @int) . ( $decimals ? $dec . $frac : '') ;
+    return $result if ($compact || $val eq '') ;
+    
+    my $unit = $self->{unit} ;
+    my $unittext = !$unit?'':$self -> form -> convert_text ($self, ($unit =~ /:/)?$unit:'unit:' . lc($unit), $unit, $req) ;
+    $unittext =~ s/^unit:// ;
+
+    return $result . ' ' . $unittext ;        
     }
+    
+    
+
 
 # ------------------------------------------------------------------------------------------
 #
@@ -98,6 +106,7 @@ sub prepare_fdat
 
     my $fdat  = $req -> {form} || \%fdat ;
     my $name    = $self->{name} ;
+    return if (!exists $fdat->{$name}) ;
     my $val     = $fdat->{$name} ;
     return if ($val eq '') ;
     
@@ -133,6 +142,8 @@ __END__
 
 =pod
 
+=encoding iso8859-1
+
 =head1 NAME
 
 Embperl::Form::Control::price - A price input control with optional unit inside an Embperl Form
@@ -151,7 +162,7 @@ Embperl::Form::Control::price - A price input control with optional unit inside 
 
 Used to create a price input control inside an Embperl Form.
 Will format number as a money ammout.
-Optionaly it can display an unit after the input field.
+Optionally it can display an unit after the input field.
 See Embperl::Form on how to specify parameters.
 
 =head2 PARAMETER
@@ -179,7 +190,6 @@ Gives the maximun length in characters
 =head3 unit
 
 Gives a string that should be displayed right of the input field.
-(Default: €)
 
 =head3 use_comma
 

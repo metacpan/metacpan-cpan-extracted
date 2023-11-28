@@ -2,7 +2,7 @@ use Object::Pad ':experimental( init_expr mop )';
 
 package OpenTelemetry::SDK::Trace::Span;
 
-our $VERSION = '0.011';
+our $VERSION = '0.020';
 
 use OpenTelemetry;
 my $logger = OpenTelemetry->logger;
@@ -16,7 +16,6 @@ class OpenTelemetry::SDK::Trace::Span
     use experimental 'isa';
 
     use List::Util qw( any pairs );
-    use Mutex;
     use Ref::Util qw( is_arrayref is_hashref );
     use Time::HiRes 'time';
 
@@ -36,7 +35,6 @@ class OpenTelemetry::SDK::Trace::Span
     field $end;
     field $kind       :param   = INTERNAL;
     field $limits     :param //= OpenTelemetry::SDK::Trace::SpanLimits->new;
-    field $lock                = Mutex->new;
     field $name       :param;
     field $resource   :param   = undef;
     field $scope      :param;
@@ -149,16 +147,11 @@ class OpenTelemetry::SDK::Trace::Span
     }
 
     method end ( $time = undef ) {
-        $time //= time;
-
-        return $self unless $lock->enter( sub {
-            unless ($self->recording) {
-                $logger->warn('Calling end on an ended Span');
-                return;
-            }
-
-            $end = $time;
-        });
+        # This should in theory be an atomic check. For now, to reduce
+        # the chances of it becoming a problem, we check the field
+        # directly instead of going through `recording`
+        return $self if defined $end;
+        $end = $time // time;
 
         $_->on_end($self) for @processors;
 
@@ -166,12 +159,39 @@ class OpenTelemetry::SDK::Trace::Span
     }
 
     method record_exception ( $exception, %attributes ) {
+        return $self unless $self->recording;
+
+        my ( $message, $stacktrace );
+        if ( $exception isa Exception::Class::Base ) {
+            $message    = $exception->message;
+            $stacktrace = $exception->trace->as_string;
+        }
+        else {
+            # This should cover the following common exceptions:
+            # * Catalyst::Exception::Basic
+            # * Class::Throwable
+            # * Dancer::Exception::Base
+            # * Exception::Base
+            # * Mojo::Exception
+            # * Throwable::Error
+            # * X::Tiny
+            # * plain die strings
+
+            local $ENV{MOJO_EXCEPTION_VERBOSE} = 1;
+            local $Class::Throwable::DEFAULT_VERBOSITY = 2;
+
+            ( $message, $stacktrace ) = split /\n/, "$exception", 2;
+
+            $stacktrace //= $exception->get_caller_stacktrace
+                if $exception isa Exception::Base;
+        }
+
         $self->add_event(
             name       => 'exception',
             attributes => {
-                'exception.type'       => ref $exception || '',
-                'exception.message'    => "$exception" =~ s/\n.*//r,
-                'exception.stacktrace' => "$exception",
+                'exception.type'       => ref $exception || 'string',
+                'exception.message'    => $message,
+                'exception.stacktrace' => $stacktrace,
                 %attributes,
             }
         );

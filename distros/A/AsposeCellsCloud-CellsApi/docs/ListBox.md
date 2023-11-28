@@ -9,12 +9,12 @@ use AsposeCellsCloud::Object::ListBox;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **InputRange** | **string** |  |
-**ItemCount** | **int** |  |
-**PageChange** | **int** |  |
-**SelectedCells** | **ARRAY[LinkElement]** |  |
-**SelectedIndex** | **int** |  |
-**SelectionType** | **string** |  |
-**Shadow** | **boolean** |  |
+**ItemCount** | **int** | Gets the number of items in the list box. |
+**PageChange** | **int** | Specifies the amount by which the control's value is changed                         when the user clicks on the scrollbar's page up or page down region. |
+**SelectedCells** | **ARRAY[LinkElement]** | Gets the selected cells.                        Returns null if the input range is not set or no item is selected |
+**SelectedIndex** | **int** | Gets or sets the index number of the currently selected item in a list box or combo box.                        Zero-based. |
+**SelectionType** | **string** | Gets or sets the selection mode of the specified list box. |
+**Shadow** | **boolean** | Indicates whether the combobox has 3-D shading. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

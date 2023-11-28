@@ -1,9 +1,11 @@
 Changes
-examples/ex1.pl
-examples/ex2.pl
-examples/ex3.pl
-examples/ex4.pl
+examples/abstract_class.pl
+examples/link_for_bricklink_com.pl
+examples/link_for_lego_com.pl
+examples/link_for_lugnet_com.pl
+examples/link_for_peeron_com.pl
 Image.pm
+Image/BricklinkCom.pm
 Image/LegoCom.pm
 Image/LugnetCom.pm
 Image/PeeronCom.pm
@@ -24,6 +26,10 @@ MANIFEST			This list of files
 META.yml
 README
 SIGNATURE
+t/Lego-Part-Image-BricklinkCom/01-use.t
+t/Lego-Part-Image-BricklinkCom/02-version.t
+t/Lego-Part-Image-BricklinkCom/03-new.t
+t/Lego-Part-Image-BricklinkCom/04-image_url.t
 t/Lego-Part-Image-LegoCom/01-use.t
 t/Lego-Part-Image-LegoCom/02-version.t
 t/Lego-Part-Image-LegoCom/03-new.t
@@ -41,6 +47,8 @@ t/Lego-Part-Image/02-version.t
 t/Lego-Part-Image/03-new.t
 t/Lego-Part-Image/04-image.t
 t/Lego-Part-Image/05-image_url.t
+xt/Lego-Part-Image-BricklinkCom/01-pod_coverage.t
+xt/Lego-Part-Image-BricklinkCom/02-pod.t
 xt/Lego-Part-Image-LegoCom/01-pod_coverage.t
 xt/Lego-Part-Image-LegoCom/02-pod.t
 xt/Lego-Part-Image-LugnetCom/01-pod_coverage.t

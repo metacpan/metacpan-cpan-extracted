@@ -52,19 +52,19 @@ L<systemd.scope(5)>.
 Unit files are loaded from a set of paths determined during compilation, described in the next
 section.
 
-Valid unit names consist of a \"name prefix\" and a dot and a suffix specifying the unit type. The
-\"unit prefix\" must consist of one or more valid characters (ASCII letters, digits, C<:>,
-C<->, C<_>, C<.>, and C<\\>). The total
-length of the unit name including the suffix must not exceed 256 characters. The type suffix must be one
-of C<.service>, C<.socket>, C<.device>,
-C<.mount>, C<.automount>, C<.swap>,
-C<.target>, C<.path>, C<.timer>,
-C<.slice>, or C<.scope>.
+Valid unit names consist of a \"unit name prefix\", and a suffix specifying the unit type which
+begins with a dot. The \"unit name prefix\" must consist of one or more valid characters (ASCII letters,
+digits, C<:>, C<->, C<_>, C<.>, and
+C<\\>). The total length of the unit name including the suffix must not exceed 255
+characters. The unit type suffix must be one of C<.service>, C<.socket>,
+C<.device>, C<.mount>, C<.automount>,
+C<.swap>, C<.target>, C<.path>,
+C<.timer>, C<.slice>, or C<.scope>.
 
-Units names can be parameterized by a single argument called the \"instance name\". The unit is then
+Unit names can be parameterized by a single argument called the \"instance name\". The unit is then
 constructed based on a \"template file\" which serves as the definition of multiple services or other
-units. A template unit must have a single C<\@> at the end of the name (right before the
-type suffix). The name of the full unit is formed by inserting the instance name between
+units. A template unit must have a single C<\@> at the end of the unit name prefix (right
+before the type suffix). The name of the full unit is formed by inserting the instance name between
 C<\@> and the unit type suffix. In the unit file itself, the instance parameter may be
 referred to using C<%i> and other specifiers, see below.
 
@@ -226,7 +226,7 @@ Thus, directories listed here are just the defaults. To see the actual list that
 would be used based on compilation options and current environment use
 
 
-+-+systemd-analyze --user unit-paths
+    systemd-analyze --user unit-paths
 
 
 
@@ -475,12 +475,11 @@ failed, and no job is queued for them. While a C<Wants> dependency on another un
 has a one-time effect when this units started, a C<Upholds> dependency on it has a
 continuous effect, constantly restarting the unit if necessary. This is an alternative to the
 C<Restart> setting of service units, to ensure they are kept running whatever
-happens.
+happens. The restart happens without delay, and usual per-unit rate-limit applies.
 
 When C<Upholds=b.service> is used on C<a.service>, this
 dependency will show as C<UpheldBy=a.service> in the property listing of
-C<b.service>. The C<UpheldBy> dependency cannot be specified
-directly.',
+C<b.service>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -600,8 +599,7 @@ creates the corresponding device unit without delay.',
       'OnFailure',
       {
         'description' => 'A space-separated list of one or more units that are activated when this unit enters
-the C<failed> state.  A service unit using C<Restart> enters the
-failed state only after the start limits are reached.',
+the C<failed> state.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -651,16 +649,18 @@ units that are linked to it using these two settings.',
       'JoinsNamespaceOf',
       {
         'description' => 'For units that start processes (such as service units), lists one or more other units
-whose network and/or temporary file namespace to join. This only applies to unit types which support
-the C<PrivateNetwork>, C<NetworkNamespacePath>,
+whose network and/or temporary file namespace to join. If this is specified on a unit (say, a.service
+has C<JoinsNamespaceOf=b.service>), then this the inverse dependency
+(C<JoinsNamespaceOf=a.service> for b.service) is implied. This only applies to unit
+types which support the C<PrivateNetwork>, C<NetworkNamespacePath>,
 C<PrivateIPC>, C<IPCNamespacePath>, and
 C<PrivateTmp> directives (see
 L<systemd.exec(5)> for
 details). If a unit that has this setting set is started, its processes will see the same
 C</tmp/>, C</var/tmp/>, IPC namespace and network namespace as
-one listed unit that is started. If multiple listed units are already started, it is not defined
-which namespace is joined. Note that this setting only has an effect if
-C<PrivateNetwork>/C<NetworkNamespacePath>,
+one listed unit that is started. If multiple listed units are already started and these do not share
+their namespace, then it is not defined which namespace is joined. Note that this setting only has an
+effect if C<PrivateNetwork>/C<NetworkNamespacePath>,
 C<PrivateIPC>/C<IPCNamespacePath> and/or
 C<PrivateTmp> is enabled for both the unit that joins the namespace and the unit
 whose namespace is joined.',
@@ -681,6 +681,26 @@ will be pulled in by this unit.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'OnSuccessJobMode',
+      {
+        'description' => 'Takes a value of
+C<fail>,
+C<replace>,
+C<replace-irreversibly>,
+C<isolate>,
+C<flush>,
+C<ignore-dependencies> or
+C<ignore-requirements>. Defaults to
+C<replace>. Specifies how the units listed in
+C<OnSuccess>/C<OnFailure> will be enqueued. See
+L<systemctl(1)>\'s
+C<--job-mode=> option for details on the
+possible values. If this is set to C<isolate>,
+only a single unit may be listed in
+C<OnSuccess>/C<OnFailure>.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'OnFailureJobMode',
       {
         'description' => 'Takes a value of
@@ -692,12 +712,12 @@ C<flush>,
 C<ignore-dependencies> or
 C<ignore-requirements>. Defaults to
 C<replace>. Specifies how the units listed in
-C<OnFailure> will be enqueued. See
+C<OnSuccess>/C<OnFailure> will be enqueued. See
 L<systemctl(1)>\'s
 C<--job-mode=> option for details on the
 possible values. If this is set to C<isolate>,
 only a single unit may be listed in
-C<OnFailure>.',
+C<OnSuccess>/C<OnFailure>.',
         'migrate_from' => {
           'formula' => '$unit',
           'variables' => {
@@ -870,7 +890,7 @@ Both settings take a time span with the default unit of seconds, but other units
 specified, see
 L<systemd.time(5)>.
 The default is C<infinity> (job timeouts disabled), except for device units where
-C<JobRunningTimeoutSec> defaults to C<DefaultTimeoutStartSec>.
+C<JobRunningTimeoutSec> defaults to C<DefaultDeviceTimeoutSec>.
 
 Note: these timeouts are independent from any unit-specific timeouts (for example, the timeout
 set with C<TimeoutStartSec> in service units). The job timeout has no effect on the
@@ -891,7 +911,7 @@ Both settings take a time span with the default unit of seconds, but other units
 specified, see
 L<systemd.time(5)>.
 The default is C<infinity> (job timeouts disabled), except for device units where
-C<JobRunningTimeoutSec> defaults to C<DefaultTimeoutStartSec>.
+C<JobRunningTimeoutSec> defaults to C<DefaultDeviceTimeoutSec>.
 
 Note: these timeouts are independent from any unit-specific timeouts (for example, the timeout
 set with C<TimeoutStartSec> in service units). The job timeout has no effect on the
@@ -930,15 +950,22 @@ call.',
       'StartLimitAction',
       {
         'choice' => [
+          'exit',
+          'exit-force',
+          'halt',
+          'halt-force',
+          'halt-immediate',
+          'kexec',
+          'kexec-force',
           'none',
-          'reboot',
-          'reboot-force',
-          'reboot-immediate',
           'poweroff',
           'poweroff-force',
           'poweroff-immediate',
-          'exit',
-          'exit-force'
+          'reboot',
+          'reboot-force',
+          'reboot-immediate',
+          'soft-reboot',
+          'soft-reboot-force'
         ],
         'description' => 'Configure an additional action to take if the rate limit configured with
 C<StartLimitIntervalSec> and C<StartLimitBurst> is hit. Takes the same
@@ -963,36 +990,36 @@ units.',
       {
         'cargo' => {
           'choice' => [
-            'x86',
-            'x86-64',
-            'ppc',
-            'ppc-le',
-            'ppc64',
-            'ppc64-le',
-            'ia64',
-            'parisc',
-            'parisc64',
-            's390',
-            's390x',
-            'sparc',
-            'sparc64',
-            'mips',
-            'mips-le',
-            'mips64',
-            'mips64-le',
             'alpha',
+            'arc',
+            'arc-be',
             'arm',
             'arm-be',
             'arm64',
             'arm64-be',
+            'cris',
+            'ia64',
+            'm68k',
+            'mips',
+            'mips-le',
+            'mips64',
+            'mips64-le',
+            'native',
+            'parisc',
+            'parisc64',
+            'ppc',
+            'ppc-le',
+            'ppc64',
+            'ppc64-le',
+            's390',
+            's390x',
             'sh',
             'sh64',
-            'm68k',
+            'sparc',
+            'sparc64',
             'tilegx',
-            'cris',
-            'arc',
-            'arc-be',
-            'native'
+            'x86',
+            'x86-64'
           ],
           'type' => 'leaf',
           'value_type' => 'enum'
@@ -1074,6 +1101,7 @@ C<uml>,
 C<bhyve>,
 C<qnx>,
 C<apple>,
+C<sre>,
 C<openvz>,
 C<lxc>,
 C<lxc-libvirt>,
@@ -1192,8 +1220,8 @@ check for variables passed in by the enclosing container manager or PAM.",
 security technology is enabled on the system. Currently, the recognized values are
 C<selinux>, C<apparmor>, C<tomoyo>,
 C<ima>, C<smack>, C<audit>,
-C<uefi-secureboot> and C<tpm2>. The test may be negated by prepending
-an exclamation mark.',
+C<uefi-secureboot>, C<tpm2> and C<cvm>.
+The test may be negated by prepending an exclamation mark.',
         'type' => 'list'
       },
       'ConditionCapability',
@@ -1228,10 +1256,10 @@ disconnected from a power source.',
       {
         'cargo' => {
           'choice' => [
-            '/var/',
-            '/etc/',
+            '!/etc/',
             '!/var/',
-            '!/etc/'
+            '/etc/',
+            '/var/'
           ],
           'type' => 'leaf',
           'value_type' => 'enum'
@@ -1447,14 +1475,21 @@ C<@system>.',
           'value_type' => 'uniline'
         },
         'description' => 'Check whether given cgroup controllers (e.g. C<cpu>) are available
-for use on the system.
+for use on the system or whether the legacy v1 cgroup or the modern v2 cgroup hierarchy is used.
 
 Multiple controllers may be passed with a space separating them; in this case the condition
 will only pass if all listed controllers are available for use. Controllers unknown to systemd are
-ignored. Valid controllers are C<cpu>, C<cpuset>,
-C<io>, C<memory>, and C<pids>. Even if available in
-the kernel, a particular controller may not be available if it was disabled on the kernel command
-line with C<cgroup_disable=controller>.',
+ignored. Valid controllers are C<cpu>, C<io>,
+C<memory>, and C<pids>. Even if available in the kernel, a
+particular controller may not be available if it was disabled on the kernel command line with
+C<cgroup_disable=controller>.
+
+Alternatively, two special strings C<v1> and C<v2> may be
+specified (without any controller names). C<v2> will pass if the unified v2 cgroup
+hierarchy is used, and C<v1> will pass if the legacy v1 hierarchy or the hybrid
+hierarchy are used. Note that legacy or hybrid hierarchies have been deprecated. See
+L<systemd(1)> for
+more information.',
         'type' => 'list'
       },
       'ConditionMemory',
@@ -2100,7 +2135,7 @@ into.",
         'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 252 doc',
+    'generated_by' => 'parse-man.pl from systemd 254 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

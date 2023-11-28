@@ -1,6 +1,41 @@
 Revision history for Perl extension App-LXC-Container
 
-0.29 2023-09-21T08:41:03Z
+0.36 2023-11-27T08:44:17Z
+
+0.36 2023-11-27T08:43:43Z
+
+    - added still more diagnostic for 'ldd' / 'dpkg-query' problem on some smokers
+
+0.35 2023-11-26T09:37:50Z
+
+    - added still more diagnostic for 'ldd' / 'dpkg-query' problem on some smokers
+
+0.34 2023-11-23T09:21:20Z
+
+    - mockup/dpkg-query: added diagnostic for 'ldd' problem on some smokers
+    - fix for 'ldd' tests for /bin/ls on Alpine smoker
+
+0.33 2023-11-21T10:21:57Z
+
+    - trying different approach for 'ldd' tests (no mockup for /bin/ls)
+
+0.32 2023-11-20T10:04:17Z
+
+    - added diagnostic for 'ldd' problem on some smokers
+    - fixes when abs_path in common::libraries_used returns undef
+    - fixed shellcheck warning in t/mockup/nft
+
+0.31 2023-11-13T08:18:10Z
+
+    - fixes for some failing ldd tests on various smokers
+
+0.30 2023-11-09T11:22:53Z
+
+    - added German help texts
+    - setup now supports modifying packages and can use ldd dependencies
+    - added support of optional special configuration lines (just copied)
+    - fixed handling of names with special characters in Debian::package_of
+    - minor documentation fixes
 
 0.29 2023-09-21T08:40:34Z
 

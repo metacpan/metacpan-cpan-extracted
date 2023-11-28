@@ -8,13 +8,13 @@ Locale::CLDR::Locales::So::Any::So - Package for language Somali
 
 package Locale::CLDR::Locales::So::Any::So;
 # This file auto generated from Data\common\main\so_SO.xml
-#	on Fri 13 Oct  9:39:55 am GMT
+#	on Sat  4 Nov  6:23:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

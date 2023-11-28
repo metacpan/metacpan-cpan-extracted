@@ -1,3 +1,11 @@
+1.35  2023-11-05
+
+- massive speed up, esp. for scripts using stuff from 
+  the Moose ecosystem, thanks to @shawnlaffan:
+
+  - add package level caches for INC searches (_find_in_inc, _glob_in_inc)
+  - faster add_deps on case insensitive systems AKA Windows
+
 1.34  2023-09-24
 
 - Fix issue #19 (AKA rschupp/PAR-Packer#78): invalid paths in zip file

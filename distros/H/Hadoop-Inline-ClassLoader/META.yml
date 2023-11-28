@@ -8,16 +8,21 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  blib: '1.01'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 keywords:
   - hadoop
   - yarn
   - java
   - inline
+  - mapreduce
+  - bigdata
+  - hive
+  - spark
+  - sqoop
+  - analytics
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,11 +36,12 @@ requires:
   Inline::Java: '0'
   Ref::Util: '0'
   constant: '0'
-  perl: '5.010'
+  perl: '5.014'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/Perl-Hadoop/Hadoop-Inline-ClassLoader/issues
-  repository: git://github.com/Perl-Hadoop/Hadoop-Inline-ClassLoader.git
-version: '0.001'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+  repository: git://github.com/burak/Hadoop-Inline-ClassLoader.git
+version: '0.002'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

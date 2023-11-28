@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd;
 
-use Test::More tests => 46;
+use Test::More tests => 49;
 use Test::Output;
 
 #####################################
@@ -98,6 +98,7 @@ sub check_config_against_regexp($$$)
 #########################################################################
 # identical parts of messages:
 my $re_msg_tail = qr/ at $0 line \d{2,}\.?$/;
+my $re_msg_tail_m = qr/ at $0 line \d{2,}\.?$/m;
 my $re_msg_tail_eval = qr/ at \(eval \d+\)(?:\[$0:\d{2,}\])? line \d+\.?$/;
 
 # initial clean-up, only needed for re-run:
@@ -170,10 +171,12 @@ _remove_file($test_file);
 my $re_div = '----------\s++';
 my $re_buttons_mp = '\[ - \]\s++\[ \+ \]\s++';
 my $re_buttons_map = '\[ - \]\s++\[ \* \]\s++\[ \+ \]\s++';
+my $re_buttons_mapp = '\[ - \]\s++\[ \* \]\s++\[ \+ \]\s++\[ \+\+ \]\s++';
 my $re_listbox_head = '(?:<1> ++)?(?:0|[1-9][0-9]*-[1-9][0-9]*)/\d+\s++';
 my $re_list_buttons_mp = $re_listbox_head . '[^[]*+' . $re_buttons_mp;
 my $re_list_buttons_map = $re_listbox_head . '[^[]*+' . $re_buttons_map;
-my $re_list_packages = 'packages\s++' . $re_list_buttons_mp;
+my $re_list_buttons_mapp = $re_listbox_head . '[^[]*+' . $re_buttons_mapp;
+my $re_list_packages = 'packages\s++' . $re_list_buttons_mapp;
 my $re_list_files = 'files\s++' . $re_list_buttons_map;
 my $re_list_filter = 'filter\s++' . $re_list_buttons_map;
 my $re_radio = '(?:<[1*]>\s++)?\([o ]\) ';
@@ -198,6 +201,8 @@ my $re_select =
     '^----- enter number to choose next step: \d++\s++';
 my $re_select_mp = '<1> \[ - \]\s++<2> \[ \+ \]\s++';
 my $re_select_map = '<1> \[ - \]\s++<2> \[ \* \]\s++<3> \[ \+ \]\s++';
+my $re_select_mapp =
+    '<1> \[ - \]\s++<2> \[ \* \]\s++<3> \[ \+ \]\s++<4> \[ \+\+ \]\s++';
 my $re_select_listbox =
     '^< ?0> ++leave listbox\s++' .
     '^enter selection(?: \(\+/- scrolls\))?: \d++\s++';
@@ -241,6 +246,9 @@ my $re_select_file_dialogue_inside =
 my $re_select_file_dialogue_package =
     '^========== (?:select files for packages\s++){2}' .
     $re_select_file_dialogue_inside;
+my $re_select_file_dialogue_libraries =
+    '^========== (?:select files for needed library packages\s++){2}' .
+    $re_select_file_dialogue_inside;
 my $re_select_file_dialogue_files =
     '^========== (?:select files and/or directory\s++){2}' .
     $re_select_file_dialogue_inside;
@@ -255,6 +263,11 @@ my $re_select_file_list =
     '^(< ?[1-9]\d*>[ *]{3}\S++\s++)++' .
     $re_select_listbox;
 my $re_select_cancel_ok_buttons = '<1> \[ Cancel \]\s++<2> \[ OK \]\s++';
+
+my $re_modify_package_dialogue =
+    '========== (?:modify chromium\s++){2}' .
+    '^<1> (?:chromium|VI)\s++' .
+    $re_2nd_cancel_ok . $re_select;
 
 my $re_select_in_files_list =
     '(?:^<\+/-> ++)?' . $re_listbox_head .
@@ -319,7 +332,9 @@ $_=    '
 ';
 
 my $re_error_to_small = '^screen [0-9x]+ to small for window, ' .
-    'need >= [0-9x]+ for all UI variants' . $re_msg_tail;
+    'need >= [0-9x]+ for all UI variants' . $re_msg_tail_m;
+my $re_bad_interpreter = "bad interpreter '.*/usr/bin/1chromium' doesn't" .
+    ' use ld-linux.so for dynamic linkage at ';
 
 # PS:	Yes, I have a little helper script to analyse the error output of a
 #	running Perl test script (to see where a regular expression fails to
@@ -390,48 +405,94 @@ $re_output =
     $re_main_box;					# 1
 
 push @input,
-    qw(2 2 1 2 1 0 0 2 2 0),	# add a binary (mock: package chromium)
-    qw(2 2 1 2 1 0 0 2 2 0),	# same again
-    qw(2 2 1 2 1 0 0 2 1 0),	# same again, but cancel
-    qw(2 2 1 2 2 0 0 2 2 0);	# try missing package (2something)
+    qw(2 3 1 2 1 0 0 2 2 0),	# add a binary (mock: package chromium)
+    qw(2 3 1 2 1 0 0 2 2 0),	# same again
+    qw(2 3 1 2 1 0 0 2 1 0),	# same again, but cancel
+    qw(2 3 1 2 2 0 0 2 2 0);	# try missing package (2something)
 $re_output .=
     '(?:' .
     $re_list_packages . $re_select .			# 2
-    $re_select_mp . $re_select .			# 2
+    $re_select_mapp . $re_select .			# 3
     $re_select_file_dialogue_package . $re_select .	# 1
     $re_select_file_box . $re_select .			# 2
     '(?:' . $re_select_file_list . '){2}' .		# 1 (or 2), 0
     $re_select_file_box . $re_select .			# 0
     $re_select_file_dialogue_package . $re_select .	# 2
     $re_select_cancel_ok_buttons . $re_select .		# 2 (or 1)
-    $re_select_mp . $re_select .			# 0
+    $re_select_mapp . $re_select .			# 0
     '){4}';						# same/similar again
 push @input,
-    qw(2 2 1 2 0 0 2 2 0);	# try adding directory
+    qw(2 3 1 2 0 0 2 2 0);	# try adding directory
 $re_output .=
     $re_list_packages . $re_select .			# 2
-    $re_select_mp . $re_select .			# 2
+    $re_select_mapp . $re_select .			# 3
     $re_select_file_dialogue_package . $re_select .	# 1
     $re_select_file_box . $re_select .			# 2
     $re_select_file_list .				# 0
     $re_select_file_box . $re_select .			# 0
     $re_select_file_dialogue_package . $re_select .	# 2
     $re_select_cancel_ok_buttons . $re_select .		# 2
-    $re_select_mp . $re_select;				# 0
+    $re_select_mapp . $re_select;			# 0
 
 push @input,
-    qw(2 1 0),			# try removing without selection
-    qw(1 1 0 2 1 0);		# remove 1st of the 2
+    qw(2 2 0),			# try modifying without selection
+    qw(1 1 0 2 2 1 VI 2 1 0),	# modify (not) 1st of the 2
+    qw(2 2 1 VI 2 2 0),		# modify 1st of the 2
+    qw(1 1 0);			# remove selection for next test!
 $re_output .=
     $re_list_packages . $re_select .			# 2
-    '(?:' . $re_select_mp . $re_select . '){2}' .	# 1, 0
+    '(?:' . $re_select_mapp . $re_select . '){2}' .	# 2, 0
     $re_list_packages . $re_select .			# 1
     '1-2/2\s++' . '(?:<[12]>   chromium\s++){2}' .
     $re_select_listbox .				# 1
     '1-2/2\s++' . '(?:<[12]> [ *] chromium\s++){2}' .
     $re_select_listbox .				# 0
     $re_list_packages . $re_select .			# 2
-    '(?:' . $re_select_mp . $re_select . '){2}';	# 1, 0
+    $re_select_mapp . $re_select .			# 2
+    $re_modify_package_dialogue .			# 1
+    'old value: chromium\s++new value\?\s++' .		# VI
+    $re_modify_package_dialogue .			# 2
+    $re_select_cancel_ok_buttons . $re_select .		# 1
+    $re_select_mapp . $re_select .			# 0
+    $re_list_packages . $re_select .			# 2
+    $re_select_mapp . $re_select .			# 2
+    $re_modify_package_dialogue .			# 1
+    'old value: chromium\s++new value\?\s++' .		# VI
+    $re_modify_package_dialogue .			# 2
+    $re_select_cancel_ok_buttons . $re_select .		# 2
+    $re_select_mapp . $re_select .			# 0
+    $re_list_packages . $re_select .			# 1
+    '1-2/2\s++' . '(?:<[12]> [ *] (?:chromium|VI)\s++){2}' .
+    $re_select_listbox .				# 1
+    '1-2/2\s++' . '(?:<[12]>   (?:chromium|VI)\s++){2}' .
+    $re_select_listbox;					# 0
+
+push @input,
+    qw(2 1 0),			# try removing without selection
+    qw(1 1 0 2 1 0);		# remove 1st of the 2
+$re_output .=
+    $re_list_packages . $re_select .			# 2
+    '(?:' . $re_select_mapp . $re_select . '){2}' .	# 1, 0
+    $re_list_packages . $re_select .			# 1
+    '1-2/2\s++' . '(?:<[12]>   (?:chromium|VI)\s++){2}' .
+    $re_select_listbox .				# 1
+    '1-2/2\s++' . '(?:<[12]> [ *] (?:chromium|VI)\s++){2}' .
+    $re_select_listbox .				# 0
+    $re_list_packages . $re_select .			# 2
+    '(?:' . $re_select_mapp . $re_select . '){2}';	# 1, 0
+
+push @input,
+    qw(2 4 1 2 1 0 0 2 2 0);	# try adding ldd dependency (and fail)
+$re_output .=
+    $re_list_packages . $re_select .			# 2
+    $re_select_mapp . $re_select .			# 4
+    $re_select_file_dialogue_libraries . $re_select .	# 1
+    $re_select_file_box . $re_select .			# 2
+    '(?:' . $re_select_file_list . '){2}' .		# 1, 0
+    $re_select_file_box . $re_select .			# 0
+    $re_select_file_dialogue_libraries . $re_select .	# 2
+    $re_select_cancel_ok_buttons . $re_select .		# 2
+    $re_select_mapp . $re_select;			# 0
 
 push @input, qw(0 2);		# .. -> files box
 $re_output .=
@@ -574,7 +635,7 @@ $re_output .=
 output_like
 {   _call_with_stdin(\@input, sub { App::LXC::Container::setup("test"); });   }
     qr{$re_output}ms,
-    qr{$re_error_to_small},
+    qr{$re_error_to_small\s+$re_bad_interpreter},
     'modifying everything printed expected output';
 
 my @big_stat = (scalar(@input), length($re_output));
@@ -725,5 +786,56 @@ output_like
     qr{^$}, qr{^$},
     'large enough window removed error';
 
+#########################################################################
+# special tests for library dependencies (ldd):
+package Dummy::UI
+{
+    require Exporter;
+    our @ISA = qw(Exporter);
+    sub new($) { my $self = {}; bless $self, 'Dummy::UI'; }
+    sub add($@) { shift; print "ADD2UI\t", join(',', @_), "\n"; }
+};
+sub test_ldd_dummy_object(@)
+{
+    my $dummy_ui = Dummy::UI->new();
+    App::LXC::Container::Setup::__add_library_packages_internal_code
+	    ($dummy_ui, @_);
+}
+if (-f '/bin/ls')
+{
+    diag(`echo \$PATH`, `ls -l t/mockup`, `file /bin/ls`, `ldd /bin/ls`);
+    my @libs = App::LXC::Container::Data::libraries_used('/bin/ls');
+    diag('LU:', join('|', @libs));
+    foreach (@libs)
+    { diag('PKG("',$_,'"):',App::LXC::Container::Data::package_of($_),'.'); }
+}
+else
+{   diag('/bin/ls is missing!');   }
+stdout_like
+{   test_ldd_dummy_object('/bin/ls');   }
+    qr{^ADD2UI\s+libc6(?::amd64|:i386)?$},
+    'test for existing library dependencies';
+
+_setup_file('/usr/bin/3ls');
+_setup_link(TMP_PATH . '/usr/libbad.so.0', '/usr/non-existing-dir/libbad.so');
+chmod 0755, T_PATH . '/mockup/ldd'
+    or  die "can't chmod 0755 ", T_PATH . '/mockup/ldd';
+
+stdout_like
+{   test_ldd_dummy_object(TMP_PATH . '/usr/bin/3ls');   }
+    qr{^$},
+    'ldd test with bad symbolic link';
+
+stdout_like
+{   test_ldd_dummy_object('/nowhere/to/be/found');   }
+    qr{^$},
+    'test for non-existing library dependencies';
+_remove_link(TMP_PATH . '/usr/libbad.so.0');
+
+chmod 0644, T_PATH . '/mockup/ldd'
+    or  die "can't chmod 0644 ", T_PATH . '/mockup/ldd';
+
+#########################################################################
+# final statistics:
 diag('big test statistic: ', $big_stat[0],
      ' inputs checked against a regular expression of size ', $big_stat[1]);

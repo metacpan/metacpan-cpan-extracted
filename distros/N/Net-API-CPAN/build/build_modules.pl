@@ -12,7 +12,10 @@ use Module::Generic::Array;
 use Module::Generic::File qw( file );
 our $VERSION = 'v0.1.0';
 
+my $base_class = 'Net::API::CPAN';
 my $base_dir = file( __FILE__ )->parent;
+# To check actual module version number and use it when building our new and updated modules
+my $lib_dir = $base_dir->parent->child( 'lib' );
 # Built with ./build/fields2api_def.pl
 my $api_specs = $base_dir->child( 'api.json' );
 my $specs = $api_specs->load_json || die( $api_specs->error );
@@ -32,6 +35,7 @@ my $year = DateTime->now->year;
 my $test_num = 5;
 my $modules_version = 'v0.1.0';
 my $modules_created = DateTime->new( year => 2023, month => 7, day => 25 )->strftime( '%Y/%m/%d' );
+my @error_modules = ();
 
 my $core_methods =
 {
@@ -104,10 +108,10 @@ EOT
             pod => <<EOT,
 =head2 releases
 
-Returns an L<Net::API::CPAN::ResultSet> oject containing all the author latest releases as L<release objects|Net::API::CPAN::Release>.
+Returns an L<${base_class}::ResultSet> oject containing all the author latest releases as L<release objects|${base_class}::Release>.
 EOT
             type => 'object',
-            class => 'Net::API::CPAN::List',
+            class => "${base_class}::List",
         },
     },
     distribution =>
@@ -139,7 +143,7 @@ EOT
             pod => <<EOT,
 =head2 github
 
-Returns the object for the dynamic class C<Net::API::CPAN::Bugs::Github>, which provides access to a few methods.
+Returns the object for the dynamic class C<${base_class}::Bugs::Github>, which provides access to a few methods.
 
 See L</bugs> for more information.
 
@@ -153,7 +157,7 @@ EOT
             pod => <<EOT,
 =head2 rt
 
-Returns the object for the dynamic class C<Net::API::CPAN::Bugs::Rt>, which provides access to a few methods.
+Returns the object for the dynamic class C<${base_class}::Bugs::Rt>, which provides access to a few methods.
 
 See L</bugs> for more information.
 
@@ -196,7 +200,7 @@ sub package
 {
     my \$self = shift( \@_ );
     my \$doc = \$self->documentation || 
-        return( \$self->error( "No documentation module class is set to call Net::API::CPAN->package" ) );
+        return( \$self->error( "No documentation module class is set to call ${base_class}->package" ) );
     my \$result = \$self->api->package( \$doc ) || return( \$self->pass_error );
     return( \$result );
 }
@@ -204,7 +208,7 @@ EOT
             pod => <<EOT,
 =head2 package
 
-Returns an L<Net::API::CPAN::Package> object for this module, or upon error, sets an L<error object|Net::API::CPAN::Exception> and returns C<undef> in scalar context or an empty list in list context.
+Returns an L<${base_class}::Package> object for this module, or upon error, sets an L<error object|${base_class}::Exception> and returns C<undef> in scalar context or an empty list in list context.
 
 An error is returned if the L<documentation property|/documentation> is not set.
 EOT
@@ -217,7 +221,7 @@ sub permission
 {
     my \$self = shift( \@_ );
     my \$doc = \$self->documentation || 
-        return( \$self->error( "No documentation module class is set to call Net::API::CPAN->package" ) );
+        return( \$self->error( "No documentation module class is set to call ${base_class}->package" ) );
     my \$result = \$self->api->permission( \$doc ) || return( \$self->pass_error );
     return( \$result );
 }
@@ -225,7 +229,7 @@ EOT
             pod => <<EOT,
 =head2 permission
 
-Returns an L<Net::API::CPAN::Permission> object for this module, or upon error, sets an L<error object|Net::API::CPAN::Exception> and returns C<undef> in scalar context or an empty list in list context.
+Returns an L<${base_class}::Permission> object for this module, or upon error, sets an L<error object|${base_class}::Exception> and returns C<undef> in scalar context or an empty list in list context.
 
 An error is returned if the L<documentation property|/documentation> is not set.
 EOT
@@ -348,25 +352,55 @@ foreach my $object ( sort( keys( %$specs ) ) )
         : join( '', map( ucfirst( lc( $_ ) ), split( /_/, $object ) ) );
     ( my $module_path = $module_name ) =~ s,::,/,g;
     $module_path .= '.pm';
-    my $mod_file = $mod_dir->child( "$module_name.pm" );
-    my $parent = 'Net::API::CPAN::Generic';
+    # my @parts = split( /::/, $module_name );
+    # $module_path .= join( '/', @parts ) . '.pm';
+    my $module_class = join( '::', $base_class, $module_name );
+    # my $mod_file = $mod_dir->child( "$module_name.pm" );
+    my $mod_file = $mod_dir->child( $module_path );
+    $mod_file->parent->mkpath if( !$mod_file->parent->exists );
+    ( my $actual_mod_path = $module_class ) =~ s,::,/,g;
+    my $actual_mod_file = $lib_dir->child( "${actual_mod_path}.pm" );
+    my $module_version = $modules_version;
+    say "\tChecking actual module $module_class file $actual_mod_file for version change.";
+    if( $actual_mod_file->exists )
+    {
+        say "\tModule file $actual_mod_file exists, trying to get its version number.";
+        # try-catch
+        local $@;
+        my $this_version = eval
+        {
+            no strict 'refs';
+            require( "$actual_mod_file" );
+            return( ${"${module_class}::VERSION"} );
+        };
+        if( $@ )
+        {
+            say "\tModule ${module_class} file $actual_mod_file has some error: $@";
+        }
+        else
+        {
+            say "\tModule $module_name is using version $this_version, using it instead of $modules_version" if( $this_version ne $modules_version );
+            $module_version = $this_version;
+        }
+    }
+    my $parent = "${base_class}::Generic";
     my $parent_specs;
     my $object_plural = ( substr( $object, -1, 1 ) eq 's' ? $object : $object . 's' );
-    if( index( $module_name, '::' ) != -1 )
-    {
-        my @parts = split( /::/, $module_name );
-        # Skip the last one that forms our module name and retain the rest that constitutes the parent directory(ie)
-        my $this_name = pop( @parts );
-        my $module_parent_dir = $mod_dir->child( join( '/', @parts ) );
-        $module_parent_dir->mkpath if( !$module_parent_dir->exists );
-        $mod_file = $module_parent_dir->child( "${this_name}.pm" );
-    }
+#     if( index( $module_name, '::' ) != -1 )
+#     {
+#         my @parts = split( /::/, $module_name );
+#         # Skip the last one that forms our module name and retain the rest that constitutes the parent directory(ie)
+#         my $this_name = pop( @parts );
+#         my $module_parent_dir = $mod_dir->child( join( '/', @parts ) );
+#         $module_parent_dir->mkpath if( !$module_parent_dir->exists );
+#         $mod_file = $module_parent_dir->child( "${this_name}.pm" );
+#     }
     
     if( exists( $extends->{ $object } ) )
     {
         $parent_specs = $specs->{ $extends->{ $object } } ||
             die( "There is no object '", $extends->{ $object }, "' to extends object '$object' in CPAN API specifications ($api_specs)." );
-        $parent = 'Net::API::CPAN::' . join( '', map( ucfirst( lc( $_ ) ), split( /_/, $extends->{ $object } ) ) );
+        $parent = "${base_class}::" . join( '', map( ucfirst( lc( $_ ) ), split( /_/, $extends->{ $object } ) ) );
         say "\tClass $object inherits from ", $extends->{ $object };
     }
     my $methods = $specs->{ $object };
@@ -387,7 +421,7 @@ foreach my $object ( sort( keys( %$specs ) ) )
     if( defined( $sample_data ) )
     {
         my $args_string = &dump_this( $sample_data );
-        $synop->push( "my \$obj = Net::API::CPAN::${module_name}->new( $args_string ) || die( Net::API::CPAN::${module_name}->error );\n" );
+        $synop->push( "my \$obj = ${base_class}::${module_name}->new( $args_string ) || die( ${base_class}::${module_name}->error );\n" );
     }
     
     my $lines = Module::Generic::Array->new;
@@ -395,7 +429,7 @@ foreach my $object ( sort( keys( %$specs ) ) )
     my $code = <<EOT;
 ##----------------------------------------------------------------------------
 ## Meta CPAN API - ~/lib/Net/API/CPAN/${module_path}
-## Version ${modules_version}
+## Version ${module_version}
 ## Copyright(c) ${year} DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack\@deguest.jp>
 ## Created $modules_created
@@ -408,14 +442,14 @@ foreach my $object ( sort( keys( %$specs ) ) )
 ##----------------------------------------------------------------------------
 # This module file has been automatically generated. Any change made here will be lost.
 # Edit the script in ./build/build_modules.pl instead
-package Net::API::CPAN::${module_name};
+package ${module_class};
 BEGIN
 {
     use strict;
     use warnings;
     use parent qw( ${parent} );
     use vars qw( \$VERSION );
-    our \$VERSION = '${modules_version}';
+    our \$VERSION = '${module_version}';
 };
 
 use strict;
@@ -445,7 +479,7 @@ BEGIN
 
 BEGIN
 {
-    use_ok( 'Net::API::CPAN::${module_name}' );
+    use_ok( '${module_class}' );
 };
 
 use strict;
@@ -454,11 +488,11 @@ use warnings;
 my \$test_data = Module::Generic->new->new_json->decode( join( '', <DATA> ) );
 \$test_data->{debug} = \$DEBUG;
 my \$this;
-my \$obj = Net::API::CPAN::${module_name}->new( \$test_data );
-isa_ok( \$obj => 'Net::API::CPAN::${module_name}' );
+my \$obj = ${module_class}->new( \$test_data );
+isa_ok( \$obj => '${module_class}' );
 if( !defined( \$obj ) )
 {
-    BAIL_OUT( Net::API::CPAN::${module_name}->error );
+    BAIL_OUT( ${module_class}->error );
 }
 
 # To generate this list:
@@ -860,9 +894,9 @@ EOT
                 $this_prop_pod = <<EOT;
 =head2 $meth
 
-${example}Sets or gets an array of dynamic class objects with class name C<Net::API::CPAN::${module_name}::${method_class}> and having the folowing properties also accessible as methods, and returns an L<array object|Module::Generic::Array> even if there is no value.
+${example}Sets or gets an array of dynamic class objects with class name C<${module_class}::${method_class}> and having the folowing properties also accessible as methods, and returns an L<array object|Module::Generic::Array> even if there is no value.
 
-A C<Net::API::CPAN::${module_name}::${method_class}> object will be instantiated with each value from the array provided and replace said value.
+A C<${module_class}::${method_class}> object will be instantiated with each value from the array provided and replace said value.
 
 ${props_definition}
 EOT
@@ -877,7 +911,7 @@ EOT
                 $this_prop_pod = <<EOT;
 =head2 $meth
 
-${example}Sets or gets a dynamic class object with class name C<Net::API::CPAN::${module_name}::${method_class}> and having the folowing properties also accessible as methods, and returns an object from such class, or C<undef> if no value was provided.
+${example}Sets or gets a dynamic class object with class name C<${module_class}::${method_class}> and having the folowing properties also accessible as methods, and returns an object from such class, or C<undef> if no value was provided.
 
 ${props_definition}
 EOT
@@ -1158,7 +1192,7 @@ EOT
     
     $code .= <<EOT;
     \$self->{_init_strict_use_sub} = 1;
-    \$self->{_exception_class} = 'Net::API::CPAN::Exception';
+    \$self->{_exception_class} = '${base_class}::Exception';
     \$self->SUPER::init( \@_ ) || return( \$self->pass_error );
 EOT
     my $prefix = '    $self->{fields} = ';
@@ -1217,28 +1251,28 @@ __END__
 
 =head1 NAME
 
-Net::API::CPAN::${module_name} - Meta CPAN API ${module_name} Class
+${module_class} - Meta CPAN API ${module_name} Class
 
 =head1 SYNOPSIS
 
-    use Net::API::CPAN::${module_name};
+    use ${module_class};
 ${synop_lines}
 
 =head1 VERSION
 
-    ${modules_version}
+    ${module_version}
 
 =head1 DESCRIPTION
 
 ${module_short_description}
 
-It inherits from L<Net::API::CPAN::Generic>
+It inherits from L<${base_class}::Generic>
 
 =head1 CONSTRUCTOR
 
 =head2 new
 
-Provided with an hash or hash reference of parameters, and this instantiates a new C<Net::API::CPAN::${module_name}> object.
+Provided with an hash or hash reference of parameters, and this instantiates a new C<${module_class}> object.
 
 The parameters that can be provided bear the same name and supports the same values as the methods below.
 
@@ -1279,7 +1313,7 @@ Jacques Deguest E<lt>F<jack\@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<Net::API::CPAN>, L<Net::API::CPAN::Activity>, L<Net::API::CPAN::Author>, L<Net::API::CPAN::Changes>, L<Net::API::CPAN::Changes::Release>, L<Net::API::CPAN::Contributor>, L<Net::API::CPAN::Cover>, L<Net::API::CPAN::Diff>, L<Net::API::CPAN::Distribution>, L<Net::API::CPAN::DownloadUrl>, L<Net::API::CPAN::Favorite>, L<Net::API::CPAN::File>, L<Net::API::CPAN::Module>, L<Net::API::CPAN::Package>, L<Net::API::CPAN::Permission>, L<Net::API::CPAN::Rating>, L<Net::API::CPAN::Release>
+L<${base_class}>, L<${base_class}::Activity>, L<${base_class}::Author>, L<${base_class}::Changes>, L<${base_class}::Changes::Release>, L<${base_class}::Contributor>, L<${base_class}::Cover>, L<${base_class}::Diff>, L<${base_class}::Distribution>, L<${base_class}::DownloadUrl>, L<${base_class}::Favorite>, L<${base_class}::File>, L<${base_class}::Module>, L<${base_class}::Package>, L<${base_class}::Permission>, L<${base_class}::Rating>, L<${base_class}::Release>
 
 L<MetaCPAN::API>, L<MetaCPAN::Client>
 
@@ -1311,6 +1345,21 @@ EOT
     }
     $test_file->unload_utf8( $test_content ) || die( $test_file->error );
     say "Saved object ${object} unit tests to $test_file";
+    my $res = qx( $^X -I./lib -cw $mod_file 2>&1 );
+    say "Syntax for ${test_file} is ", ( ( $? >> 8 ) ? 'not ' : '' ), 'ok';
+    push( @error_modules, $mod_file ) if( $? >> 8 );
+    say $res if( $? >> 8 );
+}
+
+if( scalar( @error_modules ) )
+{
+    say "The following module files have error, please look into it.";
+    say $_ for( @error_modules );
+    exit(1);
+}
+else
+{
+    say "All module files have a good perl syntax.";
 }
 
 sub definition_to_pod

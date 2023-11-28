@@ -2,8 +2,8 @@ NAME
     List::Util::Uniq - List utilities related to finding unique items
 
 VERSION
-    This document describes version 0.006 of List::Util::Uniq (from Perl
-    distribution List-Util-Uniq), released on 2023-06-21.
+    This document describes version 0.007 of List::Util::Uniq (from Perl
+    distribution List-Util-Uniq), released on 2023-08-14.
 
 SYNOPSIS
      use List::Util::Uniq qw(
@@ -47,6 +47,10 @@ SYNOPSIS
 
      @res = dupe_ci("a", "b", "B", "c", "a"); #  => ("B", "a")
 
+DESCRIPTION
+    This module supplements List::Util with functions related to list item's
+    uniqueness.
+
 FUNCTIONS
     None exported by default but exportable.
 
@@ -57,7 +61,7 @@ FUNCTIONS
 
     Remove *adjacent* duplicates from list, i.e. behave more like Unix
     utility's uniq instead of List::Util's "uniq" function. Uses string
-    equality test.
+    equality test (the "eq" operator).
 
   uniq_adj_ci
     Like "uniq_adj" except case-insensitive.
@@ -71,8 +75,8 @@ FUNCTIONS
      my $is_uniq = is_uniq(@list);
 
     Return true when the values in @list is unique (compared string-wise).
-    Knowing whether a list has unique values is faster using this function
-    compared to doing:
+    In theory, knowing whether a list has unique values is faster using this
+    function compared to doing:
 
      my @uniq = uniq(@list);
      @uniq == @list;
@@ -93,7 +97,7 @@ FUNCTIONS
      is_monovalued(qw/a a a/); # => 1
 
     Return true if @list contains only a single value. Returns true for
-    empty list. Undef is coerced to empty string, so "is_monovalued(undef)"
+    empty list. Undef is coerced to empty string, so is_monovalued(undef)
     and "is_monovalued(undef, undef)" return true.
 
   is_monovalued_ci

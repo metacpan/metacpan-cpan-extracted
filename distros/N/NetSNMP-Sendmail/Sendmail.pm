@@ -21,8 +21,8 @@ NetSNMP::Sendmail - NetSNMP plugin for Sendmail statistics
 
 =head1 SYNOPSIS
 
-B<perl use NetSNMP::Sendmail qw (:config bindir /usr/bin/sm.bin);>    
-    
+B<perl use NetSNMP::Sendmail qw (:config bindir /usr/bin/sm.bin);>
+
 =head1 DESCRIPTION
 
 A perl plugin for B<net-snmp> that provides access to Sendmail
@@ -52,7 +52,7 @@ passed as a hash to the B<Configure> function, or passed with the
 B<use> statement following the B<:config> marker.  The following
 options are defined:
 
-=over 4    
+=over 4
 
 =item B<bindir>
 
@@ -64,30 +64,30 @@ using B<mailq> and B<mailstats> keywords.
 =item B<cf>
 
 Absolute name of the Sendmail configuaration file.  Defaults to
-F</etc/mail/sendmail.cf>.    
-    
+F</etc/mail/sendmail.cf>.
+
 =item B<mailstats>
 
-Name of the B<mailstats> binary.  Default is B<mailstats>.    
-    
+Name of the B<mailstats> binary.  Default is B<mailstats>.
+
 =item B<mailq>
 
-Name of the B<mailq> binary.  Default is B<mailq>.    
-    
+Name of the B<mailq> binary.  Default is B<mailq>.
+
 =item B<mailstats_ttl>
 
 Time in seconds during which the result of the recent invocation of
 B<mailstats>(8) is cached.  Default is 10.
-    
+
 =item B<mailq_ttl>
 
 Time in seconds during which the result of the recent invocation of
 B<mailq>(1) is cached.  Default is 10.
 
-=back    
+=back
 
 =head2 OIDS
-    
+
 The MIB is defined in file SENDMAIL-STATS.txt, which is distributed along
 with this module.  The following OIDs are defined:
 
@@ -107,101 +107,101 @@ the following elements (I<N> stands for the row index):
 =item B<queueName.>I<N>
 
 Name of the queue group.
-    
+
 =item B<queueDirectory.>I<N>
 
 Queue directory.
-    
-=item B<queueMessages.>I<N>    
 
-Number of messages in that queue group. 
-    
-=back    
-    
+=item B<queueMessages.>I<N>
+
+Number of messages in that queue group.
+
+=back
+
 =item B<mailerTable>
 
 This OID provides a conceptual table of mailers with the corresponding
 statistics.  Each row has the following elements (I<N> stands for the
 row index):
 
-=over 4    
-    
+=over 4
+
 =item B<mailerName.>I<N>
 
 Name of the mailer, as set in its definition in F<sendmail.cf>.
-    
+
 =item B<mailerMessagesFrom.>I<N>
 
-Number of outgoing messages sent using this mailer.    
-    
+Number of outgoing messages sent using this mailer.
+
 =item B<mailerKBytesFrom.>I<N>
 
 Number of kilobytes in outgoing messages sent using this mailer.
-    
+
 =item B<mailerMessagesTo.>I<N>
 
 Number of messages received using this mailer.
-    
+
 =item B<mailerKBytesTo.>I<N>
 
 Number of kilobytes in messages received using this mailer.
-    
+
 =item B<mailerMessagesRejected.>I<N>
 
-Number of messages rejected by this mailer.    
-    
+Number of messages rejected by this mailer.
+
 =item B<mailerMessagesDiscarded.>I<N>
 
-Number of messages discarded by this mailer.    
-    
+Number of messages discarded by this mailer.
+
 =item B<mailerMessagesQuarantined.>I<N>
 
 Number of messages put in quarantine by this mailer.
-    
+
 =back
 
-    
+
 =item B<totalMessagesFrom.0>
 
 Total number of outgoing messages.
-    
+
 =item B<totalKBytesFrom.0>
 
 Total number of outgoing kilobytes.
-    
+
 =item B<totalMessagesTo.0>
 
 Total number of incoming messages.
-    
+
 =item B<totalKBytesTo.0>
 
 Total number of incoming kilobytes.
-    
+
 =item B<totalMessagesRejected.0>
 
 Total number of rejected messages.
-    
+
 =item B<totalMessagesDiscarded.0>
 
 Total number of discarded messages.
-    
+
 =item B<totalMessagesQuarantined.0>
 
 Total number of messages put in quarantine.
-    
+
 =item B<connectionMessagesFrom.0>
 
 Number of messages sent over TCP connections.
-    
+
 =item B<connectionMessagesTo.0>
 
 Number of messages received over TCP connections.
-    
+
 =item B<connectionMessagesRejected.0>
 
 Number of messages that arrived over TCP connections and were rejected.
 
-=back    
+=back
 
 =head1 SEE ALSO
 
@@ -214,11 +214,11 @@ GPLv3+: GNU GPL version 3 or later, see
 
 This  is  free  software:  you  are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
-    
+
 =head1 AUTHOR
 
-Sergey Poznyakoff <gray@gnu.org>.    
-    
+Sergey Poznyakoff <gray@gnu.org>.
+
 =cut
 
 package NetSNMP::Sendmail;
@@ -227,7 +227,7 @@ use strict;
 use warnings;
 use feature 'state';
 use NetSNMP::agent::Support;
-use NetSNMP::agent (':all'); 
+use NetSNMP::agent (':all');
 use NetSNMP::ASN (':all');
 use Carp;
 
@@ -236,7 +236,7 @@ use Data::Dumper;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = "0.96";
+our $VERSION = "0.97";
 
 our @EXPORT_OK = qw(&Configure);
 
@@ -254,7 +254,7 @@ my %config = (
     mailstats_ttl => \$ttl{mailstats},
     mailq => \$mailq_bin,
     mailstats => \$mailstats_bin,
-    cf => \$sendmail_cf,	      
+    cf => \$sendmail_cf,
     bindir => sub {
 	$mailq_bin = "$_[1]/$mailq_bin" if $mailq_bin !~ m#^/#;
 	$mailstats_bin = "$_[1]/$mailstats_bin" if $mailstats_bin !~ m#^/#;
@@ -325,7 +325,7 @@ sub readcf {
 	    my $name = $1;
 	    # Collect parameters.  So far only P is actially used.
 	    my %h = map { if (/([a-zA-Z])[^=]*=(.+)/) {
-		             if (exists($qopt{$1})) {
+			     if (exists($qopt{$1})) {
 				 $qopt{$1} => $2;
 			     } else {
 				 ()
@@ -333,7 +333,7 @@ sub readcf {
 			  } else {
 			      ()
 			  }
-	              } split /,\s*/, $2;
+		      } split /,\s*/, $2;
 	    if (exists($h{queueDirectory})) {
 		my $dir = $h{queueDirectory};
 		delete $h{$dir};
@@ -357,25 +357,27 @@ sub queue_stats {
 	my $now = time();
 	return %tmp if $now - $timestamp{mailq} < $ttl{mailq};
 	$timestamp{mailq} = $now;
-	%tmp = ();
     }
-    open(my $fd, '-|', $mailq_bin)
-	or die "can't run $mailq_bin: $!";
-    while (<$fd>) {
-	chomp;
-	if (/^(^\S+) is empty/) {
-	    push @{$tmp{q}}, { queueName => $qgroup{$1}{queueName} || "",
-			       queueDirectory => $1,
-			       queueMessages => 0 };
-	} elsif (/^\s*(\S+) \((\d+) requests\)/) {
-	    push @{$tmp{q}}, { queueName => $qgroup{$1}{queueName} || "",
-			       queueDirectory => $1,
-			       queueMessages => $2 };
-	} elsif (/Total requests:\s+(\d+)\s*$/) {
-	    $tmp{total} = $1 
+    %tmp = ();
+    if (open(my $fd, '-|', $mailq_bin)) {
+	while (<$fd>) {
+	    chomp;
+	    if (/^(^\S+) is empty/) {
+		push @{$tmp{q}}, { queueName => $qgroup{$1}{queueName} || "",
+				   queueDirectory => $1,
+				   queueMessages => 0 };
+	    } elsif (/^\s*(\S+) \((\d+) requests\)/) {
+		push @{$tmp{q}}, { queueName => $qgroup{$1}{queueName} || "",
+				   queueDirectory => $1,
+				   queueMessages => $2 };
+	    } elsif (/Total requests:\s+(\d+)\s*$/) {
+		$tmp{total} = $1
+	    }
 	}
+	close($fd);
+    } else {
+	warn "can't run $mailq_bin: $!";
     }
-    close($fd);
     return %tmp;
 }
 
@@ -388,45 +390,47 @@ sub mailer_stats {
     $timestamp{mailstats} = $now;
     %mstats = ();
 
-    debug("calling $mailstats_bin");    
-    open(my $fd, '-|', "$mailstats_bin -P")
-	or die "can't run $mailstats_bin: $!";
-    my $line = 0;
+    debug("calling $mailstats_bin");
+    if (open(my $fd, '-|', "$mailstats_bin -P")) {
+	my $line = 0;
 
-    while (<$fd>) {
-	++$line;
+	while (<$fd>) {
+	    ++$line;
 
-	next if $line == 1;
-	
-	s/^\s+//;
+	    next if $line == 1;
+
+	    s/^\s+//;
 #  msgsfr  bytes_from   msgsto    bytes_to  msgsrej msgsdis msgsqur  Mailer
-	my @a = split /\s+/;
-	if ($a[0] eq 'T') {
-	    @{$mstats{totals}}{('totalMessagesFrom',
-				'totalKBytesFrom',	      
-				'totalMessagesTo',
-				'totalKBytesTo',
-				'totalMessagesRejected',
-				'totalMessagesDiscarded', 
-				'totalMessagesQuarantined')} = @a[1..7];
-	} elsif ($a[0] eq 'C') {
-	    @{$mstats{conn}}{('connectionMessagesFrom',
-			      'connectionMessagesTo',
-			      'connectionMessagesRejected')} = @a[1..3];
-	} else {
-	    my %h;
-	    @h{('mailerMessagesFrom',
-		'mailerKBytesFrom',	      
-		'mailerMessagesTo',
-		'mailerKBytesTo',
-		'mailerMessagesRejected',
-		'mailerMessagesDiscarded', 
-		'mailerMessagesQuarantined',
-		'mailerName')} = @a[1..8];
-	    push @{$mstats{mailer}}, \%h;
+	    my @a = split /\s+/;
+	    if ($a[0] eq 'T') {
+		@{$mstats{totals}}{('totalMessagesFrom',
+				    'totalKBytesFrom',
+				    'totalMessagesTo',
+				    'totalKBytesTo',
+				    'totalMessagesRejected',
+				    'totalMessagesDiscarded',
+				    'totalMessagesQuarantined')} = @a[1..7];
+	    } elsif ($a[0] eq 'C') {
+		@{$mstats{conn}}{('connectionMessagesFrom',
+				  'connectionMessagesTo',
+				  'connectionMessagesRejected')} = @a[1..3];
+	    } else {
+		my %h;
+		@h{('mailerMessagesFrom',
+		    'mailerKBytesFrom',
+		    'mailerMessagesTo',
+		    'mailerKBytesTo',
+		    'mailerMessagesRejected',
+		    'mailerMessagesDiscarded',
+		    'mailerMessagesQuarantined',
+		    'mailerName')} = @a[1..8];
+		push @{$mstats{mailer}}, \%h;
+	    }
 	}
+	close($fd);
+    } else {
+	warn "can't run $mailstats_bin: $!";
     }
-    close($fd);
     return %mstats;
 }
 
@@ -453,7 +457,7 @@ sub check_queueTable {
 
 sub next_queueTable {
     my ($len, $oid) = @_;
-    
+
     my $idx = getOidElement($oid, $len);
     my %qstats = queue_stats();
     ++$idx;
@@ -479,7 +483,7 @@ sub check_mailerTable {
 
 sub next_mailerTable {
     my ($len, $oid) = @_;
-    
+
     my $idx = getOidElement($oid, $len);
     my %mstats = mailer_stats();
 
@@ -501,7 +505,6 @@ sub connection_table_get {
     my %mstats = mailer_stats();
     return $mstats{conn}->{$name};
 }
-
 # Hash for all OIDs
 my  $oidtable={
     ".1.3.6.1.4.1.9163.100.1.2.1.2.0" => {

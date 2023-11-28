@@ -1,5 +1,9 @@
 Revision history for Perl extension DBIx::DataModel.
 
+v3.06
+  - support for SQL dialect 'Oracle12c'
+  - new arguments 'sql_abstract_class' and 'sql_abstract_args' to define_schema()
+
 v3.05 26.07.2023
   - new method $statement->nb_fetched_rows & fix buggy $statement->page_boundaries
 

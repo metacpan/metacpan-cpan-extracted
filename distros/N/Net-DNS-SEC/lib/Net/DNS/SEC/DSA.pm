@@ -3,7 +3,7 @@ package Net::DNS::SEC::DSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: DSA.pm 1863 2022-03-14 14:59:21Z willem $)[2];
+our $VERSION = (qw$Id: DSA.pm 1940 2023-10-30 15:59:20Z willem $)[2];
 
 
 =head1 NAME
@@ -64,8 +64,8 @@ sub sign {
 	my $evpmd = $parameters{$private->algorithm};
 	die 'private key not DSA' unless $evpmd;
 
-	my ( $p, $q, $g, $x, $y ) =
-			map { decode_base64( $private->$_ ) } qw(prime subprime base private_value public_value);
+	my @key = qw(prime subprime base private_value public_value);
+	my ( $p, $q, $g, $x, $y ) = map { decode_base64( $private->$_ ) } @key;
 	my $t = ( length($g) - 64 ) / 8;
 
 	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_DSA( $p, $q, $g, $y, $x );
@@ -87,7 +87,7 @@ sub verify {
 	my $len = 64 + 8 * unpack( 'C', $key );			# RFC2536, section 2
 	my ( $q, $p, $g, $y ) = unpack "x a20 a$len a$len a$len", $key;
 
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_DSA( $p, $q, $g, $y, '' );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_DSA( $p, $q, $g, $y );
 
 	my $asn1 = _ASN1encode($sigbin);
 	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $asn1, $evpkey, $evpmd );

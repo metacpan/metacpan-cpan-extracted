@@ -43,7 +43,7 @@ diag join "\n\t", "\nThese tests were run using:", @diag;
 plan tests => 1 + scalar(@Net::DNS::EXPORT);
 
 
-use_ok('Net::DNS::Multicast');
+use_ok('Net::DNS::Multicast') or BAIL_OUT('Fatal compilation failure');
 
 #
 # Check that Net::DNS symbol table was imported correctly

@@ -4708,10 +4708,10 @@ compile(...)
   }
   
   // Compile SPVM
-  int32_t error_id = env_api->api->compiler->compile(compiler, basic_type_name);
+  int32_t status = env_api->api->compiler->compile(compiler, basic_type_name);
   
   SV* sv_success = &PL_sv_undef;
-  if (error_id == 0) {
+  if (status == 0) {
     sv_success = sv_2mortal(newSViv(1));
   }
   
@@ -4916,7 +4916,7 @@ set_native_method_address(...)
 }
 
 SV*
-build_precompile_module_source(...)
+build_precompile_class_source(...)
   PPCODE:
 {
   SV* sv_self = ST(0);
@@ -4938,7 +4938,7 @@ build_precompile_module_source(...)
   
   void* basic_type = env_api->api->runtime->get_basic_type_by_name(runtime, basic_type_name);
   
-  env_api->api->runtime->build_precompile_module_source(runtime, string_buffer, basic_type);
+  env_api->api->runtime->build_precompile_class_source(runtime, string_buffer, basic_type);
   
   const char* string_buffer_value = env_api->api->string_buffer->get_string(string_buffer);
   int32_t string_buffer_length = env_api->api->string_buffer->get_length(string_buffer);

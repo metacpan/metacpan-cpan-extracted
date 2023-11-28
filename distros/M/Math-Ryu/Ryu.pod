@@ -40,11 +40,11 @@ Math::Ryu - perl interface to Ryu (float-to-string conversion).
 =head1 FUNCTIONS
 
    $nv = s2d($str);
-    Converts the string ($str) to a vloating point value ($nv)
+    Converts the string ($str) to a floating point value ($nv)
     and return $nv.
 
    $str = d2s($nv);
-    $nv holds a floating point numeric value.
+    $nv holds a floating point numeric value (NV).
     $str is a string in floating point format, that accurately
     and succinctly represents the value held by $nv.
     $str, when correctly assigned back to a perl number, will
@@ -54,6 +54,30 @@ Math::Ryu - perl interface to Ryu (float-to-string conversion).
     non-nan values of $nv. (Eg if $nv is sqrt 2.0 or 1.4/10 .)
     Also, $str will contain as few digits as possible, without
     compromising that accuracy.
+    Arguments that are not an NV will silently be coerced to an
+    NV, following the rules that perl uses for such a coercion.
+
+   $str = n2s($sv);
+    If the argument is a floating point numeric value, then this
+    function returns the same as d2s().
+    Otherwise, it stringifies the numeric value of the given
+    argument, according to whether that numeric value is an
+    integer value (that fits into an IV or UV) or a floating
+    point value.
+    Some examples, assuming IVSIZE is 8:
+    d2s(~0) returns 1.8446744073709552E19
+    n2s(~0) returns 18446744073709551615
+    n2s("18446744073709551615") returns 18446744073709551615
+    But:
+    n2s("18446744073709551615.0") returns 1.8446744073709552E19,
+    because the string argument "18446744073709551615.0" numifies
+    to an NV - whereas "18446744073709551615" numifies to a UV.
+    References, such as Math::BigInt objects will currently
+    throw an error when passed to n2s() - though this could be
+    changed in the future if there's an appetite for such.
+    If you want to know what happens when the argument is neither
+    a reference, nor an IV/UV, nor a string (PV) nor a floating
+    point value (NV), then you'll have to test that yourself ;-)
 
    $str = d2fixed($nv, $digits);
     $str is a $digits-decimal fixed point representation of $nv.

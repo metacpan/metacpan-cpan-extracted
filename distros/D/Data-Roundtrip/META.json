@@ -53,6 +53,7 @@
             "Test::More" : "0",
             "Test::Pod" : "1.51",
             "Test::Script" : "1.28",
+            "Test::Taint" : "0",
             "YAML" : "0",
             "YAML::PP" : "0",
             "YAML::XS" : "0"
@@ -71,6 +72,6 @@
          "web" : "https://github.com/hadjiprocopis/data-roundtrip"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

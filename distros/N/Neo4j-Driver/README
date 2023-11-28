@@ -1,4 +1,4 @@
-Neo4j::Driver 0.40
+Neo4j::Driver 0.41
 
 This software is a community driver for the Neo4j <https://neo4j.com/> graph
 database server. It is designed to follow the Neo4j Driver API, allowing
@@ -7,7 +7,7 @@ calls as the official Neo4j drivers do. This extends the uniformity across
 languages, which is a stated goal of the Neo4j Driver API, to Perl.
 
 More information about this software:
-https://metacpan.org/release/Neo4j-Driver
+https://metacpan.org/dist/Neo4j-Driver
 
 
 INSTALLATION
@@ -21,7 +21,7 @@ For example:
 If you already have downloaded the distribution, you can alternatively
 point your tool directly at the archive file or the directory:
 
-  cpanm Neo4j-Driver-0.40.tar.gz
+  cpanm Neo4j-Driver-0.41.tar.gz
 
 You can also install the module manually by following these steps:
 

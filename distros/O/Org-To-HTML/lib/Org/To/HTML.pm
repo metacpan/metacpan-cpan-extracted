@@ -12,14 +12,13 @@ use HTML::Entities qw/encode_entities/;
 use Org::Document;
 
 use Moo;
-use experimental 'smartmatch';
 with 'Org::To::Role';
 extends 'Org::To::Base';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-12'; # DATE
+our $DATE = '2023-11-06'; # DATE
 our $DIST = 'Org-To-HTML'; # DIST
-our $VERSION = '0.235'; # VERSION
+our $VERSION = '0.236'; # VERSION
 
 our @EXPORT_OK = qw(org_to_html);
 
@@ -465,7 +464,7 @@ Org::To::HTML - Export Org document to HTML
 
 =head1 VERSION
 
-This document describes version 0.235 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2022-02-12.
+This document describes version 0.236 of Org::To::HTML (from Perl distribution Org-To-HTML), released on 2023-11-06.
 
 =head1 SYNOPSIS
 
@@ -497,99 +496,6 @@ L<App::OrgUtils>.
 Note that this module is just a simple exporter, for "serious" work you'll
 probably want to use the exporting features or L<org-mode|http://orgmode.org>.
 
-=head1 new(%args)
-
-=head2 $exp->export_document($doc) => HTML
-
-Export document to HTML.
-
-=head1 FUNCTIONS
-
-
-=head2 org_to_html
-
-Usage:
-
- org_to_html(%args) -> [$status_code, $reason, $payload, \%result_meta]
-
-Export Org document to HTML.
-
-This is the non-OO interface. For more customization, consider subclassing
-Org::To::HTML.
-
-This function is not exported by default, but exportable.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<css_url> => I<str>
-
-Add a link to CSS document.
-
-=item * B<exclude_tags> => I<array[str]>
-
-Exclude trees that carry one of these tags.
-
-If the whole document doesn't have any of these tags, then the whole document
-will be exported. Otherwise, trees that do not carry one of these tags will be
-excluded. If a selected tree is a subtree, the heading hierarchy above it will
-also be selected for export, but not the text below those headings.
-
-exclude_tags is evaluated after include_tags.
-
-=item * B<html_title> => I<str>
-
-HTML document title, defaults to source_file.
-
-=item * B<ignore_unknown_settings> => I<bool>
-
-=item * B<include_tags> => I<array[str]>
-
-Include trees that carry one of these tags.
-
-Works like Org's 'org-export-select-tags' variable. If the whole document
-doesn't have any of these tags, then the whole document will be exported.
-Otherwise, trees that do not carry one of these tags will be excluded. If a
-selected tree is a subtree, the heading hierarchy above it will also be selected
-for export, but not the text below those headings.
-
-=item * B<inline_images> => I<bool> (default: 1)
-
-If set to true, will make link to an image filename into an <imgE<gt> element instead of <aE<gt>.
-
-=item * B<naked> => I<bool>
-
-Don't wrap exported HTML with HTMLE<sol>HEADE<sol>BODY elements.
-
-=item * B<source_file> => I<str>
-
-Source Org file to export.
-
-=item * B<source_str> => I<str>
-
-Alternatively you can specify Org string directly.
-
-=item * B<target_file> => I<str>
-
-HTML file to write to.
-
-If not specified, HTML string will be returned.
-
-
-=back
-
-Returns an enveloped result (an array).
-
-First element ($status_code) is an integer containing HTTP-like status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or something like "OK" if status is
-200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
-element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information, much like how HTTP response headers provide additional metadata.
-
-Return value:  (any)
-
 =for Pod::Coverage ^(export_.+|before_.+|after_.+)$
 
 =head1 ATTRIBUTES
@@ -609,7 +515,17 @@ to the name of the source file, or C<(source string)>.
 
 If set, export_document() will output a LINK element pointing to this CSS.
 
+=head2 inline_images => BOOL
+
 =head1 METHODS
+
+=head2 new(%args)
+
+=head2 $exp->export_document($doc) => HTML
+
+Export document to HTML.
+
+=head2 org_to_html
 
 =head1 FAQ
 
@@ -669,13 +585,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

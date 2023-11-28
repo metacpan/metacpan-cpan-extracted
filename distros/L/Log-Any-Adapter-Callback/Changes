@@ -1,3 +1,11 @@
+0.102   2023-11-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Mark distribution as up for adoption since I'm no longer using
+          Log::Any.
+
+
 0.101   2020-01-14  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

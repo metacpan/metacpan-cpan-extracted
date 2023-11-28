@@ -4,6 +4,7 @@
 class Native::Compiler : pointer {
   use Native::Runtime;
   use Native::ClassFile;
+  use Error::Compile;
   
   # Fields
   
@@ -13,7 +14,7 @@ class Native::Compiler : pointer {
   native static method new : Native::Compiler ();
   
   # Instance Methods
-  native method compile : int ($basic_type_name : string);
+  native method compile : void ($basic_type_name : string);
   
   native method get_runtime : Native::Runtime ();
   
@@ -22,6 +23,8 @@ class Native::Compiler : pointer {
   native method set_start_line : void ($start_line : int);
   
   native method add_include_dir : void ($include_dir : string);
+  
+  native method prepend_include_dir : void ($include_dir : string);
   
   native method get_error_messages : string[] ();
   

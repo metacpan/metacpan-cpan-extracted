@@ -1,0 +1,838 @@
+NAME
+    File::Util::Sort - Routines related to sorting files in one or more
+    directories
+
+VERSION
+    This document describes version 0.010 of File::Util::Sort (from Perl
+    distribution File-Util-Sort), released on 2023-11-26.
+
+DESCRIPTION
+FUNCTIONS
+  foremost
+    Usage:
+
+     foremost(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return file(s) which are alphabetically the first.
+
+    Notes:
+
+    *   by default dotfiles are not included, use "--all" ("-a") to include
+        them
+
+    Some examples:
+
+     # return foremost file in current directory
+     % foremost -f
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   ignore_case => *bool*
+
+        (No description)
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  hindmost
+    Usage:
+
+     hindmost(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return file(s) which are alphabetically the last.
+
+    Notes:
+
+    *   by default dotfiles are not included, use "--all" ("-a") to include
+        them
+
+    Some examples:
+
+     # return hindmost file in current directory
+     % hindmost -f
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   ignore_case => *bool*
+
+        (No description)
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  largest
+    Usage:
+
+     largest(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the largest file(s) in one or more directories.
+
+    Some examples:
+
+     # return largest file in current directory
+     % largest -f
+ 
+     # return largest file(s) in /some/dir (if there are multiple files with the
+     # same size they will all be returned
+     % largest -N1 -f /some/dir
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  longest_name
+    Usage:
+
+     longest_name(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return file(s) with the longest name in one or more directories.
+
+    Notes:
+
+    *   by default dotfiles are not included, use "--all" ("-a") to include
+        them
+
+    Some examples:
+
+     # return file with the longest name in current directory
+     % longest-name -f
+ 
+     # return file(s) with the longest name in /some/dir. if there are multiple
+     # files with the same length, they will all be returned.
+     % longest-name -N1 -f /some/dir
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  newest
+    Usage:
+
+     newest(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the newest file(s) in one or more directories.
+
+    Notes:
+
+    *   by default dotfiles are not included, use "--all" ("-a") to include
+        them
+
+    Suppose a new file is downloaded in "~/Downloads", but you are not sure
+    of its name. You just want to move that file, which you are pretty sure
+    is the newest in the "Downloads" directory, somewhere else. So from the
+    CLI in "~/Downloads":
+
+     % mv C<newest -f> /somewhere/else
+
+    or, from "/somewhere/else":
+
+     % mv C<newest -f ~/Downloads> .
+
+    If you want to see the filename on stderr as well:
+
+     % mv C<newest --verbose -f ~/Downloads> .
+
+    File is deemed as newest by its mtime.
+
+    Some examples:
+
+     # return newest file in current directory
+     % newest -f
+ 
+     # return newest file(s) in /some/dir (if there are multiple files with the
+     # same newest mtime) they will all be returned
+     % newest -N1 -f /some/dir
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  oldest
+    Usage:
+
+     oldest(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the oldest file(s) in one or more directories.
+
+    Notes:
+
+    *   by default dotfiles are not included, use "--all" ("-a") to include
+        them
+
+    File is deemed as oldest by its mtime.
+
+    Some examples:
+
+     # return oldest file in current directory
+     % oldest -f
+ 
+     # return oldest file(s) in /some/dir (if there are multiple files with the
+     # same oldest mtime) they will all be returned
+     % oldest -N1 -f /some/dir
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  shortest_name
+    Usage:
+
+     shortest_name(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return file(s) with the shortest name in one or more directories.
+
+    Notes:
+
+    *   by default dotfiles are not included, use "--all" ("-a") to include
+        them
+
+    Some examples:
+
+     # return file with the shortest name in current directory
+     % shortest-name -f
+ 
+     # return file(s) with the shortest name in /some/dir. if there are multiple
+     # files with the same length, they will all be returned.
+     % shortest-name -N1 -f /some/dir
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  smallest
+    Usage:
+
+     smallest(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the smallest file(s) in one or more directories.
+
+    Some examples:
+
+     # return smallest file in current directory
+     % smallest -f
+ 
+     # return smallest file(s) in /some/dir (if there are multiple files with the
+     # same size they will all be returned
+     % smallest -N1 -f /some/dir
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  sort_files
+    Usage:
+
+     sort_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Sort files in one or more directories and display the result in a
+    flexible way.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   by_code => *code_from_str*
+
+        Perl code to sort.
+
+    *   by_field => *str*
+
+        Field name to sort against.
+
+    *   by_sortsub => *str*
+
+        Sort::Sub routine name to sort.
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["."])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str*
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   key => *code_from_str*
+
+        Perl code to generate key to sort against.
+
+        If "key" option is not specified, then: 1) if sorting is "by_code"
+        then the code will receive files as records (hashes) with keys like
+        "name", "size", etc; 2) if sorting is "by_field" then the associated
+        field is used as key; 3) if sorting is "by_sortsub" then by default
+        the "name" field will be used as the key.
+
+        To select a field, use this:
+
+         '$_->{FIELDNAME}'
+
+        for example:
+
+         '$_->{size}'
+
+        Another example, to generate length of name as key:
+
+         'length($_->{name})'
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   reverse => *true*
+
+        Reverse order of sorting.
+
+    *   sortsub_args => *hash*
+
+        Arguments to pass to Sort::Sub routine.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Util-Sort>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-File-Util-Sort>.
+
+SEE ALSO
+    App::FileSortUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Util-Sort>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

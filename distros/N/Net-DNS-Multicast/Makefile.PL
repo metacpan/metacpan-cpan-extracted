@@ -22,8 +22,8 @@ my %metadata = (
 	ABSTRACT_FROM	   => $module,
 	AUTHOR		   => $author,
 	LICENSE		   => 'mit',
-	MIN_PERL_VERSION   => '5.008009',
-	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.48,},
+	MIN_PERL_VERSION   => 5.008009,
+	CONFIGURE_REQUIRES => {'ExtUtils::MakeMaker' => 6.48},
 	TEST_REQUIRES	   => {
 		'ExtUtils::MakeMaker' => 0,
 		'File::Find'	      => 1.13,
@@ -35,8 +35,12 @@ my %metadata = (
 
 
 my %prerequisite = (
-	'Net::DNS' => 1.38,
-	'Exporter' => 5.56,
+	'Net::DNS'	 => 1.38,
+	'Exporter'	 => 5.63,
+	'IO::Select'	 => 1.17,
+	'IO::Socket'	 => 1.30,
+	'IO::Socket::IP' => 0.38,
+	'Socket'	 => 2.025,
 	);
 
 
@@ -58,14 +62,14 @@ exit;
 
 package MY;				## customise generated Makefile
 
-sub test {
-	return join '', shift->SUPER::test(), <<'END' if $^O =~ /MSWin/i;
+sub constants {
+	return join "\n", shift->SUPER::constants(), <<'END' if $^O =~ /MSWin/i;
+#	include test directory
 TEST_DIR = t
 FULLPERLRUN = $(FULLPERL) "-I$(TEST_DIR)"
 END
-
-	return join '', shift->SUPER::test(), <<'END';
-# suppress parallel test execution	include test directory
+	return join "\n", shift->SUPER::constants(), <<'END';
+#	suppress parallel test execution	include test directory
 TEST_DIR = t
 FULLPERLRUN = HARNESS_OPTIONS=j1:c $(FULLPERL) "-I$(TEST_DIR)"
 END

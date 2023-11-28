@@ -321,3 +321,17 @@ Revision history for Debug-Easy
 
         Added github info and list of modules I write to the perldoc section.
 
+2.09    Oct 17, 2023
+
+        Added conditional use of Data::Dumper::Simple for better output, but
+		falls back on the distribution included Data::Dumper if not installed.
+
+        Change the requirement of threads to its conditional use if it doesn't
+		exist.  This was already mostly implemented in the code, except for
+		the "use" command which forced its requirement.  That has changed.
+		Non-threaded Perls can now use this module.
+ 
+2.10    Nov 27, 2023
+
+        Muted the initial message if log level is ERROR.  In other words, be
+		silent.

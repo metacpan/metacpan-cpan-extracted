@@ -4,7 +4,7 @@ use Imager;
 use vars qw($VERSION @ISA);
 
 BEGIN {
-  $VERSION = "0.003";
+  $VERSION = "0.005";
 
   require XSLoader;
   XSLoader::load('Imager::File::HEIF', $VERSION);
@@ -90,6 +90,10 @@ eval {
   Imager->add_type_extensions("heif", "heic", "heif");
 };
 
+END {
+  __PACKAGE__->deinit();
+}
+
 1;
 
 
@@ -102,11 +106,11 @@ Imager::File::HEIF - read and write HEIF files
 =head1 SYNOPSIS
 
   use Imager;
-  # you need to explicitly load it, or supply a type => "heif" parameter
+  # before Imager 1.013 you need to explicitly load this
   use Imager::File::HEIF;
 
   my $img = Imager->new;
-  $img->read(file=>"foo.heif")
+  $img->read(file => "foo.heif")
     or die $img->errstr;
 
   # type won't be necessary if the extension is heif from Imager 1.008
@@ -115,33 +119,44 @@ Imager::File::HEIF - read and write HEIF files
 
 =head1 DESCRIPTION
 
-Implements .heif file support for Imager.
+Implements F<.heif> file support for Imager.
 
-=head1 LIMITATIONS
+=head1 CLASS METHODS
 
 =over
 
-=item *
+=item libversion()
 
-Due to the limitations of C<heif> (or possibly C<libheif>) grayscale
-images are written as RGB images.
+=item buildversion()
 
-=item *
+  my $lib_version   = Imager::File::HEIF->libversion;
+  my $build_version = Imager::File::HEIF->buildversion;
 
-libx265 will
-L<reject|https://mailman.videolan.org/pipermail/x265-devel/2018-May/012068.html>
-attempts to write images smaller than 64x64 pixels.  Since this may
-change in the future I haven't tried to prevent that in Imager itself.
+Returns the version of C<libheif>, either the version of the library
+currently being used, or the version that Imager::File::HEIF was built
+with.
 
-=item *
+These might differ because the library was updated after
+Imager::File::HEIF was built.
 
-Imager's images are always RGB or grayscale images, and libheif will
-re-encode the RGB data Imager provides to YCbCr for output.  This
-inevitably loses some information, and I've seen one
-L<complaint|https://github.com/strukturag/libheif/issues/40#issuecomment-428598563>
-that libheif's conversion isn't as good as it could be.  Grayscale
-images (which are still passed through as RGB) seem to be supported
-with very good quality.  YMMV.
+=item init()
+
+=item deinit()
+
+  Imager::File::HEIF->init;
+  Imager::File::HEIF->deinit;
+
+You do not need to call these in normal code.
+
+Initialise or clean up respectively the state of C<libheif>.
+
+These require C<libheif> 1.13.0 or later to have any effect.
+
+Imager::File::HEIF will call these on load and at C<END> time
+respectively.
+
+In practice C<libx265> still leaves a lot of memory leaked in my
+testing.
 
 =back
 
@@ -151,14 +166,25 @@ The h.265 compression libheif uses is covered by patents, if you use
 this code for commercial purposes you may need to license those
 patents.
 
+=head1 LICENSING
+
+Imager::File::HEIF itself and Imager are licensed under the same terms
+as Perl itself, and C<libheif> is licensed under the LGPL 3.0.
+
+But C<libx264>, which C<libheif> is typically built to use for
+encoding, is licensed under the GPL 2.0, and the owners provide a
+L<fairly strict interpretation of that
+license|https://www.x265.org/x265-licensing-faq/>.  They also sell
+commercial licenses.
+
 =head1 INSTALLATION
 
 To install Imager::File::HEIF you need Imager installed and you need
-libheif, libde265 and libx265 and their development files.
+C<libheif>, C<libde265> and C<libx265> and their development files.
 
-Development of Imager::File::HEIF was done with the latest development
-versions of libheif and libde265 at the time ie from git, older
-releases might fail to build or run.
+Imager::File::HEIF requires at least version 1.9.0 of C<libheif>, but
+in general you want the very latest version you can get.
+Imager::File::HEIF has been tested up to version 1.17.3 of C<libheif>.
 
 =head1 CONTROLLING COMPRESSION
 
@@ -186,19 +212,19 @@ B<WARNING>: from my testing, using the rough measure done by Imager
 i_img_diff(), lossy at 80 quality turned out closer to the original
 image than lossless.
 
+=head1 RESOURCE USAGE
+
+HEIF processing is fairly resource intensive, and libheif uses
+multiple decoding threads by default when you read a HEIF image.
+
+With C<libheif> 1.13.0 or later you can set
+C<$Imager::File::HEIF::MaxThreads> to the maximum number of threads to
+use.  If this is negative or not defined the default is used, which is
+defined by C<libheif>.
+
 =head1 TODO
 
 =over
-
-=item *
-
-can we hack grayscale by setting the chroma bits to zero?  The sample
-code produces a chroma bits 8 image when given a grayscale input PNG,
-which is why I suspect the format doesn't support gray, but they might
-be a deficiency in the tool.  I tried just adding a Y channel for
-grayscale, but that simply made the encoding step crash.
-
-The heif_enc sample creates a YCbCr image and only adds a Y plane.
 
 =item *
 
@@ -242,5 +268,11 @@ Tony Cook <tonyc@cpan.org>
 =head1 SEE ALSO
 
 Imager, Imager::Files.
+
+https://github.com/strukturag/libheif
+
+https://github.com/strukturag/libde265 - x265 decoder
+
+https://www.x265.org/ - x265 encoder
 
 =cut

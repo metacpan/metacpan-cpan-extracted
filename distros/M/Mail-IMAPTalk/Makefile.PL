@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "4.04",
+  "VERSION" => "4.06",
   "test" => {
     "TESTS" => ""
   }

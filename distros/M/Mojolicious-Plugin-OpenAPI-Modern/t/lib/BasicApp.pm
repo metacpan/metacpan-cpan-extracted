@@ -1,3 +1,4 @@
+use strictures 2;
 package BasicApp;
 use Mojo::Base 'Mojolicious', -signatures;
 
@@ -10,7 +11,12 @@ Class::Method::Modifiers::before('Test::Mojo::_request_ok' => sub {
 });
 
 sub startup ($self) {
-  $self->plugin('OpenAPI::Modern', $self->config->{openapi});
+  my $config = $self->config->{openapi};
+  $config->{after_response} //= sub ($c) {
+    $LAST_VALIDATE_RESPONSE_RESULT = $c->validate_response;
+    $LAST_VALIDATE_RESPONSE_STASH = $c->stash('openapi');
+  };
+  $self->plugin('OpenAPI::Modern', $config);
 
   my $routes = $self->routes;
 
@@ -25,11 +31,6 @@ sub startup ($self) {
         result => $result,
       },
     );
-  });
-
-  $self->hook(after_dispatch => sub ($c) {
-    $LAST_VALIDATE_RESPONSE_RESULT = $c->validate_response;
-    $LAST_VALIDATE_RESPONSE_STASH = $c->stash('openapi');
   });
 }
 

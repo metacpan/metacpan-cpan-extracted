@@ -4,42 +4,58 @@ NAME
 
 SYNOPSIS
      my $cnf = Config::Dot::Array->new(%params);
-     my $struct_hr = $cnf->parse($string);
+
+     my $struct_hr = $cnf->parse($string_or_array_ref);
      $cnf->reset;
      my $serialized = $cnf->serialize;
 
 METHODS
-    "new(%params)"
-             Constructor.
+  "new"
+    Constructor.
 
-            *       "callback"
+    *       "callback"
 
-                     Callback code for adding parameter.
-                     Callback arguments are:
-                     $key_ar - Reference to array with keys.
-                     $value - Key value.
-                     Default is undef.
+            Callback code for adding parameter. Callback arguments are:
 
-            *       "config"
+             $key_ar - Reference to array with keys.
+             $value - Key value.
 
-                     Reference to hash structure with default config data.
-                     This is hash of hashes or arrays structure.
-                     Default value is reference to blank hash.
+            Default is undef.
 
-            *       "set_conflicts"
+    *       "config"
 
-                     Set conflicts detection as error.
-                     Default value is 1.
+            Reference to hash structure with default config data. This is
+            hash of hashes or arrays structure.
 
-    "parse($string_or_array_ref)"
-            Parse string $string_or_array_ref or reference to array
-            $string_or_array_ref and returns hash structure.
+            Default value is reference to blank hash.
 
-    "reset()"
-            Reset content in class (config parameter).
+    *       "set_conflicts"
 
-    "serialize()"
-            Serialize 'config' hash to output.
+            Set conflicts detection as error.
+
+            Default value is 1.
+
+  "parse"
+     my $struct_hr = $cnf->parse($string_or_array_ref);
+
+    Parse string $string_or_array_ref or reference to array
+    $string_or_array_ref and returns structure.
+
+    Returns reference to hash.
+
+  "reset"
+     $cnf->reset;
+
+    Reset content in class (config parameter).
+
+    Returns undef.
+
+  "serialize"
+     my $serialized = $cnf->serialize;
+
+    Serialize 'config' parameter hash to output.
+
+    Returns string.
 
 PARAMETER_FILE
      # Comment.
@@ -177,7 +193,7 @@ SEE ALSO
         Common config utilities.
 
 REPOSITORY
-    <https://github.com/tupinek/Config-Dot-Array>
+    <https://github.com/michal-josef-spacek/Config-Dot-Array>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -185,9 +201,17 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2011-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 246:
+        =back without =over
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,39 +12,45 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 2c4fae4020f71f8ac610c26a1b98bfffe3014c7c Changes
-SHA1 d736c95cfe4647ee36e4772b5372921e8408722d Generator.pm
-SHA1 f6f99b50ddf40ff89a85a50ceaef1acd9756d898 LICENSE
-SHA1 9123dd0c8a5576b180001368e02ca11bb81733fa MANIFEST
-SHA1 d2929edd7a7c575c2e37bb1a3cc767f275c1c150 META.yml
-SHA1 8825afe3b865f7b97b4e1e07f9215d8752b680f7 Makefile.PL
-SHA1 0abb69d7db87488393d705e0698b1707a6fdcbda README
-SHA1 bf0cd2c6f8ed2a346f5cbeae65a3dfb44d6ed8a2 examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 38e92359d3e5d02d3105e7ba1a16aebea8c9a167 t/Dicom-UID-Generator/01-use.t
-SHA1 81b26125c1be5a2e1bfbb0fe7120e6f4ac84e9e4 t/Dicom-UID-Generator/02-version.t
-SHA1 020942bb87d9e4e3bdbdb29227b28b9ab3328d05 xt/Dicom-UID-Generator/01-pod_coverage.t
-SHA1 82efecc33032f9d49c450c4d97c1dd7cfc188bbb xt/Dicom-UID-Generator/02-pod.t
+SHA256 d323e2d27f8ed902ae2c524aa67c2042ca3c16ec8693dcbf987a3298806f55da Changes
+SHA256 77e95d38df6e26633a8fe439c7fe58cdad639704dd4d40c5c09ea1011a103951 Generator.pm
+SHA256 4c4f95ffe59b34de08884ca2f71d13db74181ef812f7d4aea8fe6560be9e7059 LICENSE
+SHA256 e00bde13bc5b3f2c51feaae9fab46bd0edfe4fbc2dfbad33e5beb47187bc53ea MANIFEST
+SHA256 ed87e30573d72bbe6905a3d63ff1702bb8c0b1d6abb423779685e07e68ec6b3a META.yml
+SHA256 06998c013914860b0006c89a92d3e3f151199e7eeb29be6b5f7e4808cfacc3d5 Makefile.PL
+SHA256 4be7198442c92b1e1bd851f564e9a3e88a4e09a74e99a53b9d5d3cddbd745885 README
+SHA256 98f3cd7405d5a8dcf7954aee311a6179460c6aa956cef369186cc665037eaa68 examples/gen_uid_numbers.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 0554dc82a82956968b492dd0006fd83f4d0e737ad58f53df0c633053d0e8948d t/Dicom-UID-Generator/01-use.t
+SHA256 ba78a124175df6848466fade5e348d241996ebbc2d1cca93d500a46611ab9e3d t/Dicom-UID-Generator/02-version.t
+SHA256 4229f03001f3f60bb23b1f8820c0d77b1f445fb2cd54a2657d5cc4c3d950c3c2 t/Dicom-UID-Generator/03-new.t
+SHA256 46a231984b242201c747e23da2df86a99285fe6c616f21e28e842e331f973315 xt/Dicom-UID-Generator/01-pod_coverage.t
+SHA256 b91d43288165478af57e34caad6a738c7f5584a0f5f1aa82be343514018e6ae4 xt/Dicom-UID-Generator/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJXvrl0AAoJEJe+XXKaIuTlKiMIAJA7Ny29cAJPntXvDsq4c5wZ
-xujUAOamrKnunQfbSiulJ/eK3CC15FcRDRk9CuzSOVt01y2NMjzS6NUbhl8FfmIN
-uGSoeYNS8O7ukYcVA2BONii49FM4/+Z5FLp0Eag0T4NP1uI6xsMuhCxjEPC+VbWY
-bRc6QUwjDnAQXnpjIHtRrD4A9zSgIIcXGjlg3sq5bEuZKj+pl+rwpIb2yXSm6Jkm
-fTWd7TWy+S72Evfbqk37SI3ODk5Cua4//BGREY7gmFWDynlk8UL3IZg5Hfxb2AHI
-Tlxtkrq44UaA6jZ/ysejWyRiKaN5Jd6osUatGsv/X2iaBRxLb5mVzGpAofZMcq4=
-=ZSJ1
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVflcgACgkQojV9Rpe/
+B8tAnA//ftG/06zbD377pbAeNlBW1dgX/HguubqiCNi9FAiQgWqezbT795hNitet
+pHevCthhBrhF0VXe7r2E77ytJzbgbe+O0i8/WaMZCdDV7Gf3+HC1bwfoe6keTCnz
+4zKi2KfHzou7winuVe/EiRcEriPGaoPhtKE+lWYQMBoV7074dgJC5j8nMVIhQV7f
+R79TwNa3wM4H3LYbhoPWWJv48flN5q0SfNnG7tLomD+b+WNqnnCzcFlRdTn0NyH7
+t1Hi9F4V0M+5pjS+4xzsEEcJKQNKrDuICaCSG+5YaLDGe7mLL8DlZ9TXnTfZFOf7
+iyXL03SMcC9MKLLCtvNKJ5DZHGuPHOvYvHN1H5UMdKvB2ZHu931rJ+CnCD0Ifx7a
+WQRIsj76YK56SJVlUOS4uWA9G4ZNhXrUQhlP2PvjmFbJRJv1XZUuc6tSmG9FFbRT
+daa8U3aaJqpK5wFuC5B8yHZst4s/OnmKvjGibGdxzImDOSnBO/foHbaCyNYhZ8Eu
+Ys84PDzSJUmRISBsepeSP0SHfKh5pQyGCc7V6EJ2PdYbYf9ZA4dW6fzCq39UW4B6
+kPwrud5wOSFVL30wd5VtpfRIfeYR4EJatnCOHCfCkBj0dGOf7w6Ltu40M3G7HGTa
+qtIdhn3C+NABJtYocsAYfSrs13oW3DePK+iHHfM3kD5tr/V6ESk=
+=yIAb
 -----END PGP SIGNATURE-----

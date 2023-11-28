@@ -7,16 +7,16 @@ Kossy - Sinatra-ish Simple and Clear web application framework
     % kossy-setup MyApp
     % cd MyApp
     % plackup app.psgi
-    
+
     ## lib/MyApp/Web.pm
-    
+
     use Kossy;
-    
+
     get '/' => sub {
         my ( $self, $c )  = @_;
         $c->render('index.tx', { greeting => "Hello!" });
     };
-    
+
     get '/json' => sub {
         my ( $self, $c )  = @_;
         my $result = $c->req->validator([
@@ -29,9 +29,9 @@ Kossy - Sinatra-ish Simple and Clear web application framework
         ]);
         $c->render_json({ greeting => $result->valid->get('q') });
     };
-    
+
     1;
-    
+
     ## views/index.tx
     : cascade base
     : around content -> {
@@ -86,7 +86,7 @@ Kossy exports some methods to building application
             my ( $self:Kossy, $c:Kossy::Connection )  = @_;
             $c->render('index.tx', { greeting => "Hello!" });
         };
-        
+
         get '/json' => sub {
             my ( $self:Kossy, $c:Kossy::Connection )  = @_;
             $c->render_json({ greeting => "Hello!" });
@@ -114,7 +114,13 @@ per-request object, herds request and response
 - stash:HashRef
 - args:HashRef
 
-    Router::Simple->match result
+    path parameters captured by Router::Boom
+
+        get '/user/:id' => sub {
+            my ($self, $c) = @_;
+            my $id = $c->args->{id};
+            ...
+        };
 
 - halt(status\_code, message)
 
@@ -165,7 +171,7 @@ This class is child class of Plack::Request, decode query/body parameters automa
 
     build absolute URI with path and $args
 
-        my $uri = $c->req->uri_for('/login',[ arg => 'Hello']);  
+        my $uri = $c->req->uri_for('/login',[ arg => 'Hello']);
 
 - validator($rule):Kossy::Validator::Result
 
@@ -191,6 +197,35 @@ This class is child class of Plack::Request, decode query/body parameters automa
 
     These methods are the accessor to raw values. 'raw' means the value is not decoded.
 
+- body\_parameters
+
+    Accessor to decoded body parameters. It's Hash::MultiValue object.
+
+- query\_parameters
+
+    Accessor to decoded query parameters. It's Hash::MultiValue object.
+
+- json\_parameters
+
+    Accessor to decoded JSON body parameters. It's **NOT** Hash::MultiValue object.
+
+        post '/api' => sub {
+            my ($self, $c) = @_;
+            my $foo = $c->req->json_parameters->{foo}; # bar
+        };
+
+        # requrest
+        # $ua->requrest(
+        #     HTTP::Request->new(
+        #         "POST",
+        #         "http://example.com/api",
+        #         [ "Content-Type" => 'application/json', "Content-Length" => 13 ],
+        #         '{"foo":"bar"}'
+        #     )
+        # );
+
+    NOTE: Not need to set `kossy.request.parse_json_body` to 1
+
 # Kossy::Response
 
 This class is child class of Plack::Response
@@ -199,7 +234,7 @@ This class is child class of Plack::Response
 
 - X-Frame-Options
 
-    By default, Kossy outputs "X-Frame-Options: DENY". You can change this header 
+    By default, Kossy outputs "X-Frame-Options: DENY". You can change this header
 
         get '/iframe' => sub {
             my ($self, $c) = @_;

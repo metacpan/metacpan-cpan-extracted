@@ -4,6 +4,7 @@ NAME
 
 SYNOPSIS
      use Graph::Reader::TGF::CSV;
+
      my $obj = Graph::Reader::TGF::CSV->new;
      my $graph = $obj->read_graph($tgf_csv_file);
 
@@ -39,11 +40,9 @@ ERRORS
                      String: %s
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Graph::Reader::TGF::CSV;
      use IO::Barf qw(barf);
      use File::Temp qw(tempfile);
@@ -88,17 +87,18 @@ SEE ALSO
         Install the Graph::Reader modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Graph-Reader-TGF-CSV>
+    <https://github.com/michal-josef-spacek/Graph-Reader-TGF-CSV>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

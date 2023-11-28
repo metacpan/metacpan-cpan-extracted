@@ -11,13 +11,13 @@
 
 	<table>
 		<tr>
-			<td>[+ $ks[$row] +]</td><td>[+ $udat{$ks[$row] || ''} +]</td>
+			<td>[+ $ks[$row] +]</td><td>[+ 0+$udat{$ks[$row] || ''} +]</td>
 		</tr>
 	</table>
 
 	[+ $num > 0?"ok (num=$num)":"Not a session hash (num=$num)" +]<p>
 
-    $mdat{cnt} = -[+ $mdat{cnt}  +]- <br>
+    $mdat{cnt} = -[+ 0+$mdat{cnt}  +]- <br>
     $udat{cnt} = -[+ $udat{cnt}  +]- <br>
 
 	[- $_[0] -> DeleteSession (1) ; -]

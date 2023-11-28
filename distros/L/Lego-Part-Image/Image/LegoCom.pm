@@ -1,32 +1,24 @@
 package Lego::Part::Image::LegoCom;
 
-# Pragmas.
 use base qw(Lego::Part::Image);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Get image URL.
 sub image_url {
 	my $self = shift;
+
 	if (! defined $self->{'part'}->element_id) {
 		err "Element ID doesn't defined.";
 	}
-	my $url = sprintf 'http://cache.lego.com/media/bricks/5/%s/%s.jpg',
-		$self->_zoom, $self->{'part'}->element_id;
-	return $url;
-}
+	my $url = sprintf 'https://www.lego.com/cdn/product-assets/element.img.lod5photo.192x192/%s.jpg',
+		$self->{'part'}->element_id;
 
-# lego.com zoom rutine.
-sub _zoom {
-	my $self = shift;
-	# TODO Better resolution? 2/3 in lego.com
-	return 2;
+	return $url;
 }
 
 1;
@@ -44,40 +36,48 @@ Lego::Part::Image::LegoCom - Lego part image class for lego.com.
 =head1 SYNOPSIS
 
  use Lego::Part::Image::LegoCom;
+
  my $obj = Lego::Part::Image::LegoCom->new;
  my $image = $obj->image;
  my $image_url = $obj->image_url;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item * C<new()>
+ my $obj = Lego::Part::Image::LegoCom->new;
 
- Constructor.
- Returns object.
+Constructor.
 
 =over 8
 
 =item * C<part>
 
- Lego::Part object.
- It is required.
- Default value is undef.
+L<Lego::Part> object.
+
+It is required.
+
+Default value is undef.
 
 =back
 
-=item * C<image()>
+Returns instance of object.
 
- Get image.
- Not implemented now.
+=head2 C<image>
 
-=item * C<image_url()>
+ my $image = $obj->image;
 
- Get image URL.
- Returns string with image URL.
+Get image.
 
-=back
+Not implemented now.
+
+=head2 C<image_url>
+
+ my $image_url = $obj->image_url;
+
+Get image URL.
+
+Returns string with image URL.
 
 =head1 ERRORS
 
@@ -96,11 +96,11 @@ Lego::Part::Image::LegoCom - Lego part image class for lego.com.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=link_for_lego_com.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Lego::Part;
  use Lego::Part::Image::LegoCom;
 
@@ -118,11 +118,11 @@ Lego::Part::Image::LegoCom - Lego part image class for lego.com.
  print "Part with element ID '300321' URL is: ".$image_url."\n";
 
  # Output:
- # Part with element ID '300321' URL is: http://cache.lego.com/media/bricks/5/2/300321.jpg
+ # Part with element ID '300321' URL is: https://www.lego.com/cdn/product-assets/element.img.lod5photo.192x192/300321.jpg
 
 =begin html
 
-<img src="http://cache.lego.com/media/bricks/5/2/300321.jpg" alt="Lego brick with element ID '300321'." />
+<img src="https://www.lego.com/cdn/product-assets/element.img.lod5photo.192x192/300321.jpg" alt="Lego brick with element ID '300321'." />
 
 =end html
 
@@ -155,21 +155,22 @@ Install the Lego modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Lego-Part-Image>
+L<https://github.com/michal-josef-spacek/Lego-Part-Image>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- BSD 2-Clause License
+© 2015-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

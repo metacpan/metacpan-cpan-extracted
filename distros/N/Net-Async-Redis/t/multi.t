@@ -1,8 +1,11 @@
 use strict;
 use warnings;
+use experimental qw(signatures);
 
 use Test::More;
 use Test::Fatal;
+use Future::AsyncAwait;
+use Future::Utils qw(fmap_void);
 
 use Net::Async::Redis;
 use IO::Async::Loop;
@@ -35,6 +38,7 @@ subtest 'basic MULTI' => sub {
     })->get;
     done_testing;
 };
+
 subtest 'MULTI combined with regular requests' => sub {
     my $data;
     my $multi = $redis->multi(sub {
@@ -48,8 +52,6 @@ subtest 'MULTI combined with regular requests' => sub {
             }, undef, 'no exception on ->get');
         });
     });
-    await $multi;
-    is($data, '123', 'data is correct after multi');
     my $f = $redis->get('x')->on_ready(sub {
         my $f = shift;
         is(exception {
@@ -61,8 +63,69 @@ subtest 'MULTI combined with regular requests' => sub {
         $multi,
         $f
     )->get;
+    is($data, '123', 'data is correct after multi');
     done_testing;
 };
+
+subtest 'MULTI while existing MULTI is active' => sub { (async sub {
+    my $data;
+    my $k = "multi.key";
+    await $redis->hset($k, x => "y");
+    await $redis->expire($k, 60);
+    my %result;
+    my $target = $ENV{AUTHOR_TESTING} ? 2000 : 100;
+    await fmap_void(async sub ($item) {
+        await $redis->multi(sub ($tx) {
+            $tx->hset($k, $item => '' . reverse $item);
+            $tx->hget($k, $item)->on_ready(sub {
+                my $f = shift;
+                is(exception {
+                    ($data) = $f->get;
+                    $result{$item} = $data;
+                    is($data, '' . reverse($item), 'data is correct inside MULTI');
+                }, undef, 'no exception on ->get');
+            });
+            return;
+        });
+    }, concurrent => 64, foreach => [1 .. $target]);
+    done_testing;
+})->()->get };
+
+subtest 'MULTI interspersed with regular Redis calls' => sub { (async sub {
+    my $data;
+    my $k = "multi.key";
+    await $redis->unlink($k);
+    await $redis->hset($k, x => "y");
+    await $redis->expire($k, 300);
+    my %result;
+    my $target = $ENV{AUTHOR_TESTING} ? 2000 : 100;
+    await $redis->unlink($k . '.count');
+    await fmap_void(async sub ($item) {
+        await $redis->multi(sub ($tx) {
+            my $v = '' . reverse $item;
+            $tx->hset($k, $item => $v);
+            $redis->hget($k, $item)->on_ready(sub {
+                my $f = shift;
+                is(exception {
+                    ($data) = $f->get;
+                    is($data, $result{$item}, 'data is correct inside regular HGET');
+                }, undef, 'no exception on ->get');
+            });
+            $redis->incr($k . '.count')->retain;
+            $tx->hget($k, $item)->on_ready(sub {
+                my $f = shift;
+                is(exception {
+                    ($data) = $f->get;
+                    $result{$item} = $data;
+                    is($data, $v, 'data is correct inside MULTI');
+                }, undef, 'no exception on ->get');
+            });
+            return;
+        });
+    }, concurrent => 64, foreach => [1..$target]);
+    is(await $redis->get($k . '.count'), $target, 'count matches afterwards');
+    done_testing;
+})->()->get };
 
 done_testing;
 

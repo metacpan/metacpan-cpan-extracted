@@ -2,7 +2,7 @@
 # Distribution : HiPi Modules for Raspberry Pi
 # File         : lib/HiPi/Constant.pm
 # Description  : Constants for HiPi
-# Copyright    : Copyright (c) 2013-2020 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -15,7 +15,7 @@ use warnings;
 use parent qw( Exporter );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.82';
+our $VERSION ='0.89';
 
 our @EXPORT_OK = ( qw( hipi_export_ok  hipi_export_constants hipi_export_tags ) );
 our %EXPORT_TAGS = ( hipi => \@EXPORT_OK );
@@ -68,8 +68,6 @@ my $const = {
     
     rpi => {
         
-        
-        
         RPI_PIN_3  =>  ( $legacyboard ) ? 0 : 2,
         RPI_PIN_5  =>  ( $legacyboard ) ? 1 : 3,
         RPI_PIN_7  =>  4,
@@ -110,9 +108,14 @@ my $const = {
         RPI_MODE_ALT3   => 7,
         RPI_MODE_ALT4   => 3,
         RPI_MODE_ALT5   => 2,
+        RPI_MODE_ALT6   => 8,
+        RPI_MODE_ALT7   => 9,
+        RPI_MODE_ALT8   => 10,
+        RPI_MODE_NONE   => 11,
         
         RPI_ALT_FUNCTION_VERSION_2708 => 1,
         RPI_ALT_FUNCTION_VERSION_2711 => 2,
+        RPI_ALT_FUNCTION_VERSION_2712 => 3,
         
         RPI_INT_NONE           => 0x00,
         RPI_INT_FALL           => 0x01,
@@ -132,6 +135,10 @@ my $const = {
         RPI_PINMODE_ALT3       => 7,
         RPI_PINMODE_ALT4       => 3,
         RPI_PINMODE_ALT5       => 2,
+        RPI_PINMODE_ALT6       => 8,
+        RPI_PINMODE_ALT7       => 9,
+        RPI_PINMODE_ALT8       => 10,
+        RPI_PINMODE_NONE       => 11,
         
         RPI_HIGH   => 1,
         RPI_LOW    => 0,
@@ -150,6 +157,16 @@ my $const = {
         
         DEV_GPIO_PIN_STATUS_NONE         => 0x00,
         DEV_GPIO_PIN_STATUS_EXPORTED     => 0x01,
+        
+        RPI_SCHMITT_OFF        => 0,
+        RPI_SCHMITT_ON         => 1,
+        
+        RPI_SLEW_SLOW          => 0,
+        RPI_SLEW_FAST          => 1,
+        
+        RPI_ACTIVE_HIGH        => 0,
+        RPI_ACTIVE_LOW         => 1
+        
     },
     
     spi => {
@@ -633,6 +650,13 @@ my $const = {
         RF69_VAL_PREAMBLELSB3	=> 0x03,  # preamble size LSB 3
         RF69_VAL_PREAMBLELSB5	=> 0x05,  # preamble size LSB 5
         
+        RF69_VAL_BITRATEMSB_4800 => 0x1A, 
+        RF69_VAL_BITRATELSB_4800 => 0x0B,
+        RF69_VAL_BITRATEMSB_2400 => 0x34,
+        RF69_VAL_BITRATELSB_2400 => 0x15,
+        RF69_VAL_BITRATEMSB_1200 => 0x68, 
+        RF69_VAL_BITRATELSB_1200 => 0x2B,
+        
         RF69_VAL_OCP_OFF        => 0x0F,
         RF69_VAL_OCP_ON         => 0x1A,  # default
         RF69_PALEVEL_PA0_ON     => 0x80,  # Default
@@ -755,7 +779,12 @@ my $const = {
         OPENTHINGS_MANUFACTURER_ENERGENIE   => 0x04,
         OPENTHINGS_MANUFACTURER_SENTEC      => 0x01,
         OPENTHINGS_MANUFACTURER_HILDERBRAND => 0x02,
-        OPENTHINGS_MANUFACTURER_RASPBERRY   => 0x3F,
+        OPENTHINGS_MANUFACTURER_RASPBERRY   => 0x00,
+        
+        OPENTHINGS_RASPBERRY_CRYPTSEED   => 0xA9,
+        OPENTHINGS_DEFAULT_CRYPTSEED     => 1,
+        
+        OPENTHINGS_MAXIMUM_BUFFER_LEN    => 0x42,
         
         OPENTHINGS_PARAM_ALARM           => 0x21,
         OPENTHINGS_PARAM_DEBUG_OUTPUT    => 0x2D,

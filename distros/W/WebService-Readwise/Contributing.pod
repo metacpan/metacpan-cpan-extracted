@@ -1,0 +1,31 @@
+=pod
+
+=encoding UTF-8
+
+=head1 GETTING INVOLVED
+
+Please collaborate on this project.
+
+It is very basic at present so there is plenty of easy things you might add.
+
+Take a look at the git repository and make a pull request.
+
+If you want to chat about this project; please contact Lance.
+
+Please be kind with your words and actions.
+
+=head1 RELEASING
+
+I've been using L<dzil.org> to manage things; so you will need that installed.
+
+    # Run the unit tests in t/
+    dzil test
+
+    # Run the xt/ tests (You will need to set a WEBSERVICE_READWISE_TOKEN environment variable)
+    dzil xtest
+
+    # Run a release test
+    dzil test --release
+
+=cut
+

@@ -8,19 +8,14 @@ use App::GUI::Harmonograph::Widget::SliderCombo;
 
 sub new {
     my ( $class, $parent ) = @_;
-    #return unless defined $max;
     my $self = $class->SUPER::new( $parent, -1 );
 
     $self->{'length'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 80, 'Length','length of drawing in full circles', 1,  150,  10);
     $self->{'density'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 80, 'Density','pixel per circle',  1,  50,  10);
     $self->{'thickness'} = App::GUI::Harmonograph::Widget::SliderCombo->new( $self, 80, 'Thickness','dot size or thickness of drawn line in pixel',  0,  12,  0);
-    #$self->{'thickness'}  = Wx::ComboBox->new( $self, -1, 1, [-1,-1],[75, -1], [1 .. 25], 1);
     $self->{'connect'} = Wx::CheckBox->new( $self, -1, '  Line');
-    #$self->{'thickness'}->SetToolTip('dot size or thickness of drawn line in pixel');
     $self->{'connect'}->SetToolTip('connect the points / dots');
-
-    # Wx::Event::EVT_CHECKBOX( $self, $self->{'connect'}, sub {  $self->{'callback'}->() });
-
+    Wx::Event::EVT_CHECKBOX( $self, $self->{'connect'}, sub {  $self->{'callback'}->() });
 
     my $row1 = Wx::BoxSizer->new(&Wx::wxHORIZONTAL);
     $row1->AddSpacer(  15 );

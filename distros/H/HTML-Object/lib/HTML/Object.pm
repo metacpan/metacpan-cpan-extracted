@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.2.9
+## Version v0.3.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2023/10/11
+## Modified 2023/11/06
 ## All rights reserved
 ## 
 ## 
@@ -33,9 +33,8 @@ BEGIN
     use HTML::Parser;
     use JSON;
     use Module::Generic::File qw( file );
-    use Nice::Try;
     use Scalar::Util ();
-    our $VERSION = 'v0.2.9';
+    our $VERSION = 'v0.3.1';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -51,7 +50,9 @@ use warnings;
     my $tags_repo = $path->child( $dict_json );
     if( $tags_repo->exists )
     {
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $json = $tags_repo->load_utf8 ||
                 die( "Unable to open html tags json dictionary \"$tags_repo\": ", $tags_repo->error, "\n" );
@@ -66,10 +67,10 @@ use warnings;
                     $LINK_ELEMENTS->{ $_ } = $DICT->{ $_ }->{link_in};
                 }
             }
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            die( "Fatal error occurred while trying to load html tags json dictionary \"$tags_repo\": $e\n" );
+            die( "Fatal error occurred while trying to load html tags json dictionary \"$tags_repo\": $@\n" );
         }
     }
     else
@@ -554,16 +555,18 @@ sub parse_data
     my $self = shift( @_ );
     my $html = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    try
+    # try-catch
+    local $@;
+    eval
     {
         if( $opts->{utf8} )
         {
             $html = Encode::decode( 'utf8', $html, Encode::FB_CROAK );
         }
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error found while utf8 decoding ", length( $html ), " bytes of html data provided." ) );
+        return( $self->error( "Error found while utf8 decoding ", length( $html ), " bytes of html data provided: $@" ) );
     }
     
     my $e;
@@ -666,36 +669,40 @@ sub parse_url
         return( $self->error( "URI version 1.74 or higher is required to use load()" ) );
     }
     $opts->{timeout} //= 10;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $uri = URI->new( "$uri" );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Bad url provided \"$uri\": $e" ) );
+        return( $self->error( "Bad url provided \"$uri\": $@" ) );
     }
     
     my $content;
-    try
+    my $resp;
+    # try-catch
+    eval
     {
         my $ua = LWP::UserAgent->new(
             agent   => "HTML::Object/$VERSION",
             timeout => $opts->{timeout},
         );
-        my $resp = $ua->get( $uri, ( CORE::exists( $opts->{headers} ) && defined( $opts->{headers} ) && ref( $opts->{headers} ) eq 'HASH' && scalar( keys( %{$opts->{headers}} ) ) ) ? %{$opts->{headers}} : () );
-        if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
-        {
-            return( $self->error({
-                code => $resp->code,
-                message => $resp->message,
-            }) );
-        }
+        $resp = $ua->get( $uri, ( CORE::exists( $opts->{headers} ) && defined( $opts->{headers} ) && ref( $opts->{headers} ) eq 'HASH' && scalar( keys( %{$opts->{headers}} ) ) ) ? %{$opts->{headers}} : () );
         $content = $resp->decoded_content;
-        $self->response( $resp );
-    }
-    catch( $e )
+    };
+    if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
     {
-        return( $self->error( "Error making a GET request to $uri: $e" ) );
+        return( $self->error({
+            code => $resp->code,
+            message => $resp->message,
+        }) );
+    }
+    $self->response( $resp );
+    if( $@ )
+    {
+        return( $self->error( "Error making a GET request to $uri: $@" ) );
     }
     my $doc = $self->parse_data( $content );
     $doc->uri( $uri );
@@ -865,7 +872,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.2.9
+    v0.3.1
 
 =head1 DESCRIPTION
 

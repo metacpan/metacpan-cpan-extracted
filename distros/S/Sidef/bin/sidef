@@ -459,7 +459,7 @@ sub add_class_methods_to_completion {
         my $class = $module =~ s{\.pm\z}{}r =~ s{\W+}{::}gr;
         $class =~ /^Sidef::Types::/ or next;
 
-        foreach my $method_name (keys %{$class->methods}) {
+        foreach my $method_name (keys %{(eval { $class->methods }) // {}}) {
             add_tree_entry($tree, [split(//, $method_name)], $method_name);
         }
     }
@@ -473,7 +473,9 @@ sub add_words_to_completion {
 
     while ($string =~ /(\w+)/g) {
         my $word = $1;
-        add_tree_entry($tree, [split(//, $word)], $word);
+        if (length($word) <= 50) {
+            add_tree_entry($tree, [split(//, $word)], $word);
+        }
     }
 
     return 1;
@@ -610,7 +612,7 @@ EOT
         my $line = '';
 
       LINE: {
-            $line .= Encode::decode_utf8($term->readline($line eq '' ? '> ' : '   ') // return);
+            $line .= Encode::decode_utf8($term->readline($line eq '' ? '> ' : '  ') // return);
 
             if ($line eq 'help') {
                 help_interactive($term);
@@ -1010,7 +1012,7 @@ Outputs:
 The interactive mode (a.k.a. REPL) is available by simply executing the C<sidef> command, or by specifying the C<-i> command-line switch:
 
     $ sidef -i
-    Sidef 23.10, running on Linux, using Perl v5.38.0.
+    Sidef 23.11, running on Linux, using Perl v5.38.0.
     Type "help", "copyright" or "license" for more information.
     > n = 41
     #1 = 41

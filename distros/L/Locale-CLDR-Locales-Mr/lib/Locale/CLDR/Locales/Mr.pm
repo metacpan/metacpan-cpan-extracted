@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mr - Package for language Marathi
 
 package Locale::CLDR::Locales::Mr;
 # This file auto generated from Data\common\main\mr.xml
-#	on Fri 13 Oct  9:27:38 am GMT
+#	on Sat  4 Nov  6:13:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

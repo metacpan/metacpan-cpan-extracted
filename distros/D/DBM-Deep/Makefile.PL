@@ -3,22 +3,22 @@ require 5.008004;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'PREREQ_PM' => {
-                   'Test::Warn' => '0.08',
-                   'File::Temp' => '0.01',
-                   'Scalar::Util' => '1.14',
-                   'Test::More' => '0.88',
-                   'File::Path' => '0.01',
-                   'Pod::Usage' => '1.3',
-                   'Test::Deep' => '0.095',
-                   'Digest::MD5' => '1.00',
-                   'Test::Exception' => '0.21',
-                   'Fcntl' => '0.01'
-                 },
   'NAME' => 'DBM::Deep',
-  'PL_FILES' => {},
+  'VERSION_FROM' => 'lib/DBM/Deep.pm',
+  'PREREQ_PM' => {
+                   'Digest::MD5' => '1.00',
+                   'Fcntl' => '0.01',
+                   'File::Path' => '0.01',
+                   'File::Temp' => '0.01',
+                   'Pod::Usage' => '1.3',
+                   'Scalar::Util' => '1.14',
+                   'Test::Deep' => '0.095',
+                   'Test::Exception' => '0.21',
+                   'Test::More' => '0.88',
+                   'Test::Warn' => '0.08'
+                 },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],
-  'VERSION_FROM' => 'lib/DBM/Deep.pm'
+  'PL_FILES' => {}
 )
 ;

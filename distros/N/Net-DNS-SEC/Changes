@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::SEC.
 
 
+**** 1.23 Nov 8, 2023
+
+	Code refactoring of XS component.
+
+
 **** 1.22 Sep 12, 2023
 
 	Enable Ed25519 sign/verify for BoringSSL & LibreSSL.
@@ -675,4 +680,4 @@ Net::DNS. The history of those is documented below.
 
 
 ---------------------------------------------------------------------------
-$Id: Changes 1939 2023-09-12 13:34:55Z willem $
+$Id: Changes 1943 2023-11-08 09:02:03Z willem $

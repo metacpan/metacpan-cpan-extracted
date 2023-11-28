@@ -19,7 +19,7 @@ sub new {
     my $gtc     = Wx::StaticText->new( $self, -1, 'Graphics::Toolkit::Color  '.$Graphics::Toolkit::Color::VERSION, @center);
     my $hd      = Wx::StaticText->new( $self, -1, 'File::HomeDir  '.$File::HomeDir::VERSION, @center);
     my $url_lbl = Wx::StaticText->new( $self, -1, 'latest version on CPAN:   ', @center);
-    my $url     = Wx::HyperlinkCtrl->new( $self, -1, 'metacpan.org/dist/App::GUI::Harmonograph', 'https://metacpan.org/dist/App::GUI::Harmonograph' );
+    my $url     = Wx::HyperlinkCtrl->new( $self, -1, 'metacpan.org/dist/App::GUI::Harmonograph', 'https://metacpan.org/dist/App-GUI-Harmonograph' );
 
     $self->{'close'} = Wx::Button->new( $self, -1, '&Close', [10,10], [-1, -1] );
     Wx::Event::EVT_BUTTON( $self, $self->{'close'},  sub { $self->EndModal(1) });

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigRat;
@@ -126,3 +126,37 @@ subtest '$y = Math::BigRat -> as_rat("3.5");' => sub {
     is(ref($y), 'Math::BigRat', 'class of $y');
     cmp_ok(eval("$y"), "==", 3.5, 'value of $y');
 };
+
+note("as_rat() preserves all instance variables");
+
+Math::BigInt -> upgrade(undef);
+Math::BigRat -> downgrade(undef);
+Math::BigRat -> upgrade(undef);
+
+$x = Math::BigRat -> new("3");
+
+$x -> accuracy(2);
+$y = $x -> as_rat();
+
+subtest '$x = Math::BigRat -> new("3"); $x -> accuracy(2); $y = $x -> as_rat()'
+  => sub {
+      plan tests => 4;
+      is($x -> accuracy(), 2, 'accuracy of $x');
+      is($x -> precision(), undef, 'precision of $x');
+      is($y -> accuracy(), $x -> accuracy(), 'accuracy of $y');
+      is($y -> precision(), $x -> precision(), 'precision of $y');
+  };
+
+$x -> precision(2);
+$y = $x -> as_rat();
+
+subtest '$x = Math::BigRat -> new("3"); $x -> precision(2); $y = $x -> as_rat()'
+  => sub {
+      plan tests => 4;
+      is($x -> accuracy(), undef, 'accuracy of $x');
+      is($x -> precision(), 2, 'precision of $x');
+      is($y -> accuracy(), $x -> accuracy(), 'accuracy of $y');
+      is($y -> precision(), $x -> precision(), 'precision of $y');
+  };
+
+done_testing();

@@ -108,7 +108,7 @@ if(eval { require HTTP::Cache::Transparent; }) {
 
 	if(!-d $cachedir) {
 		print "Creating the cache directory $cachedir\n";
-		mkdir $cachedir || die "$cachedir: $@";
+		mkdir $cachedir, 02755 || die "$cachedir: $@";
 	}
 	HTTP::Cache::Transparent::init({
 		BasePath => $cachedir,
@@ -185,6 +185,8 @@ foreach my $url(keys %urls) {
 
 if(!(-r 'downloads/allCountries.txt')) {
 	my $zip = 'downloads/allCountries.zip';
+	print "Inflating $zip\n";
+
 	eval 'require IO::Uncompress::Unzip';
 	if($@) {
 		system("unzip $zip") or die "unzip $zip failed";
@@ -247,6 +249,9 @@ if($^O ne 'solaris') {
 }
 if($ENV{'OSM_HOME'}) {
 	$build_requires->{'XML::LibXML::Reader'} = 0;
+}
+if($ENV{'REDIS_SERVER'}) {
+	$build_requires->{'Redis'} = 0;
 }
 
 my $test_requires = {

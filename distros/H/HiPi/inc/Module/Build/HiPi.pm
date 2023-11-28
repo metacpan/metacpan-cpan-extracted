@@ -10,7 +10,7 @@ use Cwd;
 use File::Path;
 our @ISA = qw( Module::Build );
 
-our $VERSION ='0.81';
+our $VERSION ='0.90';
 
 sub process_xs_files {
 	my $self = shift;
@@ -70,11 +70,12 @@ sub hipi_build_xs {
     $self->log_info(qq(Building XS Files\n));
     
     my @modules = (
-        { name => 'Utils', version => $VERSION, autopath => 'HiPi/Utils', libs => '' },
-        { name => 'Exec', version => $VERSION, autopath => 'HiPi/Utils/Exec', libs => '-lz' },
-        { name => 'I2C',  version => $VERSION, autopath => 'HiPi/Device/I2C', libs => '' },
-        { name => 'SPI',  version => $VERSION, autopath => 'HiPi/Device/SPI', libs => '' },
-        { name => 'GPIO', version => $VERSION, autopath => 'HiPi/GPIO', libs => '' },
+        { name => 'Utils', version => $VERSION, autopath => 'HiPi/Utils',      libs => '' },
+        { name => 'Exec',  version => $VERSION, autopath => 'HiPi/Utils/Exec', libs => '-lz' },
+        { name => 'I2C',   version => $VERSION, autopath => 'HiPi/Device/I2C', libs => '-li2c' },
+        { name => 'SPI',   version => $VERSION, autopath => 'HiPi/Device/SPI', libs => '' },
+        { name => 'GPIO',  version => $VERSION, autopath => 'HiPi/GPIO',       libs => '' },
+        { name => 'RP1',   version => $VERSION, autopath => 'HiPi/GPIO/RP1',   libs => '' },
     );
     
     #----------------------------------------------

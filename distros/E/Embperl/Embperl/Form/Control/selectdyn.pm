@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -33,7 +34,7 @@ sub get_std_control_attr
         {
         $id = $req -> {uuid} . '_' . $self -> {name} ;
         my $url  = $self -> {showurl} ;
-        $url =~ s/<id>/$self -> get_id_from_value ($Embperl::fdat{$self -> {name}})/e ;
+        $url =~ s/<id>/$self -> get_id_from_value ($Embperl::fdat{$self -> {name}}, $req)/e ;
         my $attr = $self -> SUPER::get_std_control_attr ($req, $id, $type, 'ef-control-selectdyn-readonly') ;
         return $attr . qq{ onDblClick="\$('#$self->{use_ajax}').ef_document ('load', '$url');"} ;
         }
@@ -65,7 +66,7 @@ sub init_data
 #   prepare_fdat - daten zusammenfuehren
 #
 
-sub prepare_fdat
+sub xprepare_fdat
     {
     my ($self, $req) = @_ ;
 
@@ -86,6 +87,32 @@ sub show_control_addons
 
     }
     
+# ---------------------------------------------------------------------------
+
+sub get_doctypes_for_new_menu
+    {
+    my ($self, $req) = @_ ;
+
+    return ;
+    }
+    
+# ---------------------------------------------------------------------------
+
+sub get_datasource
+    {
+    my ($self) = @_ ;
+    
+    return  $self -> {datasrcobj} ;
+    }
+
+# ---------------------------------------------------------------------------
+
+sub add_query_param
+    {
+    my ($self, $req, $datasource) = @_ ;
+    
+    return  '' ;
+    }
 
 1 ;
 
@@ -101,21 +128,66 @@ __EMBPERL__
 
 my $name     = $self -> {name} ;
 my $class = $self -> {class} ;
-$]
 
-<input name="_opt_[+ $name +]" [+ do { local $escmode = 0 ; $self -> get_std_control_attr($req) } +]
-type="text" _ef_attach="ef_selectdyn"
+my $doctypes ;
+my $datasrc = $self -> {datasrc} ;
+if ($datasrc)
+    {
+    my $datasource = $self -> get_datasource ;
+    if ($datasource)
+        {
+        $datasrc = $datasource -> datasource ;
+        if (!$self -> {no_new})
+            {
+            $doctypes = $self -> get_doctypes_for_new_menu ($req, $datasource) ;
+            }
+        
+        my ($constrain, $without_constrain) = $datasource -> get_constrain_value ($req, $self) ;
+        $datasrc .= '&constrain=' . $epreq->Escape ($constrain,6) . '&without_constrain=' . ($without_constrain?1:0) if ($constrain) ;
+        $datasrc .= $self -> add_query_param ($req, $datasource) ;
+        
+        ($self -> {url_from}, $self -> {url_to}) = $datasource -> get_url_modifier ($req, $self) ;
+        $self -> {dbname} = $datasource -> get_dbname ($req, $self) ;
+        }
+    }
+
+my $addtop    = $self -> {addtop} ;
+my $addbottom = $self -> {addbottom} ;
+my $append    = $self -> {datasrcurl_append} ;
+if ($addtop)
+    {
+    $append .= '&' if ($append) ;
+    $append .= '&addtop=' . $epreq->Escape ($req -> {json} -> encode($addtop), 6) ;    
+    }
+if ($addbottom)
+    {
+    $append .= '&' if ($append) ;
+    $append .= '&addbottom=' . $epreq->Escape ($req -> {json} -> encode($addbottom), 6) ;    
+    }
+    
+$]
+<div class="ef-control-selectdyn-div">
+<input name="_opt_[+ $name +]" [+ do { local $escmode = 0 ; $self -> get_std_control_attr($req, undef, undef, 'ef-context-menu ' . ($self -> {no_button}?'':'ef-control-selectdyn-has-ctrl' )) } +]
+type="text" _ef_attach="ef_selectdyn" 
 [$if $self -> {size}            $]size="[+ $self->{size} +]" [$endif$]
 [$if $self -> {showurl}         $]_ef_show_url="[+ $self -> {showurl} +]" [$endif$] 
+[$if $self -> {showurl_append}  $]_ef_show_url_append="[+ $self -> {showurl_append} +]" [$endif$] 
 [$if $self -> {popupurl}        $]_ef_popup_url="[+ $self -> {popupurl} +]" [$endif$] 
 [$if $self -> {datasrcurl}      $]_ef_datasrc_url="[+ $self -> {datasrcurl} +]" [$endif$] 
-[$if $self -> {datasrc}         $]_ef_datasrc_nam="[+ $self -> {datasrc} +]" [$endif$] 
+[$if $self -> {url_from}        $]_ef_url_from="[+ $self -> {url_from} +]" [$endif$] 
+[$if $self -> {url_to}          $]_ef_url_to="[+ $self -> {url_to} +]" [$endif$] 
+[$if $self -> {dbname}          $][+ '_ef_dbname' +]="[+ $self -> {dbname} +]" [$endif$] 
+[$if $append                    $]_ef_datasrc_url_append="[+ $append +]" [$endif$] 
+[$if $datasrc                   $]_ef_datasrc_nam="[+ $datasrc +]" [$endif$] 
 [$if $self -> {datasrctermmax}  $]_ef_datasrc_term_max="[+ $self -> {datasrctermmax} +]" [$endif$] 
 [$if $self -> {use_ajax}        $]_ef_use_ajax="[+ $self -> {use_ajax} +]" [$endif$] 
 [$if $self -> {show_on_select}  $]_ef_show_on_select="[+ $self -> {show_on_select}?'1':'' +]" [$endif$] 
+[$if $doctypes                  $]_ef_doctypes="[+ $doctypes +]" [$endif$] 
 >
+[$if !$self -> {no_button} $]<span class="ui-icon ui-icon-triangle-1-s ef-icon ef-control-selectdyn-ctrl ef-context-menu [+ $self -> {state} +]"></span>[$endif$]
 <input type="hidden" name="[+ $name +]">
 <input type="hidden" name="_id_[+ $name +]">
+</div>
 [$endsub$]
 
 
@@ -222,6 +294,14 @@ If true show the selected item as soon as it is selected (useses showurl)
 
 If set to an id of an html element, documents that are loaded via showurl
 are fetch via ajax into this html container, instead of fetching a whole page.
+
+=head3 no_button
+
+Do not show button right of input to select all entries
+
+=head3 no_new
+
+Do add "New" to context menu
 
 =head3 $fdat{-init-<name>}
 

@@ -1,13 +1,13 @@
 package Excel::ValueReader::XLSX::Backend::LibXML;
 use utf8;
-use 5.10.1;
+use 5.12.1;
 use Moose;
 use Scalar::Util qw/looks_like_number/;
 use XML::LibXML::Reader qw/XML_READER_TYPE_END_ELEMENT/;
 
 extends 'Excel::ValueReader::XLSX::Backend';
 
-our $VERSION = '1.10';
+our $VERSION = '1.13';
 
 #======================================================================
 # LAZY ATTRIBUTE CONSTRUCTORS
@@ -43,9 +43,8 @@ sub _strings {
 sub _workbook_data {
   my $self = shift;
 
-  my %sheets;
+  my %workbook_data = (sheets => {}, base_year => 1900);
   my $sheet_id  = 1;
-  my $base_year = 1900;
 
   my $reader = $self->_xml_reader_for_zip_member('xl/workbook.xml');
 
@@ -56,14 +55,17 @@ sub _workbook_data {
     if ($reader->name eq 'sheet') {
       my $name = $reader->getAttribute('name')
         or die "sheet node without name";
-      $sheets{$name} = $sheet_id++;
+      $workbook_data{sheets}{$name} = $sheet_id++;
     }
-    elsif ($reader->name eq 'workbookPr' and my $attr_value = $reader->getAttribute('date1904')) {
-      $base_year = 1904 if $attr_value eq '1' or $attr_value eq 'true'; # this workbook uses the 1904 calendar
+    elsif ($reader->name eq 'workbookPr' and my $date_attr = $reader->getAttribute('date1904')) {
+      $workbook_data{base_year} = 1904 if $date_attr eq '1' or $date_attr eq 'true'; # this workbook uses the 1904 calendar
+    }
+    elsif ($reader->name eq 'workbookView' and my $active_attr = $reader->getAttribute('activeTab')) {
+      $workbook_data{active_sheet} = $active_attr + 1 if defined $active_attr;
     }
   }
 
-  return {sheets => \%sheets, base_year => $base_year};
+  return \%workbook_data;
 }
 
 

@@ -1,4 +1,4 @@
-Video::NRK::Cache 3.00
+Video::NRK::Cache 3.01
 
 The Video-on-Demand programs of the Norwegian Broadcasting Corporation (NRK)
 can be difficult to watch over a slow or unstable network connection. This
@@ -6,7 +6,7 @@ script creates a local cache of such video programs in an MPEG-4 container,
 enabling users to watch without interruptions.
 
 More information about this software:
-https://metacpan.org/release/Video-NRK-Cache
+https://metacpan.org/dist/Video-NRK-Cache
 
 
 INSTALLATION
@@ -20,7 +20,7 @@ For example:
 If you already have downloaded the distribution, you can alternatively
 point your tool directly at the archive file or the directory:
 
-  cpanm Video-NRK-Cache-3.00.tar.gz
+  cpanm Video-NRK-Cache-3.01.tar.gz
 
 You can also install the module manually by following these steps:
 

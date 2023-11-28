@@ -6,7 +6,7 @@ use FindBin;
 
 package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.69';
+our $VERSION = '0.71';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -39,7 +39,7 @@ App::GUI::Harmonograph - sculpting beautiful circular drawings
 
 =item 1.
 
-read this POD or check dialogs from help menu
+read this POD
 
 =item 2.
 
@@ -47,26 +47,29 @@ start the program (C<harmonograph>)
 
 =item 3.
 
-move knobs and observe how preview sketch reacts til you got
-an interesting configuration
+move knobs in tabs and observe preview sketch reacting til settings are interesting
 
 =item 4.
 
-push I<Draw> (right below drawing board or C<Ctrl+D> or C<Alt+D> ) to produce full image
+push I<Draw> (right below drawing board or C<Ctrl+D> or C<Alt+D> or in Image menu)
+to produce a full image
 
 =item 5.
 
-choose I<Save> in I<Image> menu (or C<Ctrl+S>) to store image in a PNG / JPEG / SVG file
+choose in image menu output size (in pixel) and output format. Then select
+there I<Save> (or C<Ctrl+S>) to store image in a PNG / JPEG / SVG file.
 
 =item 6.
 
 choose I<Write> in settings menu (C<Ctrl+W>) to save settings into an
-INI file for tweaking them later
+INI file. Load it from there later to restore settings for further tweaking.
 
 =back
 
-Please note that quick preview changes two PEN SETTINGS (last tab)
-to produce always something visible.
+Please note that color changes do not trigger a new preview sketch and if
+you sketch is not visible, it is most likely due the combination in LINE
+SETTINGS of line being off (dots only), dot thinkness is low and dot density
+being also low.
 
 After first use of the program, a config file will be created under
 I<~/.config/harmonograph> in your home directory. It contains mainly
@@ -86,7 +89,7 @@ creating together spiraling pictures :
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/hose.png"      alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wirbel_4.png"  alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wolke.png"     alt=""  width="300" height="300">
-<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/df.png"     alt=""  width="300" height="300">
+<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/df.png"        alt=""  width="300" height="300">
 </p>
 
 

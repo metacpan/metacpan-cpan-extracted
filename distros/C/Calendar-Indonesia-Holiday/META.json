@@ -38,7 +38,7 @@
             "Function::Fallback::CoreOrPP" : "0",
             "Perinci::Sub::Gen::AccessTable" : "0.592",
             "Perinci::Sub::Property::result::table" : "0",
-            "Perinci::Sub::Util" : "0.471",
+            "Perinci::Sub::Util" : "0.472",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -56,7 +56,7 @@
    "provides" : {
       "Calendar::Indonesia::Holiday" : {
          "file" : "lib/Calendar/Indonesia/Holiday.pm",
-         "version" : "0.351"
+         "version" : "0.352"
       }
    },
    "release_status" : "stable",
@@ -71,7 +71,7 @@
          "web" : "https://github.com/perlancar/perl-Calendar-Indonesia-Holiday"
       }
    },
-   "version" : "0.351",
+   "version" : "0.352",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"
@@ -176,7 +176,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.608"
+            "version" : "0.609"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",

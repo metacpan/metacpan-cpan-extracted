@@ -29,13 +29,18 @@ sub port {
 sub establish_proxy {
     my ($self, $fh, $target_host, $target_port, $cb) = @_;
     my $ah;
+    my $header_reader;
     $ah = AnyEvent::Handle->new(
         fh => $fh,
         on_error => sub {
             ## TODO: how should we report the error detail?
+            undef $ah;
+            undef $header_reader;
             $cb->(0);
         },
         on_eof => sub {
+            undef $ah;
+            undef $header_reader;
             $cb->(0);
         },
     );
@@ -43,12 +48,12 @@ sub establish_proxy {
         "CONNECT $target_host:$target_port HTTP/1.1\r\n" .
         "Host: $target_host:$target_port\r\n\r\n"
     );
-    my $header_reader;
     $header_reader = sub {
         my ($h, $line) = @_;
         if($line eq "") {
             $ah->destroy();
             undef $ah;
+            undef $header_reader;
             $cb->(1);
             return;
         }
@@ -59,6 +64,7 @@ sub establish_proxy {
         if($line !~ qr{^HTTP/1\S* +(\d{3})}) {
             $ah->destroy();
             undef $ah;
+            undef $header_reader;
             $cb->(0);
             return;
         }
@@ -66,6 +72,7 @@ sub establish_proxy {
         if(int($status / 100) != 2) {
             $ah->destroy();
             undef $ah;
+            undef $header_reader;
             $cb->(0);
             return;
         }

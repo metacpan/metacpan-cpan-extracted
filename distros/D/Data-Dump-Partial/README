@@ -3,7 +3,8 @@ NAME
     partially
 
 VERSION
-    version 0.05
+    This document describes version 0.06 of Data::Dump::Partial (from Perl
+    distribution Data-Dump-Partial), released on 2023-08-07.
 
 SYNOPSIS
      use Data::Dump::Partial qw(dump_partial dumpp);
@@ -15,10 +16,10 @@ SYNOPSIS
      dumpp($data, $more_data, {max_total_len => 50, max_keys => 4});
 
      # mask passwords specified in hash key values
-     dumpp({auth_info=>{user=>"steven", password=>"secret"}, foo=>1, bar=>2},
+     dumpp({auth_info=>{user=>"jajang", password=>"secret"}, foo=>1, bar=>2},
            {mask_keys_regex=>qr/\Apass\z|passw(or)?d/i});
      # prints something like:
-     # {auth_info=>{user=>"steven", password=>"***"}, foo=>1, bar=>2}
+     # {auth_info=>{user=>"jajang", password=>"***"}, foo=>1, bar=>2}
 
 DESCRIPTION
 FUNCTIONS
@@ -115,16 +116,45 @@ FAQ
   Is the dump result eval()-able? Will the dump result eval() to produce the original data?
     Sometimes it is/will, sometimes it does/will not if it gets truncated.
 
-SEE ALSO
-    Data::Dump::Filtered
-
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Data-Dump-Partial>.
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-Data-Dump-Partial>.
+    <https://github.com/perlancar/perl-Data-Dump-Partial>.
+
+SEE ALSO
+    Data::Dump::Filtered
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023, 2014, 2012, 2010 by perlancar
+    <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -132,13 +162,4 @@ BUGS
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
-
-AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Steven Haryanto.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

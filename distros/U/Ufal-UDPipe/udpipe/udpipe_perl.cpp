@@ -6,6 +6,9 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
+#define SWIG_TYPE_TABLE ufal_udpipe
+
+
 
 #define SWIG_VERSION 0x040101
 #define SWIGPERL

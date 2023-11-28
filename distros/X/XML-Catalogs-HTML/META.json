@@ -1,43 +1,70 @@
 {
    "abstract" : "Catalog of HTML and XHTML DTDs",
    "author" : [
-      "Eric Brine, C<< <ikegami@adaelis.com> >>"
+      "Eric Brine <ikegami@adaelis.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Catalogs-HTML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : 0
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.36"
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage" : "0.18",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "File::ShareDir" : "1.00",
-            "XML::Catalogs" : 0,
-            "version" : 0
+            "XML::Catalogs" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
-   "provides" : {
-      "XML::Catalogs::HTML" : {
-         "file" : "lib/XML/Catalogs/HTML.pm",
-         "version" : "v1.0.3"
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ikegami/perl-XML-Catalogs-HTML/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/XML-Catalogs-HTML/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ikegami/perl-XML-Catalogs-HTML.git",
+         "web" : "https://github.com/ikegami/perl-XML-Catalogs-HTML"
       }
    },
-   "release_status" : "stable",
-   "version" : "v1.0.3"
+   "version" : "v1.6.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

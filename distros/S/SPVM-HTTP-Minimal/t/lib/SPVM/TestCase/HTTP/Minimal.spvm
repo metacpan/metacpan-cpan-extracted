@@ -1,6 +1,10 @@
 class TestCase::HTTP::Minimal {
   use HTTP::Minimal;
   use Fn;
+  use Go;
+  use Array;
+  
+  our $RESULT : IntList;
   
   static method test : int () {
     
@@ -15,6 +19,45 @@ class TestCase::HTTP::Minimal {
     unless (Fn->contains($content, "www.google.com")) {
       return 0;
     }
+    
+    return 1;
+  }
+  
+  static method go : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      my $url = "http://google.com";
+      
+      my $http = HTTP::Minimal->new;
+      
+      my $res = $http->get($url);
+      
+      my $content = $res->content;
+      
+      $RESULT->push(Fn->contains($content, "www.google.com"));
+    });
+    
+    Go->go(method : void () {
+      my $url = "http://google.com";
+      
+      my $http = HTTP::Minimal->new;
+      
+      my $res = $http->get($url);
+      
+      my $content = $res->content;
+      
+      $RESULT->push(Fn->contains($content, "www.google.com"));
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [1, 1])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
     
     return 1;
   }

@@ -11,6 +11,12 @@ my @locale_codes = sort DateTime::Locale->codes;
 my %locale_names = map { $_ => 1 } DateTime::Locale->names;
 my %locale_codes = map { $_ => 1 } DateTime::Locale->codes;
 
+# These are locales that are missing English name data in the JSON source
+# files.
+my %is_locale_without_en_data = map { $_ => 1 } qw(
+    skr
+);
+
 # These are locales that are missing native name data in the JSON source
 # files.
 my %is_locale_without_native_data = map { $_ => 1 } qw(
@@ -18,7 +24,8 @@ my %is_locale_without_native_data = map { $_ => 1 } qw(
     aa-DJ
     aa-ER
     aa-ET
-    apc
+    bew
+    bew-ID
     bm-Nkoo
     bm-Nkoo-ML
     byn
@@ -43,31 +50,26 @@ my %is_locale_without_native_data = map { $_ => 1 } qw(
     iu-Latn-CA
     la
     la-VA
-    lmo
-    lmo-IT
     mn-Mong
     mn-Mong-CN
     ms-Arab
     ms-Arab-BN
     ms-Arab-MY
-    nds
-    nds-DE
-    nds-NL
     nmg
     nr
     nr-ZA
     nso
-    oc
-    oc-ES
-    oc-FR
     sid
     sid-ET
+    skr
     tig
     tig-ER
     tn
     tn-BW
     ts
     ts-ZA
+    tyv
+    tyv-RU
     ve
     ve-ZA
     vo
@@ -133,7 +135,9 @@ sub test_one_locale {
         '$locale->code returns the code used to load the locale'
     );
 
-    ok( length $locale->name, 'has a locale name' );
+    unless ( $is_locale_without_en_data{$code} ) {
+        ok( length $locale->name, 'has a locale name' );
+    }
 
     unless ( $is_locale_without_native_data{$code} ) {
         ok(
@@ -393,13 +397,16 @@ sub check_en_GB {
         EHm                 => 'E HH:mm',
         EHms                => 'E HH:mm:ss',
         Ed                  => 'E d',
-        Ehm                 => "E h:mm\N{U+202F}a",
-        Ehms                => "E h:mm:ss\N{U+202F}a",
+        Ehm                 => "E h:mm\N{U+202f}a",
+        'Ehm-alt-ascii'     => 'E h:mm a',
+        Ehms                => "E h:mm:ss\N{U+202f}a",
+        'Ehms-alt-ascii'    => 'E h:mm:ss a',
         Gy                  => 'y G',
         GyMMM               => 'MMM y G',
+        GyMMMEEEEd          => 'EEEE d MMM y G',
         GyMMMEd             => 'E, d MMM y G',
         GyMMMd              => 'd MMM y G',
-        GyMd                => 'd/M/y G',
+        GyMd                => 'dd/MM/y G',
         H                   => 'HH',
         Hm                  => 'HH:mm',
         Hms                 => 'HH:mm:ss',
@@ -408,7 +415,9 @@ sub check_en_GB {
         M                   => 'L',
         MEd                 => 'E, dd/MM',
         MMM                 => 'LLL',
+        MMMEEEEd            => 'EEEE d MMM',
         MMMEd               => 'E, d MMM',
+        MMMMEEEEd           => 'EEEE d MMMM',
         'MMMMW-count-one'   => q{'week' W 'of' MMMM},
         'MMMMW-count-other' => q{'week' W 'of' MMMM},
         MMMMd               => 'd MMMM',
@@ -416,18 +425,25 @@ sub check_en_GB {
         MMdd                => 'dd/MM',
         Md                  => 'dd/MM',
         d                   => 'd',
-        h                   => "h\N{U+202F}a",
-        hm                  => "h:mm\N{U+202F}a",
-        hms                 => "h:mm:ss\N{U+202F}a",
-        hmsv                => "h:mm:ss\N{U+202F}a v",
-        hmv                 => "h:mm\N{U+202F}a v",
+        h                   => "h\N{U+202f}a",
+        'h-alt-ascii'       => 'h a',
+        hm                  => "h:mm\N{U+202f}a",
+        'hm-alt-ascii'      => 'h:mm a',
+        hms                 => "h:mm:ss\N{U+202f}a",
+        'hms-alt-ascii'     => 'h:mm:ss a',
+        hmsv                => "h:mm:ss\N{U+202f}a v",
+        'hmsv-alt-ascii'    => 'h:mm:ss a v',
+        hmv                 => "h:mm\N{U+202f}a v",
+        'hmv-alt-ascii'     => 'h:mm a v',
         ms                  => 'mm:ss',
         y                   => 'y',
         yM                  => 'MM/y',
         yMEd                => 'E, dd/MM/y',
         yMMM                => 'MMM y',
+        yMMMEEEEd           => 'EEEE d MMM y',
         yMMMEd              => 'E, d MMM y',
         yMMMM               => 'MMMM y',
+        yMMMMEEEEd          => 'EEEE d MMMM y',
         yMMMd               => 'd MMM y',
         yMd                 => 'dd/MM/y',
         yQQQ                => 'QQQ y',

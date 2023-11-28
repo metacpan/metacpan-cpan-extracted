@@ -1,8 +1,6 @@
 use strict;
 use warnings;
 
-use English qw(-no_match_vars);
-use Error::Pure::Utils qw(clean);
 use Test::More 'tests' => 4;
 use Test::NoWarnings;
 use Unicode::Block::Ascii;

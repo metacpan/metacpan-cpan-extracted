@@ -6,6 +6,7 @@ use Test2::Tools::OpenTelemetry;
 use OpenTelemetry::Constants -span_status, -span_kind, 'INVALID_SPAN_ID';
 use OpenTelemetry::Trace;
 use OpenTelemetry::SDK::InstrumentationScope;
+use OpenTelemetry::X;
 
 my $scope = OpenTelemetry::SDK::InstrumentationScope->new( name => 'test' );
 
@@ -109,9 +110,9 @@ subtest 'Events' => sub {
                 object {
                     call name       => 'exception';
                     call attributes => {
-                        'exception.type'       => '',
+                        'exception.type'       => 'string',
                         'exception.message'    => 'Died',
-                        'exception.stacktrace' => "Died\nFrom somewhere",
+                        'exception.stacktrace' => 'From somewhere',
                     };
                 },
             ];
@@ -123,14 +124,29 @@ subtest 'Events' => sub {
                 object {
                     call name       => 'exception';
                     call attributes => {
-                        'exception.type'       => '',
+                        'exception.type'       => 'string',
                         'exception.message'    => 'Died',
-                        'exception.stacktrace' => "Died\nFrom somewhere",
+                        'exception.stacktrace' => 'From somewhere',
                         'foo'                  => 123,
                     };
                 },
             ];
         }, 'Recorded exception with attributes';
+
+    is CLASS->new( name => 'foo', scope  => $scope )->record_exception(
+        OpenTelemetry::X->create( Invalid => 'Died' )
+    ) => object {
+            call_list sub { shift->snapshot->events } => [
+                object {
+                    call name       => 'exception';
+                    call attributes => {
+                        'exception.type'       => 'OpenTelemetry::X::Invalid',
+                        'exception.message'    => 'Died',
+                        'exception.stacktrace' => match qr/called in \S+ at line /,
+                    };
+                },
+            ];
+        }, 'Recorded blessed exception';
 };
 
 subtest End => sub {
@@ -142,13 +158,11 @@ subtest End => sub {
         call sub { shift->snapshot->end_timestamp } => 123;
     }, 'Ended span with timestamp';
 
-    is messages {
+    no_messages {
         is CLASS->new( name => 'foo', scope => $scope )->end(1)->end(2), object {
             call sub { shift->snapshot->end_timestamp } => 1;
         }, 'Second end is ignored';
-    } => [
-        [ warning => OpenTelemetry => match qr/end on an ended Span/ ],
-    ], 'Logged end on an ended span';
+    };
 };
 
 subtest 'Set status' => sub {

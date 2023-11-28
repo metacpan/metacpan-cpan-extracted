@@ -469,6 +469,16 @@ is_same_sql_bind(
 
 
 
+# Oracle12c version of limit/offset
+$sqla = SQL::Abstract::More->new(sql_dialect => 'Oracle12c');
+($sql, @bind) = $sqla->limit_offset(123, 456);
+is_same_sql_bind(
+  $sql, \@bind,
+  "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY",
+  [456, 123],
+  "limit/offset for Oracle12c",
+);
+
 
 #----------------------------------------------------------------------
 # method redefinition

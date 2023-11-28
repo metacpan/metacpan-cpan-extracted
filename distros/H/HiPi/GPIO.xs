@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 // File          GPIO.xs
 // Description:  XS module for HiPi::GPIO
-// Copyright:    Copyright (c) 2017 Mark Dootson
+// Copyright:    Copyright (c) 2017-2023 Mark Dootson
 // License:      This is free software; you can redistribute it and/or modify it under
 //               the same terms as the Perl 5 programming language system itself.
 //

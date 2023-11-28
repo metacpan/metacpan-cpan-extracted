@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -77,19 +78,25 @@ sub init_data
 
     my $field = $self -> {fields}[0] ;    
     my $i = 0 ;
+    my @opt ;
+    my @data ;
     foreach my $entry (@entries)
         {
         $fdat->{"__${name}__$i"} = $entry ;
-        if ($field -> can ('init_data'))
+        if (1) #$field -> can ('init_data'))
             {
             local $field->{name} = "__${name}__$i" ;
             local $field -> {fullid} = "$self->{fullid}__$i" ;
-            $field -> init_data ($req, $self)  ;
+            $field -> init_data ($req, $self) if ($field -> can ('init_data')) ;
+            push @data, $fdat->{$field->{name}} ;
+            push @opt,  $fdat->{'_opt_' . $field->{name}} // $self -> get_display_text ($req, $entry) ;
             }
             
         $i++ ;
         }
     $fdat->{"__${name}_max"} = $i?$i:1;
+    $fdat->{$name} //= join ("\t", @data);
+    $fdat->{'_opt_' . $name} //= join (", ", @opt);
     }
 
 # ------------------------------------------------------------------------------------------
@@ -100,16 +107,40 @@ sub init_data
 sub prepare_fdat
     {
     my ($self, $req) = @_ ;
-    my $fdat  = $req -> {form} || \%fdat ;
+    my $fdat    = $req -> {form} || \%fdat ;
     my $name    = $self->{name} ;
     my $max     = $fdat->{"__${name}_max"} || 1 ;
 
     my $field = $self -> {fields}[0] ;    
+    my $fieldprep = (ref ($field) =~ /::/) && $field -> can ('prepare_fdat') ;
     my @rows;
     my $val ;
+    if ($fieldprep && $fdat -> {$name} eq '')
+        {
+        if (exists ($fdat -> {"_opt_$name"}))
+            {
+            my @vals = split (/\s*,\s*/, $fdat -> {"_opt_$name"}) ;
+            $max = @vals ;
+            for (my $i = 0; $i < $max; $i++)
+                {
+                $val = $fdat->{"_opt___${name}__$i"} = shift @vals ;
+                }
+            }
+        elsif (exists ($fdat -> {"_id_$name"}))
+            {
+            my @vals = split (/\s*,\s*/, $fdat -> {"_id_$name"}) ;
+            $max = @vals ;
+            for (my $i = 0; $i < $max; $i++)
+                {
+                $val = $fdat->{"_id___${name}__$i"} = shift @vals ;
+                }
+            }
+        }
+
+
     for (my $i = 0; $i < $max; $i++)
         {
-        if ((ref ($field) =~ /::/) && $field -> can ('prepare_fdat'))
+        if ($fieldprep)
             {
             local $field->{name} = "__${name}__$i" ;
             local $field -> {fullid} = "$self->{fullid}__$i" ;
@@ -142,6 +173,41 @@ sub get_display_text
     return $field -> get_display_text ($req, $value) ;
     }
 
+# ---------------------------------------------------------------------------
+#
+#   get_option_form_value - returns the option for a given value
+#
+#   in  $value  value
+#   ret         option
+#
+
+sub get_option_from_value
+
+    {
+    my ($self, $value, $req) = @_ ;
+
+    my $field = $self -> {fields}[0] ;
+    return if (!$field) ;
+    
+    return $field -> get_option_from_value ($value, $req) ;
+    }
+    
+# ---------------------------------------------------------------------------
+#
+#   get_id_from_value - returns id for a given value
+#
+
+sub get_id_from_value
+
+    {
+    my ($self, $value, $req) = @_ ;
+
+    my $field = $self -> {fields}[0] ;
+    return if (!$field) ;
+    
+    return $field -> get_id_from_value ($value, $req) ;
+    }
+    
 # ------------------------------------------------------------------------------------------
 
 sub show 
@@ -166,7 +232,7 @@ __EMBPERL__
 $fdat{$self -> {name}} = $self -> {default} if ($fdat{$self -> {name}} eq '' && exists ($self -> {default})) ;
 my $span = 0 ;
 
-$]<table class="ef-element ef-element-width-[+ $self -> {width_percent} +] ef-element-[+ $self -> {type} +] [+ $self -> {state} +]"
+$]<table class="ef-element ef-element-width-[+ $self -> {width_percent} +] ef-element-[+ $self -> {type} +] [+ ' ' . $self -> {state} +] ef-attach-always"
     [$     if (!$self -> is_readonly($req) ) $]_ef_attach="ef_mult"[$endif$] >
   <tr>
     [-
@@ -257,7 +323,7 @@ $]
 [$ endsub $]
 
 
-[$ sub show_label_icon ($self)
+[$ sub show_label_icon ($self, $req)
     $name   = $self -> {name} ;
     my $jsname = $name ;
     $jsname =~ s/[^a-zA-Z0-9]/_/g ;
@@ -266,8 +332,8 @@ $]
  
  $]
 [$if (! $self -> is_readonly ($req)) $]
-              <span class="ui-icon ui-icon-circle-plus ef-icon ef-control-mult-add" title="Zeile Hinzuf&uuml;gen"></span>
-              <span class="ui-icon ui-icon-circle-minus ef-icon ef-control-mult-del" title="Zeile L&ouml;schen"></span>
+              <span class="ui-icon ui-icon-circle-plus ef-icon ef-control-mult-add" title="[= ctl:grid_add =]"></span>
+              <span class="ui-icon ui-icon-circle-minus ef-icon ef-control-mult-del" title="[= ctl:grid_del =]"></span>
               
 [$endif$]              
 [$endsub$]

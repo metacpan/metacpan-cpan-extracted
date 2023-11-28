@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v1.0.2
+## Version v1.1.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2023/10/11
+## Modified 2023/11/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,8 +25,6 @@ BEGIN
     use Apache2::Reload;
     use JSON::PP ();
     use Regexp::Common;
-    # use Nice::Try debug => 6, debug_file => '/usr/local/src/perl/Net-API-REST/dev/debug_nice_try.pl', debug_code => 1;
-    use Nice::Try dont_want => 1;
     use Devel::Confess;
     use Scalar::Util ();
     # use Crypt::JWT;
@@ -42,7 +40,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Apache2::API::Status;
-    $VERSION = 'v1.0.2';
+    $VERSION = 'v1.1.0';
 };
 
 use strict;
@@ -240,9 +238,6 @@ sub handler : method
             # Net::API::REST::reply will automatically set a json with an error message based on the user language
             return( $self->reply({ code => Apache2::Const::HTTP_UNAUTHORIZED }) );
         }
-        else
-        {
-        }
     }
     
     $self->request( $req );
@@ -341,36 +336,38 @@ EOT
 #         my $deparse = B::Deparse->new("-p", "-sC");
 #         my $code_body = $deparse->coderef2text( $handler );
         
-        try
+        # try-catch
+        local $@;
+        my $rc = eval
         {
             # my $rc = $ep->handler->();
-            my $rc = $handler->();
-            # Server error
-            if( !defined( $rc ) )
-            {
-                # Net::API::REST::reply will automatically set a json with an error message based on the user language
-                # It is ok to set a reply ourself here, because if it were a normal response, we would not be getting an undef value
-                return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR }) );
-                # return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-            }
-            elsif( $rc == Apache2::Const::HTTP_OK )
-            {
-                return( Apache2::Const::OK );
-            }
-            else
-            {
-                return( $rc );
-            }
-            # Stop sending data !!
-            $self->request->socket->close;
-            exit( 0 );
-        }
-        catch( $e )
+            $handler->();
+        };
+        if( $@ )
         {
-            $self->error({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $e });
+            $self->error({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR, message => $@ });
             # return( $self->reply( 500, { message => 'An internal server error occured' } ) );
-            return( $self->bailout( "An error occurred while executing code for api resource: $e" ) );
+            return( $self->bailout( "An error occurred while executing code for api resource: $@" ) );
         }
+        # Server error
+        if( !defined( $rc ) )
+        {
+            # Net::API::REST::reply will automatically set a json with an error message based on the user language
+            # It is ok to set a reply ourself here, because if it were a normal response, we would not be getting an undef value
+            return( $self->reply({ code => Apache2::Const::HTTP_INTERNAL_SERVER_ERROR }) );
+            # return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+        }
+        elsif( $rc == Apache2::Const::HTTP_OK )
+        {
+            return( Apache2::Const::OK );
+        }
+        else
+        {
+            return( $rc );
+        }
+        # Stop sending data !!
+        $self->request->socket->close;
+        exit(0);
     }
 }
 
@@ -546,14 +543,16 @@ sub jwt_decode
     {
         my $token = shift( @_ );
         my $data;
-        try
+        # try-catch
+        local $@;
+        eval
         {
             ## $data = Crypt::JWT::decode_jwt( token => $token );
             $data = Net::API::REST::JWT::decode_jwt( token => $token );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "There was an error decoding Json Web Token payload: $e" ) );
+            return( $self->error( "There was an error decoding Json Web Token payload: $@" ) );
         }
         return( $data );
     }
@@ -601,14 +600,16 @@ sub jwt_decode
     }
     
     my $data;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         ## $data = Crypt::JWT::decode_jwt( %$param );
         $data = Net::API::REST::JWT::decode_jwt( %$param );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "There was an error decoding Json Web Token payload: $e" ) );
+        return( $self->error( "There was an error decoding Json Web Token payload: $@" ) );
     }
     return( $data );
 }
@@ -673,14 +674,16 @@ sub jwt_encode
         $params{ $_ } = $opts->{ $_ } if( CORE::exists( $opts->{ $_ } ) && CORE::length( $opts->{ $_ } ) );
     }
     
-    try
+    # try-catch
+    local $@;
+    eval
     {
         ## $token = Crypt::JWT::encode_jwt(
         $token = Net::API::REST::JWT::encode_jwt( %params );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error in the arguments or payload when creating a Jason Web Token: $e" ) );
+        return( $self->error( "Error in the arguments or payload when creating a Jason Web Token: $@" ) );
     }
     return( $token );
 }
@@ -698,17 +701,19 @@ sub jwt_extract
     return( $self->error( "Token provided ($token) seems malformed. I was expecting 3 chunks of base64 data separated by dots" ) ) if( $token !~ /^([^\.]+)\.([^\.]+)\.([^\.]+)$/ );
     my( $header, $claim, $crypto )  = split( /\./, $token, 3 );
     my $hash = {};
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $hash->{raw_header} = MIME::Base64::decode_base64( $header );
         $hash->{raw_claim} = MIME::Base64::decode_base64( $claim );
         my $j = JSON->new->allow_nonref;
         $hash->{header} = $j->utf8->decode( $hash->{raw_header} );
         $hash->{claim} = $j->utf8->decode( $hash->{raw_claim} );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occured while attempting to extract token data: $e" ) );
+        return( $self->error( "An error occured while attempting to extract token data: $@" ) );
     }
     return( $hash );
 }
@@ -798,7 +803,9 @@ sub jwt_verify
         return( $self->error( "Unable to find a matching key for the one found in the token header ($kid) against the rsa keys provided." ) ) if( !CORE::length( $e ) || !CORE::length( $n ) );
         # Ok, we are very reasonably safe to call Crypt::JWT now
         my $data;
-        try
+        # try-catch
+        local $@;
+        eval
         {
             # $data = Crypt::JWT::decode_jwt( token => $token );
             # $data = Crypt::JWT::decode_jwt(
@@ -809,12 +816,12 @@ sub jwt_verify
                 verify_exp      => 0,
                 debug           => 3,
             );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Faile validating jwt token '$token'. Reason is: $e" ) );
+            return( $self->error( "Faile validating jwt token '$token'. Reason is: $@" ) );
         }
-        ## Ok, we're good
+        # Ok, we're good
     }
     return( $hash );
 }
@@ -948,17 +955,18 @@ sub route
                     elsif( $handler =~ /^([^\-]+)\-\>(\S+)$/ )
                     {
                         my( $cl, $meth ) = ( $1, $2 );
-                        try
+                        # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
+                        # require $cl unless( defined( *{"${cl}::"} ) );
+                        $self->_load_class( $cl ) || return( $self->pass_error({ code => 500 }) );
+                        # NOTE: 2021-09-05 (Jacques): See above same comment for the same issue, i.e. we only need to use the class name to check if the method exists, otherwise creating an instance of the object would have undesirable consequences under OPTIONS
+                        my $code = $cl->can( $meth );
+                        return( $self->error({ code => 500, message => "Class \"$cl\" does not have a method \"$meth\"." }) ) if( !$code );
+                        # return( sub{ $code->( $o, api => $self, @_ ) } );
+                        # try-catch
+                        local $@;
+                        my $ep = eval
                         {
-                            # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
-                            # require $cl unless( defined( *{"${cl}::"} ) );
-                            my $rc = eval{ $self->_load_class( $cl ); };
-                            return( $self->error({ code => 500, message => "Unable to load class \"$cl\": $@" }) ) if( $@ );
-                            # NOTE: 2021-09-05 (Jacques): See above same comment for the same issue, i.e. we only need to use the class name to check if the method exists, otherwise creating an instance of the object would have undesirable consequences under OPTIONS
-                            my $code = $cl->can( $meth );
-                            return( $self->error({ code => 500, message => "Class \"$cl\" does not have a method \"$meth\"." }) ) if( !$code );
-                            # return( sub{ $code->( $o, api => $self, @_ ) } );
-                            my $ep = Net::API::REST::Endpoint->new(
+                            Net::API::REST::Endpoint->new(
                                 handler => sub
                                 {
                                     my $o = $cl->new(
@@ -983,12 +991,12 @@ sub route
                                 access => $access,
                                 path => $uri,
                             );
-                            return( $ep );
-                        }
-                        catch( $e ) 
+                        };
+                        if( $@ )
                         {
-                            return( $self->error({ code => 500, message => $e }) );
+                            return( $self->error({ code => 500, message => $@ }) );
                         }
+                        return( $ep );
                     }
                     else
                     {
@@ -1001,28 +1009,29 @@ sub route
             elsif( $subroutes->{ $part } =~ /^([^\-]+)\-\>(\S+)$/ )
             {
                 my( $cl, $meth ) = ( $1, $2 );
-                try
+                # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
+                # require $cl unless( defined( *{"${cl}::"} ) );
+                # my $rc = eval{ $self->_load_class( $cl ); };
+                $self->_load_class( $cl ) || return( $self->pass_error({ code => 500 }) );
+                # NOTE: 2021-09-05 (Jacques): This turned out to be a bad idea to check if a method exists in class, because by merely instantiating an object, it would trigger execution of code that is undesirable when running under OPTIONS, which only aims to check sanity and not actually run the query.
+                # As it turns out $cl->can( $meth ) works just as well.
+                # my $o = $cl->new(
+                #    apache_request => $self->apache_request,
+                #    debug => $self->debug,
+                #    request => $req,
+                #    response => $resp,
+                #    # Pass the api object here as well
+                #    api => $self,
+                # ) || return( $self->pass_error( $cl->error ) );
+                # my $code = $o->can( $meth );
+                my $code = $cl->can( $meth );
+                return( $self->error({ code => 500, message => "Class \"$cl\" does not have a method \"$meth\"." }) ) if( !$code );
+                # return( sub{ $code->( $o, api => $self, @_ ) } );
+                # try-catch
+                local $@;
+                my $ep = eval
                 {
-                    # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
-                    # require $cl unless( defined( *{"${cl}::"} ) );
-                    # my $rc = eval{ $self->_load_class( $cl ); };
-                    my $rc = $self->_load_class( $cl );
-                    return( $self->error({ code => 500, message => "Unable to load class \"$cl\": " . $self->error }) ) if( !defined( $rc ) );
-                    # NOTE: 2021-09-05 (Jacques): This turned out to be a bad idea to check if a method exists in class, because by merely instantiating an object, it would trigger execution of code that is undesirable when running under OPTIONS, which only aims to check sanity and not actually run the query.
-                    # As it turns out $cl->can( $meth ) works just as well.
-                    # my $o = $cl->new(
-                    #    apache_request => $self->apache_request,
-                    #    debug => $self->debug,
-                    #    request => $req,
-                    #    response => $resp,
-                    #    # Pass the api object here as well
-                    #    api => $self,
-                    # ) || return( $self->pass_error( $cl->error ) );
-                    # my $code = $o->can( $meth );
-                    my $code = $cl->can( $meth );
-                    return( $self->error({ code => 500, message => "Class \"$cl\" does not have a method \"$meth\"." }) ) if( !$code );
-                    # return( sub{ $code->( $o, api => $self, @_ ) } );
-                    my $ep = Net::API::REST::Endpoint->new(
+                    Net::API::REST::Endpoint->new(
                         handler => sub
                         {
                             my $o = $cl->new(
@@ -1041,12 +1050,12 @@ sub route
                         access => $access,
                         path => $uri,
                     );
-                    return( $ep );
-                }
-                catch( $e ) 
+                };
+                if( $@ )
                 {
-                    return( $self->error({ code => 500, message => $e }) );
+                    return( $self->error({ code => 500, message => $@ }) );
                 }
+                return( $ep );
             }
             else
             {
@@ -1132,26 +1141,27 @@ sub route
                 elsif( $handler =~ /^([^\-]+)\-\>(\S+)$/ )
                 {
                     my( $cl, $meth ) = ( $1, $2 );
-                    try
+                    # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
+                    # require $cl unless( defined( *{"${cl}::"} ) );
+                    $self->_load_class( $cl ) || return( $self->pass_error({ code => 500 }) );
+                    # NOTE: 2021-09-05 (Jacques): See above same comment for the same issue, i.e. we only need to use the class name to check if the method exists, otherwise creating an instance of the object would have undesirable consequences under OPTIONS
+                    # my $o = $cl->new(
+                    #     apache_request => $self->apache_request,
+                    #     debug => $self->debug,
+                    #     request => $req,
+                    #     response => $resp,
+                    #     # Pass the api object here as well
+                    #     api => $self,
+                    # ) || return( $self->pass_error( $cl->error ) );
+                    # my $code = $o->can( $meth );
+                    my $code = $cl->can( $meth );
+                    return( $self->error({ code => 500, message => "Class \"$cl\" does not have a method \"$meth\"." }) ) if( !$code );
+                    # return( sub{ $code->( $o, api => $self, @_ ) } );
+                    # try-catch
+                    local $@;
+                    my $ep = eval
                     {
-                        # https://stackoverflow.com/questions/32608504/how-to-check-if-perl-module-is-available#comment53081298_32608860
-                        # require $cl unless( defined( *{"${cl}::"} ) );
-                        my $rc = eval{ $self->_load_class( $cl ); };
-                        return( $self->error({ code => 500, message => "Unable to load class \"$cl\": $@" }) ) if( $@ );
-                        # NOTE: 2021-09-05 (Jacques): See above same comment for the same issue, i.e. we only need to use the class name to check if the method exists, otherwise creating an instance of the object would have undesirable consequences under OPTIONS
-                        # my $o = $cl->new(
-                        #     apache_request => $self->apache_request,
-                        #     debug => $self->debug,
-                        #     request => $req,
-                        #     response => $resp,
-                        #     # Pass the api object here as well
-                        #     api => $self,
-                        # ) || return( $self->pass_error( $cl->error ) );
-                        # my $code = $o->can( $meth );
-                        my $code = $cl->can( $meth );
-                        return( $self->error({ code => 500, message => "Class \"$cl\" does not have a method \"$meth\"." }) ) if( !$code );
-                        # return( sub{ $code->( $o, api => $self, @_ ) } );
-                        my $ep = Net::API::REST::Endpoint->new(
+                        Net::API::REST::Endpoint->new(
                             handler => sub
                             {
                                 my $o = $cl->new(
@@ -1170,12 +1180,12 @@ sub route
                             access => $access,
                             path => $uri,
                         );
-                        return( $ep );
-                    }
-                    catch( $e ) 
+                    };
+                    if( $@ )
                     {
-                        return( $self->error({ code => 500, message => $e }) );
+                        return( $self->error({ code => 500, message => $@ }) );
                     }
+                    return( $ep );
                 }
                 else
                 {
@@ -1195,7 +1205,7 @@ sub route
     # An error occurred
     if( !defined( $ep ) )
     {
-        return( undef() );
+        return;
     }
     # Nothing found
     elsif( !length( $ep ) )
@@ -1254,36 +1264,28 @@ sub routes
                 }
                 elsif( $v =~ /^([^\:]+)\:{2}[^\:]+/ )
                 {
-                    try
+                    # my $cl = $subroutes->{ $part };
+                    my $cl = $v;
+                    my $meth;
+                    if( $cl =~ /^([^\-]+)\-\>(\S+)$/ )
                     {
-                        # my $cl = $subroutes->{ $part };
-                        my $cl = $v;
-                        my $meth;
-                        if( $cl =~ /^([^\-]+)\-\>(\S+)$/ )
-                        {
-                            ( $cl, $meth ) = ( $1, $2 );
-                        }
-                        # require $cl unless( defined( *{"${cl}::"} ) );
-                        my $rc = $self->_load_class( $cl );
-                        return( $self->error({ code => 500, message => "Unable to load class \"$cl\": " . $self->error }) ) if( !defined( $rc ) );
-                        # 2021-09-06: We do not need to instantiate an object to check if the module 'can' a method, and also this would trigger code which could lead to undesired results, because the instantiated object does not know if this is an actual query and at this stage could be missing authentication tokens to work properly. Yes, I am talking out of experience here :)
-                        #my $o = $cl->new(
-                        #    apache_request => $self->apache_request,
-                        #    debug => $self->debug,
-                        #    request => $req,
-                        #    response => $resp,
-                        #    # Pass the api object here as well
-                        #    api => $self,
-                        #    checkonly => 1
-                        #) || return( $self->pass_error( $cl->error ) );
-                        if( defined( $meth ) )
-                        {
-                            return( "Class \"$cl\" does not have a method \"$meth\"." ) if( !$cl->can( $meth ) );
-                        }
+                        ( $cl, $meth ) = ( $1, $2 );
                     }
-                    catch( $e ) 
+                    # require $cl unless( defined( *{"${cl}::"} ) );
+                    $self->_load_class( $cl ) || return( $self->pass_error({ code => 500 }) );
+                    # 2021-09-06: We do not need to instantiate an object to check if the module 'can' a method, and also this would trigger code which could lead to undesired results, because the instantiated object does not know if this is an actual query and at this stage could be missing authentication tokens to work properly. Yes, I am talking out of experience here :)
+                    #my $o = $cl->new(
+                    #    apache_request => $self->apache_request,
+                    #    debug => $self->debug,
+                    #    request => $req,
+                    #    response => $resp,
+                    #    # Pass the api object here as well
+                    #    api => $self,
+                    #    checkonly => 1
+                    #) || return( $self->pass_error( $cl->error ) );
+                    if( defined( $meth ) )
                     {
-                        return( $self->error({ code => 500, message => $e }) );
+                        return( "Class \"$cl\" does not have a method \"$meth\"." ) if( !$cl->can( $meth ) );
                     }
                 }
                 elsif( $k eq '_allowed_method' )
@@ -1367,15 +1369,18 @@ sub _try
     my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
     my $r = Apache2::RequestUtil->request;
     # $r->log_error( "Net::API::REST::_try to call method \"$meth\" in package \"$pack\"." );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( $self->$pack->$meth ) if( !scalar( @_ ) );
         return( $self->$pack->$meth( @_ ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $e" ) );
+        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $@" ) );
     }
+    return( $rv );
 }
 
 # NOTE: Net::API::REST::Endpoint package
@@ -1581,7 +1586,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v1.0.2
+    v1.1.0
 
 =head1 DESCRIPTION
 

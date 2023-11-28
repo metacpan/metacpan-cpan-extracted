@@ -4,10 +4,11 @@ use_ok('Parse::SAMGov::Exclusion');
 
 my $e = new_ok('Parse::SAMGov::Exclusion');
 can_ok(
-    $e, qw( classification name address DUNS
+    $e, qw( classification name address DUNS UEI
       xprogram xagency CT_code xtype comments active_date
       termination_date record_status crossref
-      SAM_number CAGE NPI
+      SAM_number CAGE NPI creation_date dnb_open_data
+      load load_v1 load_v2
       )
 );
 $e->name(Parse::SAMGov::Exclusion::Name->new(entity => 'ABC Corp Inc'));
@@ -46,6 +47,12 @@ is($e->active_date->mdy('/'), '01/01/1994', 'active date matches');
 isa_ok($e->termination_date('12/01/1994'), 'DateTime');
 isa_ok($e->termination_date,               'DateTime');
 is($e->termination_date->mdy('/'), '12/01/1994', 'termination date matches');
+isa_ok($e->termination_date('Indefinite'), 'DateTime');
+isa_ok($e->termination_date,               'DateTime');
+is($e->termination_date->year, '2200', 'termination date year matches 2200');
+isa_ok($e->creation_date('12/01/1994'), 'DateTime');
+isa_ok($e->creation_date,               'DateTime');
+is($e->creation_date->mdy('/'), '12/01/1994', 'termination date matches');
 
 done_testing();
 __END__

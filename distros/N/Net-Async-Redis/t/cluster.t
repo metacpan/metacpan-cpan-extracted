@@ -10,6 +10,7 @@ use Future::AsyncAwait;
 
 use Test::More;
 use Test::Fatal qw(lives_ok exception);
+use Future::Utils qw(fmap_void);
 use Test::MockModule;
 use Net::Async::Redis::Cluster;
 use IO::Async::Loop;
@@ -176,6 +177,41 @@ cluster_test MULTI => async sub ($redis) {
     });
     await $multi;
     is($data, '123', 'had correct data after transaction');
+};
+
+cluster_test 'MULTI interspersed with regular Redis calls' => async sub ($redis) {
+    my $data;
+    my $k = "multi.key.cluster.";
+    await $redis->set($k . 'x' => "y");
+    await $redis->expire($k . 'x', 300);
+    my %result;
+    my $target = $ENV{AUTHOR_TESTING} ? 2000 : 100;
+    await $redis->unlink($k . 'count');
+    await fmap_void(async sub ($item) {
+        await $redis->multi(sub ($tx) {
+            my $v = '' . reverse $item;
+            $tx->set($k . $item => $v);
+            $tx->expire($k . $item, 300);
+            $redis->get($k . $item)->on_ready(sub {
+                my $f = shift;
+                is(exception {
+                    ($data) = $f->get;
+                    is($data, $result{$item}, 'data is correct inside regular HGET');
+                }, undef, 'no exception on ->get');
+            });
+            $redis->incr($k . 'count')->retain;
+            $tx->get($k . $item)->on_ready(sub {
+                my $f = shift;
+                is(exception {
+                    ($data) = $f->get;
+                    $result{$item} = $data;
+                    is($data, $v, 'data is correct inside MULTI');
+                }, undef, 'no exception on ->get');
+            });
+            return;
+        });
+    }, concurrent => 64, foreach => [1..$target]);
+    is(await $redis->get($k . 'count'), $target, 'count matches afterwards');
 };
 
 done_testing;

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,20 +26,20 @@ no_index:
 provides:
   Text::VisualPrintf:
     file: lib/Text/VisualPrintf.pm
-    version: '4.01'
+    version: '4.03'
   Text::VisualPrintf::IO:
     file: lib/Text/VisualPrintf/IO.pm
 requires:
-  Text::Conceal: '0.99'
+  Text::Conceal: '1.03'
   Text::VisualWidth::PP: '0.05'
   perl: v5.14.0
 resources:
-  bugtracker: https://github.com/kaz-utashiro/Text-VisualPrintf/issues
-  homepage: https://github.com/kaz-utashiro/Text-VisualPrintf
-  repository: git://github.com/kaz-utashiro/Text-VisualPrintf.git
-version: '4.01'
+  bugtracker: https://github.com/tecolicom/Text-VisualPrintf/issues
+  homepage: https://github.com/tecolicom/Text-VisualPrintf
+  repository: https://github.com/tecolicom/Text-VisualPrintf.git
+version: '4.03'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

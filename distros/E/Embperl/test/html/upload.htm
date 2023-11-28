@@ -8,7 +8,7 @@ use Data::Dumper ;
 !]
 <h1>Embperl Tests - File-Upload</h1>
 
-[+ do { $cgiok = $CGI::VERSION > 2.45 ; @info = sort keys %{$fdat{-upload}} ; $cgiok?"@info":'Content-Disposition Content-Type' } +]
+[+ do { $cgiok = $CGI::VERSION > 2.45; $cgi4 = $CGI::VERSION >= 4; @info = sort keys %{$fdat{-upload}} ; ($cgiok||$cgi4)?"@info":'Content-Disposition Content-Type' } +]
 Filename:       [+ $cgiok?$fdat{upload}:'upload-filename' +]<br>
 Content-Type:	[+ $cgiok?$fdat{-upload} -> {'Content-Type'}:'test/plain' +]<br>
 CGI-Version:    [+ $CGI::VERSION +]

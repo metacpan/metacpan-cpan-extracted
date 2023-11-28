@@ -14,9 +14,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-08'; # DATE
+our $DATE = '2023-11-16'; # DATE
 our $DIST = 'Perinci-Sub-DepChecker'; # DIST
-our $VERSION = '0.126'; # VERSION
+our $VERSION = '0.128'; # VERSION
 
 my $pa;
 
@@ -106,7 +106,7 @@ sub checkdep_prog {
             $ver_extract = sub { $_[0] =~ /git version (.+)/ ? $1 : undef };
         } elsif ($prog_name eq 'perl') {
             @ver_cmd = ($prog_path, "-v");
-            $ver_extract = sub { $_[0] =~ /\(v(.+?)\)/ ? $1 : undef };
+            $ver_extract = sub { $_[0] =~ /\s\(?v([\.\d]+)\*?\)?\s/ ? $1 : undef };
         } else {
             return "ERR: Cannot check minimum version for program '$prog_name'";
         }
@@ -243,7 +243,7 @@ Perinci::Sub::DepChecker - Check dependencies from 'deps' property
 
 =head1 VERSION
 
-This document describes version 0.126 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2023-07-08.
+This document describes version 0.128 of Perinci::Sub::DepChecker (from Perl distribution Perinci-Sub-DepChecker), released on 2023-11-16.
 
 =head1 SYNOPSIS
 

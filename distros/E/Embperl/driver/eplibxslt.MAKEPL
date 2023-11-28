@@ -2,7 +2,14 @@
 use File::Spec ;
 use File::Find ;
 use Cwd ;
+use ExtUtils::PkgConfig ;
 
+
+BEGIN
+    {
+    eval "use ExtUtils::PkgConfig" ;
+    $nopkgcfg = 1 if ($@) ;
+    } ;
 $win32 = ($^O eq 'MSWin32') ;
 
 my $prefix  ;
@@ -14,40 +21,23 @@ my $cflags2  ;
 my $version ;
 my $version2 ;
 
-if (!$win32)
+if (!$win32 && !$nopkgcfg)
     {
-    if (!open (C, "xml2-config --version|"))
-        {
-        print "Cannot execute xml2-config ($!). libxml2 and libxslt will not be linked into Embperl\n" ;
-        return undef ;
-        }
-    chomp ($version = <C>)  or die ("Cannot execute xml2-config to get version.") ;
-    close C ;
-
-    open C, "xml2-config --prefix --libs --cflags|" or die ("Cannot execute xml2-config ($!).") ;
-    chomp ($prefix = <C>) ;
-    chomp ($libs = <C>) ;
-    chomp ($cflags = <C>) ;
-    close C ;
+    my $pkg = 'libxml-2.0';
+    my %xml2_info = ExtUtils::PkgConfig->find ($pkg) ;
+    $version = $xml2_info{modversion} ;
+    $libs    = $xml2_info{libs} ;
+    $cflags  = $xml2_info{cflags} ;
+    $prefix  = ExtUtils::PkgConfig->variable($pkg, 'exec_prefix') ;
 
     print "Found libxml2 $version installed under $prefix\n" ;
 
-    if (!open (C, "xslt-config --version|"))
-        {
-        print "Cannot execute xslt-config ($!). libxml2 and libxslt will not be linked into Embperl\n" ;
-        return undef ;
-        }
-    chomp ($version2 = <C>)  or die ("Cannot execute xslt-config to get version.") ;
-    close C ;
-
-    open C, "xslt-config --prefix --libs |" or die ("Cannot execute xslt-config ($!).") ;
-    chomp ($prefix2 = <C>) ;
-    chomp ($libs2 = <C>) ;
-    close C ;
-
-    open C, "xslt-config --cflags|" or die ("Cannot execute xslt-config ($!).") ;
-    chomp ($cflags2 = <C>) ;
-    close C ;
+    $pkg = 'libxslt';
+    my %xslt_info = ExtUtils::PkgConfig->find ($pkg) ;
+    $version2 = $xslt_info{modversion} ;
+    $libs2    = $xslt_info{libs} ;
+    $cflags2  = $xslt_info{cflags} ;
+    $prefix2  = ExtUtils::PkgConfig->variable($pkg, 'exec_prefix') ;
 
     print "Found libxslt $version2 installed under $prefix2\n" ;
     

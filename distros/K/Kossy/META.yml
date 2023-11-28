@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,19 +26,19 @@ no_index:
 provides:
   Kossy:
     file: lib/Kossy.pm
-    version: '0.60'
+    version: '0.63'
   Kossy::Connection:
     file: lib/Kossy/Connection.pm
-    version: '0.60'
+    version: '0.63'
   Kossy::Exception:
     file: lib/Kossy/Exception.pm
-    version: '0.60'
+    version: '0.63'
   Kossy::Request:
     file: lib/Kossy/Request.pm
-    version: '0.60'
+    version: '0.63'
   Kossy::Response:
     file: lib/Kossy/Response.pm
-    version: '0.60'
+    version: '0.63'
 requires:
   Class::Accessor::Lite: '0'
   Cookie::Baker: '0.08'
@@ -58,7 +58,7 @@ requires:
   Plack: '1.0029'
   Plack::Middleware::ReverseProxy: '0'
   Plack::Middleware::Static: '0'
-  Router::Boom: '1.01'
+  Router::Boom: '1.03'
   Scalar::Util: '0'
   Test::More: '0.88'
   Text::Xslate: v3.2.4
@@ -67,12 +67,12 @@ requires:
   WWW::Form::UrlEncoded: '0.19'
   WWW::Form::UrlEncoded::XS: '0.19'
   parent: '0'
-  perl: '5.008004'
+  perl: '5.014004'
 resources:
   bugtracker: https://github.com/kazeburo/Kossy/issues
   homepage: https://github.com/kazeburo/Kossy
-  repository: git://github.com/kazeburo/Kossy.git
-version: '0.60'
+  repository: https://github.com/kazeburo/Kossy.git
+version: '0.63'
 x_contributors:
   - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
   - 'Masahiro Nagano <kazeburo@gmail.com>'
@@ -82,6 +82,7 @@ x_contributors:
   - 'Yutaka Imoto <yutaka.imoto@dena.com>'
   - 'hisaichi5518 <hisaichi5518@gmail.com>'
   - 'kfly8 <kfly@cpan.org>'
+  - 'kobaken <kentafly88@gmail.com>'
   - 'sonots <sonots@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -245,17 +245,13 @@ below. I< Optional. Type uniline.  >
 
 =head2 OnCalendar
 
-Defines realtime (i.e. wallclock) timers with
-calendar event expressions. See
-L<systemd.time(7)>
-for more information on the syntax of calendar event
-expressions. Otherwise, the semantics are similar to
+Defines realtime (i.e. wallclock) timers with calendar event expressions. See
+L<systemd.time(7)> for
+more information on the syntax of calendar event expressions. Otherwise, the semantics are similar to
 C<OnActiveSec> and related settings.
 
-Note that timers do not necessarily expire at the
-precise time configured with this setting, as it is subject to
-the C<AccuracySec> setting
-below.
+Note that timers do not necessarily expire at the precise time configured with this setting, as
+it is subject to the C<AccuracySec> setting below.
 
 May be specified more than once, in which case the timer unit will trigger whenever any of the
 specified expressions elapse. Moreover calendar timers and monotonic timers (see above) may be
@@ -263,7 +259,24 @@ combined within the same timer unit.
 
 If the empty string is assigned to any of these options, the list of timers is reset (both
 C<OnCalendar> timers and monotonic timers, see above), and all prior assignments
-will have no effect. I< Optional. Type list of uniline.  > 
+will have no effect.
+
+Note that calendar timers might be triggered at unexpected times if the system's realtime clock
+is not set correctly. Specifically, on systems that lack a battery-buffered Realtime Clock (RTC) it
+might be wise to enable C<systemd-time-wait-sync.service> to ensure the clock is
+adjusted to a network time source before the timer event is set up. Timer units
+with at least one C<OnCalendar> expression are automatically ordered after
+C<time-sync.target>, which C<systemd-time-wait-sync.service> is
+ordered before.
+
+When a system is temporarily put to sleep (i.e. system suspend or hibernation) the realtime
+clock does not pause. When a calendar timer elapses while the system is sleeping it will not be acted
+on immediately, but once the system is later resumed it will catch up and process all timers that
+triggered while the system was sleeping. Note that if a calendar timer elapsed more than once while
+the system was continuously sleeping the timer will only result in a single service activation. If
+C<WakeSystem> (see below) is enabled a calendar time event elapsing while the system
+is suspended will cause the system to wake up (under the condition the system's hardware supports
+time-triggered wake-up functionality). I< Optional. Type list of uniline.  > 
 
 =head2 AccuracySec
 

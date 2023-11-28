@@ -1,24 +1,23 @@
 package Lego::Part::Image::LugnetCom;
 
-# Pragmas.
 use base qw(Lego::Part::Image);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Get image URL.
 sub image_url {
 	my $self = shift;
+
 	if (! defined $self->{'part'}->design_id) {
 		err "Design ID doesn't defined.";
 	}
 	my $url = sprintf 'http://img.lugnet.com/ld/%s.gif',
 		$self->{'part'}->design_id;
+
 	return $url;
 }
 
@@ -37,40 +36,48 @@ Lego::Part::Image::LugnetCom - Lego part image class for lugnet.com.
 =head1 SYNOPSIS
 
  use Lego::Part::Image::LugnetCom;
+
  my $obj = Lego::Part::Image::LugnetCom->new;
  my $image = $obj->image;
  my $image_url = $obj->image_url;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item * C<new()>
+ my $obj = Lego::Part::Image::LugnetCom->new;
 
- Constructor.
- Returns object.
+Constructor.
 
 =over 8
 
 =item * C<part>
 
- Lego::Part object.
- It is required.
- Default value is undef.
+L<Lego::Part> object.
+
+It is required.
+
+Default value is undef.
 
 =back
 
-=item * C<image()>
+Returns instance of object.
 
- Get image.
- Not implemented now.
+=head2 C<image>
 
-=item * C<image_url()>
+ my $image = $obj->image;
 
- Get image URL.
- Returns string with image URL.
+Get image.
 
-=back
+Not implemented now.
+
+=head2 C<image_url>
+
+ my $image_url = $obj->image_url;
+
+Get image URL.
+
+Returns string with image URL.
 
 =head1 ERRORS
 
@@ -89,11 +96,11 @@ Lego::Part::Image::LugnetCom - Lego part image class for lugnet.com.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=link_for_lugnet_com.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Lego::Part;
  use Lego::Part::Image::LugnetCom;
 
@@ -148,21 +155,22 @@ Install the Lego modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Lego-Part-Image>
+L<https://github.com/michal-josef-spacek/Lego-Part-Image>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- BSD 2-Clause License
+© 2015-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

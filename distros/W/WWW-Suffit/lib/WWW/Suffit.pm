@@ -11,7 +11,7 @@ WWW::Suffit - The Suffit core library
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 # . . . coming soon . . .
 

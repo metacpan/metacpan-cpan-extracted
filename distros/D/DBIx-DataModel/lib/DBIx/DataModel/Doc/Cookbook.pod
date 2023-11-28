@@ -218,15 +218,10 @@ By default, table or column names are inserted "as is" in the generated SQL;
 but sometimes this could cause conflicts with SQL reserved words.
 The solution is to quote table and column names, by activating the
 C<quote_char> option of L<SQL::Abstract>, inherited through
-L<SQL::Abstract::More>. Here is an example (assuming
-single-schema mode) :
+L<SQL::Abstract::More>. Here is an example :
 
   # define the schema
-  DBIx::DataModel->Schema('SCH');
-
-  # feed the schema with a custom instance of SQL::Abstract::More
-  my $sqlam = SQL::Abstract::More->new(quote_char => "`");
-  SCH->singleton->sql_abstract($sqlam);
+  DBIx::DataModel->Schema('SCH', {sql_abstract_args => [quote_char => "`"]});
 
   # define a table
   SCH->Table(qw/Config CONFIG KEY/);
@@ -372,15 +367,10 @@ are lost within the SQL syntax. To make it easier, we define a I<special operato
 for L<SQL::Abstract::More> :
 
   # define the schema
-  DBIx::DataModel->Schema('SCH');
-  
-  # feed the schema with a custom instance of SQL::Abstract::More
-  my $sqlam = SQL::Abstract::More->new(
-    sql_dialect => "Oracle",
-    special_ops => [{regex   => qr/^contains(:?_all|_any)?$/i,
-                     handler => \&_fulltext_contains_for_Oracle}],
-   );
-  SCH->singleton->sql_abstract($sqlam);
+  DBIx::DataModel->Schema('SCH',
+                          {sql_abstract_args => [sql_dialect => "Oracle12c",
+                                                 special_ops => [{regex   => qr/^contains(:?_all|_any)?$/i,
+                                                                  handler => \&_fulltext_contains_for_Oracle}]]});
   
   sub _fulltext_contains_for_Oracle {
     my ($self, $field, $op, $arg) = @_;

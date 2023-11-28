@@ -3,10 +3,10 @@ package MARC::Convert::Wikidata::Object::People;
 use strict;
 use warnings;
 
-use MARC::Convert::Wikidata::Object::Utils qw(check_date check_date_order);
 use Mo qw(build is);
+use Mo::utils::Date qw(check_date check_date_order);
 
-our $VERSION = 0.01;
+our $VERSION = 0.03;
 
 has date_of_birth => (
 	is => 'ro',
@@ -78,7 +78,7 @@ Returns instance of object.
 
 Date of birth of people.
 
-Parameter is string with date. See L<MARC::Convert::Wikidata::Object::Utils/check_date> for more information.
+Parameter is string with date. See L<Mo::utils::Date/check_date> for more information.
 
 Default value is undef.
 
@@ -86,7 +86,7 @@ Default value is undef.
 
 Date of death of people.
 
-Parameter is string with date. See L<MARC::Convert::Wikidata::Object::Utils/check_date> for more information.
+Parameter is string with date. See L<Mo::utils::Date/check_date> for more information.
 
 Default value is undef.
 
@@ -153,12 +153,12 @@ Returns string.
 =head1 ERRORS
 
  new():
-         From MARC::Convert::Wikidata::Object::Utils::check_date():
+         From Mo::utils::Date::check_date():
                  Parameter 'date_of_birth' for date is in bad format.
                  Parameter 'date_of_birth' has year greater than actual year.
                  Parameter 'date_of_death' for date is in bad format.
                  Parameter 'date_of_death' has year greater than actual year.
-         From MARC::Convert::Wikidata::Object::Utils::check_date_order():
+         From Mo::utils::Date::check_date_order():
                  Parameter 'date_of_birth' has date greater or same as parameter 'date_of_death' date.
 
 =head1 EXAMPLE1
@@ -184,7 +184,7 @@ Returns string.
  # Output:
  # MARC::Convert::Wikidata::Object::People  {
  #     Parents       Mo::Object
- #     public methods (7) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_date (MARC::Convert::Wikidata::Object::Utils), isa (UNIVERSAL), VERSION (UNIVERSAL)
+ #     public methods (7) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_date (Mo::utils::Date), isa (UNIVERSAL), VERSION (UNIVERSAL)
  #     private methods (1) : __ANON__ (Mo::build)
  #     internals: {
  #         date_of_birth   "1952-12-08",
@@ -196,8 +196,8 @@ Returns string.
 
 =head1 DEPENDENCIES
 
-L<MARC::Convert::Wikidata::Object::Utils>,
-L<Mo>.
+L<Mo>,
+L<Mo::utils::Date>.
 
 =head1 SEE ALSO
 
@@ -227,6 +227,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.03
 
 =cut

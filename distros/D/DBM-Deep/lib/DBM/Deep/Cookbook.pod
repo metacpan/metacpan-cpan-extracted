@@ -201,7 +201,7 @@ an intermediate variable than to re-look it up every time. Thus
 
 =item * Make your file as tight as possible
 
-If you know that you are not going to use more than 65K in your database,
+If you know that you are not going to use more than 65KB in your database,
 consider using the C<pack_size =E<gt> 'small'> option. This will instruct
 DBM::Deep to use 16bit addresses, meaning that the seek times will be less.
 

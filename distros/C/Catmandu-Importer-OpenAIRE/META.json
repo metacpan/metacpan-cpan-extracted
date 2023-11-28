@@ -4,7 +4,7 @@
       "Patrick Hochstenbach"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -31,13 +31,14 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.22",
+            "Dist::Milla" : "v1.0.20",
             "Test::Pod" : "1.41"
          }
       },
       "runtime" : {
          "requires" : {
             "Catmandu" : "1.0306",
+            "JSON" : "2.90",
             "perl" : "v5.10.1"
          }
       },
@@ -62,7 +63,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Importer-OpenAIRE"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_contributors" : [
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>"
    ],

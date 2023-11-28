@@ -1,3 +1,10 @@
+0.007   2023-11-24  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] [cli cdtarget-backend] If not given symlink as argument,
+          defaults to the only symlink in current directory if there is
+          one.
+
+
 0.006   2022-09-30  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: cdtarget-backend.

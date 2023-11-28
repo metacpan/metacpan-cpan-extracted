@@ -7,10 +7,6 @@ my $prereq = {
 	'GIS::Distance' => 0
 };
 
-if(defined($ENV{'TIMEZONEDB_KEY'})) {
-	$prereq->{'TimeZone::TimeZoneDB'} = 0;
-}
-
 WriteMakefile(
     NAME		=> 'Geo::Location::Point',
     AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},

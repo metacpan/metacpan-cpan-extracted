@@ -8,13 +8,13 @@ use warnings;
 
 use experimental ( 'postderef', 'signatures' );
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Exporter 'import';
 
 our @EXPORT_OK = qw[
   iterator iter iarray icycle icache
-  icat igrep imap iproduct iseq ifreeze thaw
+  icat igrep imap iproduct iseq istack ifreeze thaw
 ];
 
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
@@ -365,6 +365,35 @@ sub iseq {
 
 
 
+sub istack ( @args ) {
+    require Iterator::Flex::Stack;
+    Iterator::Flex::Stack->new( @args );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -437,7 +466,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory icat istack
 
 =head1 NAME
 
@@ -445,7 +474,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -751,6 +780,28 @@ The iterator supports the following methods:
 =item rewind
 
 =item freeze
+
+=back
+
+=head2 istack
+
+  $iterator = istack( \@iterables, ?\%pars );
+
+A stack of iterables.  It returns the next value from the iterator at
+the top of the stack.  Iterators are popped when they are exhausted.
+It supports C<push>, C<pop>, C<shift>, and C<unshift> methods, which
+have same API as the Perl builtin subroutines.  See
+L<Iterator::Flex::Stack> for more details.
+
+The returned iterator supports the following methods:
+
+=over
+
+=item next
+
+=item prev
+
+=item current
 
 =back
 

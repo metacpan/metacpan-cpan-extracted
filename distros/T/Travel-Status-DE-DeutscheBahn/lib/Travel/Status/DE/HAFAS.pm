@@ -7,8 +7,6 @@ use warnings;
 use 5.014;
 use utf8;
 
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
-
 use Carp qw(confess);
 use DateTime;
 use DateTime::Format::Strptime;
@@ -16,13 +14,13 @@ use Digest::MD5 qw(md5_hex);
 use Encode      qw(decode encode);
 use JSON;
 use LWP::UserAgent;
+use Travel::Status::DE::HAFAS::Journey;
+use Travel::Status::DE::HAFAS::Location;
 use Travel::Status::DE::HAFAS::Message;
 use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
-use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
-use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.18';
+our $VERSION = '5.01';
 
 # {{{ Endpoint Definition
 
@@ -200,12 +198,14 @@ sub new {
 	if (
 		not(   $conf{station}
 			or $conf{journey}
+			or $conf{journeyMatch}
 			or $conf{geoSearch}
 			or $conf{locationSearch} )
 	  )
 	{
 		confess(
-			'station / journey / geoSearch / locationSearch must be specified');
+'station / journey / journeyMatch / geoSearch / locationSearch must be specified'
+		);
 	}
 
 	if ( not defined $service ) {
@@ -244,6 +244,27 @@ sub new {
 						jid         => $conf{journey}{id},
 						name        => $conf{journey}{name} // '0',
 						getPolyline => $conf{with_polyline} ? \1 : \0,
+					},
+				}
+			],
+			%{ $hafas_instance{$service}{request} }
+		};
+	}
+	elsif ( $conf{journeyMatch} ) {
+		$req = {
+			svcReqL => [
+				{
+					meth => 'JourneyMatch',
+					req  => {
+						date => ( $conf{datetime} // $now )->strftime('%Y%m%d'),
+						input    => $conf{journeyMatch},
+						jnyFltrL => [
+							{
+								type  => "PROD",
+								mode  => "INC",
+								value => $self->mot_mask
+							}
+						]
 					},
 				}
 			],
@@ -408,6 +429,9 @@ sub new {
 	if ( $conf{journey} ) {
 		$self->parse_journey;
 	}
+	elsif ( $conf{journeyMatch} ) {
+		$self->parse_journey_match;
+	}
 	elsif ( $conf{geoSearch} or $conf{locationSearch} ) {
 		$self->parse_search;
 	}
@@ -425,11 +449,14 @@ sub new_p {
 	if (
 		not(   $conf{station}
 			or $conf{journey}
+			or $conf{journeyMatch}
 			or $conf{geoSearch}
 			or $conf{locationSearch} )
 	  )
 	{
-		return $promise->reject('station or journey flag must be passed');
+		return $promise->reject(
+'station / journey / journeyMatch / geoSearch / locationSearch flag must be passed'
+		);
 	}
 
 	my $self = $obj->new( %conf, async => 1 );
@@ -442,6 +469,9 @@ sub new_p {
 			$self->check_mgate;
 			if ( $conf{journey} ) {
 				$self->parse_journey;
+			}
+			elsif ( $conf{journeyMatch} ) {
+				$self->parse_journey_match;
 			}
 			elsif ( $conf{geoSearch} or $conf{locationSearch} ) {
 				$self->parse_search;
@@ -619,15 +649,12 @@ sub check_mgate {
 sub add_message {
 	my ( $self, $json, $is_him ) = @_;
 
-	my $short = $json->{txtS};
-	my $text  = $json->{txtN};
-	my $code  = $json->{code};
-	my $prio  = $json->{prio};
+	my $text = $json->{txtN};
+	my $code = $json->{code};
 
 	if ($is_him) {
-		$short = $json->{head};
-		$text  = $json->{text};
-		$code  = $json->{hid};
+		$text = $json->{text};
+		$code = $json->{hid};
 	}
 
 	# Some backends use remL for operator information. We don't want that.
@@ -643,10 +670,7 @@ sub add_message {
 	}
 
 	my $message = Travel::Status::DE::HAFAS::Message->new(
-		short     => $short,
-		text      => $text,
-		code      => $code,
-		prio      => $prio,
+		json      => $json,
 		is_him    => $is_him,
 		ref_count => 1,
 	);
@@ -663,19 +687,14 @@ sub parse_search {
 		return $self;
 	}
 
-	my @refLocL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
-	my @locL    = @{ $self->{raw_json}{svcResL}[0]{res}{locL}         // [] };
+	my @locL = @{ $self->{raw_json}{svcResL}[0]{res}{locL} // [] };
 
 	if ( $self->{raw_json}{svcResL}[0]{res}{match} ) {
 		@locL = @{ $self->{raw_json}{svcResL}[0]{res}{match}{locL} // [] };
 	}
 
-	for my $loc (@locL) {
-		push(
-			@{ $self->{results} },
-			Travel::Status::DE::HAFAS::Stop->new( loc => $loc )
-		);
-	}
+	@{ $self->{results} }
+	  = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) } @locL;
 
 	return $self;
 }
@@ -687,7 +706,8 @@ sub parse_journey {
 		return $self;
 	}
 
-	my @locL    = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
+	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 	my $journey = $self->{raw_json}{svcResL}[0]{res}{journey};
 	my @polyline;
 
@@ -697,18 +717,47 @@ sub parse_journey {
 			my $poly = $polyline[ $ref->{ppIdx} ];
 			my $loc  = $locL[ $ref->{locX} ];
 
-			$poly->{name} = $loc->{name};
-			$poly->{eva}  = $loc->{extId} + 0;
+			$poly->{name} = $loc->name;
+			$poly->{eva}  = $loc->eva;
 		}
 	}
 
 	$self->{result} = Travel::Status::DE::HAFAS::Journey->new(
 		common   => $self->{raw_json}{svcResL}[0]{res}{common},
+		locL     => \@locL,
 		journey  => $journey,
 		polyline => \@polyline,
 		hafas    => $self,
 	);
 
+	return $self;
+}
+
+sub parse_journey_match {
+	my ($self) = @_;
+
+	$self->{results} = [];
+
+	if ( $self->{errstr} ) {
+		return $self;
+	}
+
+	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
+	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+
+	my @jnyL = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] };
+
+	for my $result (@jnyL) {
+		push(
+			@{ $self->{results} },
+			Travel::Status::DE::HAFAS::Journey->new(
+				common  => $self->{raw_json}{svcResL}[0]{res}{common},
+				locL    => \@locL,
+				journey => $result,
+				hafas   => $self,
+			)
+		);
+	}
 	return $self;
 }
 
@@ -721,6 +770,8 @@ sub parse_board {
 		return $self;
 	}
 
+	my @locL = map { Travel::Status::DE::HAFAS::Location->new( loc => $_ ) }
+	  @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 	my @jnyL = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] };
 
 	for my $result (@jnyL) {
@@ -728,6 +779,7 @@ sub parse_board {
 			@{ $self->{results} },
 			Travel::Status::DE::HAFAS::Journey->new(
 				common  => $self->{raw_json}{svcResL}[0]{res}{common},
+				locL    => \@locL,
 				journey => $result,
 				hafas   => $self,
 			)
@@ -800,6 +852,7 @@ sub station {
 		return $self->{station_info};
 	}
 
+	# no need to use Location instances here
 	my @locL = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
 
 	my %prefc_by_loc;
@@ -911,7 +964,7 @@ monitors
 
 =head1 VERSION
 
-version 4.18
+version 5.01
 
 =head1 DESCRIPTION
 
@@ -932,7 +985,7 @@ Requests item(s) as specified by I<opt> and returns a new
 Travel::Status::DE::HAFAS element with the results.  Dies if the wrong
 I<opt> were passed.
 
-I<opt> must contain either a B<station>, B<geoSearch>, B<locationSearch>, or B<journey> flag:
+I<opt> must contain either a B<station>, B<geoSearch>, B<locationSearch>, B<journey>, or B<journeyMatch> flag:
 
 =over
 
@@ -958,6 +1011,14 @@ Results are available via C<< $status->results >>.
 Request details about the journey identified by I<tripid> and I<line>.
 The result is available via C<< $status->result >>.
 
+=item B<journeyMatch> => I<query>
+
+Request journeys that match I<query> (e.g. "ICE 205" or "S 31111").
+Results are available via C<< $status->results >>.
+In contrast to B<journey>, the results typically only contain a minimal amount
+of information: trip ID, train/line identifier, and first and last stop.  There
+is no real-time data.
+
 =back
 
 The following optional flags may be set.
@@ -981,14 +1042,14 @@ minutes.
 
 Date and time to report for.  Defaults to now.
 
-=item B<excluded_mots> => [I<mot1>, I<mot2>, ...] (geoSearch, station)
+=item B<excluded_mots> => [I<mot1>, I<mot2>, ...] (geoSearch, station, journeyMatch)
 
 By default, all modes of transport (trains, trams, buses etc.) are returned.
 If this option is set, all modes appearing in I<mot1>, I<mot2>, ... will
 be excluded. The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
 
-=item B<exclusive_mots> => [I<mot1>, I<mot2>, ...] (geoSearch, station)
+=item B<exclusive_mots> => [I<mot1>, I<mot2>, ...] (geoSearch, station, journeyMatch)
 
 If this option is set, only the modes of transport appearing in I<mot1>,
 I<mot2>, ...  will be returned.  The supported modes depend on B<service>, use
@@ -1063,8 +1124,8 @@ describing it.  If no error occurred, returns undef.
 
 =item $status->results (geoSearch, locationSearch)
 
-Returns a list of stations. Each list element is a
-Travel::Status::DE::HAFAS::Stop(3pm) object.
+Returns a list of stop locations. Each list element is a
+Travel::Status::DE::HAFAS::Location(3pm) object.
 
 If no matching results were found or the parser / http request failed, returns
 an empty list.
@@ -1076,6 +1137,12 @@ Travel::Status::DE::HAFAS::Journey(3pm) object.
 
 If no matching results were found or the parser / http request failed, returns
 undef.
+
+=item $status->results (journeyMatch)
+
+Returns a list of Travel::Status::DE::HAFAS::Journey(3pm) object that describe
+matching journeys. In general, these objects lack real-time data,
+intermediate stops, and more.
 
 =item $status->result (journey)
 
@@ -1178,7 +1245,7 @@ Travel::Status::DE::HAFAS::Journey(3pm), Travel::Status::DE::HAFAS::StopFinder(3
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2022 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

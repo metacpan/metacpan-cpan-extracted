@@ -11,6 +11,14 @@ t/02useit.t
 t/03bug.t
 t/04v_version.t
 t/05_pkgwithversion.t
+t/06_multi_version.t
+t/07_class_version.t
+t/08_misleading.t
+t/lib/GH/ClassIssue1.pm
+t/lib/GH/Issue1.pm
+t/lib/Misleading.pm
+t/lib/Misleading/GetVersion.pm
+t/lib/Misleading/Version.pm
 t/lib/PkgWithVersion.pm
 t/lib/PkgWithVersion2.pm
 t/lib/V_Version.pm
@@ -20,3 +28,4 @@ xt/01-compile.t
 xt/02-pod_syntax.t
 xt/03-pod-coverage.t
 xt/04-kwalitee.t
+xt/10-packages-check.t

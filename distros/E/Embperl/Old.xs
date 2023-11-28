@@ -252,7 +252,7 @@ log_svs(r,sText)
     tReq * r
     char * sText
 CODE:
-    lprintf (r->pApp,"[%d]MEM:  %s: SVs: %d OBJs: %d\n", r->pThread->nPid, sText, sv_count, sv_objcount) ;
+    lprintf (r->pApp,"[%d]MEM:  %s: SVs: %d\n", r->pThread->nPid, sText, sv_count) ;
 
 SV *
 embperl_Escape(r, str, mode)

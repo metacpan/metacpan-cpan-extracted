@@ -7,7 +7,8 @@ lib/Net/DNS/Multicast.pm
 t/00-install.t
 t/00-load.t
 t/00-pod.t
-t/01-resolver.t
-t/03-MDNS-flags.t
+t/10-unicast.t
+t/20-multicast.t
+t/30-MDNS-flags.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

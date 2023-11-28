@@ -1,5 +1,12 @@
 Revision history for App-FileCleanerByDiskUage
 
+0.3.0   2023-11-11/15:00
+        - Add PID file to prevent multiple instances from starting up if calling via cron.
+		- convert to use Pod::Usage
+		- remove -v and -h short options for --version and and --help
+		- add writing results to a file using the -w flag using File::Slurp write_file in atomic mode
+		- add -q for quiet
+
 0.2.1   2023-09-01/14:30
         - Fix handling of extra / on the end of the path.
 

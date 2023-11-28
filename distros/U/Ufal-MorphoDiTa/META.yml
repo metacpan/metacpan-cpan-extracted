@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,69 +17,69 @@ name: Ufal-MorphoDiTa
 provides:
   Ufal::MorphoDiTa:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::Analyses:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::DerivatedLemma:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::DerivatedLemmas:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::DerivationFormatter:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::Derivator:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::Forms:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::Indices:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::Morpho:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TaggedForm:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TaggedForms:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TaggedLemma:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TaggedLemmaForms:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TaggedLemmas:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TaggedLemmasForms:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::Tagger:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TagsetConverter:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TokenRange:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::TokenRanges:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::Tokenizer:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTa::Version:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
+    version: v1.11.2.1
   Ufal::MorphoDiTac:
     file: lib/Ufal/MorphoDiTa.pm
-    version: v1.11.0.1
-version: v1.11.0.1
+    version: v1.11.2.1
+version: v1.11.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

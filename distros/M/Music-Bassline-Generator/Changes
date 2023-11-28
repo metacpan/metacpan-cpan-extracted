@@ -1,0 +1,191 @@
+Revision history for Music-Bassline-Generator
+
+0.0607 2023-11-12 13:50:03
+    - Oops. Revert array deref syntax to the old-skool way.
+
+0.0606 2023-11-12 10:19:36
+    - Fix ABSTRACT again!
+
+0.0605 2023-11-12 10:06:45
+    - Link to the previous versions on the backpan.
+
+0.0604 2023-11-12 10:02:06
+    - Ack! This module is not deprecated!!
+
+0.0603 2023-11-11 20:19:44
+    - Fix dist name. :(
+
+0.0602 2023-11-11 20:11:45
+    - Rename to Music::Bassline::Generator.
+    - Improve docs!
+    - Improve tests.
+
+0.0601 2023-11-11 19:36:32
+    - Clean-up things!
+
+0.0600 2023-11-11 09:07:48
+    - Enable the positions attribute, to specify allowed scale degrees.
+
+0.0512 2023-11-10 13:51:54
+    - No. Tonic means play the first scale note!
+
+0.0511 2023-11-10 13:40:53
+    - Play the IV note for 7-note scales, instead of the iii.
+
+0.0510 2023-11-10 09:04:37
+    - Do not trample the existing key!
+
+0.0509 2023-11-10 08:49:24
+    - Allow single note tonic computation.
+
+0.0508 2023-02-04 15:09:07
+    - No! Fix the chord *before* parsing.
+
+0.0507 2023-02-04 14:46:18
+    - Do not allow uninterpretable X/Y type chords.
+
+0.0506 2022-12-10 12:18:49
+    - Add the wrap attribute.
+    - Improve tests.
+    - Improve documentation.
+
+0.0505 2022-10-23 08:07:32
+    - Avoid implicit imports.
+
+0.0504 2022-08-08 05:58:25
+    - Fix tone-pruning flavor logic.
+
+0.0503 2022-07-06 10:39:45
+    - Improve documentation.
+
+0.0502 2022-07-06 05:34:15
+    - Specify minimum version for L::U.
+
+0.0501 2022-07-04 15:40:56
+    - Improve documentation a bit.
+
+0.0500 2022-07-03 19:52:17
+    - Build the default scale subroutine for either major/minor or modal.
+    - Use the List::SomeUtils module.
+    - Allow the tonic attribute to apply to any Western 7-note scale.
+    - Fix-up eg/solitude a bit.
+
+0.0404 2022-07-03 08:14:01
+    - Fix variable naming in eg/.
+    - Improve documentation slightly.
+
+0.0403 2022-07-03 06:47:37
+    - Drop "flavor-clashing" scale notes for *any* scale.
+
+0.0402 2022-07-02 10:25:06
+    - Improve tests slightly.
+    - Add the eg/solitude program.
+
+0.0401 2022-07-02 00:11:29
+    - Optionally toggle inclusion of non-scale chord notes in the choices.
+    - Make sure the _closest() function has arguments.
+    - Modularize boolean isa code.
+    - Improve documentation slightly.
+    - Improve tests.
+
+0.0400 2022-07-01 12:08:47
+    - Enable modal accompaniment, instead of playing non-key, sour notes.
+    - Improve documentation.
+
+0.0312 2022-06-16 20:10:09
+    - Improve documentation.
+    - Use Music::PitchNum instead of doing Music::Note gymnastics.
+
+0.0311 2022-01-26 21:50:58
+    - Fix-up the "closest element" logic.
+    - Improve documentation.
+
+0.0310 2022-01-26 20:34:30
+    - Reinstate the mid-scale voice->context.
+
+0.0309 2022-01-26 13:01:40
+    - Something is wrong and the distribution is not on CPAN?
+
+0.0308 2022-01-26 10:56:19
+    - Fix the description of the tonic attribute.
+    - Whoops - Incremented the version number twice. :\
+
+0.0306 2022-01-26 07:47:22
+    - I *think* that voice->context takes an arrayref, but I'm not sure... thrig?
+    - If tonic is set, replace the first note with the I, III, or V notes.
+
+0.0305 2022-01-25 12:23:59
+    - Modularize verbose note output.
+    - Clean-up code a bit.
+
+0.0304 2022-01-25 11:32:51
+    - Reinstate context() if the tonic attribute is set.
+    - Choose the closest pitch, if given a next-chord intersection.
+
+0.0303 2022-01-25 01:55:15
+    - Clean-up code ever-so-slightly.
+
+0.0302 2022-01-25 01:36:42
+    - Improve intersection logic.
+    - Add a tonic attribute.
+    - Improve the eg/walking program.
+
+0.0301 2022-01-24 16:21:53
+    - Remove debugging code.
+    - Do not have a next_scale without a next_chord.
+
+0.0300 2022-01-24 16:14:16
+    - If given a "next chord" in generate() use note intersection.
+
+0.0207 2021-05-31 01:03:17
+    - Improve documentation slightly.
+    - Add the eg/walking program to illustrate usage.
+
+0.0206 2021-05-31 00:17:52
+    - Resort the guitar pitches.
+
+0.0205 2021-05-30 23:45:04
+    - Improve documentation.
+    - Add the "guitar" attribute to transpose-up, notes below E2.
+
+0.0204 2021-05-19 21:31:41
+    - Allow an empty scale, thereby walking only the notes of the chord.
+    - Improve documentation.
+
+0.0203 2021-05-19 12:59:18
+    - Restrict note skipping to major or minor scales.
+
+0.0202 2021-05-19 11:58:45
+    - Fix ugly logic typos.
+
+0.0201 2021-05-19 11:24:55
+    - Improve documentation.
+
+0.0200 2021-05-19 11:15:17
+    - Add the scale attribute.
+
+0.0106 2021-05-19 02:31:21
+    - Don't drop the 5th note from a 5 chord.
+    - Handle enharmonics in the matching process.
+
+0.0105 2021-05-18 12:53:19
+    - Don't drop the 7th note from a maj7 chord.
+
+0.0104 2021-05-17 20:19:08
+    - Improve documentation.
+    - Use croak instead of die.
+
+0.0103 2021-05-17 19:55:01
+    - Improve test.
+    - Improve documentation.
+    - Improve verbose output.
+
+0.0102 2021-05-17 17:26:40
+    - Attempt to fix diminished and augmented chords...
+    - Improve documentation.
+
+0.0101 2021-05-17 10:25:54
+    - Improve documentation.
+
+0.0100 2021-05-17 09:55:25
+    - Mint with Dist::Zilla.

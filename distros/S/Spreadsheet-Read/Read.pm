@@ -38,7 +38,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = "0.87";
+our $VERSION = "0.88";
 sub  Version { $VERSION }
 
 use Carp;
@@ -52,28 +52,30 @@ use File::Temp   qw( );
 use Data::Dumper;
 
 my @parsers = (
-    [ csv	=> "Text::CSV_XS",			"0.71"		],
-    [ csv	=> "Text::CSV_PP",			"1.17"		],
-    [ csv	=> "Text::CSV",				"1.17"		],
-    [ ods	=> "Spreadsheet::ParseODS",		"0.26"		],
-    [ ods	=> "Spreadsheet::ReadSXC",		"0.26"		],
-    [ sxc	=> "Spreadsheet::ParseODS",		"0.26"		],
-    [ sxc	=> "Spreadsheet::ReadSXC",		"0.26"		],
-    [ xls	=> "Spreadsheet::ParseExcel",		"0.34"		],
-    [ xlsx	=> "Spreadsheet::ParseXLSX",		"0.24"		],
-    [ xlsm	=> "Spreadsheet::ParseXLSX",		"0.24"		],
-    [ xlsx	=> "Spreadsheet::XLSX",			"0.13"		],
-#   [ prl	=> "Spreadsheet::Perl",			""		],
-    [ sc	=> "Spreadsheet::Read",			"0.01"		],
-    [ gnumeric	=> "Spreadsheet::ReadGnumeric",		"0.2"		],
+    [ csv	=> "Text::CSV_XS",		"0.71"	],
+    [ csv	=> "Text::CSV_PP",		"1.17"	],
+    [ csv	=> "Text::CSV",			"1.17"	],
+    [ ods	=> "Spreadsheet::ParseODS",	"0.26"	],
+    [ ods	=> "Spreadsheet::ReadSXC",	"0.26"	],
+    [ sxc	=> "Spreadsheet::ParseODS",	"0.26"	],
+    [ sxc	=> "Spreadsheet::ReadSXC",	"0.26"	],
+    [ sxc	=> "Spreadsheet::ReadSXC__BAD",	"0.26"	], # For testing
+    [ xls	=> "Spreadsheet::ParseExcel",	"0.34"	],
+    [ xlsx	=> "Spreadsheet::ParseXLSX",	"0.24"	],
+    [ xlsm	=> "Spreadsheet::ParseXLSX",	"0.24"	],
+    [ xlsx	=> "Spreadsheet::XLSX",		"0.13"	],
+    [ xlsx	=> "Excel::ValueReader::XLSX",	"1.13"	],
+#   [ prl	=> "Spreadsheet::Perl",		""	],
+    [ sc	=> "Spreadsheet::Read",		"0.01"	],
+    [ gnumeric	=> "Spreadsheet::ReadGnumeric",	"0.2"	],
 
-    [ zzz1	=> "Z10::Just::For::Testing",		"1.23"		],
-    [ zzz2	=> "Z20::Just::For::Testing",		""		],
-    [ zzz3	=> "Z30::Just::For::Testing",		"1.00"		],
+    [ zzz1	=> "Z10::Just::For::Testing",	"1.23"	],
+    [ zzz2	=> "Z20::Just::For::Testing",	""	],
+    [ zzz3	=> "Z30::Just::For::Testing",	"1.00"	],
 
     # Helper modules
-    [ ios	=> "IO::Scalar",				""		],
-    [ dmp	=> "Data::Peek",				""		],
+    [ ios	=> "IO::Scalar",		""	],
+    [ dmp	=> "Data::Peek",		""	],
     );
 my %can = ( supports => { map { $_->[1] => $_->[2] } @parsers });
 foreach my $p (@parsers) {
@@ -110,21 +112,25 @@ foreach my $p (@parsers) {
     $can{$format} = $preset;
     }
 delete $can{supports};
-for (@parsers) {
-    my ($flag, $mod, $vsn) = @$_;
+foreach my $p (@parsers) {
+    my ($flag, $mod, $vsn) = @$p;
     $can{$flag} and next;
     eval "require $mod; \$vsn and ${mod}->VERSION (\$vsn); \$can{\$flag} = '$mod'" and next;
-    $_->[0] = "! Cannot use $mod version $vsn: $@";
+    $p->[0] = "! Cannot use $mod version $vsn: $@";
     $can{$flag} = $@ =~ m/need to install|can(?:not|'t) locate/i
 	? 0	# Not found
 	: "";	# Too old
     }
 $can{sc} = __PACKAGE__;	# SquirrelCalc is built-in
 
-defined $Spreadsheet::ParseExcel::VERSION && $Spreadsheet::ParseExcel::VERSION < 0.61 and
-    *Spreadsheet::ParseExcel::Workbook::get_active_sheet = sub { undef; };
-defined $Spreadsheet::ParseODS::VERSION   && $Spreadsheet::ParseODS::VERSION   < 0.25 and
-    *Spreadsheet::ParseODS::Workbook::get_active_sheet   = sub { undef; };
+sub _def_gas {
+    defined $Spreadsheet::ParseExcel::VERSION  && $Spreadsheet::ParseExcel::VERSION  < 0.61 and
+	*Spreadsheet::ParseExcel::Workbook::get_active_sheet = sub { undef; };
+    defined $Spreadsheet::ParseODS::VERSION    && $Spreadsheet::ParseODS::VERSION    < 0.25 and
+	*Spreadsheet::ParseODS::Workbook::get_active_sheet   = sub { undef; };
+    defined $Excel::ValueReader::XLSX::VERSION && $Excel::ValueReader::XLSX::VERSION < 9.99 and
+	*Excel::ValueReader::XLSX::get_active_sheet          = sub { undef; };
+    } # _def_gas
 
 my $debug = 0;
 my %def_opts = (
@@ -179,6 +185,14 @@ sub _dump {
 
 sub _parser {
     my $type = shift		or  return "";
+    if ($type =~ m/::/ and my @p = grep { $_->[1] eq $type } @parsers) {
+	my $format = $p[0][0];
+	$ENV{"SPREADSHEET_READ_\U$format"} = $type;
+	eval "local \$_; require $type";
+	$@ and croak ("Forced backend $type for $format fails to load:\n$@");
+	$can{$format} = $type;
+	$type = $format;
+	}
     $type = lc $type;
     my $ods = $can{ods} ? "ods" : "sxc";
     # Aliases and fullnames
@@ -454,9 +468,9 @@ sub _xls_fill {
 
 sub _missing_parser {
     my ($type, $suggest) = (shift, "");
-    for (@parsers) {
-	$_->[0] eq lc $type or next;
-	$suggest = "\nPlease install $_->[1]";
+    foreach my $p (@parsers) {
+	$p->[0] eq lc $type or next;
+	$suggest = "\nPlease install $p->[1]";
 	}
     "No parser for $type found$suggest\n";
     } # _missing_parser
@@ -514,7 +528,7 @@ sub ReadData {
     $debug = defined $opt{debug} ? $opt{debug} : $def_opts{debug};
     $debug > 4 and _dump (Options => \%opt);
 
-    my %parser_opts = map { $_ => $opt{$_} }
+    my %parser_opts = map  { $_ => $opt{$_} }
 		      grep { !exists $def_opts{$_} }
 		      keys %opt;
 
@@ -713,15 +727,19 @@ sub ReadData {
 	my $oBook = eval {
 	    $io_ref
 		? $parse_type eq "XLSX"
-		? $can{xlsx} =~ m/::XLSX$/
-		? $parser->new ($io_ref)
-		: $parser->new (%parser_opts)->parse ($io_ref)
-		: $parser->new (%parser_opts)->Parse ($io_ref)
+		 ? $can{xlsx} eq "Spreadsheet::XLSX"
+		  ?  $parser->new ($io_ref)                       # Spreadsheet::XLXS        ($io)
+		  : $can{xlsx} eq "Excel::ValueReader::XLSX"
+		   ? $parser->new (xlsx => $io_ref, %parser_opts) # Excel::ValueReader::XLSX ($io / $content)
+		   : $parser->new (%parser_opts)->parse ($io_ref) # Spreadsheet::ParseXLSX   ($io)
+		  :  $parser->new (%parser_opts)->Parse ($io_ref) # Spreadsheet::ParseExcel  ($io)
 		: $parse_type eq "XLSX"
-		? $can{xlsx} =~ m/::XLSX$/
-		? $parser->new ($txt)
-		: $parser->new (%parser_opts)->parse ($txt)
-		: $parser->new (%parser_opts)->Parse ($txt);
+		 ? $can{xlsx} eq "Spreadsheet::XLSX"
+		  ?  $parser->new ($txt)                          # Spreadsheet::XLXS        ($file / $content)
+		  : $can{xlsx} eq "Excel::ValueReader::XLSX"
+		   ? $parser->new (xlsx => $txt, %parser_opts)	  # Excel::ValueReader::XLSX ($file / $content)
+		   : $parser->new (%parser_opts)->parse ($txt)    # Spreadsheet::ParseXLSX   ($file / $content)
+		 :   $parser->new (%parser_opts)->Parse ($txt);   # Spreadsheet::ParseExcel  ($file / $content)
 	    };
 	unless ($oBook) {
 	    # cleanup will fail on folders with spaces.
@@ -760,12 +778,56 @@ sub ReadData {
 	    );
 	$oBook->{FormatStr}{$_} = $def_fmt{$_} for keys %def_fmt;
 	my $oFmt = $parse_type eq "XLSX"
-	    ? $can{xlsx} =~ m/::XLSX$/
+	    ? $can{xlsx} eq "Spreadsheet::XLSX"
 		? Spreadsheet::XLSX::Fmt2007->new
 		: Spreadsheet::ParseExcel::FmtDefault->new
 	    :     Spreadsheet::ParseExcel::FmtDefault->new;
 
 	$debug > 20 and _dump ("oBook before conversion", $oBook);
+	if ($can{xlsx} eq "Excel::ValueReader::XLSX" and !exists $oBook->{SheetCount}) {
+	    my @sheets = $oBook->sheet_names;
+	    $data[0]{sheet}  = { map { $sheets[$_] => $_ + 1 } 0 .. $#sheets };
+	    $data[0]{sheets} = scalar @sheets;
+
+	    foreach my $sheet_name (@sheets) {
+
+		my $grid = $oBook->values ($sheet_name);
+
+		my $sheet = {
+		    label  => $sheet_name,
+		    minrow => 1,
+		    mincol => 1,
+		    indx   => 1,
+		    merged => [],
+		    };
+		# Transpose to column vectors.
+		# The A1, B5 etc items could be added here as well.
+		my @c;
+		foreach my $r (0 .. $#$grid) {
+		    my $row = $grid->[$r];
+		    foreach my $c (0 .. $#$row) {
+			# add 1 for array base 1
+			my $val = $grid->[$r][$c];
+			my $cell = cr2cell ($c + 1, $r + 1);
+			$opt{rc}    and $sheet->{cell}[$c + 1][$r + 1] = $val;
+			$opt{cells} and $sheet->{$cell} = $val;
+			$c[$c] = 1;
+			}
+		    }
+
+		# First entry in @t is padding so number of items
+		# is the max index.
+		$sheet->{maxcol} = scalar @c;
+
+		# No padding of first entry in $grid so
+		# number of items is the array length.
+		$sheet->{maxrow} = @$grid;
+
+		push @data => $sheet;
+		}
+	    #use DP;die DDumper { oBook => $oBook, oFmt => $oFmt, data => \@data, parser_type => $parse_type };
+	    }
+
 	if ($parse_type eq "ODS" and !exists $oBook->{SheetCount}) {
 	    my $styles = delete $oBook->{_styles};
 	    my $sheets = delete $oBook->{_sheets};
@@ -821,6 +883,7 @@ sub ReadData {
 	    }
 
 	$debug and print STDERR "\t$data[0]{sheets} sheets\n";
+	_def_gas ();
 	my $active_sheet = $oBook->get_active_sheet
 			|| $oBook->{ActiveSheet}
 			|| $oBook->{SelectedSheet};
@@ -996,7 +1059,7 @@ sub ReadData {
 	    for (@{$sheet{cell}}) {
 		defined or $_ = [];
 		}
-	    push @data, { %sheet };
+	    push @data => { %sheet };
 #	    $data[0]{sheets}++;
 	    if ($sheet{label} eq "-- unlabeled --") {
 		$sheet{label} = "";
@@ -1046,6 +1109,7 @@ sub ReadData {
 	# $debug and $data[0]{_parser} = $oBook;
 
 	$debug and print STDERR "\t$data[0]{sheets} sheets\n";
+	_def_gas ();
 	my $active_sheet = $oBook->get_active_sheet;
 	my $current_sheet = 0;
 	foreach my $oWkS ($oBook->worksheets) {
@@ -1112,7 +1176,7 @@ sub ReadData {
 		    $opt{cells} and	# Formatted value
 			$sheet{$cell} = defined $val ? $oWkC->value : undef;
 		    if ($opt{attr}) {
-			my $FnT = $FmT ? $FmT->{font_face} : undef;
+#			my $FnT = $FmT ? $FmT->{font_face} : undef;
 			my $fmi;
 			#my $fmi = $FmT ? $FmT->{FmtIdx}
 			#   ? $oBook->{FormatStr}{$FmT->{FmtIdx}}
@@ -1723,6 +1787,18 @@ have a good reason to prefer a different parser, you can set that in
 environment variables. The other options then will not be tested for:
 
  env SPREADSHEET_READ_CSV=Text::CSV_PP ...
+
+You can also directly pass the required backend, forcing the matching
+type, but this excludes version checking.
+
+ # Checks for minimal version
+ BEGIN { $ENV{SPREADSHEET_READ_CSV} = "Text::CSV_PP" }
+ my $book = ReadData ("test.csv", parser => "csv");
+
+ vs
+
+ # NO check for minimal version
+ my $book = ReadData ("test.csv", parser => "Text::CSV_PP");
 
 =item cells
 X<cells>
@@ -2575,6 +2651,9 @@ FastXLSX library.
 This is SAX based parser, so you can parse very large XLSX file with
 lower memory usage.
 
+Last commit 2021-02-16, so I will take PR's but won't do it myself as
+there seems to be little gain in supporting this.
+
 =back
 
 =item Other spreadsheet formats
@@ -2639,6 +2718,16 @@ documentation.
 This module is dead and deprecated. It is B<buggy and unmaintained>.  I<Please>
 use L<Spreadsheet::ParseXLSX|https://metacpan.org/release/Spreadsheet-ParseXLSX>
 instead.
+
+=item Excel::ValueReader::XLSX
+
+See L<Excel::ValueReader::XLSX|https://metacpan.org/release/Excel-ValueReader-XLSX>
+documentation.
+
+This module aims at speed-reading ignoring all attributes and formatting.
+
+Using this backend does not, and will not, support parsing strings, string-refs,
+or globs. Only filenames and file handles are supported.
 
 =item Spreadsheet::ParseODS
 

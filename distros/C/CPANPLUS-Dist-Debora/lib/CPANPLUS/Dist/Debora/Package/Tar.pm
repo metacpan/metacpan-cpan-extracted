@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -256,7 +256,7 @@ CPANPLUS::Dist::Debora::Package::Tar - Create tar archives
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -298,7 +298,7 @@ Extracts the tar archive.
   my $tar = $package->outputname;
 
 Returns the tar archive's name, e.g.
-F<~/.cpanplus/5.34.0/build/XXXX/perl-Some-Module-1.0-1.tar.gz>.
+F<~/.cpanplus/5.36.1/build/XXXX/perl-Some-Module-1.0-1.tar.gz>.
 
 =head1 DIAGNOSTICS
 
@@ -318,7 +318,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-This module cannot be used in taint mode.
+None known.
 
 =head1 AUTHOR
 
@@ -326,7 +326,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2023 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

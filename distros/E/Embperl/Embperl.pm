@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -10,8 +11,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id: Embperl.pm 1578075 2014-03-16 14:01:14Z richter $
 #
 ###################################################################################
 
@@ -50,7 +49,8 @@ use vars qw(
 
 @ISA = qw(Exporter DynaLoader);
 
-$VERSION = '2.5.0' ;
+# should be 3.0.0-rc.1 but Dynaloader doesn't like it ...
+$VERSION = '3.0.0' ;
 
 
 if ($modperl  = $ENV{MOD_PERL})
@@ -128,7 +128,7 @@ sub Execute
     local $SIG{__WARN__} = \&Warn ;
 
     # when called inside a Embperl Request, Execute the component only
-    return Embperl::Req::ExecuteComponent ($_ep_param, @_) if ($req) ;
+    return Embperl::Req::ExecuteComponent ($_ep_param, @_) if ($req && $Embperl::coro_req == $Coro::current) ;
 
     $_ep_param = { inputfile => $_ep_param, param => [@_]} if (!ref $_ep_param) ;
 
@@ -152,11 +152,21 @@ sub Execute
         $req_rec = $_ep_param -> {req_rec} ;
         }
 
+    
+    my $eplguard ;
+    if (defined ($Coro::current))
+        {
+        # make sure that there is only one request at the same time
+        $Embperl::coro_semaphore ||= Coro::Semaphore -> new (1) ;
+        $eplguard = $Embperl::coro_semaphore -> guard  ;
+        $Embperl::coro_req = $Coro::current ;
+        }
     my $_ep_rc ;
         {
         $_ep_rc = Embperl::Req::ExecuteRequest (undef, $_ep_param)  ;
         }
-    
+    undef $eplguard ;
+
     return $_ep_rc ;
     }
 
@@ -332,7 +342,7 @@ sub get_multipart_formdata
 	
 	$self -> log ("[$$]FORM: $_=$fdat->{$_}\n") if ($dbgForm) ; 
 
-	if (ref($fdat->{$_}) eq 'Fh') 
+	if (ref($fdat->{$_}) eq 'Fh' or ref($fdat->{$_}) =~ /File::Temp/) 
 	    {
 	    $fdat->{"-$_"} = $cgi -> uploadInfo($fdat->{$_}) ;
 	    }

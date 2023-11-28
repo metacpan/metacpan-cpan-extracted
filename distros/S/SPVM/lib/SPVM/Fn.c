@@ -13,8 +13,6 @@
 static const char* FILE_NAME = "Fn.c";
 
 int32_t SPVM__Fn__DBL_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   stack[0].dval = DBL_MAX;
   
@@ -22,8 +20,6 @@ int32_t SPVM__Fn__DBL_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__DBL_MIN(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   stack[0].dval = DBL_MIN;
   
@@ -31,8 +27,6 @@ int32_t SPVM__Fn__DBL_MIN(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__DOUBLE_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   stack[0].dval = DBL_MAX;
   
@@ -40,8 +34,6 @@ int32_t SPVM__Fn__DOUBLE_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__DOUBLE_MIN(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   stack[0].dval = DBL_MIN;
   
@@ -49,8 +41,6 @@ int32_t SPVM__Fn__DOUBLE_MIN(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__FLOAT_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   stack[0].fval = FLT_MAX;
   
@@ -58,8 +48,6 @@ int32_t SPVM__Fn__FLOAT_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__FLOAT_MIN(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   stack[0].fval = FLT_MIN;
   
@@ -67,8 +55,6 @@ int32_t SPVM__Fn__FLOAT_MIN(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__FLT_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   stack[0].fval = FLT_MAX;
   
@@ -76,8 +62,6 @@ int32_t SPVM__Fn__FLT_MAX(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__FLT_MIN(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
-  (void)stack;
   
   stack[0].fval = FLT_MIN;
   
@@ -111,7 +95,6 @@ static ptrdiff_t SPVM__Fn__static__convert_code_point_to_utf8_char(int32_t uc, u
 }
 
 int32_t SPVM__Fn___chr_native(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   int32_t code_point = stack[0].ival;
   
@@ -210,26 +193,25 @@ static ptrdiff_t spvm_utf8proc_iterate(const uint8_t *str, ptrdiff_t strlen, int
 }
 
 int32_t SPVM__Fn__get_code_point(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
+  
+  int32_t error_id = 0;
   
   void* obj_string = stack[0].oval;
   int32_t* offset_ref = stack[1].iref;
-
+  
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(*offset_ref >= 0)) {
-    return env->die(env, stack, "$offset must be greater than or equal to 0", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$offset must be greater than or equal to 0.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);
   int32_t string_len = env->length(env, stack, obj_string);
   
   if (!(*offset_ref < string_len)) {
-    // GET_CODE_POINT_ERROR_OVER_STRING_RANGE
-    stack[0].ival = -1;
-    return 0;
+    return env->die(env, stack, "The value of $offset must be less than the length of $string.", __func__, FILE_NAME, __LINE__);
   }
   
   int32_t dst;
@@ -243,8 +225,12 @@ int32_t SPVM__Fn__get_code_point(SPVM_ENV* env, SPVM_VALUE* stack) {
     *offset_ref += utf8_char_len;
   }
   else if (utf8_char_len == SPVM_UTF8PROC_ERROR_INVALIDUTF8) {
-    // GET_CODE_POINT_ERROR_INVALID_UTF8
-    uchar = -2;
+    env->die(env, stack, "An invalid UTF-8 is gotten.", __func__, FILE_NAME, __LINE__);
+    
+    int32_t error_id_unicode_invalid_utf8 = env->get_basic_type_id_by_name(env, stack, "Error::Unicode::InvalidUTF8", &error_id, __func__, FILE_NAME, __LINE__);
+    if (error_id) { return error_id; }
+    
+    return error_id_unicode_invalid_utf8;
   }
   else {
     assert(0);
@@ -256,7 +242,6 @@ int32_t SPVM__Fn__get_code_point(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__is_array(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* object = stack[0].oval;
   
@@ -274,7 +259,6 @@ int32_t SPVM__Fn__is_array(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__is_class(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* object = stack[0].oval;
   
@@ -292,7 +276,6 @@ int32_t SPVM__Fn__is_class(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__is_mulnum_array(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* object = stack[0].oval;
   
@@ -310,7 +293,6 @@ int32_t SPVM__Fn__is_mulnum_array(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__is_numeric_array(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* object = stack[0].oval;
   
@@ -328,7 +310,6 @@ int32_t SPVM__Fn__is_numeric_array(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__is_object_array(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* object = stack[0].oval;
   
@@ -346,7 +327,6 @@ int32_t SPVM__Fn__is_object_array(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__is_pointer_class(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* object = stack[0].oval;
   
@@ -372,27 +352,27 @@ int32_t SPVM__Fn__memcpy(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t length = stack[4].ival;
   
   if (!obj_dest) {
-    return env->die(env, stack, "$dest must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$dest must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(env->is_string(env, stack, obj_dest) || env->is_numeric_array(env, stack, obj_dest) || env->is_mulnum_array(env, stack, obj_dest))) {
-    return env->die(env, stack, "$type of $dest must be $string type, $numeric array type, or $multi numeric array type", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$type of $dest must be $string type, $numeric array type, or $multi numeric array type.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_source) {
-    return env->die(env, stack, "$source must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$source must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(env->is_string(env, stack, obj_source) || env->is_numeric_array(env, stack, obj_source) || env->is_mulnum_array(env, stack, obj_source))) {
-    return env->die(env, stack, "$type of $source must be $string type, $numeric array type, or $multi numeric array type", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$type of $source must be $string type, $numeric array type, or $multi numeric array type.", __func__, FILE_NAME, __LINE__);
   }
   
   if (env->is_read_only(env, stack, obj_dest)) {
-    return env->die(env, stack, "$dest cannnot be be a read-only string", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$dest cannnot be be a read-only string.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(length >= 0)) {
-    return env->die(env, stack, "$length must be greater than or equal to 0", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$length must be greater than or equal to 0.", __func__, FILE_NAME, __LINE__);
   }
   
   if (length == 0) {
@@ -405,7 +385,7 @@ int32_t SPVM__Fn__memcpy(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t dest_byte_length = dest_elem_size * dest_length;
   
   if (!(obj_dest_offset + length <= dest_byte_length)) {
-    return env->die(env, stack, "$offset of $obj_dest + $length must be less than or equal to the length of $obj_dest", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$offset of $obj_dest + $length must be less than or equal to the length of $obj_dest.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* source = env->get_chars(env, stack, obj_source);
@@ -414,7 +394,7 @@ int32_t SPVM__Fn__memcpy(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t source_byte_length = source_elem_size * source_length;
   
   if (!(obj_source_offset + length <= source_byte_length)) {
-    return env->die(env, stack, "$offset of $obj_source + $length must be less than or equal to the length of $obj_source", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$offset of $obj_source + $length must be less than or equal to the length of $obj_source.", __func__, FILE_NAME, __LINE__);
   }
   
   memcpy((char*)(dest + obj_dest_offset), (char*)(source + obj_source_offset), length);
@@ -431,27 +411,27 @@ int32_t SPVM__Fn__memmove(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t length = stack[4].ival;
 
   if (!obj_dest) {
-    return env->die(env, stack, "$dest must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$dest must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(env->is_string(env, stack, obj_dest) || env->is_numeric_array(env, stack, obj_dest) || env->is_mulnum_array(env, stack, obj_dest))) {
-    return env->die(env, stack, "$type of $dest must be $string type, $numeric array type, or $multi numeric array type", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$type of $dest must be $string type, $numeric array type, or $multi numeric array type.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!obj_source) {
-    return env->die(env, stack, "$source must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$source must be defined.", __func__, FILE_NAME, __LINE__);
   }
 
   if (!(env->is_string(env, stack, obj_source) || env->is_numeric_array(env, stack, obj_source) || env->is_mulnum_array(env, stack, obj_source))) {
-    return env->die(env, stack, "$type of $source must be $string type, $numeric array type, or $multi numeric array type", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$type of $source must be $string type, $numeric array type, or $multi numeric array type.", __func__, FILE_NAME, __LINE__);
   }
 
   if (env->is_read_only(env, stack, obj_dest)) {
-    return env->die(env, stack, "$dest must not be a read-only string", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$dest must not be a read-only string.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(length >= 0)) {
-    return env->die(env, stack, "$length must be greater than or equal to 0", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$length must be greater than or equal to 0.", __func__, FILE_NAME, __LINE__);
   }
   
   if (length == 0) {
@@ -464,7 +444,7 @@ int32_t SPVM__Fn__memmove(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t dest_byte_length = dest_elem_size * dest_length;
   
   if (!(obj_dest_offset + length <= dest_byte_length)) {
-    return env->die(env, stack, "$offset of $obj_dest + $length must be less than or equal to the length of $obj_dest", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$offset of $obj_dest + $length must be less than or equal to the length of $obj_dest.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* source = env->get_chars(env, stack, obj_source);
@@ -473,7 +453,7 @@ int32_t SPVM__Fn__memmove(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t source_byte_length = source_elem_size * source_length;
   
   if (!(obj_source_offset + length <= source_byte_length)) {
-    return env->die(env, stack, "$offset of $obj_source + $length must be less than or equal to the length of $obj_source", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$offset of $obj_source + $length must be less than or equal to the length of $obj_source.", __func__, FILE_NAME, __LINE__);
   }
   
   memmove((char*)(dest + obj_dest_offset), (char*)(source + obj_source_offset), length);
@@ -498,17 +478,16 @@ int32_t SPVM__Fn__sizeof_native_pointer(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Fn__shorten(SPVM_ENV* env, SPVM_VALUE* stack) {
-  (void)env;
   
   void* string = stack[0].oval;
   int32_t length = stack[1].ival;
   
   if (!string) {
-    return env->die(env, stack, "$string must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(length >= 0)) {
-    return env->die(env, stack, "$length must be greater than or equal to 0", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$length must be greater than or equal to 0.", __func__, FILE_NAME, __LINE__);
   }
   
   env->shorten(env, stack, string, length);
@@ -521,7 +500,7 @@ int32_t SPVM__Fn__to_double(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_string = stack[0].oval;
   
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);
@@ -530,10 +509,10 @@ int32_t SPVM__Fn__to_double(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   double num = strtod(string, &end);
   if (*end != '\0') {
-    return env->die(env, stack, "$string must be the string that can be parsed as a double number", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be the string that can be parsed as a double number.", __func__, FILE_NAME, __LINE__);
   }
   else if (errno == ERANGE) {
-    return env->die(env, stack, "$string must be a double number in $correct range", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be a double number in $correct range.", __func__, FILE_NAME, __LINE__);
   }
   
   stack[0].dval = num;
@@ -546,7 +525,7 @@ int32_t SPVM__Fn__to_float(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_string = stack[0].oval;
   
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);
@@ -555,10 +534,10 @@ int32_t SPVM__Fn__to_float(SPVM_ENV* env, SPVM_VALUE* stack) {
   errno = 0;
   float num = strtof(string, &end);
   if (*end != '\0') {
-    return env->die(env, stack, "$string must be the string that can be parsed as a float number", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be the string that can be parsed as a float number.", __func__, FILE_NAME, __LINE__);
   }
   else if (errno == ERANGE) {
-    return env->die(env, stack, "$string must be a float number in $correct range", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be a float number in $correct range.", __func__, FILE_NAME, __LINE__);
   }
   
   stack[0].fval = num;
@@ -572,11 +551,11 @@ int32_t SPVM__Fn__to_int_with_base(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t digit = stack[1].ival;
   
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(digit == 2 || digit == 8 || digit == 10 || digit == 16)) {
-    return env->die(env, stack, "$digit must be one of 2, 8, 10, or 16", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$digit must be one of 2, 8, 10, or 16.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);
@@ -588,7 +567,7 @@ int32_t SPVM__Fn__to_int_with_base(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "$string must be the string that can be parsed as a %d-digit 32-bit integer", digit, __func__, FILE_NAME, __LINE__);
   }
   else if (errno == ERANGE || num < INT32_MIN || num > INT32_MAX) {
-    return env->die(env, stack, "$string must be a 32-bit integer in $correct range", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be a 32-bit integer in $correct range.", __func__, FILE_NAME, __LINE__);
   }
   
   stack[0].ival = (int32_t)num;
@@ -602,11 +581,11 @@ int32_t SPVM__Fn__to_long_with_base(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t digit = stack[1].ival;
   
   if (!obj_string) {
-    return env->die(env, stack, "$string must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   if (!(digit == 2 || digit == 8 || digit == 10 || digit == 16)) {
-    return env->die(env, stack, "$digit must be one of 2, 8, 10, or 16", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$digit must be one of 2, 8, 10, or 16.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* string = env->get_chars(env, stack, obj_string);
@@ -618,7 +597,7 @@ int32_t SPVM__Fn__to_long_with_base(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "$string must be the string that can be parsed as a %d-digit 64-bit integer", digit, __func__, FILE_NAME, __LINE__);
   }
   else if (errno == ERANGE) {
-    return env->die(env, stack, "$string must be a 64-bit integer in $correct range", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$string must be a 64-bit integer in $correct range.", __func__, FILE_NAME, __LINE__);
   }
   
   stack[0].lval = (int64_t)num;
@@ -650,14 +629,14 @@ int32_t SPVM__Fn__get_version_string(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_basic_type_name = stack[0].oval;
   
   if (!obj_basic_type_name) {
-    return env->die(env, stack, "$basic_type_name must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$basic_type_name must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* basic_type_name = env->get_chars(env, stack, obj_basic_type_name);
   
   void* basic_type = env->api->runtime->get_basic_type_by_name(env->runtime, basic_type_name);
   if (!basic_type) {
-    return env->die(env, stack, "The class specified by $basic_type_name must be loaded", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The class specified by $basic_type_name must be loaded.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* version_string = env->get_version_string(env, stack, basic_type);
@@ -685,14 +664,14 @@ int32_t SPVM__Fn__get_version_number(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_basic_type_name = stack[0].oval;
   
   if (!obj_basic_type_name) {
-    return env->die(env, stack, "$basic_type_name must be defined", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "$basic_type_name must be defined.", __func__, FILE_NAME, __LINE__);
   }
   
   const char* basic_type_name = env->get_chars(env, stack, obj_basic_type_name);
   
   void* basic_type = env->api->runtime->get_basic_type_by_name(env->runtime, basic_type_name);
   if (!basic_type) {
-    return env->die(env, stack, "The class specified by $basic_type_name must be loaded", __func__, FILE_NAME, __LINE__);
+    return env->die(env, stack, "The class specified by $basic_type_name must be loaded.", __func__, FILE_NAME, __LINE__);
   }
   
   double version_number = env->get_version_number(env, stack, basic_type);
@@ -718,6 +697,26 @@ int32_t SPVM__Fn__get_memory_blocks_count(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t memory_blocks_count = env->get_memory_blocks_count(env, stack);
   
   stack[0].ival = memory_blocks_count;
+  
+  return 0;
+}
+
+int32_t SPVM__Fn__get_basic_type_id(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  void* obj_basic_type_name = stack[0].oval;
+  
+  if (!obj_basic_type_name) {
+    return env->die(env, stack, "$basic_type_name must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  const char* basic_type_name = env->get_chars(env, stack, obj_basic_type_name);
+  
+  int32_t basic_type_id = env->get_basic_type_id(env, stack, basic_type_name);
+  if (!(basic_type_id >= 0)) {
+    return env->die(env, stack, "The basic type \"%s\" is not found.", basic_type_name, __func__, FILE_NAME, __LINE__);
+  }
+  
+  stack[0].ival = basic_type_id;
   
   return 0;
 }

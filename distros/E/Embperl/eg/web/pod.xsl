@@ -220,6 +220,21 @@
         <xsl:apply-templates select="*[name()!='title']"/> 
     </xsl:template>
 
+    <!-- ********** content - sect3 ********** -->
+
+    <xsl:template match="sect3">                         
+        <br/>
+        <xsl:element name="a">
+            <xsl:attribute name="name">sect_<xsl:number level="any"/></xsl:attribute>
+          <table width="100%" border="0" cellspacing="0" cellpadding="6">
+            <tr class="cPodH3"> 
+              <td><xsl:value-of select="title"/></td>
+              <td align="right"><a href="#top" class="cTopLink">top</a></td> 
+            </tr>
+            </table>
+        </xsl:element>
+        <xsl:apply-templates select="*[name()!='title']"/> 
+    </xsl:template>
 
 
 </xsl:stylesheet> 

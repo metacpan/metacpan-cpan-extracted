@@ -5,7 +5,7 @@ package Iterator::Flex::Role::State::Registry;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Iterator::Flex::Utils qw( :default ITERATOR STATE :IterStates );
 
@@ -24,7 +24,7 @@ use namespace::clean;
 
 sub set_state ( $self, $state ) {
     $REGISTRY{ refaddr $self }{ +ITERATOR }{ +STATE } = $state
-      unless ( $REGISTRY{ refaddr $self }{ +ITERATOR }{ +STATE } // + IterState_CLEAR )
+      unless ( $REGISTRY{ refaddr $self }{ +ITERATOR }{ +STATE } // +IterState_CLEAR )
       == +IterState_ERROR;
 }
 
@@ -66,7 +66,7 @@ Iterator::Flex::Role::State::Registry - Iterator State is kept in the registry
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 METHODS
 

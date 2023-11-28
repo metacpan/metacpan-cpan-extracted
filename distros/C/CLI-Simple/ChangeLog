@@ -1,0 +1,141 @@
+Sat Nov 18 08:26:26 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[dependencies]:
+	* VERSION: bump
+	* autotools/ax_requirements_check.m4: update dependencies
+	* requires.json: likewise
+	* requires.txt: likewise
+	* cpan/requires: likewise
+	* cpan/buildspec.yml: typo in web address
+	* configure.ac: add perlcritic config to configure output
+	* manifest.yaml: removed
+	* src/main/perl/lib/CLI/Simple/Utils.pm.in: @PACKAGE_VERSION@
+
+Thu Nov 16 17:14:27 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[modulino]:
+	* .gitignore: add modulino
+	* cpan/buildspec.yml
+	- add src/examples
+	- add modulino script
+	* src/examples/MyScript.pm: renamed from myscript.pm
+	* includes/bash-bin.inc: add modulino.sh.in
+	* src/main/bash/bin/Makefile.am: likewise
+	* src/main/perl/lib/Makefile.am: build .t files
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+	* src/main/perl/lib/CLI/Simple.pm.in
+	- pod tweaks
+	(get_args): return all args if empty list of var names
+
+Thu Nov 16 15:18:56 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[pod tweaks]:
+	* src/main/perl/lib/CLI/Simple.pm.in
+	- pod tweaks
+	(new): accept hash or hash ref
+
+Thu Nov 16 13:36:17 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[make check]:
+	* includes/perlcritic.inc: add pbp to theme
+	* .gitignore: + generatedd files cpan/, t/
+	* Makefile.am: remove README.md from build
+	* README.md: symlink to module README.md
+	* cpan/Makefile.am: rm directory if created
+	* src/main/perl/lib/CLI/Simple.pm.in: pod tweaks
+	* src/main/perl/lib/Makefile.am: build .t files from .t.in
+	* src/main/perl/lib/README.md: generated
+	* src/main/perl/lib/CLI/Simple/README.md: likewise
+
+Thu Nov 16 07:53:09 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[docs/wip]:
+	* README.md: generated
+	* src/main/perl/lib/CLI/Simple.pm.in
+	* src/main/perl/lib/CLI/Simple/README.md
+
+Wed Nov 15 16:25:19 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[docs]:
+	* Makefile.am: make docs
+	* README.md: generated
+	* src/main/perl/lib/CLI/Simple/README.md: likewise
+	* src/main/perl/lib/CLI/Simple.pm.in: pod tweaks
+
+Wed Nov 15 15:51:35 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[BigBang]:
+	* .gitignore: add .3man
+	* README.md: new
+	* includes/perl-modules.inc: dependencies
+	* src/examples/myscript.pm: new
+	* src/main/perl/lib/CLI/Simple.pm.in
+	- replace template with actual file
+	* src/main/perl/lib/CLI/Simple/Constants.pm.in: likewise
+	* src/main/perl/lib/CLI/Simple/Utils.pm.in: likewise
+	* src/main/perl/lib/CLI/Simple/Constants/README.md: new
+	* src/main/perl/lib/CLI/Simple/README.md: new
+	* src/main/perl/lib/CLI/Simple/Utils/README.md: new
+	* src/main/perl/lib/README.md: new
+
+Wed Nov 15 08:15:23 2023 <rlauer6@comcast.net>
+
+	[BigBang]:
+
+	* VERSION: new
+	* .autoconf-template-perlrc: new
+	* .gitignore: new
+	* bootstrap: new
+	* ChangeLog: new
+	* configure.ac: new
+	* COPYING: new
+	* COPYRIGHT: new
+	* Makefile.am: new
+	* manifest.yaml: new
+	* perl-CLI-Simple.spec.in: new
+	* perlcriticrc: new
+	* perltidyrc: new
+	* README.md: new
+	* requires.json: new
+	* requires.txt: new
+	* autotools/ads_PERL_INCLUDES.m4: new
+	* autotools/ads_PERL_MODULE.m4: new
+	* autotools/ads_PROG_PERL.m4: new
+	* autotools/am_build_mode.m4: new
+	* autotools/am_perlcritic_mode.m4: new
+	* autotools/apache_config.m4: new
+	* autotools/ax-extra-opts.m4: new
+	* autotools/ax_am_conditional_example.m4: new
+	* autotools/ax_deps_check.m4: new
+	* autotools/ax_distcheck_hack.m4: new
+	* autotools/ax_perlcritic_config.m4: new
+	* autotools/ax_requirements_check.m4: new
+	* autotools/prove.sh.in: new
+	* autotools/test-driver: new
+	* config/Makefile.am: new
+	* cpan/Makefile.am: new
+	* cpan/requries: new
+	* cpan/test-requires: new
+	* cpan/buildspec.yml
+	* includes/apache-directories.inc: new
+	* includes/bash-bin.inc: new
+	* includes/directories.inc: new
+	* includes/perl-bin.inc: new
+	* includes/perl-cgi-bin.inc: new
+	* includes/perl-modules.inc: new
+	* includes/perlcritic.inc: new
+	* install-from-cpan.in: new
+	* resources/Makefile.am: new
+	* src/main/bash/bin/Makefile.am: new
+	* src/main/bash/Makefile.am: new
+	* src/main/Makefile.am: new
+	* src/main/perl/bin/Makefile.am: new
+	* src/main/perl/lib/CLI/Simple.pm.in: new
+	* src/main/perl/lib/CLI/Simple/Constants.pm.in: new
+	* src/main/perl/lib/CLI/Simple/Utils.pm.in: new
+	* src/main/perl/lib/Makefile.am: new
+	* src/main/perl/lib/t/00-cli-simple-constants.t: new
+	* src/main/perl/lib/t/00-cli-simple-utils.t: new
+	* src/main/perl/lib/t/00-cli-simple.t: new
+	* src/main/perl/Makefile.am: new
+	* src/Makefile.am: new

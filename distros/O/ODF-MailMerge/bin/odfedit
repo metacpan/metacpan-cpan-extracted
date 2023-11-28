@@ -7,7 +7,7 @@ use strict; use warnings FATAL => 'all'; use 5.010;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = "dev"; }
 our $VERSION = "0.002"; # Future: V ERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-10-31'; # DATE from Dist::Zilla::Plugin::OurDate
+our $DATE = '2023-11-16'; # DATE from Dist::Zilla::Plugin::OurDate
 
 #use 5.12; # for unicode_strings
 use v5.18; # for lexical_subs
@@ -385,11 +385,10 @@ Scripts are parsed similarly to Unix shell scripts:
 
 =over 2
 
-#comments and blank lines are ignored
-
 Command names and arguments are delimited by white space.
 "double quotes", 'single quotes' or \-escapes may be used
 for arguments with embedded spaces or special characters.
+#comments and blank lines are ignored
 
 Commands must be on a single logical line. Use \<newline> to fold
 long lines and semicolon (;) to separate commands on the same line.
@@ -398,23 +397,23 @@ long lines and semicolon (;) to separate commands on the same line.
 
 =head1 DEFINITIONS
 
-Any B<TOKEN> argument has brackets added to form "{TOKEN}"
-unless the argument already contains the { and }.
-Literal { } or : characters may be used with \-escapes
-(such arguments should be 'single quoted' in the script).
+B<SPREADSHEET> means the path of
+a .csv file or a spreadsheet (.ods, .xlsx, etc.)
+If a multi-sheet spreadsheet workbook is used, SPREADSHEET must be of
+the form "PATH!SHEETNAME" to specify which sheet to use.
+Spreadsheets may be used only if Libre Office is installed;
+and, due to an LO bug, LO may not be open interactively even
+for unrelated purposes.   .csv files may always be used without issue.
 
 B<COLSPEC> means a spreadsheet column specifier: It may be an actual
 title, an identifier derived from a title by replacing offending characters
 with underscores, an absolute column letter ("A", "B" etc.)
 or a regular expression written as "/.../" which matches one title.
 
-B<SPREADSHEET> means the path of
-a .csv file or a spreadsheet (.ods, .xlsx, etc.)
-If a multi-sheet spreadsheet workbook is used, SPREADSHEET must be of
-the form "PATH!SHEETNAME" to specify which sheet to use.
-Spreadsheets may be used only if a modern version of Libre Office is
-installed; and, due to an LO bug, LO may not be open interactively even
-for unrelated purposes.   .csv files may always be used without issue.
+Any B<TOKEN> argument has brackets added to form "{TOKEN}"
+unless the argument already contains the { and }.
+Literal { } or : characters may be used with \-escapes
+(such arguments should be 'single quoted' in the script).
 
 =head1 COMMANDS
 
@@ -447,7 +446,7 @@ specify format overrides.
 
 =head2 mail-merge I<PROTO-TOKEN> I<SPREADSHEET>
 
-=head2 mail-merge I<PROTO-TOKEN> B<-a> I<aliasname=COLSPEC> ... <SPREADSHEET>
+=head2 mail-merge I<PROTO-TOKEN> B<-a> I<aliasname=COLSPEC> ... I<SPREADSHEET>
 
 First, a prototype Table is located which contains "{PROTO-TOKEN}"
 somewhere within it.  The "{PROTO-TOKEN}" string is used only to
@@ -463,7 +462,7 @@ brackets) as a COLSPEC to identify which column value to use from the record.
 
 If B<-a> option(s) are specified, then each I<aliasname> becomes an
 alternate COLSPEC for the indicated column.
-For example the prototype table may contain "{aliasname}" instaed
+Then the prototype table may contain "{aliasname}" instaed
 of "{The Actual Column Title}".
 I<aliasname> must be an identifier, i.e. must start with a letter and contain
 only letters, digits, and underscores.
@@ -478,8 +477,9 @@ An error occurs if a "token" does not indicate any column in the spreadsheet.
 by B<-a> options to define column aliases.)
 
 In this form, some {token} values may be found in a specific record from a
-secondary spreadsheet; that record is selected using the values in
-the primary sheet's record of columns indicated by the I<COLSPEC>s.
+secondary spreadsheet; that specific record is selected using the values
+of certain columns in the current record from the primary sheet,
+indicated by the I<COLSPEC>s.
 
 For example, to produce a company directory of department contacts for
 Payroll, Personnel, etc., the prototype table might contain tokens
@@ -519,7 +519,7 @@ which contain spaces or special characters.
 
 =head1 SEE ALSO
 
-It may be helpful to refer to the following to understand how all this works:
+It may be helpful to read docs for the following:
 
 L<ODF::MailMerge>
 

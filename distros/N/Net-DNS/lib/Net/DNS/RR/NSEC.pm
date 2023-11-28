@@ -2,7 +2,7 @@ package Net::DNS::RR::NSEC;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: NSEC.pm 1896 2023-01-30 12:59:25Z willem $)[2];
+our $VERSION = (qw$Id: NSEC.pm 1945 2023-11-22 08:02:31Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -20,10 +20,10 @@ use Net::DNS::Parameters qw(:type);
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset ) = @_;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
 	my $limit = $offset + $self->{rdlength};
-	( $self->{nxtdname}, $offset ) = Net::DNS::DomainName->decode( $data, $offset );
+	( $self->{nxtdname}, $offset ) = Net::DNS::DomainName->decode( $data, $offset, @opaque );
 	$self->{typebm} = substr $$data, $offset, $limit - $offset;
 	return;
 }

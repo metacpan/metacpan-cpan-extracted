@@ -63,6 +63,16 @@ $queue = update_queue($queue, $time_hours);
 $command = join(" ", @ARGV);
 usage(1) unless ($command);
 
+if ($verbose) {
+    say STDERR YELLOW, BOLD, "PARAMETERS:",RESET;
+    say STDERR YELLOW, "Queue:      ", RESET, $queue // "(not set)";
+    say STDERR YELLOW, "Memory:     ", RESET, $memory // "(not set)";
+    say STDERR YELLOW, "Threads:    ", RESET, $threads // "(not set)";
+    say STDERR YELLOW, "Time:       ", RESET, $time // "(not set)";
+    say STDERR YELLOW, "Tmpdir:     ", RESET, $tmpdir // "(not set)";
+    say STDERR YELLOW, "Name:       ", RESET, $name // "(not set)";
+    say STDERR YELLOW, "Command:    ", RESET, $command // "(not set)";
+}
 # Check threadshours
 if (-d $time) {
     say STDERR RED, BOLD, "ERROR:", RESET, " did you mean \"--tmpdir $time\"  instead of $threads threads?";
@@ -266,7 +276,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.8.1
+version 0.8.2
 
 =head1 SYNOPSIS
 

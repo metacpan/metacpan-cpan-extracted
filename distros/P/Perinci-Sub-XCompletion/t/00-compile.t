@@ -6,13 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perinci/Sub/XCompletion.pm',
     'Perinci/Sub/XCompletion/comma_sep.pm',
     'Perinci/Sub/XCompletion/dirname.pm',
-    'Perinci/Sub/XCompletion/filename.pm'
+    'Perinci/Sub/XCompletion/dirname_curdir.pm',
+    'Perinci/Sub/XCompletion/filename.pm',
+    'Perinci/Sub/XCompletion/filename_curdir.pm',
+    'Perinci/Sub/XCompletion/pathname_curdir.pm'
 );
 
 

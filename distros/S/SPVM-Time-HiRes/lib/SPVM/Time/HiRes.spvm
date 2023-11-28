@@ -1,0 +1,200 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Time::HiRes {
+  
+  version "0.002";
+  
+  use Fn;
+  use Sys::Time;
+  use Sys::Signal;
+  use Sys::Process;
+  use Sys::Time::Timeval;
+  use Sys::Time::Timespec;
+  use Sys::Time::Itimerval;
+  use Time::HiRes::ItimervalFloat;
+  use Time::HiRes::Util;
+  
+  # Class Methods
+  static method gettimeofday : Sys::Time::Timeval () {
+  
+    my $tv = Sys::Time::Timeval->new;
+    
+    Sys::Time->gettimeofday($tv, undef);
+    
+    return $tv;
+  }
+  
+  static method usleep : int ($usec : int) {
+    
+    my $slept_time = Sys::Process->usleep($usec);
+    
+    return $slept_time;
+  }
+  
+  static method nanosleep : long ($nanoseconds : long) {
+    
+    my $nanoseconds_ts = Time::HiRes::Util->nanoseconds_to_timespec($nanoseconds);
+    
+    my $remain_ts = Sys::Time::Timespec->new;
+    
+    Sys::Time->nanosleep($nanoseconds_ts, $remain_ts);
+    
+    my $remain = Time::HiRes::Util->timespec_to_nanoseconds($remain_ts);
+    
+    return $remain;
+  }
+  
+  static method ualarm : int ($usecs : int, $interval : int = 0) {
+    
+    my $remain_time = Sys::Signal->ualarm($usecs, $interval);
+    
+    return $remain_time;
+  }
+  
+  static method tv_interval : double ($a : Sys::Time::Timeval, $b : Sys::Time::Timeval = undef) {
+    
+    unless ($b) {
+      $b = &gettimeofday;
+    }
+    
+    my $tv_interval = Time::HiRes::Util->timeval_interval($a, $b);
+    
+    return $tv_interval;
+  }
+  
+  static method time : double () {
+    
+    my $tv = &gettimeofday;
+    
+    my $float_seconds = (double)Time::HiRes::Util->timeval_to_float_seconds($tv);
+    
+    return $float_seconds;
+  }
+  
+  static method sleep : double ($float_seconds : double) {
+    
+    my $microseconds = (int)Time::HiRes::Util->float_seconds_to_microseconds($float_seconds);
+    
+    my $slept_time = &usleep($microseconds);
+    
+    my $slept_time_float_seconds = (double)Time::HiRes::Util->microseconds_to_float_seconds($slept_time);
+    
+    return $slept_time_float_seconds;
+  }
+  
+  static method alarm : double ($float_seconds : double, $interval_float_seconds : double = 0) {
+    
+    my $usecs = (int)Time::HiRes::Util->float_seconds_to_microseconds($float_seconds);
+    
+    my $interval = (int)Time::HiRes::Util->float_seconds_to_microseconds($interval_float_seconds);
+    
+    my $remain_time = &ualarm($usecs, $interval);
+    
+    my $remain_time_float_seconds = (double)Time::HiRes::Util->microseconds_to_float_seconds($remain_time);
+    
+    return $remain_time_float_seconds;
+  }
+  
+  static method setitimer : Time::HiRes::ItimervalFloat ($which : int, $new_itimer_float : Time::HiRes::ItimervalFloat) {
+    
+    my $itimer = Sys::Time::Itimerval->new;
+    
+    Sys::Time->getitimer($which, $itimer);
+    
+    my $new_itimer = Sys::Time::Itimerval->new;
+    
+    my $new_iinter_it_interval = Time::HiRes::Util->float_seconds_to_timeval($new_itimer_float->it_interval);
+    
+    $new_itimer->set_it_interval($new_iinter_it_interval);
+    
+    my $new_iinter_it_value = Time::HiRes::Util->float_seconds_to_timeval($new_itimer_float->it_value);
+    
+    $new_itimer->set_it_value($new_iinter_it_value);
+    
+    my $old_itimer = Sys::Time::Itimerval->new;
+    
+    Sys::Time->setitimer($which, $new_itimer, $old_itimer);
+    
+    my $old_itimer_it_interval_float = Time::HiRes::Util->timeval_to_float_seconds($old_itimer->it_interval);
+    
+    my $old_itimer_it_value_float = Time::HiRes::Util->timeval_to_float_seconds($old_itimer->it_value);
+    
+    my $old_itimer_float = Time::HiRes::ItimervalFloat->new;
+    
+    $old_itimer_float->set_it_interval($old_itimer_it_interval_float);
+    
+    $old_itimer_float->set_it_value($old_itimer_it_value_float);
+    
+    return $old_itimer_float;
+  }
+  
+  static method getitimer : Time::HiRes::ItimervalFloat ($which : int) {
+    
+    my $itimer = Sys::Time::Itimerval->new;
+    
+    Sys::Time->getitimer($which, $itimer);
+    
+    my $itimer_it_interval_float = Time::HiRes::Util->timeval_to_float_seconds($itimer->it_interval);
+    
+    my $itimer_it_value_float = Time::HiRes::Util->timeval_to_float_seconds($itimer->it_value);
+    
+    my $itimer_float = Time::HiRes::ItimervalFloat->new;
+    
+    $itimer_float->set_it_interval($itimer_it_interval_float);
+    
+    $itimer_float->set_it_value($itimer_it_value_float);
+    
+    return $itimer_float;
+  }
+  
+  static method clock_gettime : double ($clk_id : int) {
+    
+    my $ts = Sys::Time::Timespec->new;
+    
+    my $status = Sys::Time->clock_gettime($clk_id, $ts);
+    
+    my $ret = -1.0;
+    if ($status == 0) {
+      $ret = Time::HiRes::Util->timespec_to_float_seconds($ts);
+    }
+    
+    return $ret;
+  }
+  
+  static method clock_getres : double ($clk_id : int) {
+    
+    my $ts = Sys::Time::Timespec->new;
+    
+    my $status = Sys::Time->clock_getres($clk_id, $ts);
+    
+    my $ret = -1.0;
+    if ($status == 0) {
+      $ret = Time::HiRes::Util->timespec_to_float_seconds($ts);
+    }
+    
+    return $ret;
+  }
+  
+  static method clock_nanosleep : long ($clockid : int, $nanoseconds : long, $flags : int = 0) {
+    
+    my $ts = Time::HiRes::Util->nanoseconds_to_timespec($nanoseconds);
+    
+    my $remain_ts = Sys::Time::Timespec->new;
+    
+    Sys::Time->clock_nanosleep($clockid, $flags, $ts, $remain_ts);
+    
+    my $remain_nanoseconds = Time::HiRes::Util->timespec_to_nanoseconds($remain_ts);
+    
+    return $remain_nanoseconds;
+  }
+  
+  static method clock : long () {
+    my $cpu_time = Sys::Time->clock;
+    
+    return $cpu_time;
+  }
+  
+  # utime LIST
+  
+}

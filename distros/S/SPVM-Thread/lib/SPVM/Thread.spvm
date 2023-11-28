@@ -1,0 +1,31 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Thread {
+  use Callback;
+  use Thread::ID;
+  
+  # Fields
+  has task : Callback;
+  
+  # Class Methods
+  static method new : Thread ($task : Callback) {
+    
+    my $self = new Thread;
+    
+    $self->{task} = $task;
+    
+    $self->create;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  native private method create : void ();
+  
+  native method join : void ();
+  
+  native method get_id : Thread::ID ();
+  
+  native method DESTROY : void ();
+}

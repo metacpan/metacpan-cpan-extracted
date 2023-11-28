@@ -51,7 +51,6 @@
     yMd => "y-MM-dd",
     yQQQ => "y QQQ",
     yQQQQ => "y QQQQ",
-    "yw-count-one" => "'week' w 'of' Y",
     "yw-count-other" => "'week' w 'of' Y",
   },
   code => "st-ZA",
@@ -269,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

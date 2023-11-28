@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Request/Params.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/05/31
+## Modified 2023/10/21
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -20,10 +21,9 @@ BEGIN
     # Which itself inherits from APR::Request
     use parent qw( APR::Request::Apache2 );
     use vars qw( $ERROR $VERSION );
-    use Nice::Try;
     use Scalar::Util ();
     our $ERROR;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub new
@@ -81,18 +81,22 @@ sub upload
     my $self = shift( @_ );
     # As per APR::Request: "upload() will throw an APR::Request::Error object whenever body_status() is non-zero"
     my $body;
-    try
+    my $return = 0;
+    # try-catch
+    local $@;
+    eval
     {
         if( $self->body_status != 0 )
         {
             $ERROR = "APR::Request::body_status returned non-zero (" . $self->body_status . ")";
-            return;
+            $return++;
         }
-        $body = $self->body or return;
-    }
-    catch( $e )
+        $body = $self->body or ++$return;
+    };
+    return if( $return );
+    if( $@ )
     {
-        return( $self->error( "Unable to get the APR::Request body objet: $e" ) );
+        return( $self->error( "Unable to get the APR::Request body objet: $@" ) );
     }
     # So further call on this object will be handled by Apache2::API::Request::Params::Field below
     $body->param_class( 'Apache2::API::Request::Upload' );
@@ -110,18 +114,22 @@ sub uploads
 {
     my $self = shift( @_ );
     my $body;
-    try
+    my $return = 0;
+    # try-catch
+    local $@;
+    eval
     {
         if( $self->body_status != 0 )
         {
             $ERROR = "APR::Request::body_status returned non-zero (" . $self->body_status . ")";
-            return;
+            $return++;
         }
-        $body = $self->body or return;
-    }
-    catch( $e )
+        $body = $self->body or ++$return;
+    };
+    return if( $return );
+    if( $@ )
     {
-        return( $self->error( "Unable to get the APR::Request body objet: $e" ) );
+        return( $self->error( "Unable to get the APR::Request body objet: $@" ) );
     }
     # So further call on this object will be handled by Apache2::API::Request::Params::Field below
     $body->param_class( __PACKAGE__ . '::Field' );
@@ -206,7 +214,7 @@ Apache2::API::Request::Params - Apache2 Request Fields Object
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

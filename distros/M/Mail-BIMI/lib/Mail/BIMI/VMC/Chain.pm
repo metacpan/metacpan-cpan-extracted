@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Chain;
 # ABSTRACT: Class to model a VMC Chain
-our $VERSION = '3.20230913'; # VERSION
+our $VERSION = '3.20231123'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -41,7 +41,7 @@ sub _build_is_valid($self) {
     close $temp_fh;
   }
 
-  my $root_ca = Crypt::OpenSSL::Verify->new($ssl_root_cert,{noCApath=>0});
+  my $root_ca = Crypt::OpenSSL::Verify->new($ssl_root_cert,{noCApath=>0,strict_certs=>0});
   my $root_ca_ascii = scalar read_file $ssl_root_cert;
   foreach my $cert ( $self->cert_object_list->@* ) {
     my $i = $cert->index;
@@ -195,7 +195,7 @@ Mail::BIMI::VMC::Chain - Class to model a VMC Chain
 
 =head1 VERSION
 
-version 3.20230913
+version 3.20231123
 
 =head1 DESCRIPTION
 

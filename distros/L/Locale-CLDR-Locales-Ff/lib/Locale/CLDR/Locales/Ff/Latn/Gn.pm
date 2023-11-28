@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ff::Latn::Gn - Package for language Fulah
 
 package Locale::CLDR::Locales::Ff::Latn::Gn;
 # This file auto generated from Data\common\main\ff_Latn_GN.xml
-#	on Fri 13 Oct  9:15:15 am GMT
+#	on Sat  4 Nov  6:01:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

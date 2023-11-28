@@ -1,4 +1,11 @@
-0.001   2019-01-09 (PERLANCAR)
+0.002   2023-08-06  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract (add 'List of ...') to follow convention.
+
+
+0.001   2019-01-09  Released-By: PERLANCAR
 
         - First release, split from Acme-CPANModulesBundle-PERLANCAR and remove
           the PERLANCAR:: in the name.

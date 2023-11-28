@@ -3,9 +3,9 @@ package App::TextTableUtils;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-18'; # DATE
+our $DATE = '2023-03-10'; # DATE
 our $DIST = 'App-TextTableUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to text tables
@@ -22,7 +22,7 @@ App::TextTableUtils - CLI utilities related to text tables
 
 =head1 VERSION
 
-This document describes version 0.008 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2022-02-18.
+This document describes version 0.009 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2023-03-10.
 
 =head1 DESCRIPTION
 
@@ -31,91 +31,91 @@ text tables:
 
 =over
 
-=item * L<csv2ansitable>
+=item 1. L<csv2ansitable>
 
-=item * L<csv2asciitable>
+=item 2. L<csv2asciitable>
 
-=item * L<csv2dd>
+=item 3. L<csv2dd>
 
-=item * L<csv2json>
+=item 4. L<csv2json>
 
-=item * L<csv2mdtable>
+=item 5. L<csv2mdtable>
 
-=item * L<csv2orgtable>
+=item 6. L<csv2orgtable>
 
-=item * L<csv2texttable>
+=item 7. L<csv2texttable>
 
-=item * L<dd2ansitable>
+=item 8. L<dd2ansitable>
 
-=item * L<dd2asciitable>
+=item 9. L<dd2asciitable>
 
-=item * L<dd2csv>
+=item 10. L<dd2csv>
 
-=item * L<dd2mdtable>
+=item 11. L<dd2mdtable>
 
-=item * L<dd2orgtable>
+=item 12. L<dd2orgtable>
 
-=item * L<dd2texttable>
+=item 13. L<dd2texttable>
 
-=item * L<dd2tsv>
+=item 14. L<dd2tsv>
 
-=item * L<ini2ansitable>
+=item 15. L<ini2ansitable>
 
-=item * L<ini2asciitable>
+=item 16. L<ini2asciitable>
 
-=item * L<ini2csv>
+=item 17. L<ini2csv>
 
-=item * L<ini2mdtable>
+=item 18. L<ini2mdtable>
 
-=item * L<ini2orgtable>
+=item 19. L<ini2orgtable>
 
-=item * L<ini2texttable>
+=item 20. L<ini2texttable>
 
-=item * L<ini2tsv>
+=item 21. L<ini2tsv>
 
-=item * L<iod2ansitable>
+=item 22. L<iod2ansitable>
 
-=item * L<iod2asciitable>
+=item 23. L<iod2asciitable>
 
-=item * L<iod2csv>
+=item 24. L<iod2csv>
 
-=item * L<iod2mdtable>
+=item 25. L<iod2mdtable>
 
-=item * L<iod2orgtable>
+=item 26. L<iod2orgtable>
 
-=item * L<iod2texttable>
+=item 27. L<iod2texttable>
 
-=item * L<iod2tsv>
+=item 28. L<iod2tsv>
 
-=item * L<json2ansitable>
+=item 29. L<json2ansitable>
 
-=item * L<json2asciitable>
+=item 30. L<json2asciitable>
 
-=item * L<json2csv>
+=item 31. L<json2csv>
 
-=item * L<json2mdtable>
+=item 32. L<json2mdtable>
 
-=item * L<json2orgtable>
+=item 33. L<json2orgtable>
 
-=item * L<json2texttable>
+=item 34. L<json2texttable>
 
-=item * L<json2tsv>
+=item 35. L<json2tsv>
 
-=item * L<texttableutils-convert>
+=item 36. L<texttableutils-convert>
 
-=item * L<tsv2ansitable>
+=item 37. L<tsv2ansitable>
 
-=item * L<tsv2asciitable>
+=item 38. L<tsv2asciitable>
 
-=item * L<tsv2dd>
+=item 39. L<tsv2dd>
 
-=item * L<tsv2json>
+=item 40. L<tsv2json>
 
-=item * L<tsv2mdtable>
+=item 41. L<tsv2mdtable>
 
-=item * L<tsv2orgtable>
+=item 42. L<tsv2orgtable>
 
-=item * L<tsv2texttable>
+=item 43. L<tsv2texttable>
 
 =back
 
@@ -156,13 +156,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2019, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2019, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

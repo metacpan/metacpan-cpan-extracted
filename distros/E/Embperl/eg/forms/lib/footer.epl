@@ -7,7 +7,7 @@
 	<td colspan=1 valign=top align=left class="cFooterText">
 		[= txt:logged_in_as =] <span  class="cFooterTextBold">&nbsp;[+ $user || $epreq -> gettext('txt:<unknown>') +]</span></td>
 	<td colspan=1 valign=top align=right class="cFooterText">
-	    &nbsp;&nbsp;&nbsp; Copyright &copy; [+ $oem -> {copyrighttime} +]&nbsp;&nbsp;&nbsp;<a href="[+ $oem -> {copyrighthref} || 'http://www.embperl.org/'+]" target="_blank">[+ $oem -> {copyright} || 'Gerald Richter' +]</a>&nbsp;&nbsp;&nbsp;<a href="/main_empty.epl?-frame=[+ $epreq -> frames +]">u.a.</a>&nbsp;&nbsp;&nbsp;
+	    &nbsp;&nbsp;&nbsp; Copyright &copy; [+ $oem -> {copyrighttime} +]&nbsp;&nbsp;&nbsp;<a href="[+ $oem -> {copyrighthref} || 'https://www.embperl.org/'+]" target="_blank">[+ $oem -> {copyright} || 'Gerald Richter' +]</a>&nbsp;&nbsp;&nbsp;<a href="/main_empty.epl?-frame=[+ $epreq -> frames +]">u.a.</a>&nbsp;&nbsp;&nbsp;
 	</td>
     </tr>
 </table>

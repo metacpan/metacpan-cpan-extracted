@@ -37,28 +37,28 @@ Embperl::Intro - Introduction to Embperl
 Embperl has started as a Perl module for simply embedding Perl 
 into HTML and has grown to
 a full featured system to build dynamic content (not only) under 
-mod_perl. The version 1.x focus on HTML documents, also it could be
+mod_perl. The version 1.x focuses on HTML documents, also it could be
 used for any sort of ascii files, and brings a lot of features
-especially useful in a web-environment. This features includes
+especially useful in a web-environment. These features include
 handling of form data and dynamic HTML tables/lists, session management
-and context sensitv escaping and unescaping. More over you can
+and context sensitive escaping and unescaping. Moreover you can
 break up your documents in small reusable components/objects and build
-a object-oriented website out of such objects, by using inheritence and
-specificly overriding parts of the page. Also Embperl can cope with pages
-that are screw up by high-level HTML editors, so your designer can still
-use there favorite tool.
+an object-oriented website out of such objects, by using inheritance and
+specifically overriding parts of the page. Also Embperl can cope with pages
+that are screwed up by high-level HTML editors, so your designer can still
+use their favorite tool.
 
 Embperl 2.0, which is a complete rewrite of the Embperl core, is not
-even much faster then 1.x, but adds new possibilities. You can extent
+only much faster then 1.x, but adds new possibilities. You can extend
 or define your own syntax, thus giving the chance to trigger actions
 on certain tags or inventing your own tags (creating a taglib). 
 It is much more modularized, so specific steps could be replaced by
-custom processor and more then one processor can act on a document
-before it goes to the browser (just like a Unix pipe). To enhances
-performance 2.0 indrocuces caching of the output or intermediate steps.
+a custom processor and more than one processor can act on a document
+before it goes to the browser (just like a Unix pipe). To enhance
+performance 2.0 introduces caching of the output or intermediate steps.
 
-Due to this modularization, it is now possible, to replace Embperl parser
-by an XML parser and to do XML processing, for example by pluging in
+Due to this modularization, it is now possible to replace the Embperl parser
+by an XML parser and to do XML processing, for example by plugging in
 an XSLT processer in the processing pipeline.
 Embperl 2.0 can utilize libxml2 and libxslt for XML and XSLT processing.
 
@@ -85,19 +85,19 @@ Template::Toolkit and AxKit). All of these have their special strength.
 So why to use Embperl? We believe that Embperl, especialy the 
 version 2.0, covers all of the aspects of these modules and integrates them
 in one module with addtionaly benefits that are unique to Embperl.
-Addtionaly Embperl is the fastes of these solutions, because it's engine
+Additionally Embperl is the fastest of these solutions, because it's engine
 is totaly written in C and is optimized for delivering dynamic content
 online.
 
-A another competitor for Embperl is PHP.
+Another competitor for Embperl is PHP.
 PHP is developing a strong user base, because it is rumored to be easy
 to learn, and was designed specifically for HTML. Also PHP is probably one
 of the strongest open source alternatives to using Perl in your
 HTML, it's target is very webcentric and you may discover at a certain
-point that is has it's limitations when you try to realize great projects.
+point that is has its limitations when you try to realize great projects.
 Also it's not true, like some anecdotal stories on the Web might want to make
-you belive, that PHP is faster then Perl. Perl,
-and therfore Embperl also, scales and performs very well for high end solution.
+you believe, that PHP is faster than Perl. Perl,
+and therefore Embperl also, scales and performs very well for high end solution.
 
 
 =head2 Focus of this document
@@ -254,7 +254,7 @@ first row:
  # prepare the sql select
  $sth = $dbh -> prepare ("SELECT * from $table") ;
 
- # excute the query
+ # execute the query
  $sth -> execute ;
 
  # get the fieldnames for the heading in $head
@@ -313,7 +313,7 @@ Depending on the values of $fdat{check}, $fdat{send} and if
 $fdat{name} and $fdat{email} contains data, the document decides which
 part to show.
 
- [-  $MailTo = 'richter\@ecos.de' ;
+ [-  $MailTo = 'user\@example.org' ;
 
   @errors = () ;
   if (defined($fdat{check}) || defined($fdat{send}))
@@ -517,7 +517,7 @@ settings, Embperl logs the following things:
 =back
 
 
-Addtional you can write your own debug informtion to the Embperl
+Additionally you can write your own debug information to the Embperl
 logfile by writing to the special filehandle C<LOG> which is
 opend by Embperl.
 
@@ -535,7 +535,7 @@ chapter about dynamic tables, this example works with explicit loops.
  # prepare the sql select
  $sth = $dbh -> prepare ("SELECT * from $table") ;
 
- # excute the query
+ # execute the query
  $sth -> execute ;
 
  # get the fieldnames for the heading in $head
@@ -689,8 +689,8 @@ tutorial about how to build an object-oriented website.
 L<"perldoc IntroEmbperl2"|"IntroEmbperl2.pod"> describes the advanced
 features of Embperl 2
 
-For a full documenation read L<"perldoc Embperl"|"Embperl.pod"> and
+For a full documentation read L<"perldoc Embperl"|"Embperl.pod"> and
 L<"perldoc Config"|"Config.pod">.
 
-You can find additional information on http://perl.apache.org/embperl
+You can find additional information on https://perl.apache.org/embperl
 

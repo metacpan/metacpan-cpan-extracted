@@ -1,4 +1,4 @@
-package EAI::DB 1.5;
+package EAI::DB 1.902;
 
 use strict; use feature 'unicode_strings'; use warnings;
 use Exporter qw(import); use DBI qw(:sql_types); use DBD::ODBC (); use Data::Dumper qw(Dumper); use Log::Log4perl qw(get_logger);
@@ -80,7 +80,7 @@ sub readFromDB ($$) {
 			@{$DB->{columnnames}} = @{$sth->{NAME}} if $sth->{NAME}; # take field names from the statement handle of query, used for later processing
 			@$data = @{$sth->fetchall_arrayref({})};
 		};
-		die $@.",DB error: ".$DBI::errstr." executed statement: ".$statement if ($@);
+		die "$@, executed statement: $statement" if ($@);
 	};
 	$dbh->{RaiseError} = 0;
 	if ($@) {

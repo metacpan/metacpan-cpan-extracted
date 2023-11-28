@@ -77,4 +77,26 @@ Line 5
 END
 };
 
+subtest convert_comments => sub {
+   -e $_ && unlink $_ for $out_c, $out_h;
+   is( run_cpppp([ '--convert-linecomment-to-c89', '-o', $out_c ], <<END), 0 );
+/* unaffected
+ */
+int main() { // main function
+   // first line of main function
+   int i= 0; /* unaffected */
+   return i; // second line
+}
+END
+   is( slurp($out_c), <<END, 'out.c' );
+/* unaffected
+ */
+int main() { /* main function */
+   /* first line of main function */
+   int i= 0; /* unaffected */
+   return i; /* second line */
+}
+END
+};
+
 done_testing;

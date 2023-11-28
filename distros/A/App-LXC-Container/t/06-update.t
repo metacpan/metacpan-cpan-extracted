@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd;
 
-use Test::More tests => 192;
+use Test::More tests => 193;
 use Test::Output;
 
 #####################################
@@ -266,6 +266,8 @@ _setup_file('/lxc/conf/un-CNF-update-test-broken.master');
 _setup_file('/lxc/conf/un-NOT-update-test-broken.filter');
 _setup_file('/lxc/conf/un-MNT-update-test-broken.mounts');
 _setup_file('/lxc/conf/un-PKG-update-test-broken.packages');
+_setup_file('/lxc/conf/un-SPC-update-test-broken.special');
+_chmod(0,   '/lxc/conf/un-SPC-update-test-broken.special');
 my $broken = App::LXC::Container::Update->new('update-test-broken');
 $broken->_parse_master();
 $broken->_parse_packages();
@@ -285,6 +287,10 @@ eval {   $broken->_write_lxc_configuration();   };
 like($@,
      qr{^INTERNAL ERROR .+: bad filter value: invalid_value.*$re_msg_tail},
     'invalid internal value for filter fails');
+eval {   $broken->_parse_specials();   };
+like($@,
+     qr{^can't open '/.[^']+/un-SPC-update-test-broken.special': .*$re_msg_tail},
+    'inaccessible special configuration fails');
 
 #########################################################################
 # basic tests for minimal container:
@@ -612,6 +618,10 @@ _setup_file('/lxc/conf/u2-MNT-update-test-2.mounts',
 	    '# same as in u1...',
 	    '',
 	    $path2something);
+_setup_file('/lxc/conf/u1-SPC-update-test-1.special',
+	    '# special test entry:',
+	    '',
+	    'lxc.namespace.keep=ipc');
 
 $update_object = App::LXC::Container::Update->new('update-test-1');
 $update_object->_parse_mounts();
@@ -785,6 +795,9 @@ SKIP:{
 	 '# u3:',
 	 'lxc\.idmap = g 1003 1003 1',
 	 'lxc\.idmap = g 1004 101004 64532',
+	 '',
+	 '#+ special configuration #+',
+	 'lxc.namespace.keep=ipc',
 	 '',
 	 '#+ container users #+',
 	 '',

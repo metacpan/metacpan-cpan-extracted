@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.231650';
+$App::RouterColorizer::VERSION = '1.233180';
 use Moose;
 
 use feature 'signatures';
@@ -80,6 +80,7 @@ our $IPV4CIDR = qr/ $RE{net}{IPv4}
                            | (?:[0-9])
                         )
                     )?
+                    (?![0-9])
                 /xx;
 
 our $IPV6CIDR = qr/ $RE{net}{IPv6}
@@ -91,6 +92,7 @@ our $IPV6CIDR = qr/ $RE{net}{IPv6}
                            | (?:[0-9])
                         )
                     )?
+                    (?![0-9])
                 /xx;
 
 our $BIGALARMS    = qr/critical|major|minor|warning/;
@@ -229,7 +231,7 @@ s/^ ( \Q  Configured maximum total number of routes is \E \d+ (?: \Q, warning li
     #
 
     # We look for information lines
-    if ( $line =~ m/^     ((?:$INT [^,]+, )*$INT [^,]+)$/ ) {
+    if ( $line =~ m/^     ((?:$INT [^, ][^,]+, )*$INT [^, ][^,]+)$/ ) {
         my (%values) =
           map { reverse split / /, $_, 2 } split ', ', $1;
 
@@ -779,7 +781,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.231650
+version 1.233180
 
 =head1 DESCRIPTION
 

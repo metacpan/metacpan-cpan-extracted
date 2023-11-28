@@ -1,11 +1,17 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 
 package Blockchain::Ethereum::ABI::TypeRole;
 role Blockchain::Ethereum::ABI::TypeRole;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.013';          # VERSION
+our $VERSION   = '0.015';          # VERSION
 
 method encode;
 
@@ -27,7 +33,7 @@ Blockchain::Ethereum::ABI::TypeRole
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 METHODS
 

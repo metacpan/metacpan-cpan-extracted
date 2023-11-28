@@ -439,6 +439,10 @@ Insert the matching entry at the end
 
 Network lifecycle events
 
+=item Sys::Virt::Network::EVENT_ID_METADATA_CHANGE
+
+The network metadata has changed
+
 =back
 
 =head2 LIFECYCLE CHANGE EVENTS

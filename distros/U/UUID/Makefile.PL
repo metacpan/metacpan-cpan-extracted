@@ -4,10 +4,10 @@ use Devel::CheckLib;
 use ExtUtils::MakeMaker;
 
 BEGIN {
-    local $/;
-    open my $fh, '<', 'UUID.pm' or die $!;
-    my $content = <$fh>;
-    $main::DEV_VERSION = $content =~ /VERSION\s+=\s+\S+_/;
+    #local $/;
+    #open my $fh, '<', 'UUID.pm' or die $!;
+    #my $content = <$fh>;
+    #$main::DEV_VERSION = $content =~ /VERSION\s+=\s+\S+_/;
 
     $main::USE_DEBUG = 0;
     @ARGV = map {
@@ -17,8 +17,8 @@ BEGIN {
 
 use constant DEBUG => $ENV{UUID_DEBUG}
     || ( $main::USE_DEBUG ? 1 : 0 )
-    || ( $ENV{AUTOMATED_TESTING} && $main::DEV_VERSION )
-    || $main::DEV_VERSION   # <--- always debug dev versions
+    #|| ( $ENV{AUTOMATED_TESTING} && $main::DEV_VERSION )
+    #|| $main::DEV_VERSION   # <--- always debug dev versions
     || 0
 ;
 
@@ -81,11 +81,12 @@ sub try_rpc {
     my ( $hdr, $tlib ) = @_;
     warn "# ===> Checking for RPC interface in $hdr with -l$tlib\n" if DEBUG;
     eval { assert_lib(
-        lib      => $tlib,
-        header   => $hdr,
-        debug    => DEBUG,
-        libpath  => '/lib64 /usr/lib64',
-        function => qq/
+        lib         => $tlib,
+        header      => $hdr,
+        debug       => DEBUG,
+        libpath     => '/lib64 /usr/lib64',
+        not_execute => 1,
+        function    => join("\n", map { s/^\s+//; $_ } split("\n", q{
             char *str,buff[37];
             uuid_t u1,u2;
             int32_t r,s;
@@ -98,7 +99,7 @@ sub try_rpc {
             r = uuid_equal(&u1,&u2,&s);
             r = uuid_is_nil(&u1,&s);
             return 0;
-        /,
+        })),
     )};
     if ($@) { my $L = length $@; warn "# ===> Err($L): \"$@\"\n" if DEBUG; return 0 }
     push @$defs, '-DPERL__UUID__RPC_INT';
@@ -112,11 +113,12 @@ sub try_e2fs {
     my ( $hdr, $tlib ) = @_;
     warn "# ===> Checking for e2fs interface in $hdr with -l$tlib\n" if DEBUG;
     eval { assert_lib(
-        lib      => $tlib,
-        header   => $hdr,
-        debug    => DEBUG,
-        libpath  => '/lib64 /usr/lib64',
-        function => qq/
+        lib         => $tlib,
+        header      => $hdr,
+        debug       => DEBUG,
+        libpath     => '/lib64 /usr/lib64',
+        not_execute => 1,
+        function    => join("\n", map { s/^\s+//; $_ } split("\n", q{
             int i;
             char s[37];
             uuid_t u,uu;
@@ -130,7 +132,7 @@ sub try_e2fs {
             i = uuid_compare(u,uu);
             i = uuid_is_null(u);
             return 0;
-        /,
+        })),
     )};
     if ($@) { my $L = length $@; warn "# ===> Err($L): \"$@\"\n" if DEBUG; return 0 }
     push @$defs, '-DPERL__UUID__E2FS_INT';
@@ -144,11 +146,12 @@ sub try_ossp {
     my ( $hdr, $tlib ) = @_;
     warn "# ===> Checking for ossp interface in $hdr with -l$tlib\n" if DEBUG;
     eval { assert_lib(
-        lib      => $tlib,
-        header   => $hdr,
-        debug    => DEBUG,
-        libpath  => '/lib64 /usr/lib64',
-        function => qq{
+        lib         => $tlib,
+        header      => $hdr,
+        debug       => DEBUG,
+        libpath     => '/lib64 /usr/lib64',
+        not_execute => 1,
+        function    => join("\n", map { s/^\s+//; $_ } split("\n", q{
             int i;
             size_t len;
             uuid_rc_t rc;
@@ -169,7 +172,7 @@ sub try_ossp {
             uuid_destroy(u);
             uuid_destroy(uu);
             return 0;
-        },
+        })),
     )};
     if ($@) { my $L = length $@; warn "# ===> Err($L): \"$@\"\n" if DEBUG; return 0 }
     push @$defs, '-DPERL__UUID__OSSP_INT';
@@ -183,13 +186,12 @@ sub try_win {
     my ( $hdr, $tlib ) = @_;
     warn "# ===> Checking for Win interface in $hdr with -l$tlib\n" if DEBUG;
     eval { assert_lib(
-        lib      => $tlib,
-        header   => [ $hdr, 'rpcdce.h' ],
-        debug    => DEBUG,
-        libpath  => '/lib64 /usr/lib64',
-        # this puts the typedef inside the main loop, but sometimes
-        # ya jus gotta wurk wit wat ya got!
-        function => join("\n", map { s/^\s+//; $_ } split("\n", q/
+        lib         => $tlib,
+        header      => [ $hdr, 'rpcdce.h' ],
+        debug       => DEBUG,
+        libpath     => '/lib64 /usr/lib64',
+        not_execute => 1,
+        function    => join("\n", map { s/^\s+//; $_ } split("\n", q{
             #ifndef RPC_CSTR
             typedef unsigned char* RPC_CSTR;
             #define UuidCreateSequential(x) UuidCreate(x)
@@ -207,7 +209,7 @@ sub try_win {
             i  = UuidIsNil(&u,&st);
             st = UuidFromString(cs,&u);
             return 0;
-        /)),
+        })),
     )};
     if ($@) { my $L = length $@; warn "# ===> Err($L): \"$@\"\n" if DEBUG; return 0 }
     push @$defs, '-DPERL__UUID__WIN_INT';
@@ -252,9 +254,23 @@ push @$defs, $header;
 
 warn "# ===> Writing Makefile\n" if DEBUG;
 
-my $EUMM_version = '6.64';
-my $DCL_version  = '1.14';
-my $TM_version   = 0;
+my $EX_version   = 0;      # Exporter
+my $DL_version   = 0;      # DynaLoader
+my $EUMM_version = '6.64'; # ExtUtils::MakeMaker
+my $DCL_version  = '1.14'; # Devel::CheckLib
+my $TM_version   = 0;      # Test::More
+
+my $UUID_version = get_uuidpm_version();
+
+sub get_uuidpm_version {
+    open my $fh, '<', 'UUID.pm' or die "open: UUID.pm: $!";
+    while (<$fh>) {
+        # $VERSION = '0.30_02';
+        return $1
+            if /^\$VERSION = '([\d\.\_]+)';$/;
+    }
+    return undef;
+}
 
 WriteMakefile1(
     'NAME'               => 'UUID',
@@ -267,7 +283,10 @@ WriteMakefile1(
     'DEFINE'             => join(' ', @$defs), #$header,
     'INC'                => '',
     'NO_MYMETA'          => 1,
-    'PREREQ_PM'          => {},
+    'PREREQ_PM'          => {
+        'DynaLoader' => $DL_version,
+        'Exporter'   => $EX_version,
+    },
     'CONFIGURE_REQUIRES' => {
         'Devel::CheckLib'     => $DCL_version,
         'ExtUtils::MakeMaker' => $EUMM_version,
@@ -276,13 +295,24 @@ WriteMakefile1(
         'ExtUtils::MakeMaker' => $EUMM_version,
     },
     'TEST_REQUIRES' => {
-        'Test::More' => $TM_version,
+        'DynaLoader'         => $DL_version,
+        'Exporter'           => $EX_version,
+        'Test::More'         => $TM_version,
+        'warnings'           => 0,
+        'strict'             => 0,
+        'CPAN::Meta'         => 0,
+        'ExtUtils::Manifest' => 0,
+        'lib'                => 0,
     },
-    #'META_MERGE'       => {
-    #    'resources' => {
-    #        #repository => 'URL to repository here',
-    #    },
-    #},
+    'META_MERGE' => {
+        'dynamic_config' => 0,
+        'provides' => {
+            'UUID' => {
+                'file'    => 'UUID.pm',
+                'version' => $UUID_version,
+            },
+        },
+    },
 );
 
 sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-upgrade.
@@ -290,7 +320,7 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
     my $eumm_version=$ExtUtils::MakeMaker::VERSION;
     $eumm_version=eval $eumm_version;
     die "EXTRA_META is deprecated" if exists $params{EXTRA_META};
-    die "License not specified" if not exists $params{LICENSE};
+    die "LICENSE not specified" if not exists $params{LICENSE};
     if ($params{BUILD_REQUIRES} and $eumm_version < 6.5503) {
         #EUMM 6.5502 has problems with BUILD_REQUIRES
         $params{PREREQ_PM}={ %{$params{PREREQ_PM} || {}} , %{$params{BUILD_REQUIRES}} };
@@ -302,6 +332,7 @@ sub WriteMakefile1 {  #Written by Alexandr Ciornii, version 0.21. Added by eumm-
     delete $params{META_MERGE} if $eumm_version < 6.46;
     delete $params{META_ADD} if $eumm_version < 6.46;
     delete $params{LICENSE} if $eumm_version < 6.31;
+    delete $params{NO_MYMETA} if $eumm_version < 6.58;
     delete $params{AUTHOR} if $] < 5.005;
     delete $params{ABSTRACT_FROM} if $] < 5.005;
     delete $params{BINARY_LOCATION} if $] < 5.005;
@@ -339,24 +370,68 @@ sub bail {
 
 package MY;
 
-sub postamble {
-    return <<EOP;
-readme: create_distdir
-	\$(NOECHO) \$(ECHO) Generating README
-	\$(NOECHO) pod2text UUID.pm README_new
-	\$(NOECHO) \$(ABSPERLRUN) -i -pe's{\\*(\\S+)\\*}{\\1}g' README_new
-	-\$(NOECHO) \$(MV) README_new \$(DISTVNAME)/README
-
-distreadme: create_distdir readme
-	\$(NOECHO) cd \$(DISTVNAME) && \$(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{README};' \\
-	  -e 'eval { maniadd({q{README} => q{Module README (added by MakeMaker)}}) }' \\
-	  -e '    or die "Could not add README to MANIFEST: \$\${'\\''\@'\\''}"' --
-EOP
-}
-
+# add distlicense and distreadme prereqs.
+# silence manicopy step during config.
 sub distdir {
     my $t = shift->SUPER::distdir(@_);
-    $t =~ s{^(distdir :.*?)\s*$}{$1 distreadme}m;
+    $t =~ s{^(distdir :.*?)\s*$}{$1 distlicense distreadme}m;
+    $t =~ s{PERLRUN}{NOECHO) \$(PERLRUN};
     $t;
+}
+
+# remove metafile comments in manifest.
+# make metafiles authoritative to cpan.
+sub distmeta {
+    my $t = <<'EOS';
+distmeta : create_distdir metafile
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{META.yml};' \
+	  -e 'eval { maniadd({ q{META.yml} => q{} }) }' \
+	  -e '    or die "Could not add META.yml to MANIFEST: $${'\''@'\''}"' --
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -f q{META.json};' \
+	  -e 'eval { maniadd({ q{META.json} => q{} }) }' \
+	  -e '    or die "Could not add META.json to MANIFEST: $${'\''@'\''}"' --
+EOS
+    $t;
+}
+
+# add UUID_DISTTEST flag to 'make disttest'
+sub dist_test {
+    my $t = shift->SUPER::dist_test(@_);
+    $t =~ s{ test }{ test UUID_DISTTEST=1 };
+    $t;
+}
+
+# add distlicense and distreadme targets
+sub postamble {
+    return <<'EOP';
+license: create_distdir
+	$(NOECHO) $(ECHO) Generating LICENSE
+	$(NOECHO) $(RM_F) LICENSE_new
+	$(NOECHO) $(ABSPERLRUN) -MSoftware::License::Artistic_2_0 \
+	  -e 'print Software::License::Artistic_2_0->new({holder => q{Rick Myers}, year => sprintf(qq{2014-%04d}, 1900+(localtime(time))[5])})->fulltext' \
+	  > LICENSE_new
+	$(NOECHO) $(MV) LICENSE_new $(DISTVNAME)/LICENSE
+
+distlicense: create_distdir license
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{LICENSE};' \
+	  -e 'eval { maniadd({ q{LICENSE} => q{} }) }' \
+	  -e '    or die "Could not add LICENSE to MANIFEST: $${'\''@'\''}"' --
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -e 'print sort <>' MANIFEST > MANIFEST_new
+	$(NOECHO) $(MV) $(DISTVNAME)/MANIFEST_new $(DISTVNAME)/MANIFEST
+
+readme: create_distdir
+	$(NOECHO) $(ECHO) Generating README
+	$(NOECHO) $(RM_F) README_new
+	$(NOECHO) pod2text UUID.pm README_new
+	$(NOECHO) $(ABSPERLRUN) -i -pe's{\*(\S+)\*}{\1}g' README_new
+	$(NOECHO) $(MV) README_new $(DISTVNAME)/README
+
+distreadme: create_distdir readme
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'exit unless -e q{README};' \
+	  -e 'eval { maniadd({ q{README} => q{} }) }' \
+	  -e '    or die "Could not add README to MANIFEST: $${'\''@'\''}"' --
+	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -e 'print sort <>' MANIFEST > MANIFEST_new
+	$(NOECHO) $(MV) $(DISTVNAME)/MANIFEST_new $(DISTVNAME)/MANIFEST
+EOP
 }
 

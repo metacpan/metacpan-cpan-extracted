@@ -1,7 +1,7 @@
 --- 
 abstract: Comma-Separated Values manipulation routines
 author: 
-  - H.Merijn Brand <hmbrand.org>
+  - H.Merijn Brand <hmbrand@cpan.org>
 build_requires: 
   Config: 0
 configure_requires: 
@@ -16,9 +16,9 @@ name: Text-CSV_XS
 provides: 
   Text::CSV_XS: 
     file: CSV_XS.pm
-    version: '1.52'
+    version: '1.53'
 recommends: 
-  Encode: '3.19'
+  Encode: '3.20'
 requires: 
   IO::Handle: 0
   Test::More: 0
@@ -31,4 +31,4 @@ resources:
   homepage: https://metacpan.org/pod/Text::CSV_XS
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Text-CSV_XS
-version: '1.52'
+version: '1.53'

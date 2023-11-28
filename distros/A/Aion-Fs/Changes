@@ -1,5 +1,19 @@
 Revision history for Perl extension Aion::Fs
 
+0.0.6 2023-11-15T09:59:00Z
+
+    - add unsupported os
+
+0.0.5 2023-11-15T09:28:51Z
+
+    - fix pod
+
+0.0.4 2023-11-15T09:21:57Z
+
+    - add see also in subroutines manual
+    - fix mkpath for working paths from root
+    - add subroutines: to_pkg and from_pkg
+
 0.0.3 2023-10-19T15:34:24Z
 
     - mtime in unixtime in subsecond resolution (from Time::HiRes::stat)

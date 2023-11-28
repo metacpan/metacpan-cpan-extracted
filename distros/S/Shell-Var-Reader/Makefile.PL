@@ -34,6 +34,8 @@ my %WriteMakefileArgs = (
 		'Rex::CMDB::TOML'    => '0.0.1',
 		'JSON::Path'         => '1.0.3',
 		'Hash::Flatten'      => '0',
+		'File::Slurp'        => '0',
+		'File::ShareDir'     => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Shell-Var-Reader-*' },

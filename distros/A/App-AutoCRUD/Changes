@@ -1,5 +1,9 @@
 Revision history for Plack-App-AutoCRUD
 
+0.15 25.11.2023
+  - sort paths in alphabetic order so that they are always displayed in the same order
+  - fixed inaccuracies in pod doc for App::AutoCRUD::ConfigDomain
+
 0.14 03.02.2021
   - pod documentation updated
   - fixed failing pod test

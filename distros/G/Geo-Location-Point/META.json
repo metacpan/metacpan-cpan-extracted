@@ -34,7 +34,6 @@
          "requires" : {
             "Carp" : "0",
             "GIS::Distance" : "0",
-            "TimeZone::TimeZoneDB" : "0",
             "perl" : "5.010000"
          }
       },
@@ -62,6 +61,6 @@
          "x_repository" : "https://github.com/nigelhorne/Geo-Location-Point"
       }
    },
-   "version" : "0.09",
+   "version" : "0.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

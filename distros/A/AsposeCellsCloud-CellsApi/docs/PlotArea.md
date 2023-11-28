@@ -8,10 +8,10 @@ use AsposeCellsCloud::Object::PlotArea;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**InnerHeight** | **int** |  |
-**InnerWidth** | **int** |  |
-**InnerX** | **int** |  |
-**InnerY** | **int** |  |
+**InnerHeight** | **int** | Gets or sets the height of plot area in units of 1/4000 of the chart area. |
+**InnerWidth** | **int** | Gets or sets the width  of plot area in units of 1/4000 of the chart area. |
+**InnerX** | **int** | Gets or gets the x coordinate of the upper top corner of plot area in units of 1/4000 of the chart area. |
+**InnerY** | **int** | Gets or gets the x coordinate of the upper top corner of plot area in units of 1/4000 of the chart area. |
 **Area** | **Area** |  |
 **AutoScaleFont** | **boolean** |  |
 **BackgroundMode** | **string** |  |

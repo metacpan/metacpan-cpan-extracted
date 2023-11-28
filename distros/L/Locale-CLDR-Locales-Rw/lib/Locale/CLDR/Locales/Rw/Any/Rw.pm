@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Rw::Any::Rw - Package for language Kinyarwanda
 
 package Locale::CLDR::Locales::Rw::Any::Rw;
 # This file auto generated from Data\common\main\rw_RW.xml
-#	on Fri 13 Oct  9:36:07 am GMT
+#	on Sat  4 Nov  6:22:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

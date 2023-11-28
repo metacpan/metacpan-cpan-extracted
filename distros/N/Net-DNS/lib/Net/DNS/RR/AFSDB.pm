@@ -2,7 +2,7 @@ package Net::DNS::RR::AFSDB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: AFSDB.pm 1898 2023-02-15 14:27:22Z willem $)[2];
+our $VERSION = (qw$Id: AFSDB.pm 1945 2023-11-22 08:02:31Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,10 +19,10 @@ use Net::DNS::DomainName;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset ) = @_;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
 	$self->{subtype}  = unpack "\@$offset n", $$data;
-	$self->{hostname} = Net::DNS::DomainName2535->decode( $data, $offset + 2 );
+	$self->{hostname} = Net::DNS::DomainName2535->decode( $data, $offset + 2, @opaque );
 	return;
 }
 

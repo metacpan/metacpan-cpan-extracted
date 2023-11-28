@@ -1,0 +1,105 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Schedule::Task {
+  allow Go::Schedule;
+  
+  use Sys::Time;
+  use Sys::Time::Timeval;
+  use Sys::Time::Timespec;
+  use Sys::Poll::PollfdArray;
+  use Sys::Poll::Constant as POLL;
+  use Sys::Poll;
+  
+  has schedule : Go::Schedule;
+  
+  private static method new : Go::Schedule::Task () {
+    
+    my $self = new Go::Schedule::Task;
+    
+    return $self;
+  }
+  
+  private method : void () {
+    
+    my $schedule = $self->{schedule};
+    
+    my $poll = $schedule->{poll};
+    
+    my $loop_count = 0;
+    while (1) {
+      
+      my $coroutines = $schedule->{coroutines};
+      
+      if ($coroutines->length == 0) {
+        last;
+      }
+      
+      my $check_io = $loop_count % 60 == 0;
+      
+      if ($check_io) {
+        $poll->check;
+      }
+      else {
+        my $coroutine = (Go::Coroutine)undef;
+        
+        if ($coroutines->length > 0) {
+          $coroutine = (Go::Coroutine)$coroutines->shift;
+        }
+        
+        if ($coroutine->{finished}) {
+          $schedule->{current_coroutine} = undef;
+        }
+        elsif ($coroutine->{disable}) {
+          $coroutines->push($coroutine);
+        }
+        else {
+          my $is_over_deadline = 0;
+          
+          my $deadline_base_timer = $coroutine->{deadline_base_timer};
+          my $after = $coroutine->{after};
+
+          if ($deadline_base_timer) {
+            
+            $is_over_deadline = Go::Schedule->is_over_deadline($deadline_base_timer, $after);
+            
+            if ($is_over_deadline) {
+              $coroutine->{deadline_base_timer} = undef;
+            }
+            else {
+              $coroutines->push($coroutine);
+            }
+          }
+          else {
+            $is_over_deadline = 1;
+          }
+          
+          my $fd = $coroutine->{fd};
+          if ($fd >= 0) {
+            $coroutine->{disable} = 1;
+            my $coroutine_address = Fn->to_address($coroutine);
+            $schedule->{poll}->{coroutines_h}->set($coroutine_address, $coroutine);
+            $coroutines->push($coroutine);
+          }
+          else {
+            if ($is_over_deadline) {
+              
+              my $schedule_task_coroutine = $schedule->{schedule_task_coroutine};
+              
+              $coroutines->push($coroutine);
+              
+              $coroutine->{return_back} = $schedule_task_coroutine;
+              
+              $schedule->{current_coroutine} = $coroutine;
+              
+              Go::Coroutine->transfer($schedule_task_coroutine, $coroutine);
+            }
+          }
+        }
+      }
+      
+      $loop_count++;
+    }
+  }
+  
+}

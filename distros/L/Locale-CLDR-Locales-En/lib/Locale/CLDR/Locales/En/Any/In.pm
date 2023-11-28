@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::In - Package for language English
 
 package Locale::CLDR::Locales::En::Any::In;
 # This file auto generated from Data\common\main\en_IN.xml
-#	on Fri 13 Oct  9:13:21 am GMT
+#	on Sat  4 Nov  5:59:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';
@@ -396,6 +396,10 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(=%spellout-numbering=),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(←← point →→),
+				},
 				'100' => {
 					base_value => q(100),
 					divisor => q(100),
@@ -439,13 +443,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(not a number),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(←← point →→),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(←← point →→),
+					rule => q(not a number),
 				},
 			},
 		},

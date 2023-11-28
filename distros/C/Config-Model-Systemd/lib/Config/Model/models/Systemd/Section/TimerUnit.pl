@@ -24,74 +24,110 @@ return [
       'FailureAction',
       {
         'choice' => [
+          'exit',
+          'exit-force',
+          'halt',
+          'halt-force',
+          'halt-immediate',
+          'kexec',
+          'kexec-force',
           'none',
-          'reboot',
-          'reboot-force',
-          'reboot-immediate',
           'poweroff',
           'poweroff-force',
           'poweroff-immediate',
-          'exit',
-          'exit-force'
+          'reboot',
+          'reboot-force',
+          'reboot-immediate',
+          'soft-reboot',
+          'soft-reboot-force'
         ],
-        'description' => 'Configure the action to take when the unit stops and enters a failed state or inactive state.
-Takes one of C<none>, C<reboot>, C<reboot-force>,
-C<reboot-immediate>, C<poweroff>, C<poweroff-force>,
-C<poweroff-immediate>, C<exit>, and C<exit-force>. In system mode,
-all options are allowed. In user mode, only C<none>, C<exit>, and
-C<exit-force> are allowed. Both options default to C<none>.
+        'description' => 'Configure the action to take when the unit stops and enters a failed state or
+inactive state.  Takes one of C<none>, C<reboot>,
+C<reboot-force>, C<reboot-immediate>, C<poweroff>,
+C<poweroff-force>, C<poweroff-immediate>, C<exit>,
+C<exit-force>, C<soft-reboot>, C<soft-reboot-force>,
+C<kexec>, C<kexec-force>, C<halt>,
+C<halt-force> and C<halt-immediate>. In system mode, all options are
+allowed. In user mode, only C<none>, C<exit>,
+C<exit-force>, C<soft-reboot> and C<soft-reboot-force> are
+allowed. Both options default to C<none>.
 
-If C<none> is set, no action will be triggered. C<reboot> causes a reboot
-following the normal shutdown procedure (i.e. equivalent to systemctl reboot).
-C<reboot-force> causes a forced reboot which will terminate all processes forcibly but should
-cause no dirty file systems on reboot (i.e. equivalent to systemctl reboot -f) and
-C<reboot-immediate> causes immediate execution of the
-L<reboot(2)> system call, which
-might result in data loss (i.e. equivalent to systemctl reboot -ff). Similarly,
-C<poweroff>, C<poweroff-force>, C<poweroff-immediate> have the effect
-of powering down the system with similar semantics. C<exit> causes the manager to exit following
-the normal shutdown procedure, and C<exit-force> causes it terminate without shutting down
-services. When C<exit> or C<exit-force> is used by default the exit status of the
-main process of the unit (if this applies) is returned from the service manager. However, this may be overridden
-with C<FailureActionExitStatus>/C<SuccessActionExitStatus>, see
-below.',
+If C<none> is set, no action will be triggered. C<reboot> causes a
+reboot following the normal shutdown procedure (i.e. equivalent to systemctl
+reboot).  C<reboot-force> causes a forced reboot which will terminate all
+processes forcibly but should cause no dirty file systems on reboot (i.e. equivalent to
+systemctl reboot -f) and C<reboot-immediate> causes immediate
+execution of the
+L<reboot(2)> system
+call, which might result in data loss (i.e. equivalent to systemctl reboot -ff).
+Similarly, C<poweroff>, C<poweroff-force>,
+C<poweroff-immediate>, C<kexec>, C<kexec-force>,
+C<halt>, C<halt-force> and C<halt-immediate> have the
+effect of powering down the system, executing kexec, and halting the system respectively with similar
+semantics. C<exit> causes the manager to exit following the normal shutdown procedure,
+and C<exit-force> causes it terminate without shutting down services. When
+C<exit> or C<exit-force> is used by default the exit status of the main
+process of the unit (if this applies) is returned from the service manager. However, this may be
+overridden with
+C<FailureActionExitStatus>/C<SuccessActionExitStatus>, see below.
+C<soft-reboot> will trigger a userspace reboot operation.
+C<soft-reboot-force> does that too, but does not go through the shutdown transaction
+beforehand.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },
       'SuccessAction',
       {
         'choice' => [
+          'exit',
+          'exit-force',
+          'halt',
+          'halt-force',
+          'halt-immediate',
+          'kexec',
+          'kexec-force',
           'none',
-          'reboot',
-          'reboot-force',
-          'reboot-immediate',
           'poweroff',
           'poweroff-force',
           'poweroff-immediate',
-          'exit',
-          'exit-force'
+          'reboot',
+          'reboot-force',
+          'reboot-immediate',
+          'soft-reboot',
+          'soft-reboot-force'
         ],
-        'description' => 'Configure the action to take when the unit stops and enters a failed state or inactive state.
-Takes one of C<none>, C<reboot>, C<reboot-force>,
-C<reboot-immediate>, C<poweroff>, C<poweroff-force>,
-C<poweroff-immediate>, C<exit>, and C<exit-force>. In system mode,
-all options are allowed. In user mode, only C<none>, C<exit>, and
-C<exit-force> are allowed. Both options default to C<none>.
+        'description' => 'Configure the action to take when the unit stops and enters a failed state or
+inactive state.  Takes one of C<none>, C<reboot>,
+C<reboot-force>, C<reboot-immediate>, C<poweroff>,
+C<poweroff-force>, C<poweroff-immediate>, C<exit>,
+C<exit-force>, C<soft-reboot>, C<soft-reboot-force>,
+C<kexec>, C<kexec-force>, C<halt>,
+C<halt-force> and C<halt-immediate>. In system mode, all options are
+allowed. In user mode, only C<none>, C<exit>,
+C<exit-force>, C<soft-reboot> and C<soft-reboot-force> are
+allowed. Both options default to C<none>.
 
-If C<none> is set, no action will be triggered. C<reboot> causes a reboot
-following the normal shutdown procedure (i.e. equivalent to systemctl reboot).
-C<reboot-force> causes a forced reboot which will terminate all processes forcibly but should
-cause no dirty file systems on reboot (i.e. equivalent to systemctl reboot -f) and
-C<reboot-immediate> causes immediate execution of the
-L<reboot(2)> system call, which
-might result in data loss (i.e. equivalent to systemctl reboot -ff). Similarly,
-C<poweroff>, C<poweroff-force>, C<poweroff-immediate> have the effect
-of powering down the system with similar semantics. C<exit> causes the manager to exit following
-the normal shutdown procedure, and C<exit-force> causes it terminate without shutting down
-services. When C<exit> or C<exit-force> is used by default the exit status of the
-main process of the unit (if this applies) is returned from the service manager. However, this may be overridden
-with C<FailureActionExitStatus>/C<SuccessActionExitStatus>, see
-below.',
+If C<none> is set, no action will be triggered. C<reboot> causes a
+reboot following the normal shutdown procedure (i.e. equivalent to systemctl
+reboot).  C<reboot-force> causes a forced reboot which will terminate all
+processes forcibly but should cause no dirty file systems on reboot (i.e. equivalent to
+systemctl reboot -f) and C<reboot-immediate> causes immediate
+execution of the
+L<reboot(2)> system
+call, which might result in data loss (i.e. equivalent to systemctl reboot -ff).
+Similarly, C<poweroff>, C<poweroff-force>,
+C<poweroff-immediate>, C<kexec>, C<kexec-force>,
+C<halt>, C<halt-force> and C<halt-immediate> have the
+effect of powering down the system, executing kexec, and halting the system respectively with similar
+semantics. C<exit> causes the manager to exit following the normal shutdown procedure,
+and C<exit-force> causes it terminate without shutting down services. When
+C<exit> or C<exit-force> is used by default the exit status of the main
+process of the unit (if this applies) is returned from the service manager. However, this may be
+overridden with
+C<FailureActionExitStatus>/C<SuccessActionExitStatus>, see below.
+C<soft-reboot> will trigger a userspace reboot operation.
+C<soft-reboot-force> does that too, but does not go through the shutdown transaction
+beforehand.',
         'type' => 'leaf',
         'value_type' => 'enum'
       },

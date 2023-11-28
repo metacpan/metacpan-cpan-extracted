@@ -13,7 +13,7 @@ return 1 if caller;
 plan skip_all => "Net::OpenSSH does not work on Windows" if $^O eq 'MSWin32'; # but it can still be installed
 plan 'no_plan';
 
-my @std_master_opts = qw(-oPasswordAuthentication=no -oBatchMode=yes);
+my @std_master_opts = qw(-oPasswordAuthentication=no -oBatchMode=yes -oConnectTimeout=3);
 
 my $doit = Doit->init;
 

@@ -1,2 +1,11 @@
+0.03 2023-11-14T15:21:19+01:00
+ - Add doc for Kramerius object.
+ - Add test for Kramerius url() method.
+ - Move MARC::Convert::Wikidata::Object::Utils to Mo::utils::Date.
+
+0.02 2023-11-13T00:00:03+01:00
+ - Add "defaults => []" for 'compilers' parameter. Same as other.
+ - Improve doc.
+
 0.01 2023-05-26T09:58:59+02:00
  - First version.

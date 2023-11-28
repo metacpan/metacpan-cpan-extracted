@@ -71,7 +71,7 @@
    "provides" : {
       "Sidef" : {
          "file" : "lib/Sidef.pm",
-         "version" : "23.10"
+         "version" : "23.11"
       },
       "Sidef::Deparse::Perl" : {
          "file" : "lib/Sidef/Deparse/Perl.pm"
@@ -196,6 +196,9 @@
       "Sidef::Types::Number::Polynomial" : {
          "file" : "lib/Sidef/Types/Number/Polynomial.pm"
       },
+      "Sidef::Types::Number::PolynomialMod" : {
+         "file" : "lib/Sidef/Types/Number/PolynomialMod.pm"
+      },
       "Sidef::Types::Number::Quadratic" : {
          "file" : "lib/Sidef/Types/Number/Quadratic.pm"
       },
@@ -249,6 +252,6 @@
          "url" : "https://github.com/trizen/sidef"
       }
    },
-   "version" : "23.10",
+   "version" : "23.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

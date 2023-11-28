@@ -1,0 +1,112 @@
+=pod
+
+=head1 NAME
+
+Time::Out - Easily timeout long running operations
+
+=head1 SYNOPSIS
+
+  use Time::Out qw( timeout );
+
+  timeout $timeout => sub {
+    # your operation is implemented here and will be interrupted
+    # if it runs for more than $timeout seconds
+  };
+  if ( $@ ) {
+    # operation timed-out
+  }
+
+=head1 DESCRIPTION
+
+The C<Time::Out> module provides an easy interface to alarm(2) based timeouts.
+Nested timeouts are supported. The module exports the C<timeout()> function by
+default. The function returns whatever the code placed inside the subroutine
+reference returns:
+
+  use Time::Out qw( timeout );
+
+  my $result = timeout 5 => sub {
+    return 7;
+  };
+  # $result == 7
+
+If C<Time::Out> sees that L<Time::HiRes> has been loaded, it will use that
+C<alarm()> function (if available) instead of the default one, allowing float
+timeout values to be used effectively:
+
+  use Time::HiRes qw();
+  use Time::Out   qw( timeout );
+
+  timeout 3.1416 => sub {
+    # ...
+  };
+
+=head1 CAVEATS
+
+=over 2
+
+=item Blocking I/O on MSWin32
+
+alarm(2) doesn't interrupt blocking I/O on MSWin32, so C<timeout()> won't do
+that either.
+
+=item @_
+
+One drawback to using C<timeout()> is that it masks C<@_> in the affected
+code.  This happens because the affected code is actually wrapped inside
+another subroutine that provides it's own C<@_>. You can get around this by
+specifically passing your C<@_> (or whatever you want for that matter) to
+C<timeout()> as such:
+
+  use Time::Out qw( timeout );
+
+  sub foo {
+    timeout 5, @_ => sub {
+      @_;
+    };
+  }
+  my @result = foo( 42, "Hello, World!" );
+  # @result == ( 42, "Hello, World!" );
+
+=item Eval inside timeout
+
+If the affected code has its own exception handling using L<Try::Tiny> for
+example, the catch block has to be amended in a way so that it will rethrow an
+exception, if it refers to a timeout:
+
+  use Scalar::Util qw( blessed  );
+  use Time::Out    qw( timeout );
+  use Try::Tiny    qw( catch try );
+
+  timeout 5, sub {
+    try {
+      select( undef, undef, undef, 7 );
+      die "bad\n";
+    } catch {
+      # rethrow exception, if it refers to a timeout
+      die $_ if blessed $_ && $_->isa( 'Time::Out::Exception' );
+      # handle all other exceptions
+    }
+  };
+
+=back
+
+=head1 SEE ALSO
+
+alarm(2), L<Sys::AlarmCall>
+
+=head1 AUTHORS
+
+Sven Willenbuecher, E<lt>sven.willenbuecher@gmx.deE<gt>
+
+Patrick LeBoutillier, E<lt>patl@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2005-2008 Patrick LeBoutillier, 2023 by Sven
+Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+
+=cut

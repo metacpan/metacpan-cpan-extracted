@@ -6,15 +6,39 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '4.18';
+our $VERSION = '5.01';
 
 Travel::Status::DE::HAFAS::Message->mk_ro_accessors(
-	qw(short text code prio is_him ref_count));
+	qw(short type text code prio is_him ref_count));
 
 sub new {
 	my ( $obj, %conf ) = @_;
 
-	my $ref = \%conf;
+	my $json   = $conf{json};
+	my $is_him = $conf{is_him};
+
+	my $short = $json->{txtS};
+	my $text  = $json->{txtN};
+	my $type  = $json->{type};
+	my $code  = $json->{code};
+	my $prio  = $json->{prio};
+
+	if ($is_him) {
+		$short = $json->{head};
+		$text  = $json->{text};
+		$code  = $json->{hid};
+	}
+
+	my $ref = {
+		short     => $short,
+		text      => $text,
+		type      => $type,
+		code      => $code,
+		prio      => $prio,
+		is_him    => $is_him,
+		ref_count => $conf{ref_count},
+	};
+
 	bless( $ref, $obj );
 
 	return $ref;
@@ -45,7 +69,7 @@ Travel::Status::DE::HAFAS::Message - An arrival/departure-related message.
 
 =head1 VERSION
 
-version 4.18
+version 5.01
 
 =head1 DESCRIPTION
 
@@ -67,6 +91,56 @@ string such as "Information". Does not contain newlines.
 =item $message->text
 
 Detailed message content. Does not contain newlines.
+
+=item $message->code
+
+Two-digit message code, seems to be only used with messages of type "A".
+Details unknown.
+
+=item $message->type
+
+A single character indicating the message type.
+The following types are known:
+
+=over
+
+=item A
+
+Generic information about a specific trip such as "WiFi available", "air
+conditioning", "DB tickets are not valid here", or "from here on as [line]
+towards [destination]".
+
+=item C
+
+"Current information available", "Journey cancelled", "connection may not be caught", possibly more.
+
+=item D
+
+Large-scale disruption, e.g. medical emergency on line.
+
+=item G
+
+Platform change, possibly more.
+
+=item H
+
+Misc stuff such as "Journey contains trains with mandatory reservation" or
+"ICE Sprinter".
+
+=item L
+
+Replacement journey
+
+=item M
+
+Free-text infos about construction sites, broken elevators, large events and
+similar occasions.
+
+=item P
+
+Journey has been cancelled, possibly more.
+
+=back
 
 =item $message->ref_count
 
@@ -104,7 +178,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2020-2022 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2020-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

@@ -1,5 +1,12 @@
 Revision history for Perl module HTML::Object
 
+v0.3.1 2023-11-06T12:37:30+0900
+    - Improved code for speed
+
+v0.3.0 2023-11-05T19:38:07+0900
+    - Corrected documentation bad link in HTML::Object::DOM::Element::Input
+    - Added new HTML element 'search' with class HTML::Object::DOM::Element::Search
+
 v0.2.9 2023-10-11T16:58:57+0900
     - Corrected malformed signature for distribution release
 

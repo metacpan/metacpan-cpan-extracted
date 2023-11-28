@@ -1,0 +1,65 @@
+[Unit]
+Description=[% vars.description %]
+
+[% IF vars.after %]
+After=[% vars.after %]
+[% ELSE %]
+After=syslog.target network-online.target
+[% END %]
+
+[% IF vars.start_limit_interval_sec %]
+StartLimitIntervalSec=[% vars.start_limit_interval_sec %]
+[% ELSE %]
+StartLimitIntervalSec=0
+[% END %]
+
+[Service]
+Type=simple
+
+[% IF vars.user %]
+User=[% vars.user %]
+[% END %]
+
+[% IF vars.user %]
+Group=[% vars.group %]
+[% END %]
+
+[% FOREACH start_pre IN vars.start_pre %]
+ExecStartPre=[% start_pre %]
+
+[% END %]
+
+ExecStart=[% vars.start %]
+
+[% IF vars.reload %]
+ExecReload=[% vars.reload %]
+[% END %]
+
+[% IF vars.stop %]
+ExecStop=[% vars.stop %]
+[% END %]
+
+[% IF vars.kill_mode %]
+KillMode=[% vars.kill_mode %]
+[% END %]
+
+[% IF vars.timeout_start_sec %]
+TimeoutStartSec=[% vars.timeout_start_sec %]
+[% ELSE %]
+TimeoutStartSec=300
+[% END %]
+
+[% IF vars.restart %]
+Restart=[% vars.restart %]
+[% ELSE %]
+Restart=always
+[% END %]
+
+[% IF vars.restart_sec %]
+RestartSec=[% vars.restart_sec %]
+[% ELSE %]
+RestartSec=3
+[% END %]
+
+[Install]
+WantedBy=multi-user.target

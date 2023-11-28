@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/kaz-utashiro/Text-VisualPrintf.svg?branch=master)](https://travis-ci.com/kaz-utashiro/Text-VisualPrintf) [![MetaCPAN Release](https://badge.fury.io/pl/Text-VisualPrintf.svg)](https://metacpan.org/release/Text-VisualPrintf)
+[![MetaCPAN Release](https://badge.fury.io/pl/Text-VisualPrintf.svg)](https://metacpan.org/release/Text-VisualPrintf)
 # NAME
 
 Text::VisualPrintf - printf family functions to handle Non-ASCII characters
@@ -15,12 +15,16 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 # VERSION
 
-Version 4.01
+Version 4.03
 
 # DESCRIPTION
 
-Text::VisualPrintf is a almost-printf-compatible library with a
-capability of handling multi-byte wide characters properly.
+**Text::VisualPrintf** is a almost-printf-compatible library with a
+capability of handling:
+
+    - Multi-byte wide characters
+    - Combining characters
+    - Backspaces
 
 When the given string is truncated by the maximum precision, space
 character is padded if the wide character does not fit to the remained
@@ -41,36 +45,31 @@ space.
 
 # VARIABLES
 
-- $VISUAL\_WIDTH
+- $REORDER
 
-    Hold a function reference to calculate visual width of given string.
-    Default function is `Text::VisualWidth::PP::width`.
+    The original `printf` function has the ability to specify the
+    arguments to be targeted by the position specifier, but by default
+    this module assumes that the arguments will appear in the given order,
+    so you will not get the expected result. If you wish to use it, set
+    the package variable `$REORDER` to 1.
 
-- $IS\_TARGET
-
-    Hold a regexp object of funciton reference to test if the given string
-    is subject of replacement.  Default is `qr/[\e\b\P{ASCII}]/`, and
-    test if the string include `ESCAPE` or `BACKSPACE` or non-ASCII
-    characters.
+    By doing so, the order in which arguments appear can be changed and
+    the same argument can be processed even if it appears more than once.
 
 # IMPLEMENTATION NOTES
 
 Strings in the LIST which contains wide-width character are replaced
-before formatting, and recovered after the process.
-
-Unique replacement string contains combinations of two ASCII
-characters not found in the format string and all parameters.  If two
-characters are not available, function behaves just like a standard
-one.
+before formatting, and recovered after the process.  Replacement is
+implemented in the [Text::Conceal](https://metacpan.org/pod/Text%3A%3AConceal) module.
 
 # SEE ALSO
 
-[Text::VisualPrintf](https://metacpan.org/pod/Text::VisualPrintf), [Text::VisualPrintf::IO](https://metacpan.org/pod/Text::VisualPrintf::IO),
-[https://github.com/kaz-utashiro/Text-VisualPrintf](https://github.com/kaz-utashiro/Text-VisualPrintf)
+[Text::VisualPrintf](https://metacpan.org/pod/Text%3A%3AVisualPrintf), [Text::VisualPrintf::IO](https://metacpan.org/pod/Text%3A%3AVisualPrintf%3A%3AIO),
+[https://github.com/tecolicom/Text-VisualPrintf](https://github.com/tecolicom/Text-VisualPrintf)
 
-[Text::Conceal](https://metacpan.org/pod/Text::Conceal), [https://github.com/kaz-utashiro/Text-Conceal](https://github.com/kaz-utashiro/Text-Conceal)
+[Text::Conceal](https://metacpan.org/pod/Text%3A%3AConceal), [https://github.com/tecolicom/Text-Conceal](https://github.com/tecolicom/Text-Conceal)
 
-[Text::ANSI::Printf](https://metacpan.org/pod/Text::ANSI::Printf), [https://github.com/kaz-utashiro/Text-ANSI-Printf](https://github.com/kaz-utashiro/Text-ANSI-Printf)
+[Text::ANSI::Printf](https://metacpan.org/pod/Text%3A%3AANSI%3A%3APrintf), [https://github.com/tecolicom/Text-ANSI-Printf](https://github.com/tecolicom/Text-ANSI-Printf)
 
 # AUTHOR
 
@@ -78,7 +77,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2011-2020 Kazumasa Utashiro.
+Copyright 2011-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

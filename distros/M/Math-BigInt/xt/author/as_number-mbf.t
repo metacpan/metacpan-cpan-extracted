@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 2;
+use Test::More;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigFloat;
@@ -29,3 +29,5 @@ subtest '$x = Math::BigFloat -> new("2"); $y = $x -> as_number();' => sub {
     cmp_ok($y, "==", 2, '$y == 2');
     isnt(refaddr($x), refaddr($y), '$x and $y are different objects');
 };
+
+done_testing();

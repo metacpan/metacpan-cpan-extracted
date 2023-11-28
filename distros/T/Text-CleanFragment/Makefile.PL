@@ -52,7 +52,7 @@ my %module = (
         'Text::Unidecode'    => 0, # for transliteration
     },
     TEST_REQUIRES => {
-                        'Test::More'   => '0',
+                        'Test2::V0'    => '0',
                         'Data::Dumper' => '0',
                         'utf8'         => '0',
     },

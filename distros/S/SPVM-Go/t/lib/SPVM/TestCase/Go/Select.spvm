@@ -1,0 +1,239 @@
+class TestCase::Go::Select {
+  use Go;
+  use Sort;
+  
+  our $RESULT : IntList;
+  
+  static method minimal : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make;
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        $ch->write(1);
+      });
+      
+      my $select = Go->new_select;
+      
+      $select->add_read($ch);
+      
+      my $result = $select->select;
+      
+      my $value = (int)$result->value;
+      
+      my $ok = $result->ok;
+      
+      $RESULT->push($value);
+      
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [1])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method blocking : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch0 = Go->make;
+      
+      my $ch1 = Go->make;
+      
+      my $ch2 = Go->make;
+      
+      my $ch3 = Go->make;
+      
+      Go->go([has ch0 : Go::Channel = $ch0, has ch1 : Go::Channel = $ch1, has ch2 : Go::Channel = $ch2, has ch3 : Go::Channel = $ch3] method : void () {
+        
+        my $ch0 = $self->{ch0};
+        
+        $ch0->write(4);
+        
+        my $ch1 = $self->{ch1};
+        
+        $ch1->write(3);
+        
+        my $ch2 = $self->{ch2};
+        
+        $ch2->write(2);
+        
+        my $ch3 = $self->{ch3};
+        
+        my $ok = 0;
+        
+        my $value = (int)$ch3->read(\$ok);
+        
+        $RESULT->push($value);
+        
+      });
+      
+      my $select = Go->new_select;
+      
+      $select->add_read($ch2);
+      
+      $select->add_read($ch1);
+      
+      $select->add_read($ch0);
+      
+      $select->add_write($ch3 => 1);
+      
+      while (1) {
+        my $result = $select->select;
+        
+        my $ok = $result->ok;
+        
+        if ($ok) {
+          my $ch = $result->channel;
+          
+          my $is_write = $result->is_write;
+          
+          if ($is_write) {
+            $select->remove_write($ch);
+          }
+          else {
+            my $value = (int)$result->value;
+            
+            $RESULT->push($value);
+            
+            $select->remove_read($ch);
+          }
+        }
+        
+        if ($select->is_empty) {
+          last;
+        }
+      }
+      
+    });
+    
+    Go->gosched;
+    
+    my $got = $RESULT->to_array;
+    
+    Sort->sort_int_asc($got);
+    
+    unless (Array->equals_int($got, [1, 2, 3, 4])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method non_blocking : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch0 = Go->make;
+      
+      my $ch1 = Go->make;
+      
+      my $ch2 = Go->make;
+      
+      my $ch3 = Go->make;
+      
+      Go->go([has ch0 : Go::Channel = $ch0, has ch1 : Go::Channel = $ch1, has ch2 : Go::Channel = $ch2, has ch3 : Go::Channel = $ch3] method : void () {
+        
+        my $ch0 = $self->{ch0};
+        
+        $ch0->write(1);
+        
+        my $ch1 = $self->{ch1};
+        
+        $ch1->write(2);
+        
+        my $ch2 = $self->{ch2};
+        
+        $ch2->write(3);
+        
+        my $ch3 = $self->{ch3};
+        
+        my $ok = 0;
+        
+        my $value = (int)$ch3->read(\$ok);
+        
+        $RESULT->push($value);
+        
+      });
+      
+      my $select = Go->new_select;
+      
+      $select->set_non_blocking(1);
+      
+      $select->add_read($ch2);
+      
+      $select->add_read($ch1);
+      
+      $select->add_read($ch0);
+      
+      $select->add_write($ch3 => 4);
+      
+      while (1) {
+        my $result = $select->select;
+        
+        if ($result) {
+          my $ok = $result->ok;
+          
+          if ($ok) {
+            my $ch = $result->channel;
+            
+            my $is_write = $result->is_write;
+            
+            if ($is_write) {
+              $select->remove_write($ch);
+            }
+            else {
+              my $value = (int)$result->value;
+              
+              $RESULT->push($value);
+              
+              $select->remove_read($ch);
+            }
+          }
+          
+          if ($select->is_empty) {
+            last;
+          }
+        }
+        else {
+          warn "[Test Output]Non-blocking select returns undef";
+          Go->gosched;
+        }
+      }
+      
+    });
+    
+    
+    Go->gosched;
+    
+    my $got = $RESULT->to_array;
+    
+    Sort->sort_int_asc($got);
+    
+    unless (Array->equals_int($got, [1, 2, 3, 4])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+}

@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     "Module::Load::Util" => "0.009",
     "Role::Tiny" => 0,
     "Role::Tiny::With" => 0,
-    "TableDataRole::Spec::Basic" => "0.2.0",
+    "TableDataRole::Spec::Basic" => "0.2.5",
     "TableDataRole::Spec::GetRowByPos" => 0,
     "Text::CSV_XS" => 0,
     "alias::module" => 0,
@@ -48,7 +48,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.017",
+  "VERSION" => "0.019",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,7 +69,7 @@ my %FallbackPrereqs = (
   "Module::Load::Util" => "0.009",
   "Role::Tiny" => 0,
   "Role::Tiny::With" => 0,
-  "TableDataRole::Spec::Basic" => "0.2.0",
+  "TableDataRole::Spec::Basic" => "0.2.5",
   "TableDataRole::Spec::GetRowByPos" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",

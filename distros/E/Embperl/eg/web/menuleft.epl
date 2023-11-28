@@ -1,4 +1,4 @@
-
+[* no warnings "uninitialized" ; *]
 [$ sub menuitem $]
 [*
 my ($url, $txt, $state, $tablebg, $ndx) = @_ ; 
@@ -55,8 +55,22 @@ local $^W = 0 ;
 $r = shift ;
 $app  = $r -> app ;
 -]
-
 <table width="152" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td>
+          <p>&nbsp;</p>
+        </td>
+    </tr>
+    <tr>
+        <td valign="top" width="100%" align="center"><img src="[+ $r -> {imageuri} +]EmbperlLogo.gif" width="74" height="74"border="0">
+        </td>
+    </tr>
+    <tr>
+        <td>
+          <p>&nbsp;</p>
+        </td>
+    </tr>
+
   <tr> 
     <td><img src="[+ $r -> {imageuri} +]h_content.gif" width="152" height="19"><br></td>
   </tr>
@@ -82,12 +96,13 @@ $app  = $r -> app ;
     <tr> 
         <td><img src="[+ $r -> {imageuri} +]linie-nav.gif" width="152" height="1"></td>
     </tr>
-    [- menuitem ($r -> {baseuri} . 'pod/doc/Embperl.-page-19-.htm', 'Stable 2.4.0', 0, 1) -]
+    [- $linkuri = $r -> {baseuri} . ($epreq -> param -> language eq 'de'?'pod/doc/Embperl.-page-12-.htm':'pod/doc/Embperl.-page-18-.htm') -]
+    [- menuitem ($linkuri, 'Stable 3.0.0', 0, 1) -]
     <tr> 
         <td><img src="[+ $r -> {imageuri} +]linie-nav.gif" width="152" height="1"></td>
     </tr>
 
-    [- menuitem ($r -> {baseuri} . 'pod/doc/Embperl.-page-19-.htm', 'Beta 2.5.0_3', 0, 1) -]
+    [- menuitem ($linkuri, 'Beta 3.0.0-rc.2', 0, 1) -]
     <tr>
         <td><img src="[+ $r -> {imageuri} +]linie-nav.gif" width="152" height="1"></td>
     </tr>
@@ -96,7 +111,7 @@ $app  = $r -> app ;
     <tr>
         <td align="left" valign="top">
 
-
+[#
 <table><tr style="padding: 0px; margin: 0px; border-colapse: yes; border: 0px">
 <td style="padding: 6px 0px; margin: 0px">[- Execute ('paypal.epl') -]</td>
 [$ if $epreq -> param -> language eq 'de' $]
@@ -105,7 +120,7 @@ $app  = $r -> app ;
 <td style="font-size: 10px; padding: 0px; margin: 0px">Support the development of Embperl! <a href="[+ $r -> {baseuri} . 'donate.htm'  +]">More...<br></td>
 [$endif$]
 </tr></table>
-
+#]
 [#
 <script type="text/javascript"><!--
 google_ad_client = "pub-6848064800813254";
@@ -121,9 +136,35 @@ google_color_url = "008000";
 google_color_text = "6F6F6F";
 //--></script>
 <script type="text/javascript"
-  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+  src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
 #]
+        </td>
+    </tr>
+    <tr>
+        <td>
+          <p>&nbsp;</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+          <p>&nbsp;</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+          <p>&gt;&nbsp;<a href="[+ do { $u = $r -> app -> languri($r, $r -> param -> uri, 'de') ; $u =~ s/(\.\w+?)$/$parm$1/; $u } +]" target="_top">Deutsch</a>&nbsp;
+          </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+          <p>&nbsp;</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+          <p>&gt;&nbsp;<a href="[+ do { $u = $r -> app -> languri($r, $r -> param -> uri, 'en') ; $u =~ s/(\.\w+?)$/$parm$1/; $u } +]" target="_top">English</a></p>
         </td>
     </tr>
 

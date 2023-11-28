@@ -9,7 +9,7 @@ use Pod::Usage;
 use Text::CSV qw(csv);
 use WebService::IdoitAPI;
 
-use version; our $VERSION = qv('v0.2.2');
+use version; our $VERSION = qv('v0.3.1');
 
 sub get_reports {
     my $config = shift;
@@ -69,7 +69,16 @@ sub print_aoh {
 
 sub print_aoh_csv {
     my ($config,$aoh) = @_;
-    csv(in => $aoh, out => \*STDOUT);
+
+    return                      unless (0 < scalar @$aoh);
+
+    my @headers = sort keys %{$aoh->[0]};
+    my $csv = Text::CSV->new({binary => 1, auto_diag => 1});
+
+    $csv->say(\*STDOUT, [@headers]);
+    for my $row (@{$aoh}) {
+        $csv->say(\*STDOUT, [$row->@{@headers}]);
+    }
 } # print_aoh_csv()
 
 sub print_aoh_json {
@@ -121,7 +130,7 @@ idoit-reports - get i-doit reports
 
 =head1 VERSION
 
-This is version v0.2.2
+This is version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -181,6 +190,7 @@ The program shows this man page and exits.
 =head3 --csv
 
 The report is printed as CSV.
+Columns are sorted alphabetically.
 
 =head3 --json
 

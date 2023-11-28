@@ -1,14 +1,19 @@
 package Dist::Zilla::Plugin::BuildSelf;
-$Dist::Zilla::Plugin::BuildSelf::VERSION = '0.004';
+$Dist::Zilla::Plugin::BuildSelf::VERSION = '0.006';
 use Moose;
 with qw/Dist::Zilla::Role::BuildPL Dist::Zilla::Role::TextTemplate Dist::Zilla::Role::PrereqSource/;
+
+use experimental 'signatures', 'postderef';
 
 use Dist::Zilla::File::InMemory;
 
 has add_buildpl => (
 	is => 'ro',
 	isa => 'Bool',
-	default => 1,
+	lazy => 1,
+	default => sub($self) {
+		return not grep { $_->name eq 'Build.PL' } $self->zilla->files->@*;
+	},
 );
 
 has template => (
@@ -27,47 +32,46 @@ has module => (
 has auto_configure_requires => (
 	is => 'ro',
 	isa => 'Bool',
-	default => 0,
+	default => 1,
 );
 
 has minimum_perl => (
 	is      => 'ro',
 	isa     => 'Str',
 	lazy    => 1,
-	default => sub {
-		my $self = shift;
+	default => sub($self) {
 		return $self->zilla->prereqs->requirements_for('runtime', 'requires')->requirements_for_module('perl') || '5.006'
 	},
 );
 
+has sanatize_for => (
+	is => 'ro',
+	isa => 'Str',
+	default => 0,
+);
 
-sub _module_builder {
-	my $self = shift;
-	(my $name = $self->zilla->name) =~ s/-/::/g;
-	return $name;
+sub _module_builder($self) {
+	return $self->zilla->name =~ s/-/::/gr;
 }
 
-sub register_prereqs {
-	my ($self) = @_;
-
+sub register_prereqs($self) {
 	if ($self->auto_configure_requires) {
-		my $reqs = $self->zilla->prereqs->requirements_for('runtime', 'requires');
-		$self->zilla->register_prereqs({ phase => 'configure' }, %{ $reqs->as_string_hash });
+		my $prereqs = $self->zilla->prereqs;
+		if (my $for = $self->sanatize_for) {
+			require CPAN::Meta::Prereqs::Filter;
+			$prereqs = CPAN::Meta::Prereqs::Filter::filter_prereqs($prereqs, omit_core => $for);
+		}
+		my $reqs = $prereqs->requirements_for('runtime', 'requires');
+		$self->zilla->register_prereqs({ phase => 'configure' }, $reqs->as_string_hash->%*);
 	}
-
-	return;
 }
 
-sub setup_installer {
-	my ($self, $arg) = @_;
-
+sub setup_installer($self) {
 	if ($self->add_buildpl) {
 		my $content = $self->fill_in_string($self->template, { module => $self->module, minimum_perl => $self->minimum_perl });
 		my $file = Dist::Zilla::File::InMemory->new({ name => 'Build.PL', content => $content });
 		$self->add_file($file);
 	}
-
-	return;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -88,13 +92,25 @@ Dist::Zilla::Plugin::BuildSelf - Build a Build.PL that uses the current module t
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
 Unless you're writing a Build.PL compatible module builder, you should not be looking at this. The only purpose of this module is to bootstrap any such module on Dist::Zilla.
 
 =head1 ATTRIBUTES
+
+=head2 add_buildpl
+
+If enabled it will generate a F<Build.PL> file for you. Defaults to true if no Build.PL file is given.
+
+=head2 auto_configure_requires
+
+If enabled it will automatically add the runtime requirements of the dist to the configure requirements.
+
+=head2 sanatize_for
+
+If non-zero it will filter modules provided by the given perl version from the configure dependencies.
 
 =head2 module
 
@@ -107,10 +123,6 @@ The minimal version of perl needed to run this Build.PL. It defaults to the curr
 =head2 template
 
 The template to use for the Build.PL script. This is a Text::Template string with the arguments as described above: C<$module> and C<$minimum_perl>. Default is typical for the author's Build.PL ideas, YMMV.
-
-=for Pod::Coverage register_prereqs
-setup_installer
-=end
 
 =head1 AUTHOR
 

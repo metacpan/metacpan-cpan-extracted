@@ -1,0 +1,371 @@
+# NAME
+
+Dancer2::Plugin::OpenAPI - create OpenAPI documentation of your application
+
+# VERSION
+
+version 1.0.1
+
+# SYNOPSIS
+
+```perl
+package MyApp;
+
+use Dancer;
+use Dancer2::Plugin::OpenAPI;
+
+our $VERSION = "0.1";
+
+get '/choreograph/:name' => sub { ... };
+
+1;
+```
+
+# DESCRIPTION
+
+This plugin provides tools to create and access a [OpenApi](https://spec.openapis.org) specification file for a
+Dancer REST web service. Originally was [Dancer::Plugin::Swagger](https://metacpan.org/pod/Dancer%3A%3APlugin%3A%3ASwagger).
+
+Overview of `Dancer2::Plugin::OpenAPI`'s features:
+
+- Can create a `/openapi.json` REST specification file.
+- Can auto-discover routes and add them to the OpenAPI file.
+- Can provide a OpenAPI UI version of the OpenAPI documentation.
+
+# CONFIGURATION
+
+```
+plugins:
+    OpenApi
+       main_api_module: MyApp
+       show_ui: 1
+       ui_url: /doc
+       ui_dir: /path/to/files
+       auto_discover_skip:
+        - /openapi.json
+        - qr#^/doc/#
+```
+
+## main\_api\_module
+
+If not provided explicitly, the OpenApi document's title and version will be set
+to the abstract and version of this module. 
+
+For Perl >= 5.36.0, defaults to the first module to import [Dancer2::Plugin::OpenAPI](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AOpenAPI).
+
+## show\_ui
+
+If `true`, a route will be created for the Swagger UI (see [http://swagger.io/swagger-ui/](http://swagger.io/swagger-ui/)).
+
+Defaults to `true`.
+
+## ui\_url
+
+Path of the swagger ui route. Will also be the prefix for all the CSS/JS dependencies of the page.
+
+Defaults to `/doc`.
+
+## ui\_dir
+
+Filesystem path to the directory holding the assets for the Swagger UI page.
+
+Defaults to a copy of the Swagger UI code bundled with the [Dancer2::Plugin::OpenAPI](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AOpenAPI) distribution.
+
+## auto\_discover\_skip
+
+List of urls that should not be added to the OpenApi document by `openapi_auto_discover`.
+If an url begins with `qr`, it will be compiled as a regular expression.
+
+Defauls to `/openapi.json` and, if `show_ui` is `true`, all the urls under `ui_url`.
+
+## validate\_response 
+
+If set to `true`, calls to `openapi_response` will verify if a schema is defined 
+for the response, and if so validate against it. [JSON::Schema::AsType](https://metacpan.org/pod/JSON%3A%3ASchema%3A%3AAsType) is used for the
+validation (and this required if this option is used).
+
+Defaults to `false`.
+
+## strict\_validation
+
+If set to `true`, dies if a call to `openapi_response` doesn't find a schema for its response.
+
+Defaults to `false`.
+
+# PLUGIN KEYWORDS
+
+## openapi\_path $description, \\%args, $route
+
+```perl
+openapi_path {
+    description => 'Returns info about a judge',
+},
+get '/judge/:judge_name' => sub {
+    ...;
+};
+```
+
+Registers a route as a OpenAPI path item in the OpenAPI document.
+
+`%args` is optional.
+
+The `$description` is optional as well, and can also be defined as part of the 
+`%args`.
+
+```perl
+# equivalent to the main example
+openapi_path 'Returns info about a judge',
+get '/judge/:judge_name' => sub {
+    ...;
+};
+```
+
+If the `$description` spans many lines, it will be left-trimmed.
+
+```perl
+openapi_path q{ 
+    Returns info about a judge.
+
+    Some more documentation can go here.
+
+        And this will be seen as a performatted block
+        by OpenAPI.
+}, 
+get '/judge/:judge_name' => sub {
+    ...;
+};
+```
+
+### Supported arguments
+
+- method
+
+    The HTTP method (GET, POST, etc) for the path item.
+
+    Defaults to the route's method.
+
+- path
+
+    The url for the path item.
+
+    Defaults to the route's path.
+
+- description
+
+    The path item's description.
+
+- tags
+
+    Optional arrayref of tags assigned to the path.
+
+- parameters
+
+    List of parameters for the path item. Must be an arrayref or a hashref.
+
+    Route parameters are automatically populated. E.g., 
+
+    ```perl
+    openapi_path
+    get '/judge/:judge_name' => { ... };
+    ```
+
+    is equivalent to
+
+    ```perl
+    openapi_path {
+        parameters => [
+            { name => 'judge_name', in => 'path', required => 1, type => 'string' },
+        ] 
+    },
+    get '/judge/:judge_name' => { ... };
+    ```
+
+    If the parameters are passed as a hashref, the keys are the names of the parameters, and they will
+    appear in the OpenAPI document following their alphabetical order.
+
+    If the parameters are passed as an arrayref, they will appear in the document in the order
+    in which they are passed. Additionally, each parameter can be given as a hashref, or can be a 
+    `name => arguments` pair. 
+
+    In both format, for the key/value pairs, a string value is considered to be the 
+    `description` of the parameter.
+
+    Finally, if not specified explicitly, the `in` argument of a parameter defaults to `query`,
+    and its type to `string`.
+
+    ```perl
+    parameters => [
+        { name => 'bar', in => 'path', required => 1, type => 'string' },
+        { name => 'foo', in => 'query', type => 'string', description => 'yadah' },
+    ],
+
+    # equivalent arrayref with mixed pairs/non-pairs
+
+    parameters => [
+        { name => 'bar', in => 'path', required => 1, type => 'string' },
+        foo => { in => 'query', type => 'string', description => 'yadah' },
+    ],
+
+    # equivalent hashref format 
+
+    parameters => {
+        bar => { in => 'path', required => 1, type => 'string' },
+        foo => { in => 'query', type => 'string', description => 'yadah' },
+    },
+
+    # equivalent, using defaults
+    parameters => {
+        bar => { in => 'path', required => 1 },
+        foo => 'yadah',
+    },
+    ```
+
+- responses
+
+    Possible responses from the path. Must be a hashref.
+
+    ```perl
+    openapi_path {
+        responses => {
+            default => { description => 'The judge information' }
+        },
+    },
+    get '/judge/:judge_name' => { ... };
+    ```
+
+    If the key `example` is given (instead of `examples` as defined by the OpenAPI specs), 
+
+    and the serializer used by the application is [Dancer2::Serializer::JSON](https://metacpan.org/pod/Dancer2%3A%3ASerializer%3A%3AJSON) or [Dancer2::Serializer::YAML](https://metacpan.org/pod/Dancer2%3A%3ASerializer%3A%3AYAML),
+    the example will be expanded to have the right content-type key.
+
+    ```perl
+    openapi_path {
+        responses => {
+            default => { example => { fullname => 'Mary Ann Murphy' } }
+        },
+    },
+    get '/judge/:judge_name' => { ... };
+
+    # equivalent to
+
+    openapi_path {
+        responses => {
+            default => { examples => { 'application/json' => { fullname => 'Mary Ann Murphy' } } }
+        },
+    },
+    get '/judge/:judge_name' => { ... };
+    ```
+
+    The special key `template` will not appear in the OpenAPI doc, but will be
+    used by the `openapi_template` plugin keyword.
+
+## openapi\_template $code, $args
+
+```perl
+openapi_path {
+    responses => {
+        404 => { template => sub { +{ error => "judge '$_[0]' not found" } }  
+    },
+},
+get '/judge/:judge_name' => {  
+    my $name = param('judge_name');
+    return openapi_template 404, $name unless in_db($name);
+    ...;
+};
+```
+
+Calls the template for the `$code` response, passing it `$args`. If `$code` is numerical, also set
+the response's status to that value. 
+
+## openapi\_auto\_discover skip => \\@list
+
+Populates the OpenAPI document with information of all
+the routes of the application.
+
+Accepts an optional `skip` parameter that takes an arrayref of
+routes that shouldn't be added to the OpenAPI document. The routes
+can be specified as-is, or via regular expressions. If no skip list is given, defaults to 
+the c&lt;auto\_discover\_skip> configuration value.
+
+```perl
+openapi_auto_discover skip => [ '/openapi.json', qr#^/doc/# ];
+```
+
+The information of a route won't be altered if it's 
+already present in the document.
+
+If a route has path parameters, they will be automatically
+added as such in the `parameters` section.
+
+Routes defined as regexes are skipped, as there is no clean way
+to automatically make them look nice.
+
+```perl
+    # will be picked up
+get '/user' => ...;
+
+    # ditto, as '/user/{user_id}'
+get '/user/:user_id => ...;
+
+    # won't be picked up
+get qr#/user/(\d+)# => ...;
+```
+
+Note that routes defined after `openapi_auto_discover` has been called won't 
+be added to the OpenAPI document. Typically, you'll want `openapi_auto_discover`
+to be called at the very end of your module. Alternatively, `openapi_auto_discover`
+can be called more than once safely -- which can be useful if an application creates
+routes dynamically.
+
+## openapi\_definition $name => $definition, ...
+
+Adds a schema (or more) to the definition section of the OpenAPI document.
+
+```perl
+openapi_definition 'Judge' => {
+    type => 'object',
+    required => [ 'fullname' ],
+    properties => {
+        fullname => { type => 'string' },
+        seasons => { type => 'array', items => { type => 'integer' } },
+    }
+};
+```
+
+The function returns the reference to the definition that can be then used where
+schemas are used.
+
+```perl
+my $Judge = openapi_definition 'Judge' => { ... };
+# $Judge is now the hashref '{ '$ref' => '#/definitions/Judge' }'
+
+# later on...
+openapi_path {
+    responses => {
+        default => { schema => $Judge },
+    },
+},
+get '/judge/:name' => sub { ... };
+```
+
+# EXAMPLES
+
+See the `examples/` directory of the distribution for a working example.
+
+# SEE ALSO
+
+- [http://swagger.io/|Swagger](http://swagger.io/|Swagger)
+- [Dancer2::Plugin::OpenAPI](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AOpenAPI)
+
+    The original plugin, for Dancer1.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

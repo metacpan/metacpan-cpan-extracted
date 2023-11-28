@@ -24,6 +24,7 @@ requires 'DateTime' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
 requires 'MARC::Convert::Wikidata::Object' => 0;
+requires 'MARC::Leader' => 0;
 requires 'Readonly' => 0;
 requires 'Roman' => 0;
 requires 'Unicode::UTF8' => 0;
@@ -40,7 +41,7 @@ test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Warn' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.04';
+version '0.06';
 
 # Run.
 WriteAll();

@@ -1,10 +1,10 @@
 NAME
-    Acme::CPANModules::UUID - Modules that can generate immutable
+    Acme::CPANModules::UUID - List of modules that can generate immutable
     universally unique identifier (UUIDs)
 
 VERSION
-    This document describes version 0.010 of Acme::CPANModules::UUID (from
-    Perl distribution Acme-CPANModules-UUID), released on 2021-05-06.
+    This document describes version 0.011 of Acme::CPANModules::UUID (from
+    Perl distribution Acme-CPANModules-UUID), released on 2023-10-30.
 
 SYNOPSIS
     To run benchmark with default option:
@@ -53,7 +53,8 @@ DESCRIPTION
     (currently just a wrapper for Data::UUID).
 
 ACME::CPANMODULES ENTRIES
-    *   Data::UUID
+    Data::UUID
+        Author: RJBS <https://metacpan.org/author/RJBS>
 
         This module creates v1 and v2 UUIDs. Depending on the OS, for MAC
         address, it usually uses a hash of hostname instead. This module is
@@ -62,7 +63,8 @@ ACME::CPANMODULES ENTRIES
 
         The benchmark code creates 1000+1 v1 string UUIDs.
 
-    *   UUID::FFI
+    UUID::FFI
+        Author: PLICEASE <https://metacpan.org/author/PLICEASE>
 
         This module provides access to libuuid via the FFI interface. It can
         create v1 as well as v4 (random) UUIDs. Note that Data::UUID
@@ -70,7 +72,8 @@ ACME::CPANMODULES ENTRIES
 
         The benchmark code creates 1000+1 v1 string UUIDs.
 
-    *   UUID::Tiny
+    UUID::Tiny
+        Author: CAUGUSTIN <https://metacpan.org/author/CAUGUSTIN>
 
         This module should be your go-to choice if you cannot use an XS
         module. It can create v1, v3, v4 UUIDs. However, the random v4 UUIDs
@@ -82,11 +85,12 @@ ACME::CPANMODULES ENTRIES
         See also: Types::UUID which is a type library that uses Data::UUID
         as the backend.
 
-    *   UUID::Random
+    UUID::Random
+        Author: PERLER <https://metacpan.org/author/PERLER>
 
-        This module simply uses 32 calls to Perl's "rand()" to construct
-        each random hexadecimal digits of the UUID (v4). Not really
-        recommended, since perl's default pseudo-random generator is neither
+        This module simply uses 32 calls to Perl's rand() to construct each
+        random hexadecimal digits of the UUID (v4). Not really recommended,
+        since perl's default pseudo-random generator is neither
         cryptographically secure nor has 128 bit of entropy. It also does
         not produce v4 UUIDs that conform to RFC 4122 (no encoding of
         variant & version information).
@@ -95,38 +99,50 @@ ACME::CPANMODULES ENTRIES
 
         The benchmark code creates 1000+1 v4 string UUIDs.
 
-    *   UUID::Random::PERLANCAR
+    UUID::Random::PERLANCAR
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
         Just another implementation of UUID::Random.
 
         The benchmark code creates 1000+1 v4 string UUIDs.
 
-    *   UUID::Random::Secure
+    UUID::Random::Secure
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
 
         Just like UUID::Random, except it uses Math::Random::Secure's
-        "irand()" to produce random numbers.
+        irand() to produce random numbers.
 
         The benchmark code creates 1000+1 v4 string UUIDs.
 
-    *   Crypt::Misc
+    Crypt::Misc
+        Author: MIK <https://metacpan.org/author/MIK>
 
         This module from the CryptX distribution has a function to create
         and check v4 UUIDs.
 
         The benchmark code creates 1000+1 v4 string UUIDs.
 
+    UUID
+        Author: JRM <https://metacpan.org/author/JRM>
+
+        This module generates DCE-compatible UUIDs, which according to RFC
+        belongs to the legacy variants.
+
+        The benchmark creates 1000+1 random UUIDs.
+
 ACME::CPANMODULES FEATURE COMPARISON MATRIX
-     +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
-     | module                  | create_v1 | create_v2 | create_v3 | create_v4 | create_v5 | is_pp | is_xs | v4_rfc4122 *1) | v4_secure_random *2) |
-     +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
-     | Data::UUID              | yes       | yes       | no        | no        | no        | no    | yes   | N/A            | N/A                  |
-     | UUID::FFI               | yes       | no        | no        | yes       | no        | no    | yes   | yes            | no                   |
-     | UUID::Tiny              | yes       | no        | yes       | yes       | yes       | yes   | no    | yes            | no                   |
-     | UUID::Random            | no        | no        | no        | yes       | no        | yes   | no    | no             | no                   |
-     | UUID::Random::PERLANCAR | no        | no        | no        | yes       | no        | yes   | no    | yes            | no                   |
-     | UUID::Random::Secure    | no        | no        | no        | yes       | no        | yes   | no    | yes            | yes                  |
-     | Crypt::Misc             | no        | no        | no        | yes       | no        | yes   | no    | yes            | yes                  |
-     +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+
+     +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+---------------+
+     | module                  | create_v1 | create_v2 | create_v3 | create_v4 | create_v5 | is_pp | is_xs | v4_rfc4122 *1) | v4_secure_random *2) | create_legacy |
+     +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+---------------+
+     | Data::UUID              | yes       | yes       | no        | no        | no        | no    | yes   | N/A            | N/A                  | N/A           |
+     | UUID::FFI               | yes       | no        | no        | yes       | no        | no    | yes   | yes            | no                   | N/A           |
+     | UUID::Tiny              | yes       | no        | yes       | yes       | yes       | yes   | no    | yes            | no                   | N/A           |
+     | UUID::Random            | no        | no        | no        | yes       | no        | yes   | no    | no             | no                   | N/A           |
+     | UUID::Random::PERLANCAR | no        | no        | no        | yes       | no        | yes   | no    | yes            | no                   | N/A           |
+     | UUID::Random::Secure    | no        | no        | no        | yes       | no        | yes   | no    | yes            | yes                  | N/A           |
+     | Crypt::Misc             | no        | no        | no        | yes       | no        | yes   | no    | yes            | yes                  | N/A           |
+     | UUID                    | no        | no        | no        | no        | no        | no    | yes   | no             | no                   | yes           |
+     +-------------------------+-----------+-----------+-----------+-----------+-----------+-------+-------+----------------+----------------------+---------------+
 
     Notes:
 
@@ -140,9 +156,9 @@ BENCHMARKED MODULES
     Version numbers shown below are the versions used when running the
     sample benchmark.
 
-    Data::UUID 1.224
+    Data::UUID 1.226
 
-    UUID::FFI 0.09
+    UUID::FFI 0.11
 
     UUID::Tiny 1.04
 
@@ -152,7 +168,9 @@ BENCHMARKED MODULES
 
     UUID::Random::Secure 0.004
 
-    Crypt::Misc 0.069
+    Crypt::Misc 0.078
+
+    UUID 0.29
 
 BENCHMARK PARTICIPANTS
     *   Data::UUID (perl_code)
@@ -209,44 +227,111 @@ BENCHMARK PARTICIPANTS
 
          Crypt::Misc::random_v4uuid() for 1..1000; Crypt::Misc::random_v4uuid()
 
-SAMPLE BENCHMARK RESULTS
-    Run on: perl: *v5.30.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
-    (2 cores)*, OS: *GNU/Linux Ubuntu version 20.04*, OS kernel: *Linux
-    version 5.3.0-64-generic*.
+    *   UUID (perl_code)
 
-    Benchmark with default options ("bencher --cpanmodules-module UUID"):
+        Code template:
+
+         my $uuid; UUID::generate_random($uuid) for 1..1000; UUID::generate_random($uuid); $uuid
+
+BENCHMARK SAMPLE RESULTS
+  Sample benchmark #1
+    Run on: perl: *v5.38.0*, CPU: *Intel(R) Core(TM) i5-7200U CPU @ 2.50GHz
+    (2 cores)*, OS: *GNU/Linux Ubuntu version 20.04*, OS kernel: *Linux
+    version 5.4.0-164-generic*.
+
+    Benchmark command (default options):
+
+     % bencher --cpanmodules-module UUID
+
+    Result formatted as table:
 
      #table1#
      +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
      | participant                           | rate (/s) | time (ms) | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
      +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
-     | UUID::Random::Secure::generate_rfc    |        46 |     22    |                 0.00% |              4868.44% | 7.5e-05   |      28 |
-     | UUID::Random::Secure::generate        |        47 |     21    |                 2.74% |              4735.97% |   6e-05   |      23 |
-     | UUID::Random                          |        90 |     10    |                95.80% |              2437.45% |   0.00034 |      22 |
-     | UUID::Tiny                            |       140 |      7.2  |               201.89% |              1545.81% | 1.8e-05   |      20 |
-     | Crypt::Misc                           |       290 |      3.5  |               525.12% |               694.80% | 1.4e-05   |      20 |
-     | UUID::FFI                             |       930 |      1.1  |              1911.64% |               146.98% | 3.4e-06   |      20 |
-     | UUID::Random::PERLANCAR::generate_rfc |      1000 |      1    |              2098.91% |               125.95% | 2.9e-05   |      34 |
-     | UUID::Random::PERLANCAR::generate     |      1700 |      0.59 |              3596.91% |                34.39% | 1.1e-06   |      20 |
-     | Data::UUID                            |      2300 |      0.44 |              4868.44% |                 0.00% | 1.8e-06   |      20 |
+     | UUID::Random::Secure::generate        |        30 |     30    |                 0.00% |              4218.76% |   0.0013  |      22 |
+     | UUID::Random::Secure::generate_rfc    |        40 |     20    |                42.61% |              2928.29% |   0.0003  |      21 |
+     | UUID::Random                          |       100 |      9    |               257.90% |              1106.70% |   0.00018 |      20 |
+     | UUID::Tiny                            |       100 |      8    |               335.56% |               891.54% |   0.00013 |      20 |
+     | UUID                                  |       171 |      5.84 |               481.07% |               643.25% | 1.4e-06   |      21 |
+     | Crypt::Misc                           |       296 |      3.37 |               906.43% |               329.12% | 2.6e-06   |      20 |
+     | UUID::Random::PERLANCAR::generate_rfc |       520 |      1.9  |              1682.35% |               142.31% | 7.6e-06   |      20 |
+     | UUID::Random::PERLANCAR::generate     |       900 |      1    |              2809.14% |                48.45% | 2.5e-05   |      23 |
+     | UUID::FFI                             |       870 |      1.2  |              2848.45% |                46.48% | 1.8e-06   |      20 |
+     | Data::UUID                            |      1000 |      0.8  |              4218.76% |                 0.00% | 9.3e-06   |      21 |
      +---------------------------------------+-----------+-----------+-----------------------+-----------------------+-----------+---------+
 
-    Benchmark module startup overhead ("bencher --cpanmodules-module UUID
-    --module-startup"):
+    The above result formatted in Benchmark.pm style:
+
+                 Rate  URS:g  URS:g_r    U:R   U:T     U   C:M  URP:g_r   U:F  URP:g   D:U 
+      URS:g      30/s     --     -33%   -70%  -73%  -80%  -88%     -93%  -96%   -96%  -97% 
+      URS:g_r    40/s    50%       --   -55%  -60%  -70%  -83%     -90%  -94%   -95%  -96% 
+      U:R       100/s   233%     122%     --  -11%  -35%  -62%     -78%  -86%   -88%  -91% 
+      U:T       100/s   275%     150%    12%    --  -27%  -57%     -76%  -85%   -87%  -90% 
+      U         171/s   413%     242%    54%   36%    --  -42%     -67%  -79%   -82%  -86% 
+      C:M       296/s   790%     493%   167%  137%   73%    --     -43%  -64%   -70%  -76% 
+      URP:g_r   520/s  1478%     952%   373%  321%  207%   77%       --  -36%   -47%  -57% 
+      U:F       870/s  2400%    1566%   650%  566%  386%  180%      58%    --   -16%  -33% 
+      URP:g     900/s  2900%    1900%   800%  700%  484%  237%      89%   19%     --  -19% 
+      D:U      1000/s  3650%    2400%  1025%  900%  630%  321%     137%   49%    25%    -- 
+ 
+     Legends:
+       C:M: participant=Crypt::Misc
+       D:U: participant=Data::UUID
+       U: participant=UUID
+       U:F: participant=UUID::FFI
+       U:R: participant=UUID::Random
+       U:T: participant=UUID::Tiny
+       URP:g: participant=UUID::Random::PERLANCAR::generate
+       URP:g_r: participant=UUID::Random::PERLANCAR::generate_rfc
+       URS:g: participant=UUID::Random::Secure::generate
+       URS:g_r: participant=UUID::Random::Secure::generate_rfc
+
+  Sample benchmark #2
+    Benchmark command (benchmarking module startup overhead):
+
+     % bencher --cpanmodules-module UUID --module-startup
+
+    Result formatted as table:
 
      #table2#
      +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
      | participant             | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
      +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
-     | UUID::Random::Secure    |      86   |              78   |                 0.00% |               976.54% |   0.00038 |      20 |
-     | UUID::FFI               |      60   |              52   |                44.16% |               646.77% | 8.1e-05   |      20 |
-     | UUID::Tiny              |      24   |              16   |               259.84% |               199.17% | 3.8e-05   |      22 |
-     | Crypt::Misc             |      18.3 |              10.3 |               371.86% |               128.15% | 1.6e-05   |      20 |
-     | Data::UUID              |      16   |               8   |               429.19% |               103.43% |   0.00012 |      20 |
-     | UUID::Random            |       9.2 |               1.2 |               840.25% |                14.50% | 2.7e-05   |      20 |
-     | UUID::Random::PERLANCAR |       9.1 |               1.1 |               850.03% |                13.32% | 2.3e-05   |      20 |
-     | perl -e1 (baseline)     |       8   |               0   |               976.54% |                 0.00% |   0.00018 |      20 |
+     | UUID::Random::Secure    |     95    |             88.45 |                 0.00% |              1352.22% |   0.00022 |      20 |
+     | UUID::FFI               |     53    |             46.45 |                80.85% |               703.01% |   0.00013 |      20 |
+     | UUID::Tiny              |     26.7  |             20.15 |               256.48% |               307.38% | 2.3e-05   |      20 |
+     | Crypt::Misc             |     20.9  |             14.35 |               354.68% |               219.40% | 1.9e-05   |      20 |
+     | Data::UUID              |     20    |             13.45 |               429.95% |               174.03% |   0.00041 |      20 |
+     | UUID                    |     11.4  |              4.85 |               734.65% |                73.99% | 5.5e-06   |      20 |
+     | UUID::Random            |      8.9  |              2.35 |               962.94% |                36.62% |   1e-05   |      20 |
+     | UUID::Random::PERLANCAR |      8.94 |              2.39 |               964.20% |                36.46% | 7.2e-06   |      20 |
+     | perl -e1 (baseline)     |      6.55 |              0    |              1352.22% |                 0.00% | 6.3e-06   |      20 |
      +-------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+
+    The above result formatted in Benchmark.pm style:
+
+                              Rate   UR:S   U:F   U:T   C:M   D:U     U  UR:P   U:R  perl -e1 (baseline) 
+      UR:S                  10.5/s     --  -44%  -71%  -78%  -78%  -88%  -90%  -90%                 -93% 
+      U:F                   18.9/s    79%    --  -49%  -60%  -62%  -78%  -83%  -83%                 -87% 
+      U:T                   37.5/s   255%   98%    --  -21%  -25%  -57%  -66%  -66%                 -75% 
+      C:M                   47.8/s   354%  153%   27%    --   -4%  -45%  -57%  -57%                 -68% 
+      D:U                   50.0/s   375%  165%   33%    4%    --  -42%  -55%  -55%                 -67% 
+      U                     87.7/s   733%  364%  134%   83%   75%    --  -21%  -21%                 -42% 
+      UR:P                 111.9/s   962%  492%  198%  133%  123%   27%    --    0%                 -26% 
+      U:R                  112.4/s   967%  495%  200%  134%  124%   28%    0%    --                 -26% 
+      perl -e1 (baseline)  152.7/s  1350%  709%  307%  219%  205%   74%   36%   35%                   -- 
+ 
+     Legends:
+       C:M: mod_overhead_time=14.35 participant=Crypt::Misc
+       D:U: mod_overhead_time=13.45 participant=Data::UUID
+       U: mod_overhead_time=4.85 participant=UUID
+       U:F: mod_overhead_time=46.45 participant=UUID::FFI
+       U:R: mod_overhead_time=2.35 participant=UUID::Random
+       U:T: mod_overhead_time=20.15 participant=UUID::Tiny
+       UR:P: mod_overhead_time=2.39 participant=UUID::Random::PERLANCAR
+       UR:S: mod_overhead_time=88.45 participant=UUID::Random::Secure
+       perl -e1 (baseline): mod_overhead_time=0 participant=perl -e1 (baseline)
 
     To display as an interactive HTML table on a browser, you can add option
     "--format html+datatables".
@@ -260,8 +345,13 @@ FAQ
 
   What are ways to use this Acme::CPANModules module?
     Aside from reading this Acme::CPANModules module's POD documentation,
-    you can install all the listed modules (entries) using cpanmodules CLI
-    (from App::cpanmodules distribution):
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n UUID
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
 
         % cpanmodules ls-entries UUID | cpanm -n
 
@@ -282,7 +372,9 @@ FAQ
 
     This Acme::CPANModules module also helps lcpan produce a more meaningful
     result for "lcpan related-mods" command when it comes to finding related
-    modules for the modules listed in this Acme::CPANModules module.
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -292,13 +384,6 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Acme-CPANModules-UUID>.
 
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://github.com/perlancar/perl-Acme-CPANModules-UUID/issues>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
-
 SEE ALSO
     Acme::CPANModules - about the Acme::CPANModules namespace
 
@@ -306,12 +391,39 @@ SEE ALSO
 
     RFC 4122, <https://tools.ietf.org/html/rfc4122>
 
+    <https://en.wikipedia.org/wiki/Universally_unique_identifier>
+
 AUTHOR
     perlancar <perlancar@cpan.org>
 
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+    This software is copyright (c) 2023, 2021, 2020 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-UUID
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

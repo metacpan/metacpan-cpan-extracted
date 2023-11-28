@@ -1,7 +1,7 @@
 {
    "abstract" : "utilities for filesystem: read, write, find, replace files, etc",
    "author" : [
-      "Yaroslav O. Kosmina LL<mailto:dart@cpan.org>"
+      "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.19",
@@ -60,7 +60,7 @@
    "provides" : {
       "Aion::Fs" : {
          "file" : "lib/Aion/Fs.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.6"
       }
    },
    "release_status" : "stable",
@@ -75,12 +75,12 @@
          "web" : "https://github.com/darviarush/perl-aion-fs"
       }
    },
-   "version" : "0.0.3",
+   "version" : "0.0.6",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",
       "Yaroslav O. Kosmina <darviarush@mail.ru>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
-   "x_static_install" : 1
+   "x_static_install" : 0
 }

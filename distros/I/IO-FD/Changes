@@ -1,4 +1,19 @@
 Revision history for Perl extension IO::FD.
+v0.3.3 2023-11-12
+  [fixes]
+    - Fixed logic error in return value of send/sendto binding.
+    - Fixed error checking on uninitialized result code
+    - Fixed link to github using https
+    - Fixed failing test on linux due to unknown bare word
+
+
+v0.3.2 2023-07-25
+    [improvements]
+    - Do not attempt import of non existent SOCK_NONBLOCK and SOCK_CLOEXEC on darwin
+    - Added constant::more to prerequisites (for future improvements)
+    - Added link to bug tracker
+    - updated GH actions workflow
+
 v0.3.1 2023-05-24
     [tests]
     - Fix failing send file test on OpenBSD. No sendfile to test!

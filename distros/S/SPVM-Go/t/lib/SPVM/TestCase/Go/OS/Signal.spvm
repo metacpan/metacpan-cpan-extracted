@@ -1,0 +1,115 @@
+class TestCase::Go::OS::Signal {
+  use Go;
+  use Go::OS::Signal;
+  use Sys::Signal::Constant as SIGNAL;
+  use Sys::Signal;
+  
+  our $RESULT : IntList;
+  
+  static method minimal : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+    
+      my $ch = Go->make(1);
+      
+      Go::OS::Signal->notify($ch, SIGNAL->SIGTERM);
+      
+      Sys::Signal->raise(SIGNAL->SIGTERM);
+      
+      my $ok = 0;
+      my $signal = $ch->read(\$ok);
+      
+      $RESULT->push($signal);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method multi_channles : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+    
+      my $ch0 = Go->make(1);
+      
+      Go::OS::Signal->notify($ch0, SIGNAL->SIGTERM);
+      
+      Sys::Signal->raise(SIGNAL->SIGTERM);
+      
+      my $ok = 0;
+      
+      my $signal0 = $ch0->read(\$ok);
+      
+      $RESULT->push($signal0);
+      
+      my $ch1 = Go->make(1);
+      
+      Go::OS::Signal->notify($ch1, SIGNAL->SIGTERM);
+      
+      Sys::Signal->raise(SIGNAL->SIGTERM);
+      
+      my $signal1 = $ch1->read(\$ok);
+      
+      $RESULT->push($signal1);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGTERM])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method multi_signals : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+    
+      my $ch0 = Go->make(2);
+      
+      Go::OS::Signal->notify($ch0, SIGNAL->SIGINT);
+      
+      Go::OS::Signal->notify($ch0, SIGNAL->SIGTERM);
+      
+      Sys::Signal->raise(SIGNAL->SIGTERM);
+      
+      Sys::Signal->raise(SIGNAL->SIGINT);
+      
+      my $ok = 0;
+      
+      my $signal0 = $ch0->read(\$ok);
+      
+      $RESULT->push($signal0);
+      
+      my $signal1 = $ch0->read(\$ok);
+      
+      $RESULT->push($signal1);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [SIGNAL->SIGTERM, SIGNAL->SIGINT])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+}

@@ -116,7 +116,7 @@ Spanish Mexico locale.
   jun
   jul
   ago
-  sept
+  sep
   oct
   nov
   dic
@@ -162,7 +162,7 @@ Spanish Mexico locale.
   jun
   jul
   ago
-  sept
+  sep
   oct
   nov
   dic
@@ -186,9 +186,9 @@ Spanish Mexico locale.
 
 =head3 Wide (format)
 
-  1.er trimestre
+  1.º trimestre
   2.º trimestre
-  3.er trimestre
+  3.º trimestre
   4.º trimestre
 
 =head3 Abbreviated (format)
@@ -208,9 +208,9 @@ Spanish Mexico locale.
 
 =head3 Wide (stand-alone)
 
-  1.er trimestre
+  1.º trimestre
   2.º trimestre
-  3.er trimestre
+  3.º trimestre
   4.º trimestre
 
 =head3 Abbreviated (stand-alone)
@@ -222,10 +222,10 @@ Spanish Mexico locale.
 
 =head3 Narrow (stand-alone)
 
-  1T
-  2T
-  3T
-  4T
+  1
+  2
+  3
+  4
 
 =head2 Eras
 
@@ -262,7 +262,7 @@ Spanish Mexico locale.
 
    2008-02-05T18:30:30 = 5 feb 2008
    1995-12-22T09:05:02 = 22 dic 1995
-  -0010-09-15T04:44:23 = 15 sept -10
+  -0010-09-15T04:44:23 = 15 sep -10
 
 =head3 Short
 
@@ -275,54 +275,54 @@ Spanish Mexico locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 6:30:30 p.m. UTC
+   1995-12-22T09:05:02 = 9:05:02 a.m. UTC
+  -0010-09-15T04:44:23 = 4:44:23 a.m. UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 6:30:30 p.m. UTC
+   1995-12-22T09:05:02 = 9:05:02 a.m. UTC
+  -0010-09-15T04:44:23 = 4:44:23 a.m. UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 18:30:30
-   1995-12-22T09:05:02 = 09:05:02
-  -0010-09-15T04:44:23 = 04:44:23
+   2008-02-05T18:30:30 = 6:30:30 p.m.
+   1995-12-22T09:05:02 = 9:05:02 a.m.
+  -0010-09-15T04:44:23 = 4:44:23 a.m.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 18:30
-   1995-12-22T09:05:02 = 09:05
-  -0010-09-15T04:44:23 = 04:44
+   2008-02-05T18:30:30 = 6:30 p.m.
+   1995-12-22T09:05:02 = 9:05 a.m.
+  -0010-09-15T04:44:23 = 4:44 a.m.
 
 
 =head2 Datetime Formats
 
 =head3 Full
 
-   2008-02-05T18:30:30 = martes, 5 de febrero de 2008, 18:30:30 UTC
-   1995-12-22T09:05:02 = viernes, 22 de diciembre de 1995, 09:05:02 UTC
-  -0010-09-15T04:44:23 = sábado, 15 de septiembre de -10, 04:44:23 UTC
+   2008-02-05T18:30:30 = martes, 5 de febrero de 2008, 6:30:30 p.m. UTC
+   1995-12-22T09:05:02 = viernes, 22 de diciembre de 1995, 9:05:02 a.m. UTC
+  -0010-09-15T04:44:23 = sábado, 15 de septiembre de -10, 4:44:23 a.m. UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 de febrero de 2008, 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 de diciembre de 1995, 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 de septiembre de -10, 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 de febrero de 2008, 6:30:30 p.m. UTC
+   1995-12-22T09:05:02 = 22 de diciembre de 1995, 9:05:02 a.m. UTC
+  -0010-09-15T04:44:23 = 15 de septiembre de -10, 4:44:23 a.m. UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 5 feb 2008 18:30:30
-   1995-12-22T09:05:02 = 22 dic 1995 09:05:02
-  -0010-09-15T04:44:23 = 15 sept -10 04:44:23
+   2008-02-05T18:30:30 = 5 feb 2008, 6:30:30 p.m.
+   1995-12-22T09:05:02 = 22 dic 1995, 9:05:02 a.m.
+  -0010-09-15T04:44:23 = 15 sep -10, 4:44:23 a.m.
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 05/02/08, 18:30
-   1995-12-22T09:05:02 = 22/12/95, 09:05
-  -0010-09-15T04:44:23 = 15/09/-10, 04:44
+   2008-02-05T18:30:30 = 05/02/08, 6:30 p.m.
+   1995-12-22T09:05:02 = 22/12/95, 9:05 a.m.
+  -0010-09-15T04:44:23 = 15/09/-10, 4:44 a.m.
 
 
 =head2 Available Formats
@@ -383,15 +383,15 @@ Spanish Mexico locale.
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = mar 6:30 p. m.
-   1995-12-22T09:05:02 = vie 9:05 a. m.
-  -0010-09-15T04:44:23 = sáb 4:44 a. m.
+   2008-02-05T18:30:30 = mar 6:30 p.m.
+   1995-12-22T09:05:02 = vie 9:05 a.m.
+  -0010-09-15T04:44:23 = sáb 4:44 a.m.
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = mar 6:30:30 p. m.
-   1995-12-22T09:05:02 = vie 9:05:02 a. m.
-  -0010-09-15T04:44:23 = sáb 4:44:23 a. m.
+   2008-02-05T18:30:30 = mar 6:30:30 p.m.
+   1995-12-22T09:05:02 = vie 9:05:02 a.m.
+  -0010-09-15T04:44:23 = sáb 4:44:23 a.m.
 
 =head3 Gy (y G)
 
@@ -403,13 +403,13 @@ Spanish Mexico locale.
 
    2008-02-05T18:30:30 = feb 2008 d.C.
    1995-12-22T09:05:02 = dic 1995 d.C.
-  -0010-09-15T04:44:23 = sept -10 a.C.
+  -0010-09-15T04:44:23 = sep -10 a.C.
 
 =head3 GyMMMEd (E, d MMM y G)
 
    2008-02-05T18:30:30 = mar, 5 feb 2008 d.C.
    1995-12-22T09:05:02 = vie, 22 dic 1995 d.C.
-  -0010-09-15T04:44:23 = sáb, 15 sept -10 a.C.
+  -0010-09-15T04:44:23 = sáb, 15 sep -10 a.C.
 
 =head3 GyMMMM (MMMM 'de' y G)
 
@@ -433,7 +433,7 @@ Spanish Mexico locale.
 
    2008-02-05T18:30:30 = 5 feb 2008 d.C.
    1995-12-22T09:05:02 = 22 dic 1995 d.C.
-  -0010-09-15T04:44:23 = 15 sept -10 a.C.
+  -0010-09-15T04:44:23 = 15 sep -10 a.C.
 
 =head3 GyMd (d/M/y GGGGG)
 
@@ -493,13 +493,13 @@ Spanish Mexico locale.
 
    2008-02-05T18:30:30 = feb
    1995-12-22T09:05:02 = dic
-  -0010-09-15T04:44:23 = sept
+  -0010-09-15T04:44:23 = sep
 
 =head3 MMMEd (E d 'de' MMM)
 
    2008-02-05T18:30:30 = mar 5 de feb
    1995-12-22T09:05:02 = vie 22 de dic
-  -0010-09-15T04:44:23 = sáb 15 de sept
+  -0010-09-15T04:44:23 = sáb 15 de sep
 
 =head3 MMMMEd (E, d 'de' MMMM)
 
@@ -529,13 +529,13 @@ Spanish Mexico locale.
 
    2008-02-05T18:30:30 = 5 feb
    1995-12-22T09:05:02 = 22 dic
-  -0010-09-15T04:44:23 = 15 sept
+  -0010-09-15T04:44:23 = 15 sep
 
 =head3 MMMdd (dd-MMM)
 
    2008-02-05T18:30:30 = 05-feb
    1995-12-22T09:05:02 = 22-dic
-  -0010-09-15T04:44:23 = 15-sept
+  -0010-09-15T04:44:23 = 15-sep
 
 =head3 MMd (d/MM)
 
@@ -563,39 +563,39 @@ Spanish Mexico locale.
 
 =head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 p. m.
-   1995-12-22T09:05:02 = 9 a. m.
-  -0010-09-15T04:44:23 = 4 a. m.
+   2008-02-05T18:30:30 = 6 p.m.
+   1995-12-22T09:05:02 = 9 a.m.
+  -0010-09-15T04:44:23 = 4 a.m.
 
 =head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 p. m.
-   1995-12-22T09:05:02 = 9:05 a. m.
-  -0010-09-15T04:44:23 = 4:44 a. m.
+   2008-02-05T18:30:30 = 6:30 p.m.
+   1995-12-22T09:05:02 = 9:05 a.m.
+  -0010-09-15T04:44:23 = 4:44 a.m.
 
 =head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 p. m.
-   1995-12-22T09:05:02 = 9:05:02 a. m.
-  -0010-09-15T04:44:23 = 4:44:23 a. m.
+   2008-02-05T18:30:30 = 6:30:30 p.m.
+   1995-12-22T09:05:02 = 9:05:02 a.m.
+  -0010-09-15T04:44:23 = 4:44:23 a.m.
 
 =head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 p. m. UTC
-   1995-12-22T09:05:02 = 9:05:02 a. m. UTC
-  -0010-09-15T04:44:23 = 4:44:23 a. m. UTC
+   2008-02-05T18:30:30 = 6:30:30 p.m. UTC
+   1995-12-22T09:05:02 = 9:05:02 a.m. UTC
+  -0010-09-15T04:44:23 = 4:44:23 a.m. UTC
 
 =head3 hmsvvvv (h:mm:ss a (vvvv))
 
-   2008-02-05T18:30:30 = 6:30:30 p. m. (UTC)
-   1995-12-22T09:05:02 = 9:05:02 a. m. (UTC)
-  -0010-09-15T04:44:23 = 4:44:23 a. m. (UTC)
+   2008-02-05T18:30:30 = 6:30:30 p.m. (UTC)
+   1995-12-22T09:05:02 = 9:05:02 a.m. (UTC)
+  -0010-09-15T04:44:23 = 4:44:23 a.m. (UTC)
 
 =head3 hmv (h:mm a v)
 
-   2008-02-05T18:30:30 = 6:30 p. m. UTC
-   1995-12-22T09:05:02 = 9:05 a. m. UTC
-  -0010-09-15T04:44:23 = 4:44 a. m. UTC
+   2008-02-05T18:30:30 = 6:30 p.m. UTC
+   1995-12-22T09:05:02 = 9:05 a.m. UTC
+  -0010-09-15T04:44:23 = 4:44 a.m. UTC
 
 =head3 ms (mm:ss)
 
@@ -631,13 +631,13 @@ Spanish Mexico locale.
 
    2008-02-05T18:30:30 = feb 2008
    1995-12-22T09:05:02 = dic 1995
-  -0010-09-15T04:44:23 = sept -10
+  -0010-09-15T04:44:23 = sep -10
 
 =head3 yMMMEd (EEE, d 'de' MMM 'de' y)
 
    2008-02-05T18:30:30 = mar, 5 de feb de 2008
    1995-12-22T09:05:02 = vie, 22 de dic de 1995
-  -0010-09-15T04:44:23 = sáb, 15 de sept de -10
+  -0010-09-15T04:44:23 = sáb, 15 de sep de -10
 
 =head3 yMMMM (MMMM 'de' y)
 
@@ -661,7 +661,7 @@ Spanish Mexico locale.
 
    2008-02-05T18:30:30 = 5 feb 2008
    1995-12-22T09:05:02 = 22 dic 1995
-  -0010-09-15T04:44:23 = 15 sept -10
+  -0010-09-15T04:44:23 = 15 sep -10
 
 =head3 yMd (d/M/y)
 
@@ -677,9 +677,9 @@ Spanish Mexico locale.
 
 =head3 yQQQQ (QQQQ 'de' y)
 
-   2008-02-05T18:30:30 = 1.er trimestre de 2008
+   2008-02-05T18:30:30 = 1.º trimestre de 2008
    1995-12-22T09:05:02 = 4.º trimestre de 1995
-  -0010-09-15T04:44:23 = 3.er trimestre de -10
+  -0010-09-15T04:44:23 = 3.º trimestre de -10
 
 =head3 yw-count-one ('semana' w 'de' Y)
 
@@ -698,7 +698,7 @@ Spanish Mexico locale.
 
 =head3 Prefers 24 hour time?
 
-Yes
+No
 
 =head3 Local first day of the week
 
@@ -710,7 +710,7 @@ Yes
 
    2008-02-05T18:30:30 = mar 05 feb 2008 18:30:30
    1995-12-22T09:05:02 = vie 22 dic 1995 09:05:02
-  -0010-09-15T04:44:23 = sáb 15 sept -10 04:44:23
+  -0010-09-15T04:44:23 = sáb 15 sep -10 04:44:23
 
 =head3 %x (%d/%m/%y) - date format
 

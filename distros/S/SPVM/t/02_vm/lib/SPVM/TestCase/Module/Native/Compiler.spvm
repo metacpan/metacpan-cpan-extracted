@@ -1,0 +1,79 @@
+class TestCase::Module::Native::Compiler {
+  use Native::Compiler;
+  use Native;
+  use Native::MethodCall;
+  use Stringable;
+  use Fn;
+  
+  static method add_class : int () {
+    
+    my $current_env = Native->get_current_env;
+    
+    my $current_stack = Native->get_current_stack;
+    
+    my $current_runtime = $current_env->runtime;
+    
+    my $current_compiler = $current_runtime->get_compiler;
+    
+    my $include_dir = "t/test_add_class/SPVM";
+    
+    $current_compiler->prepend_include_dir($include_dir);
+    
+    $current_compiler->set_start_file(__FILE__);
+    
+    {
+      my $basic_type_name = "MyPoint";
+      $current_compiler->set_start_line(__LINE__ + 1);
+      eval { $current_compiler->compile($basic_type_name); }
+      
+      if ($@) {
+        my $error_messages = $current_compiler->get_error_messages;
+        for my $error_message (@$error_messages) {
+          warn "$error_message";
+        }
+        
+        return 0;
+      }
+    }
+    
+    {
+      my $class_method_call = Native::MethodCall->new_class_method("MyPoint", "new");
+      
+      {
+        my $stringable = (Stringable)$class_method_call->call([(object)1, 2]);
+        
+        unless ($stringable->to_string eq "(1,2)") {
+          return 0;
+        }
+      }
+    }
+    
+    {
+      eval { Native::MethodCall->new_class_method("MyPoint", "not_exists"); }
+      
+      Fn->contains($@, "he \"not_exists\" method in the \"MyPoint\" class cannot be found.");
+      
+      $@ = undef;
+    }
+
+    {
+      my $basic_type_name = "NotExist::XXXXXXXXXXXXXXXXXXXXXXXXX";
+      $current_compiler->set_start_line(__LINE__ + 1);
+      eval { $current_compiler->compile($basic_type_name); }
+      
+      if ($@ && eval_error_id is_error Error::Compile) {
+        my $error_messages = $current_compiler->get_error_messages;
+        for my $error_message (@$error_messages) {
+          warn "$error_message";
+        }
+      }
+      else {
+        return 0;
+      }
+    }
+    
+    $@ = undef;
+    
+    return 1;
+  }
+}

@@ -92,6 +92,7 @@ t/testlib/LensUtil.pm
 t/testlib/PKLUtil.pm
 t/testlib/RefUtil.pm
 t/testlib/ScriptUtil.pm
+unisample.pl
 xt/async_bigoutput.t
 xt/async_option.t
 xt/encoding.t

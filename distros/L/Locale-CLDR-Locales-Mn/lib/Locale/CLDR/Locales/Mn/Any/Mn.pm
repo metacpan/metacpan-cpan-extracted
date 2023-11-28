@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mn::Any::Mn - Package for language Mongolian
 
 package Locale::CLDR::Locales::Mn::Any::Mn;
 # This file auto generated from Data\common\main\mn_MN.xml
-#	on Fri 13 Oct  9:27:37 am GMT
+#	on Sat  4 Nov  6:13:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

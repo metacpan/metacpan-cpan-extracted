@@ -1,0 +1,41 @@
+0.5    2023-11-27  lichtkind
+-------
+    * * reworked constriants tab
+        added options to use constant or coordinate values
+    * * polynomial tab for more complex equations with more monomials
+    * ' minor corrections in POD
+    * ! linkfix in readme
+    * ! crash when render black and white (no color) image
+
+0.43   2023-11-20  lichtkind
+-------
+    * = fixes yet
+    * / more color constants
+    * ' improved example picture in POD
+    * ! fixed smoke tests
+
+0.42   2023-11-17  lichtkind
+-------
+    * = more fixes
+    * / faster sketch drawing and thus app start
+    * / more color sets
+    * ' more examples
+    * ! link url for images
+
+0.41   2023-11-17  lichtkind
+-------
+    * = POD fix
+    * ! link url for images
+
+0.4   2023-11-17  lichtkind
+-------
+    * = initial release
+    * * compute and display julia and mandelbrot sets
+        with many exponents and a linear component
+    * * zoom and move inside the image arbitrarily
+
+
+TODO:
+
+# ! slow
+# optional color smoothing

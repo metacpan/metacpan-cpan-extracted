@@ -8,10 +8,10 @@ use AsposeCellsCloud::Request::GetWorksheetAutoshapes;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** |  |
-**sheet_name** | **string** |  |
-**folder** | **string** |  |
-**storage_name** | **string** |  |  
+**name** | **string** | The workbook name. |
+**sheet_name** | **string** | The worksheet name. |
+**folder** | **string** | Document's folder. |
+**storage_name** | **string** | Storage name. |  
 
 [[Back to Model list]](../README.md#documentation-for-requests) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

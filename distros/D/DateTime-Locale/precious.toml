@@ -27,7 +27,7 @@ expect_stderr = true
 [commands.omegasort-stopwords]
 type = "both"
 include = ".stopwords"
-cmd = [ "omegasort", "--sort=text", "--case-insensitive", "--locale", "en-US", "--unique" ]
+cmd = [ "omegasort", "--sort", "text", "--case-insensitive", "--locale", "en-US", "--unique" ]
 lint_flags = "--check"
 tidy_flags = "--in-place"
 ok_exit_codes = 0

@@ -2,12 +2,12 @@
 use strict;
 use warnings;
 
-use 5.010001;
+
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Utilities related to sorting files in a directory",
+  "ABSTRACT" => "CLI utilities related to sorting files in one or more directories",
   "AUTHOR" => "perlancar <perlancar\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -25,33 +25,30 @@ my %WriteMakefileArgs = (
     "script/sort-files"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::FileSortUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Compiler::perl::TH::array" => "0.914",
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
     "Data::Sah::Compiler::perl::TH::code" => "0.914",
     "Data::Sah::Compiler::perl::TH::hash" => "0.914",
     "Data::Sah::Compiler::perl::TH::int" => "0.914",
+    "Data::Sah::Compiler::perl::TH::re" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Code::eval" => 0,
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
-    "Exporter" => "5.57",
-    "Fcntl" => 0,
-    "File::chdir" => 0,
-    "List::Rank" => 0,
+    "Data::Sah::Filter::perl::Re::re_from_str" => 0,
+    "File::Util::Sort" => 0,
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
-    "Perinci::Sub::Util" => "0.472",
     "Perinci::Sub::XCompletion::sortsub_spec" => 0,
     "Sah::Schema::code_from_str" => 0,
-    "Sah::Schema::dirname::default_curdir" => 0,
+    "Sah::Schema::dirname" => 0,
+    "Sah::Schema::re_from_str" => 0,
     "Sah::Schema::true" => 0,
     "Sah::Schema::uint" => 0,
-    "Sort::Sub" => "0.120",
-    "strict" => 0,
-    "warnings" => 0
+    "strict" => 0
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
@@ -59,7 +56,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.005",
+  "VERSION" => "0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -67,34 +64,32 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Compiler::perl::TH::array" => "0.914",
   "Data::Sah::Compiler::perl::TH::bool" => "0.914",
   "Data::Sah::Compiler::perl::TH::code" => "0.914",
   "Data::Sah::Compiler::perl::TH::hash" => "0.914",
   "Data::Sah::Compiler::perl::TH::int" => "0.914",
+  "Data::Sah::Compiler::perl::TH::re" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "Data::Sah::Filter::perl::Code::eval" => 0,
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
-  "Exporter" => "5.57",
-  "Fcntl" => 0,
+  "Data::Sah::Filter::perl::Re::re_from_str" => 0,
   "File::Spec" => 0,
-  "File::chdir" => 0,
+  "File::Util::Sort" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "List::Rank" => 0,
   "Log::ger" => "0.038",
   "Perinci::CmdLine::Any" => "0.154",
   "Perinci::CmdLine::Lite" => "1.924",
-  "Perinci::Sub::Util" => "0.472",
   "Perinci::Sub::XCompletion::sortsub_spec" => 0,
   "Sah::Schema::code_from_str" => 0,
-  "Sah::Schema::dirname::default_curdir" => 0,
+  "Sah::Schema::dirname" => 0,
+  "Sah::Schema::re_from_str" => 0,
   "Sah::Schema::true" => 0,
   "Sah::Schema::uint" => 0,
-  "Sort::Sub" => "0.120",
   "Test::More" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "strict" => 0
 );
 
 

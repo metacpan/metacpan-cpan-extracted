@@ -27,7 +27,7 @@ Die Zeilen der Ein- und Ausgabedaten müssen nicht identisch sein, wenn die Opti
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # OPTIONS
 
@@ -39,19 +39,25 @@ Version 0.9901
 
     Kombiniert eine Folge von nicht leeren Zeilen zu einer einzigen Zeile, bevor sie an den Filterbefehl übergeben wird. Zeilenumbrüche zwischen breiten Zeichen werden gelöscht, und andere Zeilenumbrüche werden durch Leerzeichen ersetzt.
 
-- **--blockmatch**
+- **--blocks**
 
     Normalerweise wird der Bereich, der dem angegebenen Suchmuster entspricht, an den externen Befehl gesendet. Wenn diese Option angegeben wird, wird nicht der übereinstimmende Bereich, sondern der gesamte Block, der ihn enthält, verarbeitet.
 
     Um zum Beispiel Zeilen mit dem Muster `foo` an das externe Kommando zu senden, müssen Sie das Muster angeben, das auf die gesamte Zeile passt:
 
-        greple -Mtee cat -n -- '^.*foo.*\n'
+        greple -Mtee cat -n -- '^.*foo.*\n' --all
 
-    Mit der Option **--blockmatch** kann dies jedoch ganz einfach wie folgt geschehen:
+    Aber mit der Option **--blocks** kann es so einfach wie folgt gemacht werden:
 
-        greple -Mtee cat -n -- foo
+        greple -Mtee cat -n -- foo --blocks
 
-    Mit der Option **--blockmatch** verhält sich dieses Modul eher wie die Option **-g** von [teip(1)](http://man.he.net/man1/teip).
+    Mit der Option **--blocks** verhält sich dieses Modul eher wie [teip(1)](http://man.he.net/man1/teip) mit der Option **-g**. Ansonsten ist das Verhalten ähnlich wie bei [teip(1)](http://man.he.net/man1/teip) mit der Option **-o**.
+
+    Verwenden Sie die Option **--blocks** nicht mit der Option **--all**, da der Block die gesamten Daten sein werden.
+
+- **--squeeze**
+
+    Kombiniert zwei oder mehr aufeinanderfolgende Zeilenumbruchzeichen zu einem.
 
 # WHY DO NOT USE TEIP
 

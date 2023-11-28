@@ -440,7 +440,7 @@ class evaluator {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.3.0
+// UniLib version: 3.3.1
 // Unicode version: 15.0.0
 
 namespace unilib {
@@ -538,7 +538,7 @@ char32_t unicode::titlecase(char32_t chr) {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.3.0
+// UniLib version: 3.3.1
 // Unicode version: 15.0.0
 
 namespace unilib {
@@ -667,8 +667,13 @@ void utf8::decode(const std::string& str, std::u32string& decoded) {
   decode(str.c_str(), decoded);
 }
 
-class utf8::string_decoder::iterator : public std::iterator<std::input_iterator_tag, char32_t> {
+class utf8::string_decoder::iterator {
  public:
+  using iterator_category = std::input_iterator_tag;
+  using value_type = char32_t;
+  using difference_type = ptrdiff_t;
+  using pointer = char32_t*;
+  using reference = char32_t&;
   iterator(const char* str) : codepoint(0), next(str) { operator++(); }
   iterator(const iterator& it) : codepoint(it.codepoint), next(it.next) {}
   iterator& operator++() { if (next) { codepoint = decode(next); if (!codepoint) next = nullptr; } return *this; }
@@ -699,8 +704,13 @@ utf8::string_decoder utf8::decoder(const std::string& str) {
   return string_decoder(str.c_str());
 }
 
-class utf8::buffer_decoder::iterator : public std::iterator<std::input_iterator_tag, char32_t> {
+class utf8::buffer_decoder::iterator {
  public:
+  using iterator_category = std::input_iterator_tag;
+  using value_type = char32_t;
+  using difference_type = ptrdiff_t;
+  using pointer = char32_t*;
+  using reference = char32_t&;
   iterator(const char* str, size_t len) : codepoint(0), next(str), len(len) { operator++(); }
   iterator(const iterator& it) : codepoint(it.codepoint), next(it.next), len(it.len) {}
   iterator& operator++() { if (!len) next = nullptr; if (next) codepoint = decode(next, len); return *this; }
@@ -11115,7 +11125,7 @@ void tagset_converter_unique_generated(vector<tagged_lemma_forms>& forms) {
       if (forms[j].lemma == forms[i].lemma) {
         // Same lemma was found. Merge form-tag pairs
         for (auto&& tagged_form : forms[j].forms)
-          forms[i].forms.emplace_back(move(tagged_form));
+          forms[i].forms.emplace_back(std::move(tagged_form));
 
         // Remove lemma j by moving it to end and deleting
         if (j < forms.size() - 1) {
@@ -11159,13 +11169,13 @@ namespace morphodita {
 static const char _czech_tokenizer_cond_offsets[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	2, 2, 2, 2, 2, 2, 2, 2, 
-	2, 2, 2, 2, 2, 2, 2
+	2, 2, 2, 2
 };
 
 static const char _czech_tokenizer_cond_lengths[] = {
 	0, 0, 0, 0, 0, 0, 0, 2, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0
 };
 
 static const short _czech_tokenizer_cond_keys[] = {
@@ -11178,8 +11188,8 @@ static const char _czech_tokenizer_cond_spaces[] = {
 
 static const unsigned char _czech_tokenizer_key_offsets[] = {
 	0, 0, 17, 29, 43, 46, 51, 54, 
-	89, 94, 98, 101, 105, 110, 111, 116, 
-	117, 122, 136, 143, 148, 151, 163
+	89, 94, 99, 100, 105, 106, 111, 125, 
+	132, 137, 140, 152
 };
 
 static const short _czech_tokenizer_trans_keys[] = {
@@ -11194,34 +11204,33 @@ static const short _czech_tokenizer_trans_keys[] = {
 	131u, 135u, 142u, 147u, 157u, 159u, 160u, 301u, 
 	557u, 811u, 1067u, 0u, 42u, 48u, 57u, 58u, 
 	64u, 65u, 90u, 91u, 96u, 97u, 122u, 123u, 
-	255u, 9u, 10u, 13u, 32u, 147u, 9u, 13u, 
-	32u, 147u, 9u, 32u, 147u, 9u, 10u, 32u, 
-	147u, 9u, 10u, 13u, 32u, 147u, 13u, 9u, 
-	10u, 13u, 32u, 147u, 10u, 9u, 10u, 13u, 
-	32u, 147u, 13u, 32u, 34u, 39u, 41u, 59u, 
-	93u, 125u, 139u, 141u, 147u, 161u, 9u, 10u, 
-	44u, 46u, 69u, 101u, 159u, 48u, 57u, 69u, 
-	101u, 159u, 48u, 57u, 159u, 48u, 57u, 129u, 
-	131u, 135u, 151u, 155u, 157u, 65u, 90u, 97u, 
-	122u, 142u, 143u, 159u, 48u, 57u, 0
+	255u, 9u, 10u, 13u, 32u, 147u, 9u, 10u, 
+	13u, 32u, 147u, 13u, 9u, 10u, 13u, 32u, 
+	147u, 10u, 9u, 10u, 13u, 32u, 147u, 13u, 
+	32u, 34u, 39u, 41u, 59u, 93u, 125u, 139u, 
+	141u, 147u, 161u, 9u, 10u, 44u, 46u, 69u, 
+	101u, 159u, 48u, 57u, 69u, 101u, 159u, 48u, 
+	57u, 159u, 48u, 57u, 129u, 131u, 135u, 151u, 
+	155u, 157u, 65u, 90u, 97u, 122u, 142u, 143u, 
+	159u, 48u, 57u, 0
 };
 
 static const char _czech_tokenizer_single_lengths[] = {
 	0, 13, 10, 12, 1, 3, 1, 21, 
-	5, 4, 3, 4, 5, 1, 5, 1, 
-	5, 12, 5, 3, 1, 6, 1
+	5, 5, 1, 5, 1, 5, 12, 5, 
+	3, 1, 6, 1
 };
 
 static const char _czech_tokenizer_range_lengths[] = {
 	0, 2, 1, 1, 1, 1, 1, 7, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 1, 1, 1, 1, 3, 1
+	0, 0, 0, 0, 0, 0, 1, 1, 
+	1, 1, 3, 1
 };
 
 static const unsigned char _czech_tokenizer_index_offsets[] = {
 	0, 0, 16, 28, 42, 45, 50, 53, 
-	82, 88, 93, 97, 102, 108, 110, 116, 
-	118, 124, 138, 145, 150, 153, 163
+	82, 88, 94, 96, 102, 104, 110, 124, 
+	131, 136, 139, 149
 };
 
 static const char _czech_tokenizer_indicies[] = {
@@ -11235,49 +11244,48 @@ static const char _czech_tokenizer_indicies[] = {
 	10, 13, 9, 13, 9, 13, 16, 16, 
 	16, 16, 10, 16, 15, 13, 9, 17, 
 	9, 17, 9, 15, 9, 16, 9, 16, 
-	9, 14, 10, 19, 20, 10, 10, 18, 
-	10, 21, 10, 10, 18, 10, 10, 10, 
-	18, 10, 21, 10, 10, 18, 10, 22, 
-	23, 10, 10, 18, 25, 24, 10, 22, 
-	26, 10, 10, 18, 25, 24, 10, 23, 
-	26, 10, 10, 18, 4, 4, 5, 5, 
-	5, 5, 5, 5, 5, 5, 4, 5, 
-	4, 27, 28, 28, 29, 29, 15, 15, 
-	27, 29, 29, 6, 6, 27, 8, 8, 
-	27, 16, 16, 16, 16, 16, 16, 16, 
-	16, 16, 27, 15, 15, 27, 0
+	9, 14, 10, 11, 12, 10, 10, 18, 
+	10, 19, 20, 10, 10, 18, 22, 21, 
+	10, 19, 23, 10, 10, 18, 22, 21, 
+	10, 20, 23, 10, 10, 18, 4, 4, 
+	5, 5, 5, 5, 5, 5, 5, 5, 
+	4, 5, 4, 24, 25, 25, 26, 26, 
+	15, 15, 24, 26, 26, 6, 6, 24, 
+	8, 8, 24, 16, 16, 16, 16, 16, 
+	16, 16, 16, 16, 24, 15, 15, 24, 
+	0
 };
 
 static const char _czech_tokenizer_trans_targs[] = {
-	7, 1, 2, 7, 1, 3, 19, 6, 
-	20, 7, 8, 12, 16, 17, 0, 18, 
-	21, 22, 7, 9, 11, 10, 13, 14, 
-	7, 7, 15, 7, 4, 5
+	7, 1, 2, 7, 1, 3, 16, 6, 
+	17, 7, 8, 9, 13, 14, 0, 15, 
+	18, 19, 7, 10, 11, 7, 7, 12, 
+	7, 4, 5
 };
 
 static const char _czech_tokenizer_trans_actions[] = {
 	1, 0, 0, 2, 3, 0, 4, 0, 
 	0, 7, 0, 0, 0, 4, 0, 4, 
-	0, 0, 8, 0, 0, 0, 0, 0, 
-	9, 10, 0, 11, 0, 0
+	0, 0, 8, 0, 0, 9, 10, 0, 
+	11, 0, 0
 };
 
 static const char _czech_tokenizer_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 5, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0
 };
 
 static const char _czech_tokenizer_from_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 6, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0
 };
 
 static const unsigned char _czech_tokenizer_eof_trans[] = {
 	0, 1, 1, 1, 1, 1, 1, 0, 
-	19, 19, 19, 19, 19, 25, 19, 25, 
-	19, 28, 28, 28, 28, 28, 28
+	19, 19, 22, 19, 22, 19, 25, 25, 
+	25, 25, 25, 25
 };
 
 static const int czech_tokenizer_start = 7;
@@ -11922,14 +11930,14 @@ static const char _english_tokenizer_cond_offsets[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 2, 2, 2, 2, 2, 
 	2, 2, 2, 2, 2, 2, 2, 2, 
-	2, 2, 2, 2, 2
+	2, 2
 };
 
 static const char _english_tokenizer_cond_lengths[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 2, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0
+	0, 0
 };
 
 static const short _english_tokenizer_cond_keys[] = {
@@ -11942,9 +11950,9 @@ static const char _english_tokenizer_cond_spaces[] = {
 
 static const unsigned char _english_tokenizer_key_offsets[] = {
 	0, 0, 17, 29, 43, 46, 49, 52, 
-	55, 60, 63, 98, 103, 107, 110, 114, 
-	119, 120, 125, 126, 131, 145, 152, 156, 
-	161, 164, 179, 192, 206
+	55, 60, 63, 98, 103, 108, 109, 114, 
+	115, 120, 134, 141, 145, 150, 153, 168, 
+	181, 195
 };
 
 static const short _english_tokenizer_trans_keys[] = {
@@ -11961,41 +11969,39 @@ static const short _english_tokenizer_trans_keys[] = {
 	301u, 557u, 811u, 1067u, 0u, 42u, 48u, 57u, 
 	58u, 64u, 65u, 90u, 91u, 96u, 97u, 122u, 
 	123u, 255u, 9u, 10u, 13u, 32u, 147u, 9u, 
-	13u, 32u, 147u, 9u, 32u, 147u, 9u, 10u, 
-	32u, 147u, 9u, 10u, 13u, 32u, 147u, 13u, 
-	9u, 10u, 13u, 32u, 147u, 10u, 9u, 10u, 
-	13u, 32u, 147u, 13u, 32u, 34u, 39u, 41u, 
-	59u, 93u, 125u, 139u, 141u, 147u, 161u, 9u, 
-	10u, 44u, 46u, 69u, 101u, 159u, 48u, 57u, 
-	44u, 46u, 69u, 101u, 69u, 101u, 159u, 48u, 
-	57u, 159u, 48u, 57u, 39u, 45u, 129u, 131u, 
+	10u, 13u, 32u, 147u, 13u, 9u, 10u, 13u, 
+	32u, 147u, 10u, 9u, 10u, 13u, 32u, 147u, 
+	13u, 32u, 34u, 39u, 41u, 59u, 93u, 125u, 
+	139u, 141u, 147u, 161u, 9u, 10u, 44u, 46u, 
+	69u, 101u, 159u, 48u, 57u, 44u, 46u, 69u, 
+	101u, 69u, 101u, 159u, 48u, 57u, 159u, 48u, 
+	57u, 39u, 45u, 129u, 131u, 135u, 151u, 155u, 
+	157u, 161u, 65u, 90u, 97u, 122u, 142u, 143u, 
+	45u, 129u, 131u, 135u, 151u, 155u, 157u, 65u, 
+	90u, 97u, 122u, 142u, 143u, 39u, 129u, 131u, 
 	135u, 151u, 155u, 157u, 161u, 65u, 90u, 97u, 
-	122u, 142u, 143u, 45u, 129u, 131u, 135u, 151u, 
-	155u, 157u, 65u, 90u, 97u, 122u, 142u, 143u, 
-	39u, 129u, 131u, 135u, 151u, 155u, 157u, 161u, 
-	65u, 90u, 97u, 122u, 142u, 143u, 159u, 48u, 
-	57u, 0
+	122u, 142u, 143u, 159u, 48u, 57u, 0
 };
 
 static const char _english_tokenizer_single_lengths[] = {
 	0, 13, 10, 12, 1, 1, 1, 1, 
-	3, 1, 21, 5, 4, 3, 4, 5, 
-	1, 5, 1, 5, 12, 5, 4, 3, 
-	1, 9, 7, 8, 1
+	3, 1, 21, 5, 5, 1, 5, 1, 
+	5, 12, 5, 4, 3, 1, 9, 7, 
+	8, 1
 };
 
 static const char _english_tokenizer_range_lengths[] = {
 	0, 2, 1, 1, 1, 1, 1, 1, 
 	1, 1, 7, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 1, 1, 0, 1, 
-	1, 3, 3, 3, 1
+	0, 1, 1, 0, 1, 1, 3, 3, 
+	3, 1
 };
 
 static const unsigned char _english_tokenizer_index_offsets[] = {
 	0, 0, 16, 28, 42, 45, 48, 51, 
-	54, 59, 62, 91, 97, 102, 106, 111, 
-	117, 119, 125, 127, 133, 147, 154, 159, 
-	164, 167, 180, 191, 203
+	54, 59, 62, 91, 97, 103, 105, 111, 
+	113, 119, 133, 140, 145, 150, 153, 166, 
+	177, 189
 };
 
 static const char _english_tokenizer_indicies[] = {
@@ -12010,58 +12016,57 @@ static const char _english_tokenizer_indicies[] = {
 	15, 13, 16, 12, 16, 12, 16, 19, 
 	19, 19, 19, 13, 19, 18, 16, 12, 
 	20, 12, 20, 12, 18, 12, 19, 12, 
-	19, 12, 17, 13, 22, 23, 13, 13, 
-	21, 13, 24, 13, 13, 21, 13, 13, 
-	13, 21, 13, 24, 13, 13, 21, 13, 
-	25, 26, 13, 13, 21, 28, 27, 13, 
-	25, 29, 13, 13, 21, 28, 27, 13, 
-	26, 29, 13, 13, 21, 4, 4, 5, 
-	5, 5, 5, 5, 5, 5, 5, 4, 
-	5, 4, 30, 31, 32, 33, 33, 18, 
-	18, 30, 31, 32, 33, 33, 30, 33, 
-	33, 9, 9, 30, 11, 11, 30, 34, 
-	35, 19, 19, 19, 19, 19, 19, 34, 
-	19, 19, 19, 30, 35, 19, 19, 19, 
-	19, 19, 19, 19, 19, 19, 30, 34, 
-	19, 19, 19, 19, 19, 19, 34, 19, 
-	19, 19, 30, 18, 18, 30, 0
+	19, 12, 17, 13, 14, 15, 13, 13, 
+	21, 13, 22, 23, 13, 13, 21, 25, 
+	24, 13, 22, 26, 13, 13, 21, 25, 
+	24, 13, 23, 26, 13, 13, 21, 4, 
+	4, 5, 5, 5, 5, 5, 5, 5, 
+	5, 4, 5, 4, 27, 28, 29, 30, 
+	30, 18, 18, 27, 28, 29, 30, 30, 
+	27, 30, 30, 9, 9, 27, 11, 11, 
+	27, 31, 32, 19, 19, 19, 19, 19, 
+	19, 31, 19, 19, 19, 27, 32, 19, 
+	19, 19, 19, 19, 19, 19, 19, 19, 
+	27, 31, 19, 19, 19, 19, 19, 19, 
+	31, 19, 19, 19, 27, 18, 18, 27, 
+	0
 };
 
 static const char _english_tokenizer_trans_targs[] = {
 	10, 1, 2, 10, 1, 3, 5, 6, 
-	22, 23, 9, 24, 10, 11, 15, 19, 
-	20, 0, 21, 25, 28, 10, 12, 14, 
-	13, 16, 17, 10, 10, 18, 10, 4, 
-	7, 8, 26, 27
+	19, 20, 9, 21, 10, 11, 12, 16, 
+	17, 0, 18, 22, 25, 10, 13, 14, 
+	10, 10, 15, 10, 4, 7, 8, 23, 
+	24
 };
 
 static const char _english_tokenizer_trans_actions[] = {
 	1, 0, 0, 2, 3, 0, 0, 0, 
 	4, 4, 0, 0, 7, 0, 0, 0, 
 	4, 0, 4, 0, 0, 8, 0, 0, 
-	0, 0, 0, 9, 10, 0, 11, 0, 
-	0, 0, 0, 0
+	9, 10, 0, 11, 0, 0, 0, 0, 
+	0
 };
 
 static const char _english_tokenizer_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 5, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0
+	0, 0
 };
 
 static const char _english_tokenizer_from_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 6, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0
+	0, 0
 };
 
 static const unsigned char _english_tokenizer_eof_trans[] = {
 	0, 1, 1, 1, 1, 1, 1, 1, 
-	1, 1, 0, 22, 22, 22, 22, 22, 
-	28, 22, 28, 22, 31, 31, 31, 31, 
-	31, 31, 31, 31, 31
+	1, 1, 0, 22, 22, 25, 22, 25, 
+	22, 28, 28, 28, 28, 28, 28, 28, 
+	28, 28
 };
 
 static const int english_tokenizer_start = 10;
@@ -12320,13 +12325,13 @@ namespace morphodita {
 static const char _generic_tokenizer_cond_offsets[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 
 	2, 2, 2, 2, 2, 2, 2, 2, 
-	2, 2, 2, 2, 2, 2, 2
+	2, 2, 2, 2
 };
 
 static const char _generic_tokenizer_cond_lengths[] = {
 	0, 0, 0, 0, 0, 0, 0, 2, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0
 };
 
 static const short _generic_tokenizer_cond_keys[] = {
@@ -12339,8 +12344,8 @@ static const char _generic_tokenizer_cond_spaces[] = {
 
 static const unsigned char _generic_tokenizer_key_offsets[] = {
 	0, 0, 17, 29, 43, 46, 51, 54, 
-	89, 94, 98, 101, 105, 110, 111, 116, 
-	117, 122, 136, 142, 147, 150, 162
+	89, 94, 99, 100, 105, 106, 111, 125, 
+	131, 136, 139, 151
 };
 
 static const short _generic_tokenizer_trans_keys[] = {
@@ -12355,34 +12360,33 @@ static const short _generic_tokenizer_trans_keys[] = {
 	131u, 135u, 142u, 147u, 157u, 159u, 160u, 301u, 
 	557u, 811u, 1067u, 0u, 42u, 48u, 57u, 58u, 
 	64u, 65u, 90u, 91u, 96u, 97u, 122u, 123u, 
-	255u, 9u, 10u, 13u, 32u, 147u, 9u, 13u, 
-	32u, 147u, 9u, 32u, 147u, 9u, 10u, 32u, 
-	147u, 9u, 10u, 13u, 32u, 147u, 13u, 9u, 
-	10u, 13u, 32u, 147u, 10u, 9u, 10u, 13u, 
-	32u, 147u, 13u, 32u, 34u, 39u, 41u, 59u, 
-	93u, 125u, 139u, 141u, 147u, 161u, 9u, 10u, 
-	46u, 69u, 101u, 159u, 48u, 57u, 69u, 101u, 
-	159u, 48u, 57u, 159u, 48u, 57u, 129u, 131u, 
-	135u, 151u, 155u, 157u, 65u, 90u, 97u, 122u, 
-	142u, 143u, 159u, 48u, 57u, 0
+	255u, 9u, 10u, 13u, 32u, 147u, 9u, 10u, 
+	13u, 32u, 147u, 13u, 9u, 10u, 13u, 32u, 
+	147u, 10u, 9u, 10u, 13u, 32u, 147u, 13u, 
+	32u, 34u, 39u, 41u, 59u, 93u, 125u, 139u, 
+	141u, 147u, 161u, 9u, 10u, 46u, 69u, 101u, 
+	159u, 48u, 57u, 69u, 101u, 159u, 48u, 57u, 
+	159u, 48u, 57u, 129u, 131u, 135u, 151u, 155u, 
+	157u, 65u, 90u, 97u, 122u, 142u, 143u, 159u, 
+	48u, 57u, 0
 };
 
 static const char _generic_tokenizer_single_lengths[] = {
 	0, 13, 10, 12, 1, 3, 1, 21, 
-	5, 4, 3, 4, 5, 1, 5, 1, 
-	5, 12, 4, 3, 1, 6, 1
+	5, 5, 1, 5, 1, 5, 12, 4, 
+	3, 1, 6, 1
 };
 
 static const char _generic_tokenizer_range_lengths[] = {
 	0, 2, 1, 1, 1, 1, 1, 7, 
-	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 1, 1, 1, 1, 3, 1
+	0, 0, 0, 0, 0, 0, 1, 1, 
+	1, 1, 3, 1
 };
 
 static const unsigned char _generic_tokenizer_index_offsets[] = {
 	0, 0, 16, 28, 42, 45, 50, 53, 
-	82, 88, 93, 97, 102, 108, 110, 116, 
-	118, 124, 138, 144, 149, 152, 162
+	82, 88, 94, 96, 102, 104, 110, 124, 
+	130, 135, 138, 148
 };
 
 static const char _generic_tokenizer_indicies[] = {
@@ -12396,49 +12400,47 @@ static const char _generic_tokenizer_indicies[] = {
 	10, 13, 9, 13, 9, 13, 16, 16, 
 	16, 16, 10, 16, 15, 13, 9, 17, 
 	9, 17, 9, 15, 9, 16, 9, 16, 
-	9, 14, 10, 19, 20, 10, 10, 18, 
-	10, 21, 10, 10, 18, 10, 10, 10, 
-	18, 10, 21, 10, 10, 18, 10, 22, 
-	23, 10, 10, 18, 25, 24, 10, 22, 
-	26, 10, 10, 18, 25, 24, 10, 23, 
-	26, 10, 10, 18, 4, 4, 5, 5, 
-	5, 5, 5, 5, 5, 5, 4, 5, 
-	4, 27, 28, 29, 29, 15, 15, 27, 
-	29, 29, 6, 6, 27, 8, 8, 27, 
-	16, 16, 16, 16, 16, 16, 16, 16, 
-	16, 27, 15, 15, 27, 0
+	9, 14, 10, 11, 12, 10, 10, 18, 
+	10, 19, 20, 10, 10, 18, 22, 21, 
+	10, 19, 23, 10, 10, 18, 22, 21, 
+	10, 20, 23, 10, 10, 18, 4, 4, 
+	5, 5, 5, 5, 5, 5, 5, 5, 
+	4, 5, 4, 24, 25, 26, 26, 15, 
+	15, 24, 26, 26, 6, 6, 24, 8, 
+	8, 24, 16, 16, 16, 16, 16, 16, 
+	16, 16, 16, 24, 15, 15, 24, 0
 };
 
 static const char _generic_tokenizer_trans_targs[] = {
-	7, 1, 2, 7, 1, 3, 19, 6, 
-	20, 7, 8, 12, 16, 17, 0, 18, 
-	21, 22, 7, 9, 11, 10, 13, 14, 
-	7, 7, 15, 7, 4, 5
+	7, 1, 2, 7, 1, 3, 16, 6, 
+	17, 7, 8, 9, 13, 14, 0, 15, 
+	18, 19, 7, 10, 11, 7, 7, 12, 
+	7, 4, 5
 };
 
 static const char _generic_tokenizer_trans_actions[] = {
 	1, 0, 0, 2, 3, 0, 4, 0, 
 	0, 7, 0, 0, 0, 4, 0, 4, 
-	0, 0, 8, 0, 0, 0, 0, 0, 
-	9, 10, 0, 11, 0, 0
+	0, 0, 8, 0, 0, 9, 10, 0, 
+	11, 0, 0
 };
 
 static const char _generic_tokenizer_to_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 5, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0
 };
 
 static const char _generic_tokenizer_from_state_actions[] = {
 	0, 0, 0, 0, 0, 0, 0, 6, 
 	0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0
+	0, 0, 0, 0
 };
 
 static const unsigned char _generic_tokenizer_eof_trans[] = {
 	0, 1, 1, 1, 1, 1, 1, 0, 
-	19, 19, 19, 19, 19, 25, 19, 25, 
-	19, 28, 28, 28, 28, 28, 28
+	19, 19, 22, 19, 22, 19, 25, 25, 
+	25, 25, 25, 25
 };
 
 static const int generic_tokenizer_start = 7;
@@ -12786,7 +12788,7 @@ void generic_tokenizer_factory_encoder::encode(unsigned version, ostream& os) {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.3.0
+// UniLib version: 3.3.1
 // Unicode version: 15.0.0
 
 namespace unilib {
@@ -14698,7 +14700,7 @@ bool vertical_tokenizer::next_sentence(vector<token_range>& tokens) {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.3.0
+// UniLib version: 3.3.1
 // Unicode version: 15.0.0
 
 namespace unilib {
@@ -14762,7 +14764,7 @@ class version {
 namespace morphodita {
 
 version version::current() {
-  return {1, 11, 1, "dev"};
+  return {1, 11, 2, ""};
 }
 
 // Returns multi-line formated version and copyright string.
@@ -17834,7 +17836,7 @@ unique_ptr<transition_oracle::tree_oracle> transition_system_swap_oracle_static:
         create_projective_component(t, node, projective_components, node);
   }
 
-  return unique_ptr<transition_oracle::tree_oracle>(new tree_oracle_static(labels, root_label, gold, move(projective_order), move(projective_components)));
+  return unique_ptr<transition_oracle::tree_oracle>(new tree_oracle_static(labels, root_label, gold, std::move(projective_order), std::move(projective_components)));
 }
 
 void transition_system_swap_oracle_static::create_projective_order(const tree& gold, int node, vector<int>& projective_order, int& projective_index) const {
@@ -18815,21 +18817,21 @@ bool input_format_presegmented_tokenizer::next_sentence(sentence& s, string& err
       // Append words
       size_t words = s.words.size() - 1;
       for (size_t i = 1; i < partial.words.size(); i++) {
-        s.words.push_back(move(partial.words[i]));
+        s.words.push_back(std::move(partial.words[i]));
         s.words.back().id += words;
         if (s.words.back().head > 0) s.words.back().head += words;
       }
 
       // Append multiword_tokens
       for (auto&& multiword_token : partial.multiword_tokens) {
-        s.multiword_tokens.push_back(move(multiword_token));
+        s.multiword_tokens.push_back(std::move(multiword_token));
         s.multiword_tokens.back().id_first += words;
         s.multiword_tokens.back().id_last += words;
       }
 
       // Append empty nodes
       for (auto&& empty_node : partial.empty_nodes) {
-        s.empty_nodes.push_back(move(empty_node));
+        s.empty_nodes.push_back(std::move(empty_node));
         s.empty_nodes.back().id += words;
       }
     }
@@ -19582,7 +19584,7 @@ void sentence::set_comment(string_piece name, string_piece value) {
     for (size_t i = 0; i < value.len; i++)
       comment.push_back(value.str[i] == '\r' || value.str[i] == '\n' ? ' ' : value.str[i]);
   }
-  comments.push_back(move(comment));
+  comments.push_back(std::move(comment));
 }
 
 /////////
@@ -22323,7 +22325,7 @@ ostringstream training_error::message_collector;
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.3.0
+// UniLib version: 3.3.1
 // Unicode version: 15.0.0
 
 namespace unilib {
@@ -22557,7 +22559,7 @@ const char32_t unicode::othercase_block[][256] = {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.3.0
+// UniLib version: 3.3.1
 // Unicode version: 15.0.0
 
 namespace unilib {
@@ -22954,7 +22956,7 @@ const char32_t uninorms::decomposition_data[] = {
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.3.0
+// UniLib version: 3.3.1
 // Unicode version: 15.0.0
 
 namespace unilib {
@@ -23033,14 +23035,14 @@ const char utf8::REPLACEMENT_CHAR;
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
-// UniLib version: 3.3.0
+// UniLib version: 3.3.1
 // Unicode version: 15.0.0
 
 namespace unilib {
 
 // Returns current version.
 version version::current() {
-  return {3, 3, 0, ""};
+  return {3, 3, 1, ""};
 }
 
 } // namespace unilib
@@ -24885,6 +24887,8 @@ void MatchFinder_Construct(CMatchFinder *p)
   p->bufferBase = 0;
   p->directInput = 0;
   p->hash = 0;
+  p->hashSizeSum = 0;
+  p->numSons = 0;
   MatchFinder_SetDefaultSettings(p);
 
   for (i = 0; i < 256; i++)
@@ -27774,7 +27778,7 @@ bool compressor::save(ostream& os, const binary_encoder& enc) {
 
 // Returns current version.
 version version::current() {
-  return {1, 3, 0, ""};
+  return {1, 3, 1, ""};
 }
 
 // Returns multi-line formated version and copyright string.

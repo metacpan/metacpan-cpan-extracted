@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/10/11
+## Modified 2023/10/21
 ## All rights reserved
 ## 
 ## 
@@ -37,10 +37,9 @@ BEGIN
     use APR::UUID ();
     use Devel::Confess;
     use JSON ();
-    use Nice::Try dont_want => 1;
     use Scalar::Util ();
     $DEBUG   = 0;
-    $VERSION = 'v0.1.3';
+    $VERSION = 'v0.1.4';
 };
 
 use strict;
@@ -132,18 +131,21 @@ sub bailout
     }
     else
     {
-        try
+        # try-catch
+        local $@;
+        my $rv = eval
         {
             my $r = $self->apache_request;
             $r->status( $msg->{code} );
             $r->rflush;
             $r->print( $msg->{message} );
             return( $msg->{code} );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
             return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
         }
+        return( $rv );
     }
 }
 
@@ -154,14 +156,17 @@ sub decode_base64
 {
     my $self = shift( @_ );
     my $data = shift( @_ );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( APR::Base64::decode( $data ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to base64 decode data: $e" ) );
+        return( $self->error( "An error occurred while trying to base64 decode data: $@" ) );
     }
+    return( $rv );
 }
 
 sub decode_json
@@ -170,13 +175,15 @@ sub decode_json
     my $raw  = shift( @_ ) || return( $self->error( "No json data was provided to decode." ) );
     my $json = $self->json;
     my $hash;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $hash = $json->utf8->decode( $raw );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to decode json payload: $e" ) );
+        return( $self->error( "An error occurred while trying to decode json payload: $@" ) );
     }
     return( $hash );
 }
@@ -211,14 +218,17 @@ sub encode_base64
     my $self = shift( @_ );
     my $data = shift( @_ );
     return( $self->error( "No valid to base64 encode was provided." ) ) if( !length( $data ) );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( APR::Base64::encode( $data ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to base64 encode data: $e" ) );
+        return( $self->error( "An error occurred while trying to base64 encode data: $@" ) );
     }
+    return( $rv );
 }
 
 sub encode_json
@@ -228,13 +238,15 @@ sub encode_json
     return( $self->error( "Hash provided ($hash) is not a hash reference." ) ) if( !$self->_is_hash( $hash ) );
     my $json = $self->json->allow_nonref->allow_blessed->convert_blessed->relaxed;
     my $data;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $data = $json->encode( $hash );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to encode perl data: $e\nPerl data are: ", sub{ $self->SUPER::dump( $hash ) } ) );
+        return( $self->error( "An error occurred while trying to encode perl data: $@\nPerl data are: ", sub{ $self->SUPER::dump( $hash ) } ) );
     }
     return( $data );
 }
@@ -266,14 +278,17 @@ sub encode_utf8
 sub generate_uuid
 {
     my $self = shift( @_ );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( APR::UUID->new->format );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to generate an uuid using APR::UUID package: $e" ) );
+        return( $self->error( "An error occurred while trying to generate an uuid using APR::UUID package: $@" ) );
     }
+    return( $rv );
 }
 
 # rfc 6750 <https://tools.ietf.org/html/rfc6750>
@@ -446,11 +461,13 @@ sub print
         # $r->send_http_header;
         # $r->print( $json );
         # $json = Encode::encode_utf8( $json ) if( utf8::is_utf8( $json ) );
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my $bytes = $r->print( $json );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
         }
     }
@@ -662,16 +679,19 @@ sub response { return( shift->_set_get_object( 'response', 'Apache2::API::Respon
 sub server
 {
     my $self = shift( @_ );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         my $r = $self->apache_request;
         return( $r->server ) if( $r );
         return( Apache2::ServerUtil->server );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to get the Apache server object: $e" ) );
+        return( $self->error( "An error occurred while trying to get the Apache server object: $@" ) );
     }
+    return( $rv );
 }
 
 # sub server_version { return( version->parse( Apache2::ServerUtil::get_server_version ) ); }
@@ -714,15 +734,18 @@ sub _try
     my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
     my $r = Apache2::RequestUtil->request;
     # $r->log_error( "Apache2::API::_try to call method \"$meth\" in package \"$pack\"." );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( $self->$pack->$meth ) if( !scalar( @_ ) );
         return( $self->$pack->$meth( @_ ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $e" ) );
+        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $@" ) );
     }
+    return( $rv );
 }
 
 # NOTE: sub FREEZE is inherited
@@ -823,7 +846,7 @@ Apache2::API - Apache2 API Framework
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 

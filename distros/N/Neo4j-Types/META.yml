@@ -3,13 +3,13 @@ abstract: 'Common Neo4j type system'
 author:
   - 'Arne Johannessen <ajnn@cpan.org>'
 build_requires:
-  Test::Exception: '0'
-  Test::More: '0.88'
-  Test::Warnings: '0'
+  Test::Tester: '0.08'
+  Test::Warnings: '0.010'
+  if: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,28 +18,57 @@ name: Neo4j-Types
 no_index:
   directory:
     - t/lib
+  namespace:
+    - Test::Neo4j::Types
 provides:
   Neo4j::Types:
     file: lib/Neo4j/Types.pm
-    version: '1.00'
+    version: '2.00'
+  Neo4j::Types::ByteArray:
+    file: lib/Neo4j/Types/ByteArray.pm
+    version: '2.00'
+  Neo4j::Types::DateTime:
+    file: lib/Neo4j/Types/DateTime.pm
+    version: '2.00'
+  Neo4j::Types::Duration:
+    file: lib/Neo4j/Types/Duration.pm
+    version: '2.00'
+  Neo4j::Types::Generic::ByteArray:
+    file: lib/Neo4j/Types/Generic/ByteArray.pm
+    version: '2.00'
+  Neo4j::Types::Generic::DateTime:
+    file: lib/Neo4j/Types/Generic/DateTime.pm
+    version: '2.00'
+  Neo4j::Types::Generic::Duration:
+    file: lib/Neo4j/Types/Generic/Duration.pm
+    version: '2.00'
+  Neo4j::Types::Generic::Point:
+    file: lib/Neo4j/Types/Generic/Point.pm
+    version: '2.00'
   Neo4j::Types::Node:
     file: lib/Neo4j/Types/Node.pm
-    version: '1.00'
+    version: '2.00'
   Neo4j::Types::Path:
     file: lib/Neo4j/Types/Path.pm
-    version: '1.00'
+    version: '2.00'
   Neo4j::Types::Point:
     file: lib/Neo4j/Types/Point.pm
-    version: '1.00'
+    version: '2.00'
   Neo4j::Types::Relationship:
     file: lib/Neo4j/Types/Relationship.pm
-    version: '1.00'
+    version: '2.00'
+  Test::Neo4j::Types:
+    file: lib/Test/Neo4j/Types.pm
+    version: '2.00'
 requires:
-  perl: '5.006'
+  Test::Exception: '0'
+  Test::More: '0.94'
+  Test::Warnings: '0.010'
+  perl: v5.10.1
 resources:
   bugtracker: https://github.com/johannessen/neo4j-types/issues
   repository: https://github.com/johannessen/neo4j-types.git
-version: '1.00'
-x_generated_by_perl: v5.30.2
-x_serialization_backend: 'YAML::Tiny version 1.73'
+version: '2.00'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: Artistic-2.0

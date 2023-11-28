@@ -3,7 +3,7 @@ package Net::DNS::Nameserver;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Nameserver.pm 1925 2023-05-31 11:58:59Z willem $)[2];
+our $VERSION = (qw$Id: Nameserver.pm 1949 2023-11-27 11:51:17Z willem $)[2];
 
 
 =head1 NAME
@@ -44,8 +44,10 @@ use Carp;
 use Net::DNS;
 use Net::DNS::ZoneFile;
 
-use IO::Socket::IP 0.38;
 use IO::Select;
+use IO::Socket::IP 0.38;
+use IO::Socket;
+use Socket;
 
 use constant USE_POSIX => defined eval 'use POSIX ":sys_wait_h"; 1';	## no critic
 
@@ -53,6 +55,17 @@ use constant DEFAULT_ADDR => qw(::1 127.0.0.1);
 use constant DEFAULT_PORT => 5353;
 
 use constant PACKETSZ => 512;
+
+use constant SOCKOPT => eval {
+	my @sockopt;
+	push @sockopt, eval '[SOL_SOCKET, SO_REUSEADDR]';	## no critic
+	push @sockopt, eval '[SOL_SOCKET, SO_REUSEPORT]';	## no critic
+
+	my $pretest = sub {					# check that options safe to use
+		return eval { IO::Socket::IP->new( Proto => "udp", Sockopts => [shift], Type => SOCK_DGRAM ) }
+	};
+	return grep { &$pretest($_) } @sockopt;			# without any guarantee that they work!
+};
 
 
 #------------------------------------------------------------------------------
@@ -409,8 +422,8 @@ sub spawn {
 		return $pid;		## parent
 	}
 
-	# else ...			## child
-	$coderef->();
+	# else ...
+	$coderef->();			## child
 	exit;
 }
 
@@ -459,8 +472,7 @@ sub TCP_initialise {
 	my $socket = IO::Socket::IP->new(
 		LocalAddr => $ip,
 		LocalPort => $port,
-		ReuseAddr => 1,
-		ReusePort => 1,
+		Sockopt	  => [SOCKOPT],
 		Proto	  => "tcp",
 		Listen	  => SOMAXCONN,
 		Type	  => SOCK_STREAM
@@ -500,8 +512,7 @@ sub UDP_initialise {
 	my $socket = IO::Socket::IP->new(
 		LocalAddr => $ip,
 		LocalPort => $port,
-		ReuseAddr => 1,
-		ReusePort => 1,
+		Sockopt	  => [SOCKOPT],
 		Proto	  => "udp",
 		Type	  => SOCK_DGRAM
 		)

@@ -26,12 +26,6 @@ my $seed = time();
 
 # Fn
 {
-  # Enumerations
-  {
-    ok(SPVM::TestCase::Module::Fn->GET_CODE_POINT_ERROR_OVER_STRING_RANGE);
-    ok(SPVM::TestCase::Module::Fn->GET_CODE_POINT_ERROR_INVALID_UTF8);
-  }
-  
   # Class methods
   {
     ok(SPVM::TestCase::Module::Fn->BYTE_MAX);
@@ -174,6 +168,10 @@ my $seed = time();
     ok(SPVM::TestCase::Module::Fn->get_memory_blocks_count);
     
     ok(SPVM::TestCase::Module::Fn->to_address);
+    
+    ok(SPVM::TestCase::Module::Fn->check_option_names);
+    
+    ok(SPVM::TestCase::Module::Fn->get_basic_type_id);
   }
   
   # Extra

@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::BME280
 # Description  : Interface to BME280 Temperature, Humidity & Pressure Sensor
-# Copyright    : Copyright (c) 2020 Mark Dootson
+# Copyright    : Copyright (c) 2020-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -18,7 +18,7 @@ use HiPi::RaspberryPi;
 use Carp;
 use Try::Tiny;
 
-our $VERSION ='0.82';
+our $VERSION ='0.89';
 
 __PACKAGE__->create_accessors( qw( backend _id _compensation repeat_oneshot ) );
 
@@ -112,6 +112,9 @@ sub reset {
 sub compensation {
     my $self = shift;
     return $self->_compensation if $self->_compensation;
+    
+    my $little_endian = 1;
+    
     my @comp = ( 0 ) x 18;
     my $is_bme280 = ( $self->sensor_id == BME280 ) ? 1 : 0;
     my @bytes = $self->device->bus_read(BM280_REG_CALIB1, 26 );
@@ -120,8 +123,7 @@ sub compensation {
     for my $item ( @unsignedvals ) {
         my $lsb = $item * 2;
         my $msb = $lsb + 1;
-        my $val = ( ( $bytes[$msb] & 0xFF) << 8 ) + ( $bytes[$lsb] & 0xFF );
-        $comp[$item] = $val;
+        $comp[$item] = HiPi->bytes_to_integer( [ $bytes[$lsb], $bytes[$msb] ], 0, $little_endian);
     }
     
     my @signedvals = ( BM280_COMP_DIG_T2, BM280_COMP_DIG_T3, BM280_COMP_DIG_P2, BM280_COMP_DIG_P3, BM280_COMP_DIG_P4,
@@ -129,53 +131,48 @@ sub compensation {
     
     for my $item ( @signedvals ) {
         my $lsb = $item * 2;
-        my $msb = $lsb + 1;
-        my $val = ( ( $bytes[$msb] & 0xFF) << 8 ) + ( $bytes[$lsb] & 0xFF );
-        if (($bytes[$msb] & 0x80) == 0x80) {
-            $val = - HiPi->twos_compliment( $val, 2 );
-        }
-        
-        $comp[$item] = $val;
+        my $msb = $lsb + 1;       
+        $comp[$item] = HiPi->bytes_to_integer( [ $bytes[$lsb], $bytes[$msb] ], 1, $little_endian);
     }
     
     if ( $is_bme280 ) {
-        #BM280_COMP_DIG_H1 => 12,
-        # my $val = pack('C*', $bytes[25]);
-        $comp[BM280_COMP_DIG_H1] = $bytes[25];
+        # BM280_COMP_DIG_H1 => 12,  unsigned char
+        
+        $comp[BM280_COMP_DIG_H1] = HiPi->bytes_to_integer( [ $bytes[25] ], 0);
+        
         @bytes = $self->device->bus_read(BM280_REG_CALIB2, 7 );
-        #BM280_COMP_DIG_H2 => 13,
-        my $val = ( ( $bytes[1] & 0xFF) << 8 ) + ( $bytes[0] & 0xFF );
-        if (($bytes[1] & 0x80) == 0x80) {
-            $val = - HiPi->twos_compliment( $val, 2 );
-        }
-        $comp[BM280_COMP_DIG_H2] = $val;
         
-        #BM280_COMP_DIG_H3 => 14,
-        $comp[BM280_COMP_DIG_H3] = $bytes[2];
+        # BM280_COMP_DIG_H2 => 13, signed short
         
-        #BM280_COMP_DIG_H4 => 15,
-        $val = ( ( $bytes[3] & 0xFF) << 8 ) + ( ( $bytes[4] << 4 ) & 0xF0 );
-        if (($bytes[3] & 0x80) == 0x80) {
-            $val = - HiPi->twos_compliment( $val, 2 );
-        }
-        $comp[BM280_COMP_DIG_H4] = int($val / 16);
+        $comp[BM280_COMP_DIG_H2] = HiPi->bytes_to_integer( [ $bytes[0], $bytes[1] ], 1, $little_endian);
         
-        #BM280_COMP_DIG_H5 => 16,
-        $val = ( ( $bytes[5] & 0xFF) << 8 ) + ( $bytes[4] & 0xF0 );
-        if (($bytes[5] & 0x80) == 0x80) {
-            $val = - HiPi->twos_compliment( $val, 2 );
-        }
-        $comp[BM280_COMP_DIG_H5] = int($val / 16);
+        # BM280_COMP_DIG_H3 => 14, unsigned char
+        $comp[BM280_COMP_DIG_H3] = HiPi->bytes_to_integer( [ $bytes[2] ], 0);
         
-        if (($bytes[6] & 0x80) == 0x80) {
-            $comp[BM280_COMP_DIG_H6] = - HiPi->twos_compliment( $bytes[6], 1 );
-        } else {
-            $comp[BM280_COMP_DIG_H6] = $bytes[6];
+        # BM280_COMP_DIG_H4 => 15, 12 bit signed short 
+        {
+            my $msb = $bytes[3];
+            my $lsb = ( $bytes[4] << 4 ) & 0xF0;
+            my $valX16 = HiPi->bytes_to_integer( [ $lsb, $msb ], 1, $little_endian);
+            $comp[BM280_COMP_DIG_H4] = int($valX16 / 16);
         }
+        
+        # BM280_COMP_DIG_H5 => 16, 12 bit signed short 
+        {
+            my $msb = $bytes[5];
+            my $lsb = $bytes[4] & 0xF0;
+            my $valX16 = HiPi->bytes_to_integer( [ $lsb, $msb ], 1, $little_endian);
+            $comp[BM280_COMP_DIG_H5] = int($valX16 / 16);
+        }
+        
+        # BM280_COMP_DIG_H6 => 17, signed char
+                
+        $comp[BM280_COMP_DIG_H6] = HiPi->bytes_to_integer( [ $bytes[6] ], 1);
     }
     
     $self->_compensation( \@comp );
     return $self->_compensation;
+    
     # My test sensor values are
     #Comp T1 = 28432
     #Comp T2 = 26627

@@ -2,42 +2,18 @@
    "license" : [
       "artistic_2"
       ],
-   "author" : [
-      "H.Merijn Brand <perl5@tux.freedom.nl>"
-      ],
-   "resources" : {
-      "bugtracker" : {
-         "web" : "https://github.com/Tux/App-ccdiff/issues"
-         },
-      "homepage" : "https://metacpan.org/pod/App::ccdiff",
-      "license" : [
-         "http://dev.perl.org/licenses/"
-         ],
-      "x_IRC" : "irc://irc.perl.org/#csv",
-      "repository" : {
-         "web" : "https://github.com/Tux/App-ccdiff",
-         "type" : "git",
-         "url" : "https://github.com/Tux/App-ccdiff"
-         }
-      },
-   "version" : "0.32",
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-      },
-   "generated_by" : "Author",
-   "abstract" : "Colored Character Diff",
-   "provides" : {
-      "App::ccdiff" : {
-         "version" : "0.32",
-         "file" : "lib/App/ccdiff.pm"
-         }
-      },
+   "name" : "App-ccdiff",
    "prereqs" : {
       "test" : {
+         "suggests" : {
+            "Capture::Tiny" : "0.48"
+            },
          "requires" : {
             "Test::More" : "0",
             "Capture::Tiny" : "0"
+            },
+         "recommends" : {
+            "Capture::Tiny" : "0.24"
             }
          },
       "build" : {
@@ -46,26 +22,62 @@
             }
          },
       "configure" : {
+         "suggests" : {
+            "ExtUtils::MakeMaker" : "7.70"
+            },
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+            },
+         "recommends" : {
+            "ExtUtils::MakeMaker" : "7.22"
             }
          },
       "runtime" : {
-         "requires" : {
-            "Algorithm::Diff" : "1.1901",
-            "Term::ANSIColor" : "0",
-            "charnames" : "0",
-            "Getopt::Long" : "0",
-            "perl" : "5.014000",
-            "List::Util" : "0"
-            },
          "recommends" : {
             "Algorithm::Diff" : "1.201",
             "Algorithm::Diff::XS" : "0.04"
+            },
+         "requires" : {
+            "List::Util" : "0",
+            "Algorithm::Diff" : "1.1901",
+            "Getopt::Long" : "0",
+            "Term::ANSIColor" : "0",
+            "charnames" : "0",
+            "perl" : "5.014000"
             }
          }
       },
+   "version" : "0.33",
+   "provides" : {
+      "App::ccdiff" : {
+         "version" : "0.33",
+         "file" : "lib/App/ccdiff.pm"
+         }
+      },
    "release_status" : "stable",
-   "name" : "App-ccdiff",
-   "dynamic_config" : 1
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+      },
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "repository" : {
+         "url" : "https://github.com/Tux/App-ccdiff",
+         "web" : "https://github.com/Tux/App-ccdiff",
+         "type" : "git"
+         },
+      "homepage" : "https://metacpan.org/pod/App::ccdiff",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/App-ccdiff/issues"
+         }
+      },
+   "generated_by" : "Author",
+   "abstract" : "Colored Character Diff",
+   "dynamic_config" : 1,
+   "author" : [
+      "H.Merijn Brand <perl5@tux.freedom.nl>"
+      ]
    }

@@ -1,5 +1,9 @@
 Revision history for Lilith
 
+0.5.0	2023-11-12/15:00
+		 -Convert to Pod::Usage
+		 -Various document cleanups.
+
 0.4.0	2023-08-18/00:45
 		 -Now die for event fetching if --id or --event is not specified.
 		 -PCAP fetching support for Suricata via Virani

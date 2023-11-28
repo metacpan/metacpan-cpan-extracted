@@ -44,6 +44,7 @@ requires:
   File::Spec: '0'
   File::Temp: '0'
   FileHandle: '0'
+  IO::Handle: '0'
   IPC::Open3: '1.03'
   JSON: '0'
   MIME::Base64: '3.11'
@@ -60,11 +61,11 @@ requires:
   URI::URL: '0'
   URI::data: '0'
   XML::Parser: '0'
-  base: '0'
   overload: '0'
+  parent: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/david-dick/firefox-marionette/issues
   repository: https://github.com/david-dick/firefox-marionette
-version: '1.46'
+version: '1.49'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

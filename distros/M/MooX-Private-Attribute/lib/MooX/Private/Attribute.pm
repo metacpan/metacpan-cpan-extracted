@@ -2,7 +2,7 @@ package MooX::Private::Attribute;
 use strict;
 use warnings;
 use MooX::ReturnModifiers;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 sub import {
 	my $target    = caller;
@@ -31,13 +31,15 @@ sub import {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 MooX::Private::Attribute - private attributes
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 

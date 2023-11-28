@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-08-07'; # DATE
 our $DIST = 'App-TrashUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/TrashUtils/trash_list_trashes",
@@ -38,7 +38,7 @@ trash-list-trashes - List trash directories
 
 =head1 VERSION
 
-This document describes version 0.003 of trash-list-trashes (from Perl distribution App-TrashUtils), released on 2023-08-06.
+This document describes version 0.004 of trash-list-trashes (from Perl distribution App-TrashUtils), released on 2023-08-07.
 
 =head1 SYNOPSIS
 
@@ -46,11 +46,22 @@ B<trash-list-trashes> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?
 
 B<trash-list-trashes> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<trash-list-trashes> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
+B<trash-list-trashes> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--home-only|/"--home-only">>|B<L<--no-home-only|/"--home-only">>|B<L<--nohome-only|/"--home-only">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
 =head1 OPTIONS
 
 C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--home-only>
+
+(No description)
+
+
+=back
 
 =head2 Output options
 

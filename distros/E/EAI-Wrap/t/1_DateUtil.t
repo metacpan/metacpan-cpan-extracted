@@ -1,7 +1,7 @@
 use strict; use warnings; use Test::More; use utf8;
 use EAI::DateUtil; use Time::Piece;
-use Test::More tests => 188;
-
+use Test::More tests => 196;
+# for consistent time results set to timezone to UTC and invoke scalar localtime
 $ENV{TZ} = 'UTC';
 scalar localtime;
 
@@ -146,6 +146,7 @@ like(get_curtime("%02d_%02d_%02d"),qr/\d{2}_\d{2}_\d{2}/,'get_curtime with forma
 like(get_curtime("%02d%02d%02d"),qr/\d{2}\d{2}\d{2}/,'get_curtime with format %02d%02d%02d');
 print "get_curtime HHMMSS:".get_curtime("%02d%02d%02d")."\n";
 print "get_curtime HHMMSS + 30 seconds:".get_curtime("%02d%02d%02d",30)."\n";
+print "get_curtime HHMMSS + 1 day (next day):".get_curtime("%02d%02d%02d",24*60*60)."\n";
 #like(get_curtime("%02d%02d"),qr/\d{2}\d{2}/,'get_curtime with format %02d%02d'); this throws a warning Redundant argument in sprintf at C:\dev\EAI\lib/EAI/DateUtil.pm
 like(get_curtime("%02d%02d%02d"),qr/\d{2}\d{2}\d{2}/,'get_curtime with format %02d%02d%02d');
 like(get_curtime_HHMM(),qr/\d{4}/,'get_curtime_HHMM');
@@ -196,4 +197,12 @@ is(monthsToInt("mär","GE"),"03",'3 from german march');
 is(intToMonths(3,"GE"),"Mär",'german march from 3');
 is(formatDate(2019,3,1,"D.mmm.Y[fr]"),"01.mars.2019",'formatDate D.mmm.Y french');
 is(formatDate(2019,3,1,"D.mmm.Y"),"01.Mär.2019",'formatDate D.mmm.Y german');
+is(formatTime(make_time("122003")),"12:20:03",'formatTime from make_time("122003")');
+is(formatTime(make_time("122003",60)),"12:21:03",'formatTime from make_time("122003",60)');
+is(formatTime(make_time("122003",3)),"12:20:06",'formatTime from make_time("122003",3)');
+is(formatTime(make_time("122003"),"%02d%02d"),"1220",'formatTime with format %02d%02d from make_time("122003","%02d%02d")');
+is(formatTime(make_time("122003"),"%02d%02d%02d%02d"),"00122003",'formatTime from make_time("122003","%02d%02d%02d%02d")');
+is(formatTime(make_time("122003"),"%02d%02d%02d%02d%02d"),undef,'formatTime with unsupported format');
+is(formatTime(make_time("122003",60),"%02d%02d"),"1221",'formatTime with format %02d%02d from make_time("122003",60)');
+like(formatTime(get_curtime_epochs(),"%02d%02d"),qr/\d{2}\d{2}/,'formatTime(get_curtime_epochs(),"%02d%02d")');
 done_testing();

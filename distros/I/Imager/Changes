@@ -1,5 +1,25 @@
 Imager release history.  Older releases can be found in Changes.old
 
+Imager 1.020 - 12 Nov 2023
+============
+
+ - masked(): disallow negative width/height masked images
+
+ - masked(): adjust source corners as bottom right relative if they
+   are negative.
+
+ - masked(): reject image source corners where either co-ordinate is
+   negative after the above adjustment.
+
+ - Imager::Files: update external image file support modules list
+
+ - internal test: don't fail on Imager::File::APNG link
+
+ - disable Imager::Font::T1 and Freetype 1.x fonts by default.
+   Unpatched t1lib simply doesn't work on 64 bit systems, and no-one
+   ships the patched version anymore.
+   https://github.com/tonycoz/imager/issues/510
+
 Imager 1.019 - 9 Jul 2022
 ============
 

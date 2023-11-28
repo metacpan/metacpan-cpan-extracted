@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Sq::Any::Al - Package for language Albanian
 
 package Locale::CLDR::Locales::Sq::Any::Al;
 # This file auto generated from Data\common\main\sq_AL.xml
-#	on Fri 13 Oct  9:40:30 am GMT
+#	on Sat  4 Nov  6:24:08 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

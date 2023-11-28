@@ -49,8 +49,8 @@ sub build_module {
     
     $compiler->set_start_file($file);
     $compiler->set_start_line($line);
-    my $success = $compiler->compile($basic_type_name);
-    unless ($success) {
+    eval { $compiler->compile($basic_type_name) };
+    if ($@) {
       my $error_messages = $compiler->get_error_messages;
       for my $error_message (@$error_messages) {
         printf STDERR "[CompileError]$error_message\n";
@@ -132,6 +132,7 @@ sub init_api {
     for my $include_dir (@{$builder->include_dirs}) {
       $compiler->add_include_dir($include_dir);
     }
+    
     $compiler->compile(undef);
     
     my $env = $builder_api->class("Native::Env")->new($compiler);
@@ -188,7 +189,7 @@ sub load_dynamic_lib {
             {category => $category}
           );
           
-          my $precompile_source = $runtime->build_precompile_module_source($basic_type)->to_string;
+          my $precompile_source = $runtime->build_precompile_class_source($basic_type)->to_string;
           
           my $build_dir = SPVM::Builder::Util::get_normalized_env('SPVM_BUILD_DIR');
           my $builder = SPVM::Builder->new(build_dir => $build_dir);

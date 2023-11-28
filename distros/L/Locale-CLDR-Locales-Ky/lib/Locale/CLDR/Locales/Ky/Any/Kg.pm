@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ky::Any::Kg - Package for language Kyrgyz
 
 package Locale::CLDR::Locales::Ky::Any::Kg;
 # This file auto generated from Data\common\main\ky_KG.xml
-#	on Fri 13 Oct  9:25:12 am GMT
+#	on Sat  4 Nov  6:11:28 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

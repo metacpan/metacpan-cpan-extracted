@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    Version 0.24
+    Version 0.25
 
 SYNOPSIS
 
@@ -695,8 +695,9 @@ ACKNOWLEDGEMENTS
 
     leszekdubiel <https://perlmonks.org/?node_id=1164259>
 
-    marto
-    <https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763>
+    marto <https://perlmonks.org/?node_id=324763>
+
+    Haarg <https://perlmonks.org/?node_id=306692>
 
     and an anonymous monk
 

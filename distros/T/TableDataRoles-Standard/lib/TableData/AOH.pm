@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-31'; # DATE
+our $DATE = '2023-11-25'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 with 'TableDataRole::Source::AOH';
 
@@ -42,7 +42,7 @@ TableData::AOH - Get table data from array of hashes
 
 =head1 VERSION
 
-This document describes version 0.017 of TableData::AOH (from Perl distribution TableDataRoles-Standard), released on 2023-08-31.
+This document describes version 0.019 of TableData::AOH (from Perl distribution TableDataRoles-Standard), released on 2023-11-25.
 
 =head1 SYNOPSIS
 
@@ -55,39 +55,6 @@ This document describes version 0.017 of TableData::AOH (from Perl distribution 
 =head1 DESCRIPTION
 
 This is a TableData:: module to get table data from array of hashes.
-
-=head1 METHODS
-
-
-=head2 new
-
-Usage:
-
- new(%args) -> [$status_code, $reason, $payload, \%result_meta]
-
-This function is not exported.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<aoh>* => I<aoh>
-
-(No description)
-
-
-=back
-
-Returns an enveloped result (an array).
-
-First element ($status_code) is an integer containing HTTP-like status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or something like "OK" if status is
-200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
-element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information, much like how HTTP response headers provide additional metadata.
-
-Return value:  (any)
 
 =head1 HOMEPAGE
 

@@ -12,7 +12,7 @@ MIDI::Drummer::Tiny::Tutorial::Quickstart
 
 =head1 VERSION
 
-version 0.4303
+version 0.4305
 
 =head1 Import the Module
 
@@ -29,7 +29,6 @@ version 0.4303
   my $d = MIDI::Drummer::Tiny->new(
       file       => 'drums.mid',
       bpm        => 120,
-      channel    => 10,
       volume     => 120,
       signature  => '5/4', # OR:
       #beats     => 5,

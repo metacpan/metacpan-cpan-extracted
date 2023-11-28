@@ -1,5 +1,5 @@
 [![CPAN version](https://badge.fury.io/pl/CPAN-Plugin-Sysdeps.svg)](http://badge.fury.io/pl/CPAN-Plugin-Sysdeps)
-[![Build Status](https://travis-ci.org/eserte/cpan-plugin-sysdeps.png?branch=master)](https://travis-ci.org/eserte/cpan-plugin-sysdeps)
+[![Build Status](https://github.com/eserte/cpan-plugin-sysdeps/actions/workflows/test.yml/badge.svg)](https://github.com/eserte/cpan-plugin-sysdeps/actions/workflows/test.yml)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/github/eserte/cpan-plugin-sysdeps?branch=master&svg=true)](https://ci.appveyor.com/project/eserte/cpan-plugin-sysdeps/branch/master)
 
 CPAN-Plugin-Sysdeps

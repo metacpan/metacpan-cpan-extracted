@@ -21,6 +21,7 @@ my @files = (
     't/01-data.t',
     't/02-string.t',
     't/03-file.t',
+    't/author-changes.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
@@ -31,7 +32,7 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-portability.t',
     't/etc/traffic-advice.json',
-    't/release-check-manifest.t',
+    't/release-dist-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
     't/release-trailing-space.t'

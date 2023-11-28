@@ -375,8 +375,9 @@ sub compile {
   
   $compiler->set_start_file(__FILE__);
   $compiler->set_start_line(__LINE__ + 1);
-  my $success = $compiler->compile($basic_type_name);
-  unless ($success) {
+  eval { $compiler->compile($basic_type_name) };
+  
+  if ($@) {
     my $error_messages = $compiler->get_error_messages;
     for my $error_message (@$error_messages) {
       print STDERR "$error_message\n";
@@ -1003,9 +1004,9 @@ sub compile_module_precompile_source_file {
     mkpath $build_src_dir;
     
     my $class_file = $basic_type->_get_class_file;
-    my $precompile_source = $self->runtime->build_precompile_module_source($basic_type);
+    my $precompile_source = $self->runtime->build_precompile_class_source($basic_type);
     
-    $builder_cc->build_precompile_module_source_file(
+    $builder_cc->build_precompile_class_source_file(
       $basic_type_name,
       {
         output_dir => $build_src_dir,

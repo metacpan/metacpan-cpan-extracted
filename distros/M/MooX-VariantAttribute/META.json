@@ -36,7 +36,7 @@
             "Carp" : "0",
             "Combine::Keys" : "0.09",
             "Moo" : "0",
-            "MooX::ReturnModifiers" : "0.09",
+            "MooX::ReturnModifiers" : "1.000001",
             "Scalar::Util" : "0",
             "Type::Tiny" : "1.002001",
             "perl" : "5.006"
@@ -46,7 +46,7 @@
    "provides" : {
       "MooX::VariantAttribute" : {
          "file" : "lib/MooX/VariantAttribute.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "MooX::VariantAttribute::Role" : {
          "file" : "lib/MooX/VariantAttribute/Role.pm"
@@ -60,6 +60,6 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-VariantAttribute"
       }
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -5,6 +5,14 @@ $parm = ".-$parm-" if ($parm) ;
 -]
 <table width="100%" cellspacing="0" cellpadding="0" border="0">
     <tr>
+        <td valign="top"><br>
+          <h1>Embperl - building dynamic websites with Perl</h1>
+        </td>
+    </tr>
+</table>
+<hr>
+[#
+    <tr>
         <td valign="top" rowspan=2><img src="[+ $r -> {imageuri} +]kopf-links.gif" width="206" height="97" usemap="#Map" border="0"> 
 	    <map name="Map"> 
 		<area shape="rect" coords="90,56,151,69" href="[+ do { $u = $r -> app -> languri($r, $r -> param -> uri, 'de') ; $u =~ s/(\.\w+?)$/$parm$1/; $u } +]" target="_top">
@@ -36,11 +44,11 @@ $site = $1 if ($ENV{HTTP_USER_AGENT} =~ /^search:(.*?)$/) ;
 -]
 
 <!-- SiteSearch Google -->
-<form method="get" action="http://www.google.de/custom" target="_top">
+<form method="get" action="https://www.google.de/custom" target="_top">
 <table border="0" bgcolor="#ffffff">
 <tr><td nowrap="nowrap" valign="top" align="left" height="32">
-<a href="http://www.google.com/">
-<img src="http://www.google.com/logos/Logo_25wht.gif" border="0" alt="Google" align="middle"></img></a>
+<a href="https://www.google.com/">
+<img src="https://www.google.com/logos/Logo_25wht.gif" border="0" alt="Google" align="middle"></img></a>
 </td>
 <td nowrap="nowrap">
 <input type="hidden" name="domains" value="[+ $site +]"></input>
@@ -53,7 +61,7 @@ $site = $1 if ($ENV{HTTP_USER_AGENT} =~ /^search:(.*?)$/) ;
 <input type="hidden" name="forid" value="1"></input>
 <input type="hidden" name="ie" value="ISO-8859-1"></input>
 <input type="hidden" name="oe" value="ISO-8859-1"></input>
-<input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:74;LW:74;L:http://www.ecos.de/embperl/images/EmbperlLogo.gif;S:http://www.ecos.de/embperl;LP:1;FORID:1;"></input>
+<input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:336699;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:74;LW:74;L:https://www.actevy.io/embperl/images/EmbperlLogo.gif;S:https://www.actevy.io/embperl;LP:1;FORID:1;"></input>
 <input type="hidden" name="hl" value="[+ $r -> param -> language +]"></input>
 <input type="submit" name="sa" value="[+ $r -> param -> language eq 'de'?'Suchen':'Search' +]"></input>
 </td></tr></table>
@@ -66,3 +74,4 @@ $site = $1 if ($ENV{HTTP_USER_AGENT} =~ /^search:(.*?)$/) ;
         </td>
     </tr>
 </table>
+#]

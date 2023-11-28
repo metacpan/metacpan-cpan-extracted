@@ -1,5 +1,12 @@
 Revision history for Music-Duration-Partition
 
+0.0817 2023-11-21 21:00:43
+    - It is not necessary to know about the durations hash.
+
+0.0815 2023-11-21 20:32:54
+    - Fix default motifs() method, numerical argument.
+    - Improve tests a bit.
+
 0.0814 2023-04-10 23:55:17
     - Improve tutorials.
 

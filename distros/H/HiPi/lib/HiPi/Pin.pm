@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Pin
 # Description:   GPIO / Extender Pin
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -15,7 +15,7 @@ use warnings;
 use parent qw( HiPi::Class );
 use HiPi qw( :rpi );
 
-our $VERSION ='0.81';
+our $VERSION ='0.89';
 
 __PACKAGE__->create_ro_accessors( qw( pinid ) );
 
@@ -41,6 +41,24 @@ sub mode {
         return $self->_do_setmode($newval);
     } else {
         return $self->_do_getmode();
+    }
+}
+
+sub schmitt {
+    my($self, $newval) = @_;
+    if(defined($newval)) {
+        return $self->_do_setschmitt($newval);
+    } else {
+        return $self->_do_getschmitt();
+    }
+}
+
+sub slew {
+    my($self, $newval) = @_;
+    if(defined($newval)) {
+        return $self->_do_setslew($newval);
+    } else {
+        return $self->_do_getslew();
     }
 }
 

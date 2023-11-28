@@ -1,0 +1,124 @@
+NAME
+    Mo::utils::Date - Mo date utilities.
+
+SYNOPSIS
+     use Mo::utils::Date qw(check_date);
+
+     check_date($self, $key);
+     check_date_dmy($self, $key);
+     check_date_order($self, $key1, $key2);
+
+DESCRIPTION
+    Utilities for checking of data values.
+
+SUBROUTINES
+  "check_date"
+     check_date($self, $key);
+
+    Check parameter defined by $key which is date and that date isn't
+    greater than actual year.
+
+    Possible dates: - YYYY-MM-DD - YYYY-M-D - YYYY-MM - YYYY-M - YYYY
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_date_dmy"
+     check_date_dmy($self, $key);
+
+    Check parameter defined by $key which is date in right format.
+
+    Possible dates. - D.M.YYYY - DD.MM.YYYY
+
+    Date is checked via DateTime if is real.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_date_order"
+     check_date_order($self, $key1, $key2);
+
+    Check if date with $key1 is lesser than date with $key2.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_date():
+             Parameter '%s' for date is in bad format.
+                     Value: %s
+             Parameter '%s' has year greater than actual year.
+
+     check_date_dmy():
+             Parameter '%s' for date is in bad format.
+                     Value: %s
+             Parameter '%s' is bad date.
+                     Value: %s
+                     DateTime error: %s
+
+     check_date_order():
+             Parameter '%s' has date greater or same as parameter '%s' date.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils::Date qw(check_date);
+
+     my $self = {
+             'key' => '2022-01-15',
+     };
+     check_date($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils::Date qw(check_date);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => 'foo',
+     };
+     check_date($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..Utils.pm:?] Parameter 'key' is in bad format.
+
+DEPENDENCIES
+    DateTime, English, Exporter, Error::Pure, Readonly.
+
+SEE ALSO
+    Mo::utils
+        Mo utilities.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils-Date>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2022-2023
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

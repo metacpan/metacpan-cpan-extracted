@@ -13,7 +13,7 @@ use Unicode::Char;
 Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Scalar our $SPACE => q{ };
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -140,6 +140,7 @@ Unicode::Block::Item - Class for unicode block character.
 =head1 SYNOPSIS
 
  use Unicode::Block::Item;
+
  my $obj = Unicode::Block::Item->new(%parameters);
  my $base = $obj->base;
  my $char = $obj->char;
@@ -149,9 +150,9 @@ Unicode::Block::Item - Class for unicode block character.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Unicode::Block::Item->new(%parameters);
 
 Constructor.
 
@@ -159,48 +160,66 @@ Constructor.
 
 =item * C<hex>
 
- Hexadecimal number.
- Default value is undef.
- It is required.
+Hexadecimal number.
+
+It is required.
+
+Default value is undef.
 
 =item * C<hex_length>
 
- Length of hex number.
- It's used for formatting of hex() method output.
- Default value is 4.
+Length of hex number.
+It's used for formatting of hex() method output.
+
+Default value is 4.
 
 =back
 
-=item C<base()>
+Returns instance of object.
 
- Get hex base number in format 'U+???x'.
- Example: 'hex' => 1234h; Returns 'U+123x'.
- Returns string with hex base number.
+=head2 C<base>
 
-=item C<char()>
+ my $base = $obj->base;
 
- Get character.
- Example: 'hex' => 1234h; Returns 'ሴ'.
- Returns string with character.
+Get hex base number in format 'U+???x'.
+Example: 'hex' => 1234h; Returns 'U+123x'.
 
-=item C<hex()>
+Returns string with hex base number.
 
- Get hex number in 'hex_length' length.
- Example: 'hex' => 1234h; Returns '0x1234'.
- Returns string with hex number.
+=head2 C<char>
 
-=item C<last_hex()>
+ my $char = $obj->char;
 
- Get last hex number.
- Example: 'hex' => 1234h; Returns '4'.
- Returns string with last hex number.
+Get character.
+Example: 'hex' => 1234h; Returns 'ሴ'.
 
-=item C<width()>
+Returns string with character.
 
- Get character width.
- Returns string with width.
+=head2 C<hex>
 
-=back
+ my $hex = $obj->hex;
+
+Get hex number in 'hex_length' length.
+Example: 'hex' => 1234h; Returns '0x1234'.
+
+Returns string with hex number.
+
+=head2 C<last_hex>
+
+ my $last_hex = $obj->last_hex;
+
+Get last hex number.
+Example: 'hex' => 1234h; Returns '4'.
+
+Returns string with last hex number.
+
+=head2 C<width>
+
+ my $width = $obj->width;
+
+Get character width.
+
+Returns string with width.
 
 =head1 ERRORS
 
@@ -212,11 +231,13 @@ Constructor.
 
 =head1 EXAMPLE
 
+=for comment filename=print_info_about_example_character.pl
+
  use strict;
  use warnings;
 
- use Encode qw(encode_utf8);
  use Unicode::Block::Item;
+ use Unicode::UTF8 qw(encode_utf8);
 
  # Object.
  my $obj = Unicode::Block::Item->new(
@@ -265,11 +286,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2017 Michal Josef Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

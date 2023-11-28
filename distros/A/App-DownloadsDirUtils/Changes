@@ -1,0 +1,16 @@
+0.003   2023-11-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities:
+          mv-{foremost,hindmost,newest,oldest,largest,smallest}-download-he
+          re.
+
+
+0.002   2023-11-16  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix setting default pattern for
+          --exclude-filename-pattern.
+
+
+0.001   2023-11-16  Released-By: PERLANCAR
+
+        - First release.

@@ -1,5 +1,20 @@
 Revision history for JSON-Schema-Modern
 
+0.575     2023-11-26 05:11:10Z
+          - properly handle some edge cases where the "$schema" keyword can
+            change the dialect to a different specification version with
+            different Core vocabulary keywords
+          - evaluation at non-schema locations is now prohibited
+
+0.574     2023-11-13 00:50:55Z
+          - better detection of schema locations, for use by Document
+            subclasses
+          - fixed vocabulary ordering (from v0.567)
+          - properly handle "$dynamicRef", "$recursiveRef" and "$schema"
+            referencing a boolean schema
+          - bundled metaschemas have been updated to their latest versions
+            from https://json-schema.org
+
 0.573     2023-10-21 23:49:03Z
           - fix construction of default values of some attributes e.g.
             media_types, encodings

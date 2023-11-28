@@ -30,7 +30,7 @@ mv-add-prefix-datestamp - Add datestamp prefix (YYYYMMDD-) to filenames
 
 =head1 VERSION
 
-This document describes version 0.011 of mv-add-prefix-datestamp (from Perl distribution App-FileRenameUtils), released on 2023-05-24.
+This document describes version 0.012 of mv-add-prefix-datestamp (from Perl distribution App-FileRenameUtils), released on 2023-11-15.
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,8 @@ date):
  foo -> 20230110-foo
  bar.txt -> 20221223-bar.txt
 
-You can use L<perlmv>'s options, e.g. C<-d> (dry-run), etc.
+Because this script is a wrapper for L<perlmv>, You can use C<perlmv>'s options,
+e.g. C<-d> (dry-run), etc.
 
 =head1 DESCRIPTION
 

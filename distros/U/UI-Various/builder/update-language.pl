@@ -194,8 +194,9 @@ if ($dst)
     $dst_i += 2;
     # loop until both reache the closing parenthesis:
     my ($src_key, $dst_key, $subsections) = ('', '', 0);
-    my $_die = sub() {
-	die "internal error in 2nd pass (SRC/DST):\n",
+    my $_die = sub(@) {
+	my $loc = defined $_[0] ? ' - ' . $_[0] : '';
+	die 'internal error in 2nd pass' . $loc . " (SRC/DST):\n",
 	    "$src_i:\t$src[$src_i]\t$src[$src_i+1]",
 	    "$dst_i:\t$dst[$dst_i]\t$dst[$dst_i+1]";
     };
@@ -246,7 +247,7 @@ if ($dst)
 		}
 		elsif ($src_key lt $dst_key)
 		{		# insert missing key and text:
-		    $src[$src_i+1] =~ m/$re_line2/o  or  &$_die;
+		    $src[$src_i+1] =~ m/$re_line2/o  or  &$_die('insert');
 		    $_ = "$1$2$2,\t# TODO: $2$3$2\n";
 		    splice @dst, $dst_i, 0, $src[$src_i], $_;
 		    $src_i += 2;
@@ -254,13 +255,13 @@ if ($dst)
 		}
 		else
 		{		# remove outdated key and text:
-		    $dst[$dst_i+1] =~ m/$re_line2/o  or  &$_die;
+		    $dst[$dst_i+1] =~ m/$re_line2/o  or  &$_die('remove');
 		    splice @dst, $dst_i, 2;
 		}
 	    }
 	    else
 	    {
-		$src[$src_i+1] =~ m/$re_line2/o  or  &$_die;
+		$src[$src_i+1] =~ m/$re_line2/o  or  &$_die('replace');
 		$_ = "$1$2$2,\t# TODO: $2$3$2\n";
 		splice @dst, $dst_i, 0, $src[$src_i], $_;
 		$src_i += 2;

@@ -1,0 +1,60 @@
+class TestCase::Thread {
+  use Thread;
+  use Thread::ID;
+  use Thread::ThisThread;
+  
+  our $RESULT : public int[];
+  
+  static method basic : int () {
+    
+    $TestCase::Thread::RESULT = new int[100];
+    
+    my $results = [0];
+    my $thread = Thread->new([$results : int[]] method : void () {
+    
+      $results->[0] = 5;
+      
+      $TestCase::Thread::RESULT->[0] = 10;
+    });
+    
+    $thread->join;
+    
+    unless ($TestCase::Thread::RESULT->[0] == 10) {
+      return 0;
+    }
+    
+    unless ($results->[0] == 5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method thread_id : int () {
+    
+    my $thread1 = Thread->new(method : void () {
+    
+    });
+    
+    my $thread2 = Thread->new(method : void () {
+    
+    });
+    
+    my $current_thread_id = Thread::ThisThread->get_id;
+    
+    unless (Thread::ID->eq($current_thread_id, $current_thread_id)) {
+      return 0;
+    }
+    
+    my $thread1_id = $thread1->get_id;
+    
+    my $thread2_id = $thread2->get_id;
+    
+    $thread1->join;
+    
+    $thread2->join;
+    
+    return 1;
+  }
+  
+}

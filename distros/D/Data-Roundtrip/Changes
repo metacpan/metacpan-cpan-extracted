@@ -118,3 +118,9 @@ Revision history for Data-Roundtrip
 0.24    String input to yaml2perl() is now being untainted in order
         to avoid a bug with Perls < v5.14 which causes YAML::PP to
         loop indefinetely and the OS to kill the script. Until YAML::PP is fixed.
+
+0.25    Change untainting yaml string input from ($yaml_string) = each %{{$yaml_string,0}};
+        to ($yaml_string) = keys %{{$yaml_string,0}}; because it was
+        warning about "each on anonymous hash will always start from the beginning"
+        Also a new test file was added (t/14-yaml-tainted-input.t) to
+        test yaml2perl with tainted yaml string as input.

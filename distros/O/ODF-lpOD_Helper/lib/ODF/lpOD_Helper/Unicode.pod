@@ -107,8 +107,8 @@ and UTF-8 octet streams can be very fast.
 Non-Unicode-aware scripts usually "just work" as long as they never
 see characters outside the ASCII range.  This is because,
 without a I<decode> operation or literal strings with "wide" characters,
-Perl treats all strings as "binary"; the behaviour of such strings is
-usually correct when all characters have single-byte representations.
+Perl treats all strings as binary octets; the behaviour of such strings is
+usually correct if all characters have single-byte representations.
 
 =head2 The "wide character" warning
 
@@ -124,6 +124,10 @@ writing to disk either explicitly or by using an encoding file handle.
 
 Non-unicode-aware programs (which neither decode or encode),
 will "just work" with ASCII data as described earlier.
+
+=head1 SEE ALSO
+
+L<Encode>, L<Encode::Locale>, L<PerlIO::locale>, L<perlunifaq>
 
 (END)
 

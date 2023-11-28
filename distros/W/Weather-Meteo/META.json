@@ -43,10 +43,11 @@
       },
       "test" : {
          "requires" : {
-            "Geo::Location::Point" : "0.08",
+            "Geo::Location::Point" : "0.09",
             "IPC::System::Simple" : "0",
             "Test::Carp" : "0",
             "Test::Compile" : "0",
+            "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
             "Test::NoWarnings" : "0",
             "WWW::RT::CPAN" : "0",
@@ -68,6 +69,6 @@
          "x_repository" : "https://github.com/nigelhorne/Weather-Meto"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

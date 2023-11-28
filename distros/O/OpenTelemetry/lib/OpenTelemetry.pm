@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use experimental qw( isa signatures );
 
-our $VERSION = '0.011';
+our $VERSION = '0.018';
 
 use Mutex;
 use OpenTelemetry::Common;
@@ -20,6 +20,7 @@ use Sentinel;
 use Log::Any;
 
 use Exporter::Shiny qw(
+    otel_config
     otel_context_with_span
     otel_current_context
     otel_error_handler
@@ -28,6 +29,7 @@ use Exporter::Shiny qw(
     otel_propagator
     otel_span_from_context
     otel_tracer_provider
+    otel_untraced_context
 );
 
 my $logger = Log::Any->get_logger( category => 'OpenTelemetry' );
@@ -72,6 +74,10 @@ sub _generate_otel_logger { \&logger }
     sub propagator :lvalue { sentinel get => sub { $instance }, set => $set }
 }
 
+sub _generate_otel_untraced_context {
+    my $sub = sub :lvalue { OpenTelemetry::Trace->untraced_context };
+}
+
 sub _generate_otel_current_context {
     my $sub = sub :lvalue { OpenTelemetry::Context->current };
 }
@@ -84,13 +90,17 @@ sub _generate_otel_span_from_context {
     sub { OpenTelemetry::Trace->span_from_context(@_) };
 }
 
+sub _generate_otel_config {
+    \&OpenTelemetry::Common::config;
+}
+
 {
     my $lock = Mutex->new;
     my $instance = sub (%args) {
         my $error = join ' - ', grep defined,
             @args{qw( message exception )};
 
-        $logger->error("OpenTelemetry error: $error");
+        $logger->error( "OpenTelemetry error: $error", $args{details} );
     };
 
     my $set = sub ( $new ) {

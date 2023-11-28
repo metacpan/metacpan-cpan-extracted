@@ -1,8 +1,30 @@
 #!perl
 
+use File::Slurp;
+use warnings;
+use strict;
+use MIME::Base64;
+use Gzip::Faster;
+use Getopt::Long;
+use JSON;
+use File::ReadBackwards;
+use Time::Piece;
+use Pod::Usage;
+
 =head1 NAME
 
 suricata_extract_submit_extend - Provides a LibreNMS style SNMP extend for suricata_extract_submit stats
+
+=head1 VERSION
+
+0.1.0
+
+=cut
+
+sub version {
+	print "suricata_extract_submit_extend v. 0.1.0\n";
+	exit 255;
+}
 
 =head1 SYNOPSIS
 
@@ -31,6 +53,14 @@ Default :: /var/cache/suricata_extract_submit_stats
 The number of seconds to look back buy for generating stats.
 
 Default :: 300
+
+=head2 -h|--help
+
+Print help info.
+
+=head2 -v|--version
+
+Print version info.
 
 =head1 Generated JSON
 
@@ -78,20 +108,6 @@ Stat Keys...
 
 =cut
 
-use File::Slurp;
-use warnings;
-use strict;
-use MIME::Base64;
-use Gzip::Faster;
-use Getopt::Long;
-use JSON;
-use File::ReadBackwards;
-use Time::Piece;
-
-sub version {
-	print "suricata_extract_submit_extend v. 0.0.1\n";
-}
-
 my $t          = localtime;
 my $today_name = $t->strftime('%F');
 
@@ -117,25 +133,12 @@ my $read_till   = $t->epoch - $rewind_by;
 
 if ($version) {
 	version;
-	exit;
+	exit 255;
 }
 
 if ($help) {
-	version;
-
-	print '
-
--c <cache>    The stats cache JSON created by suricata_extract_submit.
-              Default: /var/cache/suricata_extract_submit_stats.json
-
--h         Print help.
---help     Print help.
--v         Print version info.
---version  Print version info.
-';
-
-	exit;
-} ## end if ($help)
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+}
 
 my $to_return = {
 	data        => {},
@@ -146,8 +149,8 @@ my $to_return = {
 
 # compute the deltas for these items
 my @to_delta = (
-	'sub',     'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
-	'sub_5xx', 'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
+	'sub',       'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
+	'sub_5xx',   'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
 	'truncated', 'sub_size'
 );
 

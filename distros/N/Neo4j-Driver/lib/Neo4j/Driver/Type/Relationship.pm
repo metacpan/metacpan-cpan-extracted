@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Relationship;
 # ABSTRACT: Describes a relationship from a Neo4j graph
-$Neo4j::Driver::Type::Relationship::VERSION = '0.40';
+$Neo4j::Driver::Type::Relationship::VERSION = '0.41';
 
 use parent 'Neo4j::Types::Relationship';
 use overload '%{}' => \&_hash, fallback => 1;
@@ -29,6 +29,7 @@ sub start_element_id {
 	my ($self) = @_;
 	
 	return $$self->{_meta}->{element_start} if defined $$self->{_meta}->{element_start};
+	warnings::warnif 'Neo4j::Types', 'start_element_id unavailable';
 	return $$self->{_meta}->{start};
 }
 
@@ -49,6 +50,7 @@ sub end_element_id {
 	my ($self) = @_;
 	
 	return $$self->{_meta}->{element_end} if defined $$self->{_meta}->{element_end};
+	warnings::warnif 'Neo4j::Types', 'end_element_id unavailable';
 	return $$self->{_meta}->{end};
 }
 
@@ -78,6 +80,7 @@ sub element_id {
 	my ($self) = @_;
 	
 	return $$self->{_meta}->{element_id} if defined $$self->{_meta}->{element_id};
+	warnings::warnif 'Neo4j::Types', 'element_id unavailable';
 	return $$self->{_meta}->{id};
 }
 
@@ -119,6 +122,13 @@ sub _private {
 }
 
 
+# As long as we remain compatible with Neo4j::Types 1.00,
+# we need to register the warning category explicitly.
+package # private
+        Neo4j::Types;
+use warnings::register;
+
+
 1;
 
 __END__
@@ -133,7 +143,7 @@ Neo4j::Driver::Type::Relationship - Describes a relationship from a Neo4j graph
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -162,6 +172,9 @@ L<Neo4j::Driver::Type::Relationship> objects in Perl describe the
 same node in the Neo4j database, you need to compare their
 element IDs.
 
+I<B<Note:> This module documentation will soon be replaced entirely
+by L<Neo4j::Driver::Types> and L<Neo4j::Types::Relationship>.>
+
 =head1 METHODS
 
 L<Neo4j::Driver::Type::Relationship> inherits all methods from
@@ -177,16 +190,10 @@ a particular context, for example the current transaction.
 This method provides the new element ID string introduced by
 S<Neo4j 5>. If the element ID is unavailable, for example with
 older Neo4j versions or with a L<Neo4j::Bolt> version that
-hasn't yet been updated for S<Neo4j 5>, this method provides
+hasn't yet been updated for S<Neo4j 5>, this method
+issues a warning in the C<Neo4j::Types> category and provides
 the legacy numeric ID instead. Note that a numeric ID cannot
 successfully be used with C<elementId()> in Cypher expressions.
-
-The behaviour of this method when the element ID is unavailable
-is subject to change in a future version of the driver.
-In particular, making this a fatal error is being considered.
-This would help users to discover such issues early. See
-L<Neo4j-Types PR#3|https://github.com/johannessen/neo4j-types/pull/3>
-for further details.
 
 Neo4j element IDs are not designed to be persistent. As such,
 if you want a public identity to use for your relationships,
@@ -235,7 +242,8 @@ Return an element ID for the node where this relationship starts.
 This method provides the new element ID string introduced by
 S<Neo4j 5>. If the element ID is unavailable, for example with
 older Neo4j versions or with a L<Neo4j::Bolt> version that
-hasn't yet been updated for S<Neo4j 5>, this method provides
+hasn't yet been updated for S<Neo4j 5>, this method
+issues a warning in the C<Neo4j::Types> category and provides
 the legacy numeric ID instead.
 
 =head2 start_id
@@ -259,7 +267,8 @@ Return an element ID for the node where this relationship ends.
 This method provides the new element ID string introduced by
 S<Neo4j 5>. If the element ID is unavailable, for example with
 older Neo4j versions or with a L<Neo4j::Bolt> version that
-hasn't yet been updated for S<Neo4j 5>, this method provides
+hasn't yet been updated for S<Neo4j 5>, this method
+issues a warning in the C<Neo4j::Types> category and provides
 the legacy numeric ID instead.
 
 =head2 end_id
@@ -294,7 +303,7 @@ is returned instead.
 
 =over
 
-=item * L<Neo4j::Driver>
+=item * L<Neo4j::Driver::Types>
 
 =item * L<Neo4j::Types::Relationship>
 

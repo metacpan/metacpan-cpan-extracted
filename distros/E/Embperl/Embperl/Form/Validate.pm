@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -10,8 +11,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id: Validate.pm 1578075 2014-03-16 14:01:14Z richter $
 #
 ###################################################################################
 
@@ -28,7 +27,9 @@ BEGIN
     } 
 
 
-$VERSION = '2.5.0' ;
+$VERSION = '3.0.0' ;
+
+=encoding iso8859-1
 
 =head1 NAME
 
@@ -180,7 +181,7 @@ It defaults to %fdat of the current Embperl page.
 
 =item $pref
 
-can contain addtional information for the validation process.
+can contain additional information for the validation process.
 At the moment the keys C<language> and C<default_language>
 are recognized. C<language> defaults to the language set by
 Embperl. C<default_language> defaults to the one given with C<new>.
@@ -190,7 +191,7 @@ Embperl. C<default_language> defaults to the one given with C<new>.
 The method verifies the content $fdat according to the rules given 
 to the Embperl::Form::Validate
 constructor and added by the add_rule() method and returns an 
-array refernce to error information. If there is no error it
+array reference to error information. If there is no error it
 returns undef. Each element of the returned array contains a hash with
 the following keys:
 
@@ -258,25 +259,24 @@ sub newtype
 
 sub validate_rules
     {
-    my ($self, $frules, $fdat, $pref, $result) = @_ ;
+    my ($self, $frules, $fdat, $pref, $result, $key, $name) = @_ ;
 
     my %param ;
     my $type ;
     my $typeobj ;
     my $i ;
     my $keys = [] ;
-    my $key ;
     my $status ;
-    my $name ;
     my $msg ;
     my $break = 0 ;
-
+    my @key_stack ;
+    
     while ($i < @$frules) 
         {
         my $action = $frules -> [$i++] ;
         if (ref $action eq 'ARRAY')
             {
-            my $fail = $self -> validate_rules ($action, $fdat, $pref, $result) ;
+            my $fail = $self -> validate_rules ($action, $fdat, $pref, $result, $key, $name) ;
             return $fail if ($fail) ;
             }
         elsif (ref $action eq 'CODE')
@@ -293,11 +293,34 @@ sub validate_rules
             if ($1 eq 'key')
                 {
                 $key        = $frules->[$i++] ;
-		$keys 	    = ref $key?$key:[$key] ;
+		        $keys 	    = ref $key?$key:[$key] ;
                 $type       = 'Default' ;
                 $typeobj    = $self -> newtype ($type) ;
                 $name       = undef ;
                 $msg        = undef ;
+                }
+            elsif ($1 eq 'key_check')
+                {
+		        push @key_stack, $key ;    
+                $key        = $frules->[$i++] ;
+		        $keys 	    = ref $key?$key:[$key] ;
+                $type       = 'Default' ;
+                $typeobj    = $self -> newtype ($type) ;
+		        $break      = 1 ;
+                }
+            elsif ($1 eq 'key_end')
+                {
+		        $key        = pop @key_stack ;    
+		        $keys 	    = ref $key?$key:[$key] ;
+		        $break      = 0 ;
+                }
+            elsif ($1 eq 'frontend_only')
+                {
+		        last ;
+                }
+            elsif ($1 eq 'backend_only')
+                {
+		        ;
                 }
             elsif ($1 eq 'name')
                 {
@@ -315,11 +338,11 @@ sub validate_rules
                 {
                 $type    = $frules->[$i++] ;
                 $typeobj = $self -> newtype ($type) ;
-		foreach my $k (@$keys) 
-		    {
-		    $status  = $typeobj -> validate ($k, $fdat -> {$k}, $fdat, $pref) ;
-		    last if (!$status) ;
-		    }
+                foreach my $k (@$keys) 
+                    {
+                    $status  = $typeobj -> validate ($k, $fdat -> {$k}, $fdat, $pref) ;
+                    last if (!$status) ;
+                    }
                 }
             else
                 {
@@ -331,7 +354,7 @@ sub validate_rules
             my $arg = $frules -> [$i++] ;
             foreach my $k (@$keys) 
                 {
-		my $method = 'validate_' . $action ;                 
+        		my $method = 'validate_' . $action ;                 
                 $status = $typeobj -> $method ($k, $fdat -> {$k}, $arg, $fdat, $pref) ;
                 last if (!$status) ;
                 }
@@ -369,14 +392,28 @@ sub validate
 
 sub build_message
     {
-    my ($self, $id, $key, $name, $msg, $param, $typeobj, $pref, $epreq) = @_ ;
+    my ($self, $id, $key, $name, $msg, $param, $typeobj, $pref, $epreq, $escape) = @_ ;
 
     my $language = $pref -> {language} ;
     my $default_language = $pref -> {default_language} || $self -> {default_language} ;
     my $charset = $pref -> {charset} ;
     my $txt ;
-
-    $name ||=  $epreq?$epreq -> gettext($key):$key ;
+    if ($name eq '')
+        {
+        if (!ref $key)
+            {
+            $name =  $epreq?$epreq -> gettext('attr:' . $key):$key ;
+            }
+        else
+            {
+            my @name ;
+            foreach my $k (@$key)
+                {
+                push @name, $epreq?$epreq -> gettext('attr:' . $k):$k ;
+                }    
+            $name = join (($language =~ /^de/)?' oder ':' or ', @name) ;
+            }
+        }
     if (ref $name eq 'ARRAY')
         {
         my @names ;
@@ -394,6 +431,7 @@ sub build_message
     if ($msg)
         {
         $txt = ref $msg ? ($msg -> {"$language.$charset"} || $msg -> {"$default_language.$charset"} || $msg -> {$language} || $msg -> {$default_language} || (each %$msg)[1] || undef):$msg ; 
+        $txt = $epreq -> gettext ($msg) if ($epreq && ($msg =~ /^\w\w\w:/)) ;
         }
     else
         {
@@ -404,6 +442,7 @@ sub build_message
     $txt ||= "Missing Message $id: %0 %1 %2 %3" ;                 
     $id = $param -> [0] ;
     $param -> [0] = $name ;
+    $param -> [0] =~ s/(?<!\\)\'/\\'/g if ($escape) ;
     my @param ;
     eval "require Encode" ;
     if ($charset && $has_encode)
@@ -415,6 +454,7 @@ sub build_message
         @param =  @$param ;
         }
     
+    $txt =~ s/(?<!\\)\'/\\'/g if ($escape) ;
     $txt =~ s/%(\d+)/$param[$1]/g ;
     $param -> [0] = $id ;
 
@@ -489,16 +529,14 @@ sub validate_messages
 
 sub gather_script_code
     {
-    my ($self, $frules, $pref, $epreq) = @_ ;
+    my ($self, $frules, $pref, $epreq, $key, $name) = @_ ;
 
     my %param ;
     my $type ;
     my $typeobj ;
     my $i ;
     my $keys = [] ;
-    my $key ;
     my $status ;
-    my $name ;
     my $msg ;
     my $msgparam ;
     my $language = $pref -> {language} ;
@@ -507,6 +545,7 @@ sub gather_script_code
     my $script = '' ;
     my $form  = $self -> {form_id} ;
     my $break = 0 ;
+    my @key_stack ;
 
     while ($i < @$frules) 
         {
@@ -515,7 +554,7 @@ sub gather_script_code
         my $action = $frules -> [$i++] ;
         if (ref $action eq 'ARRAY')
             {
-            $script .= $self -> gather_script_code ($action, $pref, $epreq) ;
+            $script .= $self -> gather_script_code ($action, $pref, $epreq, $key, $name) ;
             }
         elsif (ref $action eq 'CODE')
             {
@@ -526,11 +565,33 @@ sub gather_script_code
             if ($1 eq 'key')
                 {
                 $key        = $frules->[$i++] ;
-		$keys 	    = ref $key?$key:[$key] ;
+		        $keys 	    = ref $key?$key:[$key] ;
                 $type       = 'Default' ;
                 $typeobj    = $self -> newtype ($type) ;
                 $name       = undef ;
                 $msg        = undef ;
+                }
+            elsif ($1 eq 'key_check')
+                {
+		        push @key_stack, $key ;    
+                $key        = $frules->[$i++] ;
+		        $keys 	    = ref $key?$key:[$key] ;
+                $type       = 'Default' ;
+                $typeobj    = $self -> newtype ($type) ;
+		        $break      = 1 ;
+                }
+            elsif ($1 eq 'key_end')
+                {
+		        $key        = pop @key_stack ;    
+		        $break      = 0 ;
+                }
+            elsif ($1 eq 'frontend_only')
+                {
+		        ;
+                }
+            elsif ($1 eq 'backend_only')
+                {
+		        last ;
                 }
             elsif ($1 eq 'name')
                 {
@@ -558,7 +619,7 @@ sub gather_script_code
             }
         else
             {
-	    $method = 'getscript_' . $action ;                 
+	        $method = 'getscript_' . $action ;                 
             $arg = $frules -> [$i++] ;
             }
         
@@ -596,7 +657,7 @@ sub gather_script_code
                 my $setmsg = '' ;
                 if ($msgparam && !$break)
                     {
-                    my $txt = $self -> build_message ($msgparam -> [0], $key, $nametxt, $msgtxt, $msgparam, $typeobj, $pref, $epreq) ;
+                    my $txt = $self -> build_message ($msgparam -> [0], $key, $nametxt, $msgtxt, $msgparam, $typeobj, $pref, $epreq, 1) ;
                     $setmsg = "ids[i] = '$key' ; msgs[i++]='$txt';" 
                     }
                 if (!ref $key)
@@ -767,7 +828,11 @@ without a dash are tests to perform.
 gives the key in the passed form data hash which should be tested. -key
 is normally the name given in the HTML name attribute within a form field.
 C<-key> can also be a arrayref, in which case B<only one of> the given keys
-must statisfy the following test to succeed.
+must satisfy the following test to succeed.
+
+=item -key_break
+
+same as -key and -break => 1 without reseting name -name and -msg.
 
 =item -name
 
@@ -779,10 +844,10 @@ hash with multiple languages, e.g.
 =item -type
 
 specfify to not use the standard tests, but the ones for a special type.
-For example there is a type C<Number> which will replaces all the comparsions
-by numeric ones instead of string comparisions. You may add your own types
+For example there is a type C<Number> which will replace all the comparisons
+by numeric ones instead of string comparisons. You may add your own types
 by writing a module that contains the necessary test and dropping it under
-Embperl::Form::Validate::<Typename>. The -type directive also can verfiy
+Embperl::Form::Validate::<Typename>. The -type directive also can verify
 that the given data has a valid format for the type.
 
 The following types are available:
@@ -855,14 +920,14 @@ make sure to send them back, so they can be part of the next distribution.
 
 Used to give messages which should be used when the test fails. This message
 overrides the standard messages provided by Embperl::Form::Validate and
-by Embperls message management. Can also be a hash with messages for multiple
-languages. The -msg parameter must preceed the test for which it should be
+by Embperl's message management. Can also be a hash with messages for multiple
+languages. The -msg parameter must precede the test for which it should be
 displayed. You can have multiple different messages for different tests, e.g.
 
        [
 	-key        => 'email',
 	-name       => 'E-Mail-Address',
-	emptyok     => 1,                   # it's ok to leave this field empty (in this case the following tests are skiped)
+	emptyok     => 1,                   # it's ok to leave this field empty (in this case the following tests are skipped)
          
 	-msg => 'The E-Mail-Address is invalid.',
 	matches_regex => '(^[^ <>()@¡-ÿ]+@[^ <>()@¡-ÿ]+\.[a-zA-Z]{2,3}$)', 
@@ -896,6 +961,26 @@ errors only break current block, but does not display any message.
 The above example will only require the field "input", when the field "action" is
 not empty and is not zero.
 
+=item -key_check, -key_end
+
+Is used for preconditions, same example as for -break
+
+    [
+    -key => 'input', 
+    -key_check => 'action', emptyok => 1, ne => 0, -key_end,
+    'required' => 1
+    ]
+
+The above example will only require the field "input", when the field "action" is
+not empty and is not zero.
+
+=item backend_only
+
+The following rules will only executed in the backend
+
+=item frontend_only
+
+The following rules will only executed in the fronend
 
 =item [arrayref]
 
@@ -926,8 +1011,8 @@ The following test are currently defined:
 
 Value must be the same as in field given as argument. This is useful
 if you want for example verify that two passwords are the same. The 
-Text displayed to the user for the second field maybe added to the argument
-separeted by a colon. Example:
+Text displayed to the user for the second field may be added to the argument
+separated by a colon. Example:
 
   $epf = Embperl::Form::Validate -> new (
         [
@@ -1095,7 +1180,7 @@ only the server-side validation is performed.
 
     <p><hr>
 
-    <small>Embperl (c) 1997-2010 G.Richter / ecos gmbh <a href="http://www.ecos.de">www.ecos.de</a></small>
+    <small>Embperl (c) 1997-2010 G.Richter / ecos gmbh <a href="https://www.actevy.io">www.acteviy.io</a></small>
 
     </body>
     </html>
@@ -1110,6 +1195,6 @@ See also L<Embperl>.
 
 =head1 AUTHOR
 
-Axel Beckert (abe@ecos.de)
+Axel Beckert 
 Gerald Richter (richter at embperl dot org)
 

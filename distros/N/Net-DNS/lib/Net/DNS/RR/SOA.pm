@@ -2,7 +2,7 @@ package Net::DNS::RR::SOA;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SOA.pm 1931 2023-08-23 13:14:15Z willem $)[2];
+our $VERSION = (qw$Id: SOA.pm 1945 2023-11-22 08:02:31Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -20,10 +20,9 @@ use Net::DNS::Mailbox;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, @argument ) = @_;
-	my ( $data, $offset, @opaque ) = @argument;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
-	( $self->{mname}, $offset ) = Net::DNS::DomainName1035->decode(@argument);
+	( $self->{mname}, $offset ) = Net::DNS::DomainName1035->decode( $data, $offset, @opaque );
 	( $self->{rname}, $offset ) = Net::DNS::Mailbox1035->decode( $data, $offset, @opaque );
 	@{$self}{qw(serial refresh retry expire minimum)} = unpack "\@$offset N5", $$data;
 	return;

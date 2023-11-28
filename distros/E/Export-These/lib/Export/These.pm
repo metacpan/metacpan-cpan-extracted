@@ -3,26 +3,36 @@ package Export::These;
 use strict;
 use warnings;
 
-our $VERSION="v0.1.2";
+our $VERSION="v0.2.0";
 
 sub import {
   my $package=shift;
   my $exporter=caller;
 
-  #Treat args as key value pairs, unless the value is a string.
-  #in this case it is the name of a symbol to export
+  # Treat args as key value pairs, unless the value is a string.  in
+  # this case it is the name of a symbol to export directly
+
   my ($k, $v);
 
   no strict "refs";
 
-  # Locate or create the EXPORT, EXPORT_OK and EXPORT_TAGS package variables.
-  # These are used to accumulate our exported symbol names across multiple
-  # use Export::Terse ...; statements
+  # Locate or create the EXPORT, EXPORT_OK and EXPORT_TAGS package
+  # variables.  v0.2.0 adds EXPORT_PASS an array of names to allow to
+  # pass through for reexporting
+  # These are used to accumulate our exported symbol names across
+  # multiple use Export::Terse ...; statements
   # 
   my $export_ok= \@{"@{[$exporter]}::EXPORT_OK"};
   my $export= \@{"@{[$exporter]}::EXPORT"};
   my $export_tags= \%{"@{[$exporter]}::EXPORT_TAGS"};
 
+  #my $export_pass= \@{"@{[$exporter]}::EXPORT_PASS"};
+  
+  # This is a reference to a scalar, which is either undef
+  # or a reference to an array
+  my $export_pass=\${"@{[$exporter]}::EXPORT_PASS"};
+
+  
   while(@_){
     $k=shift;
 
@@ -42,6 +52,12 @@ sub import {
       elsif(/export$/ and $r eq "ARRAY"){
         push @$export, @$v;
         push @$export_ok, @$v;
+      }
+      elsif(/export_pass/ and $r eq "ARRAY"){
+        unless($$export_pass){
+          $$export_pass=[];
+        }
+        push @$$export_pass, @$v;
       }
       elsif($r eq "ARRAY"){
         #Assume key is a tag name
@@ -73,13 +89,20 @@ sub import {
     my \$ref_export_ok= \\\@@{[$exporter]}::EXPORT_OK;
     my \$ref_export= \\\@@{[$exporter]}::EXPORT;
     my \$ref_tags= \\\%@{[$exporter]}::EXPORT_TAGS;
+    my \$ref_export_pass= \\\$@{[$exporter]}::EXPORT_PASS;
 
     my \$target=shift;
 
+    # Filter out any refs.. this config not symbol names
+    \@_=grep !ref, \@_;
     no strict "refs";
     for(\@_ ? \@_ : \@\$ref_export){
       my \@syms;
-      if(/^:/){
+      if(ref){
+        # If not a simple scalar don't process here, but don error also
+        next;
+      }
+      elsif(/^:/){
         my \$name= s/^://r;
 
         my \$group=\$ref_tags->{\$name};
@@ -91,8 +114,16 @@ sub import {
         my \$t=\$_;
         \$t="\\\\\$t" if \$t =~ /^\\\$/;
         my \$found=grep /\$t/, \@\$ref_export_ok;
-        die "\$_ is not exported from ".__PACKAGE__."\n" unless \$found;
-        push \@syms, \$_;
+         
+        push \@syms, \$_ if \$found;
+
+        \$found\|\|=grep /^\$t\$/, \@\$\$ref_export_pass;
+
+
+
+        # If ref export is an empty array, we pass everything
+        \$found\|\|=((defined(\$\$ref_export_pass) and !\@\$\$ref_export_pass));
+        die "\$_ is not exported or reexported from ".__PACKAGE__."\n" unless \$found;
       }
       
       my \%map=(
@@ -108,7 +139,10 @@ sub import {
         my \$type=\$map{\$prefix};
 
         \$name=substr \$_, 1 if \$type;
-        \$type//="CODE";
+        unless(\$type){
+          \$type//="CODE";
+          \$prefix="";
+        }
 
         no warnings "redefine";
         eval { *{\$target."::".\$name}= *{ \\\${__PACKAGE__ ."::"}{\$name}}{\$type}; };
@@ -127,13 +161,24 @@ sub import {
     \$Exporter::ExportLevel//=0;
     my \$target=(caller(\$Exporter::ExportLevel))[0];
 
-    $exporter->_self_export(\$target, \@_);
+    my \$ref=eval {*{\\\${\$package."::"}{_preexport}}{CODE}};
+    my \@args;
+    if(\$ref){
+      \@args=$exporter->_preexport(\$target, \@_);
+    }
+    else {
+      \@args=\@_;
+    }
+
+
+
+    $exporter->_self_export(\$target, \@args);
     
     local \$Exporter::ExportLevel=\$Exporter::ExportLevel+3;
-    my \$ref=eval {*{\\\${\$package."::"}{_reexport}}{CODE}};
+    \$ref=eval {*{\\\${\$package."::"}{_reexport}}{CODE}};
 
     if(\$ref){
-      $exporter->_reexport(\$target, \@_);
+      $exporter->_reexport(\$target, \@args);
     }
 
   }
@@ -147,12 +192,12 @@ sub import {
 
 =head1 NAME
 
-Export::These - Terse Symbol (Re)Exporting
+Export::These - Terse Module Configuration and Symbol (Re)Exporting
 
 
 =head1 SYNOPSIS
 
-A fine package, exporting subroutines,
+Take a fine package, exporting subroutines,
 
   package My::ModA;
 
@@ -163,6 +208,7 @@ A fine package, exporting subroutines,
   sub blue {...} 
   sub green {...}
   1;
+
 
 Another package which would like to reexport the subs from My::ModA:
 
@@ -188,10 +234,35 @@ Use package like usual:
 
 
 
+Also can use to pass in configuration information to a module:
+
+  package My::ModB;
+
+  use Export::These;
+
+  sub _preexport {
+    
+    my @refs=grep ref, @_;
+    my @non_ref= grep !ref, @_;
+    
+    # Use @refs as configuration data
+    
+    @non_ref;
+  }
+
+
+  # Import the module, with configuration data
+  use My::ModB {option1=>"hello"}, "symbol";
+
+  ...
+
+
 =head1 DESCRIPTION
 
-A module to make exporting symbols less verbose and facilitate reexporting of
-symbols from dependencies with minimal input from the module author.
+A module to make exporting symbols less verbose and more powerful. Facilitate
+reexporting and filtering of symbols from dependencies with minimal input from
+the module author. Also provide the ability to pass in 'config data' data to a
+module during import.
 
 By default listing a symbol for export, even in a group/tag, means it will be
 automatically marked as 'export_ok', saving on duplication and managing two
@@ -202,13 +273,23 @@ routine from C<Exporter>. It injects its own C<import> subroutine into the each
 calling package. This injected subroutine adds the desired symbols to the
 target package  as you would expect.
 
-If the exporting package has a C<_reexport> subroutine, it is called when being
-imported. This is the 'hook' location where its safe to call C<-E<gt>import> on
-any dependencies modules it might want to export. The symbols from these
-packages will automatically be installed into the target package with no extra
-configuration needed.
+If the exporting package has a C<_preexport> subroutine, it is called as a
+filter 'hook' prior to normal 'importing' to allow module wide configuration or
+pre processing of requested import list. The return from this subroutine will
+be the arguments used at subsequent stages so remember to return an appropriate
+list.
 
-Finally warnings about symbols redefinition in the export process (i.e. exporting
+If the exporting package has a C<_reexport> subroutine, it is called after
+normal importing. This is the 'hook' location where its safe to call
+C<-E<gt>import> on any dependencies modules it might want to export. The
+symbols from these packages will automatically be installed into the target
+package with no extra configuration needed.
+
+Any reference types specified in an import are ignored during the normal import
+process.  This allows custom module configuration to be passed during import
+and processed in the C<_preexport> and C<_reexport> hooks.
+
+Finally, warnings about symbols redefinition in the export process (i.e. exporting
 to two subroutines with the same name into the same namespace) are silenced to
 keep warning noise to a minimum. The last symbol definition will ultimately be
 the one used.
@@ -223,10 +304,31 @@ also needs to use the subroutines from the configuration module. The consumer
 of the server module has to also add the configuration module as a dependency.
 
 With this module the server can simply reexport the required configuration
-routines, injecting the dependency, in stead of hard coding it.
+routines, injecting the dependency, instead of the consumer hard coding it.
 
 
 =head1 USAGE
+  
+=head2 Importing a module which uses this module
+
+Importing is achieved just like normal.
+
+    require My::Module;
+    My::Moudle->import;
+
+    use My::Moudle qw<:tag_name name2 ...>;
+
+However, from B<v0.2.0> importing of a module can also take a reference value
+as a key without error. This allows passing non names as configuration data for
+the module to use:
+
+    eg
+
+      use My::Module {prefork=>1, workers=>10}, "symname1", ":group1",['more', 'config'];
+
+In this hypothetical example, the My::Module uses the hash and array ref as
+configuration internally, and the normal scalars as the symbols/tag groups to
+export
 
 =head2 Specifying Symbols to Export
 
@@ -259,11 +361,26 @@ simply listing the items at the top level.
       # same as
       # use Export::These qw<sym1>;
 
+If the item name is "export_pass", then the items in the following array ref
+symbols will be allowed to be requested for import even if the module does not
+export them directly.  Use an empty array ref to allow any names for
+reexporting:
 
-If the item has another name, it is a tag name and the items in the following
+    eg 
+
+      # Allow sym1 to be reexported from sub modules
+      use Export::These export_pass=>[qw<sym1>];
+
+      # Allow any name to be reexported from submodules
+      use Export::These export_pass=>[];
+
+
+
+If the item has any other name, it is a tag name and the items in the following
 array ref are added to the C<%EXPORT_TAGS>  variable and to C<@EXPORT_OK>
 
     eg use Export::These group1=>["sym1"];
+
 
 
 The list can contain any combination of the above:

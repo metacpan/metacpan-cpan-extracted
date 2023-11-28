@@ -1,0 +1,57 @@
+[% FOREACH to_include IN config.cron.includes %]
+[% IF file_exists( to_include ) %]
+##
+## start of include from [% to_include %] ...
+##
+[% INCLUDE $to_include %]
+##
+## end of nclude from [% to_include %] ...
+##
+[% ELSE %]
+##
+## [% to_include %] in config.cron.includes
+## but the file does not exist... skipping
+##
+[% END %]
+[% END %]
+
+[% IF config.sneck.enable && config.snmp.extends.sneck.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] sneck -u -b
+[% END %]
+[% IF config.fail2ban.enable && config.snmp.extends.fail2ban.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/fail2ban -u 2> /dev/null > /dev/null
+[% END %]
+[% IF ( config.opensearch.enable || config.elasticsearch.enable ) && config.snmp.extends.opensearch.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/opensearch -p [% config.snmp.extends.opensearch.port %] -h [% config.snmp.extends.opensearch.host %] > /var/cache/opensearch.json 2> /dev/null
+[% END %]
+[% IF config.snmp.extends.systemd.enable && is_systemd %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/systemd > /var/cache/systemd.extend 2> /dev/null
+[% END %]
+[% IF config.supervisord.enable && config.snmp.extends.supervisord.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/supervisord > /var/cache/supervisord.extend 2> /dev/null
+[% END %]
+[% IF config.snmp.extends.osupdate.enable %]
+[% config.snmp.extends.osupdate.interval %] root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/osupdate > /var/cache/osupdate.extend 2> /dev/null
+[% END %]
+[% IF config.snmp.extends.logsize.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/logsize 2> /dev/null > /dev/null
+[% END %]
+[% IF config.snmp.extends.hv_monitor.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] hv_monitor -c > /var/cache/hv_monitor.json -c 2> /dev/null
+[% END %]
+[% IF config.suricata.enable && config.suricata_extract.enable && config.snmp.extends.suricata_extract.enable %]
+[% config.suricata_extract.interval %] root /usr/bin/env [% config.snmp.extend_env %]
+[% END %]
+[% IF config.snmp.extends.smart.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/smart -c [% config.snmp.extends.smart.config %] -u 2> /dev/null > /dev/null
+[% IF config.snmp.extends.smart.enable && config.snmp.extends.smart.nightly_test_enable  %]
+@daily root /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/smart -c [% config.snmp.extends.smart.config %] -t [% config.snmp.extends.smart.nightly_test %] 2> /dev/null > /dev/null
+[% END %]
+[% END %]
+
+[% IF config.snmp.extends.sagan.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] sagan_stat_check -u [% config.snmp.extends.sagan.args %] > /dev/null 2> /dev/null
+[% END %]
+[% IF config.snmp.extends.suricata.enable %]
+*/5 * * * * root /usr/bin/env [% config.snmp.extend_env %] suricata_stat_check -u [% config.snmp.extends.suricata.args %] > /dev/null 2> /dev/null
+[% END %]

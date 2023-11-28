@@ -1005,7 +1005,23 @@ Instead they write the script to the C<$writer> that is given by the enclosing C
         );
     });
 
-So, if you stick to using L<Gnuplot::Builder::Script> in the C<$code>, you don't need to use C<$writer> explicitly.
+You can mix using L<Gnuplot::Builder::Script> objects and using C<$writer> directly in a single code block.
+A good rule of thumb is that a L<Gnuplot::Builder::Script> object should be a piece of gnuplot script that makes just one plot.
+If you want to write anything that doesn't belong to a plot, you should use C<$writer> directly.
+
+For example,
+
+    $builder->multiplot('layout 2,2', sub {
+        my $writer = shift;
+        my $another_builder = Gnuplot::Builder::Script->new(xrange => q{[-pi:pi]}, title => q{"1. sin(x)"});
+        $another_builder->plot("sin(x)");
+        $writer->("set multiplot next\n");
+        $another_builder->new_child()->set(title => q{"2. sin(2x)"})->plot("sin(2 * x)");
+    });
+
+The above example uses a L<Gnuplot::Builder::Script> object and its child to make two plots, while it uses C<$writer> to write "set multiplot next" command.
+The "set multiplot next" command is not part of a plot, but it controls the layout of plots.
+So we should use C<$writer> to write it.
 
 =head2 $result = $builder->multiplot_with(%args)
 

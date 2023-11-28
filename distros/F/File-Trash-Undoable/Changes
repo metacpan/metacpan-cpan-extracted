@@ -1,3 +1,10 @@
+0.231   2023-11-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Update module name: File::MoreUtil -> File::Util::Test.
+
+        - Bump prereq version: File::Trash::FreeDesktop 0.207 (fixed version).
+
+
 0.230   2020-06-03  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Prefix function name in do/undo actions with package

@@ -1,5 +1,21 @@
 Revision history for Perl extension Net::Waiter
 
+1.10  2023.11.25
+
+    1. added get_kids_pids()
+    2. added propagate_signal()
+    3. added separate signal USR1/2 handlers for parent/child processes. see:
+        
+        on_sig_usr1()
+        on_sig_usr2()
+        on_child_sig_usr1()
+        on_child_sig_usr2()
+
+1.09  2023.11.21
+
+    1. fixed busyloop
+    2. added timeout options
+
 1.08  2023.10.04
 
     1. changed accept socket to non-blocking

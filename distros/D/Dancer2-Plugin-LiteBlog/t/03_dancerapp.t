@@ -6,17 +6,26 @@ use File::Spec;
  
 {
     package SampleApp;
-    use Dancer2;
+    BEGIN {
+        use Dancer2;
+        set logger => 'Null';
+        #set logger => 'Console::Colored';
+    }
+
     use Dancer2::Plugin::LiteBlog;
     set views => File::Spec->catfile( dirname(__FILE__), 'views');
     set appdir => File::Spec->catfile(dirname(__FILE__)),
-
     set log => 'info';
-    #set logger => 'Console::Colored';
     set logger => 'Null';
     set liteblog => {
+        
         title => "03_dancerapp.t",
-
+        base_url => 'http://localhost:4000/',
+        logo  => '/images/foo.jpg',
+        favicon => '/favicon.ico',
+        footer => 'Some Liteblog Site',
+        css => '/css/foo.css',
+        
         navigation => [
             { label => 'Text Elem'},
             { label => 'Home', link => '/'},
@@ -24,7 +33,6 @@ use File::Spec;
         feature => {
             highlight => 1,
         },
-        logo  => '/images/foo.jpg',
         widgets => [
             { name => 'blog',
               params => {
@@ -58,6 +66,10 @@ like( $res->content, qr/<h2>Read my Stories/,
     '[GET /] Blog section title found');
 
 like( $res->content, qr{"avatar-icon">.*img src="/images/foo.jpg"}s, "The logo of the site is changed"); 
+
+like( $res->content, qr{link rel="icon" type="image/x-icon" href="/favicon.ico"}, "favicon with appropriate mime type"); 
+like( $res->content, qr{<footer.* Built with}s, "footer is populated"); 
+
 # Activity cards
 like( $res->content, qr/blog-card.*<h3 class="post-title">A super Tech Blog Post/s, 
     '[GET /] First blog card found');
@@ -108,8 +120,8 @@ subtest "Rendered Liteblog Errors" => sub {
 
 $res = $test->request(GET '/');
 like $res->content, 
-    qr{<a href="/someblog/tech/first-article"><img class="post-image" src="/someblog/tech/first-article/featured\.jpg" alt="A super Tech Blog Post"></a>}, 
-    "Image URL under article path has proper permalink";
+    qr{<a href="/someblog/tech/first-article/"><img class="post-image" src="/someblog/tech/first-article/featured\.jpg" alt="A super Tech Blog Post"></a>}, 
+    "Image URL under article path has proper permalink with trailing /";
 
 $res = $test->request(GET '/someblog/doesnotexit/');
 is $res->code, 404, "Unknown category/page returns a 404";
@@ -118,5 +130,10 @@ like $res->content, qr{<h1 class="post-title">Page Not Found</h1>}, "404 is corr
 $res = $test->request(GET '/someblog/tech/');
 is $res->code, 200, "Valid category page";
 like $res->content, qr{<h1 class="post-title">Tech Stories</h1>}, "Category page is correctly rendered";
+
+like $res->content, qr{fonts\.googleapis\.com/css2\?family=Lato:wght\@400;700.*&display=swap" rel="stylesheet"},
+    "Google fonts source link looks good";
+
+like $res->content, qr{<link rel="stylesheet" href="/css/foo\.css">}, "custom CSS is loaded";
 
 done_testing;

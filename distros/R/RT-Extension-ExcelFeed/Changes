@@ -1,3 +1,6 @@
+0.09 2023-11-15
+ - Add option to hide Download as Microsoft Excel Spreadsheet from Charts
+
 0.08 2022-08-25
  - Call the core BuildEmail to automatically get RT updates
 

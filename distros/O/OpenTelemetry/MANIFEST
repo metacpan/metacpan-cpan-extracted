@@ -81,6 +81,7 @@ t/OpenTelemetry.t
 t/OpenTelemetry/Attributes.t
 t/OpenTelemetry/Baggage.t
 t/OpenTelemetry/Common.t
+t/OpenTelemetry/Constants.t
 t/OpenTelemetry/Context.t
 t/OpenTelemetry/Integration.t
 t/OpenTelemetry/Integration/DBI.t

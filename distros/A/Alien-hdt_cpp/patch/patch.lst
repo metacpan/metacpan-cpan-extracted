@@ -1,0 +1,1 @@
+wget -O gh-pr-273.patch 'https://github.com/rdfhdt/hdt-cpp/pull/273.patch?full_index=1'

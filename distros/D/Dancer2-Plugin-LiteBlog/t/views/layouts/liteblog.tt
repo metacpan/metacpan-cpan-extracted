@@ -3,34 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    [% IF page_title %]
     
+    [% IF page_title %]
     <title>[% page_title %] | [% title %]</title>
-   
+    [% IF page_excerpt %]<meta name="description" content="[% page_excerpt %]">[% END %]
+    [% IF page_author %]<meta name="author" content="[% page_author %]">[% END %]
+    [% IF page_tags %]
+      [% IF tags %]
+      <meta name="keywords" content="[% tags %], [% page_tags %]">
+      [% ELSE %]
+      <meta name="keywords" content="[% page_tags %]">
+      [% END %]
+    [% ELSE %]
+      [% IF tags %]
+      <meta name="keywords" content="[% tags %]">
+      [% END %]
+    [% END %]
+
+    <!-- Open Graph meta tags for Facebook and other social networks -->
+    <meta property="og:title" content="[% page_title %] | [% title %]">
+    [% IF page_excerpt %]<meta property="og:description" content="[% page_excerpt %]">[% END %]
+    [% IF page_image %]<meta property="og:image" content="[% base_url%][% page_image %]">[% END %]
+    <meta property="og:url" content="[% base_url %][% page_url %]">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="[% page_title %] | [% title %]">
+    [% IF page_excerpt %]<meta name="twitter:description" content="[% page_excerpt %]">[% END %]
+    [% IF page_image %]<meta name="twitter:image" content="[% base_url%][% page_image %]">[% END %] 
+
+    [% ELSE %]
+    <!-- The Home Page -->     
+    <title>[% title %]</title>
+    [% IF description %]<meta name="description" content="[% description %]">[% END %]
+    [% IF tags %]<meta name="keywords" content="[% tags %]">[% END %]
+
+    <!-- Open Graph meta tags for Facebook and other social networks -->
+    <meta property="og:title" content="[% title %]">
+    <meta property="og:description" content="[% description %]">
+    <meta property="og:image" content="[% base_url %][% logo %]"> <!-- URL to your website's thumbnail image -->
+    <meta property="og:url" content="[% base_url %]">
+    <meta property="og:type" content="website">
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="[% title %]">
+    <meta name="twitter:description" content="[% description %]">
+    <meta name="twitter:image" content="[% base_url %][% logo %]"> <!-- URL to your website's thumbnail image -->
+    [% END %]
+
+    [% IF favicon %]
+    <link rel="icon" type="[% mime_icon %]" href="[% favicon %]">
+    [% END %]
+
+    [% IF google_fonts %]
+    <link href="https://fonts.googleapis.com/css2?[% google_fonts %]" rel="stylesheet">
+    [% END %]
+
     [% IF feature.highlight %] 
     <!-- Highlight JS Lib -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
     [% END %]
 
-    [% ELSE %]
-    
-    <title>[% title %]</title>
-    
-    [% END %]
-
-    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700|Lato:400,400i,700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-
+    <!-- CSS style sheets -->
+    <!-- Liteblog UI -->
     <link rel="stylesheet" href="/css/liteblog.css">
+    <!-- Widgets -->
     [% FOREACH w IN widgets %]
     <link rel="stylesheet" href="/css/liteblog/[% w.name %].css">
-    [% END %]
     [% IF page_title %]
     <!-- a page_title is defined, let's load the single-page css -->
     <link rel="stylesheet" href="/css/liteblog/single-page.css">
     [% END %]
+    [% IF css %]
+    <!-- Source user-defined CSS -->
+    <link rel="stylesheet" href="[% css %]">
+    [% END %]
+    
+    <!-- RSS Feeds -->
+    [% IF w.instance.has_rss %]
+    <link rel="alternate" type="application/rss+xml" 
+        title="RSS Feed for [% title %]: [% w.title %]" 
+        href="[% base_url %][% w.instance.mount %]/rss/" />
+    [% END %]
+    [% END %]
+
+    <script type="text/javascript">
+    [% IF page_title %]
+    var showHeroSection = false;
+    [% ELSE %]
+    var showHeroSection = true;
+    [% END %]
+    </script>
 </head>
 <body>
 
@@ -64,7 +130,7 @@
       [% END %]
 
     [% IF navigation %]
-    <!-- the hamburger menu -->
+    <!-- the hamburger menu, hidden by default -->
       <div id="mobile-navigation-menu" class="mobile-nav">
       [% FOREACH nav IN navigation %]
         [% IF nav.link %]
@@ -74,15 +140,18 @@
       </div>
     [% END %] <!-- END hamburger menu -->
 
-
     </header> <!-- END mobile-header -->
 
     
     [% IF page_title %]
-    <!-- single-page layout -->
+    <!-- The compcat hero bar with the navigation menu, visible  -->
     <div id="hero-banner" class="hero-banner">
+    [% ELSE %]
+    <!-- The compcat hero bar with the navigation menu, hidden  -->
+    <div id="hero-banner" class="hero-banner hidden-hero">
+    [% END %]
       <div class="hero-banner-wrapper">
-        <div class="site-title">[% title %]</div>
+        <div class="site-title"><a href="/">[% title %]</a></div>
         [% IF navigation %]
         <nav>
           [% FOREACH nav IN navigation %]
@@ -98,8 +167,8 @@
       </div>
     </div>
     
-    [% ELSE %]
-    <!-- Home Landing Page -->
+    [% UNLESS page_title %]
+    <!-- The Big Hero Header for the Home Landing Page -->
     <section id="hero">
         <div class="header-wrapper">
             [% IF logo %]
@@ -116,39 +185,102 @@
     </section>
     [% END %]
 
+<!-- Content -->
 [% content %]
+<!-- End Content -->
 
-[% IF page_title %]
-<!-- mobile header detection for the 'hero-banner' (small) single page -->
+<!-- Footer -->
+<footer id="site-footer" class="site-footer">
+    <div class="footer-content">
+        <p> [% footer %]</p>
+        [% IF render_time %]<p class="debug-infos">Page generated in [% render_time %]</p>[% END %]
+
+    </div>
+</footer>
+<!-- End Footer -->
+
+
+[% UNLESS page_title %]
+<!-- We are on the landing page, there is the big Hero header -->
 <script type="text/javascript">
-window.addEventListener('scroll', function () {
-    var heroSection = document.getElementById('hero-banner');
-    var mobileHeader = document.getElementById('mobile-header');
 
-    if (window.scrollY > heroSection.clientHeight) {
-        mobileHeader.style.display = 'flex';
-    } else {
+
+/* first, Hide heroBanner if showHeroSection  */
+var heroBanner = document.getElementById('hero-banner');
+if (showHeroSection) {
+    heroBanner.style.display = 'none';
+}
+
+// This will hide the mobile-header on initial load
+document.addEventListener('DOMContentLoaded', (event) => {
+    var heroBanner = document.getElementById('hero-banner');
+    heroBanner.classList.add('hidden-hero')
+
+    var mobileHeader = document.getElementById('mobile-header');
+    if (window.innerWidth <= 768 && showHeroSection) { 
         mobileHeader.style.display = 'none';
     }
-});
-</script>
-[% ELSE %]
-<!-- mobile header detection for the 'hero' (big) landing page -->
-<script type="text/javascript">
-window.addEventListener('scroll', function () {
-    var heroSection = document.getElementById('hero');
-    var mobileHeader = document.getElementById('mobile-header');
-
-    if (window.scrollY > heroSection.clientHeight) {
+    else if (window.innerWidth <= 768) {
         mobileHeader.style.display = 'flex';
+        heroBanner.style.display = 'none';
+    }
+});
+
+// Now handle the showing/hiding logic of the header based on scrolling
+window.addEventListener('scroll', function () {
+    var heroSection = document.getElementById('hero'); // the big Hero header
+    var heroBanner = document.getElementById('hero-banner'); // the navigation bar
+    var mobileHeader = document.getElementById('mobile-header'); // the mobile compact bar
+
+    mobileHeaderStyle = window.getComputedStyle(mobileHeader);
+    var scrollY = window.scrollY || window.pageYOffset;
+
+    // Show the mobile-header if on small screen (<768) and 
+    // after user scrolls past heroSection height, or 
+    // immediatly if not present.
+    if (window.innerWidth <= 768) {
+        mobileTriggerPoint = 0;
+        if (heroSection && showHeroSection) {
+            mobileTriggerPoint = heroSection.clientHeight;
+        }
+        if (scrollY >= mobileTriggerPoint) {
+            mobileHeader.style.display = 'flex';
+        } else {
+            mobileHeader.style.display = 'none';
+        }
+    }
+
+    /* Just do nothing if the mobile nav bar is displayed or 
+     * if the heroSection is not enabled on this page */ 
+    if (mobileHeaderStyle.display == 'flex' || showHeroSection == false) {
+        return false;
+    }
+
+    /* Always display the hero navigation bar on scrolling */
+    if (window.scrollY > heroSection.clientHeight) {
+        //heroBanner.style.display = 'flex';
+        heroBanner.classList.add('visible-hero')
+        heroBanner.classList.remove('hidden-hero')
+        heroBanner.style.display = 'flex';
+        if (heroSection) { 
+            heroSection.classList.remove('visible-hero');
+            heroSection.classList.add('hidden-hero');
+        }
     } else {
-        mobileHeader.style.display = 'none';
+        heroBanner.style.display = 'none';
+        heroBanner.classList.remove('visible-hero')
+        heroBanner.classList.add('hidden-hero')
+        if (heroSection) { 
+            heroSection.classList.add('visible-hero');
+            heroSection.classList.remove('hidden-hero');
+        }
     }
 });
 </script>
 [% END %]
 
 [% IF navigation %]
+<!-- Handle the click on the hamburger icon -->
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', (event) => {
     // Get the elements

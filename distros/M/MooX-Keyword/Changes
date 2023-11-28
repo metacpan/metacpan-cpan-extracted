@@ -1,5 +1,11 @@
 Revision history for MooX-Keyword
 
+0.08    2023/11/12
+	- Use MooX::ReturnModifers sub to extend package with chained routines
+
+0.06    2023/11/22
+	- Add a sub function to the $moo object which is passed in to builders of keywords
+
 0.03    2022/05/23
 	- Remove useless declaration of use feature qw/state/ to fix failing tests
 

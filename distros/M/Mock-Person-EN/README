@@ -4,6 +4,7 @@ NAME
 SYNOPSIS
      use Mock::Person::EN qw(first_male first_female last_male last_female
              middle_male middle_female name name_female name_male);
+
      my $first_male = first_male();
      my $first_female = first_female();
      my $last_male = last_male();
@@ -67,11 +68,9 @@ VARIABLES
              Default value is 'two'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::EN qw(name);
 
@@ -82,11 +81,9 @@ EXAMPLE1
      # Mark Parent
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::EN qw(name);
 
@@ -100,11 +97,9 @@ EXAMPLE2
      # Jack Ryan Hatheway
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::EN;
 
@@ -1403,24 +1398,25 @@ EXAMPLE3
      # Yoxall
 
 DEPENDENCIES
-    Exporter, List::MoreUtils, Readonly.
+    Exporter, List::Util, Readonly.
 
 SEE ALSO
     Task::Mock::Person
         Install the Mock::Person modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Mock-Person-EN>
+    <https://github.com/michal-josef-spacek/Mock-Person-EN>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2013-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

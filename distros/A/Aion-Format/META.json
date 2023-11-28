@@ -1,7 +1,7 @@
 {
    "abstract" : "Perl extension for formatting numbers, colorizing output and so on",
    "author" : [
-      "Yaroslav O. Kosmina LL<mailto:dart@cpan.org>"
+      "Yaroslav O. Kosmina L<mailto:dart@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.19",
@@ -64,7 +64,7 @@
    "provides" : {
       "Aion::Format" : {
          "file" : "lib/Aion/Format.pm",
-         "version" : "v0.0.2"
+         "version" : "v0.0.3"
       },
       "Aion::Format::Html" : {
          "file" : "lib/Aion/Format/Html.pm"
@@ -88,12 +88,12 @@
          "web" : "https://github.com/darviarush/perl-aion-format"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.0.3",
    "x_authority" : "cpan:DART",
    "x_contributors" : [
       "Yaroslav O. Kosmina <dart@cpan.org>",
       "Yaroslav O. Kosmina <darviarush@mail.ru>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.16",
-   "x_static_install" : 1
+   "x_static_install" : 0
 }

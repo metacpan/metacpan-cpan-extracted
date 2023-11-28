@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Af::Any::Na - Package for language Afrikaans
 
 package Locale::CLDR::Locales::Af::Any::Na;
 # This file auto generated from Data\common\main\af_NA.xml
-#	on Fri 13 Oct  9:04:45 am GMT
+#	on Sat  4 Nov  5:51:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

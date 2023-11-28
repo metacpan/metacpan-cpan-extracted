@@ -44,6 +44,30 @@ unset multiplot
 EXP
     },
     {
+        label => "example: mix writer and a builder",
+        args => {
+            option => 'layout 2,2',
+            do => sub {
+                my $writer = shift;
+                my $another_builder = Gnuplot::Builder::Script->new(xrange => q{[-pi:pi]}, title => q{"1. sin(x)"});
+                $another_builder->plot("sin(x)");
+                $writer->("set multiplot next\n");
+                $another_builder->new_child()->set(title => q{"2. sin(2x)"})->plot("sin(2 * x)");
+            },
+        },
+        exp => <<'EXP'
+set multiplot layout 2,2
+set xrange [-pi:pi]
+set title "1. sin(x)"
+plot sin(x)
+set multiplot next
+set xrange [-pi:pi]
+set title "2. sin(2x)"
+plot sin(2 * x)
+unset multiplot
+EXP
+    },
+    {
         label => "with output",
         args => {
             output => "hoge.eps",

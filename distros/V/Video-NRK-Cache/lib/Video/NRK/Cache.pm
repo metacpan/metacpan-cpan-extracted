@@ -3,7 +3,7 @@ use feature 'class';
 no warnings 'experimental::class';
 
 package Video::NRK::Cache;  # Dist::Zilla doesn't know about class yet
-$Video::NRK::Cache::VERSION = '3.00';
+$Video::NRK::Cache::VERSION = '3.01';
 class Video::NRK::Cache;
 # ABSTRACT: Cache NRK Video on Demand broadcasts for offline viewing
 
@@ -98,7 +98,7 @@ Video::NRK::Cache - Cache NRK Video on Demand broadcasts for offline viewing
 
 =head1 VERSION
 
-version 3.00
+version 3.01
 
 =head1 SYNOPSIS
 

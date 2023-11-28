@@ -1,5 +1,6 @@
 package URI::PackageURL::CLI;
 
+use feature ':5.10';
 use strict;
 use warnings;
 use utf8;
@@ -7,12 +8,10 @@ use utf8;
 use Getopt::Long qw( GetOptionsFromArray :config gnu_compat pass_through );
 use Pod::Usage;
 use Carp;
-use JSON qw(encode_json);
-use Data::Dumper;
 
 use URI::PackageURL;
 
-our $VERSION = '2.02';
+our $VERSION = '2.04';
 
 sub cli_error {
     my ($error) = @_;
@@ -30,10 +29,17 @@ sub run {
         \@args, \%options, qw(
             help|h
             man
-            version
+            v
 
             download-url
             repository-url
+
+            type=s
+            namespace=s
+            name=s
+            version=s
+            qualifiers|qualifier=s%
+            subpath=s
 
             null|0
             format=s
@@ -48,9 +54,47 @@ sub run {
     pod2usage(-exitstatus => 0, -verbose => 2) if defined $options{man};
     pod2usage(-exitstatus => 0, -verbose => 0) if defined $options{help};
 
-    if (defined $options{version}) {
-        print "PackageURL CLI v$URI::PackageURL::VERSION\n";
+    if (defined $options{v}) {
+
+        (my $progname = $0) =~ s/.*\///;
+
+        say <<"VERSION";
+$progname version $URI::PackageURL::VERSION
+
+Copyright 2022-2023, Giuseppe Di Terlizzi <gdt\@cpan.org>
+
+This program is part of the URI::PackageURL distribution and is free software;
+you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Complete documentation for $progname can be found using 'man $progname'
+or on the internet at <https://metacpan.org/dist/URI-PackageURL>.
+VERSION
+
         return 0;
+
+    }
+
+    if (defined $options{type}) {
+
+        my $purl = eval {
+            URI::PackageURL->new(
+                type       => $options{type},
+                namespace  => $options{namespace},
+                name       => $options{name},
+                version    => $options{version},
+                qualifiers => $options{qualifiers},
+                subpath    => $options{subpath},
+            );
+        };
+
+        if ($@) {
+            cli_error($@);
+            return 1;
+        }
+
+        print "$purl\n";
+        return 0;
+
     }
 
     my ($purl_string) = @args;
@@ -82,20 +126,34 @@ sub run {
 
     if ($options{'repository-url'}) {
 
-        exit(2) unless defined $purl_urls->{repository};
+        return 2 unless defined $purl_urls->{repository};
 
         print $purl_urls->{repository} . ($options{null} ? "\0" : "\n");
         return 0;
     }
 
     if ($options{format} eq 'json') {
-        print JSON->new->canonical->pretty(1)->convert_blessed(1)->encode($purl);
-        return 0;
+
+        if (eval { require JSON }) {
+            print JSON->new->canonical->pretty(1)->convert_blessed(1)->encode($purl);
+            return 0;
+        }
+
+        cli_error 'JSON module missing';
+        return 255;
+
     }
 
     if ($options{format} eq 'dumper') {
-        print Data::Dumper->new([$purl])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
-        return 0;
+
+        if (eval { require Data::Dumper }) {
+            print Data::Dumper->new([$purl])->Indent(1)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump;
+            return 0;
+        }
+
+        cli_error 'Data::Dumper module missing';
+        return 255;
+
     }
 
     if ($options{format} eq 'yaml') {
@@ -177,6 +235,18 @@ URI::PackageURL::CLI - URL::PackageURL (purl) Command Line Interface
 =head1 DESCRIPTION
 
 URI::PackageURL::CLI "Command Line Interface" helper module for C<purl-tool(1)>.
+
+=over
+
+=item URI::PackageURL->run(@args)
+
+Execute the command
+
+=item cli_error($error)
+
+Clean error
+
+=back
 
 =head1 AUTHOR
 

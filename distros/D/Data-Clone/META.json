@@ -1,0 +1,90 @@
+{
+   "abstract" : "Polymorphic data cloning",
+   "author" : [
+      "Goro Fuji (gfx) <gfuji(at)cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Clone",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::PPPort" : "3.19",
+            "ExtUtils::MakeMaker" : "6.59",
+            "ExtUtils::ParseXS" : "3.18",
+            "Module::Build" : "0",
+            "Module::Build::XSUtil" : "0",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0.03"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4005",
+            "Module::Build::XSUtil" : "0.03"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0.02",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Clone" : {
+         "file" : "lib/Data/Clone.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/p5-Data-Clone/issues"
+      },
+      "homepage" : "https://github.com/gfx/p5-Data-Clone",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gfx/p5-Data-Clone.git",
+         "web" : "https://github.com/gfx/p5-Data-Clone"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "Fuji, Goro (gfx) <gfuji@cpan.org>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Tom Hukins <tom@eborcom.com>",
+      "Yves Orton <demerphq@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 0
+}

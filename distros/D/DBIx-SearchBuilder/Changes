@@ -1,5 +1,8 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.79 2023-11-27
+ - Produce correct query hints
+
 1.78 2023-07-05
  - Query the Count data if current page does not have any records
  - Require DBD::SQLite 1.60+ for combine searches

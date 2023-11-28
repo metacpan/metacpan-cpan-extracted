@@ -57,6 +57,10 @@ Embperl/Form/Validate/EMailRFC.pm
 Embperl/Form/Validate/FQDN_IPAddr.pm
 Embperl/Form/Validate/IPAddr.pm
 Embperl/Form/Validate/IPAddr_Mask.pm
+Embperl/Form/Validate/FQDN_IPv4_IPv6Addr.pm
+Embperl/Form/Validate/IP6Addr_Mask.pm
+Embperl/Form/Validate/IPv6Addr.pm
+Embperl/Form/Validate/IPv6Addr_Mask.pm
 Embperl/Form/Validate/Integer.pm
 Embperl/Form/Validate/PosInteger.pm
 Embperl/Form/Validate/Select.pm
@@ -123,6 +127,7 @@ driver/epxalan.cpp
 eg/README
 eg/images/back-expander.gif
 eg/images/but.gif
+eg/images/footer2.jpg
 eg/images/frame.jpg
 eg/images/h_content.gif
 eg/images/h_current-v.gif
@@ -239,6 +244,7 @@ test.pl
 test/cmp/includeerr3.htm514
 test/cmp/includeerr2.htm514
 test/cmp/includeerr2.htm518
+test/cmp/includeerr2.htm520
 test/cmp/error.htm514
 test/cmp/varerr.htm514
 test/cmp/Execute.htm

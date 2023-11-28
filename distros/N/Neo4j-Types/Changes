@@ -1,5 +1,29 @@
 Revision history for Neo4j::Types
 
+2.00  2023-11-21
+
+ - Add ByteArray, DateTime, and Duration types. (GH #15, #17)
+
+ - Define methods and behaviour for the Neo4j 5 element ID. (GH #13)
+
+ - Specify previously undefined behaviour. (GH #1, #11, #14)
+
+ - Expand the implementor guidance for driver authors and separate it
+   from the type definitions aimed at users.
+
+ - Separate generic type implementations from the type definitions.
+
+    - Rename the package of the generic spatial point implementation
+      to Neo4j::Types::Generic::Point. (GH #16)
+
+    - Caution driver authors against depending upon internal implementation
+      details of Neo4j:Types modules. (GH #4)
+
+ - Offer test tools to help driver authors with conforming to these types.
+
+ - Raise minimum required version of Perl to v5.10.1.
+
+
 1.00  2021-01-18
 
  - initial release, based on Neo4j::Driver 0.20 and Neo4j::Bolt 0.4200

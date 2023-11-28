@@ -1,5 +1,5 @@
 package Crayon;
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 use 5.006;
 use strict;
 use warnings;
@@ -341,7 +341,7 @@ Crayon - dedupe, minify and extend CSS
 
 =head1 VERSION
 
-Version 1.01 
+Version 1.02 
 
 =cut
 
@@ -393,7 +393,6 @@ Parse css strings into Crayons internal struct.
 			...
 		}
 	|);
-
 
 =head2 parse_file
 

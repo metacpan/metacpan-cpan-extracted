@@ -1,0 +1,183 @@
+
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" /><link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#Utility-Methods">Utility Methods</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHORS">AUTHORS</a></li>
+  <li><a href="#COPYRIGHT">COPYRIGHT</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Locale::MaybeMaketext - Find available localization / localisation / translation services.</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>There are, to my knowledge, three slightly different Maketext libraries available on Perl all of which require your &quot;translation files&quot; to reference that individual library as a parent/base package: which causes problems if you want to support all three. This package addresses this issue by allowing you to just reference this package and then it will automatically figure out which Maketext library is available on the end-users platform.</p>
+
+<p>It will try each localizer in the order:</p>
+
+<p>* <a href="https://metacpan.org/pod/Cpanel::CPAN::Locale::Maketext::Utils">Cpanel::CPAN::Locale::Maketext::Utils</a></p>
+
+<p>* <a href="https://metacpan.org/pod/Locale::Maketext::Utils">Locale::Maketext::Utils</a></p>
+
+<p>* <a href="https://metacpan.org/pod/Locale::Maketext">Locale::Maketext</a></p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<p>How to use:</p>
+
+<p>1. Create a base/parent localization class which uses <code>Locale::MaybeMaketext</code> as the parent:</p>
+
+<pre><code>    # File YourProjClass/L10N.pm
+    package YourProjClass::L10N;
+    use parent qw/Locale::MaybeMaketext/;
+    # any additional methods to share on all languages
+    1;</code></pre>
+
+<p>2. Create the individual translation files using your base/parent class as the parent:</p>
+
+<pre><code>    # File YourProjClass/L10N/en.pm
+    package YourProjClass::L10N::EN;
+    use parent qw/YourProjClass::L10N/;
+    %Lexicon = (
+       &#39;_AUTO&#39;=&gt;1,
+    );
+    1;</code></pre>
+
+<p>3. In your main program use:</p>
+
+<pre><code>    # File YourProjClass/Main.pl
+    use parent qw/YourProjClass::L10N/;
+       ...
+    my $lh=YourProjClass::L10N-&gt;get_handle() || die(&#39;Unable to find language&#39;);
+    print $lh-&gt;maketext(&quot;Hello [_1] thing\n&quot;,$thing);</code></pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p>The main method you need to concern yourself about is the <code>get_handle</code> method which gets an appropriate localizer, sets it as the &quot;parent&quot; of the package and then returns an appropriate <code>maketext</code> handle.</p>
+
+<dl>
+
+<dt>$lh = YourProjClass-&gt;get_handle(...langtags...) || die &#39;language handle?&#39;;</dt>
+<dd>
+
+<p>This ensures an appropriate localizer/Maketext library is set as the parent and then tries loading classes based on the language-tags (langtags) you provide - and for the first class that succeeds, returns YourProjClass::<i>language</i>-&gt;new().</p>
+
+</dd>
+<dt>$lh = YourProjClass-&gt;get_handle() || die &#39;language handle?&#39;;</dt>
+<dd>
+
+<p>This ensures an appropriate localizer/Maketext library is set as the parent and then asks that library to &quot;magically&quot; detect the most appropriate language for the user based on its own logic.</p>
+
+</dd>
+<dt>$localizer = Locale::MaybeMaketext::maybe_maketext_get_localizer();</dt>
+<dd>
+
+<p>Returns the package name of the currently selected localizer/Maketext library - or, if one is not set, will try and pick one from the list in <code>@maybe_maketext_known_localizers</code> and return that. If it is unable to find a localizer (for example, if the user has none of the listed packages installed), then the <code>croak</code> error message &quot;Unable to load localizers: &quot;... will be emitted along with why/how it was unable to load each localizer.</p>
+
+</dd>
+<dt>Locale::MaybeMaketext::maybe_maketext_reset();</dt>
+<dd>
+
+<p>Removes the currently set localizer from the package. Intended for testing purposes.</p>
+
+</dd>
+<dt>$text = $lh-&gt;maketext(<i>key</i>, ... parameters for this phrase ... );</dt>
+<dd>
+
+<p>This is actually just a dummy function to ensure that <code>get_handle</code> is called before any attempt is made to translate text.</p>
+
+</dd>
+<dt>@list = Locale::MaybeMaketext::maybe_maketext_get_localizer_list();</dt>
+<dd>
+
+<p>Get the list of currently configured localizers. Intended for testing purposes.</p>
+
+</dd>
+<dt>Locale::MaybeMaketext::maybe_maketext_set_localizer_list(@&lt;list of localizers&gt;);</dt>
+<dd>
+
+<p>Sets the list of currently configured localizers. Intended for testing purposes.</p>
+
+</dd>
+<dt>@reason = Locale::MaybeMaketext::maybe_maketext_get_reasoning()</dt>
+<dd>
+
+<p>Returns the reasoning &quot;why&quot; a particular localizer was choise. Intended for debugging purposes.</p>
+
+</dd>
+</dl>
+
+<h2 id="Utility-Methods">Utility Methods</h2>
+
+<p>Various <code>Maketext</code> libraries support different &#39;utility modules&#39; which help expand the bracket notation used in Maketext. Of course, you do not necessarily know which localization library will be used so it is advisable to keep to the most commonly supported utility methods.</p>
+
+<p>Here is a little list of which utility modules are available under which library:</p>
+
+<p>* LM = Locale::Maketext</p>
+
+<p>* LMU = Locale::Maketext::Utils</p>
+
+<p>* CCLMU = Cpanel::CPAN::Locale::Maketext::Utils</p>
+
+<pre><code> |-------------------------------------------|
+ | Method            |  LM   |  LMU  | CCLMU |
+ |-------------------|-------|-------|-------|
+ | quant             |   Y   |   Y   |   Y   |
+ | numf              |   Y   |   Y   |   Y   |
+ | numerate          |   Y   |   Y   |   Y   |
+ | sprintf           |   Y   |   Y   |   Y   |
+ | language_tag      |   Y   |   Y   |   Y   |
+ | encoding          |   Y   |   Y   |   Y   |
+ | join              |   N   |   Y   |   Y   |
+ | list_and          |   N   |   Y   |   Y   |
+ | list_or           |   N   |   Y   |   Y   |
+ | list_and_quoted   |   N   |   Y   |   Y   |
+ | list_or_quoted    |   N   |   Y   |   Y   |
+ | datetime          |   N   |   Y   |   Y   |
+ | current_year      |   N   |   Y   |   Y   |
+ | format_bytes      |   N   |   Y   |   Y   |
+ | convert           |   N   |   Y   |   Y   |
+ | boolean           |   N   |   Y   |   Y   |
+ | is_defined        |   N   |   Y   |   Y   |
+ | is_future         |   N   |   Y   |   Y   |
+ | comment           |   N   |   Y   |   Y   |
+ | asis              |   N   |   Y   |   Y   |
+ | output            |   N   |   Y   |   Y   |
+ |-------------------------------------------|</code></pre>
+
+<h1 id="AUTHORS">AUTHORS</h1>
+
+<dl>
+
+<dt>Richard Bairwell &lt;rbairwell@cpan.org&gt;</dt>
+<dd>
+
+</dd>
+</dl>
+
+<h1 id="COPYRIGHT">COPYRIGHT</h1>
+
+<p>Copyright 2023 Richard Bairwell &lt;rbairwell@cpan.org&gt;</p>
+
+<p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. The full text of this license can be found in the <i>LICENSE</i> file included with this module.</p>
+
+<p>See <i>http://dev.perl.org/licenses/</i></p>
+
+</body>
+</html>
+

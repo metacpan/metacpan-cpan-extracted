@@ -61,8 +61,7 @@ sub new {
             $params{device} = HiPi::Device::I2C->new(
                 devicename  => $params{devicename},
                 address     => $params{address},
-                #busmode     => $params{backend},
-                busmode     => 'i2c', # force i2c
+                busmode     => $params{backend},
             );
         }
     }

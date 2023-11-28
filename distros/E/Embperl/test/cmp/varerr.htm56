@@ -9,13 +9,13 @@ The server encountered an internal error or misconfiguration and was unable to c
 <table cellspacing='2' cellpadding='5'>
 <tr bgcolor='#eeeeee'><td>
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-^\[.*?\]ERR\:  24\:  Error in Perl code\: Global symbol &quot;\$d&quot; requires explicit package name at 
-^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$e&quot; requires explicit package name at 
-^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$e&quot; requires explicit package name at 
-^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$d&quot; requires explicit package name at 
-^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$e&quot; requires explicit package name at 
-^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$d&quot; requires explicit package name at 
-^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$e&quot; requires explicit package name at 
+^\[.*?\]ERR\:  24\:  Error in Perl code\: Global symbol &quot;\$d&quot; requires explicit package name 
+^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$e&quot; requires explicit package name 
+^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$e&quot; requires explicit package name 
+^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$d&quot; requires explicit package name 
+^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$e&quot; requires explicit package name 
+^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$d&quot; requires explicit package name 
+^<br>&nbsp;&nbsp;&nbsp;&nbsp;Global symbol &quot;\$e&quot; requires explicit package name 
 <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 </td></tr>
 </table>

@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::MAX7219LEDStrip
 # Description  : Interface to strip of MAX7219 driven LEDs
-# Copyright    : (c) 2018-2020 Mark Dootson
+# Copyright    : (c) 2018-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -44,7 +44,7 @@ sub new {
         _clear_on_exit => 1,
         # SPI
         devicename   => '/dev/spidev0.0',
-        speed        => 2000000,
+        speed        => 2000000,  # 2 MHz
         delay        => 0,
         reverse_map  => 0,
     );

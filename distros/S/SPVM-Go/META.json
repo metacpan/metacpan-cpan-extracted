@@ -1,0 +1,54 @@
+{
+   "abstract" : "Goroutines of The Go Programming Language",
+   "author" : [
+      "Yuki Kimoto<kimoto.yuki@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SPVM-Go",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "SPVM" : "0.989061"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "SPVM" : "0.989061",
+            "SPVM::Sys" : "0.500",
+            "SPVM::Thread" : "0.001"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/SPVM-Go.git",
+         "web" : "https://github.com/yuki-kimoto/SPVM-Go"
+      }
+   },
+   "version" : "0.005001",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

@@ -16,6 +16,7 @@ require POSIX;
 # ATTRIBUTES
 
 attr 'data';
+attr 'tryer';
 
 # BUILDERS
 
@@ -39,6 +40,14 @@ sub build_args {
   return $args;
 }
 
+sub build_self {
+  my ($self, $args) = @_;
+
+  $self->tryer($self->try('execute')->maybe) if !$self->tryer;
+
+  return $self;
+}
+
 # HOOKS
 
 sub _exit {
@@ -60,6 +69,22 @@ sub args {
   my ($self) = @_;
 
   return {};
+}
+
+sub auto {
+  my ($self, $code) = @_;
+
+  my $CAN_RUN
+    = $ENV{VENUS_TASK_AUTO} && (not(caller(1)) || scalar(caller(1)) eq 'main');
+
+  return $self if !$CAN_RUN;
+
+  $self = $self->class->new if !ref $self;
+
+  $self->$code if $code;
+  $self->tryer->result;
+
+  return $self;
 }
 
 sub cli {
@@ -244,9 +269,14 @@ sub pass {
 sub run {
   my ($self, @args) = @_;
 
-  my $CAN_RUN = not(caller(1)) || scalar(caller(1)) eq 'main';
+  my $CAN_RUN
+    = $ENV{VENUS_TASK_AUTO} && (not(caller(1)) || scalar(caller(1)) eq 'main');
 
-  $self->class->new(@args)->maybe('execute') if $ENV{VENUS_TASK_AUTO} && $CAN_RUN;
+  return $self if !$CAN_RUN;
+
+  $self = $self->class->new if !ref $self;
+
+  $self->tryer->result;
 
   return $self;
 }
@@ -396,6 +426,47 @@ I<Since C<2.91>>
 
 =cut
 
+=head2 tryer
+
+  tryer(Venus::Try $data) (Venus::Try)
+
+The tryer attribute is read-write, accepts C<(Venus::Try)> values, and is
+optional.
+
+I<Since C<4.11>>
+
+=over 4
+
+=item tryer example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $set_tryer = $task->tryer($task->try('execute'));
+
+  # bless(..., "Venus::Try")
+
+=back
+
+=over 4
+
+=item tryer example 2
+
+  # given: synopsis
+
+  # given: example-1 tryer
+
+  package main;
+
+  my $get_tryer = $task->tryer;
+
+  # bless(..., "Venus::Try")
+
+=back
+
+=cut
+
 =head1 INHERITS
 
 This package inherits behaviors from:
@@ -470,6 +541,76 @@ I<Since C<2.91>>
   #     help => 'Name of user',
   #   },
   # }
+
+=back
+
+=cut
+
+=head2 auto
+
+  auto(coderef $code) (Venus::Task)
+
+The auto class method is similar to the L</run> method but accepts a callback
+which will be invoked with the instansiated class before calling the
+L</execute> method. This method is meant to be used directly in package scope
+outside of any routine, and will only auto-execute under the conditions that
+the caller is the "main" package space and the C<VENUS_TASK_AUTO> environment
+variable is truthy.
+
+I<Since C<4.11>>
+
+=over 4
+
+=item auto example 1
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new(['--help']);
+
+  my $auto = $task->auto(sub{});
+
+  # bless({...}, 'Venus::Task')
+
+=back
+
+=over 4
+
+=item auto example 2
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  auto Example sub {
+    my ($self) = @_;
+    $self->tryer->no_default;
+  };
+
+  # bless({...}, 'Venus::Task')
 
 =back
 
@@ -585,7 +726,8 @@ I<Since C<2.91>>
 The execute method can be overridden and returns the invocant. This method
 prepares the L<Venus::Cli> via L</prepare>, and runs the L</startup>,
 L</handler>, and L</shutdown> sequences, passing L<Venus::Cli/parsed> to each
-method.
+method. This method is not typically invoked directly, but instead by the
+L</tryer> attribute via the L</run> or L</auto> class methods.
 
 I<Since C<2.91>>
 
@@ -1825,7 +1967,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+Copyright (C) 2022, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

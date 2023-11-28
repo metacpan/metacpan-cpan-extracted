@@ -255,6 +255,29 @@ sub _is_absolute_path {
     return $path =~ /^\// || $path =~ /^https?:\/\//;
 }
 
+sub _normalize_path_to_absolute {
+    my ($self, $asset) = @_;
+
+    # an absolute path remains unchanged
+    return $asset if $self->_is_absolute_path($asset);
+        
+    my $base = $self->base_path;
+    $base = '' if $base eq '/';
+
+    # this is a relative path, transform to its permalink
+    if ($self->is_page) {
+        return $base .
+               '/'.$self->slug .
+               '/'.$asset;
+    }
+    else {
+        return $base .
+               '/'.$self->category .
+               '/'.$self->slug . 
+               '/'.$asset;
+    }
+}
+
 has image => (
     is => 'ro',
     lazy => 1,
@@ -262,25 +285,43 @@ has image => (
         my ($self) = @_;
         my $asset = $self->meta->{'image'};
         return undef if ! defined $asset;
+        return $self->_normalize_path_to_absolute($asset); 
+    },
+);
 
-        # an absolute path remains unchanged
-        return $asset if $self->_is_absolute_path($asset);
-        
-        my $base = $self->base_path;
-        $base = '' if $base eq '/';
+=head2 background
 
-        # this is a relative path, transform to its permalink
-        if ($self->is_page) {
-            return $base .
-                   '/'.$self->slug .
-                   '/'.$asset;
-        }
-        else {
-            return $base .
-                   '/'.$self->category .
-                   '/'.$self->slug .
-                   '/'.$asset;
-        }
+If defined in C<meta.yml>, this is expected to be a path to a big image that
+will be used as the background image of the whole page. 
+As with C<image>, if the path is relative, it will be transformed to 
+its absolute form, based on the Article location.
+
+=cut
+
+has background => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        my ($self) = @_;
+        my $asset = $self->meta->{'background'};
+        return undef if ! defined $asset;
+        return $self->_normalize_path_to_absolute($asset); 
+    },
+);
+
+=head2 author
+
+The author of the article/page. To be displayed in the meta
+data of the HTML.
+
+=cut
+
+has author => (
+    is => 'ro',
+    lazy => 1,
+    default => sub {
+        my ($self) = @_;
+        return $self->meta->{'author'};
     },
 );
 
@@ -296,7 +337,7 @@ has tags => (
     lazy => 1,
     default => sub {
         my ($self) = @_;
-        return $self->meta->{'tags'};
+        return $self->meta->{'tags'} // [];
     },
 );
 
@@ -332,8 +373,10 @@ has permalink => (
         my $base = $self->base_path;
         $base = '' if !defined $base || $base eq '/';
 
-        return join('/', ($base, $self->slug)) if $self->is_page;
-        return join('/', ($base, $self->category, $self->slug ));
+        my $path;
+        $path = join('/', ($base, $self->slug)) if $self->is_page;
+        $path = join('/', ($base, $self->category, $self->slug ));
+        return $path . '/';
     },
 );
 

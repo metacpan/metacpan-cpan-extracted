@@ -1,0 +1,148 @@
+class TestCase::Go {
+  use Go;
+  use Sys;
+  use Point;
+  use Thread;
+  
+  our $RESULT : IntList;
+  
+  static method go_minimal : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      $RESULT->push(2);
+    });
+    
+    $RESULT->push(1);
+    
+    Go->gosched;
+    
+    $RESULT->push(3);
+    
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method go_basic : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      $RESULT->push(2);
+      
+      Go->go(method : void () {
+        $RESULT->push(4);
+      });
+      
+      $RESULT->push(3);
+    });
+    
+    $RESULT->push(1);
+    
+    Go->gosched;
+    
+    $RESULT->push(5);
+    
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3, 4, 5])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method go_die : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      die "Exception!.";
+      
+      $RESULT->push(1);
+      
+    });
+    
+    Go->go(method : void () {
+      eval {
+        die "Exception!.";
+      }
+      
+      $RESULT->push(2);
+      
+    });
+    
+    Go->go(method : void () {
+      &error();
+      
+      $RESULT->push(3);
+      
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [2])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method error : void () {
+    
+    die "Error Method";
+  }
+  
+  static method go_extra : int () {
+    
+    Go->go(method : void () {});
+    
+    Go->gosched;
+    
+    Go->gosched;
+    
+    return 1;
+  }
+  
+  static method sleep : int () {
+    
+    Go->go(method : void () {
+      
+      my $seconds = 1.5;
+      
+      Go->sleep($seconds);
+    });
+    
+    Go->gosched;
+    
+    return 1;
+  }
+  
+  static method thread_exception : int () {
+    
+    my $error_ref = [(string)undef];
+    
+    my $thread = Thread->new([$error_ref : string[]] method : void () {
+      eval { Go->gosched; }
+      
+      $error_ref->[0] = $@;
+    });
+    
+    $thread->join;
+    
+    unless (Fn->contains($error_ref->[0], "The schedule method in the Go::Schedule class must be called from the main thread.")) {
+      return 0;
+    }
+    
+    return 1;
+  }
+}

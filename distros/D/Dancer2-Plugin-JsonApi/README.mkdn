@@ -1,0 +1,31 @@
+# NAME
+
+Dancer2::Plugin::JsonApi - JsonApi helpers for Dancer2 apps
+
+# VERSION
+
+version 0.0.1
+
+# NAME
+
+Dancer2::Plugin::JsonAPI
+
+## DESCRIPTION
+
+If the serializer is not already explicitly set, the plugin will configure it to be [Dancer2::Serializer::JsonApi](https://metacpan.org/pod/Dancer2%3A%3ASerializer%3A%3AJsonApi).
+
+## SEE ALSO
+
+- The [JSON:API](https://jsonapi.org) specs, natch.
+- [json-api-serializer](https://www.npmjs.com/package/json-api-serializer) My go to for serializing JSON API documents in JavaScript-land. Also, inspiration for this module.
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.ca> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

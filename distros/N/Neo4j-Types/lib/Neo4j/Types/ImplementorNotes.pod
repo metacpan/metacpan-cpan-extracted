@@ -1,0 +1,518 @@
+# PODNAME: Neo4j::Types::ImplementorNotes
+# ABSTRACT: Guidance for driver authors
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Types::ImplementorNotes - Guidance for driver authors
+
+=head1 VERSION
+
+version 2.00
+
+=head1 OVERVIEW
+
+When writing a Neo4j driver in Perl, you'll need to consider how to
+match Cypher types to Perl types and vice versa. This document tries
+to give implementation advice for each Cypher type.
+
+Some Cypher types are fairly generic and seemingly straightforward to
+map to Perl. However, there are some pitfalls, which are discussed
+below. Other types (such as Neo4j nodes) are more specialised,
+requiring a custom Perl data structure. The L<Neo4j::Types>
+distribution defines interfaces with method behaviours
+that may be implemented by such data structures.
+
+B<You probably don't need to read this document,> unless you happen
+to be writing a Neo4j driver or other software that inherits from
+L<Neo4j::Types> modules or conforms to their interface.
+
+=head1 STRUCTURAL TYPES
+
+Neo4j structural types are nodes, relationships, paths.
+They may be represented as:
+
+=over
+
+=item * L<Neo4j::Types::Node>
+
+=item * L<Neo4j::Types::Relationship>
+
+=item * L<Neo4j::Types::Path>
+
+=back
+
+These modules should be treated as definitions of an
+object-oriented interface with specific behaviour for others
+to implement.
+
+While these modules currently offer default implementations of
+most methods, it is B<strongly recommended> for implementors to
+write their own method implementations for their own data
+structures in order to maintain encapsulation and to reduce
+the risk of action at a distance. The default implementations
+may be removed in future and should not be relied upon.
+
+The methods defined by this distribution are loosely modelled
+on the Neo4j Driver API. They don't match that API precisely
+because the official Neo4j drivers don't always use the exact
+same method names for their functionality, and the
+L<Neo4j Driver API Spec|https://neo4j.com/docs/bolt/current/driver-api/>
+currently doesn't discuss these methods.
+
+=head2 Node
+
+See L<Neo4j::Types::Node> for the methods defined for that
+module's interface.
+
+The recommended way to have your own module conform to the interface
+is to write implementations for all the methods, then declare
+L<Neo4j::Types::Node> as a parent type.
+
+ package Local::Node;
+ use parent 'Neo4j::Types::Node';
+ 
+ sub get        ($self, $property_key) {...}
+ sub properties ($self) {...}
+ 
+ sub labels     ($self) {...}
+ 
+ sub id         ($self) {...}
+ sub element_id ($self) {...}
+
+You are free in your choice of the internal data structure.
+While L<Neo4j::Types::Node> currently provides default
+implementations of most methods, these only exist because some
+versions of L<Neo4j::Bolt::Node> might expect them.
+They may be removed in future and should not be relied upon.
+
+It is recommended that the C<id()> method returns a number for
+which L<builtin/"created_as_number"> would be truthy (S<e. g.>
+C<0 + $id>). This can make roundtrips easier.
+
+When the element ID is unavailable, C<element_id()> must by
+default issue a warning and must otherwise behave like an alias
+for C<id()>. When the S<element ID> I<is> available, C<id()>
+may optionally issue a deprecation warning. The behaviour of
+C<id()> when the legacy ID is unavailable is undefined.
+
+For implementations geared only towards S<Neo4j 4> and older,
+C<element_id()> is currently an optional operation.
+While C<id()> is currently mandatory, it may similarly become
+an optional operation for newer Neo4j versions in future.
+
+The C<labels()> and C<properties()> methods must not return
+C<undef>. If there are no labels or properties, an empty list
+or an empty hash reference must be returned.
+(The default implementations of methods in L<Neo4j::Types::Node>
+currently also handle C<undef> in the data structure for bug
+compatibility with L<Neo4j::Bolt::CTypeHandlers>, but this may
+change in future.)
+
+For optimal performance, it is recommended for C<properties()>
+to always return a reference to the same hash. While it is
+legal to make a new defensive copy every time the method is
+called or to return a reference to a tied readonly hash, you
+should consider the performance and usability problems this may
+cause. Note that L<locked hashes|Hash::Util/"Restricted hashes">
+would cause an exception on trying to access a non-existent
+property, which is not allowed. Make sure any non-standard
+behaviour your implementation may have is well documented.
+
+Trying to access a property that doesn't exist must yield the
+scalar value C<undef>, both for the C<get()> method as well as
+the hash reference returned by C<properties()>. Expect users who
+wish to determine whether a particular property key does in fact
+not exist or whether it simply has the value C<undef> to use
+the idiom C<< exists $node->properties->{$key} >>.
+
+=head2 Relationship
+
+See L<Neo4j::Types::Relationship> for the methods defined
+for that module's interface.
+
+The recommended way to have your own module conform to the interface
+is to write implementations for all the methods, then declare
+L<Neo4j::Types::Relationship> as a parent type.
+
+ package Local::Relationship;
+ use parent 'Neo4j::Types::Relationship';
+ 
+ sub get        ($self, $property_key) {...}
+ sub properties ($self) {...}
+ 
+ sub type       ($self) {...}
+ 
+ sub id         ($self) {...}
+ sub start_id   ($self) {...}
+ sub end_id     ($self) {...}
+ 
+ sub element_id       ($self) {...}
+ sub start_element_id ($self) {...}
+ sub end_element_id   ($self) {...}
+
+You are free in your choice of the internal data structure.
+While L<Neo4j::Types::Relationship> currently provides default
+implementations of most methods, these only exist because some
+versions of L<Neo4j::Bolt::Relationship> might expect them.
+They may be removed in future and should not be relied upon.
+
+It is recommended that the methods C<id()>, C<start_id()>,
+and C<end_id()> return a number for which
+L<builtin/"created_as_number"> would be truthy
+(S<e. g.> C<0 + $id>). This can make roundtrips easier.
+
+For C<element_id()>, C<id()> and related methods, the same
+considerations as above for C<element_id()> and C<id()>
+on L<nodes|/"Node"> apply.
+
+For the C<get()> and C<properties()> methods, the same
+considerations as above for C<get()> and C<properties()>
+on L<nodes|/"Node"> apply.
+
+=head2 Path
+
+See L<Neo4j::Types::Path> for the methods defined for that
+module's interface.
+
+The recommended way to have your own module conform to the interface
+is to write implementations for all the methods, then declare
+L<Neo4j::Types::Path> as a parent type.
+
+ package Local::Path;
+ use parent 'Neo4j::Types::Path';
+ 
+ sub elements      ($self) {...}
+ sub nodes         ($self) {...}
+ sub relationships ($self) {...}
+
+You are free in your choice of the internal data structure.
+While L<Neo4j::Types::Path> currently provides default
+implementations of all methods, these only exist because some
+versions of L<Neo4j::Bolt::Path> might expect them.
+They may be removed in future and should not be relied upon.
+
+=head1 SCALAR TYPES
+
+Values of the following types can in principle be stored as a Perl
+scalar. However, Perl scalars by themselves cannot cleanly separate
+between all of these types. This can make it difficult to convert
+scalars back to Cypher types (for example for the use in Cypher
+statements parameters).
+
+=head2 Number (Integer or Float)
+
+Both Neo4j and Perl internally distinguish between integer numbers
+and floating-point numbers. Neo4j stores these as Java C<long> and
+C<double>, which both are signed 64-bit types. In Perl, their
+precision is whatever was used by the C compiler to build your
+Perl executable (usually 64-bit types as well on modern systems).
+
+Both Neo4j and Perl will automatically convert integers to floats
+to calculate an expression if necessary (like for C<1 + 0.5>), so
+the distinction between integers and floats often doesn't matter.
+However, integers and floats are both just scalars in Perl, which
+may make it difficult to create a float with an integer value in
+Neo4j (for example, trying to store C<$x = 2.0 + 1> as a property
+may result in the integer C<3> being stored in Neo4j).
+
+L<perlnumber> explains further details on type conversions in Perl.
+In particular, Perl will also try to automatically convert between
+strings and numbers, but Neo4j will not. This may have unintended
+consequences, as the following example demonstrates.
+
+ $id = get_id_from_node($node);  # returns an integer
+ say "The ID is $id.";           # silently turns $id into a string
+ $node = get_node_by_id($id);    # fails: ID must be integer
+
+Implementations can avoid this latter problem on Perl
+L<versions 5.35.9|perl5360delta/"Internal Changes"> and newer,
+which offer stable tracking of whether a value was initially
+created as number or as string. On earlier Perl versions, the
+onus to avoid it is on users, who need to use unary coercions.
+
+ $string = '' . $number;
+ $number =  0 + $string;
+
+The L<JSON::Types> distribution offers a way to do unary
+coercions in a way that might be more expressive.
+In future, L<Neo4j::Types> might be extended in a similar fashion.
+
+Note that while Neo4j easily handles the special floating point
+values -0.0, NaN and ±Infinity, Perl support for these values has
+various issues (that may vary by platform). See L<Data::Float> for
+details.
+
+=head2 String
+
+Perl scalars are a good match for Neo4j strings. However, in some
+situations, scalar strings may easily be confused with numbers or
+byte arrays in Perl.
+
+Neo4j strings are always encoded in UTF-8. Perl supports this as
+well, though string scalars that only contain ASCII are usually
+not treated as UTF-8 internally for efficiency reasons.
+
+=head2 Boolean
+
+When reading a boolean from Neo4j, a value representing
+C<true> must evaluate truthy in Perl and a Neo4j value
+representing C<false> must not. Values must be trackable
+as boolean by default to provide round-trip capability.
+
+The following two pairs of Perl values meet these
+requirements and should be used by default:
+
+=over
+
+=item On Perl version 5.36 and newer:
+
+L<C<builtin::true>|builtin/"true"> and
+L<C<builtin::false>|builtin/"false">
+
+=item On older Perl versions:
+
+C<L<JSON::PP>::true> and
+C<L<JSON::PP>::false>
+
+=back
+
+When running on v5.36 or newer, both of these boolean types
+should be accepted as query parameters for writing to Neo4j.
+
+Additional values may optionally be accepted, such as
+C<\1> and C<\0>, L<boolean>, or L<Types::Bool>.
+There is a variety of CPAN modules representing booleans
+because Perl only gained useful native boolean values
+L<in S<version v5.36>|perl5360delta/"Stable boolean tracking">.
+Modules like L<builtin::compat> might help
+with tracking native bools in earlier versions.
+
+=for comment (Internally, Perl has long had native boolean values,
+but it was difficult to track their boolean status,
+especially outside XS code. See L<perlapi/"boolSV">,
+L<makamaka/JSON-PP#49|https://github.com/makamaka/JSON-PP/issues/49>.)
+
+Optionally, your implementation may offer users a way
+to choose the boolean values. This document makes no
+recommendation as to the interface for such a setting.
+
+=for comment Some of the Perl JSON modules are currently (2023) in the
+process of adding support for core booleans. It may be
+useful to wait until those implementations are completed
+and then follow whichever approach they chose. See also:
+L<JSON::PP/"boolean_values">,
+L<rurban/Cpanel-JSON-XS#214|https://github.com/rurban/Cpanel-JSON-XS/issues/214>
+
+=head2 Null
+
+The Cypher C<null> value can be neatly implemented as Perl C<undef>.
+
+=head2 Bytes
+
+Byte arrays are not first-class Cypher values, but still have
+some limited support as pass-through values in Neo4j.
+They may be represented in Perl as unblessed string scalars
+with their C<UTF8> flag turned off, or alternatively as
+L<Neo4j::Types::ByteArray>.
+
+The recommended way to have your own module conform to
+the L<Neo4j::Types::ByteArray> interface is to write an
+implementation for the following method, then declare
+that module as a parent type.
+
+ package Local::ByteArray;
+ use parent 'Neo4j::Types::ByteArray';
+ 
+ sub as_string ($self) {...}
+
+You are free in your choice of the internal data structure.
+You may wish to provide a C<new()> constructor for your module.
+
+=head1 SPATIAL TYPES
+
+The only spatial type currently offered by Neo4j is the point.
+It may be represented as L<Neo4j::Types::Point>.
+
+It might be possible to (crudely) represent other spatial types by
+using a list of points plus external metadata, or in a Neo4j graph
+by treating the graph itself as a spatial representation.
+
+=head2 Point
+
+See L<Neo4j::Types::Point> for the methods defined for that
+module's interface.
+
+The recommended way to have your own module conform to the interface
+is to write implementations for all the methods, then declare
+L<Neo4j::Types::Point> as a parent type.
+
+ package Local::Point;
+ use parent 'Neo4j::Types::Point';
+ 
+ sub srid        ($self) {...}
+ sub coordinates ($self) {...}
+
+You are free in your choice of the internal data structure.
+L<Neo4j::Types::Point> used to provide default implementations
+of all methods, but these have been moved to
+L<Neo4j::Types::Generic::Point> with version 2.00.
+The C<new()> method in L<Neo4j::Types::Point> still exists for
+backwards compatibility, but it may be removed in future and
+should not be relied upon.
+
+It is recommended that all methods return numbers for which
+L<builtin/"created_as_number"> would be truthy
+(S<e. g.> C<0 + $srid>). This can make roundtrips easier.
+
+=head1 TEMPORAL TYPES
+
+Cypher temporal types exist in two varieties:
+temporal instants (DateTime) and durations.
+They may be represented as:
+
+=over
+
+=item * L<Neo4j::Types::DateTime>
+
+=item * L<Neo4j::Types::Duration>
+
+=back
+
+These modules should be treated as definitions of an
+object-oriented interface with specific behaviour for others
+to implement.
+
+=head2 DateTime
+
+See L<Neo4j::Types::DateTime> for the methods defined for that
+module's interface.
+
+The recommended way to have your own module conform to the interface
+is to write implementations for at least the following methods,
+then declare L<Neo4j::Types::DateTime> as a parent type.
+
+ package Local::DateTime;
+ use parent 'Neo4j::Types::DateTime';
+ 
+ sub days        ($self) {...}
+ sub seconds     ($self) {...}
+ sub nanoseconds ($self) {...}
+ sub tz_name     ($self) {...}
+ sub tz_offset   ($self) {...}
+
+Implementations for the remaining methods C<epoch()> and
+C<type()> are provided in L<Neo4j::Types::DateTime> and you
+may inherit them. But you may also override them as required.
+Additionally, you may wish to provide a C<new()> constructor
+for your module.
+
+When no IANA time zone name is available, the C<tz_name()> method
+must generate it from the offset if possible. Note that the signs
+in IANA time zone names are reversed from the S<ISO definition>.
+Available zone names range from C<Etc/GMT-14> (east)
+to C<Etc/GMT+12> (west).
+
+When no time zone offset is available, implementations may
+determine it from the IANA database, but this is not required.
+
+It is recommended that numbers returned by methods are values
+for which L<builtin/"created_as_number"> would be truthy
+(S<e. g.> C<0 + $days>). This can make roundtrips easier.
+
+=head2 Duration
+
+See L<Neo4j::Types::Duration> for the methods defined for that
+module's interface.
+
+The recommended way to have your own module conform to the interface
+is to write implementations for the following methods,
+then declare L<Neo4j::Types::Duration> as a parent type.
+
+ package Local::DateTime;
+ use parent 'Neo4j::Types::DateTime';
+ 
+ sub months      ($self) {...}
+ sub days        ($self) {...}
+ sub seconds     ($self) {...}
+ sub nanoseconds ($self) {...}
+
+You are free in your choice of the internal data structure.
+You may wish to provide a C<new()> constructor for your module.
+
+It is recommended that all methods return numbers for which
+L<builtin/"created_as_number"> would be truthy
+(S<e. g.> C<0 + $days>). This can make roundtrips easier.
+
+=head1 LIST AND MAP
+
+Constructed types, formerly known as composite types, are:
+
+=over
+
+=item * List (also known as Array)
+
+=item * Map (also known as Dictionary)
+
+=back
+
+In Perl, these types match simple unblessed array and hash
+references very nicely.
+
+=head1 SEE ALSO
+
+Generic implementations of some types are available, see
+L<Neo4j::Types::Generic>. Their constructors currently bless
+to C<__PACKAGE__> to discourage inheritance (subject to change).
+The source code of generic types might be of interest.
+
+A number of Perl distributions implement Cypher types:
+
+=over
+
+=item * L<Neo4j::Bolt/"Return Types">
+
+=item * L<Neo4j::Driver::Types>
+
+=item * L<REST::Neo4p::Entity>
+
+=back
+
+Not all of these aim to conform to L<Neo4j::Types>.
+The source code of those that do might be of interest.
+
+Several parts of the Neo4j documentation deal with types:
+
+=over
+
+=item * L<Bolt Protocol documentation|https://neo4j.com/docs/bolt/current/>
+
+=item * L<Neo4j Cypher Manual|https://neo4j.com/docs/cypher-manual/current/>
+
+=item * L<Neo4j Java Driver|https://neo4j.com/docs/api/java-driver/current/>
+
+=item * L<Neo4j Python Driver|https://neo4j.com/docs/api/python-driver/current/>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

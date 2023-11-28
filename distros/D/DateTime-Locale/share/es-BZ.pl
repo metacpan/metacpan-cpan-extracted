@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "a.\N{U+202f}m.",
-    "p.\N{U+202f}m.",
+    "a.m.",
+    "p.m.",
   ],
   available_formats => {
     Bh => "h B",
@@ -73,7 +73,7 @@
   date_format_short => "d/M/yy",
   datetime_format_full => "{1}, {0}",
   datetime_format_long => "{1}, {0}",
-  datetime_format_medium => "{1} {0}",
+  datetime_format_medium => "{1}, {0}",
   datetime_format_short => "{1}, {0}",
   day_format_abbreviated => [
     "lun",
@@ -281,5 +281,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

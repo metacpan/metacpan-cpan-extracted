@@ -3,7 +3,7 @@ package Net::Async::Redis::Multi;
 use strict;
 use warnings;
 
-our $VERSION = '4.002'; # VERSION
+our $VERSION = '5.001'; # VERSION
 
 =head1 NAME
 
@@ -36,7 +36,9 @@ async sub exec {
         $f->retain if blessed($f) and $f->isa('Future');
 
         $log->tracef('MULTI exec');
+        dynamically $self->redis->{_is_multi} = $self->redis->{multi_queue};
         my ($exec_result) = await $self->redis->exec;
+        $self->redis->{multi_queue}->finish;
         my @reply = $exec_result->@*;
         my $success = 0;
         my $failure = 0;
@@ -88,7 +90,7 @@ sub AUTOLOAD {
         push @{$self->{queued_requests}}, $f;
         my $ff = do {
             # $self->redis->{_is_multi} //= 0;
-            dynamically $self->redis->{_is_multi} = 1;
+            dynamically $self->redis->{_is_multi} = $self->redis->{multi_queue};
             $self->redis->$method(@args);
         };
         my ($resp) = await $ff;
@@ -128,5 +130,5 @@ L<Net::Async::Redis/CONTRIBUTORS>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2022. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2023. Licensed under the same terms as Perl itself.
 

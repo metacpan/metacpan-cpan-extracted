@@ -1,6 +1,6 @@
 package School::Code::Compare::Out;
 # ABSTRACT: organize the output to different formats
-$School::Code::Compare::Out::VERSION = '0.104';
+$School::Code::Compare::Out::VERSION = '0.201';
 use strict;
 use warnings;
 
@@ -159,7 +159,7 @@ School::Code::Compare::Out - organize the output to different formats
 
 =head1 VERSION
 
-version 0.104
+version 0.201
 
 =head1 AUTHOR
 
@@ -167,7 +167,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Boris Däppen.
+This software is copyright (c) 2023 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

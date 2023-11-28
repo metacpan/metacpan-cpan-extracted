@@ -8,9 +8,9 @@ use Role::Tiny::With;
 with 'TableDataRole::Spec::Basic';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-19'; # DATE
+our $DATE = '2023-11-25'; # DATE
 our $DIST = 'TableData'; # DIST
-our $VERSION = '0.2.3'; # VERSION
+our $VERSION = '0.2.6'; # VERSION
 
 my $rows = [
     {a=>1, b=>2},
@@ -89,7 +89,7 @@ TableData::Test::Spec::Basic - A test table data
 
 =head1 VERSION
 
-This document describes version 0.2.3 of TableData::Test::Spec::Basic (from Perl distribution TableData), released on 2023-04-19.
+This document describes version 0.2.6 of TableData::Test::Spec::Basic (from Perl distribution TableData), released on 2023-11-25.
 
 =for Pod::Coverage ^(.+)$
 

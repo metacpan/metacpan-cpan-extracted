@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -22,13 +23,14 @@ use vars qw{%fdat} ;
 use base 'Embperl::Form::ControlMultValue' ;
 
 use Embperl::Inline ;
+use URI::Escape ;
 
 # ---------------------------------------------------------------------------
 #
 #   show_control_readonly - output readonly control
 #
 
-sub show_control_readonly
+sub xshow_control_readonly
     {
     my ($self, $req) = @_ ;
 
@@ -62,6 +64,33 @@ sub init_data
         }
 
     }
+
+# ------------------------------------------------------------------------------------------
+#
+#   prepare_fdat - daten zusammenfuehren
+#
+
+sub prepare_fdat
+    {
+    my ($self, $req) = @_ ;
+    
+    return if ($self -> is_readonly ($req)) ;
+   
+    my $fdat  = $req -> {form} || \%fdat ;
+    my $name    = $self->{name} ;
+    if (exists $req -> {body})
+        {
+        # handle multiple checkboxes inside a grid
+        my $postdata = $req -> {body} ;
+        $name = uri_escape($name) ;
+        my $data = [ map {  uri_unescape($_) } ($postdata =~ /\Q$name\E=(.*?)&/g) ] ;
+
+        my %attrs = map { ($_ => 1) } split /\s+/, $fdat -> {-fields2empty} ;
+        $fdat -> {$name} = $data if ($attrs{$name} || @$data > 0) ;
+        }
+
+    
+    }
 1 ;
 
 __EMBPERL__
@@ -80,6 +109,7 @@ __EMBPERL__
     my ($values, $options) = $self -> get_all_values ($req) ;
     my ($ctlattrs, $ctlid, $ctlname) =  $self -> get_std_control_attr($req) ;
     my $tab      = $self -> {tab} ;
+    push @{$self -> form -> {fields2empty}}, $name ;
 
 $]
 [$if $tab $]<[# #]table style="width: 100%">[$ endif $]
@@ -90,7 +120,7 @@ $]
     <input type="checkbox" name="[+ $name +]" value="[+ $val +]" [+ do { local $escmode = 0 ; $ctlattrs } +]
     [$if ($self -> {trigger}) $]_ef_attach="ef_checkbox"[$endif$] >
     [$ if $tab $]</td><td style="width: [+ int((100 - ($tab * 3)) / $tab) +]%">[$endif$] 
-    [+ $options ->[$i] || $val +]
+    <span class="ef-control-checkboxes-text">[+ $options ->[$i] || $val +]</span>
     [- $vert = $self -> {vert} -][$while $vert-- > 0 $]<br/>[$endwhile$]
     [$ if $tab $]</td>[$ if $colcnt-- < 1 $]<[# #]/tr>[$endif$][$endif$] 
     [$endif$]

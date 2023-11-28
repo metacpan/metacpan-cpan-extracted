@@ -1,5 +1,11 @@
 Revision history for Variable-Disposition
 
+0.005     2023-11-16 03:00:57+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - when Future::XS is installed, t/retain_future.t failed due to attempting
+    to pass a value to `->cancel`, thanks to ANDK for reporting
+
 0.004     2015-02-11 22:17:44+00:00 Europe/London
 	No new features.
 

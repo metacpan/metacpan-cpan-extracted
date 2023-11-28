@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostClearObjects;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | File to upload |
+**file** | **string** | chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background |
 **objecttype** | **string** | chart/comment/picture/shape/listobject/hyperlink/oleobject/pivottable/validation/Background |
 **sheetname** | **string** |  |
 **out_format** | **string** |  |

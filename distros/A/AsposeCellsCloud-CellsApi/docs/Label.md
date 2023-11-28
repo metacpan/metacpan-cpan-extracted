@@ -26,7 +26,7 @@ Name | Type | Description | Notes
 **Y** | **int** |  |
 **RotationAngle** | **double** |  |
 **HtmlText** | **string** |  |
-**Text** | **string** |  |
+**Text** | **string** | Gets or sets the text of display unit label. |
 **AlternativeText** | **string** |  |
 **TextHorizontalAlignment** | **string** |  |
 **TextHorizontalOverflow** | **string** |  |

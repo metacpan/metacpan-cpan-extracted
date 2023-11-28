@@ -1,6 +1,5 @@
 package Chrome::DevToolsProtocol::Transport::Pipe::Mojo;
 use strict;
-use Filter::signatures;
 use Moo 2;
 no warnings 'experimental::signatures';
 use feature 'signatures';
@@ -9,7 +8,7 @@ use Scalar::Util 'weaken';
 use Mojo::IOLoop::Stream;
 use Future::Mojo;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 =head1 NAME
 

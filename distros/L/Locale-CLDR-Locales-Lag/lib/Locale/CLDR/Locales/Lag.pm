@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lag - Package for language Langi
 
 package Locale::CLDR::Locales::Lag;
 # This file auto generated from Data\common\main\lag.xml
-#	on Fri 13 Oct  9:25:13 am GMT
+#	on Sat  4 Nov  6:11:28 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

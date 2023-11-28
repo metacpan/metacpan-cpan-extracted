@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Request.pm
-## Version v1.0.0
+## Version v1.1.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2023/06/10
+## Modified 2023/11/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,8 +25,7 @@ BEGIN
     use Net::API::REST::DateTime;
     use Net::API::REST::Query;
     use Net::API::REST::Status;
-    use Nice::Try;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.1.0';
     our( $SERVER_VERSION, $ERROR );
 };
 
@@ -78,16 +77,29 @@ sub reply
     }
     $r->rflush;
     $ref->{code} = $code if( !CORE::exists( $ref->{code} ) );
-    try
+    # try-catch
+    local $@;
+    my $json = eval
     {
-        $r->print( $self->json->encode( $ref ) );
-        return( $code );
-    }
-    catch( $e )
+        $self->json->encode( $ref );
+    };
+    if( $@ )
     {
-        $self->error( "An error occurred while calling Apache Request method \"print\": $e" );
+        $self->error( "An error occurred while encoding data into JSON: $@" );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
+    
+    # try-catch
+    eval
+    {
+        $r->print( $json );
+    };
+    if( $@ )
+    {
+        $self->error( "An error occurred while calling Apache Request method \"print\": $@" );
+        return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+    }
+    return( $code );
 }
 
 # sub variables { return( shift->_set_get_object_without_init( 'variables', 'Net::API::REST::Endpoint::Variables', @_ ) ); }
@@ -151,7 +163,7 @@ Net::API::REST::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v1.0.0
+    v1.1.0
 
 =head1 DESCRIPTION
 

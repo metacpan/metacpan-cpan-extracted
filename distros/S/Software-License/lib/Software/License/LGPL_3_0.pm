@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Software::License::LGPL_3_0;
-$Software::License::LGPL_3_0::VERSION = '0.104004';
+package Software::License::LGPL_3_0 0.104005;
+
 use parent 'Software::License';
 # ABSTRACT: GNU Lesser General Public License, Version 3
 
@@ -38,7 +38,7 @@ Software::License::LGPL_3_0 - GNU Lesser General Public License, Version 3
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 PERL VERSION
 
@@ -56,7 +56,7 @@ lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -55,7 +55,7 @@ table inet lxc {
 		[ "$6" = "ip"          ]  ||  Die 'unexpected nft command' "$@"
 		[ "$7" = "saddr"       ]  ||  Die 'unexpected nft command' "$@"
 		;;
-	    8|15)	Die "$@: mockup failed";;
+	    8|15)	Die "$*: mockup failed";;
 	    *)		Die "unexpected state '$n' in mocked nft ($*)"
 	esac
 	;;
@@ -68,7 +68,7 @@ table inet lxc {
 	[ "$7" = "localfilter" ]  ||  Die 'unexpected nft command' "$@"
 	case $n in
 	    4|14)	;;	# expected states
-	    11)		Die "$@: mockup failed";;
+	    11)		Die "$*: mockup failed";;
 	    *)		Die "unexpected state '$n' in mocked nft ($*)"
 	esac
 	;;

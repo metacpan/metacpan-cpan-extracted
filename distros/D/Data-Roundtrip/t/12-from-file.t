@@ -14,12 +14,13 @@ use strict;
 use warnings;
 
 my $verbose = 0;
+my $DIAG_verbose = 0;
 
 #### nothing to change below
 use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.24';
+our $VERSION='0.25';
 
 use File::Temp;
 use File::Spec;
@@ -37,36 +38,36 @@ use Data::Roundtrip qw/:all/;
 $File::Temp::KEEP_ALL = 1;
 my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
 
-diag "calling randomiser ...";
+if( $DIAG_verbose > 0 ){ diag "calling randomiser ..."; }
 my $randomiser = Data::Random::Structure->new(
 	max_depth => 50,
 	max_elements => 200,
 );
 ok(defined $randomiser, 'Data::Random::Structure->new()'." called.") or BAIL_OUT;
 
-diag "called randomiser ... OK";
+if( $DIAG_verbose > 0 ){ diag "called randomiser ... OK"; }
 
 # first test the sub fix_recursively()
 my $td = fix_scalar('abc:xyz"\\aa"\'');
-diag "fixed the scalar 1 ... OK";
+if( $DIAG_verbose > 0 ){ diag "fixed the scalar 1 ... OK"; }
 ok($td !~ /[:"'\\]/, 'fix_scalar()'." : called and it works for bad characters.") or BAIL_OUT("no it did not:\n$td\n");
 # with utf8
 $td = fix_scalar('αβγ:χψζ"\\αα"\'');
-diag "fixed the scalar 2 ... OK";
+if( $DIAG_verbose > 0 ){ diag "fixed the scalar 2 ... OK"; }
 ok($td !~ /[:"'\\]/, 'fix_scalar()'." : called and it works for bad characters.") or BAIL_OUT("no it did not:\n$td\n");
 
-diag "calling utf8 randomiser";
+if( $DIAG_verbose > 0 ){ diag "calling utf8 randomiser"; }
 my $randomiser_utf8 = Data::Random::Structure::UTF8->new(
 	max_depth => 50,
 	max_elements => 200,
 );
 ok(defined $randomiser, 'Data::Random::Structure->new()'." called.") or BAIL_OUT;
-diag "calling utf8 randomiser OK";
+if( $DIAG_verbose > 0 ){ diag "calling utf8 randomiser OK"; }
 
 my ($outfile, $FH, $perl_data_structure, $json_string, $yaml_string, $perl_data_structure_from_file);
 
 for my $trial (1..2){
-	diag "in trials loop, trial is $trial ...";
+	if( $DIAG_verbose > 0 ){ diag "in trials loop, trial is $trial ..."; }
   # NOTE: randomiser_utf8->generate() will output to STDERR
   #       I don't know how to generate string-UTF8
   #       it is harmless and it shows that all works ok
@@ -74,98 +75,98 @@ for my $trial (1..2){
 	$randomiser->generate(),
 	$randomiser_utf8->generate()
   ){
-	diag "in perl_data_structure loop, trial is $trial ...";
+	if( $DIAG_verbose > 0 ){ diag "in perl_data_structure loop, trial is $trial ..."; }
 	ok(defined $perl_data_structure, "random perl data structure created.");
 
-	diag "about to call fix_recursively ...";
+	if( $DIAG_verbose > 0 ){ diag "about to call fix_recursively ..."; }
 	my $recursion_depth = 0;
 	fix_recursively($perl_data_structure, \$recursion_depth);
-	diag "called fix_recursively OK depth was $recursion_depth";
+	if( $DIAG_verbose > 0 ){ diag "called fix_recursively OK depth was $recursion_depth"; }
 
 	# YAML does not like quoted strings to contain escaped quotes
 
-	diag "calling Data::Roundtrip::perl2json ...";
+	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2json ..."; }
 	$json_string = Data::Roundtrip::perl2json($perl_data_structure);
-	diag "calling Data::Roundtrip::perl2json OK";
+	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2json OK"; }
 	ok(defined($json_string), "json string created from perl data structure.");
 
-	diag "calling Data::Roundtrip::perl2yaml ...";
+	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2yaml ..."; }
 	$yaml_string = Data::Roundtrip::perl2yaml($perl_data_structure);
-	diag "calling Data::Roundtrip::perl2yaml OK";
+	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::perl2yaml OK"; }
 	ok(defined($yaml_string), "yaml string created from perl data structure.");
 
 	# write JSON to file
 	$outfile = File::Spec->catdir($tmpdir, 'out.json');
-	diag "opening out to file $outfile ...";
+	if( $DIAG_verbose > 0 ){ diag "opening out to file $outfile ..."; }
 	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing JSON string.") or BAIL_OUT;
-	diag "writing out to file $outfile ...";
+	if( $DIAG_verbose > 0 ){ diag "writing out to file $outfile ..."; }
 	print $FH $json_string;
-	diag "writing out to file $outfile OK";
+	if( $DIAG_verbose > 0 ){ diag "writing out to file $outfile OK"; }
 	close $FH;
-	diag "closed file $outfile ...";
+	if( $DIAG_verbose > 0 ){ diag "closed file $outfile ..."; }
 
 	# read JSON from file
-	diag "reading jsin from file $outfile ...";
+	if( $DIAG_verbose > 0 ){ diag "reading jsin from file $outfile ..."; }
 	$perl_data_structure_from_file = Data::Roundtrip::jsonfile2perl($outfile);
-	diag "reading jsin from file $outfile OK";
+	if( $DIAG_verbose > 0 ){ diag "reading jsin from file $outfile OK"; }
 	ok(defined($perl_data_structure_from_file), "jsonfile2perl() : called and got defined result.");
-	diag "calling is_deeply ...";
+	if( $DIAG_verbose > 0 ){ diag "calling is_deeply ..."; }
 	is_deeply($perl_data_structure, $perl_data_structure_from_file, "jsonfile2perl() : result agrees with what we saved before.");
-	diag "calling is_deeply OK";
+	if( $DIAG_verbose > 0 ){ diag "calling is_deeply OK"; }
 
 	# write YAML to file
 	$outfile = File::Spec->catdir($tmpdir, 'out.yaml');
-	diag "opening2 out to file $outfile ...";
+	if( $DIAG_verbose > 0 ){ diag "opening2 out to file $outfile ..."; }
 	ok(open($FH, '>:utf8', $outfile), "open tmp file '${outfile}' for writing yaml string.") or BAIL_OUT;
-	diag "opening2 out to file $outfile OK";
+	if( $DIAG_verbose > 0 ){ diag "opening2 out to file $outfile OK"; }
 	print $FH $yaml_string;
-	diag "printed out to file $outfile OK";
+	if( $DIAG_verbose > 0 ){ diag "printed out to file $outfile OK"; }
 	close $FH;
-	diag "closed out to file $outfile OK";
+	if( $DIAG_verbose > 0 ){ diag "closed out to file $outfile OK"; }
 
 	# read YAML from file
-	diag "calling Data::Roundtrip::yamlfile2perl ...";
+	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::yamlfile2perl ..."; }
 	$perl_data_structure_from_file = Data::Roundtrip::yamlfile2perl($outfile);
-	diag "calling Data::Roundtrip::yamlfile2perl OK";
+	if( $DIAG_verbose > 0 ){ diag "calling Data::Roundtrip::yamlfile2perl OK"; }
 	ok(defined($perl_data_structure_from_file), "yamlfile2perl() : called and got defined result.") or BAIL_OUT("--begin YAML:\n${yaml_string}\n--end YAML string.\nfailed for above YAML string");
-	diag "calling is_deeply2 ...";
+	if( $DIAG_verbose > 0 ){ diag "calling is_deeply2 ..."; }
 	is_deeply($perl_data_structure, $perl_data_structure_from_file, "yamlfile2perl() : result agrees with what we saved before.") or BAIL_OUT("--begin perl_data_structure:".perl2dump($perl_data_structure_from_file)."--end perl_data_structure_from_file\n\n--begin perl_data_structure_from_file:\n".perl2dump($perl_data_structure_from_file)."--end perl_data_structure_from_file.");
-	diag "calling is_deeply2 OK";
+	if( $DIAG_verbose > 0 ){ diag "calling is_deeply2 OK"; }
 
 	if( $verbose == 0 ){
-		diag "verbose is 0 and getting details ...";
+		if( $DIAG_verbose > 0 ){ diag "verbose is 0 and getting details ..."; }
 		my @tests = Test::More->builder->details;
-		diag "verbose is 0 and getting details OK";
+		if( $DIAG_verbose > 0 ){ diag "verbose is 0 and getting details OK"; }
 		for my $test (@tests) {
-			diag "foreach test ...";
+			if( $DIAG_verbose > 0 ){ diag "foreach test ..."; }
 			if( ! $test->{ok} ){
-				diag "foreach test it is not OK will last...";
+				if( $DIAG_verbose > 0 ){ diag "foreach test it is not OK will last..."; }
 				# a test failed, rerun with verbose on
 				$verbose = 1;
 				last;
 			}
 		}
 	} else { 
-		diag "lasting here ... ...";
+		if( $DIAG_verbose > 0 ){ diag "lasting here ... ..."; }
 		last
 	 }
-	diag "ENDED in perl_data_structure loop, trial is $trial ...";
+	if( $DIAG_verbose > 0 ){ diag "ENDED in perl_data_structure loop, trial is $trial ..."; }
   }
-  diag "ENDED in trials loop, trial is $trial ...";
+  if( $DIAG_verbose > 0 ){ diag "ENDED in trials loop, trial is $trial ..."; }
 }
 
-diag "ENDED the trials loop";
+if( $DIAG_verbose > 0 ){ diag "ENDED the trials loop"; }
 
 # cleanup only on success
 diag "temp dir: '$tmpdir' ...";
 $File::Temp::KEEP_ALL = 0;
 File::Temp::cleanup();
 
-diag "cleaned up";
+if( $DIAG_verbose > 0 ){ diag "cleaned up"; }
 
 done_testing;
 
-diag "done testing called.";
+if( $DIAG_verbose > 0 ){ diag "done testing called."; }
 
 # the randomiser produces strings with these characters
 # which seem to confuse YAML::Load()
@@ -181,7 +182,7 @@ sub fix_scalar {
 sub fix_recursively {
 	my $item = $_[0];
 	${$_[1]}++;
-	diag "fix_recursively : called for depth ".${$_[1]}." ...";
+	if( $DIAG_verbose > 0 ){ diag "fix_recursively : called for depth ".${$_[1]}." ..."; }
 	my $r = ref $item;
 	if( $r eq 'ARRAY' ){
 		foreach my $at (@$item) {
@@ -199,5 +200,5 @@ sub fix_recursively {
 	} elsif( $r eq '' ){
 		$item = fix_scalar($item);
 	} else { die perl2dump($item)."do not know this ref: '$r' for above input." }
-	diag "fix_recursively : ENDED";
+	if( $DIAG_verbose > 0 ){ diag "fix_recursively : ENDED"; }
 }

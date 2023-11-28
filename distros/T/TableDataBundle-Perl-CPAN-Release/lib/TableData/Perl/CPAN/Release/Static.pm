@@ -10,12 +10,16 @@ use Role::Tiny;
 with 'TableDataRole::Source::CSVInFiles';
 
 around new => sub {
+    require DateTime;
     require File::ShareDir;
 
     my $orig = shift;
 
+    my $now = DateTime->now;
+    my $cur_year = $now->year;
+
     my @filenames;
-    for my $year (1995..2022) {
+    for my $year (1995..$cur_year) {
         my $filename = File::ShareDir::dist_file(
             ($year < 2022 ? 'TableDataBundle-Perl-CPAN-Release-Static-Older' : "TableData-Perl-CPAN-Release-Static-$year"),
             "$year.csv");
@@ -33,13 +37,13 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-18'; # DATE
+our $DATE = '2023-11-25'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '20220218.0'; # VERSION
+our $VERSION = '20231120.3'; # VERSION
 
 with 'TableDataRole::Perl::CPAN::Release::Static';
 
-our %STATS = ("num_rows",354015,"num_columns",9); # STATS
+our %STATS = ("num_columns",9,"num_rows",370933); # STATS
 
 1;
 # ABSTRACT: CPAN releases (from oldest to newest)
@@ -56,7 +60,7 @@ TableDataRole::Perl::CPAN::Release::Static - CPAN releases (from oldest to newes
 
 =head1 VERSION
 
-This document describes version 20220218.0 of TableDataRole::Perl::CPAN::Release::Static (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2022-02-18.
+This document describes version 20231120.3 of TableDataRole::Perl::CPAN::Release::Static (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-25.
 
 =head1 SYNOPSIS
 
@@ -87,6 +91,17 @@ To use from command-line (using L<tabledata> CLI):
  % tabledata --action count_rows Perl::CPAN::Release::Static
 
 See the L<tabledata> CLI's documentation for other available actions and options.
+
+=head1 TABLEDATA STATISTICS
+
+ +-------------+--------+
+ | key         | value  |
+ +-------------+--------+
+ | num_columns | 9      |
+ | num_rows    | 370933 |
+ +-------------+--------+
+
+The statistics is available in the C<%STATS> package variable.
 
 =head1 TABLEDATA NOTES
 
@@ -120,13 +135,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

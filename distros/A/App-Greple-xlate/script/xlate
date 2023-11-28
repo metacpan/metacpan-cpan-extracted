@@ -12,40 +12,45 @@ define pod <<"=cut"
 
 =head1 SYNOPSIS
 
-    xlate [ options ] file [ greple options ]
+    xlate [ options ] -t lang file [ greple options ]
 	-h   help
+	-v   show version
 	-d   debug
+	-n   dry-run
 	-a   use API
 	-c   just check translation area
 	-r   refresh cache
 	-s   silent mode
-	-p#  pattern to determine translation area
-	-w#  wrap line by # width
-	-o#  output format (xtxt, cm, ifdef)
-	-f#  from lang (ignored)
-	-t#  to lang
-	-m#  max length per API call
-	-l#  show library files (XLATE.mk, xlate.el)
+	-e # translation engine (default deepl, or gpt3)
+	-p # pattern to determine translation area
+	-w # wrap line by # width
+	-o # output format (default xtxt, or cm, ifdef)
+	-f # from lang (ignored)
+	-t # to lang
+	-m # max length per API call
+	-l # show library files (XLATE.mk, xlate.el)
         --   terminate option parsing
     Make options
 	-M   run make
-	-n   run make with -n dry-run option
     Docker options
 	-G   mount git top-level directory
 	-B   run in non-interactive (batch) mode
 	-R   mount read-only
-	-D   run xlate on the container
-	-C   run any command on the container
+	-D * run xlate on the container with the rest parameters
+	-C * run following command on the container, or run shell
 
     Control Files:
 	*.LANG    translation languates
 	*.FORMAT  translation foramt (xtxt, cm, ifdef)
+	*.ENGINE  translation engine (deepl or gpt3)
 
 =head1 VERSION
 
-    Version 0.25
+    Version 0.28
 
 =cut
+
+my_version=$(awk '$1=="Version"{print $2; exit}' <<< "$pod")
 
 git_topdir() {
     [ "$(git rev-parse --is-inside-work-tree 2>/dev/null)" == true ] || return
@@ -66,7 +71,6 @@ get_ip() {
     echo -n $ip
 }
 
-default_lang=EN-US
 repository=tecolicom/xlate
 hostname=xlate
 interactive=yes
@@ -93,6 +97,7 @@ do
 	L)     version=:latest ;;
 	R)  mount_mode=ro ;;
 	G)
+	    [ "$XLATE_RUNNING_ON_DOCKER" ] && break
 	    if [ "${topdir:=$(git_topdir)}" ]
 	    then
 		if [ "$topdir" != "${PWD:=$(pwd)}" ]
@@ -104,15 +109,14 @@ do
 	    fi
 	    ;;
 	C|D)
-	    [ "$XLATE_RUNNING_DOCKER" ] && break
+	    [ "$XLATE_RUNNING_ON_DOCKER" ] && break
 	    if [ "$DISPLAY" ] && [ "${ip:=$(get_ip)}" ]
 	    then
 		display="$ip:0"
 	    fi
 	    if [ ! "$version" ]
 	    then
-		this=$(awk '$1=="Version"{print $2}' <<< "$pod")
-		[[ "$this" =~ ^[0-9]+\.[0-9_]+$ ]] && version=":$this"
+		[[ "$my_version" =~ ^[0-9]+\.[0-9_]+$ ]] && version=":$my_version"
 	    fi
 	    declare -a command
 	    case "$OPT" in
@@ -121,10 +125,10 @@ do
 	    esac
 	    command+=(${1+"$@"})
 	    ENV=(LANG TZ TERM_PROGRAM TERM_BGCOLOR COLORTERM)
-	    ENV+=(DEEPL_AUTH_KEY)
+	    ENV+=(DEEPL_AUTH_KEY OPENAI_API_KEY)
 	    ENV_PATTERN=$(env_pattern ${ENV[@]})
 	    exec docker run --rm \
-		 -e XLATE_RUNNING_DOCKER=1 \
+		 -e XLATE_RUNNING_ON_DOCKER=1 \
 		 ${interactive:+-it} \
 		 ${read_only:+--read-only} \
 		 ${hostname:+--hostname "${hostname}"} \
@@ -145,7 +149,7 @@ OPTIND=1
 mod="App-Greple-xlate"
 share=$(perl -MFile::Share=:all -E "say dist_dir '$mod'")
 
-while getopts "${EXOPT}"'Macrsnp:w:o:f:t:m:l:h' OPT
+while getopts "${EXOPT}"'Macrsne:p:w:o:f:t:m:l:hv' OPT
 do
     case $OPT in
 	[$EXOPT]) : ignore ;;
@@ -155,6 +159,7 @@ do
 	r)   refresh=yes ;;
 	s)    silent=yes ;;
 	n)    dryrun=yes ;;
+	e)    engine="$OPTARG" ;;
 	p)   pattern="$OPTARG" ;;
 	w)      wrap="$OPTARG" ;;
 	o)    format="$OPTARG" ;;
@@ -177,11 +182,13 @@ do
 	    exec echo "$help"
 	    exit
 	    ;;
+	v)
+	    echo $my_version
+	    exit
+	    ;;
     esac
 done	
 shift $((OPTIND - 1))
-
-: ${to_lang:="$default_lang"}
 
 : run make
 if [ "$run_make" == yes ]
@@ -205,13 +212,21 @@ then
 	 XLATE_DEBUG=$debug \
 	 XLATE_MAXLEN=$max \
 	 XLATE_USEAPI=$use_api \
+	 ${engine:+XLATE_ENGINE=\""$engine"\"} \
 	 ${format:+XLATE_FORMAT=\""$format"\"} \
 	 ${files:+XLATE_FILES=\""$files"\"} \
 	 ${opt[@]}
     exit 1
 fi
 
+if [ ! "$to_lang" ]
+then
+    echo "-t option is required."
+    exit 1
+fi
+
 : ${format:=xtxt}
+: ${engine:=deepl}
 
 if [[ "$format" =~ ^(.+)-fold$ ]]
 then
@@ -221,7 +236,8 @@ fi
 
 declare -a module option
 
-module+=(-Mxlate::deepl) 
+module+=(-Mxlate) 
+option+=(--xlate-engine="$engine")
 option+=(--xlate-to="$to_lang" --xlate-format="$format" --xlate-cache=yes)
 option+=(--all)
 
@@ -239,7 +255,7 @@ case $1 in
 	area=(--re '^(.+\n)+')
 	;;
     *.md)
-	area=(--re '(?x) ^[-+#].*\n | ^[\t ]+\K.*\n | ^(.+\n)+ ')
+	area=(--re '(?x) ^[-+#].*\n | ^(\S.*\n)+ ')
 	;;
     *.pm|*.pod)
 	module+=(-Mperl)
@@ -266,4 +282,11 @@ else
     option+=("${area[@]}")
 fi
 
-greple "${module[@]}" "${option[@]}" ${1+"$@"}
+exec=(greple "${module[@]}" "${option[@]}" ${1+"$@"})
+
+if [ "$dryrun" ]
+then
+    echo "${exec[@]}"
+else
+    "${exec[@]}"
+fi

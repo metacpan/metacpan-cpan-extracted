@@ -1,5 +1,11 @@
 Revision history for MIDI-Drummer
 
+0.4305 2023-11-22 11:30:36
+    - Remove the accidental leftover dependency on CreatingRhythms.
+
+0.4304 2023-11-22 11:27:51
+    - Remove misleading channel setting from the Quickstart.
+
 0.4303 2023-05-17 22:06:08
     - Yank Music::CreatingRhythms!
 

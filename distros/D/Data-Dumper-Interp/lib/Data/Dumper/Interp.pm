@@ -26,8 +26,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '6.010'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-10-31'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '6.012'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-11-22'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Moose;
 
@@ -45,6 +45,7 @@ use List::Util 1.45 qw(min max first none all any sum0);
 use Data::Structure::Util qw/circular_off/;
 use Regexp::Common qw/RE_balanced/;
 use Term::ReadKey ();
+use Capture::Tiny qw/capture_merged/;
 use overload ();
 
 ############################ Exports #######################################
@@ -390,7 +391,7 @@ sub __stringify_if_overloaded($) {
   $_[0]
 }
 
-use constant _NIX_SHELL_UNSAFE_REGEX => qr/[^-=\w_\/:\.,]/a;
+use constant _NIX_SHELL_UNSAFE_REGEX => qr/[^-=\w_:\.,\/]/a;
 sub __nix_forceqsh(_) {
   local $_ = shift;
   return "undef" if !defined;  # undef without quotes
@@ -405,7 +406,7 @@ sub __nix_forceqsh(_) {
   }
 }
 
-use constant _WIN_CMD_UNSAFE_REGEX => qr/[^-\w=_:\.,\\]/a;
+use constant _WIN_CMD_UNSAFE_REGEX   => qr/[^-=\w_:\.,\\]/a;
 sub __win_forceqsh(_) {
   local $_ = shift;
   return "undef" if !defined;  # undef without quotes
@@ -430,7 +431,7 @@ sub __win_forceqsh(_) {
   #  * ^ escapes : & \ < > ^ | when NOT in "quotes"
   #    (but we always put them in "quotes")
   #  * ^<newline> (outside of "quotes") is ignored
-  #    (there appears to be impossible to directly include a newline in a cmd
+  #    (it appears to be impossible to directly include a newline in a cmd
   #     parameter.  It requires a helper program or interpolating
   #     a %variable%, see https://superuser.com/a/1519790)
   #  * \ outside "quotes" means \
@@ -438,7 +439,7 @@ sub __win_forceqsh(_) {
   # Backslash usually need not be protected, except:
   #  * \ quotes " whether inside "quotes" or bare (!)
   #  * \ quotes \ ONLY(?) if immediately followed by " or \"
-  #    otherwise it means two backslashes.
+  #    otherwise \\ means two backslashes.
   #FIXME TODO UNFINISHED
   s/\\(?=")/\\\\/g;
   s/"/\\"/g;
@@ -608,15 +609,22 @@ sub _get_terminal_width() {  # returns undef if unknowable
              -t STDOUT ? *STDOUT :
              -t STDIN  ? *STDIN  :
         do{my $fh; for("/dev/tty",'CONOUT$') { last if open $fh, $_ } $fh} ;
-    my $wmsg = ""; # Suppress a "didn't work" warning from Term::ReadKey.
-                   # On some platforms (different libc?) "stty" directly
-                   # outputs "stdin is not a tty" which we can not trap.
-                   # Probably this is a Term::Readkey bug where it should
-                   # redirect such messages to /dev/null...
-    my ($width, $height) = do {
-      local $SIG{'__WARN__'} = sub { $wmsg .= $_[0] };
-      $fh ? Term::ReadKey::GetTerminalSize($fh) : ()
-    };
+    my ($width, $height);
+    if ($fh) {
+      # Some platforms (bsd?) carp if the terminal size can not be determined.
+      # We don't want to see any such warnings.  Also there might be a
+      # __WARN__ trap which we don't want to trigger
+      #
+      # Sigh.  It never ends!  On some platforms (different libc?)
+      # "stty" directly prints "stdin is not a tty" which we can not trap.
+      # Probably this is a bug in Term::Readkey where it should redirect
+      # such messages to /dev/null.  So we have to do it here.
+      () = capture_merged {
+        delete local $INC{__WARN__};
+        delete local $INC{__DIE__};
+        ($width, $height) = eval{ Term::ReadKey::GetTerminalSize($fh) };
+      }
+    }
     return $width; # possibly undef (sometimes seems to be zero ?!?)
   }
 }

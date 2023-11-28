@@ -21,12 +21,14 @@ cd ~/Downloads && /usr/bin/wget -N -c --no-check-certificate --quiet https://dat
 cd ~/Downloads && /usr/bin/wget -N -c --no-check-certificate --quiet https://data.openaddresses.io/openaddr-collected-global-sa.zip
 cd $OPENADDR_HOME && rm -rf ?? *.txt summary br mx fr it za es pl be jp kr pt fi de by ch dk ru cz nz tw cl at kz co no uy si xk */*.vrt */*/*.vrt && unzip -o ~/Downloads/openaddr-collected-global-sa.zip && unzip -o ~/Downloads/openaddr-collected-global.zip
 
+# wof-update is in the NJH-Snippets package on GitHub
 mkdir -p $WHOSONFIRST_HOME
 # cd $WHOSONFIRST_HOME && ./wof-sqlite-download
 cd $WHOSONFIRST_HOME && ./wof-update
 
 if [ -r $OPENADDR_HOME/openaddresses.sql ]; then
 	mv $OPENADDR_HOME/openaddresses.sql $OPENADDR_HOME/openaddresses.sql.keep
+	chmod 444 $OPENADDR_HOME/openaddresses.sql.keep
 fi
 
 cd $DR5HN_HOME && git pull

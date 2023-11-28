@@ -136,15 +136,19 @@ sub _heif_test_code {
     struct heif_context *ctx = heif_context_alloc();
     const struct heif_encoder_descriptor *encoders[10] = { NULL };
     int count;
-    printf("libheif %d.%d.%d (%x)\n",
+    printf("libheif %d.%d.%d (%#x)\n",
 	    ver >> 24, (ver >> 16) & 0xFF, (ver >> 8) & 0xFF, ver);
 
-    if (ver < 0x01040000) {
-        printf("At least version 1.4.0 of libheif is required\n");
+    if (ver < 0x01090000) {
+        printf("At least version 1.9.0 of libheif is required\n");
         printf("Older versions can produce invalid files for non-trivial programs\n");
         return 1;
     }
-    printf("libheif is sufficiently recent (1.4.0 required).\n");
+    if (ver == 0x10a0000) {
+        printf("** Version 1.10.0 of libheif produces invalid files **\n");
+        return 1;
+    }
+    printf("libheif is sufficiently recent (1.9.0 required).\n");
 
     if (!ctx) {
         printf("Couldn't allocate a libheif context - memory?\n");

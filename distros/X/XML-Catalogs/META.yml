@@ -1,27 +1,33 @@
 ---
 abstract: 'Basic framework to provide DTD catalogs'
 author:
-  - 'Eric Brine, C<< <ikegami@adaelis.com> >>'
+  - 'Eric Brine <ikegami@adaelis.com>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0
+  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
-license: unrestricted
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: XML-Catalogs
-provides:
-  XML::Catalogs:
-    file: lib/XML/Catalogs.pm
-    version: v1.0.3
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  Carp: 0
-  File::ShareDir: 0
-  URI::file: 0
-  version: 0
+  Carp: '0'
+  File::ShareDir: '0'
+  URI::file: '0'
+  strict: '0'
+  version: '0'
+  warnings: '0'
 resources:
+  bugtracker: https://github.com/ikegami/perl-XML-Catalogs/issues
+  homepage: http://search.cpan.org/dist/XML-Catalogs/
   license: http://creativecommons.org/publicdomain/zero/1.0/
-version: v1.0.3
+  repository: https://github.com/ikegami/perl-XML-Catalogs.git
+version: v1.6.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

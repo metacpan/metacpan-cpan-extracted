@@ -6,8 +6,8 @@ SPECIFICATION VERSION
     0.2
 
 VERSION
-    This document describes version 0.2.3 of TableData (from Perl
-    distribution TableData), released on 2023-04-19.
+    This document describes version 0.2.6 of TableData (from Perl
+    distribution TableData), released on 2023-11-25.
 
 SYNOPSIS
     Use one of the "TableData::*" modules.
@@ -135,6 +135,22 @@ RELATED NAMESPACES
     data in "TableData::" modules).
 
 FAQ
+  How do I pick random row(s) from a table?
+    Apply one of the appropriate
+    "Role::TinyCommons::Collection::PickItems::*" roles, e.g.
+    Role::TinyCommons::Collection::PickItems::Iterator (which can always be
+    used, but other role might offer some speedup). This will provide you
+    the "pick_item" and "pick_items" methods. For example, to select a
+    random quoute from TableData::Quote::JamesFT:
+
+     use Role::Tiny;
+     use TableData::Quote::JamesFT;
+
+     my $td = TableData::Quote::JamesFT->new;
+     Role::Tiny->apply_roles_to_object($td, 'Role::TinyCommons::Collection::PickItems::Iterator');
+
+     my $row = $td->pick_item;
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/TableData>.

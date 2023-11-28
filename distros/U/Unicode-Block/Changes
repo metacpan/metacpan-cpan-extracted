@@ -1,3 +1,15 @@
+0.08 2023-11-21T14:40:37+01:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Improve constructor parameters in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite Encode::decode_utf8 to better Unicode::UTF8::decode_utf8.
+ - Rewrite doc to use =head2 in methods.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update copyright years.
+
 0.07 2018-02-07T07:54:14+01:00
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
 

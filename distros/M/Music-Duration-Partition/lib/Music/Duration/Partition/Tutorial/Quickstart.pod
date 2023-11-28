@@ -12,7 +12,7 @@ Music::Duration::Partition::Tutorial::Quickstart
 
 =head1 VERSION
 
-version 0.0814
+version 0.0817
 
 =head1 Setup
 

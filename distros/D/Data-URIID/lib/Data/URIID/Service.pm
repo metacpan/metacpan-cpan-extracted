@@ -17,27 +17,123 @@ use URI;
 use URI::Escape;
 use Encode;
 use Scalar::Util qw(weaken);
+use UUID::Tiny ':std';
+use DateTime::Format::ISO8601;
 
 use Data::URIID::Result;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
+my @musicbrainz_wikidata_relations = qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052);
 my %idmap_wikidata = (
     P213   => 'isni',
     P214   => 'viaf-identifier',
     P227   => 'gnd-identifier',
+    P356   => 'doi',
+    P409   => 'libraries-australia-identifier',
+    P535   => 'find-a-grave-identifier',
     P648   => 'open-library-identifier',
+    P1315  => 'nla-trove-people-identifier',
     P1566  => 'geonames-identifier',
+    P1651  => 'youtube-video-identifier',
     P2041  => 'ngv-artist-identifier',
+    P2949  => 'wikitree-person-identifier',
     P3847  => 'open-library-identifier',
     P3916  => 'unesco-thesaurus-identifier',
     P4684  => 'ngv-artwork-identifier',
+    P6735  => 'tww-artist-identifier',
+    P6804  => 'agsa-creator-identifier',
     P7033  => 'aev-identifier',
     P7704  => 'europeana-entity-identifier',
     P8168  => 'factgrid-identifier',
+    P8406  => 'grove-art-online-identifier',
+    P9575  => 'amc-artist-identifier',
+    P10086 => 'a-p-and-p-artist-identifier',
     P10787 => 'factgrid-identifier',
-    (map {$_ => 'musicbrainz-identifier'} qw(P434 P435 P436 P966 P982 P1004 P1330 P1407 P4404 P5813 P6423 P8052)),
+    (map {$_ => 'musicbrainz-identifier'} @musicbrainz_wikidata_relations),
 );
+
+my $config_wikidata = {
+    type => 'wikidata-identifier',
+    idmap => \%idmap_wikidata,
+    endpoint => {
+        sparql      => 'https://query.wikidata.org/sparql',
+        entitydata  => 'https://www.wikidata.org/wiki/Special:EntityData/%s.json?flavor=dump',
+    },
+    prefix => 'http://www.wikidata.org/entity/',
+    uuid_relations => \@musicbrainz_wikidata_relations,
+    special_ids => [
+        {
+            property => 'P1711',
+            type => 'british-museum-term',
+            to_service => sub {($_[0] =~ /^BIOG([1-9][0-9]+)$/)[0]},
+            from_service => sub {sprintf('BIOG%u', $_[0])},
+        },
+    ],
+    attributes => [
+        (map {my $c = $_; {
+                property => $c->[0],
+                from_service => sub { return ($c->[1] => {'*' => $_[0]})},
+                }} (
+                [P487 => 'icon_text'], # 'Unicode character'
+            )),
+        (map {my $c = $_; {
+                property => $c->[0],
+                from_service => sub {
+                    my ($value) = @_;
+                    my $precision = $value->{precision};
+                    if ($precision >= 9) {
+                        my $dt = DateTime::Format::ISO8601->parse_datetime($value->{time} =~ s/^\+//r);
+                        my $val;
+
+                        if ($precision == 9) {
+                            $val = $dt->year;
+                        } elsif ($precision == 10) {
+                            $val = sprintf('%.4u-%.2u', $dt->year, $dt->month);
+                        } else {
+                            $val = $dt->ymd;
+                        }
+
+                        return ($c->[1] => $val);
+                    }
+                    return ();
+                },
+            }} (
+                [P569 => 'date_of_birth'],
+                [P570 => 'date_of_death'],
+            )),
+        {   # 'sRGB colour hex triplet'
+            property => 'P465',
+            from_service => sub {
+                my ($value) = @_;
+                return (displaycolour => {'*' => sprintf('#%s', uc($value))}) if $value =~ /^[0-9a-f-AF]{6}$/;
+                return ();
+            },
+        },
+        {   # 'located on astronomical body'
+            property => 'P376',
+            from_service => sub {
+                my ($value, $config) = @_;
+                return (space_object => {'*' => URI->new($config->{prefix} . $value->{id})}) if defined $value->{id};
+                return ();
+            },
+        },
+        {   # 'coordinate location'
+            property => 'P625',
+            from_service => sub {
+                my ($value) = @_;
+                my %attr;
+
+                foreach my $subkey (qw(altitude latitude longitude)) {
+                    $attr{$subkey} = {'*' => $value->{$subkey} + 0} if defined $value->{$subkey};
+                }
+                $attr{space_object} = {'*' => URI->new($value->{globe})} if defined $value->{globe};
+
+                return %attr;
+            }
+        },
+    ],
+};
 
 my @fellig_types = qw(fellig-identifier fellig-box-number uuid oid uri wikidata-identifier e621-post-identifier wikimedia-commons-identifier british-museum-term musicbrainz-identifier gnd-identifier e621tagtype);
 
@@ -45,6 +141,111 @@ my %attrmap_osm = (
     name        => 'displayname',
     description => 'description',
 );
+
+my %own_metadata = (
+    service => {
+        'wikidata'          => {
+            'displayname' => {'*' => 'Wikidata'},
+        },
+        'fellig'            => {
+            'displayname' => {'*' => 'Fellig.org'},
+        },
+        'youtube'           => {},
+        'youtube-nocookie'  => {},
+        'dropbox'           => {},
+        '0wx'               => {},
+        'e621'              => {},
+        'dnb'               => {
+            'displayname' => {'*' => 'Deutsche Nationalbibliothek'},
+        },
+        'britishmuseum'     => {
+            'displayname' => {'*' => 'British Museum'},
+        },
+        'musicbrainz'       => {
+            'displayname' => {'*' => 'MusicBrainz'},
+        },
+        'wikimedia-commons' => {
+            'displayname' => {'*' => 'Wikimedia Commons'},
+        },
+        'wikipedia'         => {
+            'displayname' => {'*' => 'Wikipedia'},
+        },
+        'noembed.com'       => {},
+        'osm'               => {
+            'displayname' => {'*' => 'OpenStreetMap'},
+        },
+        'overpass'          => {},
+        'xkcd'              => {},
+        'Data::URIID'       => {},
+        'viaf'              => {
+            'displayname' => {'*' => 'Virtual International Authority File'},
+        },
+        'europeana'         => {},
+        'open-library'      => {
+            'displayname' => {'*' => 'Open Library'},
+        },
+        'ngv'               => {
+            'displayname' => {'*' => 'National Gallery of Victoria'},
+        },
+        'geonames'          => {},
+        'find-a-grave'      => {
+            'displayname' => {'*' => 'Find a Grave'},
+        },
+        'nla'               => {
+            'displayname' => {'*' => 'National Library of Australia'},
+        },
+        'agsa'              => {
+            'displayname' => {'*' => 'Art Gallery of South Australia'},
+        },
+        'amc'               => {
+            'displayname' => {'*' => 'Australian Music Centre'},
+        },
+        'a-p-and-p'         => {
+            'displayname' => {'*' => 'Australian Prints + Printmaking'},
+        },
+        'tww'               => {
+            'displayname' => {'*' => 'The Watercolour World'},
+        },
+        'factgrid'          => {
+            'displayname' => {'*' => 'FactGrid'},
+        },
+        'grove-art-online'  => {
+            'displayname' => {'*' => 'Grove Art Online'},
+        },
+        'wikitree'          => {
+            'displayname' => {'*' => 'WikiTree'},
+        },
+        'doi'               => {
+            'displayname' => {'*' => 'doi.org'},
+        },
+    },
+);
+
+my %own_well_known = (
+    'wikidata-identifier' => {
+        Q2 => {
+            ids => {
+                'tagname' => 'Earth',
+                'aev-identifier' => 'scot/1917',
+                'factgrid-identifier' => 'Q176134',
+                'gnd-identifier' => '1135962553',
+                'viaf-identifier' => '6270149919445006650001',
+                'open-library-identifier' => 'earth_(planet)',
+                'unesco-thesaurus-identifier' => 'concept4083',
+                'geonames-identifier' => '6295630',
+            },
+            attributes => {
+                'displayname' => {'*' => 'Earth'},
+                'description' => {'*' => 'third planet from the sun in the solar system'},
+            },
+        },
+    },
+);
+
+foreach my $id (keys %{$own_well_known{'wikidata-identifier'}}) {
+    my $uuid = create_uuid_as_string(UUID_SHA1, '9e10aca7-4a99-43ac-9368-6cbfa43636df', lc $id);
+    $own_well_known{uuid}{$uuid} = $own_well_known{'wikidata-identifier'}{$id};
+}
 
 
 # Private method:
@@ -114,6 +315,20 @@ sub online {
 }
 
 
+sub setting {
+    my ($self, $setting, $new_value) = @_;
+
+    $self->{setting} //= {};
+
+    if (scalar(@_) == 3) {
+        $self->{setting}{$setting} = $new_value;
+    }
+
+    return $self->{setting}{$setting};
+}
+
+
+
 # Private helper:
 sub _extra_lookup_services {
     return {
@@ -122,6 +337,8 @@ sub _extra_lookup_services {
         'noembed.com'   => [qw(youtube-video-identifier)],
         'osm'           => [qw(osm-node osm-way osm-relation)],
         'overpass'      => [qw(wikidata-identifier)],
+        'Data::URIID'   => [qw(wikidata-identifier)],
+        'doi'           => [qw(doi)],
     }
 }
 
@@ -137,10 +354,23 @@ sub _get_json {
 
     # We cannot use decoded_content()'s charset decoding here as it's buggy for JSON response (at least in v6.18).
     return eval {
-        my $msg = $extractor->_ua->get($url);
+        my $msg = $extractor->_ua->get($url, 'Accept' => 'application/json');
         return undef unless $msg->is_success;
         my $val = $msg->decoded_content(ref => 1, charset => 'none');
         from_json(decode($msg->content_charset, $$val));
+    };
+}
+
+# Private helper:
+sub _get_json_file {
+    my ($self, $filename) = @_;
+    my $fh = eval { open(my $fh, '<', $filename) or die $!; $fh; } // eval { open(my $fh, '<:gzip', $filename.'.gz') or die $!; $fh; };
+
+    return undef unless $fh;
+
+    return eval {
+        local $/ = undef;
+        from_json(scalar <$fh>);
     };
 }
 
@@ -150,7 +380,9 @@ sub _offline_lookup__Data__URIID {
     my Data::URIID $extractor = $self->extractor;
     my $ise_order = $result->{primary}{ise_order} // [qw(uuid oid uri)];
     my %attr;
-    my %res = (attributes => \%attr);
+    my %ids;
+    my %res = (attributes => \%attr, id => \%ids);
+    my @found;
 
     outer:
     foreach my $ise_type (@{$ise_order}) {
@@ -159,7 +391,33 @@ sub _offline_lookup__Data__URIID {
             my $name = eval { $extractor->ise_to_name($type => $ise) } // next;
             my $displayname = $attr{displayname} //= {};
             $displayname->{'*'} //= $name;
+            push(@found, {attributes => $own_metadata{$type}{$name}});
             last outer;
+        }
+    }
+
+    foreach my $id_type (keys %own_well_known) {
+        my $id = eval {$result->id($id_type, _no_convert => 1)};
+        if (defined $id) {
+            if (defined(my $entry = $own_well_known{$id_type}{$id})) {
+                push(@found, $entry);
+            }
+        }
+    }
+
+    foreach my $found (@found) {
+        my $attributes = $found->{attributes};
+        my $ids        = $found->{ids};
+
+        foreach my $attr (keys %{$attributes//{}}) {
+            $attr{$attr} //= {};
+            foreach my $key (keys %{$attributes->{$attr}}) {
+                $attr{$attr}{$key} = $attributes->{$attr}{$key};
+            }
+        }
+
+        foreach my $id_type (keys %{$ids//{}}) {
+            $ids{$id_type} //= $ids->{$id_type};
         }
     }
 
@@ -168,25 +426,26 @@ sub _offline_lookup__Data__URIID {
 
 sub _online_lookup__wikidata {
     my ($self, $result) = @_;
-    my $id = eval {$result->id('wikidata-identifier')};
+    my $config = $config_wikidata;
+    my $id = eval {$result->id($config->{type})};
 
     unless (defined $id) {
-        $id = $self->_online_lookup__wikidata__stage_0($result);
+        $id = $self->_online_lookup__wikidata__stage_0($result, $config);
     }
 
     if (defined $id) {
-        return $self->_online_lookup__wikidata__stage_1($result, $id);
+        return $self->_online_lookup__wikidata__stage_1($result, $id, $config);
     }
 
     return undef;
 }
 
 sub _online_lookup__wikidata__stage_0 {
-    my ($self, $result) = @_;
+    my ($self, $result, $config) = @_;
     my @ids;
 
-    foreach my $property (keys %idmap_wikidata) {
-        my $id = eval {$result->id($idmap_wikidata{$property})};
+    foreach my $property (keys %{$config->{idmap}}) {
+        my $id = eval {$result->id($config->{idmap}{$property})};
         if (defined $id) {
             if ($id !~ /['"]/) {
                 push(@ids, sprintf('?item wdt:%s "%s"', $property, $id));
@@ -194,13 +453,10 @@ sub _online_lookup__wikidata__stage_0 {
         }
     }
 
-    # british-museum-term is special:
-    {
-        my $id = eval {$result->id('british-museum-term')};
+    foreach my $special (@{$config->{special_ids}}) {
+        my $id = eval {$result->id($special->{type})};
         if (defined $id) {
-            if ($id =~ /^BIOG([1-9][0-9]+)$/) {
-                push(@ids, sprintf('?item wdt:P1711 "%s"', $1));
-            }
+            push(@ids, sprintf('?item wdt:%s "%s"', $special->{property}, $special->{to_service}->($id)));
         }
     }
 
@@ -208,7 +464,7 @@ sub _online_lookup__wikidata__stage_0 {
     {
         my $id = eval {$result->id('uuid')};
         if (defined $id) {
-            foreach my $property (qw(P434)) {
+            foreach my $property (@{$config->{uuid_relations}}) {
                 push(@ids, sprintf('?item wdt:%s "%s"', $property, $id));
             }
         }
@@ -218,11 +474,11 @@ sub _online_lookup__wikidata__stage_0 {
 
     {
         my $q = sprintf('SELECT * WHERE { { %s } } LIMIT 1', join('} UNION {', @ids));
-        my $res = $self->_get_json('https://query.wikidata.org/sparql', query => {format => 'json', query => $q});
+        my $res = $self->_get_json($config->{endpoint}{sparql}, query => {format => 'json', query => $q});
         my $item = eval {$res->{results}{bindings}[0]{item}};
         return undef unless $item;
         return undef unless ($item->{type} // '') eq 'uri';
-        if (($item->{value} // '') =~ m#^http://www\.wikidata\.org/entity/([QP][1-9][0-9]+)$#) {
+        if (($item->{value} // '') =~ m#^\Q$config->{prefix}\E([QP][1-9][0-9]+)$#) {
             return $1;
         }
     }
@@ -231,34 +487,40 @@ sub _online_lookup__wikidata__stage_0 {
 }
 
 sub _online_lookup__wikidata__stage_1 {
-    my ($self, $result, $id) = @_;
-    my $data = $self->_get_json(sprintf('https://www.wikidata.org/wiki/Special:EntityData/%s.json?flavor=dump', $id))->{entities}{$id};
-    my %ids = ('wikidata-identifier' => $id);
+    my ($self, $result, $id, $config) = @_;
+    my %ids = ($config->{type} => $id);
     my %attr;
     my %res = (id => \%ids, attributes => \%attr);
+    my $data;
+
+    if (defined(my $local_override_dir = $self->setting('local_override_dir'))) {
+        $data = $self->_get_json_file($local_override_dir.'/'.$id.'.json');
+    }
+    $data //= $self->_get_json(sprintf($config->{endpoint}{entitydata}, $id));
+
+    $data = $data->{entities}{$id};
 
     $attr{displayname} = {map {$_ => $data->{labels}{$_}{value}}       keys %{$data->{labels}}};
     $attr{description} = {map {$_ => $data->{descriptions}{$_}{value}} keys %{$data->{descriptions}}};
 
     $res{wikidata_sitelinks} = $data->{sitelinks};
-    foreach my $property (keys %idmap_wikidata) {
+    foreach my $property (keys %{$config->{idmap}}) {
         foreach my $entry (@{$data->{claims}{$property} // []}) {
-            $ids{$idmap_wikidata{$property}} = $entry->{mainsnak}{datavalue}{value};
+            $ids{$config->{idmap}{$property}} = $entry->{mainsnak}{datavalue}{value};
         }
     }
 
-    # Special:
-    foreach my $entry (@{$data->{claims}{P1711} // []}) {
-        $ids{'british-museum-term'} = sprintf('BIOG%u', $entry->{mainsnak}{datavalue}{value});
-    }
-    foreach my $entry (@{$data->{claims}{P625} // []}) { # 'coordinate location'
-        foreach my $subkey (qw(altitude latitude longitude)) {
-            $attr{$subkey} = {'*' => $entry->{mainsnak}{datavalue}{value}{$subkey} + 0} if defined $entry->{mainsnak}{datavalue}{value}{$subkey};
+    foreach my $special (@{$config->{special_ids}}) {
+        foreach my $entry (@{$data->{claims}{$special->{property}} // []}) {
+            $ids{$special->{type}} //= $special->{from_service}->($entry->{mainsnak}{datavalue}{value});
         }
-        $attr{space_object} = {'*' => URI->new($entry->{mainsnak}{datavalue}{value}{globe})} if defined $entry->{mainsnak}{datavalue}{value}{globe};
     }
-    foreach my $entry (@{$data->{claims}{P376} // []}) { # 'located on astronomical body'
-        $attr{space_object} = {'*' => URI->new(sprintf('http://www.wikidata.org/entity/%s', $entry->{mainsnak}{datavalue}{value}{id}))} if defined $entry->{mainsnak}{datavalue}{value}{id};
+
+    foreach my $attribute (@{$config->{attributes}}) {
+        foreach my $entry (@{$data->{claims}{$attribute->{property}} // []}) {
+            my %res = $attribute->{from_service}->($entry->{mainsnak}{datavalue}{value}, $config);
+            $attr{$_} //= $res{$_} foreach keys %res;
+        }
     }
 
     return \%res;
@@ -403,6 +665,17 @@ sub _online_lookup__xkcd {
     return \%res;
 }
 
+sub _online_lookup__doi {
+    my ($self, $result, %opts) = @_;
+    my $json = $self->_get_json($result->url(service => 'doi', action => 'metadata')) // return undef;
+    my %attr;
+    my %res = (attributes => \%attr);
+
+    $attr{displayname} = {'*' => $json->{title}} if defined($json->{title}) && length($json->{title});
+
+    return \%res;
+}
+
 1;
 
 __END__
@@ -417,7 +690,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -459,6 +732,17 @@ If this value is false no online operations are permitted.
 In addition to this value being true the online value for the extractor need to be true.
 
 See also L<"extractor">, L<Data::URIID/"online">.
+
+=head2 setting
+
+    my $value = $service->setting( $setting[, $new_value ] );
+
+Gets or sets the setting C<$setting> the of the service.
+
+The available settings depend on the service. This method may or may not die
+when an invalid setting or an invalid value is provided.
+
+Setting an invalid value may result in failures when this service is being used.
 
 =head1 KNOWN/SUPPORTED SERVICES
 

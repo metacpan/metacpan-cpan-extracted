@@ -89,6 +89,10 @@ Fetch event via row ID.
 
 Fetch the event via the event ID.
 
+=head2 --raw
+
+Do not decode the EVE JSON.
+
 =head3 --pcap <file>
 
 Fetch the remote PCAP via Virani and write it to the file. Only usable for with Suricata tables.
@@ -465,6 +469,52 @@ Color for the insance loc.
 
     - Default :: bright_cyan.
 
+=head1 CONFIG FILE
+
+The default config file is `/usr/local/etc/lilith.toml`.
+
+    - dsn ::  A DSN connection string to be used by DBI
+
+    - pass :: Password to use for the connection.
+
+    - user :: User to use for the connetion.
+
+    - class_ignore :: Array of classes to ignore.
+
+Sub hashes are then treated as a instance. The following values are available for that.
+
+    - eve :: The EVE file to follow.
+
+    - type :: `sagan` or `suricata`, depending on which it is.
+
+    - instance :: The name for the instance. If not specified the hash name is used.
+
+Example...
+
+    dsn="dbi:Pg:dbname=lilith;host=192.168.1.2"
+    pass="WhateverYouSetAsApassword"
+    user="lilith"
+    # a handy one to ignore for the extend as it is spammy
+    class_ignore=["Generic Protocol Command Decode"]
+    
+    # add a suricata instance to monitor
+    [suricata-eve]
+    instance="foo-pie"
+    type="suricata"
+    eve="/var/log/suricata/alert.json"
+    
+    # add a second suricata instance to monitor
+    [another-eve]
+    instance="foo2-pie"
+    type="suricata"
+    eve="/var/log/suricata/alert2.json"
+    
+    # add a sagan eve to monitor
+    # instance name is 'foo-lae', given there is no value for instance
+    [foo-lae]
+    type="sagan"
+    eve="/var/log/sagan/alert.json"
+
 =cut
 
 use strict;
@@ -482,6 +532,7 @@ use Gzip::Faster;
 use Data::Dumper;
 use Sys::Syslog;
 use Time::Piece::Guess;
+use Pod::Usage;
 
 sub version {
 	print 'lilith v. ' . $Lilith::VERSION . "\n";
@@ -490,236 +541,10 @@ sub version {
 sub help {
 	&version;
 
-	print '
+	print "\n\n";
 
---config <ini>     Config INI file.
-                   Default :: /usr/local/etc/lilith.ini
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
 
--a <action>        Action to perform.
-                   Default :: search
-
-Action :: run
-Description :: Runs the ingestion loop.
-
-Action :: class_map
-Description :: Display class to short class mappings.
-
-Action :: create_tables
-Description :: Creates the tables in PostgreSQL.
-
-Action :: dump_self
-Description :: Dumps $lilith via Data::Dumper
-
-Action :: event
-Description :: Fetch the information for the specified event.
-               Either --id or --event is needed.
-
---id <row id>   Row ID to fetch.
-                Default :: undef
-
---event <id>    Event ID to fetch.
-                Default :: undef
-
---raw           Do not decode the EVE JSON.
-                Default :: undef
-
---pcap <file>   Fetch the remote PCAP via Virani and write it to the file.
-                Only usable for with Suricata tables.
-                Default :: undef
-
---virani <conf> Virani setting to pass to -r.
-                Default :: instance name in alert
-
---buffer <secs> How many seconds to pad the start and end time with.
-                Default :: 60
-
-Action :: extend
-Description :: LibreNMS style SNMP extend.
-
--m <minutes>    How far backt to go in minutes.
-                Default :: 5
-
--Z              LibreNMS style compression, gzipped and
-                then base64 encoded.
-                Default :: undef
-
-Action :: generate_baphomet_yamls
-Description :: Generate Baphomet rule YAMLs.
-
---dir <dir>     Dir to output to.
-
-Action :: search
-Description :: Searches the specified table returns the results.
-
---ouput <return>   Return type. Either table or json.
-                   Default :: table
-
--t <table>         Table to search. suricata/sagan
-                   Default :: suricata
-
--m <minutes>       How far backt to go in minutes.
-                   Default :: 1440
-
---order <clm>      Column to order by.
-                   Default :: timestamp
-
---limit <int>      Limit to return.
-                   Default :: undef
-
---offset <int>     Offset for a limited return.
-                   Default :: undef
-
---orderdir <dir>   Direction to order in.
-                   Default :: ASC
-
-
-* IP Options
-
-
---si <src ip>    Source IP.
-                 Default :: undef
-                 Type :: string
-
---di <dst ip>    Destination IP.
-                 Default :: undef
-                 Type :: string
-
---ip <ip>        IP, either dst or src.
-                 Default :: undef
-                 Type :: complex
-
-
-* Port Options
-
---sp <src port>  Source port.
-                 Default :: undef
-                 Type :: integer
-
---dp <dst port>  Destination port.
-                 Default :: undef
-                 Type :: integer
-
--p <port>        Port, either dst or src.
-                 Default :: undef
-                 Type :: complex
-
-
-* Host Options
-
-Sagan :: Host is the sending system and instance host is the host the
-         instance is running on.
-
-Suricata :: Host is the system the instance is running on. There is no
-            instance host.
-
---host <host>   Host.
-                Default :: undef
-                Type :: string
-
---hostl         Use like for matching host.
-                Default :: undef
-
---hostN         Invert host matching.
-                Default :: undef
-
---ih <host>     Instance host.
-                Default :: undef
-                Type :: string
-
---ihl           Use like for matching instance host.
-                Default :: undef
-
---ihN           Invert instance host matching.
-                Default :: undef
-
-
-* Instance Options
-
--i  <instance>  Instance.
-                Default :: undef
-                Type :: string
-
---il            Use like for matching instance.
-                Default :: undef
-
---iN            Invert instance matching.
-                Default :: undef
-
-
-* Class Options
-
--c <class>      Classification.
-                Default :: undef
-                Type :: string
-
---cl            Use like for matching classification.
-                Default :: undef
-
---cN            Invert class matching.
-                Default :: undef
-
-
-* Signature Options
-
--s <sig>        Signature.
-                Default :: undef
-                Type :: string
-
---sl            Use like for matching signature.
-                Default :: undef
-
---sN            Invert signature matching.
-                Default :: undef
-
-
-* In Interface Options
-
---if <if>       Interface.
-                Default :: undef
-                Type :: string
-
---ifl           Use like for matching interface.
-                Default :: undef
-
---ifN           Invert interface matching.
-                Default :: undef
-
-
-* App Proto Options
-
---ap <proto>    App proto.
-                Default :: undef
-                Type :: string
-
---apl           Use like for matching app proto.
-                Default :: undef
-
---apN           Invert app proto matching.
-                Default :: undef
-
-
-* Rule Options
-
---gid <gid>     GID.
-                Default :: undef
-                Type :: integer
-
---sid <sid>     SID.
-                Default :: undef
-                Type :: integer
-
---rev <rev>     Rev.
-                Default :: undef
-                Type :: integer
-
-* Types
-
-Integer :: A comma seperated list of integers to check for. Any number
-           prefixed with a ! will be negated.
-String :: A string to check for. May be matched using like or negated via
-          the proper options.
-Complex :: A item to match.
-';
 } ## end sub help
 
 # get the commandline options

@@ -15,7 +15,7 @@ use HTTP::Date;
 use HTTP::Status qw/ :constants /;
 use JSON::MaybeXS 1.004000;
 
-our $VERSION = 'v0.2.5';
+our $VERSION = 'v0.3.0';
 
 
 sub prepare_app {
@@ -111,7 +111,7 @@ Plack::Middleware::TrafficAdvice - handle requests for /.well-known/traffic-advi
 
 =head1 VERSION
 
-version v0.2.5
+version v0.3.0
 
 =head1 SYNOPSIS
 

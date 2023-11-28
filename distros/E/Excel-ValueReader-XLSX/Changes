@@ -1,5 +1,16 @@
 Revision history for Excel-ValueReader-XLSX
 
+1.13 06.11.2023
+  - minor fixes: typos, source improvements, avoid dependencies on unsafe modules (Merijn Brand++)
+
+1.12 06.11.2023
+  - fix bug in test suite (useless attempt to open a file in RW mode)
+
+1.11 05.11.2023
+  - new() can take a filehandle instead of a filename
+  - additional method ->active_sheet
+  - minimal perl version is now 5.12 because of a dependency chain Moose/Sub::Exporter/Data::OptList
+
 1.10 12.02.2023
   - support cells without an 'r' attribute (David Flink++)
 

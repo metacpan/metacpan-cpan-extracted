@@ -43,7 +43,7 @@
     hmv => "v ah:mm",
     ms => "mm:ss",
     y => "y\N{U+5e74}",
-    yM => "y\N{U+5e74}M\N{U+6708}",
+    yM => "y/M",
     yMEEEEd => "y\N{U+5e74}M\N{U+6708}d\N{U+65e5}EEEE",
     yMEd => "y\N{U+5e74}M\N{U+6708}d\N{U+65e5}\N{U+ff0c}E",
     yMM => "y\N{U+5e74}M\N{U+6708}",
@@ -271,5 +271,5 @@
   time_format_medium => "ah:mm:ss",
   time_format_short => "ah:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

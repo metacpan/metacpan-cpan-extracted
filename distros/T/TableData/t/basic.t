@@ -75,4 +75,12 @@ subtest get_column_names => sub {
     is_deeply([@{ $table->get_column_names }], ["a","b"]);
 };
 
+subtest convert_row_arrayref_to_hashref => sub {
+    is_deeply($table->convert_row_arrayref_to_hashref([1,2]), {a=>1,b=>2});
+};
+
+subtest convert_row_hashref_to_arrayref => sub {
+    is_deeply($table->convert_row_hashref_to_arrayref({a=>1,b=>2}), [1,2]);
+};
+
 done_testing;

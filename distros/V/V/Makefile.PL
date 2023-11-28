@@ -27,7 +27,10 @@ WriteMakefile(
                 type => 'git',
                 url  => 'https://github.com/abeltje/V.git',
             },
+            bugtracker => {
+                web => 'https://github.com/abeltje/V/issues',
+            },
         },
-        'x_IRC' => 'irc://irc.perl.org/#amsterdam.pm',
+#        'x_IRC' => 'irc://irc.perl.org/#amsterdam.pm',
     },
 );

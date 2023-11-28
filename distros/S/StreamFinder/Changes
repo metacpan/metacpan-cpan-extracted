@@ -573,6 +573,8 @@ Revision history for StreamFinder
         seems to now work again, at least for audio streams on some sites.
         - StreamFinder::Anystream - doc. touchups.
 2.20    2023/10/24
+        - Restored StreamFinder::Subsplash (still fetches audio streams for 
+        some channels, though any video versions seem to be behind javascript).
         - Update default user-agent to:
         "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0"
         - StreamFinder::Apple - Handle "embedded" Apple podcasts 
@@ -584,3 +586,16 @@ Revision history for StreamFinder
         still does (sp.rmbl.ws).
         - StreamFinder::Youtube - Try harder to get the first (most recent) 
         video from channel pages (by skipping any "banner" video before it).
+2.21    2023/11/16
+        - StreamFinder::Anystream - Handle "escaped" URLs embedded in some 
+        sites, ie. crap like:  https:\/\/stupidsite\u002fstream.mp3 and ones 
+        that start with "//", ie. "//stupidsite/stream.mp3".
+        - StreamFinder::Bitchute - Fix failure to fetch artist and albumartist 
+        (channel name and page URL) due to a slight tweak to their site.
+        - StreamFinder::Brighteon - Hide extraneous debug message (when not 
+        running in debug mode).
+        - StreamFinder::Rumble - Warn if had to convert new "bad" site:
+        "hugh.cdn.rumble.cloud.video" to "sp.rmbl.ws".
+        Also:  try harder to fetch artist, albumartist, and icon (from "embed" 
+        URLs), since some channels allow public access to the "embed" version 
+        of their URLs but NOT always to their main (html) ones (go figure).

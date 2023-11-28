@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::RJBS 5.024;
+package Dist::Zilla::PluginBundle::RJBS 5.025;
 # ABSTRACT: BeLike::RJBS when you build your dists
 
 use Moose;
@@ -65,7 +65,7 @@ use Dist::Zilla::PluginBundle::Basic;
 use Dist::Zilla::PluginBundle::Filter;
 use Dist::Zilla::PluginBundle::Git;
 
-package Dist::Zilla::Plugin::RJBSMisc 5.024 {
+package Dist::Zilla::Plugin::RJBSMisc 5.025 {
   use Moose;
   with 'Dist::Zilla::Role::BeforeBuild',
        'Dist::Zilla::Role::AfterBuild',
@@ -94,10 +94,6 @@ package Dist::Zilla::Plugin::RJBSMisc 5.024 {
 
   sub before_build {
     my ($self) = @_;
-
-    if (($self->perl_window // '') eq 'toolchain' && $self->package_name_version) {
-      $self->log_fatal('This dist claims to be toolchain but uses "package NAME VERSION"');
-    }
 
     unless (defined $self->perl_window) {
       $self->log("❗️ did not set perl-window!");
@@ -371,7 +367,7 @@ Dist::Zilla::PluginBundle::RJBS - BeLike::RJBS when you build your dists
 
 =head1 VERSION
 
-version 5.024
+version 5.025
 
 =head1 DESCRIPTION
 

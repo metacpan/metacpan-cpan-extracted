@@ -1,16 +1,7 @@
 # -*- perl -*-
 
-use strict;
-use warnings;
-
 use Test::Lib;
 use Test::XML::Sig;
-
-use Test::More tests => 31;
-
-BEGIN {
-    use_ok( 'XML::Sig' );
-}
 
 my $key_name = 'tim';
 my $hmac_key =<<HMAC;
@@ -30,35 +21,33 @@ foreach my $alg (@hash_alg) {
     ok( $signed, "Got XML for the response" );
 
     SKIP: {
-        skip "xmlsec1 not installed", 2 unless $xmlsec->{installed};
+        skip "xmlsec1 not installed", 1 unless $xmlsec->{installed};
 
         # Try whether xmlsec is correctly installed which
         # doesn't seem to be the case on every cpan testing machine
 
-        skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 2
+        skip "OpenSSL version 3.0.0 through 3.0.7 do not support ripemd160", 1
             if ( ! $openssl->{ripemd160} and $alg eq 'ripemd160');
 
-        ok( open XML, '>', "tmp-$alg.xml" );
-        print XML $signed;
-        close XML;
-        my $verify_response = `xmlsec1 --verify --keys-file t/xmlsec-keys.xml --id-attr:ID "foo" tmp-$alg.xml 2>&1`;
-        ok( $verify_response =~ m/OK/, "Response is OK for xmlsec1" )
-            or warn "calling xmlsec1 failed: '$verify_response'\n";
-        if ($verify_response =~ m/OK/) {
-            unlink "tmp-$alg.xml";
-        } else{
-            print $signed;
-            die;
-        }
 
+        test_xmlsec1_ok(
+            "xmlsec1 response ok", $signed, qw(
+                --verify --keys-file t/xmlsec-keys.xml --id-attr:ID "foo"
+            )
+        );
     }
 
-    my $sig2 = XML::Sig->new( { hmac_key => $hmac_key, key_name => $key_name, sig_hash => $alg } );
+    my %args = (
+        hmac_key => $hmac_key,
+        key_name => $key_name,
+        sig_hash => $alg
+    );
+    my $sig2 = XML::Sig->new(\%args);
     my $result = $sig2->verify($signed);
     ok( $result, "XML Signed Properly" );
 
     my $sig3 = XML::Sig->new( { hmac_key => 'c2VjcmV0Cg==', key_name => $key_name, sig_hash => $alg } );
-    $result = $sig3->verify($signed);
-    ok(!$result, "XML Verification failed with incorrect key" );
+    ok(!$sig3->verify($signed), "XML Verification failed with incorrect key");
 }
+
 done_testing;

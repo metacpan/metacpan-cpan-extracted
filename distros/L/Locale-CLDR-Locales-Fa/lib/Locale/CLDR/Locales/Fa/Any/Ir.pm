@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fa::Any::Ir - Package for language Persian
 
 package Locale::CLDR::Locales::Fa::Any::Ir;
 # This file auto generated from Data\common\main\fa_IR.xml
-#	on Fri 13 Oct  9:15:13 am GMT
+#	on Sat  4 Nov  6:01:38 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

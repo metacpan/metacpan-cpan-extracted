@@ -16,11 +16,11 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -82,8 +82,8 @@ sub new {
 
     print 'Number of cms of snow: ', $snowfall[1], "\n";
 
-    Takes an optional argument, tz, which defaults to 'Europe/London'.
-    For that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
+Takes an optional argument, tz, which defaults to 'Europe/London'.
+For that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
 
 =cut
 
@@ -149,7 +149,7 @@ sub weather {
 	my $res = $self->{ua}->get($url);
 
 	if($res->is_error()) {
-		Carp::croak("$url API returned error: ", $res->status_line());
+		Carp::carp("$url API returned error: ", $res->status_line());
 		return;
 	}
 	# $res->content_type('text/plain');	# May be needed to decode correctly

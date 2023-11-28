@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,55 +12,62 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 60daf1e5a947658b7040c5a03ba3c3831e8aa55c Changes
-SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
-SHA1 90ab34c2ba3f5cd611bf7c30bb31548cb4546649 MANIFEST
-SHA1 d092eb04a1763e1e49f811645610caaa944ca679 META.yml
-SHA1 27b61c65af19791ece63da7b2ec3c39acc26d45d Makefile.PL
-SHA1 8a3c4d560270de34bc0b4b6034c69b8791a44b0b Part.pm
-SHA1 c5e67344913974b87f3a6bd23a837f3a33f4baf5 Part/Action.pm
-SHA1 b35825f7d557dcb27fb0d4ce451d985e54324ea3 Part/Transfer.pm
-SHA1 823ca83af5d336de77ce5d540259cfb0edf78476 README
-SHA1 3507bb986931110cf321d56f3e0ae3c530926b8d examples/ex1.pl
-SHA1 86f5afccc8163295dafcd8894d13c8f5b46d15b7 examples/ex2.pl
-SHA1 f5754e7bb4636fa07dcc7eec5b65a72f1a81cfe3 examples/ex3.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 ef291a6d01fd89bda533559633e9e27987143a6a t/Lego-Part-Action/01-use.t
-SHA1 99a017e9df04636fffe9d5e54bbc12e9b1884eca t/Lego-Part-Action/02-version.t
-SHA1 748ecd1ee800027ae8c4ae2aa16fb34fc7759a0b t/Lego-Part-Transfer/01-use.t
-SHA1 24db27e9dc4ca1e017430037cf12d012184d6f1e t/Lego-Part-Transfer/02-version.t
-SHA1 e1414619a964d84b7f8c1f43f399cdf4fbb169c1 t/Lego-Part/01-use.t
-SHA1 0ce2fe0976645b6af98d6978e4a88a7356468112 t/Lego-Part/02-version.t
-SHA1 91d95e976c406fa0a5239e68cd947b3c4c44cf39 t/Lego-Part/03-new.t
-SHA1 6b85058de591ffa70aa2f855d9edd7c94a463fbe t/Lego-Part/04-color.t
-SHA1 91671d14442b87dda869e2a3877944bceea817d2 t/Lego-Part/05-design_id.t
-SHA1 c2b3bf78d4755caee67394be028bfd690d5b6908 t/Lego-Part/06-element_id.t
-SHA1 a1ddd7521443f0338bacf4c56947bc67c79667fa xt/Lego-Part-Action/01-pod_coverage.t
-SHA1 77883fe505c74236ee29212afe8d037acbb6a4b8 xt/Lego-Part-Action/02-pod.t
-SHA1 be8445a8ef8daa101b66ae925f8f140cf4483524 xt/Lego-Part-Transfer/01-pod_coverage.t
-SHA1 b82b5af36332e155348dadc75073dff80d2df61b xt/Lego-Part-Transfer/02-pod.t
-SHA1 8b4525b0514058f36e7eace5bc458ee62a1977b1 xt/Lego-Part/01-pod_coverage.t
-SHA1 7168be3a4f298e1695191cdf87968d78b873a60f xt/Lego-Part/02-pod.t
+SHA256 99a8e48c622e5c01031e24136610a22bc20d22cc411be6687a84aaaaeb7ea549 Changes
+SHA256 16e519f1cbc291b44fcc60e62249456c7f5432e29ad17f3ac82faf65b624cff4 LICENSE
+SHA256 2512c8f2eaf0207b74f377a514c9a63dc461dc5356d11c165141175bb4870ca2 MANIFEST
+SHA256 9b8b5d1e200958939c317143ebc3e1ae480402d3245187e89a87634d1812313e META.yml
+SHA256 f4c3458d2fafcebcdecbb5974a17af0ba130961b5fc0cbf6b6cefe6ce4cacee9 Makefile.PL
+SHA256 244264375f280f6d5afd0ec506296539e93286b09712aa0cdb15789ae0a3c444 Part.pm
+SHA256 aad4bc20385ec02b24587c69dbd369ff3ae23da17a4fa88113d7a7a093df3286 Part/Action.pm
+SHA256 a800f7cfbf136d5ef9be0f9b20d4690f406f4373a71a1f66ff037ecc4c1d04be Part/Transfer.pm
+SHA256 73c9219fd443a3abdccb83fc267403ce1393a31b0b138697f218467dc1cd1909 README
+SHA256 9552128a6afdaeafe34d86e136fcb6ca3432a010fd8dad3eaf2e64cee25ea00a examples/create_part_and_print1.pl
+SHA256 b75cf44a6426b609e28308ea5038d77ec4b05fb84cde1b9bec2110f92c2625ad examples/create_part_and_print2.pl
+SHA256 b697bdbcb2c17a784a2162c90a19b19dc798cde688a50ecbca3f040beabf5302 examples/design_to_element_and_print.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 ccb9e47c59cfb71943b07d522e0ec2f5594b14cc4f9ae693f846ae4dfab9fdb9 t/Lego-Part-Action/01-use.t
+SHA256 c5fee289d06ac46751b89238221f7dff5541ecb042eddb413629cc1fa3a1bcd9 t/Lego-Part-Action/02-version.t
+SHA256 d137fad45daffe695bfb14caa0264e3ac15c407b408ceca6b466584f4a4ca90e t/Lego-Part-Action/03-new.t
+SHA256 304c51155b1d12c98730966163a28bf08cecf2361e6d9f59f40b9cf0235ac4a9 t/Lego-Part-Transfer/01-use.t
+SHA256 cf712a8c090671a889a474449876d21ba889eb2d961c8687647c98ac11d37fb4 t/Lego-Part-Transfer/02-version.t
+SHA256 5b8c2445b08223ee0fb258ea674d1c451f7c936ccd2a3d51977fb80693b02ee1 t/Lego-Part-Transfer/03-new.t
+SHA256 e64d9319b3dc98cd44f8941b5dc66a14007a604775f58d0e4cede090f461da9b t/Lego-Part/01-use.t
+SHA256 ffeed8cb9fad32de7ff109d719113573a9ab016d5c8eb4f12f7e103d0a2bc47c t/Lego-Part/02-version.t
+SHA256 fa047a11a5997e1d788901b7b6fa53ae947b264121171dd84d06184670918018 t/Lego-Part/03-new.t
+SHA256 4824a5be06454415fa593e33e360f5a9cc80913dfd8e70bcf8e3ca8e54a38236 t/Lego-Part/04-color.t
+SHA256 7e54836d1d228a69e25eb4e46d987e7d23aa77f367ca3c40c9703746fef634b8 t/Lego-Part/05-design_id.t
+SHA256 4c7abfdaeb6d6e0b2f06a01b360ef79cf8dd5c953d84dae2042cd9d0258fe5ad t/Lego-Part/06-element_id.t
+SHA256 807703432d348f80edb86aa63acc7b0e708773e75a0a5107ea08edd94ea2599e xt/Lego-Part-Action/01-pod_coverage.t
+SHA256 81b47565d60c8a192629509871eb5063d63c26da2f5cee3cdbb6dfc518a89d27 xt/Lego-Part-Action/02-pod.t
+SHA256 cefe1af0afa865b78d0840378ea5d98f1640fcdda269876fbb133a1071087d79 xt/Lego-Part-Transfer/01-pod_coverage.t
+SHA256 842bb4fcd401f48e8bba58cea6513d9f2a1dd4b881ee976fd6009bfa6fa24ee8 xt/Lego-Part-Transfer/02-pod.t
+SHA256 cd662ba82f52e1cad85a71bca8fd6a464ef38918a493beb237edcaf79436c2c1 xt/Lego-Part/01-pod_coverage.t
+SHA256 41b2b1042bd092bb4516eac19622ba1cbfb779e3f677e0214e91fe6a83eaef7c xt/Lego-Part/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWAxoKAAoJEJe+XXKaIuTltQcIAMCASqUORwB0H7hPgjylYTFG
-sQKlX18zKkkjeGUHU7DLd3hDOsiNMN1st6LK9lye1TyAm1MchosfAliVCzVCwm1y
-mpY+iLRB9ms6PYchXTUjoh5TCASH/itjQMPnwRDRO4yuEp1I/TFG939PA4fOaadK
-0ENHroEC784MrLmxe8Kxfa7LEO0L3Oc7TRYRvH9TplMr9lBkODSempm2ceY7AEx2
-NyOwf08BGnfnEWsMAQ+5k/CwKlEk9ZklbSwFfjsxI48+Dph1BHKJkzDcLtG1QLmC
-6OvUEp6J8Nu8qIR8ul0T+ju67fjHE+kDABqHTey5j05lNmcZkaraadHAiih38zA=
-=N2wq
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVhFH4ACgkQojV9Rpe/
+B8ukzw//fB2rYBqunRgzO3gpZFckRO+CE+rLKHXrSbAj89+GTJ3Vrj7AI41sa/lh
+XvvHeJ0WYgNB8YX8nDquXd0pfXXmVCLNFLrJSA4zmUb/4WTSTb41WByn+Dh1O6Zd
+9jLlb2gc+7JiA1x28UevZFzy5lPemCb26ImKo8U0Fpg4Kt62xX9gLrWayuYRv9L3
+2405X/d7zn68/Qyvt88vlOC3WwVGXz71a0JegxY7yDB3gZS/9253R9v2r/Zj8D9T
+LgaipfiE8iv7SnhFPTObkPxD94iYX62Pmvo/mwlxyvJhFYKJ55pWg7S63fd653C/
+j15HTjJ5lUQKxceWApZWClLoEDi5mtwPZ9yB4xrUx1pnhYlfKLS5PB68jYWLSHAV
+fx19rRa+BpGq7oWvP5xGqH0sV5zBKyyREc2Onz6Ya8Caj0U9/l98RXQNbVf+5qz8
+x+JY6rpDxYIyslsosgveTzW7QS9E9okey+xC7WHe0hhoWQXxbqBxhy01U1Ga2tXc
+nJJoy0eZd2N+4Vza9CRbPIF6E62vmqznfFWKaI8jr84ubHimZotVl4ztiolttrMe
+iNuEM5A/D7h2zuOfCirkNia2PkFaw+GJJItjQiOHJrRReOVnlbufYgdvgNZS7RPB
+KKINdOKEzO2TrDp3sMEZi0OqwwoZOsx/EHSF/j/jx8LulLd5BJ0=
+=0MBU
 -----END PGP SIGNATURE-----

@@ -4,7 +4,7 @@
       "Mark Dootson <mdootson@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "perl_5"
    ],
@@ -52,7 +52,7 @@
    "provides" : {
       "HiPi" : {
          "file" : "lib/HiPi.pm",
-         "version" : "0.88"
+         "version" : "0.90"
       },
       "HiPi::Class" : {
          "file" : "lib/HiPi/Class.pm",
@@ -60,7 +60,7 @@
       },
       "HiPi::Constant" : {
          "file" : "lib/HiPi/Constant.pm",
-         "version" : "0.82"
+         "version" : "0.89"
       },
       "HiPi::Device" : {
          "file" : "lib/HiPi/Device.pm",
@@ -68,15 +68,15 @@
       },
       "HiPi::Device::GPIO" : {
          "file" : "lib/HiPi/Device/GPIO.pm",
-         "version" : "0.81"
+         "version" : "0.90"
       },
       "HiPi::Device::GPIO::Pin" : {
          "file" : "lib/HiPi/Device/GPIO/Pin.pm",
-         "version" : "0.81"
+         "version" : "0.90"
       },
       "HiPi::Device::I2C" : {
          "file" : "lib/HiPi/Device/I2C.pm",
-         "version" : "0.81"
+         "version" : "0.90"
       },
       "HiPi::Device::OneWire" : {
          "file" : "lib/HiPi/Device/OneWire.pm",
@@ -84,7 +84,7 @@
       },
       "HiPi::Device::SPI" : {
          "file" : "lib/HiPi/Device/SPI.pm",
-         "version" : "0.81"
+         "version" : "0.90"
       },
       "HiPi::Device::SerialPort" : {
          "file" : "lib/HiPi/Device/SerialPort.pm",
@@ -104,11 +104,11 @@
       },
       "HiPi::Energenie::ENER314_RT" : {
          "file" : "lib/HiPi/Energenie/ENER314_RT.pm",
-         "version" : "0.82"
+         "version" : "0.89"
       },
       "HiPi::GPIO" : {
          "file" : "lib/HiPi/GPIO.pm",
-         "version" : "0.81"
+         "version" : "0.90"
       },
       "HiPi::GPIO::Pin" : {
          "file" : "lib/HiPi/GPIO/Pin.pm",
@@ -448,7 +448,7 @@
       },
       "HiPi::Interface::BME280" : {
          "file" : "lib/HiPi/Interface/BME280.pm",
-         "version" : "0.82"
+         "version" : "0.89"
       },
       "HiPi::Interface::Common::HD44780" : {
          "file" : "lib/HiPi/Interface/Common/HD44780.pm",
@@ -543,7 +543,11 @@
       },
       "HiPi::Interface::HopeRF69" : {
          "file" : "lib/HiPi/Interface/HopeRF69.pm",
-         "version" : "0.82"
+         "version" : "0.90"
+      },
+      "HiPi::Interface::HopeRF69::Dummy" : {
+         "file" : "lib/HiPi/Interface/HopeRF69/Dummy.pm",
+         "version" : "0.89"
       },
       "HiPi::Interface::IS31FL3730" : {
          "file" : "lib/HiPi/Interface/IS31FL3730.pm",
@@ -555,7 +559,7 @@
       },
       "HiPi::Interface::MAX7219" : {
          "file" : "lib/HiPi/Interface/MAX7219.pm",
-         "version" : "0.81"
+         "version" : "0.89"
       },
       "HiPi::Interface::MAX7219LEDStrip" : {
          "file" : "lib/HiPi/Interface/MAX7219LEDStrip.pm",
@@ -595,11 +599,11 @@
       },
       "HiPi::Interface::MPL3115A2" : {
          "file" : "lib/HiPi/Interface/MPL3115A2.pm",
-         "version" : "0.81"
+         "version" : "0.89"
       },
       "HiPi::Interface::MS5611" : {
          "file" : "lib/HiPi/Interface/MS5611.pm",
-         "version" : "0.82"
+         "version" : "0.89"
       },
       "HiPi::Interface::MicroDotPHAT" : {
          "file" : "lib/HiPi/Interface/MicroDotPHAT.pm",
@@ -647,30 +651,37 @@
       },
       "HiPi::Interface::ZeroSeg" : {
          "file" : "lib/HiPi/Interface/ZeroSeg.pm",
-         "version" : "0.81"
+         "version" : "0.89"
       },
       "HiPi::Pin" : {
          "file" : "lib/HiPi/Pin.pm",
-         "version" : "0.81"
+         "version" : "0.89"
+      },
+      "HiPi::RF::Message" : {
+         "file" : "lib/HiPi/RF/Message.pm",
+         "version" : "0.89"
       },
       "HiPi::RF::OpenThings" : {
          "file" : "lib/HiPi/RF/OpenThings.pm",
-         "version" : "0.81"
+         "version" : "0.89"
       },
       "HiPi::RF::OpenThings::Message" : {
          "file" : "lib/HiPi/RF/OpenThings/Message.pm",
-         "version" : "0.81"
+         "version" : "0.89"
+      },
+      "HiPi::RF::OpenThings::Message::EnumeratedValue" : {
+         "file" : "lib/HiPi/RF/OpenThings/Message.pm"
       },
       "HiPi::RF::OpenThings::Message::Record" : {
          "file" : "lib/HiPi/RF/OpenThings/Message.pm"
       },
       "HiPi::RaspberryPi" : {
          "file" : "lib/HiPi/RaspberryPi.pm",
-         "version" : "0.88"
+         "version" : "0.89"
       },
       "HiPi::Utils" : {
          "file" : "lib/HiPi/Utils.pm",
-         "version" : "0.81"
+         "version" : "0.90"
       },
       "HiPi::Utils::BitBuffer" : {
          "file" : "lib/HiPi/Utils/BitBuffer.pm",
@@ -682,7 +693,7 @@
       },
       "HiPi::Utils::Exec" : {
          "file" : "lib/HiPi/Utils/Exec.pm",
-         "version" : "0.81"
+         "version" : "0.90"
       },
       "HiPi::Utils::OLEDFont" : {
          "file" : "lib/HiPi/Utils/OLEDFont.pm",
@@ -696,6 +707,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.88",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.90",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -8,11 +8,8 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
 use Test::Warnings qw(warnings :no_end_test had_no_warnings);
 use Test::Fatal;
-use Test::Deep;
-use JSON::Schema::Modern;
 use lib 't/lib';
 use Helper;
 
@@ -90,7 +87,6 @@ subtest '<= draft7: $ref in combination with any other keyword causes the other 
 };
 
 subtest '$ref adjacent to a path used in a $ref' => sub {
-  local $TODO = 'fixing this requires traversing the schema to mark which locations are unusable';
   cmp_deeply(
     JSON::Schema::Modern->new(specification_version => 'draft7')->evaluate(
       true,
@@ -113,12 +109,12 @@ subtest '$ref adjacent to a path used in a $ref' => sub {
       errors => [
         {
           instanceLocation => '',
-          keywordLocation => '/allOf/$ref',
-          error => 'EXCEPTION: unable to find resource #/definitions/bar/anyOf/1',
+          keywordLocation => '/allOf/2/$ref',
+          error => 'EXCEPTION: bad reference to #/allOf/1/anyOf/1: not a schema',
         },
       ],
     },
-    'the presence of $ref also kills the use of other $refs to adjacent locations',
+    'the presence of $ref also blocks the use of other $refs to adjacent locations',
   );
 };
 

@@ -4,7 +4,7 @@
       "Tony Cook <tonyc@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,8 +48,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Imager@rt.cpan.org",
-         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Imager"
+         "web" : "https://github.com/tonycoz/imager/issues"
       },
       "homepage" : "http://imager.perl.org/",
       "repository" : {
@@ -58,6 +57,6 @@
          "web" : "https://github.com/tonycoz/imager.git"
       }
    },
-   "version" : "1.027",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "1.030",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

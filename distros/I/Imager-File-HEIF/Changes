@@ -1,3 +1,42 @@
+Imager-File-HEIF 0.005 - 26 Nov 2023
+======================
+
+ - the user can now limit the number of decoding threads used by
+   libheif with libheif 1.13.0 or later.
+
+ - EXIF metadata is now parsed if found using the tags described in
+   Imager::File::HEIF
+   https://github.com/tonycoz/imager-file-heif/issues/4
+
+Imager-File-HEIF 0.004 - 10 Nov 2023
+======================
+
+ - require libheif 1.9.0 or 1.11.0 or later (not 1.10.0)
+   https://github.com/tonycoz/imager-file-heif/issues/1
+
+ - support grayscale images
+   https://github.com/tonycoz/imager-file-heif/issues/2
+
+ - fix a potentially large memory leak when writing images
+   https://github.com/tonycoz/imager/issues/511
+
+ - newer libheif wants the heif_error message filled even
+   on success.
+
+ - improve write error reporting
+
+ - support calling into libheif's clean up code (requires 1.13.0)
+
+ - add some continuous integration
+   Unfortunately libheif and friends produce enough valgrind errors
+   I couldn't add detect for leaks like those above.
+
+ - documentation updates to match changes to libheif and
+   Imager::File::HEIF.
+
+ - make some internal functions into methods, some might be useful
+   in bug reporting, some you shouldn't use.
+
 Imager-File-HEIF 0.003 - 05 Apr 2019
 ======================
 

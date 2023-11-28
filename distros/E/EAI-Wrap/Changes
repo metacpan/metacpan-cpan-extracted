@@ -28,3 +28,15 @@
 	- amended logfile naming to same principles as in config lookup keys (scriptname + addToScriptName suffix), restore @ARGV after commandline parsing to allow for own commandline parsing, improved suppressing error messages in EAI::FTP::fetchFiles, improved error handling for empty files.
 1.5  Thu Oct 26 13:00:00 2023
 	- error checking for EAI::Wrap::openDBConn parameters, added possibility to have enumerated differentiation of log checks, added format_autoheader to automatically created header information from source files, improved arg checking in EAI::DB::readFromDBHash and doInDB, improved (empty) arg checking in EAI::DateUtil
+1.6  Thu Nov 09 23:00:00 2023
+	- refactoring in EAI::File, fix access to line and other data in fieldCode and lineCode custom parsing hooks, added prodEnvironmentInSeparatePath for checkLogExist, fixed resetting retrievedFiles in getLocalFiles, changed logs_to_be_ignored_in_nonprod to regex, fixed curTime check and many other things in checkLogExist.
+1.7  Sat Nov 11 00:00:00 2023
+	- added formatTime, make_time and get_curtime_epochs to EAI::DateUtil. Added checkLogExistDelay and prodEnvironmentInSeparatePath to config and checkLookup for enhancement of checkLogExist. Fixed version problems with Data::XLSX::Parser setting minimum to 0.20. Fixed time checks and logRootPath problems in checkLogExist
+1.8  Tue Nov 15 00:00:00 2023
+	- implemented API execution prevention with $execute{successfullyDone} instead of $execute{retryBecauseOfError} (only used in processingEnd() now). Fixed successMail for retrying. improved log messages and removed warnings. fixed setDebugLevel.pl finding log.config in environment.
+1.9  Sat Nov 18 00:00:00 2023
+	- removed Module::Refresh, fixed successfullyDone by moving to $process{successfullyDone}, fixed issue with multiple occurences of files in filesToArchive and filesToRemove
+1.901  Fri Nov 24 00:00:00 2023
+	- added splitcharacter in checkLogExist, autoflush to log file appender handle, include 1 before to indicate overflow in EAI::DateUtil::get_curtime, improved remoteDir setting in EAI::FTP, fixed and enhanced doAddtlProcessing in EAI::File::writeText, added enforceConn to EAI::Wrap::openDBConn and EAI::Wrap::openFTPConn
+1.902  Sun Nov 26 00:00:00 2023
+	- made changing to remoteDirs configurable for hosts where direct changing is not possible with setting noDirectRemoteDirChange to 1, allow adding additional Net::SFTP::Foreign params to EAI::FTP::putFile using additionalParams, added possibility to put multiple localFiles with EAI::FTP::putFile, generalized getSensInfo into getKeyInfo, allowing also prefixed (environment respecting) key information from DB, FTP, etc. subhashes, currently used for getting $DB{DSN} and $FTP{remoteHost}, improved argument checking and logging in sendGeneralMail

@@ -1,5 +1,4 @@
 
-# $Id: httpd.conf.src 1571436 2014-02-24 20:55:11Z richter $
 
 print OFH <<EOD ;
 #
@@ -13,23 +12,6 @@ ServerName localhost
 DocumentRoot \"$EPPATH/test\"
 Listen $EPPORT
 EOD
-
-if ($^O ne 'MSWin32')
-	{
-print OFH <<EOD ;
-
-User $EPUSER
-Group $EPGROUP
-
-MinSpareServers 1
-MaxSpareServers 30
-StartServers 3
-MaxClients 10
-MaxRequestsPerChild 0
-
-
-EOD
-    }
 
 #print OFH "Listen ", $EPPORT , "\n" ;
 print OFH "Listen ", $EPPORT + 3, "\n" ;
@@ -55,6 +37,23 @@ print OFH "$EPMODPERL\n" ;
 ##print OFH "PerlModule Apache2\n" ;
 
 print OFH "LoadModule embperl_module \"$EPPATH/blib/arch/auto/Embperl/Embperl.so\"\n" if ($MP2) ;
+
+if ($^O ne 'MSWin32')
+        {
+print OFH <<EOD ;
+
+User $EPUSER
+Group $EPGROUP
+
+MinSpareServers 1
+MaxSpareServers 30
+StartServers 3
+MaxClients 10
+MaxRequestsPerChild 0
+
+
+EOD
+    }
 
 ##print OFH "PassEnv ACTION_PREFIX\n" ;
 print OFH "PerlPassEnv TEST_PRELOAD\n" ;
@@ -425,7 +424,7 @@ SetHandler perl-script
 PerlHandler Embperl
 Options ExecCGI
 EMBPERL_APPNAME MailApp
-EMBPERL_MAILHOST mail.i.ecos.de
+EMBPERL_MAILHOST mail.example.org
 EMBPERL_MAIL_ERRORS_TO richter
 EMBPERL_MAIL_ERRORS_LIMIT 2
 EMBPERL_MAIL_ERRORS_RESET_TIME 20
@@ -692,6 +691,8 @@ SetHandler server-info
 Alias /eg/web/de/ \"$EPPATH/eg/web/\"
 Alias /eg/web/en/ \"$EPPATH/eg/web/\"
 
+Alias /eg/web/images/ \"$EPPATH/eg/images/\"
+
 # path for examples
 Alias /eg/ \"$EPPATH/eg/\"
 
@@ -728,6 +729,10 @@ EMBPERL_URIMATCH \"\\.htm.?\$|\\.epl\$|\\.xml\$|\\.pod\$|/$\"
 SetHandler perl-script
 PerlHandler Embperl::Object 
 Options ExecCGI
+</Location>
+
+<Location /eg/web/images>
+SetHandler none
 </Location>
 
 <Location /eg/web/conf>

@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "\N{U+063a}.\N{U+0645}.",
-    "\N{U+063a}.\N{U+0648}.",
+    "AM",
+    "PM",
   ],
   available_formats => {
     Bh => "h B",
@@ -56,7 +56,7 @@
   },
   code => "ps-AF",
   date_format_full => "EEEE \N{U+062f} y \N{U+062f} MMMM d",
-  date_format_long => "\N{U+062f} y \N{U+062f} MMMM d",
+  date_format_long => "y MMMM d",
   date_format_medium => "y MMM d",
   date_format_short => "y/M/d",
   datetime_format_full => "{1} {0}",
@@ -269,5 +269,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

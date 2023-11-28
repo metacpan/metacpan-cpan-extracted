@@ -4,9 +4,9 @@ my $void = <<'SKIP';
 /*
 ----------------------------------------------------------------------
 
-    ppport.h -- Perl/Pollution/Portability Version 3.68
+    ppport.h -- Perl/Pollution/Portability Version 3.71
 
-    Automatically created by Devel::PPPort running under perl 5.034000.
+    Automatically created by Devel::PPPort running under perl 5.038000.
 
     Version 3.x, Copyright (c) 2004-2013, Marcus Holland-Moritz.
 
@@ -23,8 +23,8 @@ SKIP
 if (@ARGV && $ARGV[0] eq '--unstrip') {
   eval { require Devel::PPPort };
   $@ and die "Cannot require Devel::PPPort, please install.\n";
-  if (eval $Devel::PPPort::VERSION < 3.68) {
-    die "./ppport.h was originally generated with Devel::PPPort 3.68.\n"
+  if (eval $Devel::PPPort::VERSION < 3.71) {
+    die "./ppport.h was originally generated with Devel::PPPort 3.71.\n"
       . "Your Devel::PPPort is only version $Devel::PPPort::VERSION.\n"
       . "Please install a newer version, or --unstrip will not work.\n";
   }
@@ -1022,17 +1022,12 @@ typedef NVTYPE NV;
 #endif
 #undef STMT_START
 #undef STMT_END
-#if defined(VOIDFLAGS) && defined(PERL_USE_GCC_BRACE_GROUPS)
-#define STMT_START (void)(
-#define STMT_END )
-#else
 #if defined(VOIDFLAGS) && (VOIDFLAGS) && (defined(sun) || defined(__sun__)) && !defined(__GNUC__)
 #define STMT_START if (1)
 #define STMT_END else (void)0
 #else
 #define STMT_START do
 #define STMT_END while (0)
-#endif
 #endif
 #ifndef boolSV
 #define boolSV(b) ((b) ? &PL_sv_yes : &PL_sv_no)
@@ -2799,17 +2794,18 @@ SvFLAGS(_errsv) = (SvFLAGS(_errsv) & ~SVf_UTF8) | \
 #else
 #define D_PPP_FIX_UTF8_ERRSV_FOR_SV(sv) STMT_START {} STMT_END
 #endif
-#define croak_sv(sv) \
-STMT_START { \
-SV *_sv = (sv); \
-if (SvROK(_sv)) { \
-sv_setsv(ERRSV, _sv); \
-croak(NULL); \
-} else { \
-D_PPP_FIX_UTF8_ERRSV_FOR_SV(_sv); \
-croak("%" SVf, SVfARG(_sv)); \
-} \
-} STMT_END
+PERL_STATIC_INLINE void D_PPP_croak_sv(SV *sv) {
+dTHX;
+SV *_sv = (sv);
+if (SvROK(_sv)) {
+sv_setsv(ERRSV, _sv);
+croak(NULL);
+} else {
+D_PPP_FIX_UTF8_ERRSV_FOR_SV(_sv);
+croak("%" SVf, SVfARG(_sv));
+}
+}
+#define croak_sv(sv) D_PPP_croak_sv(sv)
 #elif (PERL_BCDVERSION >= 0x5004000)
 #define croak_sv(sv) croak("%" SVf, SVfARG(sv))
 #else
@@ -3862,10 +3858,10 @@ return NULL;
 #endif
 #if !defined(sv_unmagicext)
 #if defined(NEED_sv_unmagicext)
-static int DPPP_(my_sv_unmagicext)(pTHX_ SV * const sv, const int type, MGVTBL * vtbl);
+static int DPPP_(my_sv_unmagicext)(pTHX_ SV * const sv, const int type, const MGVTBL * vtbl);
 static
 #else
-extern int DPPP_(my_sv_unmagicext)(pTHX_ SV * const sv, const int type, MGVTBL * vtbl);
+extern int DPPP_(my_sv_unmagicext)(pTHX_ SV * const sv, const int type, const MGVTBL * vtbl);
 #endif
 #if defined(NEED_sv_unmagicext) || defined(NEED_sv_unmagicext_GLOBAL)
 #ifdef sv_unmagicext
@@ -3874,7 +3870,7 @@ extern int DPPP_(my_sv_unmagicext)(pTHX_ SV * const sv, const int type, MGVTBL *
 #define sv_unmagicext(a,b,c) DPPP_(my_sv_unmagicext)(aTHX_ a,b,c)
 #define Perl_sv_unmagicext DPPP_(my_sv_unmagicext)
 int
-DPPP_(my_sv_unmagicext)(pTHX_ SV *const sv, const int type, MGVTBL *vtbl)
+DPPP_(my_sv_unmagicext)(pTHX_ SV *const sv, const int type, const MGVTBL *vtbl)
 {
 MAGIC* mg;
 MAGIC** mgp;

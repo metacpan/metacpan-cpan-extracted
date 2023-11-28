@@ -4,7 +4,7 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 # import params is just one 'no-unicode-escape-permanently'
 # if set, then unicode escaping will not happen at
@@ -207,8 +207,15 @@ sub	yaml2perl {
 	# intercepting a die by wrapping in an eval
 	# Untainting YAML::PP string input because of a bug that causes it to bomb
 	# see https://perlmonks.org/?node_id=11154911
-	# untaint recipe by ysth, see https://www.perlmonks.org/?node_id=516862
-	($yaml_string) = each %{{$yaml_string,0}};
+	# untaint recipe by ysth, see
+	#    https://www.perlmonks.org/?node_id=516862
+	# but it  gives a warning:
+	#    each on anonymous hash will always start from the beginning
+	#($yaml_string) = each %{{$yaml_string,0}};
+	# and so we do this instead
+	# Also, there is a test which check yaml with tainted input (string)
+	#    t/14-yaml-tainted-input.t
+	($yaml_string) = keys %{{$yaml_string,0}};
 	my $pv = eval { YAML::PP::Load($yaml_string) };
 	if( $@ || ! defined($pv) ){ warn "yaml2perl() : error, call to YAML::PP::Load() has failed".(defined($@)?" with this exception:\n".$@:"")."."; return undef }
 	return $pv
@@ -634,7 +641,7 @@ Data::Roundtrip - convert between Perl data structures, YAML and JSON with unico
 
 =head1 VERSION
 
-Version 0.24
+Version 0.25
 
 =head1 SYNOPSIS
 
@@ -1541,7 +1548,9 @@ L<Data::Dumper>'s incessant unicode escaping)
 
 =item L<leszekdubiel|https://perlmonks.org/?node_id=1164259>
 
-=item L<marto|https://perlmonks.org/?node_id=https://perlmonks.org/?node_id=324763>
+=item L<marto|https://perlmonks.org/?node_id=324763>
+
+=item L<Haarg|https://perlmonks.org/?node_id=306692>
 
 =item and an anonymous monk
 

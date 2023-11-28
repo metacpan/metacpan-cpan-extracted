@@ -12,7 +12,7 @@ use Text::UnicodeBox::Control qw(:all);
 # Constants.
 Readonly::Scalar our $SPACE => q{ };
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 # Get output.
 sub get {
@@ -151,15 +151,16 @@ Unicode::Block::Ascii - Ascii output of unicode block.
 =head1 SYNOPSIS
 
  use Unicode::Block::Ascii;
+
  my $obj = Unicode::Block::Ascii->new(%parameters);
  my $output = $obj->get;
  my $item = $obj->next;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Unicode::Block::Ascii->new(%parameters);
 
 Constructor.
 
@@ -167,33 +168,42 @@ Constructor.
 
 =item * C<char_from>
 
- Character from.
- Default value is '0000'.
+Character from.
+
+Default value is '0000'.
 
 =item * C<char_to>
 
- Character to.
- Default value is '007f'.
+Character to.
+
+Default value is '007f'.
 
 =item * C<title>
 
- Title of block.
- Default value is undef.
+Title of block.
+
+Default value is undef.
 
 =back
 
-=item C<get()>
+Returns instance of object.
 
- Get output.
- Return string with ascii table of Unicode::Block object.
+=head2 C<get>
 
-=item C<next()>
+ my $output = $obj->get;
 
- Get next character.
- Returns Unicode::Block::Item object for character, if character exists.
- Returns undef, if character doesn't exist.
+Get output.
 
-=back
+Return string with ascii table of Unicode::Block object.
+
+=head2 C<next>
+
+ my $item = $obj->next;
+
+Get next character.
+
+Returns Unicode::Block::Item object for character, if character exists.
+Returns undef, if character doesn't exist.
 
 =head1 ERRORS
 
@@ -205,6 +215,8 @@ Constructor.
          Long title.
 
 =head1 EXAMPLE1
+
+=for comment filename=print_unicode_block.pl
 
  use strict;
  use warnings;
@@ -247,6 +259,8 @@ Constructor.
  # └────────┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘
 
 =head1 EXAMPLE2
+
+=for comment filename=print_unicode_block_in_curses_ui.pl
 
  use strict;
  use warnings;
@@ -315,7 +329,7 @@ L<Unicode::Block>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Unicode-Block-Ascii>
+L<https://github.com/michal-josef-spacek/Unicode-Block-Ascii>
 
 =head1 AUTHOR
 
@@ -325,11 +339,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

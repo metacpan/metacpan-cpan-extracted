@@ -95,6 +95,61 @@ my @METHODS = qw(
 
 run_test(@$_) for @DATA;
 
+# mock some compiler output
+my $old_capture = \&ExtUtils::CppGuess::_capture;
+our $CAPTURES;
+{
+  no warnings "redefine";
+  *ExtUtils::CppGuess::_capture =
+    sub {
+      my @cmd = @_;
+      if (my $result = $CAPTURES->{"@cmd"}) {
+        note "Mocking output of @cmd: $result";
+        return $result;
+      }
+      goto &$old_capture;
+    };
+}
+my @CAPS =
+    (
+     [
+       { cc => "cc", config => { ccflags => '' } },
+       {
+         is_sunstudio => 0,
+         is_msvc => undef, is_gcc => undef, is_clang => 1,
+         compiler_command => 'clang++ -xc++ -Wno-reserved-user-defined-literal',
+         linker_flags => '-lstdc++',
+       },
+       { "cc --version" => "OpenBSD clang version 10.0.1" },
+     ],
+     [
+       { cc => "clang-15", config => { ccflags => '' } },
+       {
+         is_sunstudio => 0,
+         is_msvc => undef, is_gcc => undef, is_clang => 1,
+         compiler_command => 'clang++ -xc++ -Wno-reserved-user-defined-literal',
+         linker_flags => '-lstdc++',
+       },
+       { "clang-15 --version" => "Debian clang version 15.0.7" },
+     ],
+     [
+       { cc => "cc", config => { ccflags => '' } },
+       {
+         is_sunstudio => 0,
+         is_msvc => undef, is_gcc => 1, is_clang => 0,
+         compiler_command => 'g++ -xc++',
+         linker_flags => '-lstdc++',
+       },
+       { "cc --version" => "cc (Debian 12.2.0-14) 12.2.0" },
+     ],
+    );
+
+for my $test (@CAPS) {
+    my ($args, $expect, $cap) = @$test;
+    local $CAPTURES = $cap;
+    run_test($args, $expect);
+}
+
 done_testing;
 
 sub run_test {

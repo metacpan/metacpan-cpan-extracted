@@ -72,6 +72,22 @@ CONSTRUCTORS
     in the xterm 256 colour palette. The monospace Formatting attribute is
     rendered by selecting the first alternate font using altfont.
 
+ parse_terminal
+
+       $st = String::Tagged::Terminal->parse_terminal( $str );
+
+    Since version 0.07.
+
+    Returns a new instance by parsing a string containing SGR terminal
+    escape sequences mixed with plain string content.
+
+    The parser will only accept 7- or 8-bit encodings of the SGR escape
+    sequence (\e[ ... m or \x9b[ ... m). If any other escape sequences are
+    present, an exception is thrown.
+
+    Conversely, unrecognised formatting codes in SGR sequences are simply
+    ignored without warning.
+
 METHODS
 
     The following methods are provided in addition to those provided by
@@ -79,7 +95,7 @@ METHODS
 
  build_terminal
 
-       $str = $st->build_terminal( %opts )
+       $str = $st->build_terminal( %opts );
 
     Returns a string containing terminal escape sequences mixed with string
     content to render the string to a terminal.
@@ -98,14 +114,14 @@ METHODS
 
  as_formatting
 
-       $fmt = $st->as_formatting
+       $fmt = $st->as_formatting;
 
     Returns a new String::Tagged instance tagged with
     String::Tagged::Formatting standard tags.
 
  print_to_terminal
 
-       $str->print_to_terminal( $fh )
+       $str->print_to_terminal( $fh );
 
     Since version 0.03.
 
@@ -119,7 +135,7 @@ METHODS
 
  say_to_terminal
 
-       $str->say_to_terminal( $fh )
+       $str->say_to_terminal( $fh );
 
     Since version 0.03.
 
@@ -143,11 +159,6 @@ COMPATIBILITY NOTES
       any Windows version.
 
       * On Windows, only a single output console is supported.
-
-TODO
-
-      * Consider a ->parse_terminal constructor method, which would attempt
-      to parse SGR sequences from a given source string.
 
 AUTHOR
 

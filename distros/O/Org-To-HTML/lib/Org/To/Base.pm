@@ -6,12 +6,11 @@ use Log::ger;
 
 use List::Util qw(first);
 use Moo;
-use experimental 'smartmatch';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-12'; # DATE
+our $DATE = '2023-11-06'; # DATE
 our $DIST = 'Org-To-HTML'; # DIST
-our $VERSION = '0.235'; # VERSION
+our $VERSION = '0.236'; # VERSION
 
 has source_file => (is => 'rw'); # for informational purposes
 has include_tags => (is => 'rw');
@@ -23,7 +22,7 @@ sub _included_children {
     my @htags = $elem->get_tags;
     my @children = @{$elem->children // []};
     if ($self->include_tags) {
-        if (!defined(first {$_ ~~ @htags} @{$self->include_tags})) {
+        if (!defined(first {my $tag=$_; grep {$_ eq $tag} @htags} @{$self->include_tags})) {
             # headline doesn't contain include_tags, select only
             # suheadlines that contain them
             @children = ();
@@ -35,7 +34,7 @@ sub _included_children {
                         return unless
                             $elem->isa('Org::Element::Headline');
                         my @t = $elem->get_tags;
-                        return defined(first {$_ ~~ @t}
+                        return defined(first {my $tag=$_; grep {$_ eq $tag} @t}
                                            @{$self->include_tags});
                     });
                 next unless @hl_included;
@@ -45,7 +44,7 @@ sub _included_children {
         }
     }
     if ($self->exclude_tags) {
-        return () if defined(first {$_ ~~ @htags}
+        return () if defined(first {my $tag=$_; grep {$_ eq $tag} @htags}
                                  @{$self->exclude_tags});
     }
     @children;
@@ -59,7 +58,7 @@ sub export {
         my $doc_has_include_tags;
         for my $h ($doc->find('Org::Element::Headline')) {
             my @htags = $h->get_tags;
-            if (defined(first {$_ ~~ @htags} @$inct)) {
+            if (defined(first {my $tag=$_; grep {$_ eq $tag} @htags} @$inct)) {
                 $doc_has_include_tags++;
                 last;
             }
@@ -162,7 +161,7 @@ Org::To::Base - Base class for Org exporters
 
 =head1 VERSION
 
-This document describes version 0.235 of Org::To::Base (from Perl distribution Org-To-HTML), released on 2022-02-12.
+This document describes version 0.236 of Org::To::Base (from Perl distribution Org-To-HTML), released on 2023-11-06.
 
 =head1 SYNOPSIS
 
@@ -257,13 +256,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2020, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

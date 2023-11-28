@@ -1,5 +1,9 @@
 Revision history for Perl extension Aion::Str::Util
 
+0.0.3 2023-11-15T10:27:21Z
+
+    - add subroutines to_str and from_str
+
 0.0.2 2023-10-30T16:33:36Z
 
     - add dependence List::Util

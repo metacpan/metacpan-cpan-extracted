@@ -8,7 +8,7 @@ if(not $ENV{AUTHOR_TESTING}) {
 	plan(skip_all => 'Author tests not required for installation');
 }
 
-eval "use Test::Pod::No404s";
+eval 'use Test::Pod::No404s';
 if($@) {
 	plan(skip_all => 'Test::Pod::No404s required for testing POD');
 } else {

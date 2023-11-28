@@ -11,8 +11,8 @@ Content-Disposition Content-Type
 Content-Type:	test/plain<br>
 ^CGI-Version
 ^cgiok           
-filehandle:     Fh
-Info:		Content-Disposition = form-data; name=&quot;upload&quot;; filename=&quot;12upload-filename&quot;
+^filehandle:     (Fh|CGI::File::Temp)
+^Info:		
 Content-Type = test/plain
 no:   1
 size: 2048

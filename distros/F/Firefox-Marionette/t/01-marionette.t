@@ -1623,8 +1623,13 @@ SKIP: {
 		foreach my $name ($firefox->cache_keys()) {
 			no strict;
 			TODO: {
-				local $TODO = ($major_version < 113 && $name !~ /(^CLEAR_COOKIES|CLEAR_NETWORK_CACHE|CLEAR_IMAGE_CACHE)$/smx) ? "Older firefox can have different values for Firefox::Marionette::Cache constants" : q[];
-				ok($firefox->check_cache_key($name) eq &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which is " . &$name());
+				local $TODO = ($major_version < 113 && $name !~ /^(CLEAR_COOKIES|CLEAR_NETWORK_CACHE|CLEAR_IMAGE_CACHE)$/smx) ? "Older firefox (less than 113) can have different values for Firefox::Marionette::Cache constants" : q[];
+				my $result = $firefox->check_cache_key($name);
+				if (($name eq 'CLEAR_FORGET_ABOUT_SITE') && ($major_version < 121)) {
+					ok($result <= &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should less than or equal to $result and is " . &$name());
+				} else {
+					ok($result == &$name(), "\$firefox->check_cache_key($name) eq Firefox::Marionette::Cache::${name} which should be $result and is " . &$name());
+				}
 			}
 			use strict;
 		}
@@ -2667,6 +2672,10 @@ SKIP: {
 		if (out_of_time()) {
 			skip("Running out of time.  Trying to shutdown tests as fast as possible", 246);
 		}
+		if ($major_version >= 121) {
+			my @frames = sort @{$firefox->script("return [ window.frames[0], window.frames[1] ];")};
+			ok($frames[0]->isa('Firefox::Marionette::WebFrame') && $frames[1]->isa('Firefox::Marionette::WebFrame') && (scalar @frames == 2), "An array from javascript of frames returns WebFrame objects");
+		}
 		my $first_window_handle = $firefox->window_handle();
 		if ($major_version < 90) {
 			ok($first_window_handle =~ /^\d+$/, "\$firefox->window_handle() is an integer:" . $first_window_handle);
@@ -2718,7 +2727,7 @@ SKIP: {
 			if ($major_version < 90) {
 				ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
 			} else {
-				ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
+				ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of GUIDs:" . $handle);
 			}
 		}
 		ok(not($firefox->script('window.open("https://duckduckgo.com", "_blank");')), "Opening new window to duckduckgo.com via 'window.open' script");
@@ -2734,7 +2743,7 @@ SKIP: {
 				if ($major_version < 90) {
 					ok($handle =~ /^\d+$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
 				} else {
-					ok($handle =~ /^$guid_regex$/, "\$firefox->chrome_window_handles() returns a list of integers:" . $handle);
+					ok($handle =~ /^$guid_regex$/, "\$firefox->chrome_window_handles() returns a list of GUIDs:" . $handle);
 				}
 				if ($handle ne $original_chrome_window_handle) {
 					$new_chrome_window_handle = $handle;
@@ -2747,7 +2756,7 @@ SKIP: {
 			if ($major_version < 90) {
 				ok($handle =~ /^\d+$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
 			} else {
-				ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of integers:" . $handle);
+				ok($handle =~ /^$guid_regex$/, "\$firefox->window_handles() returns a list of GUIDs:" . $handle);
 			}
 			if ($handle ne $original_window_handle) {
 				$new_window_handle = $handle;
@@ -2796,6 +2805,13 @@ SKIP: {
 				skip("switch_to_frame is not supported for $major_version.$minor_version.$patch_version", 1);
 			}
 			ok($switch_to_frame, "Switched to $frame_element frame");
+			if ($major_version >= 121) {
+				my $script_window = $firefox->script("return window");
+				my $initial_url = $firefox->script("return window.location.href");
+				ok($script_window->isa('Firefox::Marionette::WebFrame'), "\$firefox->script(\"return window\") returns a Firefox::Marionette::Frame object");
+				my $argument_url = $firefox->script("return arguments[0].location.href", args => [ $script_window ]);
+				ok($argument_url eq $initial_url, "window object can be used as an in and out parameter for javascript calls:$argument_url:$initial_url");
+			}
 		}
 		SKIP: {
 			my $active_frame;
@@ -4303,6 +4319,13 @@ SKIP: {
 		my $new_window = $firefox->new_window();
 		ok(check_for_window($firefox, $new_window), "\$firefox->new_window() has created a new tab");
 		ok($firefox->switch_to_window($new_window), "\$firefox->switch_to_window(\$new_window) has switched focus to new tab");
+		if ($major_version >= 121) {
+			my $initial_url = $firefox->script("return window.location.href");
+			my $script_window = $firefox->script("return window");
+			ok($script_window eq $new_window, "\$firefox->script(\"return window\") matches \$firefox->new_window() output");
+			my $argument_url = $firefox->script("return arguments[0].location.href", args => [ $script_window ]);
+			ok($argument_url eq $initial_url, "window object can be used as an in and out parameter for javascript calls:$argument_url:$initial_url");
+		}
 		ok($firefox->close_current_window_handle(), "Closed new tab");
 		ok(!check_for_window($firefox, $new_window), "\$firefox->new_window() has closed ");
 		ok($firefox->switch_to_window($old_window), "\$firefox->switch_to_window(\$old_window) has switched focus to original window");

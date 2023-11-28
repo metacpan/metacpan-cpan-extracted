@@ -1,15 +1,18 @@
 package List::Rank;
 
-our $DATE = '2018-01-26'; # DATE
-our $VERSION = '0.002'; # VERSION
-
 use strict;
 use warnings;
 
 use Exporter qw(import);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-23'; # DATE
+our $DIST = 'List-Rank'; # DIST
+our $VERSION = '0.004'; # VERSION
+
 our @EXPORT_OK = qw(rank rankstr rankby sortrank sortrankstr sortrankby);
 
-sub rank(@) {
+sub rank(@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
     my @ary;
     my $i = 0;
     for (@_) { push @ary, [$_, $i++, undef] }
@@ -30,7 +33,7 @@ sub rank(@) {
     map { $_->[2] } sort { $a->[1] <=> $b->[1] } @ary;
 }
 
-sub rankstr(@) {
+sub rankstr(@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
     my @ary;
     my $i = 0;
     for (@_) { push @ary, [$_, $i++, undef] }
@@ -51,8 +54,8 @@ sub rankstr(@) {
     map { $_->[2] } sort { $a->[1] <=> $b->[1] } @ary;
 }
 
-sub rankby(&;@) {
-    no strict 'refs';
+sub rankby(&;@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my $cmp = shift;
 
@@ -86,7 +89,7 @@ sub rankby(&;@) {
     map { $_->[2] } sort { $a->[1] <=> $b->[1] } @ary;
 }
 
-sub sortrank(@) {
+sub sortrank(@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
     my @ary;
     my $i = 0;
     for (@_) { push @ary, [$_, $i++, undef] }
@@ -107,7 +110,7 @@ sub sortrank(@) {
     map { ($_->[0], $_->[2]) } @ary;
 }
 
-sub sortrankstr(@) {
+sub sortrankstr(@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
     my @ary;
     my $i = 0;
     for (@_) { push @ary, [$_, $i++, undef] }
@@ -128,8 +131,8 @@ sub sortrankstr(@) {
     map { ($_->[0], $_->[2]) } @ary;
 }
 
-sub sortrankby(&;@) {
-    no strict 'refs';
+sub sortrankby(&;@) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my $cmp = shift;
 
@@ -178,7 +181,7 @@ List::Rank - Ranking of list elements
 
 =head1 VERSION
 
-This document describes version 0.002 of List::Rank (from Perl distribution List-Rank), released on 2018-01-26.
+This document describes version 0.004 of List::Rank (from Perl distribution List-Rank), released on 2023-11-23.
 
 =head1 SYNOPSIS
 
@@ -196,9 +199,21 @@ Return the ranks of the elements if sorted by a custom sorter:
  my @ranks = rankby {length($a) <=> length($b)}
      "apricot", "cucumber", "banana", "banana"; # => 3, 4, "1=", "1="
 
+Return the ranks of records (taken from L<Sort::Rank>'s Synopsis):
+
+ my @ranks = rankby {$b->{score} <=> $a->{score}} (
+     {   score   => 80,  name    => 'Andy'       },
+     {   score   => 70,  name    => 'Chrissie'   },
+     {   score   => 90,  name    => 'Alex'       },
+     {   score   => 90,  name    => 'Rosie'      },
+     {   score   => 80,  name    => 'Therese'    },
+     {   score   => 10,  name    => 'Mac'        },
+     {   score   => 10,  name    => 'Horton'     },
+ ); # => ("3=", 5, "1=", "1=", "3=", "6=", "6=")
+
 Sort the list numerically and return the elements as well as ranks in pairs:
 
- my @res = sortrank 10, 30, 20, 20; => 10,1, 20,"2=", 20,"2=", 30,4
+ my @res = sortrank 10, 30, 20, 20; # => 10,1, 20,"2=", 20,"2=", 30,4
 
 Sort the list ascibetically and return the elements as well as ranks in pairs:
 
@@ -208,7 +223,7 @@ Sort the list ascibetically and return the elements as well as ranks in pairs:
 Sort the list by a custom sorter and return the elements as well as ranks in
 pairs:
 
- my @res = sortrankby "apple", "cucumber", "banana", "banana";
+ my @res = sortrankby {length($a) <=> length($b)} "apricot", "cucumber", "banana", "banana";
      # => "banana","1=", "banana","1=", "apricot",3, "cucumber",4
 
 =head1 FUNCTIONS
@@ -233,6 +248,42 @@ Please visit the project's homepage at L<https://metacpan.org/release/List-Rank>
 
 Source repository is at L<https://github.com/perlancar/perl-List-Rank>.
 
+=head1 SEE ALSO
+
+L<Sort::Rank> also accomplishes the same thing, but by default it expects an
+arrayref *of hashrefs* with key C<score> in each hashref. To process a list of
+scalars, you need to supply a coderef to supply the scores. Another thing is,
+the module does not provide a way to sort by a custom order.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=List-Rank>
@@ -240,20 +291,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<Sort::Rank>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

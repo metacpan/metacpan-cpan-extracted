@@ -810,7 +810,9 @@ static void setup_parse_field(pTHX_ bool is_block)
   CV *was_compcv = PL_compcv;
   HV *hints = GvHV(PL_hintgv);
 
-  resume_compcv_and_save(&compclassmeta->initfields_compcv);
+  ClassMeta *classmeta = compclassmeta;
+
+  resume_compcv_and_save(&classmeta->initfields_compcv);
 
   /* Set up this new block as if the current compiler context were its scope */
 
@@ -829,6 +831,13 @@ static void setup_parse_field(pTHX_ bool is_block)
 
     SAVEI8(PadnamePV(pn_self)[1]);
     PadnamePV(pn_self)[1] = '\0';
+  }
+
+  FIELDOFFSET next_fieldix = classmeta->next_fieldix;
+  if(classmeta->next_fieldix_for_initfields < next_fieldix) {
+    add_fields_to_pad(classmeta, classmeta->next_fieldix_for_initfields);;
+    intro_my();
+    classmeta->next_fieldix_for_initfields = next_fieldix;
   }
 }
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ksf - Package for language Bafia
 
 package Locale::CLDR::Locales::Ksf;
 # This file auto generated from Data\common\main\ksf.xml
-#	on Fri 13 Oct  9:24:50 am GMT
+#	on Sat  4 Nov  6:11:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

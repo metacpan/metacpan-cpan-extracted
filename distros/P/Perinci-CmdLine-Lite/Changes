@@ -1,3 +1,16 @@
+1.929   2023-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Resolve argument schemas so we can find default even if
+          it's specified in base schemas.
+
+        - [plugin Debug::Dump*] Add configuration 'dumper' to select
+          dumper.
+
+        - Force latest version of Perinci::Examples.
+
+        - Pass in_completion argument to 'subcommands' code argument.
+
+
 1.928   2022-11-24  Released-By: PERLANCAR; Urgency: medium
 
         - Display error result to STDERR instead of STDOUT.

@@ -1,4 +1,4 @@
-package EAI::File 1.5;
+package EAI::File 1.902;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -17,10 +17,13 @@ sub getcommon ($) {
 	my $skip = $File->{format_skip} if $File->{format_skip};
 	my $sep = $File->{format_sep} if $File->{format_sep};
 	$sep = $File->{format_defaultsep} if !$sep; # use default if not given
-	$sep = "\t" if !$sep; # use tab also no default
-	my @header = split $sep, $File->{format_header} if $File->{format_header};
-	my @targetheader = split $sep, $File->{format_targetheader} if $File->{format_targetheader};
-	get_logger()->debug("\$lineProcessing:$lineProcessing\n\$fieldProcessing:$fieldProcessing\n\$firstLineProc:$firstLineProc\n\$thousandsep:$thousandsep\n\$decimalsep:$decimalsep");
+	$sep = "\t" if !$sep; # use tab if also no default was given
+	# for fixed format, headers are parsed using tab
+	my @header = split(($sep =~ /^fix/ ? "\t" : $sep), $File->{format_header}) if $File->{format_header};
+	my @targetheader = split(($sep =~ /^fix/ ? "\t" : $sep), $File->{format_targetheader}) if $File->{format_targetheader};
+	$Data::Dumper::Terse = 1;
+	get_logger()->debug("\$skip:$skip\n\$sep:".Data::Dumper::qquote($sep)."\n\@header:@header\n\@targetheader:@targetheader\n\$lineProcessing:$lineProcessing\n\$fieldProcessing:$fieldProcessing\n\$firstLineProc:$firstLineProc\n\$thousandsep:$thousandsep\n\$decimalsep:$decimalsep");
+	$Data::Dumper::Terse = 0;
 	return ($lineProcessing,$fieldProcessing,$firstLineProc,$thousandsep,$decimalsep,$sep,$skip,\@header,\@targetheader);
 }
 
@@ -37,22 +40,26 @@ sub readText ($$$;$) {
 	my ($lineProcessing,$fieldProcessing,$firstLineProc,$thousandsep,$decimalsep,$sep,$skip,$header,$targetheader) = getcommon($File);
 	my @header = @$header; my @targetheader = @$targetheader;
 	my ($poslen, $isFixLen); 
-	my $origsep = $sep;
 	if ($sep =~ /^fix/) {
-		# positions/length definitions from poslen definition: e.g. "format_poslen => [(0,3),(3,3)]"
-		$poslen =  $File->{format_poslen};
-		$sep = ";";
+		# positions/length definitions from poslen definition: e.g. "format_poslen => [[0,3],[3,3]]"
+		$poslen = $File->{format_poslen};
+		if (!$poslen) {
+			$logger->error("no format_poslen array given for parsing fix length format");
+			return 0;
+		}
 		$isFixLen = 1;
 	} else {
 		if (!$sep) {
 			$logger->error("no separator set in ".Dumper($File));
 			return 0;
 		}
+		if ($File->{format_quotedcsv} and ref($sep) eq "Regexp") {
+			$logger->error("no regex separator allowed with format_quotedcsv");
+			return 0;
+		}
+		$logger->warn("string separator assumed to be a regular expression for splitting textfile without format_quotedcsv, this may produce unexpected results") if (!$File->{format_quotedcsv} and !$File->{format_autoheader} and !(ref($sep) eq "Regexp"));
 	}
 	my $autoheader = $File->{format_autoheader} if $File->{format_autoheader};
-	$Data::Dumper::Terse = 1;
-	$logger->debug("skip:$skip,sep:".Data::Dumper::qquote($origsep).",header:@header\ntargetheader:@targetheader");
-	$Data::Dumper::Terse = 0;
 	@targetheader = @header if !@targetheader; # if no specific targetheader defined use header instead
 	# read all files with same format
 	for my $filename (@filenames) {
@@ -85,8 +92,7 @@ sub readText ($$$;$) {
 			# change record separator (standard CRLF), if needed
 			local $/ = $newRecSep if $newRecSep;
 			my @layers = PerlIO::get_layers(FILE);
-			$logger->info("layers: @layers");
-			$logger->debug("starting reading file $redoSubDir$filename ... ");
+			$logger->info("reading file $redoSubDir$filename, layers: @layers");
 			if ($firstLineProc) {
 				$_ = <FILE>;
 				eval $firstLineProc;
@@ -126,7 +132,7 @@ LINE:
 				@previousline = @line;
 				if ($isFixLen) {
 					@line = undef;
-					for (my $i=0;$i<@header;$i++) {
+					for (my $i=0;$i < scalar @header; $i++) {
 						$line[$i] = substr ($_, $poslen->[$i][0],$poslen->[$i][1]-$poslen->[$i][0]);
 					}
 				} else {
@@ -464,25 +470,23 @@ sub readXML ($$$;$) {
 	return 1;
 }
 
-# if field is being replaced by a different name from targetheader, the data with the original name is placed in %templine (for further actions in $lineProcessing)
-# the final value is put in $line{$targetheader}.
-# there is also data from the previous line (%previousline) and the previous temp line (%previoustempline).
-#our (%line,%templine);
-#our $skipLineAssignment
+# to be able to access these variables in fieldCode and/or lineCode anonymous subs, they have to be package global. Access in anon sub is then done with %EAI::File::line, @EAI::File::header or $EAI::File::i (this column loop var is only meaningful in fieldCode)
+our (%line,%templine,$i,@line,@header,@targetheader,$skipLineAssignment,$lineno,$rawline);
 
 # read row into final line hash (including special "hook" code)
 sub readRow ($$$$$$$$$$) {
-	my ($data,$line,$header,$targetheader,$rawline,$lineProcessing,$fieldProcessing,$thousandsep,$decimalsep,$lineno) = @_;
-	my @line = @$line;
-	my @header = @$header;
-	my @targetheader = @$targetheader;
+	my ($data,$line,$header,$targetheader,$lineProcessing,$fieldProcessing,$thousandsep,$decimalsep);
+	($data,$line,$header,$targetheader,$rawline,$lineProcessing,$fieldProcessing,$thousandsep,$decimalsep,$lineno) = @_;
+	@line = @$line;
+	@header = @$header;
+	@targetheader = @$targetheader;
 	my $logger = get_logger();
-	my $skipLineAssignment = 0; # can be set in fieldCode, to avoid further assignment to data.
-	my (%line,%templine);
+	$skipLineAssignment = 0; # can be set in fieldCode, to avoid further assignment to data.
+	%line=(); %templine=();
 
 	$logger->trace("line:@{$line},header:@{$header},targetheader:@{$targetheader},rawline:$rawline,lineProcessing:$lineProcessing,thousandsep:$thousandsep,decimalsep:$decimalsep,lineno:$lineno") if $logger->is_trace;
 	# iterate through fields of current row
-	for (my $i = 0; $i < @line; $i++) {
+	for ($i = 0; $i < @line; $i++) {
 		# first trim leading and trailing spaces
 		$line[$i] =~ s/^ *//;
 		$line[$i] =~ s/ *$//;
@@ -502,56 +506,45 @@ sub readRow ($$$$$$$$$$) {
 		}
 		# field specific processing set, augments processing for a single specific field specified by targetheader...
 		if ($fieldProcessing->{$targetheader[$i]}) {
-			$logger->trace('BEFORE: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
-			evalCustomCode($fieldProcessing->{$targetheader[$i]},$data,$line,\%line,\%templine,$header,$targetheader,$rawline,$thousandsep,$decimalsep,$lineno,$i);
-			$logger->trace('AFTER: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.",\$skipLineAssignment: $skipLineAssignment, line: $lineno") if $logger->is_trace;
+			$logger->trace('specific fieldProcessing: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
+			if (ref($fieldProcessing->{$targetheader[$i]}) eq "CODE") {
+				eval {$fieldProcessing->{$targetheader[$i]}->()};
+			} else {
+				eval $fieldProcessing->{$targetheader[$i]};
+			}
+			$logger->error("eval of ".(ref($fieldProcessing->{$targetheader[$i]}) eq "CODE" ? "defined sub" : "'".$fieldProcessing->{$targetheader[$i]}."'")." returned error:$@") if ($@);
 		} elsif ($fieldProcessing->{""}) { # special case: if empty key is defined with processing code, do for all fields
-			$logger->trace('BEFORE: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
-			evalCustomCode($fieldProcessing->{""},$data,$line,\%line,\%templine,$header,$targetheader,$rawline,$thousandsep,$decimalsep,$lineno,$i);
-			$logger->trace('AFTER: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.",\$skipLineAssignment: $skipLineAssignment, line: $lineno") if $logger->is_trace;
+			$logger->trace('general fieldProcessing: $targetheader['.$i.']:'.$targetheader[$i].',$line{'.$targetheader[$i].']:'.$line{$targetheader[$i]}.',fieldProcessing{',$targetheader[$i],'}:'.$fieldProcessing->{$targetheader[$i]}) if $logger->is_trace;
+			if (ref($fieldProcessing->{""}) eq "CODE") {
+				eval {$fieldProcessing->{""}->()};
+			} else {
+				eval $fieldProcessing->{""};
+			}
+			$logger->error("eval of ".(ref($fieldProcessing->{""}) eq "CODE" ? "defined sub" : "'".$fieldProcessing->{""}."'")." returned error:$@") if ($@);
 		}
 	}
 	# additional row processing defined
 	if ($lineProcessing) {
-		evalCustomCode($lineProcessing,$data,$line,\%line,\%templine,$header,$targetheader,$rawline,$thousandsep,$decimalsep,$lineno);
-		if ($logger->is_trace) {
-			$logger->trace("lineProcessing:".$lineProcessing.",line: $lineno");
-			$logger->trace("templine:\n".Dumper(\%templine));
+		if (ref($lineProcessing) eq "CODE") {
+			eval {$lineProcessing->()};
+		} else {
+			eval $lineProcessing;
 		}
+		$logger->error("eval of ".(ref($lineProcessing) eq "CODE" ? "defined sub" : "'".$lineProcessing."'")." returned error:$@") if ($@);
 	}
-	$logger->trace("line:\n".Dumper(\%line)) if $logger->is_trace and !$skipLineAssignment;
+	$logger->trace("\$skipLineAssignment: $skipLineAssignment, \%line:\n".Dumper(\%line)) if $logger->is_trace;
 	# add reference to created line (don't do push @{$data}, \%line here as then subsequent lines will overwrite all before!)
-	push @{$data}, {%line} if %line and !$skipLineAssignment;
+	push @{$data}, {%line} if keys %line > 0 and !$skipLineAssignment;
 }
 
-# evaluate custom code contained either in string or ref to sub. important data is passed on as parameters.
-sub evalCustomCode ($$$$$$$$$$$;$) {
-	my ($customCode,$data,$line,$linehash,$templinehash,$header,$targetheader,$rawline,$thousandsep,$decimalsep,$lineno,$i) = @_;
-	my @data = @$data;
-	my @line = @$line;
-	my @header = @$header;
-	my @targetheader = @$targetheader;
-	my $logger = get_logger();
-
-	if (ref($customCode) eq "CODE") {
-		eval {$customCode->()};
-	} else {
-		my %line = %$linehash;
-		my %templine = %$templinehash;
-		eval $customCode;
-		%$linehash = %line;
-		%$templinehash = %templine;
-	}
-	$logger->error("eval of ".(ref($customCode) eq "CODE" ? "defined sub" : "'".$customCode."'")." returned error:$@") if ($@);
-}
-
+our $value;
 # write text file
 sub writeText ($$) {
 	my ($File,$data) = @_;
 	my $logger = get_logger();
 	my $filename = $File->{filename};
 	if (ref($data) ne 'ARRAY') {
-		$logger->error("passed data in \$data is not a ref to array:".Dumper($data));
+		$logger->error("passed data in \$data is not a ref to array (you have to initialize it as an array):".Dumper($data));
 		return 0;
 	}
 	# in case we need to print out csv/quoted values
@@ -565,12 +558,12 @@ sub writeText ($$) {
 		});
 	}
 	my @columnnames; my @paddings;
-	if (ref($File->{columns}) eq 'ARRAY') {
-		@columnnames = @{$File->{columns}};
-	} elsif (ref($File->{columns}) eq 'HASH') {
+	if (ref($File->{columns}) eq 'HASH') {
 		@columnnames = map {$File->{columns}{$_}} sort keys %{$File->{columns}};
+	} elsif (ref($File->{columns}) eq 'ARRAY') {
+		@columnnames = @{$File->{columns}};
 	} else {
-		$logger->error("no field information given (columns should be ref to array or ref to hash)");
+		$logger->error("no field information given (columns should be ref to array or ref to hash, you have to initialize it as that)");
 		return 0;
 	}
 	if (ref($File->{format_padding}) eq 'ARRAY') {
@@ -633,19 +626,31 @@ sub writeText ($$) {
 					$logger->error("row passed in (\$data) is no ref to hash! should be \$VAR1 = {'key' => 'value', ...}:\n".Dumper($row));
 					return 0;
 				}
-				my $value = $row->{$colname};
+				$value = $row->{$colname};
 				$logger->trace("\$value for \$colname $colname: $value") if $logger->is_trace;
 				if ($File->{addtlProcessingTrigger} && $File->{addtlProcessing}) {
-					eval $File->{addtlProcessingTrigger} if (eval $File->{addtlProcessingTrigger});
+					my $doAddtlProcessing = eval $File->{addtlProcessingTrigger};
 					if ($@) {
-						$logger->error("error in eval addtlProcessing: ".$File->{addtlProcessingTrigger}.":".$@);
+						$logger->error("error in eval addtlProcessingTrigger: ".$File->{addtlProcessingTrigger}.":".$@);
 						return 0;
+					}
+					if ($doAddtlProcessing) {
+						if (ref( $File->{addtlProcessing}) eq "CODE") {
+							eval {$File->{addtlProcessing}->()};
+						} else {
+							eval $File->{addtlProcessing};
+						}
+						if ($@) {
+							$logger->error("error in eval addtlProcessing: ".$File->{addtlProcessing}.":".$@);
+							return 0;
+						}
+						$logger->trace("\$value after addtlProcessing: $value") if $logger->is_trace;
 					}
 				}
 				if ($File->{format_quotedcsv}) {
 					push @$lineRow, $value;
 				} else {
-					# last column ($columnnames[@columnnames-1]) should have not separator afterwards
+					# last column ($columnnames[@columnnames-1]) should not have a separator afterwards
 					$lineRow = $lineRow.($firstcol ? "" : $File->{format_sep}).sprintf("%s", $value) if (!$File->{format_fix});
 					# additional padding for fixed length format
 					$lineRow = $lineRow.sprintf("%-*s%s", $paddings[$col],$value) if ($File->{format_fix});
@@ -681,8 +686,10 @@ sub writeExcel ($$) {
 	my @columnnames;
 	if (ref($File->{columns}) eq 'HASH') {
 		@columnnames = map {$File->{columns}{$_}} sort keys %{$File->{columns}};
+	} elsif (ref($File->{columns}) eq 'ARRAY') {
+		@columnnames = @{$File->{columns}}; 
 	} else {
-		$logger->error("no field information given (columns should be ref to hash)");
+		$logger->error("no field information given (columns should be ref to array or ref to hash, you have to initialize it as that)");
 		return 0;
 	}
 	my ($workbook,$worksheet);

@@ -1,3 +1,12 @@
-0.001   2019-05-28 (PERLANCAR)
+0.002   2023-11-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Update libreoffice versions.
+
+        - Fallback to Desktop::Open instead of xdg-open directly.
+
+        - Add doc.
+
+
+0.001   2019-05-28  Released-By: PERLANCAR
 
         - First, preliminary release.

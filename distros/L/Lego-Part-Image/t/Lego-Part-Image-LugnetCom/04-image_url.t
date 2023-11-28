@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English qw(-no_match_vars);
 use Error::Pure::Utils qw(clean);
 use Lego::Part;

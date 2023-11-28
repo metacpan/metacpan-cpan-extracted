@@ -7,9 +7,9 @@ use warnings;
 use Role::Tiny::With;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-31'; # DATE
+our $DATE = '2023-11-25'; # DATE
 our $DIST = 'TableDataRoles-Standard'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 with 'TableDataRole::Munge::MungeColumns';
 
@@ -55,7 +55,7 @@ TableData::Munge::MungeColumns - Munge (add, remove, rename, reorder) columns of
 
 =head1 VERSION
 
-This document describes version 0.017 of TableData::Munge::MungeColumns (from Perl distribution TableDataRoles-Standard), released on 2023-08-31.
+This document describes version 0.019 of TableData::Munge::MungeColumns (from Perl distribution TableDataRoles-Standard), released on 2023-11-25.
 
 =head1 SYNOPSIS
 
@@ -71,51 +71,6 @@ This document describes version 0.017 of TableData::Munge::MungeColumns (from Pe
 
 This is a TableData:: module that lets you munge columns from another tabledata.
 See L<TableDataRole::Munge::MungeColumns> for more details.
-
-=head1 METHODS
-
-
-=head2 new
-
-Usage:
-
- new(%args) -> [$status_code, $reason, $payload, \%result_meta]
-
-This function is not exported.
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<munge> => I<str|code>
-
-(No description)
-
-=item * B<munge_column_names>* => I<str|code>
-
-(No description)
-
-=item * B<munge_hashref> => I<str|code>
-
-(No description)
-
-=item * B<tabledata>* => I<any>
-
-(No description)
-
-
-=back
-
-Returns an enveloped result (an array).
-
-First element ($status_code) is an integer containing HTTP-like status code
-(200 means OK, 4xx caller error, 5xx function error). Second element
-($reason) is a string containing error message, or something like "OK" if status is
-200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
-element (%result_meta) is called result metadata and is optional, a hash
-that contains extra information, much like how HTTP response headers provide additional metadata.
-
-Return value:  (any)
 
 =head1 HOMEPAGE
 

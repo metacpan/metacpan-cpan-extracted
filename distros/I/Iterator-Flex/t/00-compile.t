@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 43 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 44 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Iterator/Flex.pm',
@@ -50,6 +50,7 @@ my @module_files = (
     'Iterator/Flex/Role/Wrap/Self.pm',
     'Iterator/Flex/Role/Wrap/Throw.pm',
     'Iterator/Flex/Sequence.pm',
+    'Iterator/Flex/Stack.pm',
     'Iterator/Flex/Utils.pm'
 );
 

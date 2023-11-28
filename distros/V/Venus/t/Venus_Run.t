@@ -114,6 +114,12 @@ our $TEST_VENUS_RUN_PROMPT = undef;
   };
 }
 
+# config
+{
+  no warnings 'once';
+  $Venus::Run::FILE = ($Venus::Run::BASENAME = '.vns.test') . '.pl';
+}
+
 =name
 
 Venus::Run
@@ -283,12 +289,20 @@ $test->for('example', 1, 'cmds', sub {
   my ($tryable) = @_;
   my $result = $tryable->result;
   is_deeply $result, {
+    'func' => {
+      help => 'Register function',
+      arg => 'command',
+    },
     'help' => {
       help => 'Display help and usages',
       arg => 'command',
     },
     'init' => {
       help => 'Initialize the configuration file',
+      arg => 'command',
+    },
+    'with' => {
+      help => 'Register subcommand',
       arg => 'command',
     },
   };
@@ -373,7 +387,7 @@ $test->for('example', 3, 'conf', sub {
   if (require Venus::Yaml && not Venus::Yaml->package) {
     plan skip_all => 'No suitable YAML library found';
   }
-  my $file = '.vns.yaml';
+  my $file = "$Venus::Run::BASENAME.yaml";
   require Venus::Path;
   require Venus::Config;
   Venus::Config
@@ -407,7 +421,7 @@ $test->for('example', 4, 'conf', sub {
   if (require Venus::Yaml && not Venus::Yaml->package) {
     plan skip_all => 'No suitable YAML library found';
   }
-  my $file = '.vns.yml';
+  my $file = "$Venus::Run::BASENAME.yml";
   require Venus::Path;
   require Venus::Config;
   Venus::Config
@@ -441,7 +455,7 @@ $test->for('example', 5, 'conf', sub {
   if (require Venus::Json && not Venus::Json->package) {
     plan skip_all => 'No suitable JSON library found';
   }
-  my $file = '.vns.json';
+  my $file = "$Venus::Run::BASENAME.json";
   require Venus::Path;
   require Venus::Config;
   Venus::Config
@@ -475,7 +489,7 @@ $test->for('example', 6, 'conf', sub {
   if (require Venus::Json && not Venus::Json->package) {
     plan skip_all => 'No suitable JSON library found';
   }
-  my $file = '.vns.js';
+  my $file = "$Venus::Run::BASENAME.js";
   require Venus::Path;
   require Venus::Config;
   Venus::Config
@@ -506,7 +520,7 @@ $test->for('example', 6, 'conf', sub {
 =cut
 
 $test->for('example', 7, 'conf', sub {
-  my $file = '.vns.perl';
+  my $file = "$Venus::Run::BASENAME.perl";
   require Venus::Path;
   require Venus::Config;
   Venus::Config
@@ -537,7 +551,7 @@ $test->for('example', 7, 'conf', sub {
 =cut
 
 $test->for('example', 8, 'conf', sub {
-  my $file = '.vns.pl';
+  my $file = $Venus::Run::FILE;
   require Venus::Path;
   require Venus::Config;
   Venus::Config
@@ -634,11 +648,11 @@ $test->for('example', 2, 'file', sub {
 $test->for('example', 3, 'file', sub {
   require Venus::Path;
   my $path = Venus::Path->new;
-  my $file = $path->child('.vns.yaml')->mkfile;
+  my $file = $path->child("$Venus::Run::BASENAME.yaml")->mkfile;
 
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, ".vns.yaml";
+  is $result, "$Venus::Run::BASENAME.yaml";
   $file->unlink;
 
   $result
@@ -662,11 +676,11 @@ $test->for('example', 4, 'file', sub {
   require Venus::Path;
   require Venus::Config;
   my $path = Venus::Path->new;
-  my $file = $path->child('.vns.yml')->mkfile;
+  my $file = $path->child("$Venus::Run::BASENAME.yml")->mkfile;
 
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, ".vns.yml";
+  is $result, "$Venus::Run::BASENAME.yml";
   $file->unlink;
 
   $result
@@ -690,11 +704,11 @@ $test->for('example', 5, 'file', sub {
   require Venus::Path;
   require Venus::Config;
   my $path = Venus::Path->new;
-  my $file = $path->child('.vns.json')->mkfile;
+  my $file = $path->child("$Venus::Run::BASENAME.json")->mkfile;
 
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, ".vns.json";
+  is $result, "$Venus::Run::BASENAME.json";
   $file->unlink;
 
   $result
@@ -718,11 +732,11 @@ $test->for('example', 6, 'file', sub {
   require Venus::Path;
   require Venus::Config;
   my $path = Venus::Path->new;
-  my $file = $path->child('.vns.js')->mkfile;
+  my $file = $path->child("$Venus::Run::BASENAME.js")->mkfile;
 
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, ".vns.js";
+  is $result, "$Venus::Run::BASENAME.js";
   $file->unlink;
 
   $result
@@ -746,11 +760,11 @@ $test->for('example', 7, 'file', sub {
   require Venus::Path;
   require Venus::Config;
   my $path = Venus::Path->new;
-  my $file = $path->child('.vns.perl')->mkfile;
+  my $file = $path->child("$Venus::Run::BASENAME.perl")->mkfile;
 
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, ".vns.perl";
+  is $result, "$Venus::Run::BASENAME.perl";
   $file->unlink;
 
   $result
@@ -774,11 +788,11 @@ $test->for('example', 8, 'file', sub {
   require Venus::Path;
   require Venus::Config;
   my $path = Venus::Path->new;
-  my $file = $path->child('.vns.pl')->mkfile;
+  my $file = $path->child($Venus::Run::FILE)->mkfile;
 
   my ($tryable) = @_;
   my $result = $tryable->result;
-  is $result, ".vns.pl";
+  is $result, $Venus::Run::FILE;
   $file->unlink;
 
   $result
@@ -975,14 +989,14 @@ $test->for('example', 4, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  unlink '.vns.pl';
-  ok !-f '.vns.pl';
+  unlink $Venus::Run::FILE;
+  ok !-f $Venus::Run::FILE;
   my $result = $tryable->result;
   is $TEST_VENUS_RUN_EXIT, 0;
   is_deeply $TEST_VENUS_RUN_SYSTEM, [];
   is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
-  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Initialized with generated file \.vns\.pl|;
-  ok -f '.vns.pl';
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Initialized with generated file $Venus::Run::FILE|;
+  ok -f $Venus::Run::FILE;
   $TEST_VENUS_RUN_SYSTEM_LOG = [];
 
   1
@@ -1011,7 +1025,7 @@ $test->for('example', 5, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1055,7 +1069,7 @@ $test->for('example', 6, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1100,7 +1114,7 @@ $test->for('example', 7, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1155,7 +1169,7 @@ $test->for('example', 8, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1211,7 +1225,7 @@ $test->for('example', 9, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1266,7 +1280,7 @@ $test->for('example', 10, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1322,7 +1336,7 @@ $test->for('example', 11, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1358,7 +1372,7 @@ $test->for('example', 12, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1394,7 +1408,7 @@ $test->for('example', 13, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1451,7 +1465,7 @@ $test->for('example', 14, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1507,7 +1521,7 @@ $test->for('example', 15, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1569,7 +1583,7 @@ $test->for('example', 16, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1624,7 +1638,7 @@ $test->for('example', 17, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1682,7 +1696,7 @@ $test->for('example', 17, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1732,7 +1746,7 @@ $test->for('example', 18, 'handler', sub {
   local $TEST_VENUS_RUN_SYSTEM = [];
   local $TEST_VENUS_RUN_PROMPT = 'secret';
   local $ENV{PASS} = undef;
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1787,7 +1801,7 @@ $test->for('example', 19, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1846,7 +1860,7 @@ $test->for('example', 20, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1903,7 +1917,7 @@ $test->for('example', 21, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'mswin32';
   my $result = $tryable->result;
@@ -1953,7 +1967,7 @@ $test->for('example', 22, 'handler', sub {
   local $TEST_VENUS_RUN_EXIT;
   local $TEST_VENUS_RUN_OUTPUT = [];
   local $TEST_VENUS_RUN_SYSTEM = [];
-  ok -f '.vns.pl';
+  ok -f $Venus::Run::FILE;
   require Venus::Os;
   $Venus::Os::TYPES{$^O} = 'linux';
   my $result = $tryable->result;
@@ -1962,6 +1976,88 @@ $test->for('example', 22, 'handler', sub {
   is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
   like $$TEST_VENUS_RUN_OUTPUT[2], qr|Usage: perl -c \<FILE\>|;
   $TEST_VENUS_RUN_SYSTEM_LOG = [];
+
+  1
+});
+
+=example-23 handler
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new(['func', 'dump', 't/path/etc/dump.pl']);
+
+  $run->execute;
+
+  # ()
+
+=cut
+
+$test->for('example', 23, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  unlink $Venus::Run::FILE;
+  ok !-f $Venus::Run::FILE;
+  require Venus::Path;
+  Venus::Path->new('t/conf/write.func.perl')->copy(
+    my $temp_file = Venus::Path->mktemp_file->extension('pl')
+  );
+  local $ENV{VENUS_FILE} = "$temp_file";
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
+  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Function dump registered in file $temp_file|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  require Venus::Config;
+  my $conf = Venus::Config->read_file($ENV{VENUS_FILE})->value;
+  ok exists $conf->{func};
+  ok exists $conf->{func}->{dump};
+  $temp_file->unlink;
+
+  1
+});
+
+=example-24 handler
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new(['with', 'asks', 't/conf/asks.perl']);
+
+  $run->execute;
+
+  # ()
+
+=cut
+
+$test->for('example', 24, 'handler', sub {
+  my ($tryable) = @_;
+  local $TEST_VENUS_RUN_EXIT;
+  local $TEST_VENUS_RUN_OUTPUT = [];
+  local $TEST_VENUS_RUN_SYSTEM = [];
+  unlink $Venus::Run::FILE;
+  ok !-f $Venus::Run::FILE;
+  require Venus::Path;
+  Venus::Path->new('t/conf/write.with.perl')->copy(
+    my $temp_file = Venus::Path->mktemp_file->extension('pl')
+  );
+  local $ENV{VENUS_FILE} = "$temp_file";
+  my $result = $tryable->result;
+  is $TEST_VENUS_RUN_EXIT, 0;
+  is_deeply $TEST_VENUS_RUN_SYSTEM, [];
+  is $$TEST_VENUS_RUN_OUTPUT[1], 'info';
+  like $$TEST_VENUS_RUN_OUTPUT[2], qr|Subcommand asks registered in file $temp_file|;
+  $TEST_VENUS_RUN_SYSTEM_LOG = [];
+  require Venus::Config;
+  my $conf = Venus::Config->read_file($ENV{VENUS_FILE})->value;
+  ok exists $conf->{with};
+  ok exists $conf->{with}->{asks};
+  $temp_file->unlink;
 
   1
 });
@@ -2510,6 +2606,6 @@ $test->for('partials');
 
 $test->render('lib/Venus/Run.pod') if $ENV{VENUS_RENDER};
 
-unlink '.vns.pl';
+unlink $Venus::Run::FILE;
 
 ok 1 and done_testing;

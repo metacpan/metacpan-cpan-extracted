@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
         'Carp'                   => '0',
-        'UML::PlantUML::Encoder' => '0.02',
+        'UML::PlantUML::Encoder' => '0.03',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'WWW-PlantUML-*' },

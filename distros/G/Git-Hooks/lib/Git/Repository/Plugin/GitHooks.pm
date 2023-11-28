@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '3.5.0';
+$Git::Repository::Plugin::GitHooks::VERSION = '3.6.0';
 use parent qw/Git::Repository::Plugin/;
 
 use v5.16.0;
@@ -614,7 +614,7 @@ sub get_config {
         }
 
         if (defined $config) {
-            # The --null option to git-log makes it output a null character
+            # The --null option to git-config makes it output a null character
             # after each option/value. The option and value are separated by a
             # newline, unless there is no value, in which case, there is no
             # newline.
@@ -891,10 +891,10 @@ sub fail_on_faults {
         $faults .= "\n" unless $faults =~ /\n$/;
         if ($warn_only) {
             $log->warning(Warning => {faults => $faults});
-            carp $faults;
+            warn $faults;       ## no critic (RequireCarping)
         } else {
             $log->error(Error => {faults => $faults});
-            croak $faults;
+            die $faults;       ## no critic (RequireCarping)
         }
     }
 
@@ -1621,7 +1621,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 3.5.0
+version 3.6.0
 
 =head1 SYNOPSIS
 

@@ -2,9 +2,9 @@
 package TableData;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-19'; # DATE
+our $DATE = '2023-11-25'; # DATE
 our $DIST = 'TableData'; # DIST
-our $VERSION = '0.2.3'; # VERSION
+our $VERSION = '0.2.6'; # VERSION
 
 1;
 # ABSTRACT: Specification for TableData::*, modules that contains table data
@@ -25,7 +25,7 @@ TableData - Specification for TableData::*, modules that contains table data
 
 =head1 VERSION
 
-This document describes version 0.2.3 of TableData (from Perl distribution TableData), released on 2023-04-19.
+This document describes version 0.2.6 of TableData (from Perl distribution TableData), released on 2023-11-25.
 
 =head1 SYNOPSIS
 
@@ -168,6 +168,22 @@ Modules that contain code to work with table data (not necessarily table data in
 C<TableData::> modules).
 
 =head1 FAQ
+
+=head2 How do I pick random row(s) from a table?
+
+Apply one of the appropriate C<Role::TinyCommons::Collection::PickItems::*>
+roles, e.g. L<Role::TinyCommons::Collection::PickItems::Iterator> (which can
+always be used, but other role might offer some speedup). This will provide you
+the C<pick_item> and C<pick_items> methods. For example, to select a random
+quoute from L<TableData::Quote::JamesFT>:
+
+ use Role::Tiny;
+ use TableData::Quote::JamesFT;
+
+ my $td = TableData::Quote::JamesFT->new;
+ Role::Tiny->apply_roles_to_object($td, 'Role::TinyCommons::Collection::PickItems::Iterator');
+
+ my $row = $td->pick_item;
 
 =head1 HOMEPAGE
 

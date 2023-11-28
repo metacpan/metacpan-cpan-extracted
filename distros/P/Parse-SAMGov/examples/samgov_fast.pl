@@ -34,25 +34,31 @@ my $entities = $parser->parse_file($filename, sub {
         # want largebiz only but isn't largebiz
         return undef if (!$smallbiz && $largebiz && $_[0]->is_smallbiz);
         # want anything that matches criteria
-        if ($_[0]->NAICS->{541511} ||
-            $_[0]->NAICS->{541512} ||
-            $_[0]->NAICS->{541519} ||
-            $_[0]->NAICS->{541712}) {
+        if ($_[0]->NAICS->{541511}) {
             my $e = $_[0];
             my $company = $e->name;
             $company .= ' dba ' . $e->dba_name if length $e->dba_name;
             my %filtered = ();
-            $filtered{$e->POC_elec->email} = { name => $e->POC_elec->name,
-                company => $company} if $e->POC_elec->email;
-            $filtered{$e->POC_elec_alt->email} = { name => $e->POC_elec_alt->name,
-                company => $company} if $e->POC_elec_alt->email;
-            $filtered{$e->POC_gov->email} = { name => $e->POC_gov->name,
-                company => $company } if $e->POC_gov->email;
-            $filtered{$e->POC_gov_alt->email} = { name => $e->POC_gov_alt->name,
-                company => $company} if $e->POC_gov_alt->email;
+            my $email = $e->POC_elec->email;
+            my $name = $e->POC_elec->name;
+            my $title = $e->POC_elec->title || '';
+            $filtered{lc $email} = { name => $name, title => $title, company => $company} if $email;
+            $email = $e->POC_elec_alt->email;
+            $name = $e->POC_elec_alt->name;
+            $title = $e->POC_elec_alt->title || '';
+            $filtered{lc $email} = { name => $name, title => $title, company => $company} if $email;
+            $email = $e->POC_gov->email;
+            $name = $e->POC_gov->name;
+            $title = $e->POC_gov->title || '';
+            $filtered{lc $email} = { name => $name, title => $title, company => $company} if $email;
+            $email = $e->POC_gov_alt->email;
+            $name = $e->POC_gov_alt->name;
+            $title = $e->POC_gov_alt->title || '';
+            $filtered{lc $email} = { name => $name, title => $title, company => $company} if $email;
             foreach my $em (keys %filtered) {
-                say join(',', $em, $filtered{$em}->{name},
-                    $filtered{$em}->{company});
+                say join(',', $em, uc $filtered{$em}->{name},
+                    uc $filtered{$em}->{title},
+                    uc $filtered{$em}->{company});
             }
         }
         return undef;

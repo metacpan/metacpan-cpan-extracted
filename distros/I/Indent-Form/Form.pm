@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -268,6 +268,8 @@ output will be without ANSI colors. See L<https://no-color.org/>.
 
 =head1 EXAMPLE1
 
+=for comment filename=default_indent.pl
+
  use strict;
  use warnings;
 
@@ -294,6 +296,8 @@ output will be without ANSI colors. See L<https://no-color.org/>.
  #      Author: skim.cz
 
 =head1 EXAMPLE2
+
+=for comment filename=left_indent.pl
 
  use strict;
  use warnings;
@@ -323,6 +327,8 @@ output will be without ANSI colors. See L<https://no-color.org/>.
  # Author     : skim.cz
 
 =head1 EXAMPLE3
+
+=for comment filename=left_indent_with_dots.pl
 
  use strict;
  use warnings;
@@ -354,6 +360,8 @@ output will be without ANSI colors. See L<https://no-color.org/>.
 
 =head1 EXAMPLE4
 
+=for comment filename=default_indent_with_prefix.pl
+
  use strict;
  use warnings;
 
@@ -382,6 +390,8 @@ output will be without ANSI colors. See L<https://no-color.org/>.
 
 =head1 EXAMPLE5
 
+=for comment filename=default_indent_ansi.pl
+
  use strict;
  use warnings;
 
@@ -390,7 +400,7 @@ output will be without ANSI colors. See L<https://no-color.org/>.
 
  # Indent object.
  my $indent = Indent::Form->new(
-     'ansi' => 1,
+         'ansi' => 1,
  );
 
  # Input data.
@@ -475,7 +485,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2021 Michal Josef Špaček
+© 2011-2023 Michal Josef Špaček
 
 Artistic License
 
@@ -483,6 +493,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

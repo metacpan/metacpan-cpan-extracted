@@ -27,7 +27,7 @@ Liniile de date de intrare și de ieșire nu trebuie să fie identice atunci câ
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # OPTIONS
 
@@ -39,19 +39,25 @@ Version 0.9901
 
     Combină o secvență de linii care nu sunt goale într-o singură linie înainte de a le transmite comenzii de filtrare. Caracterele newline dintre caracterele largi sunt șterse, iar alte caractere newline sunt înlocuite cu spații.
 
-- **--blockmatch**
+- **--blocks**
 
     În mod normal, zona care corespunde modelului de căutare specificat este trimisă la comanda externă. În cazul în care se specifică această opțiune, nu zona care corespunde, ci întregul bloc care o conține va fi procesat.
 
     De exemplu, pentru a trimite liniile care conțin modelul `foo` la comanda externă, trebuie să specificați modelul care se potrivește cu întreaga linie:
 
-        greple -Mtee cat -n -- '^.*foo.*\n'
+        greple -Mtee cat -n -- '^.*foo.*\n' --all
 
-    Dar cu opțiunea **<--blockmatch**, se poate face la fel de simplu, după cum urmează:
+    Dar cu opțiunea **--blocuri**, se poate face la fel de simplu, după cum urmează:
 
-        greple -Mtee cat -n -- foo
+        greple -Mtee cat -n -- foo --blocks
 
-    Cu opțiunea **--blockmatch**, acest modul se comportă mai mult ca opțiunea **-g** a lui [teip(1)](http://man.he.net/man1/teip).
+    Cu opțiunea **--blocuri**, acest modul se comportă mai mult ca opțiunea **-g** de la [teip(1)](http://man.he.net/man1/teip). În rest, comportamentul este similar cu cel al lui [teip(1)](http://man.he.net/man1/teip) cu opțiunea **-o**.
+
+    Nu utilizați **--blocks** cu opțiunea **--all**, deoarece blocul va fi reprezentat de toate datele.
+
+- **--squeeze**
+
+    Combină două sau mai multe caractere de linie nouă consecutive într-unul singur.
 
 # WHY DO NOT USE TEIP
 

@@ -1,0 +1,219 @@
+t/04_parser_entity_v2.t .. 
+ok 1 - use Parse::SAMGov;
+ok 2 - An object of class 'Parse::SAMGov' isa 'Parse::SAMGov'
+ok 3 - Parse::SAMGov->can('parse_file')
+# Subtest: Parse Entity file
+$VAR1 = {
+          'rows' => '0765210',
+          'version' => 'V2',
+          'seqno' => '0007556',
+          'date' => '20231105'
+        };
+    ok 1 - Entities were parsed
+    ok 2 - A reference of type 'ARRAY' isa 'ARRAY'
+    ok 3 - Parsed entities >= 1
+    ok 4 - An object of class 'Parse::SAMGov::Entity' isa 'Parse::SAMGov::Entity'
+    # BLACKHORSE, A PARSONS COMPANY
+    # UEI: CFKVXZJ329K7\nEntity EFT Indicator: 
+    # CAGE: 54VJ4
+    # Status: active
+    # Registration Purpose: All Awards
+    # Registration Date: 2008-07-13
+    # Expiry Date: 2024-02-24
+    # Last Update Date: 2023-03-06
+    # Activation Date: 2023-03-01
+    # Company Division: CORPORATE OFFICE
+    # Physical Address: 13461 SUNRISE VALLEY DR BLDG 8, HERNDON, VA, USA - 20171-3283
+    # Business Start Date: 2008-05-01
+    # Fiscal Year End: 12-31
+    # Corporate URL: http://www.blackhorsesolutions.com
+    # Business Types: [2X]
+    # NAICS Codes: [541512,611430,541715,611420,541930,541611,611699,541990,541513,541330,611710,611110,541690,541618,541519]
+    # Small Business: No
+    # NAICS Details: {
+    #   '541512' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '611430' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541715' => {
+    #     'exception' => {
+    #       'small_biz' => 0
+    #     }
+    #   },
+    #   '611420' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541930' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541611' => {
+    #     'small_biz' => 0,
+    #     'exception' => {}
+    #   },
+    #   '611699' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541990' => {
+    #     'small_biz' => 0,
+    #     'is_primary' => 1,
+    #     'exception' => {}
+    #   },
+    #   '541513' => {
+    #     'small_biz' => 0,
+    #     'exception' => {}
+    #   },
+    #   '541330' => {
+    #     'exception' => {
+    #       'small_biz' => 0
+    #     }
+    #   },
+    #   '611710' => {
+    #     'small_biz' => 0,
+    #     'exception' => {}
+    #   },
+    #   '611110' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541690' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541618' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541519' => {
+    #     'exception' => {
+    #       'small_biz' => 0
+    #     }
+    #   }
+    # }
+    # 
+    # PSC Codes: [AM15,R408,R423,U006,U012,U099]
+    # Mailing Address: 13461 SUNRISE VALLEY DRIVE SUITE 400, HERNDON, VA, USA - 20171
+    # Govt Business POC: GLORIA ZAPATA, 100 WEST WALNUT STREET, PASADENA, CA, USA - 91124-0001.
+    # Govt Business POC (alternate): STEPHEN FINNEY, SVP BUSINESS DEVELOPMENT, 13461 SUNRISE VALLEY DRIVE SUITE 400, HERNDON, VA, USA - 20171-3242.
+    # Past Performance POC: NEIL SIMS, VP, BUSINESS DEVELOPMENT, 13461 SUNRISE VALLEY DRIVE SUITE 400, HERNDON, VA, USA - 20171-3242.
+    # Electronic POC: JANINE GOOD, CONTRACTS, 13461 SUNRISE VALLEY DRIVE SUITE 400, HERNDON, VA, USA - 20171-3242.
+    # Electronic POC (alternate): TIM JONES, CFO, 13461 SUNRISE VALLEY DRIVE SUITE 400, HERNDON, VA, USA - 20171-3242.
+    # Delinquent Federal Debt: No
+    # SBA Business Type: {}
+    # Disaster Response Type: {}
+    # Is Private Listing: No
+    # D&B Open Data Flag: 
+    ok 5 - An object of class 'Parse::SAMGov::Entity' isa 'Parse::SAMGov::Entity'
+    # SEALING TECHNOLOGIES, LLC
+    # UEI: WZZSXMA52K46\nEntity EFT Indicator: 
+    # CAGE: 6RNY9
+    # Status: active
+    # Registration Purpose: All Awards
+    # Registration Date: 2012-06-05
+    # Expiry Date: 2024-10-09
+    # Last Update Date: 2023-10-11
+    # Activation Date: 2023-10-11
+    # Physical Address: 6750 ALEXANDER BELL DR STE 200, COLUMBIA, MD, USA - 21046-2199
+    # Business Start Date: 2012-05-28
+    # Fiscal Year End: 12-31
+    # Corporate URL: http://www.sealingtech.com
+    # Business Types: [2X,LJ]
+    # NAICS Codes: [541715,334112,513210,541512,541380,541990,611420,811210,334111,541519,541618,541690,541330,541513]
+    # Small Business: No
+    # NAICS Details: {
+    #   '541715' => {
+    #     'exception' => {
+    #       'small_biz' => 0
+    #     }
+    #   },
+    #   '334112' => {
+    #     'small_biz' => 0,
+    #     'exception' => {}
+    #   },
+    #   '513210' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541512' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541380' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541990' => {
+    #     'small_biz' => 0,
+    #     'exception' => {}
+    #   },
+    #   '611420' => {
+    #     'small_biz' => 0,
+    #     'exception' => {}
+    #   },
+    #   '811210' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '334111' => {
+    #     'small_biz' => 0,
+    #     'exception' => {}
+    #   },
+    #   '541519' => {
+    #     'exception' => {
+    #       'small_biz' => 0
+    #     }
+    #   },
+    #   '541618' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541690' => {
+    #     'exception' => {},
+    #     'small_biz' => 0
+    #   },
+    #   '541330' => {
+    #     'exception' => {
+    #       'small_biz' => 0
+    #     }
+    #   },
+    #   '541513' => {
+    #     'is_primary' => 1,
+    #     'small_biz' => 0,
+    #     'exception' => {}
+    #   }
+    # }
+    # 
+    # PSC Codes: [5810,7B22,7J20,7K20,DJ10,H263]
+    # Mailing Address: 6750 ALEXANDER BELL DR STE 200, COLUMBIA, MD, USA - 21046-2199
+    # Govt Business POC: EDWARD L SEALING, PRESIDENT & CEO, 7134 COLUMBIA GATEWAY DRIVE SUITE 160, COLUMBIA, MD, USA - 21046.
+    # Govt Business POC (alternate): JENNIFER BREEN, 7134 COLUMBIA GATEWAY DRIVE SUITE 160, COLUMBIA, MD, USA - 21046.
+    # Electronic POC: DANIEL G ZICK, CFO, 7134 COLUMBIA GATEWAY DRIVE SUITE 160, COLUMBIA, MD, USA - 21046.
+    # Electronic POC (alternate): EDWARD L SEALING, PRESIDENT & CEO, 7134 COLUMBIA GATEWAY DRIVE SUITE 160, COLUMBIA, MD, USA - 21046.
+    # Delinquent Federal Debt: No
+    # SBA Business Type: {}
+    # Disaster Response Type: {}
+    # Is Private Listing: No
+    # D&B Open Data Flag: 
+$VAR1 = {
+          'date' => '20231105',
+          'seqno' => '0007556',
+          'version' => 'V2',
+          'rows' => '0765210'
+        };
+
+    ok 6 - A reference of type 'ARRAY' isa 'ARRAY'
+    ok 7 - Result has 1 element
+    ok 8
+    1..8
+ok 4 - Parse Entity file
+1..4
+ok
+All tests successful.
+Files=1, Tests=4,  1 wallclock secs ( 0.03 usr  0.00 sys +  0.41 cusr  0.03 csys =  0.47 CPU)
+Result: PASS

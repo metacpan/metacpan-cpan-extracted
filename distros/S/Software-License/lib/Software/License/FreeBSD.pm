@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Software::License::FreeBSD;
-$Software::License::FreeBSD::VERSION = '0.104004';
+package Software::License::FreeBSD 0.104005;
+
 use parent 'Software::License';
 # ABSTRACT: The FreeBSD License (aka two-clause BSD)
 
@@ -24,7 +24,7 @@ Software::License::FreeBSD - The FreeBSD License (aka two-clause BSD)
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 PERL VERSION
 
@@ -42,7 +42,7 @@ lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

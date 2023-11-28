@@ -3,9 +3,9 @@
 package TableDataBundle::Perl::CPAN::Release;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-18'; # DATE
+our $DATE = '2023-11-25'; # DATE
 our $DIST = 'TableDataBundle-Perl-CPAN-Release'; # DIST
-our $VERSION = '20220218.0'; # VERSION
+our $VERSION = '20231120.3'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules that contain CPAN releases data
@@ -22,7 +22,7 @@ TableDataBundle::Perl::CPAN::Release - Collection of TableData:: modules that co
 
 =head1 VERSION
 
-This document describes version 20220218.0 of TableDataBundle::Perl::CPAN::Release (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2022-02-18.
+This document describes version 20231120.3 of TableDataBundle::Perl::CPAN::Release (from Perl distribution TableDataBundle-Perl-CPAN-Release), released on 2023-11-25.
 
 =head1 DESCRIPTION
 
@@ -33,6 +33,12 @@ This distribution contains the following L<TableData>:: modules:
 =item * L<TableData::Perl::CPAN::Release::Static>
 
 =item * L<TableData::Perl::CPAN::Release::Static::FromNewest>
+
+=item * L<TableData::Perl::CPAN::Release::Static::GroupedDaily>
+
+=item * L<TableData::Perl::CPAN::Release::Static::GroupedMonthly>
+
+=item * L<TableData::Perl::CPAN::Release::Static::GroupedWeekly>
 
 =back
 
@@ -67,13 +73,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

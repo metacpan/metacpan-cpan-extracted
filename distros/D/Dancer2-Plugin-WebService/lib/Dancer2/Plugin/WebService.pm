@@ -5,7 +5,7 @@
 # Joan Ntzougani, ✞
 
 package Dancer2::Plugin::WebService;
-our	$VERSION = '4.4.6';
+our	$VERSION = '4.4.7';
 use	strict;
 use	warnings;
 use Encode;
@@ -13,8 +13,8 @@ use	Dancer2::Plugin;
 use	Storable;
 use Cpanel::JSON::XS;
 use	XML::Hash::XS; $XML::Hash::XS::canonical=0;    $XML::Hash::XS::utf8=1;  $XML::Hash::XS::doc=0;  $XML::Hash::XS::root='root'; $XML::Hash::XS::encoding='utf-8'; $XML::Hash::XS::indent=2; $XML::Hash::XS::xml_decl=0;
-use YAML::XS;      # for user posted yaml to hash
-use YAML::Syck;    $YAML::Syck::ImplicitUnicode=1;  # for hash to reply string
+use YAML::XS;      # user posted yaml text -> hash
+use YAML::Syck;    $YAML::Syck::ImplicitUnicode=1;  # hash -> reply yaml text
 use	Data::Dumper;  $Data::Dumper::Trailingcomma=0; $Data::Dumper::Indent=2; $Data::Dumper::Terse=1; $Data::Dumper::Deepcopy=1; $Data::Dumper::Purity=1; $Data::Dumper::Sortkeys=0;
 
 if ($^O=~/(?i)MSWin/) {warn "Operating system is not supported\n"; exit 1}
@@ -58,7 +58,7 @@ has rules_compiled  => (is=>'ro', lazy=>0, default     => sub {my $array = [@{$_
 has dir_session     => (is=>'ro', lazy=>0, default     => sub {my $D = exists $_[0]->config->{'Session directory'} ? $_[0]->config->{'Session directory'}."/$_[0]->{app}->{name}" : "$_[0]->{app}->{config}->{appdir}/session"; $D=~s|/+|/|g; my @MD = split /(?:\\|\/)+/, $D; my $i; for ($i=$#MD; $i>=0; $i--) { last if -d join '/', @MD[0..$i] } for (my $j=$i+1; $j<=$#MD; $j++) { unless (mkdir join '/', @MD[0 .. $j]) {warn "Could not create the session directory \"$D\" because $!\n"; exit 1} } $D} );
 has rm              => (is=>'ro', lazy=>0, default     => sub{foreach (qw[/usr/bin /bin /usr/sbin /sbin]) {return "$_/rm" if -f "$_/rm" && -x "$_/rm" } warn "Could not found utility rm\n"; exit 1});
 
-# Recursive walker of custom Perl Data Structures
+# Recursive walker of complex Perl Data Structures
 %Handler=(
 SCALAR => sub { $Handler{WALKER}->(${$_[0]}, $_[1], @{$_[2]} )},
 ARRAY  => sub { $Handler{WALKER}->($_, $_[1], @{$_[2]}) for @{$_[0]} },
@@ -241,21 +241,21 @@ closedir DIR;
       elsif ($plg->Format->{from} eq 'xml')   {                 $plg->data( XML::Hash::XS::xml2hash $app->request->body) }
       elsif ($plg->Format->{from} eq 'yaml')  {                 $plg->data( YAML::XS::Load          $app->request->body) }
       elsif ($plg->Format->{from} eq 'perl')  {                 $plg->data( eval                    $app->request->body) }
-      elsif ($plg->Format->{from} eq 'human') { my $arrayref;
+      elsif ($plg->Format->{from} eq 'human') { my $ref={};
 
-          while ( $app->request->body =~/(.*)$/gm ) {
-          my @array = split /\s*(?:\,| |\t|-->|==>|=>|->|=|;|\|)+\s*/, $1;
+          foreach (split /\v+/, $app->request->body) {
+          my @array = split /\s*(?:=|\:|-->|->|\|)+\s*/, $_;
           next unless @array;
 
-            if (@array % 2 == 0) {
-            push @{$arrayref}, { @array }
+            if ($#array==0) {
+            $ref->{data}->{default} = $array[0]
             }
             else {
-            push @{$arrayref}, { shift @array => [ @array ] }
+            $ref->{data}->{$array[0]} = join ',', @array[1 .. $#array]
             }
           }
 
-        $plg->data( 1==scalar @{$arrayref} ? $arrayref->[0] : {'Data'=>$arrayref} )
+        $plg->data( $ref )
         }
       };
 
@@ -527,12 +527,8 @@ $plg->reply_text('');
 		$JSON->canonical($plg->sort);
 
 			if ($plg->pretty) {
-			$JSON->pretty(1);
-			$JSON->space_after(1)
-			}
-			else {
-			$JSON->pretty(0);
-			$JSON->space_after(0)
+      $JSON->pretty(1); $JSON->space_after(1) } else {
+			$JSON->pretty(0); $JSON->space_after(0)
 			}
 
     $JSON->utf8(0);
@@ -550,11 +546,11 @@ $plg->reply_text('');
 		elsif ($plg->Format->{to} eq 'perl') {
 		$Data::Dumper::Indent=$plg->pretty;
 		$Data::Dumper::Sortkeys=$plg->sort;
-		$plg->{reply_text} = Data::Dumper::Dumper $_[0]
+		$plg->{reply_text} = Encode::decode_utf8 Data::Dumper::Dumper $_[0]
 		}
 		elsif ($plg->Format->{to} eq 'human') {
 		$Handler{WALKER}->($_[0], sub {my $val=shift; $val =~s/^\s*(.*?)\s*$/$1/; $plg->{reply_text} .= join('.', @_) ." = $val\n"});
-		$plg->{reply_text} = Encode::encode('utf8', $plg->{reply_text})
+		$plg->{reply_text} = Encode::decode_utf8 $plg->{reply_text}
 		}
 	};
 
@@ -567,7 +563,7 @@ $plg->reply_text('');
 
 
 
-#	Returns a reply as string formated : json, xml, yaml, perl or human
+#	Returns a string formated as : json, xml, yaml, perl or human
 #	Always includes the error
 #
 #	reply						            only the error
@@ -772,7 +768,7 @@ Dancer2::Plugin::WebService - RESTful Web Services with login, persistent data, 
 
 =head1 VERSION
 
-version 4.4.6
+version 4.4.7
 
 =head2 SYNOPSIS
 

@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 22;
 use MIME::Base64 qw/encode_base64 decode_base64/;
 
 BEGIN { use_ok('Crypt::OpenSSL::AES') };
@@ -56,6 +56,35 @@ foreach my $ks (@keysize) {
             my $plaintext = $coa->decrypt(decode_base64($encrypted{$ks}[$padding]));
             ok($plaintext eq "Hello World. 123", "Crypt::Mode::CBC ($ks $msg) - Decrypted with Crypt::OpenSSL::AES");
         }
+    }
+}
+
+foreach my $ks (@keysize) {
+    my $padding = 1;
+    my $msg = $padding ? "Padding" : "No Padding";
+    foreach my $iks (@keysize) {
+        next if ($ks eq $iks);
+        my $coa;
+        eval {
+            $coa = Crypt::OpenSSL::AES->new(pack("H*", $key{$ks}),
+                                    {
+                                        cipher  => "AES-$iks-ECB",
+                                        padding => $padding,
+                                    });
+        };
+        like($@, qr/unsupported cipher for this keysize/, "Mismatch of keysize ($ks) and cipher ($iks)");
+    }
+    foreach my $iks (@keysize) {
+        next if ($ks ne $iks);
+        my $coa;
+        eval {
+            $coa = Crypt::OpenSSL::AES->new(pack("H*", $key{$ks}),
+                                    {
+                                        cipher  => "AES-$iks-ECB",
+                                        padding => $padding,
+                                    });
+        };
+        like($@, qr//, "Match of keysize ($ks) and cipher ($iks)");
     }
 }
 done_testing;

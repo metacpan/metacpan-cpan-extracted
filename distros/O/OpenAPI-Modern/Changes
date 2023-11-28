@@ -1,5 +1,26 @@
 Revision history for OpenAPI-Modern
 
+0.052     2023-11-26 23:48:32Z
+          - "recursive_get" now optionally takes a target entity type
+          - support added for validation of Plack::Request and Plack::Response
+            objects
+
+0.051     2023-11-13 01:02:33Z
+          - Content-Length checking is now more properly consistent with
+            RFC9112; some users of HTTP::Request and ::Response objects may
+            need to make adjustments in their tests to be compliant
+          - track all subschema locations, not just schema roots, for better
+            $ref verification
+
+0.050     2023-11-06 03:10:15Z
+          - fix construction of an OpenAPI::Modern object with a
+            pre-constructed JSON::Schema::Modern::Document::OpenAPI object
+          - "recursive_get" moved from JSON::Schema::Modern::Document::OpenAPI
+            to OpenAPI::Modern
+          - when validating header strings against a string schema, no longer
+            parse out internal whitespace surrounding commas (to use RFC9112
+            semantics, validate as an array).
+
 0.049     2023-10-29 01:01:38Z
           - fix "recursive_get" to take a uri-reference, rather than a json
             pointer
@@ -20,7 +41,7 @@ Revision history for OpenAPI-Modern
           - new "recursive_get" method on
             JSON::Schema::Modern::Document::OpenAPI for fetching a
             specification at a json pointer and following any $refs
-            (note this interface has changed as of 0.049)
+            (note this interface has changed in 0.049 and 0.050)
 
 0.046     2023-06-24 21:56:39Z
           - extra validation for Transfer-Encoding response header

@@ -1,6 +1,15 @@
+0.003 - 2023-11-08
+  - Ability to define Template as perl package with code in __DATA__
+  - New utility ::CParser
+  - ::Cpppp attribute convert_linecomment_to_c89
+      and method 'get_filtered_output'
+      and cpppp option --convert-linecomment-to-c89
+  - Attribute accessors on ::Template for autocolumn, autocomma,
+     autoindent, and autostatementline
+
 0.002 - 2023-10-31
   - Remove autocomma and autostatementline attributes on Cpppp object,
-     because they change the validity of tempalte output.
+     because they change the validity of template output.
   - Output object stringifies to its content
   - Automatically flush new template instances after BUILD
   - Documentation improvements, and minor code cleanup.

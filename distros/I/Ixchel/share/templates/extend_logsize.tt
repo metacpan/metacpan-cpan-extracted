@@ -1,0 +1,33 @@
+[sets.var_log]
+dir="/var/log/"
+
+[% IF config.suricata.enable %]
+[sets.suricata_flows_current]
+dir="/var/log/suricata/flows/current/"
+[% IF config.snmp.extends.logsize.suricata_base %]
+[sets.suricata]
+dir="/var/log/suricata/"
+[% END %]
+[% END %]
+
+[% IF config.sagan.enable && config.snmp.extends.logsize.sagan_base %]
+[sets.sagan]
+dir="/var/log/sagan/"
+[% END %]
+
+[% IF config.snmp.extends.logsize.remote %]
+[% IF config.snmp.extends.logsize.remote_sub_dirs %]
+[% FOREACH remote_dir IN get_sub_dirs( '/var/log/remote/' ) %]
+[sets.[% remote_dir.replace('\W+', '_').replace('^\_', '') %]]
+dir="/var/log/remote/[% remote_dir %]"
+[% END %]
+[% ELSE %]
+[sets.var_log_remote]
+dir="/var/log/remote"
+[% END %]
+[% END %]
+
+[% IF config.apache2.enable && config.snmp.extends.logsize.apache2 %]
+[sets.var_log_apache]
+dir="[% config.apache.logdir %]"
+[% END %]

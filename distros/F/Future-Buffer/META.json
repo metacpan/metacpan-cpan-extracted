@@ -28,7 +28,7 @@
       },
       "test" : {
          "requires" : {
-            "Test2::V0" : "0",
+            "Test2::V0" : "0.000149",
             "Test::More" : "0.88"
          }
       }
@@ -36,7 +36,7 @@
    "provides" : {
       "Future::Buffer" : {
          "file" : "lib/Future/Buffer.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -45,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

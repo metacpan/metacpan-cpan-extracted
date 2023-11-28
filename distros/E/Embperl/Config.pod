@@ -1,4 +1,6 @@
+=encoding iso8859-1
 
+=encoding iso8859-1
 
 =head1 NAME
 
@@ -320,7 +322,7 @@ You can use the Perl interacive command line debugger via
 
     perl -d embpexec.pl file.epl  
 
-or if you prefer a graphical debugger, try ddd (http://www.gnu.org/software/ddd/)
+or if you prefer a graphical debugger, try ddd (https://www.gnu.org/software/ddd/)
 it's a great tool, also for debugging any other perl script:
 
     ddd --debugger 'perl -d embpexec.pl file.epl'
@@ -381,7 +383,7 @@ $application -> config -> use_env I<[read only]>
 
 =item Default:
 
-off unless runing as CGI script
+off unless running as CGI script
 
 =item Since:
 
@@ -402,7 +404,7 @@ $application -> config -> use_redirect_env I<[read only]>
 
 =item Default:
 
-off unless runing as CGI script
+off unless running as CGI script
 
 =item Since:
 
@@ -434,7 +436,7 @@ $application -> config -> app_name I<[read only]>
 =back
 
 
-Specifies the name for an application. The name is basicly used to refer to this application
+Specifies the name for an application. The name is basically used to refer to this application
 elsewhere in httpd.conf without the need to setup the parameters for the apllication again.
 
 
@@ -898,7 +900,7 @@ Logs the parseing of the source
 
 =item dbgObjectSearch = 0x2000000
 
-Shows how Embperl::Objects seraches sourcefiles
+Shows how Embperl::Objects searches sourcefiles
 
 =item dbgCache = 0x4000000
 
@@ -1085,7 +1087,7 @@ $application -> config -> mail_errors_reset_time I<[read only]>
 =back
 
 
-Reset error counter if for <sec> seconds no error has occured.
+Reset error counter if for <sec> seconds no error has occurred.
 
 
 =head2 Embperl_Mail_Errors_Resend_Time
@@ -1160,7 +1162,7 @@ The file should contain the Perl code for
 the application object. There must be no package name given (as the package is set
 by Embperl::Object) inside the file, but the @ISA should point to Embperl::App.
 If set this file is searched through the same search path as any content file.
-After a successfull load the init method is called with the Embperl request object
+After a successful load the init method is called with the Embperl request object
 as parameter. The init method can change the parameters inside the request object
 to influence the current request.
 
@@ -1190,7 +1192,7 @@ This search through the searchpath is always performed if in a call to
 Execute no path for the file is given.
 
  
-In F<httpd.conf> or as evironment variable directories are
+In F<httpd.conf> or as environment variable directories are
 separated by C<;> (on Unix C<:> works also). The parameter for C<Execute> and
 the application object method expects/returns an array reference.
 This path is
@@ -1217,14 +1219,14 @@ $application -> config -> object_reqpath
 
 
 
-Additional directories where Embperl::Object searches for files for the inital request.
+Additional directories where Embperl::Object searches for files for the initial request.
 
 If a file is requested, but cannot be found at the given location, the directories
 given in the this path are additionally searched for the file. This applies only to
 the initial filename given to Embperl::Object and B<not> to files called via
 Execute.  
 
-In F<httpd.conf> or as evironment variable directories are
+In F<httpd.conf> or as environment variable directories are
 separated by C<;> (on Unix C<:> works also). The parameter for C<Execute> and
 the application object method expects/returns an array reference.
 
@@ -1335,7 +1337,7 @@ $request -> config -> use_env I<[read only]>
 
 =item Default:
 
-off unless runing as CGI script
+off unless running as CGI script
 
 =item Since:
 
@@ -1356,7 +1358,7 @@ $request -> config -> use_redirect_env I<[read only]>
 
 =item Default:
 
-off unless runing as CGI script
+off unless running as CGI script
 
 =item Since:
 
@@ -1712,7 +1714,7 @@ $component -> config -> use_env I<[read only]>
 
 =item Default:
 
-off unless runing as CGI script
+off unless running as CGI script
 
 =item Since:
 
@@ -1733,7 +1735,7 @@ $component -> config -> use_redirect_env I<[read only]>
 
 =item Default:
 
-off unless runing as CGI script
+off unless running as CGI script
 
 =item Since:
 
@@ -1965,7 +1967,7 @@ If you add this value to the above Embperl will always perform the
 escaping. Without it is possible to disable escaping by preceding the item that
 normally is escaped with a backslash. While this is a handy thing, it could
 be very dangerous in situations, where content that is inserted by some
-user is redisplayed, because they can enter arbitrary HTML and preceed them
+user is redisplayed, because they can enter arbitrary HTML and precede them
 with a backslash to avoid correct escaping when their input is redisplayed
 again.
 
@@ -2004,22 +2006,22 @@ Tells Embperl how to handle escape sequences that are found in the source.
 
 =over 
 
-=item 0
+=item C<0>
 
 don't interpret input (default)
 
 
-=item 1   
+=item C<1>   
 
 unescape html escapes to their characters (i.e. &lt; becomes < )
 inside of Perl code
 
-=item 2
+=item C<2>
 
 unescape url escapes to their characters (i.e. %26; becomes & )
 inside of Perl code
 
-=item 3
+=item C<3>
 
 unescape html and url escapes, depending on the context
 
@@ -2171,7 +2173,7 @@ $component -> config -> expires_func I<[read only]>
 
 
 Function that is called every time before data is taken from the cache.
-If this funtion returns true, the data from the cache isn't used anymore,
+If this function returns true, the data from the cache isn't used anymore,
 but rebuilt.
 
 Function could be either a coderef (when passed to Execute), a name of a
@@ -2504,7 +2506,7 @@ $request -> param -> server_addr
 
 
 URL of the server of the current request in the form
-schema://addr:port/ e.g. http://perl.apache.org/ (port is omitted if it is
+schema://addr:port/ e.g. https://perl.apache.org/ (port is omitted if it is
 an default port)
 
 =head2 path_info
@@ -2559,7 +2561,7 @@ $request -> param -> language
 
 
 The primary langange found in the browser C<Accept-Language> HTTP header.
-This value is used for all language dependend functions inside Embperl.
+This value is used for all language-dependent functions inside Embperl.
 You can set it change the selection of message returned by C<$request -&gt; gettext>
 and C<[= =]>.
 
@@ -2995,7 +2997,7 @@ There are three major objects in Embperl: I<application>, I<request> and I<compo
 Each of these objects can be used to get information about the processing and
 control the execution. Each of these objects has a config sub-object, which makes
 the configuration accessible and, where possible, changeable at runtime. The C<config>
-method of these three objects returns a reference to the configuation object. The methods
+method of these three objects returns a reference to the configuration object. The methods
 of these configurations objects are described in the section L<Configuration>.
 The request and the component object have addtionaly a parameter sub-object, which holds
 parameters passed to the current request/component. The C<param> method of these two
@@ -3198,7 +3200,7 @@ $application -> errors_last_time
 =back
 
 
-Time when the last error has occured.  See also L<mail_errors_to>.
+Time when the last error has occurred.  See also L<mail_errors_to>.
 
 =head2 errors_last_send_time
 
@@ -3510,7 +3512,7 @@ $request -> errors
 =back
 
 
-Reference to an array which holds all error messages occured so far.
+Reference to an array which holds all error messages occurred so far.
 
 =head2 errdat1
 
@@ -3617,7 +3619,7 @@ $request -> cleanup_packages
 =back
 
 
-Refernce to a hash which contains all packages that must be cleaned up after the request.
+Reference to a hash which contains all packages that must be cleaned up after the request.
 
 =head2 initial_cwd
 
@@ -3670,7 +3672,7 @@ for the symbol. Example:
             },
          'en' =>
             {
-            'addsel1' => 'Click on the category for wich you want to add a new item:',
+            'addsel1' => 'Click on the category for which you want to add a new item:',
             'addsel2' => 'or add new category. Please enter the description in as much languages as possible.',
             'addsel3' => 'If you don\'t know the translation leave the corresponding input field empty.',
             'addsel4' => 'Add category',
@@ -3968,7 +3970,7 @@ $component -> code
 =back
 
 
-Only valid during compile phase. Can used to retrive and modify the code
+Only valid during compile phase. Can used to retrieve and modify the code
 Embperl is generating. See Embperl::Syntax for more details and Embperl::Syntax::RTF
 for an example.
 

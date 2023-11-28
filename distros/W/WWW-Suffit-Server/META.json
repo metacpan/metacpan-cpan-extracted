@@ -34,6 +34,7 @@
       "runtime" : {
          "requires" : {
             "Mojolicious" : "7.94",
+            "Sys::Syslog" : "0",
             "WWW::Suffit" : "1",
             "perl" : "5.020"
          }
@@ -51,6 +52,6 @@
          "web" : "https://sourceforge.net/p/www-suffit-server/code/ci/master/tree/"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

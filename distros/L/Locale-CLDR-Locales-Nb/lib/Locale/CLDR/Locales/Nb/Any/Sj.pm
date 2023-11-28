@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nb::Any::Sj - Package for language Norwegian Bokmål
 
 package Locale::CLDR::Locales::Nb::Any::Sj;
 # This file auto generated from Data\common\main\nb_SJ.xml
-#	on Fri 13 Oct  9:30:09 am GMT
+#	on Sat  4 Nov  6:16:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

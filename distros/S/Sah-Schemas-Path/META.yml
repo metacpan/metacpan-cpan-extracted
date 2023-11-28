@@ -19,181 +19,250 @@ name: Sah-Schemas-Path
 provides:
   Data::Sah::Coerce::perl::To_array::From_str::expand_glob:
     file: lib/Data/Sah/Coerce/perl/To_array/From_str/expand_glob.pm
-    version: '0.021'
+    version: '0.025'
   Data::Sah::Filter::perl::Path::check_dir_exists:
     file: lib/Data/Sah/Filter/perl/Path/check_dir_exists.pm
-    version: '0.021'
+    version: '0.025'
   Data::Sah::Filter::perl::Path::check_file_exists:
     file: lib/Data/Sah/Filter/perl/Path/check_file_exists.pm
-    version: '0.021'
+    version: '0.025'
   Data::Sah::Filter::perl::Path::check_path_exists:
     file: lib/Data/Sah/Filter/perl/Path/check_path_exists.pm
-    version: '0.021'
+    version: '0.025'
   Data::Sah::Filter::perl::Path::check_path_not_exists:
     file: lib/Data/Sah/Filter/perl/Path/check_path_not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Data::Sah::Filter::perl::Path::expand_tilde:
     file: lib/Data/Sah/Filter/perl/Path/expand_tilde.pm
-    version: '0.021'
+    version: '0.025'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix:
     file: lib/Data/Sah/Filter/perl/Path/expand_tilde_when_on_unix.pm
-    version: '0.021'
+    version: '0.025'
   Data::Sah::Filter::perl::Path::strip_slashes:
     file: lib/Data/Sah/Filter/perl/Path/strip_slashes.pm
-    version: '0.021'
+    version: '0.025'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix:
     file: lib/Data/Sah/Filter/perl/Path/strip_slashes_when_on_unix.pm
-    version: '0.021'
+    version: '0.025'
+  Data::Sah::Value::perl::Path::curdir_abs:
+    file: lib/Data/Sah/Value/perl/Path/curdir_abs.pm
+    version: '0.025'
+  Data::Sah::Value::perl::Path::only_file_in_curdir:
+    file: lib/Data/Sah/Value/perl/Path/only_file_in_curdir.pm
+    version: '0.025'
+  Data::Sah::Value::perl::Path::only_file_not_dir_in_curdir:
+    file: lib/Data/Sah/Value/perl/Path/only_file_not_dir_in_curdir.pm
+    version: '0.025'
+  Data::Sah::Value::perl::Path::only_subdir_in_curdir:
+    file: lib/Data/Sah/Value/perl/Path/only_subdir_in_curdir.pm
+    version: '0.025'
   Sah::Schema::dirname:
     file: lib/Sah/Schema/dirname.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::dirname::default_curdir:
     file: lib/Sah/Schema/dirname/default_curdir.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::Schema::dirname::default_curdir_abs:
+    file: lib/Sah/Schema/dirname/default_curdir_abs.pm
+    version: '0.025'
+  Sah::Schema::dirname::default_only_subdir_in_curdir:
+    file: lib/Sah/Schema/dirname/default_only_subdir_in_curdir.pm
+    version: '0.025'
   Sah::Schema::dirname::exists:
     file: lib/Sah/Schema/dirname/exists.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::Schema::dirname::exists::default_only_subdir_in_curdir:
+    file: lib/Sah/Schema/dirname/exists/default_only_subdir_in_curdir.pm
+    version: '0.025'
   Sah::Schema::dirname::not_exists:
     file: lib/Sah/Schema/dirname/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::dirname::unix:
     file: lib/Sah/Schema/dirname/unix.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::Schema::dirname::unix::basename:
+    file: lib/Sah/Schema/dirname/unix/basename.pm
+    version: '0.025'
   Sah::Schema::dirname::unix::exists:
     file: lib/Sah/Schema/dirname/unix/exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::dirname::unix::not_exists:
     file: lib/Sah/Schema/dirname/unix/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::dirnames::exist:
     file: lib/Sah/Schema/dirnames/exist.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::filename:
     file: lib/Sah/Schema/filename.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::Schema::filename::default_only_file_in_curdir:
+    file: lib/Sah/Schema/filename/default_only_file_in_curdir.pm
+    version: '0.025'
+  Sah::Schema::filename::default_only_file_not_dir_in_curdir:
+    file: lib/Sah/Schema/filename/default_only_file_not_dir_in_curdir.pm
+    version: '0.025'
   Sah::Schema::filename::exists:
     file: lib/Sah/Schema/filename/exists.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::Schema::filename::exists::default_only_file_in_curdir:
+    file: lib/Sah/Schema/filename/exists/default_only_file_in_curdir.pm
+    version: '0.025'
   Sah::Schema::filename::not_exists:
     file: lib/Sah/Schema/filename/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::filename::unix:
     file: lib/Sah/Schema/filename/unix.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::Schema::filename::unix::basename:
+    file: lib/Sah/Schema/filename/unix/basename.pm
+    version: '0.025'
   Sah::Schema::filename::unix::exists:
     file: lib/Sah/Schema/filename/unix/exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::filename::unix::not_exists:
     file: lib/Sah/Schema/filename/unix/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::filenames:
     file: lib/Sah/Schema/filenames.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::filenames::exist:
     file: lib/Sah/Schema/filenames/exist.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::pathname:
     file: lib/Sah/Schema/pathname.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::pathname::exists:
     file: lib/Sah/Schema/pathname/exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::pathname::not_exists:
     file: lib/Sah/Schema/pathname/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::pathname::unix:
     file: lib/Sah/Schema/pathname/unix.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::Schema::pathname::unix::basename:
+    file: lib/Sah/Schema/pathname/unix/basename.pm
+    version: '0.025'
   Sah::Schema::pathname::unix::exists:
     file: lib/Sah/Schema/pathname/unix/exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::pathname::unix::not_exists:
     file: lib/Sah/Schema/pathname/unix/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::pathnames:
     file: lib/Sah/Schema/pathnames.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schema::pathnames::exist:
     file: lib/Sah/Schema/pathnames/exist.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::dirname:
     file: lib/Sah/SchemaR/dirname.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::dirname::default_curdir:
     file: lib/Sah/SchemaR/dirname/default_curdir.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::SchemaR::dirname::default_curdir_abs:
+    file: lib/Sah/SchemaR/dirname/default_curdir_abs.pm
+    version: '0.025'
+  Sah::SchemaR::dirname::default_only_subdir_in_curdir:
+    file: lib/Sah/SchemaR/dirname/default_only_subdir_in_curdir.pm
+    version: '0.025'
   Sah::SchemaR::dirname::exists:
     file: lib/Sah/SchemaR/dirname/exists.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::SchemaR::dirname::exists::default_only_subdir_in_curdir:
+    file: lib/Sah/SchemaR/dirname/exists/default_only_subdir_in_curdir.pm
+    version: '0.025'
   Sah::SchemaR::dirname::not_exists:
     file: lib/Sah/SchemaR/dirname/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::dirname::unix:
     file: lib/Sah/SchemaR/dirname/unix.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::SchemaR::dirname::unix::basename:
+    file: lib/Sah/SchemaR/dirname/unix/basename.pm
+    version: '0.025'
   Sah::SchemaR::dirname::unix::exists:
     file: lib/Sah/SchemaR/dirname/unix/exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::dirname::unix::not_exists:
     file: lib/Sah/SchemaR/dirname/unix/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::dirnames::exist:
     file: lib/Sah/SchemaR/dirnames/exist.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::filename:
     file: lib/Sah/SchemaR/filename.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::SchemaR::filename::default_only_file_in_curdir:
+    file: lib/Sah/SchemaR/filename/default_only_file_in_curdir.pm
+    version: '0.025'
+  Sah::SchemaR::filename::default_only_file_not_dir_in_curdir:
+    file: lib/Sah/SchemaR/filename/default_only_file_not_dir_in_curdir.pm
+    version: '0.025'
   Sah::SchemaR::filename::exists:
     file: lib/Sah/SchemaR/filename/exists.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::SchemaR::filename::exists::default_only_file_in_curdir:
+    file: lib/Sah/SchemaR/filename/exists/default_only_file_in_curdir.pm
+    version: '0.025'
   Sah::SchemaR::filename::not_exists:
     file: lib/Sah/SchemaR/filename/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::filename::unix:
     file: lib/Sah/SchemaR/filename/unix.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::SchemaR::filename::unix::basename:
+    file: lib/Sah/SchemaR/filename/unix/basename.pm
+    version: '0.025'
   Sah::SchemaR::filename::unix::exists:
     file: lib/Sah/SchemaR/filename/unix/exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::filename::unix::not_exists:
     file: lib/Sah/SchemaR/filename/unix/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::filenames:
     file: lib/Sah/SchemaR/filenames.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::filenames::exist:
     file: lib/Sah/SchemaR/filenames/exist.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::pathname:
     file: lib/Sah/SchemaR/pathname.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::pathname::exists:
     file: lib/Sah/SchemaR/pathname/exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::pathname::not_exists:
     file: lib/Sah/SchemaR/pathname/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::pathname::unix:
     file: lib/Sah/SchemaR/pathname/unix.pm
-    version: '0.021'
+    version: '0.025'
+  Sah::SchemaR::pathname::unix::basename:
+    file: lib/Sah/SchemaR/pathname/unix/basename.pm
+    version: '0.025'
   Sah::SchemaR::pathname::unix::exists:
     file: lib/Sah/SchemaR/pathname/unix/exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::pathname::unix::not_exists:
     file: lib/Sah/SchemaR/pathname/unix/not_exists.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::pathnames:
     file: lib/Sah/SchemaR/pathnames.pm
-    version: '0.021'
+    version: '0.025'
   Sah::SchemaR::pathnames::exist:
     file: lib/Sah/SchemaR/pathnames/exist.pm
-    version: '0.021'
+    version: '0.025'
   Sah::Schemas::Path:
     file: lib/Sah/Schemas/Path.pm
-    version: '0.021'
+    version: '0.025'
 requires:
   Perinci::Sub::XCompletion::dirname: '0'
+  Perinci::Sub::XCompletion::dirname_curdir: '0'
   Perinci::Sub::XCompletion::filename: '0'
+  Perinci::Sub::XCompletion::filename_curdir: '0'
+  Perinci::Sub::XCompletion::pathname_curdir: '0'
   Perl::osnames: '0.121'
   perl: '5.010001'
   strict: '0'
@@ -202,7 +271,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Path
   homepage: https://metacpan.org/release/Sah-Schemas-Path
   repository: git://github.com/perlancar/perl-Sah-Schemas-Path.git
-version: '0.021'
+version: '0.025'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -294,7 +363,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.608'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'

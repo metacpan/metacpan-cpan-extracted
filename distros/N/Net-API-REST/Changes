@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::REST
 
+v1.1.0 2023-11-19T09:03:58+0900
+    - Improved code
+
 v1.0.2 2023-10-11T20:34:58+0900
     - Corrected malformed signature for distribution release
 

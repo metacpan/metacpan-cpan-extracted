@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -37,11 +37,11 @@
    "provides" : {
       "String::Tagged::Terminal" : {
          "file" : "lib/String/Tagged/Terminal.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "String::Tagged::Terminal::Win32Console" : {
          "file" : "lib/String/Tagged/Terminal/Win32Console.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
+   "version" : "0.07",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

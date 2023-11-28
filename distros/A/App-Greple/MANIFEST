@@ -40,6 +40,7 @@ t/12_error.t
 t/13_max.t
 t/14_no_color.t
 t/15_encoding.t
+t/16_callback.t
 t/Checker.pm
 t/JA.txt
 t/SAMPLE.txt
@@ -49,8 +50,6 @@ t/SEARCH.txt
 t/Util.pm
 t/line/00_load.t
 t/line/02_search.t
-t/pod-coverage.t
-t/pod.t
 t/select/00_load.t
 t/select/01_select.t
 t/runner/README.md

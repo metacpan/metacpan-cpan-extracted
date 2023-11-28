@@ -2,7 +2,7 @@
 # Package        HiPi::Device::GPIO::Pin
 # Description:   Pin
 # Created        Wed Feb 20 04:37:38 2013
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2013 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -16,16 +16,19 @@ use parent qw( HiPi::Pin );
 use Carp;
 use Fcntl;
 use HiPi qw( :rpi );
+use HiPi::RaspberryPi;
 
-our $VERSION ='0.81';
+my $pinoffset = ( HiPi::RaspberryPi::has_rp1() ) ? 399 : 0;
+
+our $VERSION ='0.90';
 
 __PACKAGE__->create_accessors();
 
 sub _open {
     my ($class, %params) = @_;
     defined($params{pinid}) or croak q(pinid not defined in parameters);
-    
-    my $pinroot = qq(/sys/class/gpio/gpio$params{pinid});
+    my $syspin = $params{pinid} + $pinoffset;
+    my $pinroot = qq(/sys/class/gpio/gpio${syspin});
     croak qq(pin $params{pinid} is not exported) if !-d $pinroot;
         
     my $self = $class->SUPER::_open(%params);
@@ -80,6 +83,26 @@ sub _do_setpud {
 sub _do_getpud {
     my($self) = @_;
     return HiPi::Device::GPIO->get_pin_pud($self->pinid);
+}
+
+sub _do_setschmitt {
+    my( $self, $val ) = @_;
+    return HiPi::Device::GPIO->set_pin_schmitt($self->pinid, $val);
+}
+
+sub _do_getschmitt {
+    my( $self ) = @_;
+    return HiPi::Device::GPIO->get_pin_schmitt($self->pinid);
+}
+
+sub _do_setslew {
+    my( $self, $val ) = @_;
+    return HiPi::Device::GPIO->set_pin_slew($self->pinid, $val);    
+}
+
+sub _do_getslew {
+    my( $self ) = @_;
+    return HiPi::Device::GPIO->get_pin_slew($self->pinid);
 }
 
 sub _do_activelow {

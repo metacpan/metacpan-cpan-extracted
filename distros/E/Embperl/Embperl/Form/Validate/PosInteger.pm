@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,30 +12,33 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: Integer.pm,v 1.3 2004/01/23 06:50:57 richter Exp $
-#
 ###################################################################################
 
 
 package Embperl::Form::Validate::PosInteger ;
 
 use base qw(Embperl::Form::Validate::Integer);
+use utf8 ;
+
+my %errutf8 =
+    (
+	validate_pos_number => '"%0" muÃŸ eine Zahl grÃ¶ÃŸer oder gleich Null sein',
+    ) ;
+
+no utf8 ;
 
 my %error_messages = 
 (
     de => 
     {
-	validate_pos_number => '%0 muß eine Zahl größer oder gleich Null sein',
+	validate_pos_number => '"%0" muß eine Zahl größer oder gleich Null sein',
     },
 
-    'de.utf-8' => 
-    {
-	validate_pos_number => '%0 muÃŸ eine Zahl grÃ¶ÃŸer oder gleich Null sein',
-    },
+    'de.utf-8' => \%errutf8,
 
     en =>
     {
-	validate_pos_number => '%0 must be a number greater or equal zero',
+	validate_pos_number => '"%0" must be a number greater or equal zero',
     }
  );
 

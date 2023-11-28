@@ -1,5 +1,62 @@
 Revision history for Perl application 'greple'.
 
+9.0902 2023-11-20T10:23:55Z
+
+    - fix bug of --must pattern used with --need option
+
+9.0901 2023-11-18T05:41:58Z
+
+    - update all codes using "keys @array" syntax
+    - update option handling code
+    - skip test on v5.14, because of :lvalue function error
+    - no functional change
+
+9.09 2023-10-26T09:32:29Z
+
+    - fix bug of "--not" stop to use the first arg as a pattern
+      * this bug was introduced by "8.5202 2021-12-09T02:09:44Z"
+    - make "--may" optional pattern same as "--not"
+
+9.08 2023-09-16T04:33:12Z
+
+    - Update -Mline module
+      * implement --offload option
+    - Update -Mdig module
+      * skip node_modules
+      * skip "tif" file
+
+9.07 2023-06-07T12:14:28Z
+
+    - Allows multiple --callback functions.
+      They are applied in order and cyclically.
+
+9.06 2023-05-09T02:42:55Z
+
+    - Introduce --capture-group (-G) option
+    - Make -E alias for --re option
+
+9.05 2023-04-24T09:37:00Z
+
+    - Update -Mselect module
+      * enable multi-line mode and introduce --select-longer option
+    - Update -Mdig module
+      * update minimized file pattern
+
+9.04 2023-03-30T08:40:34Z
+
+    - Fix --select option behavior:
+      * takes line number, rather than pattern number
+
+9.03 2023-03-29T11:54:52Z
+
+    - Fix option -f behavior:
+      * do not treat space specially
+      * enclose each pattern in (?^m: ... ) to reset
+
+9.02 2023-02-02T13:19:13Z
+
+    - Introduce --postgrep option.
+
 9.0101 2023-02-01T11:20:43Z
 
     - Fix a bug of handling empty block for -Mxlate module.

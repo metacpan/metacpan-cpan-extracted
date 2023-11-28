@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ki - Package for language Kikuyu
 
 package Locale::CLDR::Locales::Ki;
 # This file auto generated from Data\common\main\ki.xml
-#	on Fri 13 Oct  9:23:19 am GMT
+#	on Sat  4 Nov  6:09:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

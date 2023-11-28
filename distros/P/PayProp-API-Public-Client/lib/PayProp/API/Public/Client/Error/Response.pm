@@ -16,7 +16,7 @@ __END__
 
 =head1 NAME
 
-	PayProp::API::Public::Client::Error::Response - Response error.
+PayProp::API::Public::Client::Error::Response - Response error.
 
 =head1 SYNOPSIS
 
@@ -27,11 +27,11 @@ __END__
 
 =head1 DESCRIPTION
 
-	Construct C<PayProp::API::Public::Client::Error::Response> errors.
+Construct C<PayProp::API::Public::Client::Error::Response> errors.
 
 =head1 ATTRIBUTES
 
-	C<PayProp::API::Public::Client::Error::Authorization> implements the following attributes.
+C<PayProp::API::Public::Client::Error::Authorization> implements the following attributes.
 
 =head2 path
 
@@ -43,22 +43,54 @@ __END__
 
 =head1 AUTHOR
 
-	Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
 
-	Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-	Copyright 2023- PayProp
+Copyright 2023- PayProp
 
 =head1 LICENSE
 
-	This library is free software; you can redistribute it and/or modify
-	it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
-	If you would like to contribute documentation
-	or file a bug report then please raise an issue / pull request:
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
 
-	L<https://github.com/Humanstate/api-client-public-module>
+L<https://github.com/Humanstate/api-client-public-module>
+
+=head1 ATTRIBUTES
+
+C<PayProp::API::Public::Client::Error::Authorization> implements the following attributes.
+
+=head2 path
+
+	my $error_path = $Error->path;
+
+=head2 message
+
+	my $error_message = $Error->message;
+
+=head1 AUTHOR
+
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2023- PayProp
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
+
+L<https://github.com/Humanstate/api-client-public-module>
 
 =cut

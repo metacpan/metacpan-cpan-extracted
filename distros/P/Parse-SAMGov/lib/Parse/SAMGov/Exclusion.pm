@@ -1,8 +1,9 @@
 package Parse::SAMGov::Exclusion;
-$Parse::SAMGov::Exclusion::VERSION = '0.106';
+$Parse::SAMGov::Exclusion::VERSION = '0.202';
 use strict;
 use warnings;
 use 5.010;
+use Carp;
 use Data::Dumper;
 use DateTime;
 use DateTime::Format::Strptime;
@@ -18,10 +19,12 @@ use overload fallback => 1,
         my $str = '';
         $str .= $self->classification . ': ' . $self->name;
         $str .= "\nAddress: " . $self->address if $self->address;
+        $str .= "\nUEI: " . $self->UEI if $self->UEI;
         $str .= "\nDUNS: " . $self->DUNS if $self->DUNS;
         $str .= "\nCAGE: " . $self->CAGE if $self->CAGE;
         $str .= "\nSAM no.: " . $self->SAM_number if $self->SAM_number;
         $str .= "\nNational Provider Identifier: " . $self->NPI if $self->NPI;
+        $str .= "\nCreation Date: " . $self->creation_date->ymd('-') if $self->creation_date;
         $str .= "\nActive Date: " . $self->active_date->ymd('-') if $self->active_date;
         if ($self->termination_date->year() == 2200) {
             $str .= "\nTermination Date: Indefinite";
@@ -35,6 +38,7 @@ use overload fallback => 1,
         $str .= "\nExclusion Type: " . $self->xtype if $self->xtype;
         $str .= "\nExclusion Type(Cause & Treatment Code): " . $self->CT_code if $self->CT_code;
         $str .= "\nAdditional Comments: " . $self->comments if $self->comments;
+        $str .= "\nD&B Open Data Flag: " . $self->dnb_open_data if defined $self->dnb_open_data;
         return $str;
     };
 
@@ -53,6 +57,8 @@ has address => default => sub {
 
 
 has 'DUNS';
+has 'dnb_open_data';
+has 'UEI';
 
 
 has 'xprogram';
@@ -80,6 +86,9 @@ sub _parse_date {
     }
     return;
 }
+
+
+has creation_date => (coerce => sub { _parse_date $_[0] });
 
 
 has active_date => (coerce => sub { _parse_date $_[0] });
@@ -112,7 +121,16 @@ sub _trim {
 
 sub load {
     my $self = shift;
-    return unless scalar(@_) >= 28;
+    my $ncols = scalar(@_);
+    return $self->load_v2(@_) if $ncols eq 31;
+    return $self->load_v1(@_) if $ncols eq 28;
+    carp "Unknown version of data file found with $ncols columns";
+    return undef;
+}
+
+sub load_v1 {
+    my $self = shift;
+    return unless scalar(@_) == 28;
     $self->classification(_trim(shift));
     my $name = Parse::SAMGov::Exclusion::Name->new(
         entity => _trim(shift),
@@ -148,6 +166,47 @@ sub load {
     return 1;
 }
 
+sub load_v2 {
+    my $self = shift;
+    return unless scalar(@_) == 31;
+    $self->classification(_trim(shift));
+    my $name = Parse::SAMGov::Exclusion::Name->new(
+        entity => _trim(shift),
+        prefix => _trim(shift),
+        first => _trim(shift),
+        middle => _trim(shift),
+        last => _trim(shift),
+        suffix => _trim(shift),
+    );
+    $self->name($name);
+    my $addr = Parse::SAMGov::Entity::Address->new(
+        # the order of shifting matters
+        address => _trim(join(' ', shift, shift, shift, shift)),
+        city => _trim(shift),
+        state => _trim(shift),
+        country => _trim(shift),
+        zip => _trim(shift),
+    );
+    $self->address($addr);
+    $self->dnb_open_data(shift);# D&B Open Data Flag
+    $self->DUNS(_trim(shift));
+    $self->UEI(_trim(shift));
+    $self->xprogram(_trim(shift));
+    $self->xagency(_trim(shift));
+    $self->CT_code(_trim(shift));
+    $self->xtype(_trim(shift));
+    $self->comments(_trim(shift));
+    $self->active_date(shift);
+    $self->termination_date(shift);
+    $self->record_status(_trim(shift));
+    $self->crossref(_trim(shift));
+    $self->SAM_number(_trim (shift));
+    $self->CAGE(_trim(shift));
+    $self->NPI(_trim(shift));
+    $self->creation_date(shift);
+    return 1;
+}
+
 1;
 
 =pod
@@ -160,7 +219,7 @@ Parse::SAMGov::Exclusion - defines the SAM Exclusions object
 
 =head1 VERSION
 
-version 0.106
+version 0.202
 
 =head1 SYNOPSIS
 
@@ -203,6 +262,14 @@ classification type of Firm must have a DUNS number. It may be found in
 exclusion records of other classification types if the individual, special
 entity or vessel has a DUNS number. This has a maximum length of 9 characters.
 
+=head2 dnb_open_data
+
+This flag denotes whether this is a D&B Open Data or not. V2 only.
+
+=head2 UEI
+
+This holds the SAM Unique Entity Identifier (UEI) and is 12 characters long. This number is only valid for V2 files on or after 2022.
+
 =head2 xprogram
 
 Exclusion Program identifies if the exclusion is Reciprocal, Nonreciprocal or Procurement.
@@ -230,6 +297,12 @@ entity is being excluded.
 
 This field provides the agency creating the exclusion space to enter additional
 information as necessary. The maximum length allowed is 4000 characters.
+
+=head2 creation_date
+
+This field identifies the date the exclusion was created in SAM. It returns a DateTime
+object. It accepts an input of the format MM/DD/YYYY, and converts it to a
+DateTime object with the timezone used as America/New_York.
 
 =head2 active_date
 
@@ -279,7 +352,7 @@ Vikas N Kumar <vikas@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Selective Intellect LLC.
+This software is copyright (c) 2023 by Selective Intellect LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

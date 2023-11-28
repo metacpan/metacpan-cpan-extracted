@@ -22,6 +22,7 @@ my @files = (
     't/02-minify_utf8.t',
     't/03-minify_ascii.t',
     't/04-undef.t',
+    't/author-changes.t',
     't/author-clean-namespaces.t',
     't/author-critic.t',
     't/author-eof.t',
@@ -36,7 +37,7 @@ my @files = (
     't/author-ppport.t',
     't/author-vars.t',
     't/etc/perlcritic.rc',
-    't/release-check-manifest.t',
+    't/release-dist-manifest.t',
     't/release-fixme.t',
     't/release-kwalitee.t',
     't/release-trailing-space.t'

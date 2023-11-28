@@ -3,3 +3,5 @@ Revision history for MooX-Keyword-Chain
 0.01    Date/time
         First version, released on an unsuspecting world.
 
+0.03    2023/11/12
+        - Update minimum dep version for MooX::Keyword

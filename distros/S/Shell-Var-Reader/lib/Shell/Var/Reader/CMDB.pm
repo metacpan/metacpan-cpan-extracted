@@ -289,39 +289,9 @@ sub update {
 				. ' --tcmdb ../cmdb/ -s -p --cmdb_host '
 				. shell_quote($cmdb_host) . ' '
 				. $munger_option
-				. ' -o json > ../json_confs/'
-				. shell_quote($cmdb_host) . '.json';
+				. ' -o multi -d ../';
 			print `$command`;
 
-			$command
-				= 'shell_var_reader -r '
-				. shell_quote($system)
-				. ' --tcmdb ../cmdb/ -s -p --cmdb_host '
-				. shell_quote($cmdb_host) . ' '
-				. $munger_option
-				. ' -o yaml > ../yaml_confs/'
-				. shell_quote($cmdb_host) . '.yaml';
-			print `$command`;
-
-			$command
-				= 'shell_var_reader -r '
-				. shell_quote($system)
-				. ' --tcmdb ../cmdb/ -s -p --cmdb_host '
-				. shell_quote($cmdb_host) . ' '
-				. $munger_option
-				. ' -o toml > ../toml_confs/'
-				. shell_quote($cmdb_host) . '.toml';
-			print `$command`;
-
-			$command
-				= 'shell_var_reader -r '
-				. shell_quote($system)
-				. ' --tcmdb ../cmdb/ -s -p --cmdb_host '
-				. shell_quote($cmdb_host) . ' '
-				. $munger_option
-				. ' -o shell > ../shell_confs/'
-				. shell_quote($cmdb_host) . '.sh';
-			print `$command`;
 		} ## end foreach my $system (@systems_in_group)
 		if ( $opts{verbose} ) {
 			print "\n\n";

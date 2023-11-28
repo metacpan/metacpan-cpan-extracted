@@ -317,7 +317,7 @@ F</etc/apache/httpd.conf>
 
 	<VirtualHost 10.1.1.2:80>
 		ServerName crazyguyonabike.com
-		Redirect / http://www.crazyguyonabike.com
+		Redirect / https://www.crazyguyonabike.com
 	</VirtualHost>
 
 	# Set EmbPerl handler for main directory

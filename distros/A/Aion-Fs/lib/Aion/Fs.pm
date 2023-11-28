@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.0.3";
+our $VERSION = "0.0.6";
 
 use Exporter qw/import/;
 use Scalar::Util qw//;
@@ -13,12 +13,28 @@ our @EXPORT = our @EXPORT_OK = grep {
 	ref \$Aion::Fs::{$_} eq "GLOB" && *{$Aion::Fs::{$_}}{CODE} && !/^(?:_|(NaN|import)\z)/
 } keys %Aion::Fs::;
 
+
+# Из пакета в файловый путь
+sub from_pkg(;$) {
+	my ($pkg) = @_ == 0? $_: @_;
+	$pkg =~ s!::!/!g;
+	"$pkg.pm"
+}
+
+# Из файлового пути в пакет
+sub to_pkg(;$) {
+	my ($path) = @_ == 0? $_: @_;
+	$path =~ s!\.\w+$!!;
+	$path =~ s!/!::!g;
+	$path
+}
+
 # Подключает модуль, если он ещё не подключён, и возвращает его
 sub include(;$) {
 	my ($pkg) = @_;
 	$pkg = $_ if @_ == 0;
 	return $pkg if $pkg->can("new");
-	my $path = ($pkg =~ s!::!/!gr) . ".pm";
+	my $path = from_pkg $pkg;
 	return $pkg if exists $INC{$path};
 	require $path;
 	$pkg
@@ -33,7 +49,11 @@ sub mkpath (;$) {
 	my $permission;
 	($path, $permission) = @$path if ref $path;
 	$permission = DIR_DEFAULT_PERMISSION unless Scalar::Util::looks_like_number $permission;
-	mkdir $`, $permission or ($! != FILE_EXISTS? die "mkpath $`: $!": ()) while $path =~ m!/!g;
+	while($path =~ m!/!g) {
+		mkdir $`, $permission
+			or ($! != FILE_EXISTS? die "mkpath $`: $!": ())
+				if $` ne '';
+	}
 	undef $!;
 	$path
 }
@@ -198,7 +218,7 @@ sub wildcard(;$) {
 }
 
 # Открывает файл на указанной строке в редакторе
-use config EDITOR => "vscodium";
+use config EDITOR => "vscodium %p:%l";
 sub goto_editor($$) {
 	my ($path, $line) = @_;
 	my $p = EDITOR;
@@ -221,7 +241,7 @@ Aion::Fs - utilities for filesystem: read, write, find, replace files, etc
 
 =head1 VERSION
 
-0.0.3
+0.0.6
 
 =head1 SYNOPSIS
 
@@ -292,6 +312,18 @@ C<cat> raise exception by error on io operation:
 
 	eval { cat "A" }; $@  # ~> cat A: No such file or directory
 
+B<See also:>
+
+=over
+
+=item * <File::Slurp> — C<read_file('file.txt')>.
+
+=item * <File::Slurper> — C<read_text('file.txt')>, C<read_binary('file.txt')>.
+
+=item * <IO::All> — C<< io('file.txt') E<gt> $contents >>.
+
+=back
+
 =head2 lay ($file, $content)
 
 Write C<$content> in C<$file>.
@@ -308,6 +340,18 @@ Write C<$content> in C<$file>.
 	lay ["unicode.txt", ":raw"], "↯"  # => unicode.txt
 	
 	eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory
+
+B<See also:>
+
+=over
+
+=item * <File::Slurp> — C<write_file('file.txt', $contents)>.
+
+=item * <File::Slurper> — C<write_text('file.txt', $contents)>, C<write_binary('file.txt', $contents)>.
+
+=item * <IO::All> — C<< io('file.txt') E<lt> $contents >>.
+
+=back
 
 =head2 find ($path, @filters)
 
@@ -342,6 +386,14 @@ If C<find> is impossible to enter the subdirectory, then call errorenter with se
 	
 	eval { find "example", errorenter { die "find $_: $!" } }; $@   # ~> find example: Permission denied
 
+B<See also:>
+
+=over
+
+=item * <File::Find> — C<find(sub { push @paths, $File::Find::name }, $dir)>.
+
+=back
+
 =head2 noenter (@filters)
 
 No enter to catalogs. Using in C<find>. C<@filters> same as in C<find>.
@@ -357,6 +409,16 @@ Remove files and empty catalogs. Returns the C<@paths>.
 	eval { erase "/" }; $@  # ~> erase dir /: Device or resource busy
 	eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied
 
+B<See also:>
+
+=over
+
+=item * <unlink>.
+
+=item * <File::Path> — C<remove_tree("dir")>.
+
+=back
+
 =head2 mkpath ($path)
 
 As B<mkdir -p>, but consider last path-part (after last slash) as filename, and not create this catalog.
@@ -370,14 +432,24 @@ As B<mkdir -p>, but consider last path-part (after last slash) as filename, and 
 =item * Default permission is C<0755>.
 
 =item * Returns C<$path>.
-cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
 
 =back
 
 	local $_ = ["A", 0755];
 	mkpath   # => A
 	
-	eval { mkpath "/A/" }; $@   # ~> mkpath : No such file or directory
+	eval { mkpath "/A/" }; $@   # ~> mkpath /A: Permission denied
+	
+	mkpath "A///./file";
+	-d "A"  # -> 1
+
+B<See also:>
+
+=over
+
+=item * <File::Path> — C<mkpath("dir1/dir2")>.
+
+=back
 
 =head2 mtime ($file)
 
@@ -390,6 +462,18 @@ Raise exeception if file not exists, or not permissions:
 	
 	mtime ["/"]   # ~> ^\d+(\.\d+)?$
 
+B<See also:>
+
+=over
+
+=item * <-M> — C<-M "file.txt">, C<-M _> in days.
+
+=item * <stat> — C<(stat "file.txt")[9]> in seconds.
+
+=item * <Time::HiRes> — C<(Time::HiRes::stat "file.txt")[9]> in seconds with fractional part.
+
+=back
+
 =head2 replace (&sub, @files)
 
 Replacing each the file if C<&sub> replace C<$_>. Returns files in which there were no replacements.
@@ -400,6 +484,16 @@ C<@files> can contain arrays of two elements. The first one is treated as a path
 	lay "abc";
 	replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 	cat  # => ¡bc
+
+B<See also:>
+
+=over
+
+=item * <File::Edit>.
+
+=item * <File::Edit::Portable>.
+
+=back
 
 =head2 include ($pkg)
 
@@ -464,6 +558,16 @@ Translate the wildcard to regexp.
 
 Using in filters the function C<find>.
 
+B<See also:>
+
+=over
+
+=item * <File::Wildcard>.
+
+=item * <String::Wildcard::Bash>.
+
+=back
+
 =head2 goto_editor ($path, $line)
 
 Open the file in editor from config on the line.
@@ -487,9 +591,23 @@ File .config.pm:
 
 Default the editor is C<vscodium>.
 
+=head2 from_pkg (;$pkg)
+
+From package to file path.
+
+	from_pkg "Aion::Fs"  # => Aion/Fs.pm
+	[map from_pkg, "Aion::Fs", "A::B::C"]  # --> ["Aion/Fs.pm", "A/B/C.pm"]
+
+=head2 to_pkg (;$path)
+
+From file path to package.
+
+	to_pkg "Aion/Fs.pm"  # => Aion::Fs
+	[map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]
+
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:dart@cpan.org>
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 

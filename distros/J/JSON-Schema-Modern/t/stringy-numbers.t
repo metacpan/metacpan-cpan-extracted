@@ -8,10 +8,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.88;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
-use JSON::Schema::Modern;
 use lib 't/lib';
 use Helper;
 
@@ -128,21 +124,6 @@ foreach my $config (0, 1) {
   $errors = [
     {
       instanceLocation => '',
-      keywordLocation => '/allOf/0/multipleOf',
-      error => 'value is not a multiple of 2',
-    },
-    {
-      instanceLocation => '',
-      keywordLocation => '/allOf/1/multipleOf',
-      error => 'value is not a multiple of 0.3',
-    },
-    {
-      instanceLocation => '',
-      keywordLocation => '/allOf',
-      error => 'subschemas 0, 1 are not valid',
-    },
-    {
-      instanceLocation => '',
       keywordLocation => '/maximum',
       error => 'value is larger than 5',
     },
@@ -160,6 +141,21 @@ foreach my $config (0, 1) {
       instanceLocation => '',
       keywordLocation => '/exclusiveMinimum',
       error => 'value is equal to or smaller than 15',
+    },
+    {
+      instanceLocation => '',
+      keywordLocation => '/allOf/0/multipleOf',
+      error => 'value is not a multiple of 2',
+    },
+    {
+      instanceLocation => '',
+      keywordLocation => '/allOf/1/multipleOf',
+      error => 'value is not a multiple of 0.3',
+    },
+    {
+      instanceLocation => '',
+      keywordLocation => '/allOf',
+      error => 'subschemas 0, 1 are not valid',
     },
   ];
 

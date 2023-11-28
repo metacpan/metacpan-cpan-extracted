@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Any::Sat_olck::Sat_fonipa;
 # This file auto generated from Data\common\transforms\sat_Olck-sat_FONIPA.xml
-#	on Fri 13 Oct  9:03:51 am GMT
+#	on Sat  4 Nov  5:50:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

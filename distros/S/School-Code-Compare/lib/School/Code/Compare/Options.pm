@@ -1,6 +1,6 @@
 package School::Code::Compare::Options;
 # ABSTRACT: don't clutter app with parsing of arguments
-$School::Code::Compare::Options::VERSION = '0.104';
+$School::Code::Compare::Options::VERSION = '0.201';
 use strict;
 use warnings;
 
@@ -22,11 +22,12 @@ sub new {
         . "\n$s" . '  - STDIN, receiving filepaths (e.g. from a find command)';
 
         my $opt_desc_in =
-            "$s" . 'Supportet arguments:'
+            "$s" . 'Comments get stripped from code.'
+        . "\n$s" . 'Supportet arguments:'
         . "\n$s" . '  - hashy:  python, perl, bash'
         . "\n$s" . '  - slashy: php, js, java, cpp, cs, c'
         . "\n$s" . '  - html, xml'
-        . "\n$s" . '  - txt (default)';
+        . "\n$s" . '  - txt (default, no effect)';
 
         my $opt_desc_out =
             "$s" . 'You can define an output format:'
@@ -61,7 +62,11 @@ sub new {
 
         my $opt_desc_sort =
             "$s" . 'Useful to ignore order of method declaration.'
-        . "\n$s" . 'Will most likely also find more false positives.';
+        . "\n$s" . 'See --split if you need to sort by something else then by line.';
+
+        my $opt_desc_split =
+            "$s" . 'You might want to split for sentences with \'\.\' in normal text.'
+        . "\n$s" . 'Use this option together with --sort.';
 
         my $opt_desc_basedir =
             "$s" . 'Folders one below will be seen as project directories.'
@@ -150,6 +155,12 @@ sub new {
             comment => "sort data by line before comparison\n" . $opt_desc_sort,
         );
 
+        opt split => (
+            isa     => 'Str',
+            alias   => 't',
+            comment => "Split files on something else then newline\n" . $opt_desc_split,
+        );
+
         opt basedir => (
             isa     => 'Str',
             alias   => 'b',
@@ -187,7 +198,7 @@ School::Code::Compare::Options - don't clutter app with parsing of arguments
 
 =head1 VERSION
 
-version 0.104
+version 0.201
 
 =head1 AUTHOR
 
@@ -195,7 +206,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Boris Däppen.
+This software is copyright (c) 2023 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

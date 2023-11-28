@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2017-2018 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Terminal::Win32Console 0.06;
+package String::Tagged::Terminal::Win32Console 0.07;
 
 use v5.14;
 use warnings;

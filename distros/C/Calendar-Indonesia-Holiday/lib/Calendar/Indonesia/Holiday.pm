@@ -13,9 +13,9 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 require Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-11'; # DATE
+our $DATE = '2023-11-13'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.351'; # VERSION
+our $VERSION = '0.352'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = (
@@ -147,6 +147,19 @@ sub _h_goodfri {
     $r->{eng_name}    = "Good Friday";
     _add_original_date($r, $opts);
     $r->{ind_aliases} = ["Wafat Isa Al-Masih"];
+    $r->{eng_aliases} = [];
+    $r->{is_holiday}  = 1;
+    $r->{tags}        = [qw/religious religion=christianity/];
+    ($r);
+}
+
+# since 2024
+sub _h_easter {
+    my ($r, $opts) = @_;
+    $r->{ind_name}    = "Paskah";
+    $r->{eng_name}    = "Easter";
+    _add_original_date($r, $opts);
+    $r->{ind_aliases} = [];
     $r->{eng_aliases} = [];
     $r->{is_holiday}  = 1;
     $r->{tags}        = [qw/religious religion=christianity/];
@@ -1264,9 +1277,51 @@ our %year_holidays;
     );
 }
 
+# decreed sep 12, 2023 (SKB No 855/2023, 3/2023, 4/2023)
+#
+# ref:
+# - https://kemenkopmk.go.id/sites/default/files/pengumuman/2023-09/SKB%202024.pdf
+#
+# TODO:
+# - renaming of Isa Almasih to Yesus Kristus
+# - decree reference for election
 {
     # 2024 holidays
-    1;
+    my ($chnewyear2024, $nyepi2024, $eidulf2024, $ascension2024, $eidula2024, $vesakha2024, $christmas);
+    $year_holidays{2024} = [
+        # - new year
+        _h_isramiraj ({_expand_dm("08-02")}, {hyear=>1445}),
+        ($chnewyear2024 = _h_chnewyear ({_expand_dm("10-02")}, {hyear=>2575})),
+        _h_pelection ({_expand_dm("14-02")}, {}),
+        ($nyepi2024 = _h_nyepi     ({_expand_dm("11-03")}, {hyear=>1946})),
+        _h_goodfri   ({_expand_dm("29-03")}),
+        _h_goodfri   ({_expand_dm("29-03")}),
+        _h_easter    ({_expand_dm("31-03")}),
+        ($eidulf2024 = _h_eidulf    ({_expand_dm("10-04")}, {hyear=>1445, day=>1})),
+        _h_eidulf    ({_expand_dm("11-04")}, {hyear=>1445, day=>2}),
+        # - labor day
+        ($ascension2024 = _h_ascension ({_expand_dm("09-05")})),
+        _h_vesakha   ({_expand_dm("23-05")}, {hyear=>2568}),
+        # - pancasila day
+        ($eidula2024 = _h_eidula    ({_expand_dm("17-06")}, {hyear=>1445})),
+        _h_hijra     ({_expand_dm("07-07")}, {hyear=>1446}),
+        # - independence day
+        _h_mawlid({_expand_dm("16-09")}, {hyear=>1446}),
+        # - christmas
+    ];
+
+    push @{ $year_holidays{2024} }, (
+        _jointlv     ({_expand_dm("09-02")}, {holiday=>$chnewyear2024}),
+        _jointlv     ({_expand_dm("12-03")}, {holiday=>$nyepi2024}),
+        _jointlv     ({_expand_dm("08-04")}, {holiday=>$eidulf2024}),
+        _jointlv     ({_expand_dm("09-04")}, {holiday=>$eidulf2024}),
+        _jointlv     ({_expand_dm("12-04")}, {holiday=>$eidulf2024}),
+        _jointlv     ({_expand_dm("15-04")}, {holiday=>$eidulf2024}),
+        _jointlv     ({_expand_dm("10-05")}, {holiday=>$ascension2024}),
+        _jointlv     ({_expand_dm("24-05")}, {holiday=>$vesakha2024}),
+        _jointlv     ({_expand_dm("18-06")}, {holiday=>$eidula2024}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+    );
 }
 
 {
@@ -1662,7 +1717,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.351 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2023-07-11.
+This document describes version 0.352 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2023-11-13.
 
 =head1 SYNOPSIS
 
@@ -1748,7 +1803,7 @@ This module provides functions to list Indonesian holidays. There is a
 command-line script interface for this module: L<list-idn-holidays> and a few
 others distributed in L<App::IndonesianHolidayUtils> distribution.
 
-Calendar years supported: 1990-2023.
+Calendar years supported: 1990-2024.
 
 Note: Note that sometimes the holiday (as set by law) falls at a different date
 than the actual religious commemoration date. When you use the C<detail> option,
@@ -1792,7 +1847,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2023
+Contains data from years 1990 to 2024
 
 This function is not exported by default, but exportable.
 
@@ -1927,7 +1982,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2023
+Contains data from years 1990 to 2024
 
 This function is not exported by default, but exportable.
 
@@ -1985,7 +2040,7 @@ List Indonesian holidays in calendar.
 
 List holidays and joint leave days ("cuti bersama").
 
-Contains data from years 1990 to 2023
+Contains data from years 1990 to 2024
 
 This function is not exported by default, but exportable.
 
@@ -2564,7 +2619,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2023
+Contains data from years 1990 to 2024
 
 This function is not exported by default, but exportable.
 

@@ -3,7 +3,8 @@ Embperl - Building dynamic Websites with Perl
 ---------------------------------------------
 
 Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-Copyright (c) 2008-2014 Gerald Richter
+Copyright (c) 2008-2015 Gerald Richter
+Copyright (c) 2015-2023 actevy.io
 
 You may distribute under the terms of either the GNU General Public 
 License or the Artistic License, as specified in the Perl README file.
@@ -12,7 +13,6 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-$Id: README 1578075 2014-03-16 14:01:14Z richter $
 
 
 Sourcecode encryption

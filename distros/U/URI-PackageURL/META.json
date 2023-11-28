@@ -54,6 +54,7 @@
          "web" : "https://github.com/giterlizzi/perl-URI-PackageURL"
       }
    },
-   "version" : "2.02",
+   "version" : "2.04",
+   "x_purl" : "pkg:cpan/GDT/URI-PackageURL",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

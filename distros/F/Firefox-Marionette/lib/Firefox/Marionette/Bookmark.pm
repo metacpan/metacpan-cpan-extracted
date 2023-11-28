@@ -20,7 +20,7 @@ our @EXPORT_OK = qw(
 
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK, );
 
-our $VERSION = '1.46';
+our $VERSION = '1.49';
 
 # guids from toolkit/components/places/Bookmarks.sys.mjs
 
@@ -204,7 +204,7 @@ Firefox::Marionette::Bookmark - Represents a Firefox bookmark retrieved using th
 
 =head1 VERSION
 
-Version 1.46
+Version 1.49
 
 =head1 SYNOPSIS
 
@@ -364,6 +364,10 @@ returns the L<tags|https://support.mozilla.org/en-US/kb/categorizing-bookmarks-m
 =head2 title
 
 returns the title of the bookmark.  This can be for a folder or a bookmark.
+
+=head2 TO_JSON
+
+required to allow L<JSON serialisation|https://metacpan.org/pod/JSON#OBJECT-SERIALISATION> to work correctly.  This method should not need to be called directly.
 
 =head2 type
 

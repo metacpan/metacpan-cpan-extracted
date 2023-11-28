@@ -21,14 +21,13 @@ requires 'Curses::UI' => 0;
 requires 'Encode' => 0;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Curses-UI-Volume';
-resources 'homepage' => 'https://github.com/tupinek/Curses-UI-Volume';
-resources 'repository' => 'git://github.com/tupinek/Curses-UI-Volume';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Curses-UI-Volume/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Curses-UI-Volume';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Curses-UI-Volume';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

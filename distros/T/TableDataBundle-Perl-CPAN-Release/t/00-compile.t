@@ -6,11 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Bencher/Scenario/TableData/Perl/CPAN/Release/Static.pm',
+    'Bencher/ScenarioR/TableData/Perl/CPAN/Release/Static.pm',
     'TableData/Perl/CPAN/Release/Static.pm',
     'TableData/Perl/CPAN/Release/Static/FromNewest.pm',
+    'TableData/Perl/CPAN/Release/Static/GroupedDaily.pm',
+    'TableData/Perl/CPAN/Release/Static/GroupedMonthly.pm',
+    'TableData/Perl/CPAN/Release/Static/GroupedWeekly.pm',
     'TableDataBundle/Perl/CPAN/Release.pm'
 );
 

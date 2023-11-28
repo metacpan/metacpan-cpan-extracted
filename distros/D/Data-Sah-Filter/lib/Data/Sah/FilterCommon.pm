@@ -5,9 +5,9 @@ use strict 'subs', 'vars';
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-21'; # DATE
+our $DATE = '2023-08-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 our %SPEC;
 
@@ -90,7 +90,7 @@ Data::Sah::FilterCommon - Common stuffs for Data::Sah::Filter and Data::Sah::Fil
 
 =head1 VERSION
 
-This document describes version 0.021 of Data::Sah::FilterCommon (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
+This document describes version 0.022 of Data::Sah::FilterCommon (from Perl distribution Data-Sah-Filter), released on 2023-08-16.
 
 =head1 FUNCTIONS
 

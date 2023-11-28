@@ -102,6 +102,7 @@ virConnectDomainEventMemoryFailureCallback
 virConnectDomainEventMemoryDeviceSizeChangeCallback
 
 virConnectNetworkEventLifecycleCallback
+virConnectNetworkEventMetadataChangeCallback
 
 virConnectStoragePoolEventLifecycleCallback
 

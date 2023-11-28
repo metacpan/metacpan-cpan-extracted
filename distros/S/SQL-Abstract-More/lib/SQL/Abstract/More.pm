@@ -19,7 +19,7 @@ use namespace::clean;
 # declare error-reporting functions from SQL::Abstract
 sub puke(@); sub belch(@);  # these will be defined later in import()
 
-our $VERSION = '1.39';
+our $VERSION = '1.40';
 our @ISA;
 
 sub import {
@@ -96,16 +96,19 @@ sub does ($$) {
 
 # builtin methods for "Limit-Offset" dialects
 my %limit_offset_dialects = (
-  LimitOffset => sub {my ($self, $limit, $offset) = @_;
-                      $offset ||= 0;
-                      return "LIMIT ? OFFSET ?", $limit, $offset;},
-  LimitXY     => sub {my ($self, $limit, $offset) = @_;
-                      $offset ||= 0;
-                      return "LIMIT ?, ?", $offset, $limit;},
-  LimitYX     => sub {my ($self, $limit, $offset) = @_;
-                      $offset ||= 0;
-                      return "LIMIT ?, ?", $limit, $offset;},
-  RowNum      => sub {
+  LimitOffset     => sub {my ($self, $limit, $offset) = @_;
+                          $offset ||= 0;
+                          return "LIMIT ? OFFSET ?", $limit, $offset;},
+  LimitXY         => sub {my ($self, $limit, $offset) = @_;
+                          $offset ||= 0;
+                          return "LIMIT ?, ?", $offset, $limit;},
+  LimitYX         => sub {my ($self, $limit, $offset) = @_;
+                          $offset ||= 0;
+                          return "LIMIT ?, ?", $limit, $offset;},
+  OffsetFetchRows => sub {my ($self, $limit, $offset) = @_;
+                          $offset ||= 0;
+                          return "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY", $offset, $limit;},
+  RowNum          => sub {
     my ($self, $limit, $offset) = @_;
     # HACK below borrowed from SQL::Abstract::Limit. Not perfect, though,
     # because it brings back an additional column. Should borrow from 
@@ -113,7 +116,7 @@ my %limit_offset_dialects = (
     # but it says : "!!! THIS IS ALSO HORRIFIC !!! /me ashamed"; so
     # I'll only take it as last resort; still exploring other ways.
     # See also L<DBIx::DataModel> : within that ORM an additional layer is
-    # added to take advantage of Oracle scrollable cursors.
+    # added to take advantage of Oracle scrollable cursors (for Oracle < 12c).
     my $sql = "SELECT * FROM ("
             .   "SELECT subq_A.*, ROWNUM rownum__index FROM (%s) subq_A "
             .   "WHERE ROWNUM <= ?"
@@ -138,17 +141,16 @@ s/JOIN %s/JOIN (%s)/ foreach values %right_assoc_join_syntax;
 
 # specification of parameters accepted by the new() method
 my %params_for_new = (
-  table_alias          => {type => SCALAR|CODEREF,   default  => '%s AS %s'},
-  column_alias         => {type => SCALAR|CODEREF,   default  => '%s AS %s'},
-  limit_offset         => {type => SCALAR|CODEREF,   default  => 'LimitOffset'},
-  join_syntax          => {type => HASHREF,          default  =>
-                                                        \%common_join_syntax},
-  join_assoc_right     => {type => BOOLEAN,          default  => 0},
-  max_members_IN       => {type => SCALAR,           optional => 1},
-  multicols_sep        => {type => SCALAR|SCALARREF, optional => 1},
-  has_multicols_in_SQL => {type => BOOLEAN,          optional => 1},
-  sql_dialect          => {type => SCALAR,           optional => 1},
-  select_implicitly_for=> {type => SCALAR|UNDEF,     optional => 1},
+  table_alias          => {type => SCALAR|CODEREF,   default  => '%s AS %s'          },
+  column_alias         => {type => SCALAR|CODEREF,   default  => '%s AS %s'          },
+  limit_offset         => {type => SCALAR|CODEREF,   default  => 'LimitOffset'       },
+  join_syntax          => {type => HASHREF,          default  => \%common_join_syntax},
+  join_assoc_right     => {type => BOOLEAN,          default  => 0                   },
+  max_members_IN       => {type => SCALAR,           optional => 1                   },
+  multicols_sep        => {type => SCALAR|SCALARREF, optional => 1                   },
+  has_multicols_in_SQL => {type => BOOLEAN,          optional => 1                   },
+  sql_dialect          => {type => SCALAR,           optional => 1                   },
+  select_implicitly_for=> {type => SCALAR|UNDEF,     optional => 1                   },
 );
 
 # builtin collection of parameters, for various databases
@@ -164,6 +166,7 @@ my %sql_dialects = (
                 column_alias         => '%s %s',
                 has_multicols_in_SQL => 1,                       },
 );
+$sql_dialects{Oracle12c} = {%{$sql_dialects{Oracle}}, limit_offset => "OffsetFetchRows"};
 
 
 # operators for compound queries
@@ -234,7 +237,7 @@ sub new {
     $more_params{$key} = delete $params{$key} if exists $params{$key};
   }
 
-  # import params from SQL dialect, if any
+  # import params from SQL dialect, if any ... but explict params above have precedence
   my $dialect = delete $more_params{sql_dialect};
   if ($dialect) {
     my $dialect_params = $sql_dialects{$dialect}
@@ -1440,7 +1443,7 @@ sub _choose_LIMIT_OFFSET_dialect {
 
 
 #----------------------------------------------------------------------
-# utility to decide if the method was called with named or positional args
+# utility to decide if the method was called with named or with positional args
 #----------------------------------------------------------------------
 
 sub _called_with_named_args {
@@ -1681,10 +1684,12 @@ Can also be supplied as a method coderef.
 =item limit_offset
 
 Name of a "limit-offset dialect", which can be one of
-C<LimitOffset>, C<LimitXY>, C<LimitYX> or C<RowNum>; 
-see L<SQL::Abstract::Limit> for an explanation of those dialects.
-Here, unlike the L<SQL::Abstract::Limit> implementation,
-limit and offset values are treated as regular values,
+C<LimitOffset>, C<LimitXY>, C<LimitYX>, C<OffsetFetchRows> or C<RowNum>.
+Most of thoses are copied from L<SQL::Abstract::Limit> -- see that module for explanations.
+The C<OffsetFetchRows> dialect has been added here and corresponds to Oracle syntax
+starting from version 12c (C<OFFSET ? ROWS FETCH ? ROWS ONLY>).
+Unlike the L<SQL::Abstract::Limit> implementation,
+limit and offset values are treated here as regular values,
 with placeholders '?' in the SQL; values are postponed to the
 C<@bind> list.
 
@@ -1823,9 +1828,15 @@ implement the regular "LIMIT ? OFFSET ?" ANSI syntax.
 
 =item Oracle
 
-For Oracle. Overrides the C<limit_offset> to use the "RowNum" dialect
+For old versions of Oracle. Overrides the C<limit_offset> to use the "RowNum" dialect
 (beware, this injects an additional column C<rownum__index> into your
-resultset). Also sets C<max_members_IN> to 999.
+resultset). Also sets C<max_members_IN> to 999 and C<has_multicols_in_SQL> to true.
+
+=item Oracle12c
+
+For Oracle starting from version 12c. Like the "Oracle" dialect, except for
+C<limit_offset> which uses C<OffsetFetchRows>.
+
 
 =back
 
@@ -2651,13 +2662,13 @@ L<https://metacpan.org/module/SQL::Abstract::More>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011-2022 Laurent Dami.
+Copyright 2011-2023 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.
 
 =cut
 

@@ -10,13 +10,13 @@ use File::Find 'find';
 use Mojo::Server::Morbo;
 use Mojo::File 'path';
 
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 sub conf ($conf) {
     my $conf_app   = Config::App->find;
     my $mojo_linda = ($conf_app) ? $conf_app->get( qw( mojolicious linda ) ) : {};
 
-    $conf->{$_}  //= $mojo_linda->{$_} for ( qw( silent app mode backend ) );
+    $conf->{$_}  //= $mojo_linda->{$_} for ( qw( silent app production backend ) );
     $conf->{app} //= $ARGV[0] || do {
         my $match;
         for my $file ( path('.')->list_tree->to_array->@* ) {
@@ -52,11 +52,13 @@ sub conf ($conf) {
         }
     }
 
+    $conf_app->deimport if $conf_app;
+
     return $conf;
 }
 
 sub run ($conf) {
-    $ENV{MOJO_MODE}          = $conf->{mode}    if $conf->{mode};
+    $ENV{MOJO_MODE}          = 'production'     if $conf->{production};
     $ENV{MOJO_MORBO_BACKEND} = $conf->{backend} if $conf->{backend};
 
     install_modifier( 'Mojo::Server::Morbo', 'after', '_spawn', sub {
@@ -92,7 +94,7 @@ MojoX::Linda - Plausibly helpful (and probably drunk) wrapper around morbo
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =for markdown [![test](https://github.com/gryphonshafer/MojoX-Linda/workflows/test/badge.svg)](https://github.com/gryphonshafer/MojoX-Linda/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/MojoX-Linda/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/MojoX-Linda)
@@ -103,11 +105,11 @@ version 1.02
 
     linda [OPTIONS]
         -s, --silent
-        -a, --app     APPLICATION
-        -m, --mode    MOJO_MODE
-        -b, --backend MOJO_MORBO_BACKEND
-        -l, --listen  LISTEN_PATTERN    # can be repeated
-        -w, --watch   DIRECTORY_OR_FILE # can be repeated
+        -a, --app        APPLICATION
+        -p, --production
+        -b, --backend    MOJO_MORBO_BACKEND
+        -l, --listen     LISTEN_PATTERN    # can be repeated
+        -w, --watch      DIRECTORY_OR_FILE # can be repeated
         -h, --help
         -m, --man
 
@@ -135,9 +137,9 @@ Mojolicious application.
 
 C<linda>'s judgement here should not be trusted.
 
-=head2 -m, --mode
+=head2 -p, --production
 
-See L<Mojo::Server::Morbo>.
+Set MOJO_MODE to "production".
 
 =head2 -b, --backend
 
@@ -156,9 +158,9 @@ See L<Mojo::Server::Morbo>.
 =head1 CONFIGURATION
 
 C<linda> will initially try to find and load a configuration file via a call to
-L<Config::App>'s C<find>. If C<find> returns a configuration, C<linda> will
-look in that configuration under C<mojolicious/linda> for settings. Any settings
-will be overwritten by any explicit command-line settings.
+L<Config::App>. If that returns a configuration, C<linda> will look in that
+configuration under C<mojolicious/linda> for settings. Any settings will be
+overwritten by any explicit command-line settings.
 
 =head1 SEE ALSO
 

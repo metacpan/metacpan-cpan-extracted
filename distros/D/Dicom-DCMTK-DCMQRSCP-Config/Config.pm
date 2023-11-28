@@ -1,14 +1,11 @@
 package Dicom::DCMTK::DCMQRSCP::Config;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -269,15 +266,16 @@ Dicom::DCMTK::DCMQRSCP::Config - Perl class for reading/writing DCMTK dcmqrscp c
 =head1 SYNOPSIS
 
  use Dicom::DCMTK::DCMQRSCP::Config;
+
  my $obj = Dicom::DCMTK::DCMQRSCP::Config->new(%parameters);
  $obj->parse($data);
  my $data = $obj->serialize;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Dicom::DCMTK::DCMQRSCP::Config->new(%parameters);
 
 Constructor.
 
@@ -285,18 +283,23 @@ Constructor.
 
 =item * C<ae_table>
 
- AE table.
- Default value is {}.
+AE table.
+
+Default value is {}.
 
 =item * C<comment>
 
- Flag, that means comments in serialize() output.
- Default value is 1.
+Flag, that means comments in serialize() output.
+
+Default value is 1.
 
 =item * C<global>
 
- Global parameters.
- Default value is {
+Global parameters.
+
+Default value is:
+
+ {
          'NetworkTCPPort' => undef,
          'MaxPDUSize' => undef,
          'MaxAssociations' => undef,
@@ -306,32 +309,41 @@ Constructor.
 
 =item * C<host_table>
 
- Host table.
- Default value is {}.
+Host table.
+
+Default value is {}.
 
 =item * C<host_table_symb>
 
- Host table symbolic names.
- Default value is {}.
+Host table symbolic names.
+
+Default value is {}.
 
 =item * C<vendor_table>
 
- Vendor table.
- Default value is {}.
+Vendor table.
+
+Default value is {}.
 
 =back
 
-=item C<parse($data)>
+Returns instance of object.
 
- Parse $data, which contains dcmqrscp configuration data.
- Returns undef.
+=head2 C<parse>
 
-=item C<serialize()>
+ $obj->parse($data);
 
- Serialize object to DCMTK dcmqrscp configuration data.
- Returns string with dcmqrscp configuration data.
+Parse C<$data>, which contains dcmqrscp configuration data.
 
-=back
+Returns undef.
+
+=head2 C<serialize>
+
+ my $data = $obj->serialize;
+
+Serialize object to DCMTK dcmqrscp configuration data.
+
+Returns string with dcmqrscp configuration data.
 
 =head1 ERRORS
 
@@ -341,11 +353,11 @@ Constructor.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=serialize_example_config.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Dicom::DCMTK::DCMQRSCP::Config;
 
  # Object.
@@ -453,21 +465,22 @@ Install the Dicom modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Dicom-DCMTK-DCMQRSCP-Config>
+L<https://github.com/michal-josef-spacek/Dicom-DCMTK-DCMQRSCP-Config>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

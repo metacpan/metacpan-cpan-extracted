@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::MS5611
 # Description  : Interface to MS5611_01BA03 barometric pressure sensor
-# Copyright    : Copyright (c) 2013-2020 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -17,7 +17,7 @@ use HiPi qw( :i2c :rpi :ms5611);
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.82';
+our $VERSION ='0.89';
 
 __PACKAGE__->create_accessors( qw( backend crc) );
 
@@ -161,10 +161,10 @@ sub _adc_cmd {
     return $result;
 }
 
-sub read_pressure_temp {
+sub _internal_read_p_t {
     my($self, $pres_osr, $temp_osr ) = @_;
     $pres_osr //= MS5611_OSR_4096;
-    $temp_osr  //= MS5611_OSR_4096;
+    $temp_osr //= MS5611_OSR_4096;
     
     my $D2 = $self->_adc_cmd( CMD_ADC_D2 + $temp_osr);
     my $D1 = $self->_adc_cmd( CMD_ADC_D1 + $pres_osr);
@@ -191,7 +191,23 @@ sub read_pressure_temp {
     
     my $P = ( ($D1 * $SENS) / (2**21) - $OFF ) / ( 2**15 );
         
-    return ( sprintf('%.4f', $P / 100), sprintf('%.2f', $TEMP / 100 ) );
+    return ( $P , $TEMP );
+}
+
+sub read_pressure_temp {
+    my($self, $pres_osr, $temp_osr ) = @_;
+    
+    my ( $pressure, $temperature ) = $self->_internal_read_p_t( $pres_osr, $temp_osr );
+            
+    return ( sprintf('%.4f', $pressure / 100), sprintf('%.2f', $temperature / 100 ) );
+}
+
+sub read_pressure_pa_temp {
+    my($self, $pres_osr, $temp_osr ) = @_;
+    
+    my ( $pressure, $temperature ) = $self->_internal_read_p_t( $pres_osr, $temp_osr );
+        
+    return ( sprintf('%.2f', $pressure ), sprintf('%.2f', $temperature / 100 ) );
 }
 
 

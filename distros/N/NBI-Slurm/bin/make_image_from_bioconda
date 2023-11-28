@@ -9,7 +9,7 @@ use Pod::Usage;
 use Term::ANSIColor qw(:constants);
 use NBI::Slurm;
 
-my $config = NBI::Slurm::load_config("$USER/.nbislurm.config");
+my $config = NBI::Slurm::load_config("$ENV{USER}/.nbislurm.config");
 my $output  = undef;
 my $move   = 0;
 my $def_file = undef;
@@ -258,7 +258,7 @@ make_image_from_bioconda - Create a Singularity/Apptainer image from micromamba
 
 =head1 VERSION
 
-version 0.8.1
+version 0.8.2
 
 =head1 SYNOPSIS
 

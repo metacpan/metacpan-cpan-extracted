@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ga::Any::Ie - Package for language Irish
 
 package Locale::CLDR::Locales::Ga::Any::Ie;
 # This file auto generated from Data\common\main\ga_IE.xml
-#	on Fri 13 Oct  9:17:43 am GMT
+#	on Sat  4 Nov  6:04:01 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

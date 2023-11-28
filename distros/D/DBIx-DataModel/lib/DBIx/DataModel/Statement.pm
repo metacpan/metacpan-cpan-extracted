@@ -418,11 +418,9 @@ sub execute {
   my ($self, @bind_args) = @_;
 
   # if not prepared yet, prepare it
-  $self->prepare              if $self->status < PREPARED;
+  $self->prepare               if $self->status < PREPARED;
 
-  # TODO: DON'T REMEMBER why the line below was here. Keep it around for a while ...
-  push @bind_args, offset => $self->{offset}  if $self->{offset};
-
+  # bind arguments if any
   $self->bind(@bind_args)      if @bind_args;
 
   # shortcuts

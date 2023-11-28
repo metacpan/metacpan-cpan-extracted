@@ -15,8 +15,6 @@ lib/App/GUI/Cellgraph/Compute/Grid.pm
 lib/App/GUI/Cellgraph/Compute/Rule.pm
 lib/App/GUI/Cellgraph/Config.pm
 lib/App/GUI/Cellgraph/Dialog/About.pm
-lib/App/GUI/Cellgraph/Dialog/Function.pm
-lib/App/GUI/Cellgraph/Dialog/Interface.pm
 lib/App/GUI/Cellgraph/Frame.pm
 lib/App/GUI/Cellgraph/Frame/Panel/Color.pm
 lib/App/GUI/Cellgraph/Frame/Panel/Global.pm

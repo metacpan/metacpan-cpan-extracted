@@ -1,0 +1,8 @@
+Revision history for Alien-Serd,
+
+0.02      2023-11-11 19:33:54-05:00 America/New_York
+  - Improve creating static and dynamic libraries.
+    See <https://github.com/perlrdf/Alien-Serd/pull/2>.
+
+0.01      2023-11-09 13:36:45-05:00 America/New_York
+  - initial version

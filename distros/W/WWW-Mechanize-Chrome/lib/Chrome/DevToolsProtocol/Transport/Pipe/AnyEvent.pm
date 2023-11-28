@@ -1,6 +1,5 @@
 package Chrome::DevToolsProtocol::Transport::Pipe::AnyEvent;
 use strict;
-use Filter::signatures;
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use Moo 2;
 no warnings 'experimental::signatures';
@@ -12,7 +11,7 @@ use Carp qw(croak);
 use AnyEvent;
 use AnyEvent::Future qw(as_future_cb);
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 our @CARP_NOT = ();
 
 =head1 NAME

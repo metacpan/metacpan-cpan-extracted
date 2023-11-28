@@ -21,7 +21,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.212';
+our $VERSION = '1.213';
 
 use Quiq::Shell;
 
@@ -154,7 +154,7 @@ sub launch {
 
 =head1 VERSION
 
-1.212
+1.213
 
 =head1 AUTHOR
 

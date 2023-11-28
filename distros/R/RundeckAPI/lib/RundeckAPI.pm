@@ -23,7 +23,12 @@
 #
 ###########################################################################
 
+#** @class RundeckAPI
+# RundeckAPI - simplifies authenticate, connect, queries to a Rundeck instance via REST API
+#*
+
 package RundeckAPI;
+
 
 use strict;
 use warnings;
@@ -44,7 +49,7 @@ our @EXPORT_OK = qw(get post put delete postData putData);
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.3.5.0";
+our $VERSION = "1.3.7.0";
 #####
 ## VARIABLES
 #####
@@ -53,12 +58,21 @@ our $VERSION = "1.3.5.0";
 ## CONSTRUCTOR
 #####
 
+#** @method public new (parameters)
+# @ creates a connection
+#
+# @params value required %options
+# @retval value the created class
+#*
+
+
 sub new {
 	my($class, %args) = @_;
 	my $rc = 403;
 	my $self = {
 		'url'		=> $args{'url'},
 		'login'		=> $args{'login'},
+		'password'	=> $args{'password'},
 		'token'		=> $args{'token'},
 		'debug'		=> $args{'debug'} || 0,
 		'verbose'	=> $args{'verbose'} || 0,
@@ -95,34 +109,23 @@ sub new {
 	$client->addHeader ("Accept", "application/json");
 	$self->{'client'} = $client;
 
+# if we have a token, use it
 	if (defined $self->{'token'}) {
 		$client->addHeader ("X-Rundeck-Auth-Token", $self->{'token'});
 		$client->GET("/api/21/tokens/$self->{'login'}");
-# check if token match id
-		my $authJSON = $client->responseContent();
 		$rc = $client->responseCode ();
 		if (($rc-$rc%100 == 200) && (index($client->{'_res'}{'_content'}, 'alert alert-danger') == -1)) {
-			my $jHash = decode_json ($authJSON);
-			if (defined $jHash->[0]) {
-				my $connOK = 0;
-				foreach my $tokenInfo (@{$jHash}) {
-					if ($tokenInfo->{'user'} eq $self->{'login'}) {
-						$connOK = 1;
-						last;
-					}
-				}
-				if ($connOK) {
-					$rc = 200;
-				} else {
-					$rc = 403;
-				}
-
-			} else {
-				$rc = 403;
-			}
+			$rc = 200;
 		} else {
 			$rc = 403;
 		}
+	} else {
+# post user/passwd
+		$client->POST(
+			"j_security_check",
+			"j_username=$self->{'login'}" . "&" . "j_password=$self->{'password'}",
+		);
+		$rc = $client->responseCode ();
 	}
 	if ($rc-$rc%100 != 200) {
 		$self->{'result'}->{'reqstatus' } = 'UNKN';
@@ -142,6 +145,13 @@ sub new {
 ## METHODS
 #####
 
+#** @method public get (parameters)
+# @ sends a GET query
+#
+# @params required endpoint
+# @retval the response
+#*
+
 sub get (){		# endpoint
 	my $self = shift;
 	my $endpoint = shift;
@@ -152,7 +162,6 @@ sub get (){		# endpoint
 	# Handle secial case where endpoint is /api/XX/job, returns YAML
 	if ($endpoint =~ /api\/[0-9]+\/job/) {
 		$endpoint .= '?format=yaml';
-
 	}
 
 	$self->{'client'}->GET($endpoint);
@@ -170,6 +179,13 @@ sub get (){		# endpoint
 	}
 	return dclone ($responsehash);
 }
+
+#** @method public post (parameters)
+# @ sends a POST request
+#
+# @params required endpoint, the JSON to POST
+# @retval the response
+#*
 
 sub post(){		# endpoint, json
 	my $self = shift;
@@ -195,6 +211,13 @@ sub post(){		# endpoint, json
 	return dclone ($responsehash);
 }
 
+#** @method public put (parameters)
+# @ sends a PUT query
+#
+# @params required endpoint, the JSON to PUT
+# @retval the response
+#*
+
 sub put(){		# endpoint, json
 	my $self = shift;
 	my $endpoint = shift;
@@ -219,6 +242,13 @@ sub put(){		# endpoint, json
 	return dclone ($responsehash);
 }
 
+#** @method public delete (parameters)
+# @ sends a DELETE query
+#
+# @params required endpoint
+# @retval the response
+#*
+
 sub delete () {		# endpoint
 	my $self = shift;
 	my $endpoint = shift;
@@ -240,6 +270,13 @@ sub delete () {		# endpoint
 	}
 	return dclone ($responsehash);
 }
+
+#** @method public postData (parameters)
+# @ sends a POST query
+#
+# @params required endpoint, mimetype, data
+# @retval the response
+#*
 
 sub postData() {		# endpoint, mimetype, data
 	my $self = shift;
@@ -266,6 +303,13 @@ sub postData() {		# endpoint, mimetype, data
 	return dclone ($responsehash);
 }
 
+#** @method public putData (parameters)
+# @ sends a PUT query
+#
+# @params required endpoint, mimetype, data
+# @retval the response
+#*
+
 sub putData() {		# endpoint, mimetype, data
 	my $self = shift;
 	my $endpoint = shift;
@@ -291,6 +335,12 @@ sub putData() {		# endpoint, mimetype, data
 	return dclone ($responsehash);
 }
 
+#** @method private _handleResponse (parameters)
+# @ manage with the various responses, build a hash with the data received
+#
+# @params required rc, responseType, responseContent
+# @retval the response
+#*
 
 sub _handleResponse () {
 	my $self = shift;
@@ -301,7 +351,7 @@ sub _handleResponse () {
 	my $responseJSON = ();
 	my $responsehash = ();
 	$responsehash->{'reqstatus'} = 'OK';
-	$responsehash->{'httpstatus'} = 200;
+	$responsehash->{'httpstatus'} = $rc;
 
 	# is data JSON ?
 	if ($responseType =~ /^application\/json.*/) {
@@ -309,7 +359,8 @@ sub _handleResponse () {
 		$responseJSON = decode_json($responseContent) if $responseContent ne '';
 		my $reftype = reftype($responseJSON);
 		if (not defined $reftype) {
-			$self->_bomb("Can't decode undef type");
+			$responsehash->{'reqstatus'} = 'CRIT';
+			$responsehash->{'httpstatus'} = 415;
 		} elsif ($reftype eq 'ARRAY') {
 			$self->_logV2("copying array");
 			$responsehash->{'content'}{'arraycount'} = $#$responseJSON+1;
@@ -317,13 +368,12 @@ sub _handleResponse () {
 				$responsehash->{'content'}{$i} = $responseJSON->[$i];
 			}
 		} elsif ($reftype eq 'SCALAR') {
-			$self->_bomb("Can't decode scalar type");
+			$responsehash->{'reqstatus'} = 'CRIT';
+			$responsehash->{'httpstatus'} = 415;
 		} elsif ($reftype eq 'HASH') {
 			$self->_logV2("copying hash");
 			$responsehash->{'content'} = $responseJSON;
 		}
-		$responsehash->{'reqstatus'} = 'OK';
-		$responsehash->{'httpstatus'} = $rc;
 	} elsif ($responseType =~ /text\/plain.*/) {
 		$self->_logV2($responseContent);
 		$responsehash->{'content'} = $responseContent;
@@ -332,6 +382,12 @@ sub _handleResponse () {
 	}
 	return $responsehash;
 }
+
+#** @method private _logV1
+# @ print a message if verbose > 1
+#
+# @params required message
+#*
 
 sub _logV1() {
 	my $self = shift;
@@ -345,6 +401,13 @@ sub _logV1() {
 		}
 	}
 }
+
+#** @method private _logV2 (parameters)
+# @ dumps an object if verbose > 2
+#
+# @params required message
+#*
+
 sub _logV2() {
 	my $self = shift;
 	my $obj = shift;
@@ -358,6 +421,12 @@ sub _logV2() {
 	}
 }
 
+#** @method private _logD (parameters)
+# @ dumps an object if debug enabled
+#
+# @params required object
+#*
+
 sub _logD() {
 	my $self = shift;
 	my $object = shift;
@@ -365,13 +434,6 @@ sub _logD() {
 	print Dumper ($object) if $self->{'debug'};
 }
 
-sub _bomb() {
-	my $self = shift;
-	my $msg = shift;
-
-	$msg .= "\nReport this to xavier.humbert\@ac-nancy-metz.fr with detail of the REST call you made";
-	die $msg;
-}
 1;
 
 =pod

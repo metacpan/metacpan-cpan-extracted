@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,10 +16,10 @@ name: String-Tagged-Terminal
 provides:
   String::Tagged::Terminal:
     file: lib/String/Tagged/Terminal.pm
-    version: '0.06'
+    version: '0.07'
   String::Tagged::Terminal::Win32Console:
     file: lib/String/Tagged/Terminal/Win32Console.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Convert::Color: '0'
   Convert::Color::XTerm: '0'
@@ -28,5 +28,5 @@ requires:
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

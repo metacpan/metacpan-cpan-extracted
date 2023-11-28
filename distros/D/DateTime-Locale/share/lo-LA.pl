@@ -30,7 +30,7 @@
     MMM => "LLL",
     MMMEd => "E d MMM",
     "MMMMW-count-other" => "\N{U+0ead}\N{U+0eb2}\N{U+0e97}\N{U+0eb4}\N{U+0e94}\N{U+0e97}\N{U+0eb5}\N{U+0ec8} W \N{U+0e82}\N{U+0ead}\N{U+0e87}\N{U+0ec0}\N{U+0e94}\N{U+0eb7}\N{U+0ead}\N{U+0e99} M",
-    MMMMd => "MMMM d",
+    MMMMd => "d MMMM",
     MMMd => "d MMM",
     Md => "d/M",
     d => "d",
@@ -267,5 +267,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

@@ -75,6 +75,12 @@ sub collect {
   return scalar($self->repeat($times, $code, @args));
 }
 
+sub default {
+  state $default = $SELF_SEED;
+
+  return $default++;
+}
+
 sub digit {
   my ($self) = @_;
 
@@ -1265,7 +1271,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+Copyright (C) 2022, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

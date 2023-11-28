@@ -1,11 +1,12 @@
 package Alien::Meson;
-$Alien::Meson::VERSION = '0.05';
+$Alien::Meson::VERSION = '0.06';
 use strict;
 use warnings;
 use base qw( Alien::Base );
 use 5.008004;
 
 use Path::Tiny;
+use Alien::Build::Util qw( _destdir_prefix );
 
 =head1 NAME
 
@@ -87,6 +88,41 @@ sub bin_dir {
   } else {
     return $class->SUPER::bin_dir(@_);
   }
+}
+
+=head2 _apply_destdir_prefix_hack
+
+  use alienfile;
+
+  eval {
+    require Alien::Meson;
+    Alien::Meson->_apply_destdir_prefix_hack;
+  };
+
+  share { ... }
+
+Applies a hack to fix how the C<DESTDIR> and prefix are joined to follow the
+approach that Meson takes. See issue at L<https://github.com/PerlAlien/Alien-Build/issues/407>
+for more information.
+
+B<WARNING>: This is a hack. It is not expected to work long-term and if a
+better solution is possible, it will be deprecated then removed.
+
+=cut
+
+sub _apply_destdir_prefix_hack {
+  my ($class) = @_;
+  no warnings "redefine";
+  # Work around for Meson's `destdir_join` which drops the first part of
+  # the path when joining (this is the drive letter).
+  # See <https://github.com/mesonbuild/meson/blob/1.2.3/mesonbuild/scripts/__init__.py>.
+  *Alien::Build::Util::_destdir_prefix = \&_meson_destdir_prefix;
+}
+
+sub _meson_destdir_prefix {
+  my($destdir, $prefix) = @_;
+  $prefix =~ s{^/?([a-z]):}{}i if $^O eq 'MSWin32';
+  path($destdir)->child($prefix)->stringify;
 }
 
 =head1 HELPERS

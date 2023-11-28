@@ -40,4 +40,4 @@ resources:
   homepage: http://search.cpan.org/dist/JSONLD/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/kasei/perl-jsonld/
-version: '0.005'
+version: '0.006'

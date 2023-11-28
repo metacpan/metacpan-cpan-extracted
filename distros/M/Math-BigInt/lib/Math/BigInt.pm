@@ -23,7 +23,7 @@ use warnings;
 use Carp          qw< carp croak >;
 use Scalar::Util  qw< blessed refaddr >;
 
-our $VERSION = '2.000000';
+our $VERSION = '2.001001';
 $VERSION =~ tr/_//d;
 
 require Exporter;
@@ -294,27 +294,36 @@ sub round_mode {
 }
 
 sub upgrade {
-    no strict 'refs';
-    # make Class->upgrade() work
     my $self = shift;
     my $class = ref($self) || $self || __PACKAGE__;
 
-    # need to set new value?
-    if (@_ > 0) {
+    no strict 'refs';
+
+    # setter/mutator
+
+    if (@_) {
         return ${"${class}::upgrade"} = $_[0];
     }
+
+    # getter/accessor
+
     ${"${class}::upgrade"};
 }
 
 sub downgrade {
-    no strict 'refs';
-    # make Class->downgrade() work
     my $self = shift;
     my $class = ref($self) || $self || __PACKAGE__;
-    # need to set new value?
-    if (@_ > 0) {
+
+    no strict 'refs';
+
+    # setter/mutator
+
+    if (@_) {
         return ${"${class}::downgrade"} = $_[0];
     }
+
+    # getter/accessor
+
     ${"${class}::downgrade"};
 }
 
@@ -322,18 +331,28 @@ sub div_scale {
     my $self = shift;
     my $class = ref($self) || $self || __PACKAGE__;
 
-    if (@_) {                           # setter
+    # setter/mutator
+
+    if (@_) {
         my $ds = shift;
         croak("The value for 'div_scale' must be defined") unless defined $ds;
+        $ds = $ds -> can('numify') ? $ds -> numify() : 0 + "$ds" if ref($ds);
+        # also croak on non-numerical
+        croak "div_scale must be a number, not '$ds'"
+          unless $ds =~/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[Ee][+-]?\d+)?\z/;
+        croak "div_scale must be an integer, not '$ds'"
+          if $ds != int $ds;
         # It is not documented what div_scale <= 0 means, but Astro::Units sets
-        # div_scale to 0 and fails its tests if this is not supported.
-        #croak("The value for 'div_scale' must be positive") unless $ds > 0;
-        $ds = $ds -> numify() if defined(blessed($ds));
+        # div_scale to 0 and fails its tests if this is not supported. So we
+        # silently support div_scale = 0.
+        croak "div_scale must be positive, not '$ds'" if $ds < 0;
         no strict 'refs';
         ${"${class}::div_scale"} = $ds;
     }
 
-    else {                              # getter
+    # getter/accessor
+
+    else {
         no strict 'refs';
         my $ds = ${"${class}::div_scale"};
         defined($ds) ? $ds : $div_scale;
@@ -341,16 +360,14 @@ sub div_scale {
 }
 
 sub accuracy {
-    # $x->accuracy($a);           ref($x) $a
-    # $x->accuracy();             ref($x)
-    # Class->accuracy();          class
-    # Class->accuracy($a);        class $a
-
     my $x = shift;
     my $class = ref($x) || $x || __PACKAGE__;
 
     no strict 'refs';
-    if (@_ > 0) {
+
+    # setter/mutator
+
+    if (@_) {
         my $a = shift;
         if (defined $a) {
             $a = $a -> can('numify') ? $a -> numify() : 0 + "$a" if ref($a);
@@ -379,6 +396,8 @@ sub accuracy {
         return $a;              # shortcut
     }
 
+    # getter/accessor
+
     # Return instance variable.
     return $x->{_a} if ref($x);
 
@@ -387,16 +406,14 @@ sub accuracy {
 }
 
 sub precision {
-    # $x->precision($p);          ref($x) $p
-    # $x->precision();            ref($x)
-    # Class->precision();         class
-    # Class->precision($p);       class $p
-
     my $x = shift;
     my $class = ref($x) || $x || __PACKAGE__;
 
     no strict 'refs';
-    if (@_ > 0) {
+
+    # setter/mutator
+
+    if (@_) {
         my $p = shift;
         if (defined $p) {
             $p = $p -> can('numify') ? $p -> numify() : 0 + "$p" if ref($p);
@@ -421,6 +438,8 @@ sub precision {
 
         return $p;              # shortcut
     }
+
+    # getter/accessor
 
     # Return instance variable.
     return $x->{_p} if ref($x);
@@ -502,8 +521,8 @@ sub _scale_a {
     no strict 'refs';
     my $class = ref($x);
 
-    $scale = ${ $class . '::accuracy' } unless defined $scale;
-    $mode = ${ $class . '::round_mode' } unless defined $mode;
+    $scale = $class -> accuracy() unless defined $scale;
+    $mode = $class -> round_mode() unless defined $mode;
 
     if (defined $scale) {
         $scale = $scale->can('numify') ? $scale->numify()
@@ -524,8 +543,8 @@ sub _scale_p {
     no strict 'refs';
     my $class = ref($x);
 
-    $scale = ${ $class . '::precision' } unless defined $scale;
-    $mode = ${ $class . '::round_mode' } unless defined $mode;
+    $scale = $class -> precision() unless defined $scale;
+    $mode = $class -> round_mode() unless defined $mode;
 
     if (defined $scale) {
         $scale = $scale->can('numify') ? $scale->numify()
@@ -1032,8 +1051,10 @@ sub bzero {
     # instance with the class variables.
 
     if (@r) {
-        croak "can't specify both accuracy and precision"
-          if @r >= 2 && defined($r[0]) && defined($r[1]);
+        if (@r >= 2 && defined($r[0]) && defined($r[1])) {
+            carp "can't specify both accuracy and precision";
+            return $self -> bnan();
+        }
         $self->{_a} = $_[0];
         $self->{_p} = $_[1];
     } elsif (!$selfref) {
@@ -1091,8 +1112,10 @@ sub bone {
     # instance with the class variables.
 
     if (@r) {
-        croak "can't specify both accuracy and precision"
-          if @r >= 2 && defined($r[0]) && defined($r[1]);
+        if (@r >= 2 && defined($r[0]) && defined($r[1])) {
+            carp "can't specify both accuracy and precision";
+            return $self -> bnan();
+        }
         $self->{_a} = $_[0];
         $self->{_p} = $_[1];
     } elsif (!$selfref) {
@@ -1158,8 +1181,10 @@ sub binf {
     # instance with the class variables.
 
     if (@r) {
-        croak "can't specify both accuracy and precision"
-          if @r >= 2 && defined($r[0]) && defined($r[1]);
+        if (@r >= 2 && defined($r[0]) && defined($r[1])) {
+            carp "can't specify both accuracy and precision";
+            return $self -> bnan();
+        }
         $self->{_a} = $_[0];
         $self->{_p} = $_[1];
     } elsif (!$selfref) {
@@ -1215,8 +1240,10 @@ sub bnan {
     # instance with the class variables.
 
     if (@r) {
-        croak "can't specify both accuracy and precision"
-          if @r >= 2 && defined($r[0]) && defined($r[1]);
+        if (@r >= 2 && defined($r[0]) && defined($r[1])) {
+            carp "can't specify both accuracy and precision";
+            return $self -> bnan();
+        }
         $self->{_a} = $_[0];
         $self->{_p} = $_[1];
     } elsif (!$selfref) {
@@ -1306,21 +1333,24 @@ sub as_int {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    # If called as an instance method, and the instance class is something we
-    # upgrade to, $x might not be a Math::BigInt, so don't just call copy().
-
     return $x -> copy() if $x -> isa("Math::BigInt");
 
-    # disable upgrading and downgrading
+    # Disable upgrading and downgrading.
 
     my $upg = Math::BigInt -> upgrade();
     my $dng = Math::BigInt -> downgrade();
     Math::BigInt -> upgrade(undef);
     Math::BigInt -> downgrade(undef);
 
+    # Copy the value.
+
     my $y = Math::BigInt -> new($x);
 
-    # reset upgrading and downgrading
+    # Copy the remaining instance variables.
+
+    ($y->{_a}, $y->{_p}) = ($x->{_a}, $x->{_p});
+
+    # Restore upgrading and downgrading
 
     Math::BigInt -> upgrade($upg);
     Math::BigInt -> downgrade($dng);
@@ -1332,7 +1362,7 @@ sub as_float {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    # disable upgrading and downgrading
+    # Disable upgrading and downgrading.
 
     require Math::BigFloat;
     my $upg = Math::BigFloat -> upgrade();
@@ -1340,9 +1370,15 @@ sub as_float {
     Math::BigFloat -> upgrade(undef);
     Math::BigFloat -> downgrade(undef);
 
+    # Copy the value.
+
     my $y = Math::BigFloat -> new($x);
 
-    # reset upgrading and downgrading
+    # Copy the remaining instance variables.
+
+    ($y->{_a}, $y->{_p}) = ($x->{_a}, $x->{_p});
+
+    # Restore upgrading and downgrading..
 
     Math::BigFloat -> upgrade($upg);
     Math::BigFloat -> downgrade($dng);
@@ -1354,7 +1390,7 @@ sub as_rat {
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
     carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
 
-    # disable upgrading and downgrading
+    # Disable upgrading and downgrading.
 
     require Math::BigRat;
     my $upg = Math::BigRat -> upgrade();
@@ -1364,7 +1400,11 @@ sub as_rat {
 
     my $y = Math::BigRat -> new($x);
 
-    # reset upgrading and downgrading
+    # Copy the remaining instance variables.
+
+    ($y->{_a}, $y->{_p}) = ($x->{_a}, $x->{_p});
+
+    # Restore upgrading and downgrading.
 
     Math::BigRat -> upgrade($upg);
     Math::BigRat -> downgrade($dng);
@@ -3204,15 +3244,21 @@ sub bsqrt {
     # calculate square root of $x
     my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
 
-    return $x if $x->modify('bsqrt');
+    return $x if $x -> modify('bsqrt');
 
-    return $x->bnan(@r)  if $x->{sign} !~ /^\+/;    # -x or -inf or NaN => NaN
-    return $x->round(@r) if $x->{sign} eq '+inf';   # sqrt(+inf) == inf
+    return $x -> bnan(@r)  if $x -> is_nan();
+    return $x -> round(@r) if $x -> is_zero() || $x -> is_inf("+");
 
-    return $upgrade->bsqrt($x, @r) if defined $upgrade;
+    if ($upgrade) {
+        $x = $upgrade -> bsqrt($x, @r);
+        $x = $x -> as_int() if $x -> is_int();
+        return $x;
+    }
 
-    $x->{value} = $LIB->_sqrt($x->{value});
-    $x->round(@r);
+    return $x -> bnan(@r) if $x -> is_neg();
+
+    $x->{value} = $LIB -> _sqrt($x->{value});
+    return $x -> round(@r);
 }
 
 sub broot {
@@ -3992,8 +4038,8 @@ sub round {
 
     # if still none defined, use globals
     unless (defined $a || defined $p) {
-        $a = ${"$class\::accuracy"};
-        $p = ${"$class\::precision"};
+        $a = $class -> accuracy();
+        $p = $class -> precision();
     }
 
     # A == 0 is useless, so undef it to signal no rounding
@@ -4005,7 +4051,7 @@ sub round {
     # set A and set P is an fatal error
     return $self->bnan() if defined $a && defined $p;
 
-    $r = ${"$class\::round_mode"} unless defined $r;
+    $r = $class -> round_mode() unless defined $r;
     if ($r !~ /^(even|odd|[+-]inf|zero|trunc|common)$/) {
         croak("Unknown round mode '$r'");
     }
@@ -5110,8 +5156,6 @@ sub objectify {
     $count ||= @a;
     unshift @a, $class;
 
-    no strict 'refs';
-
     # What we upgrade to, if anything. Note that we need the whole upgrade
     # chain, since there might be multiple levels of upgrading. E.g., class A
     # upgrades to class B, which upgrades to class C. Delay getting the chain
@@ -5123,11 +5167,8 @@ sub objectify {
     # Disable downgrading, because Math::BigFloat -> foo('1.0', '2.0') needs
     # floats.
 
-    my $down;
-    if (defined ${"$a[0]::downgrade"}) {
-        $down = ${"$a[0]::downgrade"};
-        ${"$a[0]::downgrade"} = undef;
-    }
+    my $dng = $class -> downgrade();
+    $class -> downgrade(undef);
 
   ARG: for my $i (1 .. $count) {
 
@@ -5136,13 +5177,13 @@ sub objectify {
         # Perl scalars are fed to the appropriate constructor.
 
         unless ($ref) {
-            $a[$i] = $a[0] -> new($a[$i]);
+            $a[$i] = $class -> new($a[$i]);
             next;
         }
 
         # If it is an object of the right class, all is fine.
 
-        next if $ref -> isa($a[0]);
+        next if $ref -> isa($class);
 
         # Upgrading is OK, so skip further tests if the argument is upgraded,
         # but first get the whole upgrade chain if we haven't got it yet.
@@ -5169,7 +5210,7 @@ sub objectify {
 
         my $recheck = 0;
 
-        if ($a[0] -> isa('Math::BigInt')) {
+        if ($class -> isa('Math::BigInt')) {
             if ($a[$i] -> can('as_int')) {
                 $a[$i] = $a[$i] -> as_int();
                 $recheck = 1;
@@ -5179,10 +5220,17 @@ sub objectify {
             }
         }
 
-        elsif ($a[0] -> isa('Math::BigFloat')) {
+        elsif ($class -> isa('Math::BigRat')) {
+            if ($a[$i] -> can('as_rat')) {
+                $a[$i] = $a[$i] -> as_rat();
+                $recheck = 1;
+            }
+        }
+
+        elsif ($class -> isa('Math::BigFloat')) {
             if ($a[$i] -> can('as_float')) {
                 $a[$i] = $a[$i] -> as_float();
-                $recheck = $1;
+                $recheck = 1;
             }
         }
 
@@ -5194,23 +5242,23 @@ sub objectify {
             # Perl scalars are fed to the appropriate constructor.
 
             unless ($ref) {
-                $a[$i] = $a[0] -> new($a[$i]);
+                $a[$i] = $class -> new($a[$i]);
                 next;
             }
 
             # If it is an object of the right class, all is fine.
 
-            next if $ref -> isa($a[0]);
+            next if $ref -> isa($class);
         }
 
         # Last resort.
 
-        $a[$i] = $a[0] -> new($a[$i]);
+        $a[$i] = $class -> new($a[$i]);
     }
 
-    # Reset the downgrading.
+    # Restore the downgrading.
 
-    ${"$a[0]::downgrade"} = $down;
+    $class -> downgrade($dng);
 
     return @a;
 }
@@ -5277,6 +5325,13 @@ sub import {
 
         if ($param eq 'round_mode') {
             $class -> round_mode(shift);
+            next;
+        }
+
+        # Fall-back accuracy.
+
+        if ($param eq 'div_scale') {
+            $class -> div_scale(shift);
             next;
         }
 
@@ -5384,10 +5439,8 @@ sub import {
 
     # Any non-':constant' stuff is handled by our parent, Exporter
 
-    if (@a) {
-        $class->SUPER::import(@a);              # need it for subclasses
-        $class->export_to_level(1, $class, @a); # need it for Math::BigFloat
-    }
+    $class -> SUPER::import(@a);                        # for subclasses
+    $class -> export_to_level(1, $class, @a) if @a;     # need this, too
 
     # We might not have loaded any backend library yet, either because the user
     # didn't specify any, or because the specified libraries failed to load and
@@ -5472,8 +5525,8 @@ sub _find_round_parameters {
     }
 
     # if still none defined, use globals (#2)
-    $a = ${"$class\::accuracy"}  unless defined $a;
-    $p = ${"$class\::precision"} unless defined $p;
+    $a = $class -> accuracy()  unless defined $a;
+    $p = $class -> precision() unless defined $p;
 
     # A == 0 is useless, so undef it to signal no rounding
     $a = undef if defined $a && $a == 0;
@@ -5484,7 +5537,7 @@ sub _find_round_parameters {
     # set A and set P is an fatal error
     return ($self->bnan()) if defined $a && defined $p; # error
 
-    $r = ${"$class\::round_mode"} unless defined $r;
+    $r = $class -> round_mode() unless defined $r;
     if ($r !~ /^(even|odd|[+-]inf|zero|trunc|common)$/) {
         croak("Unknown round mode '$r'");
     }
@@ -8696,20 +8749,21 @@ store additional hash keys in the object. There are also some package globals
 that must be defined, e.g.:
 
     # Globals
-    $accuracy = undef;
-    $precision = -2;       # round to 2 decimal places
-    $round_mode = 'even';
-    $div_scale = 40;
+    our $accuracy = 2;          # round to 2 decimal places
+    our $precision = undef;
+    our $round_mode = 'even';
+    our $div_scale = 40;
 
 Additionally, you might want to provide the following two globals to allow
-auto-upgrading and auto-downgrading to work correctly:
+auto-upgrading and auto-downgrading:
 
-    $upgrade = undef;
-    $downgrade = undef;
+    our $upgrade = undef;
+    our $downgrade = undef;
 
 This allows Math::BigInt to correctly retrieve package globals from the
-subclass, like C<$SubClass::precision>. See t/Math/BigInt/Subclass.pm or
-t/Math/BigFloat/SubClass.pm completely functional subclass examples.
+subclass, like C<$SubClass::precision>. See C<t/Math/BigInt/Subclass.pm>,
+C<t/Math/BigFloat/SubClass.pm>, or C<t/Math/BigRat/SubClass.pm> for subclass
+examples.
 
 Don't forget to
 
@@ -8725,16 +8779,22 @@ When used like this:
 
     use Math::BigInt upgrade => 'Foo::Bar';
 
-certain operations 'upgrade' their calculation and thus the result to the class
-Foo::Bar. Usually this is used in conjunction with Math::BigFloat:
+any operation whose result cannot be represented as an integer is upgraded to
+the class Foo::Bar. Usually this is used in conjunction with Math::BigFloat:
 
     use Math::BigInt upgrade => 'Math::BigFloat';
+
+For example, the following returns 3 as a Math::BigInt when no upgrading is
+defined, and 3.125 as a Math::BigFloat if Math::BigInt is set to upgrade to
+Math::BigFloat:
+
+    $x = Math::BigInt -> new(25) -> bdiv(8);
 
 As a shortcut, you can use the module L<bignum>:
 
     use bignum;
 
-Also good for one-liners:
+which is also good for one-liners:
 
     perl -Mbignum -le 'print 2 ** 255'
 

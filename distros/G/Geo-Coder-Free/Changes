@@ -1,5 +1,21 @@
 Revision history for Geo-Coder-Free
 
+0.34	Mon Nov  6 16:53:43 EST 2023
+	Latest DB.pm from NJH-Snippets
+	Latest Display.pm from VWF
+	Use HEAD not master to get the list of files
+	MaxMind.pm: Try hard to support whatever API that the user wants to use
+
+0.33	Mon  6 Nov 08:31:27 EST 2023
+	Calling new on a local object now returns a clone rather than setting the defaults in the new object
+	Some support for reverse_geocode
+	Added Redis as a prerequisite if REDIS_SERVER is set
+	Latest DB.pm from NJH-Snippets
+	Change the mode of the cachedir to 2755
+	Free.pm/Local.pm: Try hard to support whatever API that the user wants to use
+	Local.pm: if libpostal fails, try code without
+	Put the README file into the GETTING STARTED section of the POD
+
 0.32	Wed Jun 21 20:31:01 EDT 2023
 	Set NA rather than fail on smokers without L:P:https
 	It's OK to install modules on Github Actions

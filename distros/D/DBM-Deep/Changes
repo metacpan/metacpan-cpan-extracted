@@ -1,5 +1,15 @@
 Revision history for DBM::Deep (ordered by revision number).
 
+2.0019    2023-11-12
+
+- improvement so that when you try to put too much data in you get a
+  useful error, and don't corrupt the db
+
+2.0018    2023-11-08
+
+- tiny documentation and metadata fixes to make sure people go to the
+  correct issue tracker
+
 2.0017    2023-09-01
 
 - get rid of old perl4-style ' package separator and use :: instead

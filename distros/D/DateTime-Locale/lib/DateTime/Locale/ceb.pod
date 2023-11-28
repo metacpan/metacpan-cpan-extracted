@@ -101,7 +101,7 @@ Cebuano locale.
   Hunyo
   Hulyo
   Agosto
-  Setyembre
+  Septiyembre
   Oktubre
   Nobyembre
   Disyembre
@@ -116,7 +116,7 @@ Cebuano locale.
   Hun
   Hul
   Ago
-  Set
+  Sep
   Okt
   Nob
   Dis
@@ -147,7 +147,7 @@ Cebuano locale.
   Hunyo
   Hulyo
   Agosto
-  Setyembre
+  Septiyembre
   Oktubre
   Nobyembre
   Disyembre
@@ -162,7 +162,7 @@ Cebuano locale.
   Hun
   Hul
   Ago
-  Set
+  Sep
   Okt
   Nob
   Dis
@@ -250,19 +250,19 @@ Cebuano locale.
 
    2008-02-05T18:30:30 = Martes, Pebrero 5, 2008
    1995-12-22T09:05:02 = Biyernes, Disyembre 22, 1995
-  -0010-09-15T04:44:23 = Sabado, Setyembre 15, -10
+  -0010-09-15T04:44:23 = Sabado, Septiyembre 15, -10
 
 =head3 Long
 
    2008-02-05T18:30:30 = Pebrero 5, 2008
    1995-12-22T09:05:02 = Disyembre 22, 1995
-  -0010-09-15T04:44:23 = Setyembre 15, -10
+  -0010-09-15T04:44:23 = Septiyembre 15, -10
 
 =head3 Medium
 
    2008-02-05T18:30:30 = Peb 5, 2008
    1995-12-22T09:05:02 = Dis 22, 1995
-  -0010-09-15T04:44:23 = Set 15, -10
+  -0010-09-15T04:44:23 = Sep 15, -10
 
 =head3 Short
 
@@ -304,19 +304,19 @@ Cebuano locale.
 
    2008-02-05T18:30:30 = Martes, Pebrero 5, 2008, 6:30:30 PM UTC
    1995-12-22T09:05:02 = Biyernes, Disyembre 22, 1995, 9:05:02 AM UTC
-  -0010-09-15T04:44:23 = Sabado, Setyembre 15, -10, 4:44:23 AM UTC
+  -0010-09-15T04:44:23 = Sabado, Septiyembre 15, -10, 4:44:23 AM UTC
 
 =head3 Long
 
    2008-02-05T18:30:30 = Pebrero 5, 2008, 6:30:30 PM UTC
    1995-12-22T09:05:02 = Disyembre 22, 1995, 9:05:02 AM UTC
-  -0010-09-15T04:44:23 = Setyembre 15, -10, 4:44:23 AM UTC
+  -0010-09-15T04:44:23 = Septiyembre 15, -10, 4:44:23 AM UTC
 
 =head3 Medium
 
    2008-02-05T18:30:30 = Peb 5, 2008, 6:30:30 PM
    1995-12-22T09:05:02 = Dis 22, 1995, 9:05:02 AM
-  -0010-09-15T04:44:23 = Set 15, -10, 4:44:23 AM
+  -0010-09-15T04:44:23 = Sep 15, -10, 4:44:23 AM
 
 =head3 Short
 
@@ -403,19 +403,19 @@ Cebuano locale.
 
    2008-02-05T18:30:30 = Peb 2008 AD
    1995-12-22T09:05:02 = Dis 1995 AD
-  -0010-09-15T04:44:23 = Set -10 BC
+  -0010-09-15T04:44:23 = Sep -10 BC
 
 =head3 GyMMMEd (E, MMM d, y G)
 
    2008-02-05T18:30:30 = Mar, Peb 5, 2008 AD
    1995-12-22T09:05:02 = Biy, Dis 22, 1995 AD
-  -0010-09-15T04:44:23 = Sab, Set 15, -10 BC
+  -0010-09-15T04:44:23 = Sab, Sep 15, -10 BC
 
 =head3 GyMMMd (MMM d, y G)
 
    2008-02-05T18:30:30 = Peb 5, 2008 AD
    1995-12-22T09:05:02 = Dis 22, 1995 AD
-  -0010-09-15T04:44:23 = Set 15, -10 BC
+  -0010-09-15T04:44:23 = Sep 15, -10 BC
 
 =head3 GyMd (M/d/y GGGGG)
 
@@ -469,37 +469,37 @@ Cebuano locale.
 
    2008-02-05T18:30:30 = Peb
    1995-12-22T09:05:02 = Dis
-  -0010-09-15T04:44:23 = Set
+  -0010-09-15T04:44:23 = Sep
 
 =head3 MMMEd (E, MMM d)
 
    2008-02-05T18:30:30 = Mar, Peb 5
    1995-12-22T09:05:02 = Biy, Dis 22
-  -0010-09-15T04:44:23 = Sab, Set 15
+  -0010-09-15T04:44:23 = Sab, Sep 15
 
 =head3 MMMMW-count-one ('semana' W 'sa' MMMM)
 
    2008-02-05T18:30:30 = semana 1 sa Pebrero
    1995-12-22T09:05:02 = semana 3 sa Disyembre
-  -0010-09-15T04:44:23 = semana 2 sa Setyembre
+  -0010-09-15T04:44:23 = semana 2 sa Septiyembre
 
 =head3 MMMMW-count-other ('semana' W 'sa' MMMM)
 
    2008-02-05T18:30:30 = semana 1 sa Pebrero
    1995-12-22T09:05:02 = semana 3 sa Disyembre
-  -0010-09-15T04:44:23 = semana 2 sa Setyembre
+  -0010-09-15T04:44:23 = semana 2 sa Septiyembre
 
 =head3 MMMMd (MMMM d)
 
    2008-02-05T18:30:30 = Pebrero 5
    1995-12-22T09:05:02 = Disyembre 22
-  -0010-09-15T04:44:23 = Setyembre 15
+  -0010-09-15T04:44:23 = Septiyembre 15
 
 =head3 MMMd (MMM d)
 
    2008-02-05T18:30:30 = Peb 5
    1995-12-22T09:05:02 = Dis 22
-  -0010-09-15T04:44:23 = Set 15
+  -0010-09-15T04:44:23 = Sep 15
 
 =head3 Md (M/d)
 
@@ -571,25 +571,25 @@ Cebuano locale.
 
    2008-02-05T18:30:30 = Peb 2008
    1995-12-22T09:05:02 = Dis 1995
-  -0010-09-15T04:44:23 = Set -10
+  -0010-09-15T04:44:23 = Sep -10
 
 =head3 yMMMEd (E, MMM d, y)
 
    2008-02-05T18:30:30 = Mar, Peb 5, 2008
    1995-12-22T09:05:02 = Biy, Dis 22, 1995
-  -0010-09-15T04:44:23 = Sab, Set 15, -10
+  -0010-09-15T04:44:23 = Sab, Sep 15, -10
 
 =head3 yMMMM (MMMM y)
 
    2008-02-05T18:30:30 = Pebrero 2008
    1995-12-22T09:05:02 = Disyembre 1995
-  -0010-09-15T04:44:23 = Setyembre -10
+  -0010-09-15T04:44:23 = Septiyembre -10
 
 =head3 yMMMd (MMM d, y)
 
    2008-02-05T18:30:30 = Peb 5, 2008
    1995-12-22T09:05:02 = Dis 22, 1995
-  -0010-09-15T04:44:23 = Set 15, -10
+  -0010-09-15T04:44:23 = Sep 15, -10
 
 =head3 yMd (M/d/y)
 
@@ -638,7 +638,7 @@ No
 
    2008-02-05T18:30:30 = Mar Peb  5 18:30:30 2008
    1995-12-22T09:05:02 = Biy Dis 22 09:05:02 1995
-  -0010-09-15T04:44:23 = Sab Set 15 04:44:23 -10
+  -0010-09-15T04:44:23 = Sab Sep 15 04:44:23 -10
 
 =head3 %x (%m/%d/%y) - date format
 

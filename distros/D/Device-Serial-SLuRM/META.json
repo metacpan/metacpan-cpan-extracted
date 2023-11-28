@@ -1,10 +1,10 @@
 {
-   "abstract" : "communicate the SLÂµRM protocol over a serial port",
+   "abstract" : "communicate the SLµRM protocol over a serial port",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -26,23 +26,28 @@
             "Future::Buffer" : "0.03",
             "Future::IO" : "0",
             "IO::Termios" : "0",
-            "Object::Pad" : "0.76",
+            "Object::Pad" : "0.800",
             "Syntax::Keyword::Match" : "0",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
+            "Future::Buffer" : "0.05",
+            "Test2::V0" : "0",
             "Test::ExpectAndCheck::Future" : "0.04",
-            "Test::Future::IO" : "0.05",
-            "Test::More" : "0.88"
+            "Test::Future::IO" : "0.05"
          }
       }
    },
    "provides" : {
+      "Device::Serial::MSLuRM" : {
+         "file" : "lib/Device/Serial/MSLuRM.pm",
+         "version" : "0.06"
+      },
       "Device::Serial::SLuRM" : {
          "file" : "lib/Device/Serial/SLuRM.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -51,6 +56,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

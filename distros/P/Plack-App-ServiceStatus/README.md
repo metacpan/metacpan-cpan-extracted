@@ -4,7 +4,7 @@ Plack::App::ServiceStatus - Check and report status of various services needed b
 
 # VERSION
 
-version 0.911
+version 0.912
 
 # SYNOPSIS
 
@@ -17,7 +17,7 @@ version 0.911
         version       => '1.42',
         DBIC          => [ $schema, 'select 1' ],
         Elasticsearch => $es, # instance of Search::Elasticsearch
-    );
+    )->to_app;
 
     builder {
       mount "/_status" => $status_app;
@@ -33,6 +33,7 @@ version 0.911
             '+MyApp::ServiceStatus' => {
                   foo => literal("foo")
             },
+            buildinfo => literal('buildinfo.json'),
         );
         route '/some/endpoint' => 'some_controller.some_action';
         # ...

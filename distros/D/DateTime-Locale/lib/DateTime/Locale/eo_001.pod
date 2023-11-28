@@ -93,33 +93,33 @@ Esperanto world locale.
 
 =head3 Wide (format)
 
-  januaro
-  februaro
-  marto
-  aprilo
-  majo
-  junio
-  julio
-  aŭgusto
-  septembro
-  oktobro
-  novembro
-  decembro
+  Januaro
+  Februaro
+  Marto
+  Aprilo
+  Majo
+  Junio
+  Julio
+  Aŭgusto
+  Septembro
+  Oktobro
+  Novembro
+  Decembro
 
 =head3 Abbreviated (format)
 
-  jan
-  feb
-  mar
-  apr
-  maj
-  jun
-  jul
-  aŭg
-  sep
-  okt
-  nov
-  dec
+  Jan
+  Feb
+  Mar
+  Apr
+  Maj
+  Jun
+  Jul
+  Aŭg
+  Sep
+  Okt
+  Nov
+  Dec
 
 =head3 Narrow (format)
 
@@ -139,33 +139,33 @@ Esperanto world locale.
 
 =head3 Wide (stand-alone)
 
-  januaro
-  februaro
-  marto
-  aprilo
-  majo
-  junio
-  julio
-  aŭgusto
-  septembro
-  oktobro
-  novembro
-  decembro
+  Januaro
+  Februaro
+  Marto
+  Aprilo
+  Majo
+  Junio
+  Julio
+  Aŭgusto
+  Septembro
+  Oktobro
+  Novembro
+  Decembro
 
 =head3 Abbreviated (stand-alone)
 
-  jan
-  feb
-  mar
-  apr
-  maj
-  jun
-  jul
-  aŭg
-  sep
-  okt
-  nov
-  dec
+  Jan
+  Feb
+  Mar
+  Apr
+  Maj
+  Jun
+  Jul
+  Aŭg
+  Sep
+  Okt
+  Nov
+  Dec
 
 =head3 Narrow (stand-alone)
 
@@ -231,38 +231,38 @@ Esperanto world locale.
 
 =head3 Wide (format)
 
-  aK
-  pK
+  antaŭ nia erao
+  de nia erao
 
 =head3 Abbreviated (format)
 
-  aK
-  pK
+  a.n.e.
+  n.e.
 
 =head3 Narrow (format)
 
-  aK
-  pK
+  a.n.e.
+  n.e.
 
 =head2 Date Formats
 
 =head3 Full
 
-   2008-02-05T18:30:30 = mardo, 5-a de februaro 2008
-   1995-12-22T09:05:02 = vendredo, 22-a de decembro 1995
-  -0010-09-15T04:44:23 = sabato, 15-a de septembro -10
+   2008-02-05T18:30:30 = mardo, la 5-a de Februaro 2008
+   1995-12-22T09:05:02 = vendredo, la 22-a de Decembro 1995
+  -0010-09-15T04:44:23 = sabato, la 15-a de Septembro -10
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008-februaro-05
-   1995-12-22T09:05:02 = 1995-decembro-22
-  -0010-09-15T04:44:23 = -10-septembro-15
+   2008-02-05T18:30:30 = 2008-Februaro-05
+   1995-12-22T09:05:02 = 1995-Decembro-22
+  -0010-09-15T04:44:23 = -10-Septembro-15
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008-feb-05
-   1995-12-22T09:05:02 = 1995-dec-22
-  -0010-09-15T04:44:23 = -10-sep-15
+   2008-02-05T18:30:30 = 2008-Feb-05
+   1995-12-22T09:05:02 = 1995-Dec-22
+  -0010-09-15T04:44:23 = -10-Sep-15
 
 =head3 Short
 
@@ -275,9 +275,9 @@ Esperanto world locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 18-a horo kaj 30:30 UTC
-   1995-12-22T09:05:02 = 9-a horo kaj 5:02 UTC
-  -0010-09-15T04:44:23 = 4-a horo kaj 44:23 UTC
+   2008-02-05T18:30:30 = 18:30:30 UTC
+   1995-12-22T09:05:02 = 09:05:02 UTC
+  -0010-09-15T04:44:23 = 04:44:23 UTC
 
 =head3 Long
 
@@ -302,21 +302,21 @@ Esperanto world locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = mardo, 5-a de februaro 2008 18-a horo kaj 30:30 UTC
-   1995-12-22T09:05:02 = vendredo, 22-a de decembro 1995 9-a horo kaj 5:02 UTC
-  -0010-09-15T04:44:23 = sabato, 15-a de septembro -10 4-a horo kaj 44:23 UTC
+   2008-02-05T18:30:30 = mardo, la 5-a de Februaro 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = vendredo, la 22-a de Decembro 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = sabato, la 15-a de Septembro -10 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008-februaro-05 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995-decembro-22 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10-septembro-15 04:44:23 UTC
+   2008-02-05T18:30:30 = 2008-Februaro-05 18:30:30 UTC
+   1995-12-22T09:05:02 = 1995-Decembro-22 09:05:02 UTC
+  -0010-09-15T04:44:23 = -10-Septembro-15 04:44:23 UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008-feb-05 18:30:30
-   1995-12-22T09:05:02 = 1995-dec-22 09:05:02
-  -0010-09-15T04:44:23 = -10-sep-15 04:44:23
+   2008-02-05T18:30:30 = 2008-Feb-05 18:30:30
+   1995-12-22T09:05:02 = 1995-Dec-22 09:05:02
+  -0010-09-15T04:44:23 = -10-Sep-15 04:44:23
 
 =head3 Short
 
@@ -395,33 +395,33 @@ Esperanto world locale.
 
 =head3 Gy (G y)
 
-   2008-02-05T18:30:30 = pK 2008
-   1995-12-22T09:05:02 = pK 1995
-  -0010-09-15T04:44:23 = aK -10
+   2008-02-05T18:30:30 = n.e. 2008
+   1995-12-22T09:05:02 = n.e. 1995
+  -0010-09-15T04:44:23 = a.n.e. -10
 
 =head3 GyMMM (G y MMM)
 
-   2008-02-05T18:30:30 = pK 2008 feb
-   1995-12-22T09:05:02 = pK 1995 dec
-  -0010-09-15T04:44:23 = aK -10 sep
+   2008-02-05T18:30:30 = n.e. 2008 Feb
+   1995-12-22T09:05:02 = n.e. 1995 Dec
+  -0010-09-15T04:44:23 = a.n.e. -10 Sep
 
 =head3 GyMMMEd (G y MMM d, E)
 
-   2008-02-05T18:30:30 = pK 2008 feb 5, ma
-   1995-12-22T09:05:02 = pK 1995 dec 22, ve
-  -0010-09-15T04:44:23 = aK -10 sep 15, sa
+   2008-02-05T18:30:30 = n.e. 2008 Feb 5, ma
+   1995-12-22T09:05:02 = n.e. 1995 Dec 22, ve
+  -0010-09-15T04:44:23 = a.n.e. -10 Sep 15, sa
 
 =head3 GyMMMd (G y MMM d)
 
-   2008-02-05T18:30:30 = pK 2008 feb 5
-   1995-12-22T09:05:02 = pK 1995 dec 22
-  -0010-09-15T04:44:23 = aK -10 sep 15
+   2008-02-05T18:30:30 = n.e. 2008 Feb 5
+   1995-12-22T09:05:02 = n.e. 1995 Dec 22
+  -0010-09-15T04:44:23 = a.n.e. -10 Sep 15
 
 =head3 GyMd (GGGGG y-MM-dd)
 
-   2008-02-05T18:30:30 = pK 2008-02-05
-   1995-12-22T09:05:02 = pK 1995-12-22
-  -0010-09-15T04:44:23 = aK -10-09-15
+   2008-02-05T18:30:30 = n.e. 2008-02-05
+   1995-12-22T09:05:02 = n.e. 1995-12-22
+  -0010-09-15T04:44:23 = a.n.e. -10-09-15
 
 =head3 H (HH)
 
@@ -467,33 +467,33 @@ Esperanto world locale.
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = feb
-   1995-12-22T09:05:02 = dec
-  -0010-09-15T04:44:23 = sep
+   2008-02-05T18:30:30 = Feb
+   1995-12-22T09:05:02 = Dec
+  -0010-09-15T04:44:23 = Sep
 
 =head3 MMMEd (MMM d, E)
 
-   2008-02-05T18:30:30 = feb 5, ma
-   1995-12-22T09:05:02 = dec 22, ve
-  -0010-09-15T04:44:23 = sep 15, sa
+   2008-02-05T18:30:30 = Feb 5, ma
+   1995-12-22T09:05:02 = Dec 22, ve
+  -0010-09-15T04:44:23 = Sep 15, sa
 
 =head3 MMMMW-count-other ('week' W 'of' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of februaro
-   1995-12-22T09:05:02 = week 3 of decembro
-  -0010-09-15T04:44:23 = week 2 of septembro
+   2008-02-05T18:30:30 = week 1 of Februaro
+   1995-12-22T09:05:02 = week 3 of Decembro
+  -0010-09-15T04:44:23 = week 2 of Septembro
 
 =head3 MMMMd (MMMM d)
 
-   2008-02-05T18:30:30 = februaro 5
-   1995-12-22T09:05:02 = decembro 22
-  -0010-09-15T04:44:23 = septembro 15
+   2008-02-05T18:30:30 = Februaro 5
+   1995-12-22T09:05:02 = Decembro 22
+  -0010-09-15T04:44:23 = Septembro 15
 
 =head3 MMMd (MMM d)
 
-   2008-02-05T18:30:30 = feb 5
-   1995-12-22T09:05:02 = dec 22
-  -0010-09-15T04:44:23 = sep 15
+   2008-02-05T18:30:30 = Feb 5
+   1995-12-22T09:05:02 = Dec 22
+  -0010-09-15T04:44:23 = Sep 15
 
 =head3 Md (MM-dd)
 
@@ -563,27 +563,27 @@ Esperanto world locale.
 
 =head3 yMMM (y MMM)
 
-   2008-02-05T18:30:30 = 2008 feb
-   1995-12-22T09:05:02 = 1995 dec
-  -0010-09-15T04:44:23 = -10 sep
+   2008-02-05T18:30:30 = 2008 Feb
+   1995-12-22T09:05:02 = 1995 Dec
+  -0010-09-15T04:44:23 = -10 Sep
 
 =head3 yMMMEd (y MMM d, E)
 
-   2008-02-05T18:30:30 = 2008 feb 5, ma
-   1995-12-22T09:05:02 = 1995 dec 22, ve
-  -0010-09-15T04:44:23 = -10 sep 15, sa
+   2008-02-05T18:30:30 = 2008 Feb 5, ma
+   1995-12-22T09:05:02 = 1995 Dec 22, ve
+  -0010-09-15T04:44:23 = -10 Sep 15, sa
 
 =head3 yMMMM (y MMMM)
 
-   2008-02-05T18:30:30 = 2008 februaro
-   1995-12-22T09:05:02 = 1995 decembro
-  -0010-09-15T04:44:23 = -10 septembro
+   2008-02-05T18:30:30 = 2008 Februaro
+   1995-12-22T09:05:02 = 1995 Decembro
+  -0010-09-15T04:44:23 = -10 Septembro
 
-=head3 yMMMd (y MMM d)
+=head3 yMMMd (d MMM y)
 
-   2008-02-05T18:30:30 = 2008 feb 5
-   1995-12-22T09:05:02 = 1995 dec 22
-  -0010-09-15T04:44:23 = -10 sep 15
+   2008-02-05T18:30:30 = 5 Feb 2008
+   1995-12-22T09:05:02 = 22 Dec 1995
+  -0010-09-15T04:44:23 = 15 Sep -10
 
 =head3 yMd (y-MM-dd)
 
@@ -624,9 +624,9 @@ Yes
 
 =head3 %c (%a %d %b %Y %T) - date time format
 
-   2008-02-05T18:30:30 = ma 05 feb 2008 18:30:30
-   1995-12-22T09:05:02 = ve 22 dec 1995 09:05:02
-  -0010-09-15T04:44:23 = sa 15 sep -10 04:44:23
+   2008-02-05T18:30:30 = ma 05 Feb 2008 18:30:30
+   1995-12-22T09:05:02 = ve 22 Dec 1995 09:05:02
+  -0010-09-15T04:44:23 = sa 15 Sep -10 04:44:23
 
 =head3 %x (%Y-%m-%d) - date format
 

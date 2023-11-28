@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util qw(setup_score set_chan_patch midi_format);
+use Music::Bassline::Generator;
+use Music::Chord::Note;
+
+my @chords = @ARGV ? @ARGV : qw(
+    Am  Dm  Am  Em
+    CM7 FM7 CM7 GM7
+);
+
+my $score = setup_score();
+
+$score->synch(
+    \&bass,
+    \&chords,
+);
+
+$score->write_score("$0.mid");
+
+sub bass {
+    set_chan_patch($score, 0, 35);
+    my $bassline = Music::Bassline::Generator->new(
+        verbose => 1,
+#        tonic   => 1,
+#        scale => sub { $_[0] =~ /^[A-G][#b]?m/ ? 'pminor' : 'pentatonic' },
+    );
+    for my $n (0 .. $#chords) {
+        my $chord = $chords[$n];
+        my $next_chord = $n < $#chords ? $chords[$n + 1] : undef;
+        my $notes = $bassline->generate($chord, 4, $next_chord);
+        $score->n('qn', $_) for @$notes;
+    }
+}
+
+sub chords {
+    set_chan_patch($score, 1, 4);
+    my $cn = Music::Chord::Note->new;
+    for my $chord (@chords) {
+        my @notes = midi_format(map { $_ . 5 } $cn->chord($chord));
+        $score->n('wn', @notes);
+    }
+}

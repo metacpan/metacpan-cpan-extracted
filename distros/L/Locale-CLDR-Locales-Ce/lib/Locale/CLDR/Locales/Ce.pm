@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ce - Package for language Chechen
 
 package Locale::CLDR::Locales::Ce;
 # This file auto generated from Data\common\main\ce.xml
-#	on Fri 13 Oct  9:09:43 am GMT
+#	on Sat  4 Nov  5:56:24 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

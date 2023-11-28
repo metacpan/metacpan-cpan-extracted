@@ -1,7 +1,6 @@
 Changes
-examples/check_date_error.pl
-examples/check_date_ok.pl
 examples/create_and_dump_isbn.pl
+examples/create_and_dump_kramerius.pl
 examples/create_and_dump_people.pl
 examples/create_and_dump_publisher.pl
 examples/create_and_dump_series.pl
@@ -27,7 +26,6 @@ Object/Kramerius.pm
 Object/People.pm
 Object/Publisher.pm
 Object/Series.pm
-Object/Utils.pm
 README
 SIGNATURE
 t/MARC-Convert-Wikidata-Object-ISBN/01-use.t
@@ -41,6 +39,7 @@ t/MARC-Convert-Wikidata-Object-Kramerius/02-version.t
 t/MARC-Convert-Wikidata-Object-Kramerius/03-new.t
 t/MARC-Convert-Wikidata-Object-Kramerius/04-kramerius_id.t
 t/MARC-Convert-Wikidata-Object-Kramerius/05-object_id.t
+t/MARC-Convert-Wikidata-Object-Kramerius/06-url.t
 t/MARC-Convert-Wikidata-Object-People/01-use.t
 t/MARC-Convert-Wikidata-Object-People/02-version.t
 t/MARC-Convert-Wikidata-Object-People/03-new.t
@@ -60,10 +59,6 @@ t/MARC-Convert-Wikidata-Object-Series/03-new.t
 t/MARC-Convert-Wikidata-Object-Series/04-name.t
 t/MARC-Convert-Wikidata-Object-Series/05-publisher.t
 t/MARC-Convert-Wikidata-Object-Series/06-series_ordinal.t
-t/MARC-Convert-Wikidata-Object-Utils/01-use.t
-t/MARC-Convert-Wikidata-Object-Utils/02-version.t
-t/MARC-Convert-Wikidata-Object-Utils/03-check_date.t
-t/MARC-Convert-Wikidata-Object-Utils/04-check_date_order.t
 t/MARC-Convert-Wikidata-Object/01-use.t
 t/MARC-Convert-Wikidata-Object/02-version.t
 t/MARC-Convert-Wikidata-Object/03-new.t
@@ -105,7 +100,5 @@ xt/MARC-Convert-Wikidata-Object-Publisher/01-pod_coverage.t
 xt/MARC-Convert-Wikidata-Object-Publisher/02-pod.t
 xt/MARC-Convert-Wikidata-Object-Series/01-pod_coverage.t
 xt/MARC-Convert-Wikidata-Object-Series/02-pod.t
-xt/MARC-Convert-Wikidata-Object-Utils/01-pod_coverage.t
-xt/MARC-Convert-Wikidata-Object-Utils/02-pod.t
 xt/MARC-Convert-Wikidata-Object/01-pod_coverage.t
 xt/MARC-Convert-Wikidata-Object/02-pod.t

@@ -1,0 +1,71 @@
+{
+   "abstract" : "Automate various sys admin stuff.",
+   "author" : [
+      "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Ixchel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "File::Find::Rule" : "0",
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "Hash::Merge" : "0",
+            "JSON" : "0",
+            "JSON::Path" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::Simple" : "0",
+            "Module::List" : "0",
+            "Rex" : "v1.14.3",
+            "String::ShellQuote" : "0",
+            "TOML" : "0",
+            "Template" : "3.101",
+            "YAML::XS" : "0",
+            "YAML::yq::Helper" : "v0.1.2",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/LilithSec/Ixchel"
+      }
+   },
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

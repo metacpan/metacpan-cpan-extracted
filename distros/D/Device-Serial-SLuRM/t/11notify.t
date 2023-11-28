@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Future::IO;
 
 use constant HAVE_TEST_METRICS_ANY => eval { require Test::Metrics::Any };
@@ -72,7 +72,7 @@ sub notifications_received_for
    my @notifications = notifications_received_for
       "\x55" . with_crc8( with_crc8( "\x12\x01" ) . "B" ) .
       "\x55" . with_crc8( with_crc8( "\x12\x01" ) . "B" );
-   is_deeply( \@notifications, [ "B" ], 'Received only one NOTIFY packet with duplicate' );
+   is( \@notifications, [ "B" ], 'Received only one NOTIFY packet with duplicate' );
 
    $controller->check_and_clear( 'Receive NOTIFY packet with duplicate' );
 }
@@ -82,7 +82,7 @@ sub notifications_received_for
    my @notifications = notifications_received_for
       "\x55" . with_crc8( with_crc8( "\x13\x01" ) . "C" ) .
       "\x55" . with_crc8( with_crc8( "\x12\x01" ) . "B" );
-   is_deeply( \@notifications, [ "C" ], 'Received only one NOTIFY packet with backstep' );
+   is( \@notifications, [ "C" ], 'Received only one NOTIFY packet with backstep' );
 
    $controller->check_and_clear( 'Receive NOTIFY packet with backstep' );
 }
@@ -93,7 +93,7 @@ sub notifications_received_for
       "\x55" . with_crc8( with_crc8( "\x14\x01" ) . "D" ) .
       "\x55" . with_crc8( with_crc8( "\x16\x01" ) . "E" ) .
       "\x55" . with_crc8( with_crc8( "\x1A\x01" ) . "F" );
-   is_deeply( \@notifications, [ "D", "E", "F" ], 'Received all three NOTIFY packets with gaps' );
+   is( \@notifications, [ "D", "E", "F" ], 'Received all three NOTIFY packets with gaps' );
 
    $controller->check_and_clear( 'Receive NOTIFY packets with gap' );
 }
@@ -103,7 +103,7 @@ sub notifications_received_for
    my @notifications = notifications_received_for
       "\x55" . with_crc8( with_crc8( "\x1F\x01" ) . "G" ) .
       "\x55" . with_crc8( with_crc8( "\x10\x01" ) . "H" );
-   is_deeply( \@notifications, [ "G", "H" ], 'Received only one NOTIFY packet with wraparound' );
+   is( \@notifications, [ "G", "H" ], 'Received only one NOTIFY packet with wraparound' );
 
    $controller->check_and_clear( 'Receive NOTIFY packets with wraparound' )
 }

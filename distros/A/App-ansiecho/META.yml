@@ -27,7 +27,7 @@ no_index:
 provides:
   App::ansiecho:
     file: lib/App/ansiecho.pm
-    version: '1.07'
+    version: '1.0701'
   App::ansiecho::Util:
     file: lib/App/ansiecho/Util.pm
 requires:
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/tecolicom/App-ansiecho/issues
   homepage: https://github.com/tecolicom/App-ansiecho
   repository: https://github.com/tecolicom/App-ansiecho.git
-version: '1.07'
+version: '1.0701'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

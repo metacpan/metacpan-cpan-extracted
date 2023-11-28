@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::filename::not_exists;
 
-our $DATE = '2023-10-29'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2023-11-23'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 our $rschema = do{my$var={base=>"filename",clsets_after_base=>[{description=>"\nThis is like the `filename` schema but with an extra check that the path must\nnot already exist.\n\n",prefilters=>["Path::check_path_not_exists"],summary=>"File name, must not already exist on filesystem"}],clsets_after_type=>[{description=>"\nThis schema is basically string with some checks and prefilters. Why use this\nschema instead of plain ol' str? Mainly to give you the ability to change tilde\nto user's home directory, e.g. `~/foo.txt` into `/home/someuser/foo.txt`.\nNormally this expansion is done by a Unix shell, but sometimes your program\nreceives an unexpanded path, e.g. when you get it from some config file.\n\nSee also more OS-specific schemas like `filename::unix`, which adds some more\nchecks (e.g. filename cannot contain forward slash and each component cannot be\nlonger than 255 characters) and preprocessing (e.g. stripping extraneous slashes\nlike `foo//bar` into `foo/bar`.\n\nWhat's the difference between this schema and `dirname`? The default completion\nrule. `dirname`'s completion only includes directories and not files.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"}],min_len=>1,prefilters=>["Path::expand_tilde_when_on_unix","Path::strip_slashes_when_on_unix"],summary=>"Filesystem file name","x.completion"=>["filename"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","filename"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::filename::not_exists - File name, must not already exist on filesy
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::SchemaR::filename::not_exists (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::SchemaR::filename::not_exists (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 DESCRIPTION
 

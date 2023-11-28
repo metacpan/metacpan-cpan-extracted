@@ -198,7 +198,10 @@ sub load {
         elsif (/^\s+\+\s+(\w+)\s*=\s*\[\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\]/)
                                           { $data->{$category} = {} if ref $data->{$category} ne 'HASH';
                                             $data->{$category}{$1} = [$2, $3, $4];   }
-        elsif (/\s*(\w+)\s*=\s*(.+)\s*$/) { $data->{$1} = $2;}
+        elsif (/^\s+\+\s+(\w+)\s*=\s*\[\s*(.+)\s*\]/)
+                                          { $data->{$category} = {} if ref $data->{$category} ne 'HASH';
+                                            $data->{$category}{$1} = [map {tr/ //d; $_} split /,/, $2] }
+        elsif (/\s*(\w+)\s*=\s*(.+)\s*$/) { $data->{$1} = $2; $category =  '';}
     }
     close $FH;
     $data;
@@ -209,16 +212,17 @@ sub save {
     my $data = $self->{'data'};
     my $file = $self->{'path'};
     open my $FH, '>', $file or return "could not write $file: $!";
+    $" = ',';
     for my $key (sort keys %$data){
-        my $value = $data->{ $key };
-        if (ref $value eq 'ARRAY'){
+        my $val = $data->{ $key };
+        if (ref $val eq 'ARRAY'){
             say $FH "$key:";
-            say $FH "  - $_" for @$value;
-        } elsif (ref $value eq 'HASH'){
+            say $FH "  - $_" for @$val;
+        } elsif (ref $val eq 'HASH'){
             say $FH "$key:";
-            say $FH "  + $_ = [ $value->{$_}[0], $value->{$_}[1], $value->{$_}[2] ]" for sort keys %$value;
-        } elsif (not ref $value){
-            say $FH "$key = $value";
+            say $FH "  + $_ = [ @{$val->{$_}} ]" for sort keys %$val;
+        } elsif (not ref $val){
+            say $FH "$key = $val";
         }
     }
     close $FH;

@@ -1,5 +1,5 @@
 package Parse::SAMGov::Entity::PointOfContact;
-$Parse::SAMGov::Entity::PointOfContact::VERSION = '0.106';
+$Parse::SAMGov::Entity::PointOfContact::VERSION = '0.202';
 use strict;
 use warnings;
 use 5.010;
@@ -64,7 +64,7 @@ Parse::SAMGov::Entity::PointOfContact - Defines the Point of Contact object of t
 
 =head1 VERSION
 
-version 0.106
+version 0.202
 
 =head1 SYNOPSIS
 
@@ -138,7 +138,7 @@ Vikas N Kumar <vikas@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Selective Intellect LLC.
+This software is copyright (c) 2023 by Selective Intellect LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

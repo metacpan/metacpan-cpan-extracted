@@ -31,7 +31,7 @@
    "provides" : {
       "Astro::WaveBand" : {
          "file" : "lib/Astro/WaveBand.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -44,5 +44,5 @@
          "url" : "https://github.com/timj/perl-Astro-WaveBand.git"
       }
    },
-   "version" : "0.10"
+   "version" : "0.11"
 }

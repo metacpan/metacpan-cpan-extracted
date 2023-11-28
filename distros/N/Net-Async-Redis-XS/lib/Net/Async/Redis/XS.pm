@@ -1,12 +1,13 @@
 package Net::Async::Redis::XS;
 # ABSTRACT: faster version of Net::Async::Redis
 
+use Object::Pad;
+class Net::Async::Redis::XS :isa(Net::Async::Redis);
+
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
-
-use parent qw(Net::Async::Redis);
+our $VERSION = '1.000';
 
 =head1 NAME
 
@@ -50,8 +51,7 @@ sub dl_load_flags { 1 }
 require DynaLoader;
 __PACKAGE__->DynaLoader::bootstrap(__PACKAGE__->VERSION);
 
-sub wire_protocol {
-    my ($self) = @_;
+method wire_protocol {
     $self->{wire_protocol} ||= do {
         Net::Async::Redis::Protocol::XS->new(
             handler  => $self->curry::weak::on_message,

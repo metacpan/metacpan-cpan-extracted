@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kln::Any::Ke - Package for language Kalenjin
 
 package Locale::CLDR::Locales::Kln::Any::Ke;
 # This file auto generated from Data\common\main\kln_KE.xml
-#	on Fri 13 Oct  9:23:39 am GMT
+#	on Sat  4 Nov  6:09:53 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

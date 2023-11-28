@@ -21,6 +21,6 @@ my $url  = $puml->fetch_url(
 
 ok(
     $url eq
-'http://www.plantuml.com/plantuml/png/69NZKb1GSCp9J4vLqBLJSCfFKh1Io4ZDoSdd0W1EMmQV',
+'http://www.plantuml.com/plantuml/png/~169NZKb1GSCp9J4vLqBLJSCfFKh1Io4ZDoSdd0W1EMmQV',
     'fetched default url and default format'
 );

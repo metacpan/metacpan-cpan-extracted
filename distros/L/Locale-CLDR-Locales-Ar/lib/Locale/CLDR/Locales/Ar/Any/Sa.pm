@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ar::Any::Sa - Package for language Arabic
 
 package Locale::CLDR::Locales::Ar::Any::Sa;
 # This file auto generated from Data\common\main\ar_SA.xml
-#	on Fri 13 Oct  9:05:30 am GMT
+#	on Sat  4 Nov  5:52:28 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

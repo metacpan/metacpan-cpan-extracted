@@ -163,6 +163,7 @@ while($handling_request = ($request->Accept() >= 0)) {
 		$logger->error($msg);
 		if($buffercache) {
 			$buffercache->clear();
+			$buffercache = undef;
 		}
 	};
 

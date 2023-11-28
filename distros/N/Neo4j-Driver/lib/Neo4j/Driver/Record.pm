@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Record;
 # ABSTRACT: Container for Cypher result values
-$Neo4j::Driver::Record::VERSION = '0.40';
+$Neo4j::Driver::Record::VERSION = '0.41';
 
 use Carp qw(croak);
 use JSON::MaybeXS 1.003003 qw(is_bool);
@@ -112,7 +112,7 @@ Neo4j::Driver::Record - Container for Cypher result values
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -201,6 +201,9 @@ In a future version of this driver, these types will
 be implemented by other packages, but they will
 continue to inherit from L<Neo4j::Types> and have that interface.
 
+I<B<Note:> The type mapping documentation above will soon be replaced
+by L<Neo4j::Driver::Types>.>
+
 =head2 data
 
  $hashref = $record->data;
@@ -213,6 +216,8 @@ Return the keys and values of this record as a hash reference.
 =over
 
 =item * L<Neo4j::Driver>
+
+=item * L<Neo4j::Driver::Types>
 
 =item * L<Neo4j::Driver::Type::B<Node>>,
 L<Neo4j::Driver::Type::B<Relationship>>,

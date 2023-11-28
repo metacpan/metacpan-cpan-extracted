@@ -29,7 +29,7 @@ Liniile de date de intrare și de ieșire nu trebuie să fie identice atunci câ
 
 =head1 VERSION
 
-Version 0.9901
+Version 0.9902
 
 =head1 OPTIONS
 
@@ -43,19 +43,25 @@ Invocarea unei noi comenzi individuale pentru fiecare piesă care se potrivește
 
 Combină o secvență de linii care nu sunt goale într-o singură linie înainte de a le transmite comenzii de filtrare. Caracterele newline dintre caracterele largi sunt șterse, iar alte caractere newline sunt înlocuite cu spații.
 
-=item B<--blockmatch>
+=item B<--blocks>
 
 În mod normal, zona care corespunde modelului de căutare specificat este trimisă la comanda externă. În cazul în care se specifică această opțiune, nu zona care corespunde, ci întregul bloc care o conține va fi procesat.
 
 De exemplu, pentru a trimite liniile care conțin modelul C<foo> la comanda externă, trebuie să specificați modelul care se potrivește cu întreaga linie:
 
-    greple -Mtee cat -n -- '^.*foo.*\n'
+    greple -Mtee cat -n -- '^.*foo.*\n' --all
 
-Dar cu opțiunea B<<--blockmatch>, se poate face la fel de simplu, după cum urmează:
+Dar cu opțiunea B<--blocuri>, se poate face la fel de simplu, după cum urmează:
 
-    greple -Mtee cat -n -- foo
+    greple -Mtee cat -n -- foo --blocks
 
-Cu opțiunea B<--blockmatch>, acest modul se comportă mai mult ca opțiunea B<-g> a lui L<teip(1)>.
+Cu opțiunea B<--blocuri>, acest modul se comportă mai mult ca opțiunea B<-g> de la L<teip(1)>. În rest, comportamentul este similar cu cel al lui L<teip(1)> cu opțiunea B<-o>.
+
+Nu utilizați B<--blocks> cu opțiunea B<--all>, deoarece blocul va fi reprezentat de toate datele.
+
+=item B<--squeeze>
+
+Combină două sau mai multe caractere de linie nouă consecutive într-unul singur.
 
 =back
 
@@ -158,118 +164,3 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-
-package App::Greple::tee;
-
-our $VERSION = "0.9901";
-
-use v5.14;
-use warnings;
-use Carp;
-use List::Util qw(sum first);
-use Text::ParseWords qw(shellwords);
-use App::cdif::Command;
-use Data::Dumper;
-
-our $command;
-our $blockmatch;
-our $discrete;
-our $fillup;
-
-my($mod, $argv);
-
-sub initialize {
-    ($mod, $argv) = @_;
-    if (defined (my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
-	if (my @command = splice @$argv, 0, $i) {
-	    $command = \@command;
-	}
-	shift @$argv;
-    }
-}
-
-use Unicode::EastAsianWidth;
-
-sub fillup_paragraph {
-    (my $s1, local $_, my $s2) = $_[0] =~ /\A(\s*)(.*?)(\s*)\z/s or die;
-    s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
-    s/\s+/ /g;
-    $s1 . $_ . $s2;
-}
-
-sub call {
-    my $data = shift;
-    $command // return $data;
-    state $exec = App::cdif::Command->new;
-    if ($fillup) {
-	$data =~ s/^.+(?:\n.+)*/fillup_paragraph(${^MATCH})/pmge;
-    }
-    if (ref $command ne 'ARRAY') {
-	$command = [ shellwords $command ];
-    }
-    $exec->command($command)->setstdin($data)->update->data // '';
-}
-
-sub jammed_call {
-    my @need_nl = grep { $_[$_] !~ /\n\z/ } keys @_;
-    my @from = @_;
-    $from[$_] .= "\n" for @need_nl;
-    my @lines = map { int tr/\n/\n/ } @from;
-    my $from = join '', @from;
-    my $out = call $from;
-    my @out = $out =~ /.*\n/g;
-    if (@out < sum @lines) {
-	die "Unexpected response from command:\n\n$out\n";
-    }
-    my @to = map { join '', splice @out, 0, $_ } @lines;
-    $to[$_] =~ s/\n\z// for @need_nl;
-    return @to;
-}
-
-my @jammed;
-
-sub postgrep {
-    my $grep = shift;
-    if ($blockmatch) {
-	$grep->{RESULT} = [
-	    [ [ 0, length ],
-	      map {
-		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback}->[0] ]
-	      } $grep->result
-	    ] ];
-    }
-    return if $discrete;
-    @jammed = my @block = ();
-    for my $r ($grep->result) {
-	my($b, @match) = @$r;
-	for my $m (@match) {
-	    push @block, $grep->cut(@$m);
-	}
-    }
-    @jammed = jammed_call @block if @block;
-}
-
-sub callback {
-    if ($discrete) {
-	call { @_ }->{match};
-    }
-    else {
-	shift @jammed // die;
-    }
-}
-
-1;
-
-__DATA__
-
-builtin --blockmatch $blockmatch
-builtin --discrete!  $discrete
-builtin --fillup!    $fillup
-
-option default \
-	--postgrep &__PACKAGE__::postgrep \
-	--callback &__PACKAGE__::callback
-
-option --tee-each --discrete
-
-#  LocalWords:  greple tee teip DeepL deepl perl xlate

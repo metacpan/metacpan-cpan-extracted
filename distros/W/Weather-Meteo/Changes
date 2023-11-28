@@ -1,5 +1,9 @@
 Revision history for Weather::Meteo
 
+0.07	Thu  9 Nov 07:45:17 EST 2023
+	Fix http://www.cpantesters.org/cpan/report/b25e6af8-0ce4-11ee-8f82-220d6e8775ea
+	Carp rather than croak when the website returns 500
+
 0.06	Thu Jun 15 20:49:00 EDT 2023
 	Added bin/weather
 	weather() now supports the 'tz' argument

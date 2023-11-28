@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Br::Any::Fr - Package for language Breton
 
 package Locale::CLDR::Locales::Br::Any::Fr;
 # This file auto generated from Data\common\main\br_FR.xml
-#	on Fri 13 Oct  9:08:03 am GMT
+#	on Sat  4 Nov  5:54:50 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

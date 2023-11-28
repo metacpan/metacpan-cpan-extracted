@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,8 +12,7 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: Object.pm 1578075 2014-03-16 14:01:14Z richter $
-#
+
 ###################################################################################
 
 
@@ -26,6 +26,8 @@ require DynaLoader;
 
 use Embperl ;
 use Embperl::Constant ;
+
+no warnings "uninitialized" ;
 
 use constant OK => 0  ;
 use constant NOT_FOUND => 404 ; 
@@ -49,7 +51,7 @@ use vars qw(
 @ISA = qw(Exporter DynaLoader);
 
 
-$VERSION = '2.4.0';
+$VERSION = '3.0.0';
 
 
 $volume = (File::Spec -> splitpath ($Embperl::cwd))[0] ;
@@ -459,9 +461,9 @@ object-oriented concepts to be utilised to the fullest while staying
 within the "rapid application development" model of Perl and HTML.
 
 
-I<Embperl::Object> is basicly a I<mod_perl> handler or could be invoked
+I<Embperl::Object> is basically a I<mod_perl> handler or could be invoked
 offline and helps you to
-build a whole page out of smaller parts. Basicly it does the following:
+build a whole page out of smaller parts. Basically it does the following:
 
 When a request comes in, a page, which name is specified by L<EMBPERL_OBJECT_BASE>, is
 searched in the same directory as the requested page. If the pages isn't found, 
@@ -499,9 +501,9 @@ Methods can be ordinary Perl sub's (defined with [! sub foo { ... } !] ) or Embp
 
 The runtime configuration is done by setting environment variables,
 in your web
-server's configuration file. Basicly the configuration is the same as
+server's configuration file. Basically the configuration is the same as
 for normal Embperl. All Embperl configuration directives also applies
-to Embperl::Object. There are a few addtional configuration directives
+to Embperl::Object. There are a few additional configuration directives
 listed below. Addtionaly you have to set the C<PerlHandler> to
 C<Embperl::Object> when running under mod_perl or use C<epocgi.pl>
 instead of C<embpcgi.pl> when running as CGI Script.
@@ -549,7 +551,7 @@ Filename of the application object. The file should contain the Perl code for
 the application object. The must be no package name given (as the package is set
 by Embperl::Object), but the @ISA should point to Embperl::App.
 If set this file is searched through the same search path as any content file.
-After a successfull load the init method is called with the Embperl request object
+After a successful load the init method is called with the Embperl request object
 as parameter. The init method can change the parameters inside the request object
 to influence the current request.
 

@@ -7,7 +7,7 @@ use warnings;
 
 # VERSION
 
-our $VERSION = '4.11';
+our $VERSION = '4.15';
 
 # AUTHORITY
 
@@ -86,6 +86,7 @@ sub import {
     resolve => 1,
     roll => 1,
     search => 1,
+    set => 1,
     space => 1,
     schema => 1,
     string => 1,
@@ -925,6 +926,18 @@ sub search ($;$@) {
   return Venus::Search->new(@data)->$code(@args);
 }
 
+sub set ($;$@) {
+  my ($data, $code, @args) = @_;
+
+  require Venus::Set;
+
+  if (!$code) {
+    return Venus::Set->new($data);
+  }
+
+  return Venus::Set->new($data)->$code(@args);
+}
+
 sub space ($;$@) {
   my ($data, $code, @args) = @_;
 
@@ -1182,19 +1195,19 @@ sub yaml (;$$) {
 
 =head1 NAME
 
-Venus - OO Library
+Venus - Standard Library
 
 =cut
 
 =head1 ABSTRACT
 
-OO Standard Library for Perl 5
+Standard Library for Perl 5
 
 =cut
 
 =head1 VERSION
 
-4.11
+4.15
 
 =cut
 
@@ -4459,6 +4472,30 @@ I<Since C<2.55>>
 
 =cut
 
+=head2 set
+
+  set(arrayref $value) (Venus::Set)
+
+The set function returns a L<Venus::Set> object for the arrayref provided.
+
+I<Since C<4.11>>
+
+=over 4
+
+=item set example 1
+
+  package main;
+
+  use Venus 'set';
+
+  my $set = set [1..9];
+
+  # bless(..., 'Venus::Set')
+
+=back
+
+=cut
+
 =head2 space
 
   space(any $name) (Venus::Space)
@@ -5758,7 +5795,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+Copyright (C) 2022, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

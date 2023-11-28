@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Moo;
 use PerlX::Maybe;
-use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 use Future;
@@ -17,7 +16,9 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use URI;
 
-our $VERSION = '0.71';
+with 'MooX::Role::EventEmitter';
+
+our $VERSION = '0.72';
 our @CARP_NOT;
 
 =head1 NAME
@@ -139,17 +140,6 @@ has 'reader_fh' => (
 
 has 'writer_fh' => (
     is => 'ro',
-);
-
-=item B<on_message>
-
-A callback invoked for every message
-
-=cut
-
-has 'on_message' => (
-    is => 'rw',
-    default => undef,
 );
 
 has '_one_shot' => (
@@ -508,20 +498,8 @@ sub on_response( $self, $connection, $message ) {
             $handled++;
         };
 
-        if( $self->on_message ) {
-            if( $self->_log->is_trace ) {
-                $self->log( 'trace', "Dispatching", $response );
-            } else {
-                my $frameId = $response->{params}->{frameId};
-                my $requestId = $response->{params}->{requestId};
-                if( $frameId || $requestId ) {
-                    $self->log( 'debug', sprintf "Dispatching '%s' (%s:%s)", $response->{method}, $frameId || '-', $requestId || '-');
-                } else {
-                    $self->log( 'debug', sprintf "Dispatching '%s'", $response->{method} );
-                };
-            };
-            $self->on_message->( $response );
-
+        if( @{ $self->subscribers('message')} ) {
+            $self->emit('message', $response );
             $handled++;
         };
 
@@ -948,11 +926,10 @@ package
 use strict;
 use Moo;
 use Carp 'croak';
-use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 has 'protocol' => (
     is => 'ro',

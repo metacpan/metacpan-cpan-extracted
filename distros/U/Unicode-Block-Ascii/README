@@ -3,37 +3,51 @@ NAME
 
 SYNOPSIS
      use Unicode::Block::Ascii;
+
      my $obj = Unicode::Block::Ascii->new(%parameters);
      my $output = $obj->get;
      my $item = $obj->next;
 
 METHODS
-    "new(%parameters)"
-            Constructor.
+  "new"
+     my $obj = Unicode::Block::Ascii->new(%parameters);
 
-            *       "char_from"
+    Constructor.
 
-                     Character from.
-                     Default value is '0000'.
+    *       "char_from"
 
-            *       "char_to"
+            Character from.
 
-                     Character to.
-                     Default value is '007f'.
+            Default value is '0000'.
 
-            *       "title"
+    *       "char_to"
 
-                     Title of block.
-                     Default value is undef.
+            Character to.
 
-    "get()"
-             Get output.
-             Return string with ascii table of Unicode::Block object.
+            Default value is '007f'.
 
-    "next()"
-             Get next character.
-             Returns Unicode::Block::Item object for character, if character exists.
-             Returns undef, if character doesn't exist.
+    *       "title"
+
+            Title of block.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "get"
+     my $output = $obj->get;
+
+    Get output.
+
+    Return string with ascii table of Unicode::Block object.
+
+  "next"
+     my $item = $obj->next;
+
+    Get next character.
+
+    Returns Unicode::Block::Item object for character, if character exists.
+    Returns undef, if character doesn't exist.
 
 ERRORS
      new():
@@ -147,7 +161,7 @@ DEPENDENCIES
     Unicode::Block.
 
 REPOSITORY
-    <https://github.com/tupinek/Unicode-Block-Ascii>
+    <https://github.com/michal-josef-spacek/Unicode-Block-Ascii>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -155,9 +169,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2013-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2013-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.05
 

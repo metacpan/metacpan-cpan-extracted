@@ -49,8 +49,10 @@ t/mockup-files/os-release-like
 t/mockup-files/os-release-no-id
 t/mockup-files/os-release-unknown
 t/mockup/dpkg-query
+t/mockup/file
 t/mockup/id
 t/mockup/ip
+t/mockup/ldd
 t/mockup/lxc-attach
 t/mockup/lxc-execute
 t/mockup/lxc-ls

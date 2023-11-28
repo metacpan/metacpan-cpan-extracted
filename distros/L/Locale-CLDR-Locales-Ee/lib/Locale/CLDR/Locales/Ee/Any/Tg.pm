@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ee::Any::Tg - Package for language Ewe
 
 package Locale::CLDR::Locales::Ee::Any::Tg;
 # This file auto generated from Data\common\main\ee_TG.xml
-#	on Fri 13 Oct  9:12:30 am GMT
+#	on Sat  4 Nov  5:59:05 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

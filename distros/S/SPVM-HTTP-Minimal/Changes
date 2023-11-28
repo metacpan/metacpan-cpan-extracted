@@ -1,3 +1,11 @@
+0.002 2023-11-23
+  [Incompatible Changes]
+    * The type of timeout becomes double.
+  [New Features]
+    * Support Go.
+  [Requirement Changes]
+    * Require IO 0.211
+    
 0.001 2023-08-22
   [Changes]
     * First release.

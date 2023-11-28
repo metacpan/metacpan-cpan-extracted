@@ -1,13 +1,13 @@
-package EAI::Common 1.5;
+package EAI::Common 1.902;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
-use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number); use Module::Refresh ();
+use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
 # to make use of colored logs with Log::Log4perl::Appender::ScreenColoredLevels on windows we have to use that (special "use" to make this optional on non-win environments)
 BEGIN {
 	if ($^O =~ /MSWin/) {require Win32::Console::ANSI; Win32::Console::ANSI->import();}
 }
 
-our @EXPORT = qw($EAI_WRAP_CONFIG_PATH $EAI_WRAP_SENS_CONFIG_PATH %common %config %execute @loads @optload %opt readConfigFile getSensInfo setupConfigMerge getOptions setupEAIWrap dumpFlat extractConfigs checkHash checkParam getLogFPathForMail getLogFPath MailFilter setErrSubject setupLogging checkStartingCond sendGeneralMail looks_like_number get_logger);
+our @EXPORT = qw($EAI_WRAP_CONFIG_PATH $EAI_WRAP_SENS_CONFIG_PATH %common %config %execute @loads @optload %opt readConfigFile getKeyInfo setupConfigMerge getOptions setupEAIWrap dumpFlat extractConfigs checkHash checkParam getLogFPathForMail getLogFPath MailFilter setErrSubject setupLogging checkStartingCond sendGeneralMail looks_like_number get_logger);
 
 my %hashCheck = (
 	common => {
@@ -18,6 +18,7 @@ my %hashCheck = (
 		task => {},
 	},
 	config => { # parameter category for site global settings, defined in site.config and other associated configs loaded at INIT
+		checkLogExistDelay => {}, # ref to hash {Test => 2, Dev => 3, "" => 0}, mapping to set delays for checkLogExist per environment in $execute{env}, this can be further overriden per job (and environment) in checkLookup.
 		checkLookup => {}, # ref to datastructure {"scriptname.pl + optional addToScriptName" => {errmailaddress => "",errmailsubject => "",timeToCheck =>"", freqToCheck => "", logFileToCheck => "", logcheck => "",logRootPath =>""},...} used for logchecker, each entry of the hash lookup table defines a log to be checked, defining errmailaddress to receive error mails, errmailsubject, timeToCheck as earliest time to check for existence in log, freqToCheck as frequency of checks (daily/monthly/etc), logFileToCheck as the name of the logfile to check, logcheck as the regex to check in the logfile and logRootPath as the folder where the logfile is found. lookup key: $execute{scriptname} + $execute{addToScriptName}
 		errmailaddress => "", # default mail address for central logcheck/errmail sending 
 		errmailsubject => "", # default mail subject for central logcheck/errmail sending 
@@ -27,8 +28,9 @@ my %hashCheck = (
 		historyFolder => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where downloaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
 		historyFolderUpload => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where uploaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
 		logCheckHoliday => "", # calendar for business days in central logcheck/errmail sending. builtin calendars are AT (Austria), TG (Target), UK (United Kingdom) and WE (for only weekends). Calendars can be added with EAI::DateUtil::addCalendar
-		logs_to_be_ignored_in_nonprod => '', # logs to be ignored in central logcheck/errmail sending
+		logs_to_be_ignored_in_nonprod => qr//, # regular expression to specify logs to be ignored in central logcheck/errmail sending
 		logRootPath => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, paths to log file root folders (environment is added to that if non production), lookup key as checkLookup, default in "" => "defaultfolder"
+		prodEnvironmentInSeparatePath => 1, # set to 1 if the production scripts/logs etc. are in a separate Path defined by folderEnvironmentMapping (prod=root/Prod, test=root/Test, etc.), set to 0 if the production scripts/logs are in the root folder and all other environments are below that folder (prod=root, test=root/Test, etc.)
 		redoDir => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where files for redo are contained, lookup key as checkLookup, default in "" => "defaultfolder"
 		sensitive => {}, # hash lookup table ({"prefix" => {user=>"",pwd =>"",hostkey=>"",privkey =>""},...}) for sensitive access information in DB and FTP (lookup keys are set with DB{prefix} or FTP{prefix}), may also be placed outside of site.config; all sensitive keys can also be environment lookups, e.g. hostkey=>{Test => "", Prod => ""} to allow for environment specific setting
 		smtpServer => "", # smtp server for den (error) mail sending
@@ -43,8 +45,8 @@ my %hashCheck = (
 	execute => { # hash of parameters for current task execution which is not set by the user but can be used to set other parameters and control the flow
 		alreadyMovedOrDeleted => {}, # hash for checking the already moved or deleted files, to avoid moving/deleting them again at cleanup
 		addToScriptName => "", # this can be set to be added to the scriptname for config{checkLookup} keys, e.g. some passed parameter.
-		env => "", # Prod, Test, Dev, whatever
-		envraw => "", # Production has a special significance here as being the empty string (used for paths). Otherwise like env.
+		env => "", # Prod, Test, Dev, whatever is defined as the lookup value in folderEnvironmentMapping. homedir as fetched from the File::basename::dirname of the executing script using /^.*[\\\/](.*?)$/ is used as the key for looking up this value.
+		envraw => "", # Production has a special significance here as being an empty string. Otherwise like env.
 		errmailaddress => "", # for central logcheck/errmail sending in current process
 		errmailsubject => "", # for central logcheck/errmail sending in current process
 		failcount => 1, # for counting failures in processing to switch to longer wait period or finish altogether
@@ -64,7 +66,7 @@ my %hashCheck = (
 		processEnd => 1, # specifies that the process is ended, checked in EAI::Wrap::processingEnd
 		redoDir => "", # actually set redoDir
 		retrievedFiles => [], # files retrieved from FTP or redo directory
-		retryBecauseOfError => 1, # retryBecauseOfError shows if a rerun occurs due to errors (for successMail) and also prevents several API calls from being run again.
+		retryBecauseOfError => 1, # retryBecauseOfError shows if a rerun occurs due to errors (for successMail) 
 		retrySeconds => 60, # how many seconds are passed between retries. This is set on error with process=>retrySecondsErr and if planned retry is defined with process=>retrySecondsPlanned
 		scriptname => "", # name of the current process script, also used in log/history setup together with addToScriptName for config{checkLookup} keys
 		timeToCheck => "", # for logchecker: scheduled time of job (don't look earlier for log entries)
@@ -97,7 +99,7 @@ my %hashCheck = (
 		postDumpExecs => [], # array for execs done in dumpDataIntoDB after postDumpProcessing and before commit/rollback: [{execs => ['',''], condition => ''}]. doInDB all execs if condition (evaluated string or anonymous sub: condition => sub {...}) is fulfilled
 		postDumpProcessing => "", # done in dumpDataIntoDB after storeInDB, execute perl code in postDumpProcessing (evaluated string or anonymous sub: postDumpProcessing => sub {...})
 		postReadProcessing => "", # done in writeFileFromDB after readFromDB, execute perl code in postReadProcessing (evaluated string or anonymous sub: postReadProcessing => sub {...})
-		prefix => "", # key for sensitive information (e.g. pwd and user) in config{sensitive}
+		prefix => "", # key for sensitive information (e.g. pwd and user) in config{sensitive} or system wide DSN in config{DB}{prefix}{DSN}. respects environment in $execute{env} if configured.
 		primkey => "", # primary key indicator to be used for update statements, format: "key1 = ? AND key2 = ? ..."
 		pwd => "", # for password setting, either directly (insecure -> visible) or via sensitive lookup
 		query => "", # query statement used for readFromDB and readFromDBHash
@@ -134,7 +136,7 @@ my %hashCheck = (
 		format_fix => 1, # for text writing, specify whether fixed length format should be used (requires format_padding)
 		format_namespaces => {}, # for XML reading, hash with alias => namespace association entries
 		format_padding => {}, # for text writing, hash with field number => padding to be applied for fixed length format
-		format_poslen => [], # array of positions/length definitions: e.g. "poslen => [(0,3),(3,3)]" for fixed length format text file parsing
+		format_poslen => [], # array of array defining positions and lengths [[pos1,len1],[pos2,len2]...[posN,lenN]] of data in fixed length format text files (if format_sep == "fix")
 		format_quotedcsv => 1, # special parsing/writing of quoted csv data using Text::CSV
 		format_sep => "", # separator string for csv format, regex for split for other separated formats. Also needed for splitting up format_header and format_targetheader (Excel and XML-formats use tab as default separator here).
 		format_sepHead => "", # special separator for header row in write text, overrides format_sep
@@ -165,10 +167,11 @@ my %hashCheck = (
 		hostkey => "", # hostkey to present to the server for Net::SFTP::Foreign, either directly (insecure -> visible) or via sensitive lookup
 		localDir => "", # optional: local folder for files to be placed, if not given files are downloaded into current folder
 		maxConnectionTries => 5, # maximum number of tries for connecting in login procedure
+		noDirectRemoteDirChange => 1, # if no direct change into absolute paths (/some/path/to/change/into) ist possible then set this to 1, this separates the change into setcwd(undef) and setcwd(remoteDir)
 		onlyArchive => 0, # only archive/remove on the FTP server, requires archiveDir to be set
 		path => "", # additional relative FTP path (under remoteDir which is set at login), where the file(s) is/are located
 		port => 22, # ftp/sftp port (leave empty for default port 22)
-		prefix => "ftp", # key for sensitive information (e.g. pwd and user) in config{sensitive}
+		prefix => "ftp", # key for sensitive information (e.g. pwd and user) in config{sensitive} or system wide remoteHost in config{FTP}{prefix}{remoteHost}. respects environment in $execute{env} if configured.
 		privKey => "", # sftp key file location for Net::SFTP::Foreign, either directly (insecure -> visible) or via sensitive lookup
 		pwd => "", # for password setting, either directly (insecure -> visible) or via sensitive lookup
 		queue_size => 1, # queue_size for Net::SFTP::Foreign, if > 1 this causes often connection issues
@@ -190,6 +193,7 @@ my %hashCheck = (
 		hadErrors => 1, # set to 1 if there were any errors in the process
 		interactive_ => "", # interactive options (are not checked), can be used to pass arbitrary data via command line into the script (eg a selected date for the run with interactive_date).
 		onlyExecFor => qr//, # mark loads to only be executed when $common{task}{execOnly} !~ $load->{process}{onlyExecFor}
+		successfullyDone => "", # accumulates API sub names to prevent most API calls that ran successfully from being run again.
 		uploadCMD => "", # upload command for use with uploadFileCMD
 		uploadCMDPath => "", # path of upload command
 		uploadCMDLogfile => "", # logfile where command given in uploadCMD writes output (for error handling)
@@ -229,7 +233,7 @@ our $EAI_WRAP_CONFIG_PATH; our $EAI_WRAP_SENS_CONFIG_PATH;
 my @coreConfig = ("DB","File","FTP","process");
 my @commonCoreConfig = (@coreConfig,"task");
 my @allConfig = (@commonCoreConfig,"config");
-my $logConfig;
+our $logConfig;
 
 # read given config file (eval perl code)
 sub readConfigFile ($) {
@@ -249,11 +253,11 @@ sub readConfigFile ($) {
 	print STDOUT "read $configfilename\n";
 }
 
-# get sensitive info from $config{sensitive}{$prefix}{$key}
-sub getSensInfo ($$) {
-	my ($prefix,$key) = @_;
+# get key info from $config{$area}{$prefix}{$key} (e.g. $config{sensitive}{$prefix}{$key}). Also checks if $config{$area}{$prefix}{$key} is a hash, then get info from $config{$area}{$prefix}{$key}{$execute{env}}
+sub getKeyInfo ($$$) {
+	my ($prefix,$key,$area) = @_;
 	# depending on queried key being a ref to hash, get the environment lookup hash key value or the value directly
-	return (ref($config{sensitive}{$prefix}{$key}) eq "HASH" ? $config{sensitive}{$prefix}{$key}{$execute{env}} : $config{sensitive}{$prefix}{$key});
+	return (ref($config{$area}{$prefix}{$key}) eq "HASH" ? $config{$area}{$prefix}{$key}{$execute{env}} : $config{$area}{$prefix}{$key});
 }
 
 # setupConfigMerge creates cascading inheritance of config/DB/File/FTP/process/task settings
@@ -502,6 +506,9 @@ sub setupLogging {
 	Log::Log4perl::init($logConfig);
 	my $logger = get_logger();
 	$logger->warn($noLogFolderErr) if $noLogFolderErr;
+	if (Log::Log4perl->appenders()->{"FILE"} and Log::Log4perl->appenders()->{"FILE"}->{"appender"}->{"fh"}) {
+		Log::Log4perl->appenders()->{"FILE"}->{"appender"}->{"fh"}->autoflush;
+	}
 	if ($config{smtpServer}) {
 		# remove explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl)
 		for my $lookupKey (keys(%{$config{checkLookup}})) {
@@ -525,7 +532,11 @@ sub setupLogging {
 		} else {
 			# Production: no errmailaddress found, error message to Testerrmailaddress (if set)
 			Log::Log4perl->appenders()->{"MAIL"}->{"appender"}->{"to"} = [$config{testerrmailaddress}] if $config{testerrmailaddress};
-			$logger->error("no errmailaddress found for ".$execute{scriptname}.$execute{addToScriptName}.", no entry found in \$config{checkLookup}{$execute{scriptname}.$execute{addToScriptName}}");
+			if ($execute{envraw}) {
+				$logger->error("no errmailaddress found, no entry found in \$config{testerrmailaddress}");
+			} else {
+				$logger->error("no errmailaddress found for ".$execute{scriptname}.$execute{addToScriptName}.", no entry found in \$config{checkLookup}{$execute{scriptname}$execute{addToScriptName}}");
+			}
 		}
 		setErrSubject("Setting up EAI::Wrap"); # general context after logging initialization: setup of EAI::Wrap by script
 	} else {
@@ -561,17 +572,9 @@ sub dumpFlat ($;$$) {
 	if ($compressDump) {
 		$dump =~ s/\s+//g;$dump =~ s/,'/,/g;$dump =~ s/{'/{/g;$dump =~ s/'=>/=>/g; # compress information
 	}
-	$dump =~ s/\$VAR1=//;
+	$dump =~ s/\$VAR1//;
 	$Data::Dumper::Indent = 2;
 	return $dump;
-}
-
-# refresh modules and logging config for changes
-sub refresh {
-	# refresh modules to enable correction of processing without restart
-	Module::Refresh->refresh;
-	# also check for changes in logging configuration
-	Log::Log4perl::init($logConfig);
 }
 
 # check starting conditions and return 1 if met
@@ -624,7 +627,7 @@ sub sendGeneralMail ($$$$$$;$$$$) {
 	my ($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile) = @_;
 	my $logger = get_logger();
 	$logger->error("cannot send mail as \$config{smtpServer} not set") if !$config{smtpServer};
-	$logger->info("sending general mail From:".($From ? $From : $config{fromaddress}).", To:".($execute{envraw} ? $config{testerrmailaddress} : $To).", CC:".($execute{envraw} ? "" : $Cc).", Bcc:".($execute{envraw} ? "" : $Bcc).", Subject:".($execute{envraw} ? $execute{envraw}.": " : "").$Subject.", Type:".($Type ? $Type : "TEXT").", Encoding:".($Type eq 'multipart/related' ? undef : $Encoding).", AttachType:$AttachType, AttachFile:$AttachFile ...");
+	$logger->info("sending general mail From:".($From ? $From : $config{fromaddress}).", To:".($execute{envraw} ? $config{testerrmailaddress} : $To).", CC:".($execute{envraw} ? "" : $Cc).", Bcc:".($execute{envraw} ? "" : $Bcc).", Subject:".($execute{envraw} ? $execute{envraw}.": " : "").$Subject.", Type:".($Type ? $Type : "TEXT").", Encoding:".($Type eq 'multipart/related' ? undef : $Encoding));
 	$logger->debug("Mailbody: $Data");
 	my $msg = MIME::Lite->new(
 			From    => ($From ? $From : $config{fromaddress}),
@@ -638,6 +641,14 @@ sub sendGeneralMail ($$$$$$;$$$$) {
 		);
 	$logger->error("couldn't create msg for mail sending..") unless $msg;
 	if ($Type eq 'multipart/related') {
+		if (ref($AttachFile) ne 'ARRAY') {
+			$logger->error("argument $AttachFile needs to be ref to array for type multipart/related");
+			return 0;
+		}
+		if (!$AttachType) {
+			$logger->error("no AttachType given for type multipart/related");
+			return 0;
+		}
 		$msg->attach(
 			Type => 'text/html',
 			Data    => $Data,
@@ -657,6 +668,10 @@ sub sendGeneralMail ($$$$$$;$$$$) {
 			Id   => $AttachFile,
 			Path => $AttachFile
 		);
+	}
+	if ($AttachFile and !$AttachType) {
+		$logger->error("no AttachType given for attachment $AttachFile");
+		return 0;
 	}
 	$msg->send();
 	if ($msg->last_send_successful()) {
@@ -700,7 +715,7 @@ EAI::Common - Common parts for the EAI::Wrap package
  %execute .. hash of parameters for current running task script
 
  readConfigFile ($configfilename)
- getSensInfo ($prefix, $key)
+ getKeyInfo ($prefix, $key, $area)
  setupConfigMerge ()
  getOptions ()
  extractConfigs ($contextSub, $arg, @required)
@@ -728,11 +743,11 @@ EAI::Common contains common used functions for L<EAI::Wrap>. This is for reading
 
 read given config file (eval perl code in site.config and related files)
 
-=item getSensInfo ($$)
+=item getKeyInfo ($$$)
 
-arguments are $prefix and $key
+arguments are $prefix, $key and $area
 
-get sensitive info from $config{sensitive}{$prefix}{$key}, depending on queried key being a ref to hash, get the environment lookup hash key value or the value directly
+get sensitive info from $config{$area}{$prefix}{$key}, depending on queried key being a ref to hash, get the environment lookup hash key value or the value directly. Area can be "sensitive" or any of the categories (sub-hashes), e.g. "FTP".
 
 =item setupConfigMerge
 
@@ -802,7 +817,7 @@ set context specific subject for ErrorMail
 
 set up logging from site.config information (potentially split up using additional configs) and the central log.config. Important configs for logging in the config hash are logRootPath (direct or environment lookup setting for the log root folder), errmailaddress (default address for sending mails in case of error), errmailsubject (subject for error mails, can be changed with L<setErrSubject|/setErrSubject>), testerrmailaddress (default address for sending mails in case of error in non production environments), smtpServer (for error and other mail sending), smtpTimeout and checkLookup.
 
-checkLookup is both used by checkLogExist.pl and setupLogging. The key is used to lookup the scriptname (inlcuding .pl) + any additional defined interactive options, which are being passed to the script in an alphabetically sorted manner. So, a call of C<mytask.pl --process interactive_addinfo=add12 interactive_type=type3 interactive_zone=zone4> would yield a lookup of C<mytask.pladd12type3zone4>, which should have an existing key in checkLookup, like C<$config{checkLookup} = {"mytask.pladd12type3zone4" =E<gt> {...}, ...}>.
+checkLookup is both used by checkLogExist.pl and setupLogging. The key is used to lookup the scriptname (inlcuding .pl) + any additionally defined suffix(C<$execute{addToScriptName}>) that can be set with C<$config{executeOnInit}>. So, a call of C<mytask.pl --process interactive_addinfo=add12 interactive_type=type3 interactive_zone=zone4> and a definition C<$config{executeOnInit} = '$execute{addToScriptName} = $opt{process}{interactive_addinfo}.$opt{process}{interactive_type}.$opt{process}{interactive_zone};'> would yield a lookup of C<mytask.pladd12type3zone4>, which should have an existing key in checkLookup, like C<$config{checkLookup} = {"mytask.pladd12type3zone4" =E<gt> {...}, ...}>.
 
 Each entry of the sub-hash defines defines the errmailaddress to receive error mails and the errmailsubject, the rest is used by checkLogExist.pl.
 

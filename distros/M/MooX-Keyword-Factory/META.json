@@ -32,9 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Factory::Sub" : "0",
+            "Factory::Sub" : "0.04",
             "Moo" : "0",
-            "MooX::Keyword" : "0.04",
+            "MooX::Keyword" : "0.05",
             "perl" : "5.006"
          }
       },
@@ -46,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

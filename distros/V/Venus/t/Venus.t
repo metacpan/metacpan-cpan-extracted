@@ -203,7 +203,7 @@ $test->for('name');
 
 =tagline
 
-OO Library
+Standard Library
 
 =cut
 
@@ -211,7 +211,7 @@ $test->for('tagline');
 
 =abstract
 
-OO Standard Library for Perl 5
+Standard Library for Perl 5
 
 =cut
 
@@ -282,6 +282,7 @@ function: replace
 function: resolve
 function: roll
 function: search
+function: set
 function: space
 function: schema
 function: string
@@ -4945,6 +4946,41 @@ $test->for('example', 2, 'search', sub {
   $result
 });
 
+=function set
+
+The set function returns a L<Venus::Set> object for the arrayref provided.
+
+=signature set
+
+  set(arrayref $value) (Venus::Set)
+
+=metadata set
+
+{
+  since => '4.11',
+}
+
+=example-1 set
+
+  package main;
+
+  use Venus 'set';
+
+  my $set = set [1..9];
+
+  # bless(..., 'Venus::Set')
+
+=cut
+
+$test->for('example', 1, 'set', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  ok $result->isa('Venus::Set');
+  is_deeply $result->get, [1..9];
+
+  $result
+});
+
 =function space
 
 The space function returns a L<Venus::Space> object for the package provided.
@@ -6686,7 +6722,7 @@ $test->for('authors');
 
 =license
 
-Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+Copyright (C) 2022, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -1,3 +1,10 @@
+0.021   2023-11-20  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add pick as shorter alias for pick-random-lines.
+
+        - [doc] Mention shuf.
+
+
 0.020   2020-04-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Tweak Rinci metadata: replace deprecated

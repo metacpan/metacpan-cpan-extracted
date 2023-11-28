@@ -114,6 +114,7 @@ sub map_file
     # check if we have anything under this uri in our configuration
     #   if it's a directory, try to append index.*
     my $m ;
+    $uri = '' if ($uri eq 'index.htm') ;
     $uri =~ /^(.*)\./ ;
     if (!($m = $config -> {map1}{$uri} || $config -> {map2}{$1}))
         {
@@ -188,7 +189,7 @@ sub init
     $r -> {action_prefix} = $ENV{ACTION_PREFIX} || '' ; 
 
     my $langs  = $config -> {supported_languages} ;
-    # serach the url, if there is a language embeded,
+    # search the url, if there is a language embeded,
     # if yes remove it
     $r -> {selected_language} = '' ;
     my  $accept_lang = $r -> param -> language ;
@@ -205,10 +206,10 @@ sub init
             $lang_ok = 1 ;
             last ;
             }
-	elsif ($accept_lang && $_ eq $accept_lang)
-	    {
-	    $lang_ok = 1 ;
-	    }
+        elsif ($accept_lang && $_ eq $accept_lang)
+            {
+            $lang_ok = 1 ;
+            }
         }
 
     $r -> param -> uri ($uri) ;

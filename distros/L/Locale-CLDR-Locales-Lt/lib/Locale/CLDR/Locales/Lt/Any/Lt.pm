@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lt::Any::Lt - Package for language Lithuanian
 
 package Locale::CLDR::Locales::Lt::Any::Lt;
 # This file auto generated from Data\common\main\lt_LT.xml
-#	on Fri 13 Oct  9:26:15 am GMT
+#	on Sat  4 Nov  6:12:32 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

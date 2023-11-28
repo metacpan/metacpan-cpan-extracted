@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::TxtSaveOptions
+# AsposeCellsCloud::Object::TxtSaveOptions 
 
 ## Load the model package
 ```perl
@@ -8,19 +8,18 @@ use AsposeCellsCloud::Object::TxtSaveOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**enable_http_compression** | **boolean** |  | [optional] 
-**save_format** | **string** |  | [optional] 
-**clear_data** | **boolean** | Make the workbook empty after saving the file. | [optional] 
-**cached_file_folder** | **string** | The cached file folder is used to store some large data. | [optional] 
-**validate_merged_areas** | **boolean** | Indicates whether validate merged areas before saving the file. The default value is false.              | [optional] 
-**refresh_chart_cache** | **boolean** |  | [optional] 
-**create_directory** | **boolean** | If true and the directory does not exist, the directory will be automatically created before saving the file.              | [optional] 
-**sort_names** | **boolean** |  | [optional] 
-**quote_type** | **string** |  | [optional] 
-**separator** | **string** |  | [optional] 
-**separator_string** | **string** |  | [optional] 
-**always_quoted** | **boolean** |  | [optional] 
+**QuoteType** | **string** | Gets or sets how to quote values in the exported text file. |
+**Separator** | **string** | Gets and sets char Delimiter of text file. |
+**SeparatorString** | **string** | Gets and sets the a string value as separator. |
+**AlwaysQuoted** | **boolean** | Indicates whether always adding '"' for each field. If true then all values will be quoted; If false then values will only be quoted when needed(for example, when values contain special characters such as '"' , '\n' or separator character). Default is false. |
+**SaveFormat** | **string** |  |
+**CachedFileFolder** | **string** |  |
+**ClearData** | **boolean** |  |
+**CreateDirectory** | **boolean** |  |
+**EnableHTTPCompression** | **boolean** |  |
+**RefreshChartCache** | **boolean** |  |
+**SortNames** | **boolean** |  |
+**ValidateMergedAreas** | **boolean** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

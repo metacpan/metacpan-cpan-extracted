@@ -1,7 +1,7 @@
 ---
 abstract: 'Perl class for reading a graph from TGF format with CSV labeling.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   Encode: 0
   English: 0
@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.21'
 license: bsd
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,8 +31,8 @@ requires:
   Text::CSV: 0
   perl: 5.6.2
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Graph-Reader-TGF-CSV
-  homepage: https://github.com/tupinek/Graph-Reader-TGF-CSV
+  bugtracker: https://github.com/michal-josef-spacek/Graph-Reader-TGF-CSV/issues
+  homepage: https://github.com/michal-josef-spacek/Graph-Reader-TGF-CSV
   license: http://opensource.org/licenses/bsd-license.php
-  repository: git://github.com/tupinek/Graph-Reader-TGF-CSV
-version: '0.02'
+  repository: git://github.com/michal-josef-spacek/Graph-Reader-TGF-CSV
+version: '0.03'

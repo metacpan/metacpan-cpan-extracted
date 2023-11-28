@@ -19,7 +19,7 @@ p $obj;
 # Output:
 # MARC::Convert::Wikidata::Object::People  {
 #     Parents       Mo::Object
-#     public methods (7) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_date (MARC::Convert::Wikidata::Object::Utils), isa (UNIVERSAL), VERSION (UNIVERSAL)
+#     public methods (7) : BUILD, can (UNIVERSAL), DOES (UNIVERSAL), err (Error::Pure), check_date (Mo::utils::Date), isa (UNIVERSAL), VERSION (UNIVERSAL)
 #     private methods (1) : __ANON__ (Mo::build)
 #     internals: {
 #         date_of_birth   "1952-12-08",

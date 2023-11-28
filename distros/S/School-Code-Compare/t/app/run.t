@@ -1,4 +1,4 @@
-use Test::Script 1.10 tests => 17;
+use Test::Script 1.10 tests => 20;
 
 script_compiles('bin/compare-code');
 
@@ -89,3 +89,23 @@ script_runs(  [ 'bin/compare-code',
                 '-y',
               ] );
 script_stdout_like   ( '2,95,9,\d{3},\d{3},9,', 'app-visibles-perl-9off' );
+
+# SPLIT ON SENTENCES
+script_runs(  [ 'bin/compare-code',
+                'xt/data/sentences',
+                '-i',
+                'txt',
+                '-o',
+                'csv',
+                '-c',
+                'visibles',
+		'-t',
+		'\.',
+		'-s',
+                '-y',
+              ] );
+script_stdout_like   ( '2,100,0,33,33,0,', 'app-visibles-split-sentences' );
+script_stdout_like   ( '2,100,0,538,538,0,', 'app-visibles-split-sentences2' );
+#2	100	0	33	33	0	xt/data/sentences/b.txt	xt/data/sentences/a.txt	comparison done
+#2	100	0	538	538	0	xt/data/sentences/max_und_moritz2.txt	xt/data/sentences/max_und_moritz.txt	comparison done
+#find xt/data/sentences -type f | perl -Ilib bin/compare-code -v -c visibles -s -t '\.'

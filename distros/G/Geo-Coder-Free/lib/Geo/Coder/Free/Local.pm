@@ -17,15 +17,16 @@ Geo::Coder::Free::Local -
 Provides an interface to locations that you know yourself.
 I have found locations by using GPS apps on a smartphone and by
 inspecting GeoTagged photographs using
-L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/geotag>.
+L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/geotag>
+or by using the app GPSCF.
 
 =head1 VERSION
 
-Version 0.32
+Version 0.34
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '0.34';
 use constant	LIBPOSTAL_UNKNOWN => 0;
 use constant	LIBPOSTAL_INSTALLED => 1;
 use constant	LIBPOSTAL_NOT_INSTALLED => -1;
@@ -59,11 +60,20 @@ Geo::Coder::Free::Local provides an interface to your own location data.
 =cut
 
 sub new {
-	my $proto = shift;
+	my($proto, %args) = @_;
 	my $class = ref($proto) || $proto;
 
-	# Geo::Coder::Free::Local->new not Geo::Coder::Free::Local::new
-	return unless($class);
+	if(!defined($class)) {
+		# Geo::Coder::Free::Local->new not Geo::Coder::Free::Local::new
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+
+		# FIXME: this only works when no arguments are given
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
 
 	return bless {
 		data => xsv_slurp(
@@ -95,22 +105,36 @@ sub new {
 
 sub geocode {
 	my $self = shift;
+	my %params;
 
-	my %param;
-	if(ref($_[0]) eq 'HASH') {
-		%param = %{$_[0]};
+	# Try hard to support whatever API that the user wants to use
+	if(!ref($self)) {
+		if(scalar(@_)) {
+			return(__PACKAGE__->new()->geocode(@_));
+		} elsif(!defined($self)) {
+			# Geo::Coder::Free->geocode()
+			Carp::croak('Usage: ', __PACKAGE__, '::geocode(location => $location|scantext => $text)');
+		} elsif($self eq __PACKAGE__) {
+			Carp::croak("Usage: $self", '::geocode(location => $location|scantext => $text)');
+		}
+		return(__PACKAGE__->new()->geocode($self));
+	} elsif(ref($self) eq 'HASH') {
+		return(__PACKAGE__->new()->geocode($self));
+	} elsif(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	# } elsif(ref($_[0]) && (ref($_[0] !~ /::/))) {
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: geocode(location => $location)');
-	} elsif(@_ % 2 == 0) {
-		%param = @_;
+		Carp::croak('Usage: ', __PACKAGE__, '::geocode(location => $location|scantext => $text)');
+	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
+		%params = @_;
 	} else {
-		$param{location} = shift;
+		$params{'location'} = shift;
 	}
 
-	my $location = $param{location}
+	my $location = $params{location}
 		or Carp::croak('Usage: geocode(location => $location)');
 
-	# Only used to geoloate full addresses, not states/provinces
+	# Only used to geolocate full addresses, not states/provinces
 	return if($location !~ /,.+,/);
 
 	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
@@ -163,10 +187,11 @@ sub geocode {
 		if($l =~ /(.+), (England|UK)$/i) {
 			$l = "$1, GB";
 		}
-		if(my $error = $ap->parse($l)) {
+		# if(my $error = $ap->parse($l)) {
 			# Carp::croak($ap->report());
 			# ::diag('Address parse failed: ', $ap->report());
-		} else {
+		# } else {
+		if(!$ap->parse($l)) {
 			# ::diag(__PACKAGE__, ': ', __LINE__, ': ', $location);
 			my %c = $ap->components();
 			# ::diag(Data::Dumper->new([\%c])->Dump());
@@ -423,7 +448,8 @@ sub geocode {
 				}
 			}
 		}
-	} elsif($location =~ /^(.+?),\s*([\s\w]+),\s*([\s\w]+),\s*([\w\s]+)$/) {
+	}
+	if($location =~ /^(.+?),\s*([\s\w]+),\s*([\s\w]+),\s*([\w\s]+)$/) {
 		my %addr;
 		$addr{'road'} = $1;
 		$addr{'city'} = $2;
@@ -461,15 +487,15 @@ sub geocode {
 		if($location =~ $left) {
 			# ::diag($left, '=>', $alternatives{$left});
 			$location =~ s/$left/$alternatives{$left}/;
-			$param{'location'} = $location;
+			$params{'location'} = $location;
 			# ::diag(__LINE__, ": found alternative '$location'");
-			if(my $rc = $self->geocode(\%param)) {
+			if(my $rc = $self->geocode(\%params)) {
 				# ::diag(__LINE__, ": $location");
 				return $rc;
 			}
 			if($location =~ /(.+), (England|UK)$/i) {
-				$param{'location'} = "$1, GB";
-				if(my $rc = $self->geocode(\%param)) {
+				$params{'location'} = "$1, GB";
+				if(my $rc = $self->geocode(\%params)) {
 					# ::diag(__LINE__, ": $location");
 					return $rc;
 				}
@@ -523,10 +549,11 @@ sub _search {
 			}
 			# ::diag("$number_of_columns_matched -> $confidence");
 			return Geo::Location::Point->new(
-				'lat' => $row->{'latitude'},
-				'long' => $row->{'longitude'},
+				# 'latitude' => $row->{'latitude'},
+				# 'longitude' => $row->{'longitude'},
 				'location' => $data->{'location'},
 				'confidence' => $confidence,
+				%{$row}
 			);
 		}
 	}
@@ -541,19 +568,33 @@ sub _search {
 
 sub reverse_geocode {
 	my $self = shift;
+	my %params;
 
-	my %param;
-	if(ref($_[0]) eq 'HASH') {
-		%param = %{$_[0]};
+	# Try hard to support whatever API that the user wants to use
+	if(!ref($self)) {
+		if(scalar(@_)) {
+			return(__PACKAGE__->new()->reverse_geocode(@_));
+		} elsif(!defined($self)) {
+			# Geo::Coder::Free->reverse_geocode()
+			Carp::croak('Usage: ', __PACKAGE__, '::reverse_geocode(latlng => "$lat,$long")');
+		} elsif($self eq __PACKAGE__) {
+			Carp::croak("Usage: $self", '::reverse_geocode(latlng => "$lat,$long")');
+		}
+		return(__PACKAGE__->new()->reverse_geocode($self));
+	} elsif(ref($self) eq 'HASH') {
+		return(__PACKAGE__->new()->reverse_geocode($self));
+	} elsif(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	# } elsif(ref($_[0]) && (ref($_[0] !~ /::/))) {
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: reverse_geocode(latlng => $location)');
-	} elsif(@_ % 2 == 0) {
-		%param = @_;
+		Carp::croak('Usage: ', __PACKAGE__, '::reverse_geocode(latlng => "$lat,$long")');
+	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
+		%params = @_;
 	} else {
-		$param{'latlng'} = shift;
+		$params{'latlng'} = shift;
 	}
 
-	my $latlng = $param{'latlng'};
+	my $latlng = $params{'latlng'};
 
 	my $latitude;
 	my $longitude;
@@ -561,13 +602,13 @@ sub reverse_geocode {
 	if($latlng) {
 		($latitude, $longitude) = split(/,/, $latlng);
 	} else {
-		$latitude //= $param{'lat'};
-		$longitude //= $param{'lon'};
-		$longitude //= $param{'long'};
+		$latitude //= $params{'lat'};
+		$longitude //= $params{'lon'};
+		$longitude //= $params{'long'};
 	}
 
 	if((!defined($latitude)) || !defined($longitude)) {
-		Carp::croak('Usage: reverse_geocode(latlng => $location)');
+		Carp::croak('Usage: ', __PACKAGE__, '::reverse_geocode(latlng => "$lat,$long")');
 	}
 
 	# ::diag(__LINE__, ": $latitude,$longitude");
@@ -684,6 +725,7 @@ __DATA__
 "",1559,"GUERDON CT","PASADENA","ANNE ARUNDEL","MD","US",39.102637,-76.456384
 "ARCOLA HEALTH AND REHABILITATION CENTER",901,"ARCOLA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.036439,-77.025502
 "",9904,"GARDINER AVE","SILVER SPRING","MONTGOMERY","MD","US",39.017633,-77.049551
+"CVS",9520,"GEORGIA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.010801,-77.041771
 "FOREST GLEN MEDICAL CENTER",9801,"GEORGIA AVE","SILVER SPRING","MONTGOMERY","MD","US",39.016042,-77.042148
 "",10009,"GREELEY AVE","SILVER SPRING","MONTGOMERY","MD","US",39.019575,-77.047453
 "ADVENTIST HOSPITAL",11886,"HEALING WAY","SILVER SPRING","MONTGOMERY","MD","US",39.049570,-76.956882
@@ -694,10 +736,11 @@ __DATA__
 "",1954,"SEMINARY RD","SILVER SPRING","MONTGOMERY","MD","US",39.008961,-77.04303
 "",1956,"SEMINARY RD","SILVER SPRING","MONTGOMERY","MD","US",39.008845,-77.043317
 "",9315,"WARREN ST","SILVER SPRING","MONTGOMERY","MD","US",39.00881,-77.048953
-"",9411,"WARREN ST","SILVER SPRING","MONTGOMERY","MD","US",39.010436,-77.04855
+"",9411,"WARREN ST","SILVER SPRING","MONTGOMERY","MD","US",39.010447,-77.048548
 "SILVER DINER",12276,"ROCKVILLE PK","ROCKVILLE","MONTGOMERY","MD","US",39.05798753,-77.12165374
 "",1605,"VIERS MILL RD","ROCKVILLE","MONTGOMERY","MD","US",39.07669788,-77.12306436
 "",1406,"LANGBROOK PLACE","ROCKVILLE","MONTGOMERY","MD","US",39.075583,-77.123833
+"",2225,"FOREST GLEN RD","SILVER SPRING","MONTGOMERY","MD","US",39.015394,-77.048357
 "BP",2601,"FOREST GLEN RD","SILVER SPRING","MONTGOMERY","MD","US",39.0147541,-77.05466857
 "OMEGA STUDIOS",12412,,"ROCKVILLE","MONTGOMERY","MD","US",39.06412645,-77.11252263
 "",10424,"43RD AVE","BELTSVILLE","PRINCE GEORGE","MD","US",39.033075,-76.923859

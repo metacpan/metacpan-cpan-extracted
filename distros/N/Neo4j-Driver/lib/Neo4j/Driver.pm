@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver;
 # ABSTRACT: Neo4j community graph database driver for Bolt and HTTP
-$Neo4j::Driver::VERSION = '0.40';
+$Neo4j::Driver::VERSION = '0.41';
 
 use Carp qw(croak);
 
@@ -236,7 +236,7 @@ Neo4j::Driver - Neo4j community graph database driver for Bolt and HTTP
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -459,6 +459,8 @@ there is a compelling reason for a different approach in Perl.
 =over
 
 =item * L<Neo4j::Driver::B<Session>>
+
+=item * L<Neo4j::Driver::Types>
 
 =item * Official API documentation:
 L<Neo4j Driver API Specification|https://github.com/neo4j/docs-bolt/blob/main/modules/ROOT/pages/driver-api/index.adoc>,

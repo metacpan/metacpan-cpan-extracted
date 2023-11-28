@@ -65,9 +65,9 @@ unlike ($@, qr/AES: Data size must be multiple of blocksize/, "Padding and data 
 {
     eval {
         $c = Crypt::OpenSSL::AES->new(pack("H*", $key),
-            { cipher => "AES-192-ECB", iv => pack("H*", substr($iv, 0, 32)), });
+            { cipher => "AES-256-ECB", iv => pack("H*", substr($iv, 0, 32)), });
     };
-    like ($@, qr/AES-192-ECB does not use IV/, "AES-192-ECB does not use IV");
+    like ($@, qr/AES-256-ECB does not use IV/, "AES-256-ECB does not use IV");
 }
 
 {

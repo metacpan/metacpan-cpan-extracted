@@ -14,7 +14,7 @@ Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
 # Version.
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 # Ignore die signal.
 $SIG{__DIE__} = 'IGNORE';
@@ -66,6 +66,7 @@ with informations over HTTP.
 =head1 SYNOPSIS
 
  use Error::Pure::HTTP::ErrorList qw(err);
+
  err "This is a fatal error.", "name", "value";
 
 =head1 SUBROUTINES
@@ -79,6 +80,8 @@ with informations over HTTP.
 =back
 
 =head1 EXAMPLE1
+
+=for comment filename=error_list.pl
 
  use strict;
  use warnings;
@@ -95,6 +98,8 @@ with informations over HTTP.
 
 =head1 EXAMPLE2
 
+=for comment filename=error_list_with_arguments.pl
+
  use strict;
  use warnings;
 
@@ -109,6 +114,8 @@ with informations over HTTP.
  # #Error [script.pl:11] 1
 
 =head1 EXAMPLE3
+
+=for comment filename=error_list_multiple.pl
 
  use strict;
  use warnings;
@@ -148,7 +155,7 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure>
+L<https://github.com/michal-josef-spacek/Error-Pure>
 
 =head1 AUTHOR
 
@@ -158,11 +165,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2012-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

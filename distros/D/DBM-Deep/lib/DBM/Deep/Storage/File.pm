@@ -168,13 +168,16 @@ sub set_inode {
 
 =head2 print_at( $offset, @data )
 
-This takes an optional offset and some data to print.
+This takes an offset and some data to print.
 
-C< $offset >, if defined, will be used to seek into the file. If file_offset is
+C< $offset > will be used to seek into the file. If file_offset is
 set, it will be used as the zero location. If it is undefined, no seeking will
 occur. Then, C< @data > will be printed to the current location.
 
 There is no return value.
+
+If writing to the file would make the file too big for the C<pack_size> that
+is a fatal error.
 
 =cut
 
@@ -185,13 +188,16 @@ sub print_at {
     local ($,,$\);
 
     my $fh = $self->{fh};
-    if ( defined $loc ) {
-        seek( $fh, $loc + $self->{file_offset}, SEEK_SET );
+    my $len = length( join '', @_ );
+
+    seek( $fh, $loc + $self->{file_offset}, SEEK_SET );
+
+    if(tell($fh) > $len + 2 ** (8 * $self->{byte_size}) - 1) {
+        die("DBM::Deep: too much data, try a bigger pack_size\n");
     }
 
     if ( DEBUG ) {
         my $caller = join ':', (caller)[0,2];
-        my $len = length( join '', @_ );
         warn "($caller) print_at( " . (defined $loc ? $loc : '<undef>') . ", $len )\n";
     }
 

@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/Response.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/05/31
+## Modified 2023/10/21
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -30,10 +31,9 @@ BEGIN
     # use APR::Request::Cookie;
     use Apache2::API::Status;
     use Cookie::Jar;
-    use Nice::Try;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -100,14 +100,17 @@ sub content_encoding
     my $self = shift( @_ );
     my( $pack, $file, $line ) = caller;
     my $sub = ( caller( 1 ) )[3];
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( $self->_request->content_encoding( @_ ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to access Apache Request method \"content_encoding\": $e" ) );
+        return( $self->error( "An error occurred while trying to access Apache Request method \"content_encoding\": $@" ) );
     }
+    return( $rv );
 }
 
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Language
@@ -345,13 +348,15 @@ sub internal_redirect
     my $self = shift( @_ );
     my $uri = shift( @_ );
     $uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $self->_request->internal_redirect( $uri );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect\": $e" );
+        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect\": $@" );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
     return( Apache2::Const::HTTP_OK );
@@ -363,13 +368,15 @@ sub internal_redirect_handler
     my $self = shift( @_ );
     my $uri = shift( @_ );
     $uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $self->_request->internal_redirect_handler( $uri );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect_handler\": $e" );
+        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect_handler\": $@" );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
     return( Apache2::Const::HTTP_OK );
@@ -404,17 +411,20 @@ sub lookup_uri
     my $self = shift( @_ );
     my $uri = shift( @_ );
     $uri = $uri->path if( Scalar::Util::blessed( $uri ) && $uri->isa( 'URI' ) );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         my $subr = $self->_request->lookup_uri( $uri, @_ );
         # Returns Apache2::Const::OK, Apache2::Const::DECLINED, etc.
         return( $subr->run );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect_handler\": $e" );
+        $self->error( "An error occurred while trying to call Apache Request method \"internal_redirect_handler\": $@" );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
+    return( $rv );
 }
 
 # make_etag( $force_weak )
@@ -680,15 +690,18 @@ sub _try
     my $meth = shift( @_ ) || return( $self->error( "No method name was provided to try!" ) );
     my $r = Apache2::RequestUtil->request;
     # $r->log_error( "Apache2::API::Response::_try to call method \"$meth\" in package \"$pack\"." );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( $self->$pack->$meth ) if( !scalar( @_ ) );
         return( $self->$pack->$meth( @_ ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $e" ) );
+        return( $self->error( "An error occurred while trying to call Apache ", ucfirst( $pack ), " method \"$meth\": $@" ) );
     }
+    return( $rv );
 }
 
 # NOTE: sub FREEZE is inherited
@@ -892,7 +905,7 @@ Apache2::API::Response - Apache2 Outgoing Response Access and Manipulation
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

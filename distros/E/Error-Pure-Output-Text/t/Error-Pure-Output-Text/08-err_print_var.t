@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure::Output::Text qw(err_print_var);
 use Test::More 'tests' => 8;
 use Test::NoWarnings;

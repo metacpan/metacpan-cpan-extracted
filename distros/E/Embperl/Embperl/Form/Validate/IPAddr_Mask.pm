@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,14 +12,20 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: IPAddr_Mask.pm 1578075 2014-03-16 14:01:14Z richter $
-#
 ###################################################################################
 
 
 package Embperl::Form::Validate::IPAddr_Mask ;
 
 use base qw(Embperl::Form::Validate::Default);
+use utf8 ;
+
+my %errutf8 =
+    (
+	validate_ipaddr_mask => 'Feld %0: "%1" ist keine gültige IP-Adresse/Netzmaske. Geben Sie die IP-Adresse/Netzmaske in der Form nnn.nnn.nnn.nnn/mm ein',
+    ) ;
+
+no utf8 ;
 
 my %error_messages = 
 (
@@ -27,10 +34,7 @@ my %error_messages =
 	validate_ipaddr_mask => 'Feld %0: "%1" ist keine g�ltige IP-Adresse/Netzmaske. Geben Sie die IP-Adresse/Netzmaske in der Form nnn.nnn.nnn.nnn/mm ein',
     },
 
-    'de.utf-8' => 
-    {
-	validate_ipaddr_mask => 'Feld %0: "%1" ist keine gültige IP-Adresse/Netzmaske. Geben Sie die IP-Adresse/Netzmaske in der Form nnn.nnn.nnn.nnn/mm ein',
-    },
+    'de.utf-8' => \%errutf8,
 
     en =>
     {
@@ -56,13 +60,13 @@ sub validate
     {
     my ($self, $key, $value, $fdat, $pref) = @_ ;
     
-    if ($value =~ /^(\d+)\.(\d+).(\d+)\.(\d+)\/(\d+)$/)
+    if ($value =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)\/(\d+)$/)
 	{
 	if ($1 < 0 || $1 > 255 ||
 	    $2 < 0 || $2 > 255 ||
 	    $3 < 0 || $3 > 255 ||
 	    $4 < 0 || $4 > 255 ||
-	    $5 < 1 || $5 > 32)
+	    $5 < 0 || $5 > 32)
 	    {
             return ['validate_ipaddr_mask', $value] ;		
 	    }

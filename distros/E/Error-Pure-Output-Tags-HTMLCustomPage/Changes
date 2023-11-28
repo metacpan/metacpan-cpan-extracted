@@ -1,3 +1,15 @@
+0.04 2023-11-24T18:55:27+01:00
+ - Fix dependencies in doc.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-09-18T10:06:48+02:00
  - Add minimal version of Perl.
  - Add repository to doc.

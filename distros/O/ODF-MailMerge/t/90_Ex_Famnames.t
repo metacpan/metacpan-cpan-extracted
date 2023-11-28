@@ -66,7 +66,7 @@ my $ref_text = decode("UTF-8", $ref_octets);
 my $odt_outpath = path($tdir)->child("output.odt");
 my $txt_outpath = path($tdir)->child("output.txt");
 
-run_perlscript($scriptpath->canonpath,"-o",$odt_outpath->canonpath);
+run_perlscript($scriptpath->canonpath,"--quiet","-o",$odt_outpath->canonpath);
 
 { my $saved_cwd = Path::Tiny->cwd;
   scope_guard { chdir $saved_cwd or die; note "chdir back to $saved_cwd"; };

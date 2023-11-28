@@ -51,7 +51,7 @@
    "provides" : {
       "Plack::App::WebMySQL" : {
          "file" : "lib/Plack/App/WebMySQL.pm",
-         "version" : "4.0"
+         "version" : "4.01"
       },
       "Plack::App::WebMySQL::General" : {
          "file" : "lib/Plack/App/WebMySQL/General.pm"
@@ -72,6 +72,6 @@
          "url" : "https://github.com/thedumbterminal/Plack-App-WebMySQL"
       }
    },
-   "version" : "4.0",
+   "version" : "4.01",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

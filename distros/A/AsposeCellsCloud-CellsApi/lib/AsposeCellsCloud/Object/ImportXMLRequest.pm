@@ -139,17 +139,26 @@ __PACKAGE__->method_documentation({
      	description => 'Import position description.',
      	format => '',
      	read_only => '',
+     		},
+     'xml_content' => {
+     	datatype => 'string',
+     	base_name => 'XMLContent',
+     	description => 'Base64String default is null',
+     	format => '',
+     	read_only => '',
      		},    
 });
 
 __PACKAGE__->swagger_types( {
     'xml_file_source' => 'FileSource',
-    'import_position' => 'ImportPosition' 
+    'import_position' => 'ImportPosition',
+    'xml_content' => 'string' 
 } );
 
 __PACKAGE__->attribute_map( {
     'xml_file_source' => 'XMLFileSource',
-    'import_position' => 'ImportPosition' 
+    'import_position' => 'ImportPosition',
+    'xml_content' => 'XMLContent' 
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

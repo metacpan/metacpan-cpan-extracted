@@ -2,12 +2,11 @@ package HTTP::Cookies::ChromeDevTools;
 use strict;
 use Carp qw[croak];
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 our @CARP_NOT;
 
 use Moo 2;
 use JSON;
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 

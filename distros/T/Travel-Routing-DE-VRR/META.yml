@@ -20,19 +20,19 @@ name: Travel-Routing-DE-VRR
 provides:
   Travel::Routing::DE::EFA:
     file: lib/Travel/Routing/DE/EFA.pm
-    version: '2.23'
+    version: '2.24'
   Travel::Routing::DE::EFA::Route:
     file: lib/Travel/Routing/DE/EFA/Route.pm
-    version: '2.23'
+    version: '2.24'
   Travel::Routing::DE::EFA::Route::Message:
     file: lib/Travel/Routing/DE/EFA/Route/Message.pm
-    version: '2.23'
+    version: '2.24'
   Travel::Routing::DE::EFA::Route::Part:
     file: lib/Travel/Routing/DE/EFA/Route/Part.pm
-    version: '2.23'
+    version: '2.24'
   Travel::Routing::DE::VRR:
     file: lib/Travel/Routing/DE/VRR.pm
-    version: '2.23'
+    version: '2.24'
 requires:
   Class::Accessor: '0'
   Exception::Class: '0'
@@ -45,5 +45,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Routing-DE-VRR
-version: '2.23'
+version: '2.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

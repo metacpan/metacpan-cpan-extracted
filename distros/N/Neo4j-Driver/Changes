@@ -1,5 +1,11 @@
 Revision history for Neo4j::Driver
 
+0.41  2023-11-21
+
+ - Calling element_id() on nodes and relationships from Neo4j version 4
+   and earlier issues a warning. It will not become fatal.
+ - New Neo4j::Driver::Types doc as an initial step towards Neo4j::Types v2.
+
 0.40  2023-07-19
 
  - Add documentation that calling element_id() on nodes and relationships

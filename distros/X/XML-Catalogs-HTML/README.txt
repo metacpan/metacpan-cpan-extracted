@@ -9,20 +9,23 @@ INSTALLATION
 
 To install this module, run the following commands:
 
-   perl Build.PL
-   ./Build
-   ./Build test
-   ./Build install
+   perl Makefile.PL
+   make
+   make test
+   make install
 
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    Module::Build 0.36  (For installation only)
-    Test::More          (For testing only)
+    ExtUtils::MakeMaker   (For installation only)
+    Test::More            (For testing only)
+    parent
+    strict
     XML::Catalogs
     version
+    warnings
 
 
 SUPPORT AND DOCUMENTATION
@@ -30,21 +33,11 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc XML::Catalogs::HTML
+    perldoc XML::Catalogs
 
-You can also look for information at:
+You can also find it online at this location:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Catalogs-HTML
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/XML-Catalogs-HTML
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/XML-Catalogs-HTML
-
-    Search CPAN
-        http://search.cpan.org/dist/XML-Catalogs-HTML
+    https://metacpan.org/dist/XML-Catalogs
 
 
 COPYRIGHT AND LICENCE

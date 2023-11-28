@@ -8,9 +8,9 @@ use AsposeCellsCloud::Object::RadioButton;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**GroupBox** | **GroupBox** |  |
-**IsChecked** | **boolean** |  |
-**Shadow** | **boolean** |  |
+**GroupBox** | **GroupBox** | Gets the GroupBox that contains this RadioButton. |
+**IsChecked** | **boolean** | Indicates if the radiobutton is checked or not. |
+**Shadow** | **boolean** | Indicates whether the combobox has 3-D shading. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

@@ -1,3 +1,13 @@
+0.16 2023-11-23T19:27:57+01:00
+ [Common]
+ - Improve LICENSE AND COPYRIGHT sections in doc.
+ - Improve SYNOPSIS sections in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update copyright years.
+
 0.15 2018-01-22T17:56:43+01:00
  [Common]
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.

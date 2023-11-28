@@ -51,6 +51,6 @@
          "web" : "https://sourceforge.net/p/www-suffit/code/ci/master/tree/"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

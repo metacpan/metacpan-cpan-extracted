@@ -1,6 +1,20 @@
 class TestCase::Module::Sync::Mutex {
   
   use Sync::Mutex;
+  use TestCase::Util::Thread;
+  use Point;
+  
+  our $VALUE : public int;
+  
+  our $VALUES : public int[];
+  
+  our $MUTEX : public Sync::Mutex;
+  
+  our $INCREMENT_VALUE : public int;
+  
+  INIT {
+    $MUTEX = Sync::Mutex->new;
+  }
   
   static method basic : int () {
     
@@ -13,6 +27,184 @@ class TestCase::Module::Sync::Mutex {
     $mutex->reader_lock;
     
     $mutex->reader_unlock;
+    
+    return 1;
+  }
+  
+  static method assign : int () {
+    
+    # undef
+    {
+      my $point_ref = [(Point)undef];
+      
+      my $thread = TestCase::Util::Thread->new([has point_ref : Point[] = $point_ref] method : void () {
+        
+        my $point_ref = $self->{point_ref};
+        
+        for (my $i = 0; $i < 10000; $i++) {
+          my $point = Point->new;
+          $point_ref->[0] = $point;
+        }
+      });
+      
+      my $thread2 = TestCase::Util::Thread->new([has point_ref : Point[] = $point_ref] method : void () {
+        my $point_ref = $self->{point_ref};
+        
+        for (my $i = 0; $i < 10000; $i++) {
+          $point_ref->[0] = undef;
+        }
+      });
+      
+      $thread->join;
+      $thread2->join;
+      
+    }
+
+    # All patterns
+    {
+      my $point_ref = [(Point)undef];
+      
+      my $thread = TestCase::Util::Thread->new([has point_ref : Point[] = $point_ref] method : void () {
+        
+        my $point_ref = $self->{point_ref};
+        
+        for (my $i = 0; $i < 10000; $i++) {
+          my $point = Point->new;
+          $point_ref->[0] = $point;
+          $point_ref->[0] = $point;
+          $point_ref->[0] = Point->new;
+          $point_ref->[0] = undef;
+          $point_ref->[0] = Point->new;
+        }
+      });
+      
+      my $thread2 = TestCase::Util::Thread->new([has point_ref : Point[] = $point_ref] method : void () {
+        my $point_ref = $self->{point_ref};
+        
+        for (my $i = 0; $i < 10000; $i++) {
+          my $point = Point->new;
+          $point_ref->[0] = $point;
+          $point_ref->[0] = $point;
+          $point_ref->[0] = Point->new;
+          $point_ref->[0] = undef;
+          $point_ref->[0] = Point->new;
+        }
+      });
+      
+      $thread->join;
+      $thread2->join;
+      
+      unless ($point_ref->[0] is_type Point) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method increment : int () {
+    
+    my $thread = TestCase::Util::Thread->new(method : void () {
+      my $mutex = $TestCase::Module::Sync::Mutex::MUTEX;
+      
+      for (my $i = 0; $i < 10000; $i++) {
+        $mutex->lock;
+        
+        $TestCase::Module::Sync::Mutex::INCREMENT_VALUE++;
+        
+        $mutex->unlock;
+      }
+    });
+    
+    my $thread2 = TestCase::Util::Thread->new(method : void () {
+      my $mutex = $TestCase::Module::Sync::Mutex::MUTEX;
+      
+      for (my $i = 0; $i < 10000; $i++) {
+        $mutex->lock;
+        
+        $TestCase::Module::Sync::Mutex::INCREMENT_VALUE++;
+        
+        $mutex->unlock;
+      }
+    });
+    
+    $thread->join;
+    $thread2->join;
+    
+    unless ($TestCase::Module::Sync::Mutex::INCREMENT_VALUE == 20000) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method thread : int () {
+    
+    $TestCase::Module::Sync::Mutex::VALUE = 0;
+    
+    $TestCase::Module::Sync::Mutex::VALUES = [0, 0];
+    
+    my $values = [0, 0];
+    
+    my $thread = TestCase::Util::Thread->new([has foo : int[] = $values] method : void () {
+      my $mutex = $TestCase::Module::Sync::Mutex::MUTEX;
+      
+      $mutex->lock;
+      
+      $mutex->unlock;
+      
+      $mutex->reader_lock;
+      
+      $mutex->reader_unlock;
+      
+      $TestCase::Module::Sync::Mutex::VALUE = 1;
+      
+      $TestCase::Module::Sync::Mutex::VALUES->[0] = 2;
+      
+      $self->{foo}[0] = 5;
+      
+    });
+    
+    my $thread2 = TestCase::Util::Thread->new([has foo : int[] = $values] method : void () {
+      my $mutex = $TestCase::Module::Sync::Mutex::MUTEX;
+      
+      $mutex->lock;
+      
+      $mutex->unlock;
+      
+      $mutex->reader_lock;
+      
+      $mutex->reader_unlock;
+      
+      $TestCase::Module::Sync::Mutex::VALUES->[1] = 3;
+      
+      $self->{foo}[1] = 7;
+    });
+    
+    $thread->join;
+    $thread2->join;
+    
+    unless ($VALUE == 1) {
+      return 0;
+    }
+    
+    unless ($VALUES->[0] == 2) {
+      return 0;
+    }
+    
+    unless ($VALUES->[1] == 3) {
+      return 0;
+    }
+    
+    unless ($values->[0] == 5) {
+      return 0;
+    }
+    
+    unless ($values->[1] == 7) {
+      return 0;
+    }
+    
+    $VALUES = undef;
     
     return 1;
   }

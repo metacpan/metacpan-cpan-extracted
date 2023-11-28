@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
         'Test::More' => '0',
     },
     PREREQ_PM => {
-	'MooX::ReturnModifiers' => '1.000000', 
+	'MooX::ReturnModifiers' => '1.000001', 
 	'Moo' => '2.004000'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

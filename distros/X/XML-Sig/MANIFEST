@@ -16,7 +16,6 @@ t/002_xmlsec.t
 t/003_params.t
 t/004_keyhandling.t
 t/005_rsakeys.t
-t/006_signing.t
 t/007_verify_saml.t
 t/008_sign_saml.t
 t/009_verify_separate_cert.t
@@ -35,6 +34,7 @@ t/022_sign_no_xml_declaration.t
 t/023_hmac.t
 t/024-sign-wide-char.t
 t/025_verify-xml-with-id.t
+t/026_do-not-move-namespace-to-parent.t
 t/author-critic.t
 t/author-eof.t
 t/author-eol.t

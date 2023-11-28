@@ -70,8 +70,8 @@ subtest "list_contents" => sub {
     is(scalar(@contents), 1);
     is($contents[0]{path}, "$dir/f2");
 
-    $trash->recover("f1");
-    $trash->recover("f2");
+    $trash->recover("$dir/f1");
+    $trash->recover("$dir/f2");
 };
 
 subtest "trash" => sub {
@@ -95,16 +95,16 @@ subtest "trash" => sub {
 # state at this point: T(f1 sub/f1 f2)
 
 subtest "recover" => sub {
-    $trash->recover("f1", $ht);
+    $trash->recover("$dir/f1", $ht);
     ok((-f "f1"), "f1 recreated");
-    ok((-f "sub/f1"), "sub/f1 recreated");
+    ok(!(-f "sub/f1"), "sub/f1 NOT recreated");
 };
 # state at this point: f1 sub/f1 T(f2)
 
 subtest "erase" => sub {
     $trash->erase("f2", $ht);
     ok(!(-e "f2"), "f2 removed");
-    ok(!(-e ".local/share/Trash/info/f1.2.trashinfo"),"f2.trashinfo removed");
+    ok(!(-e ".local/share/Trash/info/f2.trashinfo"),"f2.trashinfo removed");
     ok(!(-e ".local/share/Trash/files/f2"), "files/f2 removed");
 
     write_text("f3", "");
@@ -151,13 +151,13 @@ write_text("f3", "f3a");
 $trash->trash("f3");
 write_text("f3", "f3b");
 subtest "recover to an existing file" => sub {
-    dies_ok { $trash->recover("f3") } "restore target already exists";
+    dies_ok { $trash->recover("$dir/f3") } "restore target already exists";
     is(read_text("f3"), "f3b", "existing target not replaced");
-    lives_ok { $trash->recover({on_target_exists=>'ignore'}, "f3") }
+    lives_ok { $trash->recover({on_target_exists=>'ignore'}, "$dir/f3") }
         "on_target_exists=ignore";
     is(read_text("f3"), "f3b", "existing target not replaced");
     unlink "f3";
-    lives_ok { $trash->recover("f3") } "can recover after target cleared";
+    lives_ok { $trash->recover("$dir/f3") } "can recover after target cleared";
     is(read_text("f3"), "f3a", "the correct file recovered");
 };
 # state at this point: f3 T()
@@ -171,10 +171,10 @@ subtest "recover: mtime opt" => sub {
     utime 1, 20, "f10";
     $trash->trash("f10");
 
-    $trash->recover({mtime=>20}, "f10");
+    $trash->recover({mtime=>20, filename=>"f10"});
     is(read_text("f10"), "f10.20", "f10 (mtime 20) recovered first");
     unlink "f10";
-    $trash->recover({mtime=>10}, "f10");
+    $trash->recover({mtime=>10, filename=>"f10"});
     is(read_text("f10"), "f10.10", "f10 (mtime 10) recovered");
     $trash->empty($ht);
 };
@@ -188,14 +188,14 @@ subtest "recover: suffix opt" => sub {
     $trash->trash({suffix=>"b"}, "f10");
 
     write_text("f10", "f10.another-b");
-    dies_ok { $trash->recover({suffix=>"b"}, "f10") }
+    dies_ok { $trash->recover({suffix=>"b", filename=>"f10"}) }
         "suffix already exists -> dies";
     unlink "f10";
 
-    $trash->recover({suffix=>"b"}, "f10");
+    $trash->recover({suffix=>"b", filename=>"f10"});
     is(read_text("f10"), "f10.b", "f10 (suffix b) recovered first");
     unlink "f10";
-    $trash->recover({suffix=>"a"}, "f10");
+    $trash->recover({suffix=>"a", filename=>"f10"});
     is(read_text("f10"), "f10.a", "f10 (suffix a) recovered");
     $trash->empty($ht);
 };
@@ -212,7 +212,7 @@ subtest "trash symlink" => sub {
     ok(!file_exists("s21"), "s21 deleted");
     ok( file_exists("f21"), "f21 not deleted");
 
-    $trash->recover("s21");
+    $trash->recover("$dir/s21");
     ok( file_exists("s21"), "s21 recovered");
     ok((-l "s21"), "s21 still a symlink");
     ok( file_exists("f21"), "f21 still not deleted");

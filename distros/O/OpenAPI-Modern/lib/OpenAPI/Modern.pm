@@ -1,11 +1,10 @@
-use strict;
-use warnings;
-package OpenAPI::Modern; # git description: v0.048-17-g1d1a674
+use strictures 2;
+package OpenAPI::Modern; # git description: v0.051-6-g33162f8
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.1 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.1 Swagger HTTP request response
 
-our $VERSION = '0.049';
+our $VERSION = '0.052';
 
 use 5.020;
 use utf8;
@@ -33,6 +32,7 @@ use Types::Standard 'InstanceOf';
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 use Mojo::Message::Request;
 use Mojo::Message::Response;
+use Storable 'dclone';
 use namespace::clean;
 
 has openapi_document => (
@@ -66,17 +66,18 @@ around BUILDARGS => sub ($orig, $class, @args) {
       if not exists $args->{openapi_uri};
     croak 'missing required constructor arguments: either openapi_document, or openapi_schema'
       if not exists $args->{openapi_schema};
-
-    $args->{evaluator} //= JSON::Schema::Modern->new(validate_formats => 1, max_traversal_depth => 80);
-    $args->{openapi_document} = JSON::Schema::Modern::Document::OpenAPI->new(
-      canonical_uri => $args->{openapi_uri},
-      schema => $args->{openapi_schema},
-      evaluator => $args->{evaluator},
-    );
-
-    # if there were errors, this will die with a JSON::Schema::Modern::Result object
-    $args->{evaluator}->add_schema($args->{openapi_document});
   }
+
+  $args->{evaluator} //= JSON::Schema::Modern->new(validate_formats => 1, max_traversal_depth => 80);
+
+  $args->{openapi_document} //= JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => $args->{openapi_uri},
+    schema => $args->{openapi_schema},
+    evaluator => $args->{evaluator},
+  );
+
+  # if there were errors, this will die with a JSON::Schema::Modern::Result object
+  $args->{evaluator}->add_schema($args->{openapi_document});
 
   return $args;
 };
@@ -136,7 +137,7 @@ sub validate_request ($self, $request, $options = {}) {
         my $valid =
             $param_obj->{in} eq 'path' ? $self->_validate_path_parameter($state, $param_obj, $path_captures)
           : $param_obj->{in} eq 'query' ? $self->_validate_query_parameter($state, $param_obj, $request->url)
-          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, $request->headers->header($param_obj->{name}))
+          : $param_obj->{in} eq 'header' ? $self->_validate_header_parameter($state, $param_obj->{name}, $param_obj, $request->headers)
           : $param_obj->{in} eq 'cookie' ? $self->_validate_cookie_parameter($state, $param_obj, $request)
           : abort($state, 'unrecognized "in" value "%s"', $param_obj->{in});
       }
@@ -155,8 +156,10 @@ sub validate_request ($self, $request, $options = {}) {
 
     $state->{schema_path} = jsonp($state->{schema_path}, $method);
 
-    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header') },
-        'RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that contains a Transfer-Encoding header field')
+    # RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that
+    # contains a Transfer-Encoding header field.
+    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header', 'Content-Length') },
+        'Content-Length cannot appear together with Transfer-Encoding')
       if defined $request->headers->content_length and $request->content->is_chunked;
 
     # RFC9112 §6.3-7: A user agent that sends a request that contains a message body MUST send
@@ -252,9 +255,17 @@ sub validate_response ($self, $response, $options = {}) {
         if $response->is_success and $method eq 'connect';
     }
 
-    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header') },
-        'RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that contains a Transfer-Encoding header field')
+    # RFC9112 §6.2-2: A sender MUST NOT send a Content-Length header field in any message that
+    # contains a Transfer-Encoding header field.
+    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header', 'Content-Length') },
+        'Content-Length cannot appear together with Transfer-Encoding')
       if defined $response->headers->content_length and $response->content->is_chunked;
+
+    # RFC9112 §6.3-7: A user agent that sends a request that contains a message body MUST send
+    # either a valid Content-Length header field or use the chunked transfer coding.
+    ()= E({ %$state, data_path => jsonp($state->{data_path}, 'header') }, 'missing header: Content-Length')
+      if $response->body_size and not $response->headers->content_length
+        and not $response->content->is_chunked;
 
     my $response_name = first { exists $operation->{responses}{$_} }
       $response->code, substr(sprintf('%03s', $response->code), 0, -2).'XX', 'default';
@@ -280,7 +291,7 @@ sub validate_response ($self, $response, $options = {}) {
 
       ()= $self->_validate_header_parameter({ %$state,
           data_path => jsonp($state->{data_path}, 'header', $header_name) },
-        $header_name, $header_obj, $response->headers->header($header_name));
+        $header_name, $header_obj, $response->headers);
     }
 
     $self->_validate_body_content({ %$state, data_path => jsonp($state->{data_path}, 'body') },
@@ -455,6 +466,32 @@ sub find_path ($self, $options) {
   return 1;
 }
 
+sub recursive_get ($self, $uri_reference, $entity_type = undef) {
+  my $base = $self->openapi_uri;
+  my $ref = $uri_reference;
+  my ($depth, $schema);
+
+  while ($ref) {
+    die 'maximum evaluation depth exceeded' if $depth++ > $self->evaluator->max_traversal_depth;
+    my $uri = Mojo::URL->new($ref)->to_abs($base);
+
+    my $schema_info = $self->evaluator->_fetch_from_uri($uri);
+
+    die('unable to find resource ', $uri) if not $schema_info;
+    die sprintf('bad $ref to %s: not a%s "%s"', $schema_info->{canonical_uri}, ($entity_type =~ /^[aeiou]/ ? 'n' : ''), $entity_type)
+      if $entity_type
+        and $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne $entity_type;
+
+    $entity_type //= $schema_info->{document}->get_entity_at_location($schema_info->{document_path});
+    $schema = $schema_info->{schema};
+    $base = $schema_info->{canonical_uri};
+    $ref = $schema->{'$ref'};
+  }
+
+  $schema = dclone($schema);
+  return wantarray ? ($schema, $base) : $schema;
+}
+
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
 
 sub _validate_path_parameter ($self, $state, $param_obj, $path_captures) {
@@ -512,30 +549,33 @@ sub _validate_query_parameter ($self, $state, $param_obj, $uri) {
 }
 
 # validates a header, from either the request or the response
-sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $header_string) {
+sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $headers) {
   return 1 if grep fc $header_name eq fc $_, qw(Accept Content-Type Authorization);
 
-  if (not defined $header_string) {
+  if (not $headers->every_header($header_name)->@*) {
     return E({ %$state, keyword => 'required' }, 'missing header: %s', $header_name)
       if $header_obj->{required};
     return 1;
   }
 
-  return $self->_validate_parameter_content($state, $header_obj, \ $header_string)
+  # validate as a single comma-concatenated string, presumably to be decoded
+  return $self->_validate_parameter_content($state, $header_obj, \ $headers->header($header_name))
     if exists $header_obj->{content};
 
-  # "The field value does not include any leading or trailing whitespace: OWS occurring before the
-  # first non-whitespace octet of the field value or after the last non-whitespace octet of the
-  # field value ought to be excluded by parsers when extracting the field value from a header field."
-  $header_string =~ s/^\s*//;
-  $header_string =~ s/\s*$//;
+  # RFC9112§5.1-3: "The field line value does not include that leading or trailing whitespace: OWS
+  # occurring before the first non-whitespace octet of the field line value, or after the last
+  # non-whitespace octet of the field line value, is excluded by parsers when extracting the field
+  # line value from a field line."
+  my @values = map s/^\s*//r =~ s/\s*$//r, map split(/,/, $_), $headers->every_header($header_name)->@*;
 
   my $types = $self->_type_in_schema($header_obj->{schema}, { %$state, schema_path => jsonp($state->{schema_path}, 'schema') });
 
-  # all deserialization follows the spec: https://spec.openapis.org/oas/v3.1.0#style-examples
-  # We strip leading and trailing whitespace between fields, as per RFC9112§5.1-3
+  # RFC9112§5.3-1: "A recipient MAY combine multiple field lines within a field section that have
+  # the same field name into one field line, without changing the semantics of the message, by
+  # appending each subsequent field line value to the initial field line value in order, separated
+  # by a comma (",") and optional whitespace (OWS, defined in Section 5.6.3). For consistency, use
+  # comma SP."
   my $data;
-  my @values = split /\s*,\s*/, $header_string;
   if (grep $_ eq 'array', @$types) {
     # style=simple, explode=false or true: "blue,black,brown" -> ["blue","black","brown"]
     $data = \@values;
@@ -551,7 +591,9 @@ sub _validate_header_parameter ($self, $state, $header_name, $header_obj, $heade
     }
   }
   else {
-    $data = join ', ', @values;
+    # when validating as a single string, preserve internal whitespace in each individual header
+    # but strip leading/trailing whitespace
+    $data = join ', ', map s/^\s*//r =~ s/\s*$//r, $headers->every_header($header_name)->@*;
   }
 
   $state = { %$state, schema_path => jsonp($state->{schema_path}, 'schema'), stringy_numbers => 1 };
@@ -683,7 +725,7 @@ sub _resolve_ref ($self, $entity_type, $ref, $state) {
     if $state->{depth}++ > $self->evaluator->max_traversal_depth;
 
   abort({ %$state, keyword => '$ref' }, 'EXCEPTION: bad $ref to %s: not a "%s"', $schema_info->{canonical_uri}, $entity_type)
-    if ($schema_info->{document}->get_entity_at_location($schema_info->{document_path})//'') ne $entity_type;
+    if $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne $entity_type;
 
   $state->{initial_schema_uri} = $schema_info->{canonical_uri};
   $state->{traversed_schema_path} = $state->{traversed_schema_path}.$state->{schema_path}.jsonp('/$ref');
@@ -745,13 +787,21 @@ sub _convert_request ($request) {
   return $request if $request->isa('Mojo::Message::Request');
   if ($request->isa('HTTP::Request')) {
     my $req = Mojo::Message::Request->new;
-    if (not defined $request->headers->content_length) {
-      my $length = length $request->content_ref->$*;
-      $req->headers->content_length($length) if $length;
-    }
+    # we could call $req->fix_headers here to add a missing Content-Length, but proper requests from
+    # the network should always have it set.
     $req->parse($request->as_string);
     return $req;
   }
+  elsif ($request->isa('Plack::Request')) {
+    my $req = Mojo::Message::Request->new->parse($request->env);
+    my $body = $request->content;
+    $req->parse($body) if length $body;
+    # Plack is unable to distinguish between %2F and /, so the raw (undecoded) uri can be passed
+    # here. see PSGI::FAQ
+    $req->url(Mojo::URL->new($request->env->{REQUEST_URI})) if exists $request->env->{REQUEST_URI};
+    return $req;
+  }
+
   croak 'unknown type '.ref($request);
 }
 
@@ -760,13 +810,23 @@ sub _convert_response ($response) {
   return $response if $response->isa('Mojo::Message::Response');
   if ($response->isa('HTTP::Response')) {
     my $res = Mojo::Message::Response->new;
-    if (not defined $response->headers->content_length) {
-      my $length = length $response->content_ref->$*;
-      $res->headers->content_length($length) if $length;
-    }
     $res->parse($response->as_string);
+    # we could call $req->fix_headers here to add a missing Content-Length, but proper requests from
+    # the network should always have it set.
     return $res;
   }
+  elsif ($response->isa('Plack::Response')) {
+    my $res = Mojo::Message::Response->new;
+    $res->code($response->status);
+    my @headers = $response->headers->psgi_flatten->@*;
+    while (my ($name, $value) = splice(@headers, 0, 2)) {
+      $res->headers->header($name, $value);
+    }
+    my $body = $response->body;
+    $res->body($body) if length $body;
+    return $res;
+  }
+
   croak 'unknown type '.ref($response);
 }
 
@@ -793,7 +853,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.1 d
 
 =head1 VERSION
 
-version 0.049
+version 0.052
 
 =head1 SYNOPSIS
 
@@ -908,7 +968,7 @@ than features that seem to work but actually cut corners for simplicity.
 
 =for Pod::Coverage BUILDARGS THAW
 
-=for stopwords schemas jsonSchemaDialect metaschema subschema perlish operationId
+=for stopwords schemas jsonSchemaDialect metaschema subschema perlish operationId openapi
 
 =head1 CONSTRUCTOR ARGUMENTS
 
@@ -983,7 +1043,7 @@ The L<JSON::Schema::Modern> object to use for all URI resolution and JSON Schema
     },
   );
 
-Validates an L<HTTP::Request> or L<Mojo::Message::Request>
+Validates an L<HTTP::Request>, L<Plack::Request> or L<Mojo::Message::Request>
 object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
@@ -1003,7 +1063,7 @@ to improve performance.
     },
   );
 
-Validates an L<HTTP::Response> or L<Mojo::Message::Response>
+Validates an L<HTTP::Response>, L<Plack::Response> or L<Mojo::Message::Response>
 object against the corresponding OpenAPI v3.1 document, returning a
 L<JSON::Schema::Modern::Result> object.
 
@@ -1069,6 +1129,27 @@ In addition, this value is populated in the options hash (when available):
 Note that the L<C</servers>|https://spec.openapis.org/oas/v3.1.0#server-object> section of the
 OpenAPI document is not used for path matching at this time, for either scheme and host matching nor
 path prefixes.
+
+=head2 recursive_get
+
+Given a uri or uri-reference, get the definition at that location, following any C<$ref>s along the
+way. Include the expected definition type
+(one of C<schema>, C<response>, C<parameter>, C<example>, C<request-body>, C<header>,
+C<security-scheme>, C<link>, C<callbacks>, or C<path-item>)
+for validation of the entire reference chain.
+
+Returns the data in scalar context, or a tuple of the data and the canonical URI of the
+referenced location in list context.
+
+If the provided location is relative, the main openapi document is used for the base URI.
+If you have a local json pointer you want to resolve, you can turn it into a uri-reference by
+prepending C<#>.
+
+  my $schema = $openapi->recursive_get('#/components/parameters/Content-Encoding', 'parameter');
+
+  # starts with a JSON::Schema::Modern object (TODO)
+  my $schema = $js->recursive_get('https:///openapi_doc.yaml#/components/schemas/my_object')
+  my $schema = $js->recursive_get('https://localhost:1234/my_spec#/$defs/my_object')
 
 =head2 canonical_uri
 

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Hi::Any::In - Package for language Hindi
 
 package Locale::CLDR::Locales::Hi::Any::In;
 # This file auto generated from Data\common\main\hi_IN.xml
-#	on Fri 13 Oct  9:19:39 am GMT
+#	on Sat  4 Nov  6:05:50 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

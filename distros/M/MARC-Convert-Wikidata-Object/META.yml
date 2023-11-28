@@ -3,7 +3,6 @@ abstract: 'Bibliographic Wikidata object defined by MARC record.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
-  DateTime: 0
   ExtUtils::MakeMaker: 6.59
   Test::More: 0
   Test::NoWarnings: 0
@@ -26,12 +25,12 @@ no_index:
     - xt
 requires:
   Business::ISBN: 0
-  DateTime: 0
   Error::Pure: 0
   List::MoreUtils: 0
   List::Util: 0
   Mo: 0
   Mo::utils: 0.07
+  Mo::utils::Date: 0
   Readonly: 0
   perl: 5.6.2
 resources:
@@ -39,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Convert-Wikidata-Object
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Convert-Wikidata-Object
-version: '0.01'
+version: '0.03'

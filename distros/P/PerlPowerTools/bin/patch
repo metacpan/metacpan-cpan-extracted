@@ -247,7 +247,7 @@ if (ref $patch eq 'Patch') {
 }
 
 $patch->note("done\n");
-exit $patch->error ? 1 : 0;
+exit($patch->error ? 1 : 0);
 
 END {
     close STDOUT || die "$0: can't close stdout: $!\n";
@@ -1105,7 +1105,11 @@ package
 sub TIEHANDLE {
     my ($class, $file) = @_;
     local *FH;
-    open *FH, '<', $file or return;
+    if ($file eq '-') {
+        *FH = *STDIN;
+    } else {
+        open *FH, '<', $file or return;
+    }
     bless [*FH], $class;
 }
 

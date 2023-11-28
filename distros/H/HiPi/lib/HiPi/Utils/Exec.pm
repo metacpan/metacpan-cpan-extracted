@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Utils::Exec
 # Description  : Executable Wrappers
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -23,7 +23,7 @@ use HiPi;
 
 __PACKAGE__->create_accessors( qw( workingdir sourceperl outputexec ) );
 
-our $VERSION ='0.81';
+our $VERSION ='0.90';
 
 XSLoader::load('HiPi::Utils::Exec', $VERSION) if HiPi::is_raspberry_pi();
 

@@ -1,3 +1,16 @@
+0.019   2023-11-25  Released-By: PERLANCAR; Urgency: high
+
+        - [role Munge::GroupRows][bugfix] Add tests, fix rows being
+          created.
+
+
+0.018   2023-11-24  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+        - Add role: Munge::GroupRows. (UPDATE 2023-11-25: this release is
+          broken, the role does not create rows with [$key, 'rows'] columns, but
+          only ['rows']. Fixed in 0.019).
+
+
 0.017   2023-08-31  Released-By: PERLANCAR; Urgency: medium
 
         - [role Source::AOA] Follow Spec::GetRowByPos.

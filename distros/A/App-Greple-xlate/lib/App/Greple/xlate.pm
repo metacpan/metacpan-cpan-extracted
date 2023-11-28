@@ -1,6 +1,6 @@
 package App::Greple::xlate;
 
-our $VERSION = "0.25";
+our $VERSION = "0.28";
 
 =encoding utf-8
 
@@ -10,21 +10,23 @@ App::Greple::xlate - translation support module for greple
 
 =head1 SYNOPSIS
 
+    greple -Mxlate -e ENGINE --xlate pattern target-file
+
     greple -Mxlate::deepl --xlate pattern target-file
 
 =head1 VERSION
 
-Version 0.25
+Version 0.28
 
 =head1 DESCRIPTION
 
 B<Greple> B<xlate> module find text blocks and replace them by the
-translated text.  Currently only DeepL service is supported by the
-B<xlate::deepl> module.
+translated text.  Currently DeepL (F<deepl.pm>) and ChatGPT
+(F<gpt3.pm>) module are implemeted as a back-end engine.
 
-If you want to translate normal text block in L<pod> style document,
-use B<greple> command with C<xlate::deepl> and C<perl> module like
-this:
+If you want to translate normal text blocks written in the L<pod>
+style, use B<greple> command with C<xlate::deepl> and C<perl> module
+like this:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
@@ -41,16 +43,16 @@ find and replace them by the B<deepl> command output.
 
 By default, original and translated text is printed in the "conflict
 marker" format compatible with L<git(1)>.  Using C<ifdef> format, you
-can get desired part by L<unifdef(1)> command easily.  Format can be
-specified by B<--xlate-format> option.
+can get desired part by L<unifdef(1)> command easily.  Output format
+can be specified by B<--xlate-format> option.
 
 =for html <p>
 <img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-Greple-xlate/main/images/format-conflict.png">
 </p>
 
-If you want to translate entire text, use B<--match-all> option.
-This is a short-cut to specify the pattern matches entire text
-C<(?s).+>.
+If you want to translate entire text, use B<--match-all> option.  This
+is a short-cut to specify the pattern C<(?s).+> which matches entire
+text.
 
 =head1 OPTIONS
 
@@ -83,9 +85,9 @@ could hold 74 characters at most.
 
 =item B<--xlate-engine>=I<engine>
 
-Specify the translation engine to be used.  You don't have to use this
-option because module C<xlate::deepl> declares it as
-C<--xlate-engine=deepl>.
+Specifies the translation engine to be used. If you specify the engine
+module directly, such as C<-Mxlate::deepl>, you do not need to use
+this option.
 
 =item B<--xlate-labor>
 
@@ -150,9 +152,10 @@ text is printed.
 =item B<--xlate-maxlen>=I<chars> (Default: 0)
 
 Specify the maximum length of text to be sent to the API at once.
-Default value is set as for free account service: 128K for the API
-(B<--xlate>) and 5000 for the clipboard interface (B<--xlate-labor>).
-You may be able to change these value if you are using Pro service.
+Default value is set as for free DeepL account service: 128K for the
+API (B<--xlate>) and 5000 for the clipboard interface
+(B<--xlate-labor>).  You may be able to change these value if you are
+using Pro service.
 
 =item B<-->[B<no->]B<xlate-progress> (Default: True)
 
@@ -234,6 +237,10 @@ language invoking it with prefix argument.
 
 Set your authentication key for DeepL service.
 
+=item OPENAI_API_KEY
+
+OpenAI authentication key.
+
 =back
 
 =head1 INSTALL
@@ -242,15 +249,35 @@ Set your authentication key for DeepL service.
 
     $ cpanm App::Greple::xlate
 
+=head2 TOOLS
+
+You have to install command line tools for DeepL and ChatGPT.
+
+L<https://github.com/DeepLcom/deepl-python>
+
+L<https://github.com/tecolicom/App-gpty>
+
 =head1 SEE ALSO
 
 L<App::Greple::xlate>
+
+L<App::Greple::xlate::deepl>
+
+L<App::Greple::xlate::gpt3>
 
 =over 7
 
 =item L<https://github.com/DeepLcom/deepl-python>
 
 DeepL Python library and CLI command.
+
+=item L<https://github.com/openai/openai-python>
+
+OpenAI Python Library
+
+=item L<https://github.com/tecolicom/App-gpty>
+
+OpenAI command line interface
 
 =item L<App::Greple>
 
@@ -288,13 +315,17 @@ use warnings;
 
 use Data::Dumper;
 
-use JSON;
 use Text::ANSI::Fold ':constants';
 use App::cdif::Command;
 use Hash::Util qw(lock_keys);
 use Unicode::EastAsianWidth;
 
+use Exporter 'import';
+our @EXPORT_OK = qw($VERSION &opt);
+our @EXPORT_TAGS = ( all => [ qw($VERSION) ] );
+
 our %opt = (
+    debug    => \(our $debug = 0),
     engine   => \(our $xlate_engine),
     progress => \(our $show_progress = 1),
     format   => \(our $output_format = 'conflict'),
@@ -307,7 +338,7 @@ our %opt = (
     method   => \(our $cache_method //= $ENV{GREPLE_XLATE_CACHE} || 'auto'),
     dryrun   => \(our $dryrun = 0),
     maxlen   => \(our $max_length = 0),
-    );
+);
 lock_keys %opt;
 sub opt :lvalue { ${$opt{+shift}} }
 
@@ -336,7 +367,7 @@ our %formatter = (
     },
     space   => sub { join "\n", @_ },
     discard => sub { '' },
-    );
+);
 
 # aliases
 for (keys %formatter) {
@@ -344,18 +375,13 @@ for (keys %formatter) {
     $formatter{$_} = $formatter{$formatter{$_}} // die;
 }
 
-my $old_cache = {};
-my $new_cache = {};
-my $xlate_cache_update;
+my %cache;
 
 sub setup {
     return if state $once_called++;
     if (defined $cache_method) {
 	if ($cache_method eq '') {
 	    $cache_method = 'auto';
-	}
-	if (lc $cache_method eq 'accumulate') {
-	    $new_cache = $old_cache;
 	}
 	if ($cache_method =~ /^(no|never)/i) {
 	    $cache_method = '';
@@ -394,28 +420,31 @@ sub postgrep {
 	my($b, @match) = @$r;
 	for my $m (@match) {
 	    my $key = normalize $grep->cut(@$m);
-	    $new_cache->{$key} //= delete $old_cache->{$key} // do {
+	    if (not exists $cache{$key}) {
+		$cache{$key} = undef;
 		push @miss, $key;
-		"NOT TRANSLATED YET\n";
-	    };
+	    }
 	}
     }
     cache_update(@miss) if @miss;
+}
+
+sub _progress {
+    print STDERR @_ if opt('progress');
 }
 
 sub cache_update {
     binmode STDERR, ':encoding(utf8)';
 
     my @from = @_;
-    print STDERR "From:\n", map s/^/\t< /mgr, @from if $show_progress;
+    # _progress("From:\n", map s/^/\t< /mgr, @from);
     return @from if $dryrun;
 
     my @to = &XLATE(@from);
 
-    print STDERR "To:\n", map s/^/\t> /mgr, @to if $show_progress;
+    # _progress("To:\n", map s/^/\t> /mgr, @to);
     die "Unmatched response:\n@to" if @from != @to;
-    $xlate_cache_update += @from;
-    @{$new_cache}{@from} = @to;
+    @cache{@from} = @to;
 }
 
 sub fold_lines {
@@ -425,7 +454,7 @@ sub fold_lines {
 	linebreak => LINEBREAK_ALL,
 	runin     => 4,
 	runout    => 4,
-	);
+    );
     local $_ = shift;
     s/(.+)/join "\n", $fold->text($1)->chops/ge;
     $_;
@@ -434,7 +463,7 @@ sub fold_lines {
 sub xlate {
     my $text = shift;
     my $key = normalize $text;
-    my $s = $new_cache->{$key} // "!!! TRANSLATION ERROR !!!\n";
+    my $s = $cache{$key} // "!!! TRANSLATION ERROR !!!\n";
     $s = fold_lines $s if $fold_line;
     if (state $formatter = $formatter{$output_format}) {
 	return $formatter->($text, $s);
@@ -459,55 +488,32 @@ sub cache_file {
     }
 }
 
-my $json_obj = JSON->new->utf8->canonical->pretty;
-
-sub read_cache {
-    my $file = shift;
-    %$new_cache = %$old_cache = ();
-    if (open my $fh, $file) {
-	my $json = do { local $/; <$fh> };
-	my $hash = $json eq '' ? {} : $json_obj->decode($json);
-	%$old_cache = %$hash;
-	warn "read cache from $file\n";
-    }
-}
-
-sub write_cache {
-    return if $dryrun;
-    my $file = shift;
-    if (open my $fh, '>', $file) {
-	my $json = $json_obj->encode($new_cache);
-	print $fh $json;
-	warn "write cache to $file\n";
-    }
-}
-
 sub begin {
     setup if not (state $done++);
     my %args = @_;
     $current_file = delete $args{&::FILELABEL} or die;
     s/\z/\n/ if /.\z/;
-    $xlate_cache_update = 0;
     if (not defined $xlate_engine) {
 	die "Select translation engine.\n";
     }
-    if (my $cache = cache_file) {
-	if ($cache_method =~ /^(create|clear)/) {
-	    warn "created $cache\n" unless -f $cache;
-	    open my $fh, '>', $cache or die "$cache: $!\n";
-	    print $fh "{}\n";
-	    die "skip $current_file" if $cache_method eq 'create';
+    if (my $file = cache_file) {
+	my @opt;
+	if ($cache_method =~ /create|clear/i) {
+	    push @opt, clear => 1;
 	}
-	read_cache $cache;
+	if ($cache_method =~ /accumulate/i) {
+	    push @opt, accumulate => 1;
+	}
+	require App::Greple::xlate::Cache;
+	tie %cache, 'App::Greple::xlate::Cache', $file, @opt;
+	die "skip $current_file" if $cache_method eq 'create';
     }
 }
 
 sub end {
-    if (my $cache = cache_file) {
-	if ($xlate_cache_update or %$old_cache) {
-	    write_cache $cache;
-	}
-    }
+#    if (my $obj = tied %cache) {
+#	$obj->update;
+#    }
 }
 
 sub setopt {
@@ -522,6 +528,7 @@ sub setopt {
 
 __DATA__
 
+builtin xlate-debug!       $debug
 builtin xlate-progress!    $show_progress
 builtin xlate-format=s     $output_format
 builtin xlate-fold-line!   $fold_line
@@ -536,7 +543,7 @@ builtin xlate-maxlen=i     $max_length
 builtin deepl-auth-key=s   $App::Greple::xlate::deepl::auth_key
 builtin deepl-method=s     $App::Greple::xlate::deepl::method
 
-option default --face +E --ci=A
+option default --ci=A --cm=/544E,/454E,/445E,/455E,/545E,/554E
 
 option --xlate-setopt --prologue &__PACKAGE__::setopt($<shift>)
 

@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 use Carp   qw(confess cluck);
 use Encode qw(encode);
@@ -443,6 +443,8 @@ sub results {
 		my $countdown     = $e->getAttribute('countdown');
 		my $occupancy     = $e->getAttribute('occupancy');
 		my $line          = $e_line->getAttribute('number');
+		my $train_type    = $e_line->getAttribute('trainType');
+		my $train_name    = $e_line->getAttribute('trainName');
 		my $train_no      = $e_line->getAttribute('trainNum');
 		my $dest          = $e_line->getAttribute('direction');
 		my $info          = $e_info->textContent;
@@ -502,6 +504,8 @@ sub results {
 				key           => $key,
 				lineref       => $line_obj[0] // undef,
 				line          => $line,
+				train_type    => $train_type,
+				train_name    => $train_name,
 				train_no      => $train_no,
 				destination   => $dest,
 				occupancy     => $occupancy,
@@ -640,7 +644,7 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 DESCRIPTION
 

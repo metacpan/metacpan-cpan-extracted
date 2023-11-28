@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 04-packet.t 1910 2023-03-30 19:16:30Z willem $	-*-perl-*-
+# $Id: 04-packet.t 1947 2023-11-23 09:40:45Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 102;
+use Test::More tests => 103;
 use TestToolkit;
 
 
@@ -168,6 +168,7 @@ is( $bind->header->adcount, 1, 'check additional count in synthetic packet heade
 for my $packet ( Net::DNS::Packet->new('example.com') ) {
 	my $reply = $packet->reply();	## check $packet->reply()
 	ok( $reply->isa('Net::DNS::Packet'), '$packet->reply() returns packet' );
+	like( $reply->string, '/HEADER/', 'reply->string() represents packet' );
 
 	my $udpmax = 2048;
 	$packet->edns->udpsize($udpmax);

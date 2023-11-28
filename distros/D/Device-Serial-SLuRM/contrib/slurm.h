@@ -3,7 +3,19 @@
 
 #include <stdint.h>
 
+/* Local configuration file; may be blank. May contain #define lines to
+ * further configure behaviour
+ *
+ *   #define SLURM_MULTIDROP
+ *     // enable multidrop mode using 4-byte headers
+ */
+#include "local-config.h"
+
 /* API */
+
+#ifdef SLURM_MULTIDROP
+void slurm_configure(uint8_t node_id);
+#endif
 
 void slurm_reset(void);
 
@@ -32,5 +44,11 @@ void slurm_do_tasks(void);
  */
 void do_slurm_send(uint8_t b);
 void isr_slurm_recv(uint8_t b);
+/* User code may provide do_slurm_tx_start()
+ *                       do_slurm_tx_stop()
+ * This could be used for RS485 control, etc
+ */
+void do_slurm_tx_start(void);
+void do_slurm_tx_stop(void);
 
 #endif

@@ -13,7 +13,7 @@ use Ref::Util qw/ is_plain_arrayref is_plain_hashref is_plain_scalarref /;
 
 use namespace::clean;
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.5.0';
 
 
 sub _resolved_attrs {
@@ -68,6 +68,21 @@ sub _resolved_attrs {
 }
 
 
+sub tablesample {
+    my ( $rs, $frac, $options ) = @_;
+    $options //= {};
+    return $rs->search_rs(
+        undef,
+        {
+            tablesample => {
+                fraction => $frac,
+                %$options
+            }
+        }
+    );
+}
+
+
 1;
 
 __END__
@@ -82,7 +97,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 =head1 VERSION
 
-version v0.4.0
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -118,8 +133,19 @@ This generates the SQL
 This helper adds rudimentary support for tablesample queries
 to L<DBIx::Class> resultsets.
 
-The C<tablesample> key supports the following options as a hash
-reference:
+=head1 METHODS
+
+=head2 search_rs
+
+This adds a C<tablesample> key to the search options, for example
+
+  $rs->search_rs( undef, { tablesample => 10 } );
+
+or
+
+  $rs->search_rs( undef, { tablesample => { fraction => 10, method => 'system' } } );
+
+Normally the value is a fraction, or a hash reference with the following options:
 
 =over
 
@@ -222,6 +248,16 @@ database-specific extensions should be specified has scalar
 references.
 
 =back
+
+=head2 tablesample
+
+  my $rs = $schema->resultset('Wobbles')->tablesample( $fraction, \%options );
+
+  my $rs = $schema->resultset('Wobbles')->tablesample( 10, { method => 'system' } );
+
+This is a helper method.
+
+It was added in v0.4.1.
 
 =head1 KNOWN ISSUES
 

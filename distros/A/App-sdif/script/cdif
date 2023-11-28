@@ -404,7 +404,7 @@ while (<DIFF>) {
 		$converter->(qr/[\-\+\!\ ][ \t]/, @old, @new);
 	    }
 	    my $mark_re = qr/![ \t]/;
-	    for my $i (0 .. $#old) {
+	    for my $i (keys @old) {
 		my $cmark = "! ";
 		if ($i % 2) {
 		    compare(\$old[$i], \$new[$i], $mark_re) if $app->unit;
@@ -498,7 +498,7 @@ while (<DIFF>) {
 		last;
 	    };
 
-	    my $i = first { $old[$_] =~ /^\Q|||||||\E/ } 0 .. $#old;
+	    my $i = first { $old[$_] =~ /^\Q|||||||\E/ } keys @old;
 	    my @mrg = defined $i ? splice @old, $i : ();
 
 	    my $old = join '', @old;
@@ -893,7 +893,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.28
+Version 4.29
 
 =head1 SYNOPSIS
 

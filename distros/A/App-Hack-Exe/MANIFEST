@@ -1,0 +1,18 @@
+.editorconfig
+CHANGELOG.md
+doc/hack.exe.pod
+hack.exe.in
+hack.exe.PL
+lib/App/Hack/Exe.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/demon.t
+t/error.t
+t/feature-ports.t
+t/feature-proxies.t
+t/no-color.t
+t/script.t
+t/unknown-constructor-args.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

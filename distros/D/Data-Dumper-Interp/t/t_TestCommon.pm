@@ -3,6 +3,9 @@
 # The author, Jim Avera (jim.avera at gmail) has waived all copyright and
 # related or neighboring rights to the content of this file.
 # Attribution is requested but is not required.
+#
+# PLEASE NOTE that the above applies to THIS FILE ONLY.  Other files in the
+# same distribution or other collection may have more restrictive terms.
 
 # NO use strict; use warnings here to avoid conflict with t_Common which sets them
 
@@ -245,12 +248,19 @@ sub string_to_tempfile($@) {
 #        Otherwise wide chars will be corrupted
 #
 #
+require Carp::Always;
 sub run_perlscript(@) {
   my @tfs; # keep in scope until no longer needed
   my @perlargs = ("-CIOE", @_);
   @perlargs = ((map{ "-I$_" } @INC), @perlargs);
-  unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
-  unshift @perlargs, "-MCarp::Always=verbose" if $Carp::Always::Verbose;
+  #unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
+  #unshift @perlargs, "-MCarp::Always=verbose" if $Carp::Always::Verbose;
+
+  # For unknown reason some smokers running older perls die with
+  # "...undef value as a subroutine reference at site_perl/5.20.3/TAP/Harness.pm line 612
+  # So trying to see what is happening...
+  unshift @perlargs, "-MCarp::Always=verbose";
+
   if ($^O eq "MSWin32") {
     for (my $ix=0; $ix <= $#perlargs; $ix++) {
       if ($perlargs[$ix] =~ /^-(w?)([Ee])$/) {
@@ -400,24 +410,27 @@ END{
 
 # Find the ancestor build or checkout directory (it contains a "lib" subdir)
 # and derive the package name from e.g. "My-Pack" or "My-Pack-1.234"
+# If we are not part of a CPAN distribution tree, then silently continue
+# but croak if verif_no_internals_mentioned() is later used.
 my $testee_top_module;
 for (my $path=path(__FILE__);
              $path ne Path::Tiny->rootdir; $path=$path->parent) {
   if (-e (my $p = $path->child("dist.ini"))) {
-    $p->slurp() =~ /^ *name *= *(\S+)/i or oops;
+    $p->slurp_utf8() =~ /^ *name *= *(\S+)/i or oops;
     ($testee_top_module = $1) =~ s/-/::/g;
     last
   }
   if (-e (my $p = $path->child("MYMETA.json"))) {
-    $testee_top_module = JSON->new->decode($p->slurp())->{name};
+    $testee_top_module = JSON->new->decode($p->slurp_utf8())->{name};
     $testee_top_module =~ s/-/::/g;
     last;
   }
 }
-oops unless $testee_top_module;
 
 sub verif_no_internals_mentioned($) { # croaks if references found
   my $original = shift;
+  oops "This may not be used except in a CPAN distribution tree"
+    unless $testee_top_module;
   return if $Carp::Verbose;
 
   local $_ = $original;
@@ -734,7 +747,7 @@ sub verif_eval_err(;$) {  # MUST be called on same line as the 'eval'
     confess "Got UN-expected err (not matching $msg_regex) at $fn line $ln'):\n«$ex»\n",
             "\n";
   }
-  verif_no_internals_mentioned($ex);
+  verif_no_internals_mentioned($ex) if defined $testee_top_module;
   dprint "Got expected err: $ex\n";
 }
 

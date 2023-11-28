@@ -9,8 +9,8 @@ use AsposeCellsCloud::Request::PostWorkbookImportXML;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **string** | The workbook(Excel/ODS/...) name. |
-**import_xml_request** | **ImportXMLRequest** | password |
-**password** | **string** |  |
+**import_xml_request** | **ImportXMLRequest** |  |
+**password** | **string** | password |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |
 **out_path** | **string** | Output file path. |

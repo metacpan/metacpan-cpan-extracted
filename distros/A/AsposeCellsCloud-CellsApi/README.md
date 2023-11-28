@@ -20,13 +20,13 @@ Perl Cloud SDK wraps Aspose.Cells Cloud API. The SDK enhances your Android apps 
 - Fetch the required shape from worksheet.
 - Leverage the power of named ranges.
 
-## Feature & Enhancements in Version 23.10
+## Feature & Enhancements in Version 23.11
 
 Full list of issues covering all changes in this release:
 
-- Fix protect workbook request.
-- Fix range copy API.
-- Optimize workbook protect API.
+- Optimize import xml data into Excel file.
+- Optimize import json data into Excel file.
+- **Remove deprecated functions, class and test case.**
 
  
 ## Read & Write Spreadsheet Formats
@@ -60,21 +60,24 @@ Please create an account at [Aspose for Cloud](https://dashboard.aspose.cloud/#/
 ## Convert an Excel File via Perl
 
 ```perl
-    @api = AsposeCellsCloud::CellsApi.new("appsid","appkey")
-    my $format = 'pdf'; # replace NULL with a proper value
-    my $password = undef; # replace NULL with a proper value
-    my $out_path = undef; # replace NULL with a proper value
-    my $Book1_data =undef;
-    my @fileinfos = stat("D:\\Projects\\Aspose\\Aspose.Cloud\\Aspose.Cells.Cloud.SDK\\src\\TestData\\Book1.xlsx");
-    my $filelength = @fileinfos[7];
-    open(DATA, "<D:\\Projects\\Aspose\\Aspose.Cloud\\Aspose.Cells.Cloud.SDK\\src\\TestData\\Book1.xlsx") or die "file.txt can not open, $!";
-    binmode(DATA);
-    # while( read (DATA, $Book1_data, 8)) {};
-    read (DATA, $Book1_data, $filelength);
-    close (DATA);    
-    my $folder = $TEMPFOLDER; # replace NULL with a proper value
-    # ready_file('api'=> $api, 'file'=>$name ,'folder' =>$folder) ;  
-    $result = $api->cells_workbook_put_convert_workbook( workbook => $Book1_data, format => $format, password => $password, out_path => $out_path,folder =>$folder);conver
+        my $grant_type = 'client_credentials'; # replace NULL with a proper value
+        my $client_id = $ENV{'CellsCloudClientId'}; # replace NULL with a proper value
+        my $client_secret =  $ENV{'CellsCloudClientSecret'}; # replace NULL with a proper value
+        my $config = AsposeCellsCloud::Configuration->new('base_url' =>$ENV{'CellsCloudApiBaseUrl'},'api_version' => 'v3.0', client_id => $client_id, client_secret => $client_secret);
+        my $client = AsposeCellsCloud::ApiClient->new( $config);
+        my $api = AsposeCellsCloud::CellsApi->new($client);        
+        my $remoteFolder = 'TestData/In';      
+        my $localName = 'cloud.png';
+        my $remoteName = 'cloud.png';
+        my $format = 'png';
+        my $mapFiles = {};           
+
+         $mapFiles->{$localName}= "TestData/".$localName ;
+
+        my $request = AsposeCellsCloud::Request::PutConvertWorkbookRequest->new();
+        $request->{file} =  $mapFiles;
+        $request->{format} =  $format;
+        my $result =  $api->put_convert_workbook(request=> $request);
 ```
 ## Aspose.Cells Cloud SDKs in Popular Languages
 

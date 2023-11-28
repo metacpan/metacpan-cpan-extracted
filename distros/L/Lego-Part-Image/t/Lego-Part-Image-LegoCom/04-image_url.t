@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use English qw(-no_match_vars);
 use Error::Pure::Utils qw(clean);
 use Lego::Part;
@@ -29,5 +27,5 @@ my $obj = Lego::Part::Image::LegoCom->new(
 	),
 );
 my $image_url = $obj->image_url;
-is($image_url, 'http://cache.lego.com/media/bricks/5/2/300302.jpg',
+is($image_url, 'https://www.lego.com/cdn/product-assets/element.img.lod5photo.192x192/300302.jpg',
 	'Get image url for lego element 300302.');

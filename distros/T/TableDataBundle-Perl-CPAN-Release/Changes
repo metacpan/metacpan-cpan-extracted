@@ -1,3 +1,26 @@
+20231120.3  2023-11-25  Released-By: PERLANCAR; Urgency: medium
+
+            - Add tables:
+              Perl::CPAN::Release::Static::Grouped{Weekly,Monthly}.
+
+
+20231120.2  2023-11-25  Released-By: PERLANCAR; Urgency: medium
+
+            - Add table: Perl::CPAN::Release::Static::GroupedDaily.
+
+
+20231120.1  2023-11-20  Released-By: PERLANCAR; Urgency: medium
+
+            - Fix dependency version:
+              TableDataBundle::Perl::CPAN::Release::Static::Older=20220218.
+              2.
+
+
+20231120.0  2023-11-20  Released-By: PERLANCAR; Urgency: medium
+
+            - Remove hardcoded year 2022.
+
+
 20220218.0  2022-02-18  Released-By: PERLANCAR; Urgency: medium
 
             - Update.

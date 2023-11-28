@@ -1,5 +1,61 @@
 Revision history for Dancer2-Plugin-LiteBlog
 
+0.07     2023-11-10
+
+        [FEATURES]
+        * Add meta data to generated HTML for SEO, Facebook and Twitter cards.
+
+        [FIXES]
+        * Setting 'base_url' is now properly initialized to HTTP_HOST.
+
+0.06    2023-11-08
+    
+        [FEATURES]
+        * Google Fonts are configurable via the settings: 'google_fonts'.
+        * 'Splash' widget to display a big image on the home with a big title
+          and a call-to-action button.
+        * Custom CSS can be defined in liteblog's config, will be loaded if so
+          ('css' entry).
+        * Articles can now define a 'background' setting. If so, should be a
+          valid (big) image that will change the render of the post to a
+          full-screen background. The article will then be displayed on a
+          transparent white box. Useful for important pages that need to
+          standout. 
+        * Site title is clickable in the navigation bar.
+
+0.05    2023-11-07
+
+        [FEATURES]
+        * Caching system to avoid recomputing responses from the Blog widget
+          (category landing page and permalinks are cached).
+        * (Blog) RSS feed for the 'Blog' widget. A /rss/ route is declared by the Blog
+          widget and exposes the last 10 published articles of the Blog instance.
+          The RSS feed is cached, a restart of the app is needed to refresh it.
+        * (Blog) the 'featured_posts' config entry is not mandatory anymore in
+          the 'blog-meta.yml' file. If not defined, the last 3 published
+          articles are returned instead.
+
+0.04    2023-11-05
+
+        [FEATURES]
+        * Support for 'favicon' config entry to define a favicon for the site.
+          Supported mime-types: jpg, png and ico. 
+        * Support for 'footer' setting. A footer section is added at the bottom
+          of the page. Either 'footer' is displayed, or the site title.
+
+        [FIX]
+        (CSS) Navigation Bars cleanup. 
+          - The mobile navigation bar is always visible on small screens, but
+            not shown on the landing page by dafault, only after a scroll down..
+          - The Compact navigation bar with visible nav items is always shown, 
+            even on the home page, when the user scrolls and has enough space
+            (not a small screen), hiding/showing is done with smooth
+            transitions..
+          - Category landing page fix: able to display larger areas for blog
+            post cards.
+          - Better header styling for article headers on small screens (font
+            size, spacing).
+
 0.03    2023-11-02
 
         [FEATURES]

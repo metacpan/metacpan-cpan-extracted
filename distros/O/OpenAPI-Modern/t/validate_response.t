@@ -251,7 +251,7 @@ components:
         Content-Type:
           # this is ignored!
           required: true
-          schema: {}
+          schema: false
         Foo-Bar:
           \$ref: '#/components/headers/foo-header'
   headers:
@@ -395,13 +395,21 @@ YAML
     'missing Content-Type does not cause an exception',
   );
 
+  my $response = response(200, [ 'Content-Type' => 'application/json' ], 'null');
+  remove_header($response, 'Content-Length');
 
   cmp_deeply(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ], 'null'),
+    ($result = $openapi->validate_response($response,
       { path_template => '/foo', method => 'post' }))->TO_JSON,
     {
       valid => false,
       errors => [
+        {
+          instanceLocation => '/response/header',
+          keywordLocation => jsonp(qw(/paths /foo post)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post)))->to_string,
+          error => 'missing header: Content-Length',
+        },
         {
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content application/json schema type)),
@@ -513,11 +521,10 @@ paths:
               schema:
                 type: integer
                 const: 0
+            # NOTE: this schema definition is ignored!
             Content-Type:
-              description: cannot be present (an empty value is not permitted)
-              required: false
-              schema:
-                false
+              required: true
+              schema: false
           content:
             '*/*':
               schema:
@@ -529,8 +536,9 @@ paths:
             Content-Length:
               required: false
               schema: false
+            # NOTE: this schema definition is ignored!
             Content-Type:
-              required: false
+              required: true
               schema: false
           content:
             '*/*':
@@ -586,22 +594,35 @@ YAML
     'missing body (with a lying Content-Length) does not cause an exception, but is detectable',
   );
 
-  # no Content-Length
+  $response = response(400, [ 'Content-Type' => 'text/plain' ], 'éclair');
+  remove_header($response, 'Content-Length');
+
   cmp_deeply(
-    ($result = $openapi->validate_response(response(400, [ 'Content-Type' => 'text/plain' ]),
-      { path_template => '/foo', method => 'post' }))->TO_JSON,
+    ($result = $openapi->validate_response($response, { path_template => '/foo', method => 'post' }))->TO_JSON,
     {
       valid => false,
       errors => [
+        {
+          instanceLocation => '/response/header',
+          keywordLocation => jsonp(qw(/paths /foo post)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post)))->to_string,
+          error => 'missing header: Content-Length',
+        },
         {
           instanceLocation => '/response/header/Content-Length',
           keywordLocation => jsonp(qw(/paths /foo post responses default headers Content-Length required)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses default headers Content-Length required)))->to_string,
           error => 'missing header: Content-Length',
         },
+        {
+          instanceLocation => '/response/body',
+          keywordLocation => jsonp(qw(/paths /foo post responses default content text/plain schema minLength)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo post responses default content text/plain schema minLength)))->to_string,
+          error => 'length is less than 10',
+        },
       ],
     },
-    'missing body and no Content-Length does not cause an exception, but is still detectable',
+    'Content-Length is required in responses with a message body',
   );
 
 
@@ -629,9 +650,11 @@ YAML
   );
 
 
-  # note: when 204, mojo's $message->body always returns ''
+  # note: when 204, mojo's $message->body always returns '' and Content-Length is stripped.
   # this test is only possible (for HTTP::Response) if we manually add a Content-Length; it will not
   # be added via parse().
+  TODO: {
+  local $TODO = 'Mojolicious will strip Content-Length for 204 responses' if $::TYPE eq 'mojo';
   cmp_deeply(
     ($result = $openapi->validate_response(response(204, [ 'Content-Type' => 'text/plain', 'Content-Length' => 20 ], 'I should not have content'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
@@ -654,6 +677,7 @@ YAML
     },
     'an undesired response body is detectable for 204 responses',
   );
+  }
 
 
   $openapi = OpenAPI::Modern->new(

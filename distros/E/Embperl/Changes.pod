@@ -1,6 +1,35 @@
 =pod
 
-=head 2.5.0  16. March 2014
+=encoding iso8859-1
+
+=head1 3.0.0  24. Nov 2023
+
+    - Final 3.0.0 version, no changes since 3.0.0-rc.2
+
+=head1 3.0.0-rc.2  7. Oct 2023
+
+    - Add missing test files to MANIFEST
+    - Documentation updates
+
+=head1 3.0.0-rc.1  3. Oct 2023
+
+    - Apply debian patches 
+      (https://sources.debian.org/patches/libembperl-perl/2.5.0-17/). 
+      Thanks to the Debian Perl Group, especially Dominic Hargreaves, 
+      Florian Schlichting and Axel Beckert
+    - Apply patches for fedora
+      (https://rt.cpan.org/Public/Bug/Display.html?id=148621 and 
+      https://rt.cpan.org/Public/Bug/Display.html?id=148702)
+      Thanks to Marcus Doemling
+    - Fixed compilation/Makefile of/for libxml2 and libxslt
+    - Fixed warnings about undefined values in log. Note this
+      is done by goning back to the old behaviour, were
+      using uninitialized values were not a warning. So if
+      you like to have warnings about uninitialized values
+      add [* use warnings "uninitialized" *] to your code.
+    - Add a lot of enhancements to Embperl::Form
+
+=head1 2.5.0  16. March 2014
 
     - Do not clear old code before compiling a Embperl page
       in Perl >= 5.14.x because it causes seg faults. This
@@ -59,7 +88,7 @@
     
     Adaptions to Perl 5.14/16 were sponsored by NUREG GmbH
 
-=head 2.4.0  4. Oct 2010
+=head1 2.4.0  4. Oct 2010
 
     - Support for CGI.pm 3.43 (included within Perl 5.10.1)
       for file uplaods. CGI.pm < 2.43 is not supported anymore.
@@ -733,7 +762,7 @@
      This works in various ways:
         # perl interacive command line debugger
         perl -d embpexec.pl file.epl  
-        # ddd graphical debugger (http://www.gnu.org/software/ddd/)
+        # ddd graphical debugger (https://www.gnu.org/software/ddd/)
         ddd --debugger 'perl -d embpexec.pl file.epl'
         or via Apache::DB under mod_perl
    - Embperl has now a defined API for creating/adding a new
@@ -1631,7 +1660,7 @@
 
    - A lot of documentation updates. Now Embperl ships with most of 
      the documentation which is also available on 
-           http://perl.apache.org/embperl/
+           https://perl.apache.org/embperl/
      This includes:
      - Intro.pod  an introduction to Embperl
      - Faq.pod    an new very much extented version of the FAQ

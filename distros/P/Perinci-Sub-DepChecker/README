@@ -2,8 +2,8 @@ NAME
     Perinci::Sub::DepChecker - Check dependencies from 'deps' property
 
 VERSION
-    This document describes version 0.126 of Perinci::Sub::DepChecker (from
-    Perl distribution Perinci-Sub-DepChecker), released on 2023-07-08.
+    This document describes version 0.128 of Perinci::Sub::DepChecker (from
+    Perl distribution Perinci-Sub-DepChecker), released on 2023-11-16.
 
 SYNOPSIS
      use Perinci::Spec::DepChecker qw(check_deps dep_satisfy_rel list_mentioned_dep_clauses);
@@ -24,7 +24,7 @@ FUNCTIONS
     None is exported by default, but every function is exportable.
 
   check_deps($deps) => ERRSTR
-    Check dependencies. Will in turn call various "checkdep_NAME()"
+    Check dependencies. Will in turn call various checkdep_NAME()
     subroutines. Return empty string if all dependencies are met, or a
     string containing an error message stating a dependency error.
 

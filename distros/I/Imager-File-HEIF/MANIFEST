@@ -13,6 +13,7 @@ t/20write.t
 t/30read.t
 t/90pod.t
 testimg/alpha.heic
+testimg/exif.heic
 testimg/simple.heic
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

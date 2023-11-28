@@ -3,19 +3,27 @@ NAME
 
 SYNOPSIS
      use Graph::Reader::TGF;
+
      my $obj = Graph::Reader::TGF->new;
      my $graph = $obj->read_graph($tgf_file);
 
 METHODS
-    "new()"
-             Constructor.
-             This doesn't take any arguments.
-             Returns Graph::Reader::TGF object.
+  "new"
+     my $obj = Graph::Reader::TGF->new;
 
-    "read_graph($tgf_file)"
-             Read a graph from the specified file.
-             The argument can either be a filename, or a filehandle for a previously opened file.
-             Returns Graph object.
+    Constructor.
+
+    This doesn't take any arguments.
+
+    Returns Graph::Reader::TGF object.
+
+  "read_graph"
+     my $graph = $obj->read_graph($tgf_file);
+
+    Read a graph from the specified file. The argument can either be a
+    filename, or a filehandle for a previously opened file.
+
+    Returns Graph object.
 
 TGF FILE FORMAT
      TGF = Trivial Graph Format
@@ -32,14 +40,12 @@ ERRORS
              Parameter 'vertex_callback' isn't reference to code.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
+     use File::Temp qw(tempfile);
      use Graph::Reader::TGF;
      use IO::Barf qw(barf);
-     use File::Temp qw(tempfile);
 
      # Example data.
      my $data = <<'END';
@@ -71,14 +77,12 @@ EXAMPLE1
      # 1-2
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
+     use File::Temp qw(tempfile);
      use Graph::Reader::TGF;
      use IO::Barf qw(barf);
-     use File::Temp qw(tempfile);
 
      # Example data.
      my $data = <<'END';
@@ -136,17 +140,18 @@ SEE ALSO
         Install the Graph::Reader modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Graph-Reader-TGF>
+    <https://github.com/michal-josef-spacek/Graph-Reader-TGF>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2014-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2014-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

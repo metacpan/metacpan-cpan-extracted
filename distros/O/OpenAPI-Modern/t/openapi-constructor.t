@@ -122,4 +122,38 @@ subtest 'document errors' => sub {
   );
 };
 
+subtest 'construct with document' => sub {
+  my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
+    canonical_uri => 'http://localhost:1234/api',
+    metaschema_uri => 'https://spec.openapis.org/oas/3.1/schema',
+    evaluator => my $js = JSON::Schema::Modern->new,
+    schema => {
+      %$minimal_document,
+      components => {
+        schemas => {
+          foo => true,
+        },
+      },
+    },
+  );
+
+  is($doc->errors, 0, 'no errors during traversal');
+
+  my $openapi = OpenAPI::Modern->new(
+    openapi_document => $doc,
+  );
+
+  is(
+    $openapi->openapi_uri,
+    'http://localhost:1234/api',
+    'canonical uri is taken from the document',
+  );
+
+  cmp_deeply(
+    scalar $openapi->evaluator->get('http://localhost:1234/api#/components/schemas/foo'),
+    true,
+    'can construct an openapi object with a pre-existing document',
+  );
+};
+
 done_testing;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # Version.
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 1;
 
@@ -54,7 +54,7 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-HTTP>
+L<https://github.com/michal-josef-spacek/Error-Pure-HTTP>
 
 =head1 AUTHOR
 
@@ -64,11 +64,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2012-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

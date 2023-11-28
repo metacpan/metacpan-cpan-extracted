@@ -1,0 +1,20 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Thread::ID : pointer {
+  
+  # Class Methods
+  native static method eq : int ($thread_id1 : Thread::ID, $thread_id2 : Thread::ID);
+  
+  native static method ne : int ($thread_id1 : Thread::ID, $thread_id2 : Thread::ID);
+  
+  native static method gt : int ($thread_id1 : Thread::ID, $thread_id2 : Thread::ID);
+  
+  native static method ge : int ($thread_id1 : Thread::ID, $thread_id2 : Thread::ID);
+  
+  native static method lt : int ($thread_id1 : Thread::ID, $thread_id2 : Thread::ID);
+  
+  native static method le : int ($thread_id1 : Thread::ID, $thread_id2 : Thread::ID);
+  
+  native method DESTROY : void ();
+}

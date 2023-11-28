@@ -9,5 +9,7 @@ Makefile.PL
 README
 dist.ini
 lib/ExtUtils/Typemaps/Magic.pm
+lib/ExtUtils/Typemaps/MagicBuf.pm
+lib/ExtUtils/Typemaps/MagicExt.pm
 t/00-compile.t
 xt/author/pod-syntax.t

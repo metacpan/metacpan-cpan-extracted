@@ -8,6 +8,8 @@
 
 #define my_size_t_max (~(size_t)0)
 
+static int heif_init_done = 0;
+
 static i_img *
 get_image(struct heif_context *ctx, heif_item_id id) {
   i_img *img = NULL;
@@ -34,11 +36,47 @@ get_image(struct heif_context *ctx, heif_item_id id) {
   */
   width = heif_image_handle_get_width(img_handle);
   height = heif_image_handle_get_height(img_handle);
-  /* FIXME alpha */
   channels = 3;
   if (heif_image_handle_has_alpha_channel(img_handle)) {
     ++channels;
     chroma = heif_chroma_interleaved_RGBA;
+  }
+
+  /* try a default decode, this typically gives us monochrome or RGB,
+     but we need to consider whether it might give us a YCbCr image,
+     or an RGB image without alpha when the file has alpha.
+  */
+  mm_log((1, "readheif: image (" i_DFp ") %d channels\n",
+          i_DFcp(width, height), channels));
+  err = heif_decode_image(img_handle, &him, heif_colorspace_undefined,
+                          heif_chroma_undefined, NULL);
+  if (err.code != heif_error_Ok) {
+    i_push_errorf(err.code, "failed to decoded image: %s", err.message);
+    goto fail;
+  }
+
+  cs = heif_image_get_colorspace(him);
+  if (cs == heif_colorspace_monochrome
+      && heif_image_get_chroma_format(him) == heif_chroma_monochrome) {
+    mm_log((1, "readheif: image is monochrome\n"));
+    channels = heif_image_has_channel(him, heif_channel_Alpha) ? 2 : 1;
+  }
+  else {
+    if (heif_image_get_chroma_format(him) != chroma) {
+      mm_log((1, "readheif: image isn't RGB, cs is %d chroma %d\n",
+              (int)cs, (int)heif_image_get_chroma_format(him)));
+
+      heif_image_release(him);
+
+      him = NULL;
+
+      err = heif_decode_image(img_handle, &him, heif_colorspace_RGB,
+                              chroma, NULL);
+      if (err.code != heif_error_Ok) {
+        i_push_errorf(err.code, "failed to decode image (second try): %s", err.message);
+        goto fail;
+      }
+    }
   }
 
   img = i_img_8_new(width, height, channels);
@@ -47,30 +85,73 @@ get_image(struct heif_context *ctx, heif_item_id id) {
     goto fail;
   }
 
-  err = heif_decode_image(img_handle, &him, heif_colorspace_RGB,
-			  chroma, NULL);
-  if (err.code != heif_error_Ok) {
-    i_push_error(0, "failed to decode");
-    goto fail;
+  if (channels > 2) {
+    data = heif_image_get_plane_readonly(him, heif_channel_interleaved, &stride);
+
+    for (y = 0; y < height; ++y) {
+      const uint8_t *p = data + stride * y;
+      i_psamp(img, 0, width, y, p, NULL, channels);
+    }
+  }
+  else {
+    data = heif_image_get_plane_readonly(him, heif_channel_Y, &stride);
+    for (y = 0; y < height; ++y, data += stride) {
+      i_psamp(img, 0, width, y, data, NULL, 1);
+    }
+    if (channels == 2) {
+      int alpha_chan = 1;
+      data = heif_image_get_plane_readonly(him, heif_channel_Alpha, &stride);
+
+      for (y = 0; y < height; ++y, data += stride) {
+        i_psamp(img, 0, width, y, data, &alpha_chan, 1);
+      }
+    }
   }
 
-  data = heif_image_get_plane_readonly(him, heif_channel_interleaved, &stride);
-
-  for (y = 0; y < height; ++y) {
-    const uint8_t *p = data + stride * y;
-    i_psamp(img, 0, width, y, p, 0, channels);
+  heif_item_id exif_id;
+  if (heif_image_handle_get_list_of_metadata_block_IDs(img_handle, "Exif", &exif_id, 1) > 0) {
+    size_t size = heif_image_handle_get_metadata_size(img_handle, exif_id);
+    mm_log((1, "readheif: found exif context type %s size %zu\n",
+            heif_image_handle_get_metadata_content_type(img_handle, exif_id), size));
+    if (size > 4) {
+      void *metadata = mymalloc(size);
+      err = heif_image_handle_get_metadata(img_handle, exif_id, metadata);
+      if (err.code == heif_error_Ok) {
+        unsigned char *data = metadata;
+        size_t offset = ((size_t)data[0] << 24 | (size_t)data[1] << 16 |
+                         (size_t)data[2] << 8 | data[3]);
+        /* offset counts from the end of the bytes representing the offset,
+           so account for that
+         */
+        data += 4;
+        size -= 4;
+        /* beware a bad offset */
+        if (offset < size) {
+          im_decode_exif(img, data + offset, size - offset);
+        }
+      }
+      myfree(metadata);
+    }
   }
 
+  heif_image_release(him);
   heif_image_handle_release(img_handle);
 
   i_tags_set(&img->tags, "i_format", "heif", 4);
 
+  mm_log((1, "readheif: success\n"));
+
   return img;
  fail:
+  if (him)
+    heif_image_release(him);
   if (img)
     i_img_destroy(img);
   if (img_handle)
     heif_image_handle_release(img_handle);
+
+  mm_log((1, "readheif: failed\n"));
+
   return NULL;
 }
 
@@ -106,7 +187,7 @@ my_wait_for_file_size(int64_t target_size, void* userdata) {
 }
 
 i_img *
-i_readheif(io_glue *ig, int page) {
+i_readheif(io_glue *ig, int page, int max_threads) {
   i_img *img = NULL;
   struct heif_context *ctx = heif_context_alloc();
   struct heif_error err;
@@ -118,6 +199,9 @@ i_readheif(io_glue *ig, int page) {
   heif_item_id *img_ids = NULL;
   size_t ids_size;
 
+  mm_log((1, "readheif: ig %p page %d max_threads %d\n",
+          (void *)ig, page, max_threads));
+
   i_clear_error();
   if (!ctx) {
     i_push_error(0, "failed to allocate heif context");
@@ -128,6 +212,13 @@ i_readheif(io_glue *ig, int page) {
     i_push_error(0, "page must be non-negative");
     goto fail;
   }
+
+#if LIBHEIF_HAVE_VERSION(1, 13, 0)
+  if (max_threads >= 0) {
+    heif_context_set_max_decoding_threads(ctx, max_threads);
+    mm_log((1, " readheif: set max threads %d\n", max_threads));
+  }
+#endif
 
   rd.ig = ig;
   rd.size = i_io_seek(ig, 0, SEEK_END);
@@ -185,7 +276,7 @@ i_readheif(io_glue *ig, int page) {
 }
 
 i_img **
-i_readheif_multi(io_glue *ig, int *count) {
+i_readheif_multi(io_glue *ig, int *count, int max_threads) {
   struct heif_context *ctx = heif_context_alloc();
   struct heif_error err;
   struct heif_reader reader;
@@ -199,11 +290,21 @@ i_readheif_multi(io_glue *ig, int *count) {
   int img_count = 0;
   int i;
 
+  mm_log((1, "readheif: ig %p pcount %p max threads %d\n",
+          (void *)ig, (void *)count, max_threads));
+ 
   i_clear_error();
   if (!ctx) {
     i_push_error(0, "failed to allocate heif context");
     return NULL;
   }
+
+#if LIBHEIF_HAVE_VERSION(1, 13, 0)
+  if (max_threads >= 0) {
+    heif_context_set_max_decoding_threads(ctx, max_threads);
+    mm_log((1, " readheif: set max threads %d\n", max_threads));
+  }
+#endif
 
   rd.ig = ig;
   rd.size = i_io_seek(ig, 0, SEEK_END);
@@ -277,17 +378,24 @@ i_writeheif(i_img *im, io_glue *ig) {
 
 static const int gray_chans[4] = { 0, 0, 0, 1 };
 
+struct write_context {
+  io_glue *io;
+  char error_buf[80];
+};
+
 static struct heif_error
 write_heif(struct heif_context *ctx, const void *data,
 	   size_t size, void *userdata) {
-  io_glue *ig = (io_glue *)userdata;
-  struct heif_error err = { heif_error_Ok };
+  struct write_context *wc = (struct write_context *)userdata;
+  io_glue *ig = wc->io;
+  struct heif_error err = { heif_error_Ok, heif_suberror_Unspecified, "No error" };
 
   if (i_io_write(ig, data, size) != size) {
     i_push_error(errno, "failed to write");
     err.code = heif_error_Encoding_error;
     err.subcode = heif_suberror_Cannot_write_output_data;
-    err.message = "Cannot write";
+    err.message = wc->error_buf;
+    sprintf(wc->error_buf, "Write error %d", errno);
   }
 
   return err;
@@ -298,7 +406,10 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   struct heif_context *ctx = heif_context_alloc();
   struct heif_error err;
   struct heif_writer writer;
+  struct heif_encoder *encoder = NULL;
+  struct write_context wc;
   int i;
+  int def_quality;
 
   i_clear_error();
 
@@ -310,34 +421,28 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   writer.writer_api_version = 1; /* FIXME: named constant? */
   writer.write = write_heif;
 
-#if 0
-  /* this might be useful at some point, currently only HEVC is built-in and JPEG
-     isn't supported even if libjpeg is detected by configure
-  */
-  {
-    const struct heif_encoder_descriptor* encoders[10] =  { NULL };
-    int count;
-    count = heif_context_get_encoder_descriptors(ctx, heif_compression_HEVC, NULL, encoders, 10);
-    if (count > 0) {
-      int i;
-      for (i = 0; i < count; ++i) {
-	mm_log((1, "encoder %d id %s name %s\n", i, heif_encoder_descriptor_get_id_name(encoders[i]),
-		heif_encoder_descriptor_get_name(encoders[i])));
-      }
-    }
+  err = heif_context_get_encoder_for_format(ctx, heif_compression_HEVC, &encoder);
+  if (err.code != heif_error_Ok) {
+    i_push_errorf(0, "heif error %d", (int)err.code);
+    goto fail;
   }
-#endif
+
+  err = heif_encoder_get_parameter_integer(encoder, "quality", &def_quality);
+  if (err.code != heif_error_Ok) {
+    mm_log((3, "Could not read default quality from encoder, falling back to 75: %s", err.message));
+    def_quality = 75;
+  }
+
+  heif_encoder_release(encoder);
+  encoder = NULL;
 
   for (i = 0; i < count; ++i) {
     i_img *im = imgs[i];
     int ch;
-    struct heif_image *him = NULL;
     int alpha_chan;
     int has_alpha = i_img_alpha_channel(im, &alpha_chan);
-    enum heif_chroma chroma = has_alpha ? heif_chroma_interleaved_RGBA : heif_chroma_interleaved_RGB;
-    enum heif_colorspace cs = heif_colorspace_RGB;
-    int lossless = 0, quality = -1;
-    struct heif_encoder *encoder = NULL;
+    int lossless = 0;
+    int quality = def_quality;
 
     err = heif_context_get_encoder_for_format(ctx, heif_compression_HEVC, &encoder);
     if (err.code != heif_error_Ok) {
@@ -346,65 +451,119 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
     }
 
     (void)i_tags_get_int(&im->tags, "heif_lossless", 0, &lossless);
-    if (i_tags_get_int(&im->tags, "heif_quality", 0, &quality)) {
-      heif_encoder_set_lossy_quality(encoder, quality);
-    }
-    mm_log((1, "heif: colorspace %d chroma %d lossless %d quality %d\n",
-	    (int)cs, (int)chroma, lossless, quality));
+    (void)i_tags_get_int(&im->tags, "heif_quality", 0, &quality);
+    heif_encoder_set_lossy_quality(encoder, quality);
 
     heif_encoder_set_lossless(encoder, lossless);
 
-    err = heif_image_create(im->xsize, im->ysize, cs, chroma, &him);
-    if (err.code != heif_error_Ok) {
-      i_push_errorf(0, "heif error %d", (int)err.code);
-      goto fail;
-    }
-    /* FIXME: metadata */
-    /* FIXME: leaks? */
-    {
-      i_img_dim y;
-      int stride;
-      uint8_t *p;
-      uint8_t *pa;
-      int alpha_stride;
-      int samp_chan;
-      struct heif_image_handle *him_h;
-      struct heif_encoding_options *options = NULL;
-      const int *chan_list = im->channels > 2 ? NULL : gray_chans;
-      int color_chans = i_img_color_channels(im);
+    if (im->channels >= 3) {
+      struct heif_image *him = NULL;
+      enum heif_chroma chroma = has_alpha ? heif_chroma_interleaved_RGBA : heif_chroma_interleaved_RGB;
+      mm_log((1, "heif: chroma %d lossless %d quality %d\n",
+              (int)chroma, lossless, quality));
 
-      /* I tried just adding just heif_channel_Y (luminance) for grayscale,
-	 but libheif crashed at the encoding step.
-      */
-      err = heif_image_add_plane(him, heif_channel_interleaved, im->xsize, im->ysize, has_alpha ? 32 : 24);
+      err = heif_image_create(im->xsize, im->ysize, heif_colorspace_RGB, chroma, &him);
       if (err.code != heif_error_Ok) {
-	i_push_error(0, "failed to add plane");
-      failimage:
-	heif_encoder_release(encoder);
-	heif_image_release(him);
-	goto fail;
+        i_push_errorf(0, "heif error %d", (int)err.code);
+        goto fail;
       }
-      p = heif_image_get_plane(him, heif_channel_interleaved, &stride);
+      /* FIXME: metadata */
+      /* FIXME: leaks? */
+      {
+        i_img_dim y;
+        int stride;
+        uint8_t *p;
+        uint8_t *pa;
+        int alpha_stride;
+        int samp_chan;
+        struct heif_image_handle *him_h;
+        struct heif_encoding_options *options = NULL;
+        int color_chans = i_img_color_channels(im);
+
+        err = heif_image_add_plane(him, heif_channel_interleaved, im->xsize, im->ysize, has_alpha ? 32 : 24);
+        if (err.code != heif_error_Ok) {
+          i_push_error(0, "failed to add plane");
+        failimagergb:
+          heif_image_release(him);
+          goto fail;
+        }
+        p = heif_image_get_plane(him, heif_channel_interleaved, &stride);
+        for (y = 0; y < im->ysize; ++y) {
+          uint8_t *pp = p + stride * y;
+          i_gsamp(im, 0, im->xsize, y, pp, NULL, has_alpha ? 4 : 3);
+        }
+        options = heif_encoding_options_alloc(); 
+        err = heif_context_encode_image(ctx, him, encoder, options, &him_h);
+        heif_encoding_options_free(options);
+        if (err.code != heif_error_Ok) {
+          i_push_error(0, "fail to encode");
+          goto failimagergb;
+        }
+        heif_image_release(him);
+        heif_image_handle_release(him_h);
+      }
+    }
+    else {
+      struct heif_image_handle *him_h = NULL;
+      struct heif_encoding_options *options = NULL;
+      struct heif_image *him = NULL;
+      uint8_t *py;
+      int y_row_stride;
+      i_img_dim y;
+
+      err = heif_image_create(im->xsize, im->ysize, heif_colorspace_monochrome,
+                              heif_chroma_monochrome, &him);
+      if (err.code != heif_error_Ok) {
+        i_push_errorf(0, "heif error %d", (int)err.code);
+        goto fail;
+      }
+
+      err = heif_image_add_plane(him, heif_channel_Y, im->xsize, im->ysize, 8);
+      if (err.code != heif_error_Ok) {
+        i_push_errorf(err.code, "failed to add Y plane: %s", err.message);
+      failimagegray:
+        heif_image_release(him);
+        goto fail;
+      }
+      if (has_alpha) {
+        err = heif_image_add_plane(him, heif_channel_Alpha, im->xsize, im->ysize, 8);
+        if (err.code != heif_error_Ok) {
+          i_push_errorf(err.code, "failed to add alpha plane: %s", err.message);
+          goto failimagegray;
+        }
+      }
+      py = heif_image_get_plane(him, heif_channel_Y, &y_row_stride);
       for (y = 0; y < im->ysize; ++y) {
-	uint8_t *pp = p + stride * y;
-	i_gsamp(im, 0, im->xsize, y, pp, chan_list, has_alpha ? 4 : 3);
+        i_gsamp(im, 0, im->xsize, y, py, NULL, 1);
+        py += y_row_stride;
       }
+      if (has_alpha) {
+        int a_row_stride;
+        uint8_t *pa = heif_image_get_plane(him, heif_channel_Alpha, &a_row_stride);
+        for (y = 0; y < im->ysize; ++y) {
+          i_gsamp(im, 0, im->xsize, y, py, &alpha_chan, 1);
+          pa += a_row_stride;
+        }
+      }
+
       options = heif_encoding_options_alloc(); 
       err = heif_context_encode_image(ctx, him, encoder, options, &him_h);
       heif_encoding_options_free(options);
       if (err.code != heif_error_Ok) {
-	i_push_error(0, "fail to encode");
-	goto failimage;
+        i_push_errorf(0, "fail to encode: %s", err.message);
+        goto failimagegray;
       }
       heif_image_release(him);
       heif_image_handle_release(him_h);
+      
       heif_encoder_release(encoder);
+      encoder = NULL;
     }
   }
-
-  err = heif_context_write(ctx, &writer, (void*)ig);
+  wc.io = ig;
+  err = heif_context_write(ctx, &writer, &wc);
   if (err.code != heif_error_Ok) {
-    i_push_error(0, "failed to write");
+    i_push_errorf(0, "failed to write: %s", err.message);
     goto fail;
   }
   if (i_io_close(ig)) {
@@ -416,6 +575,8 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   return 1;
   
  fail:
+  if (encoder)
+    heif_encoder_release(encoder);
   heif_context_free(ctx);
 
   return 0;
@@ -426,8 +587,37 @@ i_heif_libversion(void) {
   static char buf[100];
   if (!*buf) {
     unsigned int ver = heif_get_version_number();
-    sprintf(buf, "%d.%d.%d (%x)",
-	    ver >> 24, (ver >> 16) & 0xFF, (ver >> 8) & 0xFF, (unsigned)ver);
+    sprintf(buf, "%d.%d.%d",
+	    ver >> 24, (ver >> 16) & 0xFF, (ver >> 8) & 0xFF);
   }
   return buf;
+}
+
+char const *
+i_heif_buildversion(void) {
+  return LIBHEIF_VERSION;
+}
+
+void
+i_heif_init(void) {
+  /* intended mostly for testing, so we manage initialization.
+     We initialize once by default, and a test can i_heif_uninit() to
+     avoid noise from memory leak tests.
+   */
+  if (!heif_init_done) {
+#if LIBHEIF_HAVE_VERSION(1, 13, 0)
+    heif_init(NULL);
+#endif
+    heif_init_done = 1;
+  }
+}
+
+void
+i_heif_deinit(void) {
+  if (heif_init_done) {
+#if LIBHEIF_HAVE_VERSION(1, 13, 0)
+    heif_deinit();
+#endif
+    heif_init_done = 0;
+  }
 }

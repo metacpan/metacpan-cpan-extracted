@@ -17,7 +17,7 @@ configure_requires:
   IO::File: '1.14'
   IO::Socket::IP: '0.38'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -47,5 +47,5 @@ requires:
   Scalar::Util: '1.19'
   Time::Local: '1.19'
   perl: '5.008009'
-version: '1.40'
+version: '1.41'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

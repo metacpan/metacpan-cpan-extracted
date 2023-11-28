@@ -2,14 +2,12 @@
 # MIT License
 
 class HTTP::Minimal {
-  version "0.001";
+  version "0.002";
   
   use Fn;
   use Regex;
   use Hash;
-  use Sys;
   use Format;
-  use Sys::Time::Tm;
   use HTTP::Minimal::Socket;
   use HTTP::Minimal::Message::Request;
   use HTTP::Minimal::Message::Response;
@@ -19,7 +17,7 @@ class HTTP::Minimal {
   # Fields
   has agent : ro string;
   
-  has timeout : ro int;
+  has timeout : ro double;
   
   # Class Methods
   static method new : HTTP::Minimal ($options : object[] = undef) {
@@ -29,7 +27,7 @@ class HTTP::Minimal {
     my $self = new HTTP::Minimal;
     
     # timeout
-    my $timeout = $options_h->delete_or_default_int("timeout", 60);
+    my $timeout = $options_h->delete_or_default_double("timeout", 60.0);
     $self->{timeout} = $timeout;
     unless ($timeout >= 0) {
       die "The timeout option must be greater than or equal to 0";
@@ -74,7 +72,7 @@ class HTTP::Minimal {
     
     my $headers = (HTTP::Minimal::Headers)$options_h->delete_or_default("headers", undef);
     
-    my $timeout = $options_h->delete_or_default_int("timeout", $self->{timeout});
+    my $timeout = $options_h->delete_or_default_double("timeout", $self->{timeout});
     
     for my $name (@{$options_h->keys}) {
       die "The \$name option is not available.";

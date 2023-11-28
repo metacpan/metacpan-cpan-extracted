@@ -1,15 +1,23 @@
-# ImportPictureOption
- 
+# AsposeCellsCloud::Object::ImportPictureOption 
 
-## Properties 
+## Load the model package
+```perl
+use AsposeCellsCloud::Object::ImportPictureOption;
+```
+
+## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
- UpperLeftRow | integer | Upper Left Row. | [optional] 
- UpperLeftColumn | integer | Upper Left Column. | [optional] 
- LowerRightRow | integer | Lower Right Row. | [optional] 
- LowerRightColumn | integer | Lower Right Column. | [optional] 
- Filename | string | Filename. | [optional] 
- Data | string | data : base64  string. | [optional] 
-
+**UpperLeftRow** | **int** |  |
+**UpperLeftColumn** | **int** |  |
+**LowerRightRow** | **int** |  |
+**LowerRightColumn** | **int** |  |
+**Filename** | **string** |  |
+**Data** | **string** | base64 |
+**DestinationWorksheet** | **string** |  |
+**IsInsert** | **boolean** |  |
+**ImportDataType** | **string** |  |
+**Source** | **FileSource** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+

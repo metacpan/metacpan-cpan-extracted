@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.2.6
+## Version v0.2.7
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2023/05/18
+## Modified 2023/11/06
 ## All rights reserved
 ## 
 ## 
@@ -24,7 +24,6 @@ BEGIN
     use Data::UUID;
     use Digest::MD5 ();
     use Encode ();
-    use Nice::Try;
     use Scalar::Util ();
     use Want;
     use overload (
@@ -35,7 +34,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.2.6';
+    our $VERSION = 'v0.2.7';
 };
 
 use strict;
@@ -350,13 +349,15 @@ sub attr
         if( CORE::exists( $callbacks->{ $attr } ) && ref( $callbacks->{ $attr } ) eq 'CODE' )
         {
             my $cb = $callbacks->{ $attr };
-            try
+            # try-catch
+            local $@;
+            eval
             {
                 $cb->( $self, $v );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                return( $self->error( "Error executing attribute callback for attribute \"$attr\" for element with tag \"", $self->tag, "\"." ) );
+                return( $self->error( "Error executing attribute callback for attribute \"$attr\" for element with tag \"", $self->tag, "\": $@" ) );
             }
         }
         $self->reset(1);
@@ -1519,14 +1520,17 @@ sub _get_md5_hash
     my $self = shift( @_ );
     my $data = shift( @_ );
     return( $self->error( "No data was provided to compute a md5 hash." ) ) if( !defined( $data ) || !length( "$data" ) );
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( Digest::MD5::md5_hex( Encode::encode( 'utf8', $data, Encode::FB_CROAK ) ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "An error occurred while calculating the md5 hash for tag \"", $self->tag, "\": $e" ) );
+        return( $self->error( "An error occurred while calculating the md5 hash for tag \"", $self->tag, "\": $@" ) );
     }
+    return( $rv );
 }
 
 # For other modules to use
@@ -1619,7 +1623,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.2.6
+    v0.2.7
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.20",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -58,7 +58,7 @@
    "provides" : {
       "App::Greple" : {
          "file" : "lib/App/Greple.pm",
-         "version" : "9.0101"
+         "version" : "9.0902"
       },
       "App::Greple::Common" : {
          "file" : "lib/App/Greple/Common.pm"
@@ -124,7 +124,7 @@
          "web" : "https://github.com/kaz-utashiro/greple"
       }
    },
-   "version" : "9.0101",
+   "version" : "9.0902",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

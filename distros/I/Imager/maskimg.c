@@ -133,7 +133,7 @@ i_img_masked_new(i_img *targ, i_img *mask, i_img_dim x, i_img_dim y, i_img_dim w
   dIMCTXim(targ);
 
   im_clear_error(aIMCTX);
-  if (x >= targ->xsize || y >= targ->ysize) {
+  if (x < 0 || x >= targ->xsize || y < 0 || y >= targ->ysize) {
     im_push_error(aIMCTX, 0, "subset outside of target image");
     return NULL;
   }
@@ -147,6 +147,11 @@ i_img_masked_new(i_img *targ, i_img *mask, i_img_dim x, i_img_dim y, i_img_dim w
     w = targ->xsize - x;
   if (y+h > targ->ysize)
     h = targ->ysize - y;
+
+  if (w < 1 || h < 1) {
+    im_push_error(aIMCTX, 0, "width and height must be greater than or equal to 1");
+    return NULL;
+  }
 
   im = im_img_alloc(aIMCTX);
 

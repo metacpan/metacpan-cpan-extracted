@@ -39,6 +39,7 @@ my @files = (
     't/author-pod-syntax.t',
     't/author-test-version.t',
     't/l10n2.t',
+    't/l10n3.t',
     't/locales/sub/sub1/sub3/test.en_US.yaml',
     't/locales/sub/sub1/sub3/test.ru_RU.yaml',
     't/locales/sub/sub2/sub3/test.en_US.yaml',

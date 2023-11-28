@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/TableData.pm','lib/TableData/Test/Spec/Basic.pm','lib/TableDataRole/Spec/Basic.pm'];
+my $filenames = ['lib/TableData.pm','lib/TableData/Test/Spec/Basic.pm','lib/TableDataRole/Spec/Basic.pm','lib/TableDataRole/Spec/GetRowByPos.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

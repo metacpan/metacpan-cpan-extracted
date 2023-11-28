@@ -2,7 +2,7 @@
 #
 # HTML::Embperl::Session
 # A bridge between Apache::Session and Embperl's %udat hash
-# Copyright(c) 1999 Gerald Richter (richter@ecos.de)
+# Copyright(c) 1999 Gerald Richter (richter at embperl dot org)
 # Copyright(c) 1998, 1999 Jeffrey William Baker (jeffrey@kathyandjeffrey.net)
 # Distribute under the Artistic License
 #
@@ -85,7 +85,7 @@ a derived class:
     DataSource => 'dbi:Oracle:db' 
     };
 
-NOTE: HTML::Embperl::Session will require the nessecary additional perl modules for you.
+NOTE: HTML::Embperl::Session will require the necessary additional perl modules for you.
 
 
 =head2 Addtional Methods
@@ -94,7 +94,7 @@ NOTE: HTML::Embperl::Session will require the nessecary additional perl modules 
 
 =item setid
 
-Set the session id for futher accesses.
+Set the session id for further accesses.
 
 =item getid
 
@@ -114,7 +114,7 @@ Gerald Richter <richter at embperl dot org> is the current maintainer.
 
 This class was written by Jeffrey Baker (jeffrey@kathyandjeffrey.net)
 but it is taken wholesale from a patch that Gerald Richter
-(richter@ecos.de) sent me against Apache::Session.
+(richter at embperl dot org) sent me against Apache::Session.
 
 
 =cut 
@@ -124,10 +124,12 @@ package HTML::Embperl::Session;
 use strict;
 use vars qw(@ISA $VERSION);
 
-$VERSION = '2.0.0';
+$VERSION = '3.0.0';
 @ISA = qw(Apache::Session);
 
 use Apache::Session;
+
+no warnings "uninitialized" ;
 
 use constant NEW      => Apache::Session::NEW () ;
 use constant MODIFIED => Apache::Session::MODIFIED () ;

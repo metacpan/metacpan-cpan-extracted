@@ -1,7 +1,7 @@
 Ascii.pm
 Changes
-examples/ex1.pl
-examples/ex2.pl
+examples/print_unicode_block.pl
+examples/print_unicode_block_in_curses_ui.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

@@ -4,7 +4,7 @@ use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { 
 # 
 # # VERSION
 # 
-# 0.0.2
+# 0.0.3
 # 
 # # SYNOPSIS
 # 
@@ -293,6 +293,8 @@ done_testing; }; subtest 'trapperr (&block)' => sub {
 ::is scalar do {trapperr { print STDERR 123 }}, "123", 'trapperr { print STDERR 123 }  # => 123';
 
 # 
+# See also `IO::Capture::Stderr`.
+# 
 # ## trappout (&block)
 # 
 # Trap for STDOUT.
@@ -300,6 +302,8 @@ done_testing; }; subtest 'trapperr (&block)' => sub {
 done_testing; }; subtest 'trappout (&block)' => sub { 
 ::is scalar do {trappout { print 123 }}, "123", 'trappout { print 123 }  # => 123';
 
+# 
+# See also `IO::Capture::Stdout`.
 # 
 # ## TiB ()
 # 
@@ -369,11 +373,29 @@ done_testing; }; subtest 'xxS ()' => sub {
 ::is scalar do {xxS}, scalar do{255}, 'xxS  # -> 255';
 
 # 
+# ## to_str (;$scalar)
+# 
+# Converts to string perl without interpolation.
+# 
+done_testing; }; subtest 'to_str (;$scalar)' => sub { 
+::is scalar do {to_str "a'\n"}, "'a\\'\n'", 'to_str "a\'\n" # => \'a\\\'\n\'';
+::is_deeply scalar do {[map to_str, "a'\n"]}, scalar do {["'a\\'\n'"]}, '[map to_str, "a\'\n"] # --> ["\'a\\\'\n\'"]';
+
+# 
+# ## from_str (;$one_quote_str)
+# 
+# Converts from string perl without interpolation.
+# 
+done_testing; }; subtest 'from_str (;$one_quote_str)' => sub { 
+::is scalar do {from_str "'a\\'\n'"}, "a'\n", 'from_str "\'a\\\'\n\'"  # => a\'\n';
+::is_deeply scalar do {[map from_str, "'a\\'\n'"]}, scalar do {["a'\n"]}, '[map from_str, "\'a\\\'\n\'"]  # --> ["a\'\n"]';
+
+# 
 # # SUBROUTINES/METHODS
 # 
 # # AUTHOR
 # 
-# Yaroslav O. Kosmina [dart@cpan.org](mailto:dart@cpan.org)
+# Yaroslav O. Kosmina <dart@cpan.org>
 # 
 # # LICENSE
 # 

@@ -2,8 +2,8 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    This document describes version 0.205 of File::Trash::FreeDesktop (from
-    Perl distribution File-Trash-FreeDesktop), released on 2023-08-07.
+    This document describes version 0.207 of File::Trash::FreeDesktop (from
+    Perl distribution File-Trash-FreeDesktop), released on 2023-11-21.
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -198,11 +198,17 @@ METHODS
         die if file with that suffix already exists, so be sure to pick a
         unique suffix.
 
-  $trash->recover([\%opts, ]$file[, $trash_dir])
+  $trash->recover([\%opts, $orig_path, $trash_dir])
     Recover a file or multiple files from trash.
 
     Unless $trash_dir is specified, will search in all existing user's trash
     dirs. Will die on errors.
+
+    You need to specify the original path of the file before it was trashed,
+    but you can also specify unqualified filename (without path) and/or path
+    patterns via options (see below) instead.
+
+    If no files are found, the method will simply return.
 
     If first argument is a hashref, it will be accepted as options. Known
     options:

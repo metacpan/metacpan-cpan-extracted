@@ -1,6 +1,6 @@
 =head1 NAME
 
-Embperl::TOC - Embperl Documenation: Table of Contents
+Embperl::TOC - Embperl Documentation: Table of Contents
 
 =head1 DESCRIPTION
 
@@ -206,7 +206,7 @@ namespaces; Handling queries in DBI; Handling exits; Handling errors;
 Development and production websites.
 
 As an example how Embperl can be used, the sourcecode of the Embperl
-website (see http://perl.apache.org/embperl/) is contained in the
+website (see https://perl.apache.org/embperl/) is contained in the
 directory eg/ of the Embperl distribution archive. Read L<eg/README>
 of the Embperl distribution archive for an overview.
 
@@ -225,4 +225,4 @@ See perldoc L<Changes.pod>
 
 =head1 AUTHOR
 
-G. Richter (richter at embperl dot org), A. Beckert (beckert@ecos.de)
+G. Richter (richter at embperl dot org), A. Beckert

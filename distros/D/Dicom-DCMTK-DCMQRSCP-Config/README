@@ -4,57 +4,76 @@ NAME
 
 SYNOPSIS
      use Dicom::DCMTK::DCMQRSCP::Config;
+
      my $obj = Dicom::DCMTK::DCMQRSCP::Config->new(%parameters);
      $obj->parse($data);
      my $data = $obj->serialize;
 
 METHODS
-    "new(%parameters)"
-            Constructor.
+  "new"
+     my $obj = Dicom::DCMTK::DCMQRSCP::Config->new(%parameters);
 
-            *       "ae_table"
+    Constructor.
 
-                     AE table.
-                     Default value is {}.
+    *       "ae_table"
 
-            *       "comment"
+            AE table.
 
-                     Flag, that means comments in serialize() output.
-                     Default value is 1.
+            Default value is {}.
 
-            *       "global"
+    *       "comment"
 
-                     Global parameters.
-                     Default value is {
-                             'NetworkTCPPort' => undef,
-                             'MaxPDUSize' => undef,
-                             'MaxAssociations' => undef,
-                             'UserName' => undef,
-                             'GroupName' => undef,
-                     };
+            Flag, that means comments in serialize() output.
 
-            *       "host_table"
+            Default value is 1.
 
-                     Host table.
-                     Default value is {}.
+    *       "global"
 
-            *       "host_table_symb"
+            Global parameters.
 
-                     Host table symbolic names.
-                     Default value is {}.
+            Default value is:
 
-            *       "vendor_table"
+             {
+                     'NetworkTCPPort' => undef,
+                     'MaxPDUSize' => undef,
+                     'MaxAssociations' => undef,
+                     'UserName' => undef,
+                     'GroupName' => undef,
+             };
 
-                     Vendor table.
-                     Default value is {}.
+    *       "host_table"
 
-    "parse($data)"
-             Parse $data, which contains dcmqrscp configuration data.
-             Returns undef.
+            Host table.
 
-    "serialize()"
-             Serialize object to DCMTK dcmqrscp configuration data.
-             Returns string with dcmqrscp configuration data.
+            Default value is {}.
+
+    *       "host_table_symb"
+
+            Host table symbolic names.
+
+            Default value is {}.
+
+    *       "vendor_table"
+
+            Vendor table.
+
+            Default value is {}.
+
+    Returns instance of object.
+
+  "parse"
+     $obj->parse($data);
+
+    Parse $data, which contains dcmqrscp configuration data.
+
+    Returns undef.
+
+  "serialize"
+     my $data = $obj->serialize;
+
+    Serialize object to DCMTK dcmqrscp configuration data.
+
+    Returns string with dcmqrscp configuration data.
 
 ERRORS
      new():
@@ -62,11 +81,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Dicom::DCMTK::DCMQRSCP::Config;
 
      # Object.
@@ -166,17 +183,18 @@ SEE ALSO
         Install the Dicom modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Dicom-DCMTK-DCMQRSCP-Config>
+    <https://github.com/michal-josef-spacek/Dicom-DCMTK-DCMQRSCP-Config>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

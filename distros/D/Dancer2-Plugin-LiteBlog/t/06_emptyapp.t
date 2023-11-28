@@ -10,8 +10,10 @@ use File::Spec;
     use Dancer2;
     set views => File::Spec->catfile( dirname(__FILE__), 'views');
     set appdir => File::Spec->catfile(dirname(__FILE__), 'lib'); # no files will be found here
+    set logger => 'Null';
     require 'Dancer2/Plugin/LiteBlog.pm';
     Dancer2::Plugin::LiteBlog->import;
+    liteblog_init();
 }
 
 my $emptyapp = EmptyApp->to_app;

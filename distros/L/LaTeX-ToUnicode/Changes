@@ -1,5 +1,7 @@
 Changes for LaTeX::ToUnicode
 
+0.54    2023-11-17 Better handling of \{ \}.  New release
+
 0.53    2023-08-20 Tests fixed, new release
 
 0.52	2022-11-07  Support many more control sequences, \kern removal,

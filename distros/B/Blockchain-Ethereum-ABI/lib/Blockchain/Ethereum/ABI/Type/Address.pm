@@ -1,4 +1,10 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 # ABSTRACT: Solidity address type interface
 
@@ -8,7 +14,7 @@ class Blockchain::Ethereum::ABI::Type::Address
     :does(Blockchain::Ethereum::ABI::TypeRole);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.013';          # VERSION
+our $VERSION   = '0.015';          # VERSION
 
 method _configure { return }
 
@@ -39,7 +45,7 @@ Blockchain::Ethereum::ABI::Type::Address - Solidity address type interface
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 

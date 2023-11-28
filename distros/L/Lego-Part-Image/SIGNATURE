@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,66 +12,79 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 2f80a260c576b4f34800248d4d1d3aa4ec8864c4 Changes
-SHA1 c12dbc7ef4e3e8582719c20639e269e5924333ab Image.pm
-SHA1 869e48c22639af2341bbb7f61d889f87790878b1 Image/LegoCom.pm
-SHA1 abe275c410d0588c0de3d62cb579b7285539227e Image/LugnetCom.pm
-SHA1 b3e5227c9ad1ccf42857c840d1e4a6fb0d96313a Image/PeeronCom.pm
-SHA1 fda23a0b314432c4a81e8d7beb5290e9f0219c73 LICENSE
-SHA1 d60ee6db1ac458f0b5861140d16b4e8d1b61b2b6 MANIFEST
-SHA1 632d62b997efedfcf4f743f6419c0bb1798abe5c META.yml
-SHA1 85af20251a7ae7e90b481379068d235cd3ce14a2 Makefile.PL
-SHA1 6da0477dc6aae5aaa30df73238bd80c7bca1d10b README
-SHA1 fefe3699c0392fb1488c767625a82565ba65a57d examples/ex1.pl
-SHA1 c2438305da772f02b8d20d1011722659dcde6a8e examples/ex2.pl
-SHA1 479615bab8164817546c1d9a56a429e60a317fd6 examples/ex3.pl
-SHA1 cd0adada2d9cf6f6771126ceb4f870d322d02114 examples/ex4.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 4146d9c2ec0608b9cd421687f1972a4505d5224a t/Lego-Part-Image-LegoCom/01-use.t
-SHA1 aa2938be462377103144f3937103e3f1b9523e6a t/Lego-Part-Image-LegoCom/02-version.t
-SHA1 03949de3e67abab11c66072e5833f59a134e09e0 t/Lego-Part-Image-LegoCom/03-new.t
-SHA1 56934e1ffb4fc06e8b453963da195bbb8c0802fb t/Lego-Part-Image-LegoCom/04-image_url.t
-SHA1 738c5edd44ea8a7f1433edacb284de252fd1ebc2 t/Lego-Part-Image-LugnetCom/01-use.t
-SHA1 de084d87c61c4480aab5b8f6a83c8695c55f2346 t/Lego-Part-Image-LugnetCom/02-version.t
-SHA1 4893c0251c50f365cb235dec2eef1d217f4c3ce7 t/Lego-Part-Image-LugnetCom/03-new.t
-SHA1 413a6b37a719623bdfa741d863c0bd5b8eac2a07 t/Lego-Part-Image-LugnetCom/04-image_url.t
-SHA1 a61e09eb504275d862eed437a76483b0c8dbedef t/Lego-Part-Image-PeeronCom/01-use.t
-SHA1 4123af994fbb40718123fe5afb81b92551c6aa85 t/Lego-Part-Image-PeeronCom/02-version.t
-SHA1 be7d9ac5516a26f8dc01e4f4fdd8894fbf776a2d t/Lego-Part-Image-PeeronCom/03-new.t
-SHA1 003657a156e9a5cc3b339851d25a1e99752815f6 t/Lego-Part-Image-PeeronCom/04-image_url.t
-SHA1 8bef6782a0921c336a0726e571b485cc94109dc6 t/Lego-Part-Image/01-use.t
-SHA1 b7eb84a622a28712c962cac3c4912439eb363e07 t/Lego-Part-Image/02-version.t
-SHA1 7587224a50e323a869d252d6d3a8640b881b7d5b t/Lego-Part-Image/03-new.t
-SHA1 464aaa2df3617335fc8d34ebec61da60912e062e t/Lego-Part-Image/04-image.t
-SHA1 b2b9aa8a5a81ecbb5767564382cde70bb3c10b4f t/Lego-Part-Image/05-image_url.t
-SHA1 512213b9c5f29f742885c3ee55fbe2a7786e92f8 xt/Lego-Part-Image-LegoCom/01-pod_coverage.t
-SHA1 cc5202cd9e61876f46bc30ea791bf5c24a2eef9d xt/Lego-Part-Image-LegoCom/02-pod.t
-SHA1 2c5d4667185f5b86cfda6ebcd016c13056fb2d63 xt/Lego-Part-Image-LugnetCom/01-pod_coverage.t
-SHA1 f2ae8eee36cb8ca531c78493d2e867348c47e4ba xt/Lego-Part-Image-LugnetCom/02-pod.t
-SHA1 c845a33c087e31dccedf3cd1a2f0630ae3f17b3d xt/Lego-Part-Image-PeeronCom/01-pod_coverage.t
-SHA1 ba0adede4cda1c765729218dd316de66652c2c6b xt/Lego-Part-Image-PeeronCom/02-pod.t
-SHA1 4b25d5b5bfe5959f263e9a0a3e70cad8f992070e xt/Lego-Part-Image/01-pod_coverage.t
-SHA1 4166d4737473a47a56e42700e221ffc99e03c365 xt/Lego-Part-Image/02-pod.t
+SHA256 fff55ba42a38e1df70e3e82bcff2a2f670e3f6652c5503f5bdbcaa27cbc85d3f Changes
+SHA256 0262122b76c37bd3b2c18047591cbeea75bfe6f63a052e6d98aa4512056a5308 Image.pm
+SHA256 9ec8fc6bb8eba64fedc3ad51f9a8882814258ae82c2460d7e3554219b094ecc4 Image/BricklinkCom.pm
+SHA256 8aaff602474d783b33a2066b14f7c8923a4e9974c026684b99dcf3c31c7c1d18 Image/LegoCom.pm
+SHA256 aadf7d283d27be690d8267be1436b4058899970eb75882bbff44f8c02f756bd6 Image/LugnetCom.pm
+SHA256 7366812739004bb011695109e953977dd3032364c4d5c342876a913a2cba2770 Image/PeeronCom.pm
+SHA256 3eda4295af098a9626e4f5855d21c245deb5c775997162e52d29ba812f2c1e7f LICENSE
+SHA256 ce5bfefdf4a30271f969055e5411d1563ccbb53e705bcc801390184a50bd7bf4 MANIFEST
+SHA256 45fedc0dee465015e570bd55d053c5562a22031b6f8b9a22587a56905add28be META.yml
+SHA256 f44a6c75e00127b2d7a7a04cf834e5f190f2f1648594f639a35c237d50e6bcba Makefile.PL
+SHA256 c036565b676220cda59ec07102059bfc0fa8ac9163a76a5ea9e1eea521d3ba74 README
+SHA256 2c13730f5651abe44f6a137b0200cb5eb5127905f4f8a4b19972f3e4b21a7111 examples/abstract_class.pl
+SHA256 24ff777d689f0af20ee0eda6784019715afe81fc0bb814c23f1c344a0d32e8e3 examples/link_for_bricklink_com.pl
+SHA256 5d314f7a7a33900bb49600debda3434542159753dd08b2e44fce9419c4dc091f examples/link_for_lego_com.pl
+SHA256 9dca7ba2eead446a0f8564a992a95e56067f44e957c80573b90001d0a9173509 examples/link_for_lugnet_com.pl
+SHA256 c69f5cbe8f2f2f679e58322159f2f7007021ac6856a5eefc2f7e1d5451382cb7 examples/link_for_peeron_com.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 06c51e01cf6e5919760e4a28c5bb4cc6badd9b52019d89e73ff9dc2bc9577039 t/Lego-Part-Image-BricklinkCom/01-use.t
+SHA256 2c724d386fadb047b66600918238125dcae803055874532b4ae022317bdd3e48 t/Lego-Part-Image-BricklinkCom/02-version.t
+SHA256 f486ab3023941efc1438825d7a365a05fa3dd746af89eecc43fd86502bfb3513 t/Lego-Part-Image-BricklinkCom/03-new.t
+SHA256 ff36ecc105bcec1a1da694a7da4285997624e25c01529bd5a2bfc42eaf931765 t/Lego-Part-Image-BricklinkCom/04-image_url.t
+SHA256 ed8c761dd706ef85aa59e2cb1cd61b1aecb362054d43dfa894535714fa9e03a6 t/Lego-Part-Image-LegoCom/01-use.t
+SHA256 06e2848bcb7e62dbe23ec3d30549426d5040600cdbfa37e9aa303d5ae4c208b0 t/Lego-Part-Image-LegoCom/02-version.t
+SHA256 5d28d8366c8f32ba00abd5aeff1e1919fba211072bbe7dde15a4f33cd374c028 t/Lego-Part-Image-LegoCom/03-new.t
+SHA256 98da46294c730e775de8b6fff9dfea67c63725af0fc39712b0ea5bdf9b6fd9f3 t/Lego-Part-Image-LegoCom/04-image_url.t
+SHA256 0b8b2afe099b847f451a1eb172a409ba7a44550df56e38d6977bac4b84bd0f8b t/Lego-Part-Image-LugnetCom/01-use.t
+SHA256 eb54376f50406448c4a96591a7cfd2fe557479179149e15b7cd9d43f109a189e t/Lego-Part-Image-LugnetCom/02-version.t
+SHA256 2dce3faca25274e71d70531c924b36c4a4a26d5101f8bb88ad50ffbba2c61c3d t/Lego-Part-Image-LugnetCom/03-new.t
+SHA256 e0e7718d35943562ae5d5acdcb2092db06898040e697a422966b24ed92051d84 t/Lego-Part-Image-LugnetCom/04-image_url.t
+SHA256 266ea3b6ffe6b50bff4e3fe6f6030715a30c6cf27adbe13f5227e0b379494126 t/Lego-Part-Image-PeeronCom/01-use.t
+SHA256 bd3f7941812cf9844b6f8ac234115ef4ebe5da416588999f2152e402bcce2ac6 t/Lego-Part-Image-PeeronCom/02-version.t
+SHA256 e25a377e1479f04e32dd45d445ef1e8ddc4ce66313c06ce3d191fb59a062e3fc t/Lego-Part-Image-PeeronCom/03-new.t
+SHA256 e7f76fc5c5f7e258c4211fd63260ec07d5742545c480d82015fd4f066aef25d9 t/Lego-Part-Image-PeeronCom/04-image_url.t
+SHA256 fa4f8ca24f287c9ad65e86c72a9d73885a9ec6b499144336a3b233abec70ca34 t/Lego-Part-Image/01-use.t
+SHA256 5d7300360df360de8d55f73f1084ca656876ec077a7ee817f2ea8c868747378c t/Lego-Part-Image/02-version.t
+SHA256 c5fb7fda2e057d125b99a9b096dd4a17557438de6db81468a2d912bea36f543f t/Lego-Part-Image/03-new.t
+SHA256 f9174591c1c7a069d8ca391474ae1b346e14722998903770d2c188c0253c311a t/Lego-Part-Image/04-image.t
+SHA256 7d897fc0cf4201d7d9f5cd4e292fc35f64ce767d365b005db69af10e99402306 t/Lego-Part-Image/05-image_url.t
+SHA256 4a70824887e9fd474018f03779cfbc2b34355b24c42d05c3f7aa21d3b1c23401 xt/Lego-Part-Image-BricklinkCom/01-pod_coverage.t
+SHA256 7d283e1714272ab8b34716791d9541e1aff4fdf3fe4e75e0d805bb3b06ce4789 xt/Lego-Part-Image-BricklinkCom/02-pod.t
+SHA256 dbcc92a742570ad1b391ddadb182ace7a2fd7c18512af03021e7ad2532817b97 xt/Lego-Part-Image-LegoCom/01-pod_coverage.t
+SHA256 d70ba56948817e558a5600307143e3af303173fca0476edadff38c18903f1fe8 xt/Lego-Part-Image-LegoCom/02-pod.t
+SHA256 c8eac4f12191f8e43b0ce58c691d038f524646930b733b6404005e85cc5d2887 xt/Lego-Part-Image-LugnetCom/01-pod_coverage.t
+SHA256 a8ac3bef99c622f57c942e1e35223f83792112ef69caf1133a19a810f4b4591f xt/Lego-Part-Image-LugnetCom/02-pod.t
+SHA256 3f2c61d1b5a165d5c8361f0f0942cb2c830f9c1f5bae8183437f902c3e9c8e23 xt/Lego-Part-Image-PeeronCom/01-pod_coverage.t
+SHA256 26c9275aef025bcdce96b9776c969b5bf4bb4698df0eb371a1bf47a3a0da8098 xt/Lego-Part-Image-PeeronCom/02-pod.t
+SHA256 386fad095b8f50e9c94939b979084fed2e7295337c6a2901ba5092e747e6bcd1 xt/Lego-Part-Image/01-pod_coverage.t
+SHA256 ff5ec7869849d26ebebb45114fceb3ffb4459fd718980b850d31fa957307d037 xt/Lego-Part-Image/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWAyXlAAoJEJe+XXKaIuTlI/MIAKgxo3kYJOGdHt+XnI+QFtg3
-XEJWLBeqwsQ2ezmOpxJwuWuzQdYqD0W9ZSTzn8qJkRn2JV5/tnCd1izLzzAcIrOX
-ytn0JItZvij0kbhuQbvsOFJOS/CaUFKS0oNhE2j4Tj/IGT2tw5RFkOHvvLcAtXzP
-NXYFoLQQwmMwRWXBWHbuYjyZK3iJ6tS+OP9OhMBiSBPQyy8hRLHfYCE07Hw2q3st
-mtyZtqSCWSWgi+jVJCjet/aG2P58U26kVpJyiO+VBnexVo9Gn34ewSp9oHZW0LB3
-eOgjl00Ur6C6l7J24e2vBjp1bBsArG0xIlqJeRWJ+1vJMKZBjldyotSSA5Fshew=
-=DIvi
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVhy2oACgkQojV9Rpe/
+B8tUdhAAktxqaZwa1aiSWhxrV5Tv214Dp9oc8QNC2d4e/fVHUFa/Z8daIWFvJC8X
+c0h8+19otvngpeZjWKvlP8Xlw1car0/TLH0gSgeSRIc3z7HPwRtB+ho6t5aY/oAs
+MFimruSbx/F/RRuqLw9bzhrawde/+6JdWjdfdppVB1wA++tJ+r6O1okSTWhWUmMm
+FDtvtjNoB8NvMTdCD5H7oLCwglKgyR5oBvKakiGoCOA9tzUxgdefzNL/2exnNUBx
+QGYVd/ulDRDufqCASfBTMJ/I71DMsSOhIdAfnW8c/cKti6RafO1xWIZXwk3szxkV
+zftsAF6XkbHMQ20mWAPKqIGksjUrLyK0MNbSbUa950c/v7Bdxg8GJ9KyWuyGPG2h
+voumeP7VU7vueKN8HOKVvo3JXt2g57xpPz/TpCygRqdG8fIQhn934uW2Av00FKTa
+bA7iEb4zZgPwu1MfaXd73xlZG03NCvij/U6TkT1t7RyjrJiE46nN/eawFcXq07vI
+aTwKtb6dx2xGIP3YBr2Pe/hwOW/TKivdIO1MmtOdHoWhbzjifrAALM+P8z/bAa38
+LoBNDBAbPH1JMRdthw5rnNQUlpOgYloLIKfIUGsJH1LR6vV1BUlBFLNJC6G4+pRf
+uQkaS1/ruTw9m0l72Qg+ZVMGcu5zSdyecuymrlT6lDaP/+8P6tg=
+=jcpo
 -----END PGP SIGNATURE-----

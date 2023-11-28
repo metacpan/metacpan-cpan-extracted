@@ -17,6 +17,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.018",
   "NAME" => "Data::Dumper::Interp",
   "PREREQ_PM" => {
+    "Capture::Tiny" => 0,
     "Carp" => 0,
     "Data::Dumper" => 0,
     "Data::Structure::Util" => 0,
@@ -36,7 +37,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Capture::Tiny" => 0,
+    "Carp::Always" => 0,
     "Clone" => 0,
     "Cwd" => 0,
     "Data::Compare" => 0,
@@ -74,7 +75,7 @@ my %WriteMakefileArgs = (
     "parent" => 0,
     "vars" => 0
   },
-  "VERSION" => "6.010",
+  "VERSION" => "6.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -84,6 +85,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Carp" => 0,
+  "Carp::Always" => 0,
   "Clone" => 0,
   "Cwd" => 0,
   "Data::Compare" => 0,

@@ -36,6 +36,7 @@ t/movies_config.yaml
 t/movies_weights.yaml
 t/ontologies.yaml
 t/patient.json
+t/rank_ref_sorted.txt
 t/rank_weight_ref_sorted.txt
 t/ref_align.csv
 t/ref_align.target.csv

@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -75,7 +76,7 @@ sub init_data
 #   show_control_readonly - output readonly control
 #
 
-sub show_control_readonly
+sub xshow_control_readonly
     {
     my ($self, $req) = @_ ;
 
@@ -87,11 +88,82 @@ sub show_control_readonly
     $self -> SUPER::show_control_readonly ($req, $fdat{$name} eq $val?'X':'-') ;
     }
 
+# ------------------------------------------------------------------------------------------
+#
+#   get_display_text - returns the text that should be displayed
+#
 
+sub get_display_text
+    {
+    my ($self, $req, $value) = @_ ;
+
+    my $fdat  = $req -> {docdata} || \%fdat ;
+    my $name     = $self -> {name} ;
+    my $val      = $self -> {value} ;
+    $val = 1 if ($val eq '') ;
+    
+    return $value eq $val?'X':'-' if (defined ($value)) ;
+    return $fdat->{$name} eq $val?'X':'-' ;
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   init_markup - add any dynamic markup to the form data
+#
+
+sub init_markup
+
+    {
+    my ($self, $req, $parentctl, $method) = @_ ;
+
+    return if (!$self -> is_readonly($req) && (! $parentctl || ! $parentctl -> is_readonly($req))) ;
+    
+    my $val = $self -> get_value ($req) ;
+    if ($val ne '')
+        {
+        my $name = $self -> {name} ;
+        my $fdat = $req -> {docdata} || \%Embperl::fdat ;
+        my $opt  = $self -> get_display_text ($req, $val) ;
+        $fdat -> {'_opt_' . $name} = $opt if ($opt ne '') ;
+        }
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   label_text - return text of label
+#
+
+sub label_text
+    {
+    my ($self, $req) = @_ ;
+
+    if ($self -> {button} && !$self -> is_readonly)
+        {
+        $self->{controlclass} ||= 'ef-control-checkbox-button' ;    
+        return '' ;
+        }
+    return $self -> SUPER::label_text ($req) ;
+    }
 
 1 ;
 
 __EMBPERL__
+
+[# ---------------------------------------------------------------------------
+#
+#   show_control_readonly - output the control as readonly
+#]
+
+[$ sub show_control_readonly ($self, $req, $value) 
+
+my $text  = $self -> get_display_text ($req, $value)  ;
+my $name  = $self -> {force_name} || $self -> {name} ;
+$]
+<div [+ do { local $escmode = 0 ; $self -> get_std_control_attr($req, '', 'readonly', 'ef-control-with-id') } +] _ef_divname="_opt_[+ $name +]">[+ $text +]</div>
+[$ if $self->{hidden} $]
+<input type="hidden" name="[+ $name +]" value="[+ $value +]">
+[$endif$]
+[$endsub$]
 
 [# ---------------------------------------------------------------------------
 #
@@ -109,11 +181,34 @@ __EMBPERL__
 
     my ($ctlattrs, $ctlid, $ctlname) =  $self -> get_std_control_attr($req) ;
     push @{$self -> form -> {fields2empty}}, $name ;
+
+    my $buttontext ;
+    if (ref $self -> {button})
+        {
+        if ($self -> {showtext})
+            {
+            $buttontext = join(',', @{$self -> {button}}) ;
+            }
+        else
+            {
+            $buttontext = join(',', map { $self -> form -> convert_text ($self, $_, undef, $req) } @{$self -> {button}}) ;
+            }
+        }    
 $]
 <input type="checkbox"  name="[+ $ctlname +]" [+ do { local $escmode = 0 ; $ctlattrs } +] value="[+ $val +]"
-[$if ($self -> {trigger}) $]_ef_attach="ef_checkbox"[$endif$]
->
+[$if ($self -> {trigger} || $self -> {button} || $self -> {timer}) $]_ef_attach="ef_checkbox"[$endif$]
+[$if ($self -> {button}) $]_ef_button="1"[$endif$]
+[$if ($buttontext) $]_ef_buttonlabels="[+ $buttontext +]"[$endif$]
+>[$if ($self -> {button}) $]<label for="[+ $ctlid +]"></label>[$endif$]
 [$endsub$]
+
+[# ---------------------------------------------------------------------------
+#
+#   show_control_addons - output additional things after the control
+#]
+
+[$ sub show_control_addons ($self, $req) $][$if ($self -> {timer}) $]<span class='ui-icon ui-icon-clock ef-icon'></span>[$endif$][$endsub$]
+
 
 __END__
 
@@ -166,7 +261,7 @@ Gives the value for the checkbox.
 
 %%%name%%% is replaced by $fdat{<name>}, where <name> is the value that
 is given with name parameter. Is is especially useful inside of grids
-where the actual name of the html control is computed dynamicly.
+where the actual name of the html control is computed dynamically.
 
 =head3 class
 

@@ -30,7 +30,6 @@
     MMM => "LLL",
     MMMEd => "E, d MMM",
     MMMMEd => "E, d MMMM",
-    "MMMMW-count-one" => "W'\N{U+00aa}' 's\N{U+1ebd}m\N{U+00e3}na' MMMM",
     "MMMMW-count-other" => "W'\N{U+00aa}' 's\N{U+1ebd}m\N{U+00e3}na' MMMM",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
@@ -56,7 +55,6 @@
     yMd => "dd/MM/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "w'\N{U+00aa}' 's\N{U+1ebd}m\N{U+00e3}na' Y",
     "yw-count-other" => "w'\N{U+00aa}' 's\N{U+1ebd}m\N{U+00e3}na' Y",
   },
   code => "yrl",
@@ -274,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

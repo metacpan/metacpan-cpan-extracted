@@ -5,7 +5,7 @@ NAME
 
 SYNOPSIS
 
-       use v5;36;
+       use v5.36;
        use Device::Serial::SLuRM;
     
        my $slurm = Device::Serial::SLuRM->new(
@@ -29,6 +29,9 @@ DESCRIPTION
 
     It currently does not support receiving REQUESTs, though this could be
     added relatively easily.
+
+    Optionally, this module supports being the controller for a multi-drop
+    ("MSLµRM") bus. See the Device::Serial::MSLuRM subclass.
 
  SLµRM
 
@@ -207,7 +210,7 @@ METHODS
 
  send_notify
 
-       await $slurm->send_notify( $payload )
+       await $slurm->send_notify( $payload );
 
     Sends a NOTIFY packet.
 

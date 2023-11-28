@@ -4,7 +4,7 @@ Log::Dispatch::Email::Sendmail - Subclass of Log::Dispatch::Email that sends e-m
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -28,7 +28,7 @@ fork/exec so it should only be used where really needed.
       ],
     );
 
-    $log->emerg("Something bad is happening");
+    $log->emerg('Something bad is happening');
 
 # SUBROUTINES/METHODS
 
@@ -64,10 +64,6 @@ You can also look for information at:
 
     [http://annocpan.org/dist/Log-Dispatch-Log-Sendmail](http://annocpan.org/dist/Log-Dispatch-Log-Sendmail)
 
-- CPAN Ratings
-
-    [http://cpanratings.perl.org/d/Log-Dispatch-Log-Sendmail](http://cpanratings.perl.org/d/Log-Dispatch-Log-Sendmail)
-
 - Search CPAN
 
     [http://search.cpan.org/dist/Log-Dispatch-Log-Sendmail/](http://search.cpan.org/dist/Log-Dispatch-Log-Sendmail/)
@@ -78,6 +74,6 @@ Kudos to Dave Rolksy for the entire Log::Dispatch framework.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2013-2022 Nigel Horne.
+Copyright 2013-2023 Nigel Horne.
 
 This program is released under the following licence: GPL

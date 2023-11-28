@@ -1,5 +1,61 @@
 Revision history for OpenTelemetry
 
+0.018     2023-11-23 19:28:38+00:00 Europe/London
+
+    * Document all shutdown and force_flush methods as async
+
+0.017     2023-11-19 12:39:37+00:00 Europe/London
+
+    * Undo conditional logic in Tracer's in_span introduced in 0.016.
+      The span is read-only, so we cannot read its status. We now set
+      the status unconditionally, but the user is free to mark the span
+      as ended, in which case the automatically set status will be
+      discarded.
+
+0.016     2023-11-16 23:37:27+00:00 Europe/London
+
+    * Fix issue tracker link in meta
+    * Try to limit information set as span error descriptions in
+      integrations. Instead of passing in the entire, which could
+      have multiple lines and contextual information, we trim and
+      pass only the first line, without the trailing `at line #`
+      added from eg. plain `die`. This error is still set unmodified
+      as the exception.
+    * Injection and extraction methods for processors catch errors
+      from their callbacks as required by
+      https://opentelemetry.io/docs/specs/otel/error-handling/#guidance
+    * Validate initial values for TraceContext::TraceFlags: they
+      must be in the 0-255 range (inclusive) or they are ignored
+    * The Tracer's experimental in_span interface now automatically
+      sets the status of the span as long as the span's status remains
+      unset at the end of the block
+
+0.015     2023-11-09 23:42:47+00:00 Europe/London
+
+    * Add -span and -trace export tags to OpenTelemetry::Constants
+    * Add tests for OpenTelemetry::Constants
+    * Add otel_config to OpenTelemetry exportable functions
+
+0.014     2023-11-09 00:01:05+00:00 Europe/London
+
+    * Add missing documentation for the 'record_exception' method
+      for spans
+    * OpenTelemetry::X errors print stack traces when stringified
+    * Improve the reporting of errors caught in calls to
+      'in_span' in OpenTelementry::Trace
+    * Minor documentation fixes throughout
+
+0.013     2023-11-07 20:23:49+00:00 Europe/London
+
+    * Add support for a `details` parameter to the error handler
+      for passing additional structured context data
+
+0.012     2023-11-05 18:29:49+00:00 Europe/London
+
+    * Fix the documentation for OpenTelemetry::Common::config, which
+      incorrectly stated the order variables are read in
+    * Added otel_untraced_context to OpenTelemetry exportable functions
+
 0.011     2023-11-01 23:18:14+00:00 Europe/London
 
     * Added missing documentation for

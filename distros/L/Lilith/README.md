@@ -51,6 +51,24 @@ pass="WhateverYouSetAsApassword"
 user="lilith"
 # a handy one to ignore for the extend as it is spammy
 class_ignore=["Generic Protocol Command Decode"]
+
+# add a suricata instance to monitor
+[suricata-eve]
+instance="foo-pie"
+type="suricata"
+eve="/var/log/suricata/alert.json"
+
+# add a second suricata instance to monitor
+[another-eve]
+instance="foo2-pie"
+type="suricata"
+eve="/var/log/suricata/alert2.json"
+
+# add a sagan eve to monitor
+# instance name is 'foo-lae', given there is no value for instance
+[foo-lae]
+type="sagan"
+eve="/var/log/sagan/alert.json"
 ```
 
 Now we just need to setup the tables.
@@ -65,207 +83,485 @@ If using snmpd.
 extend lilith /usr/local/bin/lilith -a extend
 ```
 
-## --help
+### Config File
 
-```
---config <ini>     Config INI file.
-                   Default :: /usr/local/etc/lilith.ini
+The default config file is `/usr/local/etc/lilith.toml`.
 
--a <action>        Action to perform.
-                   Default :: search
+| Variable     | Description                                                                                                            |
+|--------------|------------------------------------------------------------------------------------------------------------------------|
+| dsn          | A DSN connection string to be used by [DBI][https://metacpan.org/pod/DBI]. [DBD::Pg][https://metacpan.org/pod/DBD::Pg] |
+| pass         | Password to use for the connection.                                                                                    |
+| user         | User to use for the connetion.                                                                                         |
+| class_ignore | Array of classes to ignore.                                                                                            |
 
-Action :: run
-Description :: Runs the ingestion loop.
+Sub hashes are then treated as a instance. The following values are
+available for that.
 
-Action :: class_map
-Description :: Display class to short class mappings.
+| Variable | Required | Description                                                        |
+|----------|----------|--------------------------------------------------------------------|
+| eve      | yes      | The EVE file to follow.                                            |
+| type     | yes      | `sagan` or `suricata`, depending on which it is.                   |
+| instance | no       | The name for the instance. If not specified the hash name is used. |
 
-Action :: create_tables
-Description :: Creates the tables in PostgreSQL.
+## Options
 
-Action :: event
-Description :: Fetch the information for the specified event.
-               Either --id or --event is needed.
+### SYNOPSIS
 
---id <row id>  Row ID to fetch.
-               Default :: undef
+lilith \[-c \<config\>\] -a run
 
---event <id>   Event ID to fetch.
-               Default :: undef
+lilith -a class_map
 
-Action :: extend
-Description :: LibreNMS style SNMP extend.
+lilith \[-c \<config\>\] -a create_tables
 
--m <minutes>    How far backt to go in minutes.
-                Default :: 5
+lilith \[-c \<config\>\] -a dump_self
 
--Z              LibreNMS style compression, gzipped and
-                then base64 encoded.
-                Default :: undef
+lilith \[-c \<config>\] -a event \[-t \<table\>\] --id \<row_id\> \[--raw\]
+\[\[--virani \<remote\>\] \[--pcap \<output file\>\] \[--buffer \<buffer secodns\>\]\]
 
-Action :: search
-Description :: Searches the specified table returns the results.
+lilith \[-c \<config\>\] -a event \[-t \<table\>\] --event \<event_id\> \[--raw\]
+\[\[--virani \<remote\>\] \[--pcap \<output file\>\] \[--buffer \<buffer secodns\>\]\]
 
---ouput <return>   Return type. Either table or json.
-                   Default :: table
+lilith \[-c \<config\>\] -a extend \[-Z\] \[-m \<minutes\>\]
 
--t <table>         Table to search. suricata/sagan
-                   Default :: suricata
+lilith -a generate_baphomet_yamls --dir \<dir\>
 
--m <minutes>       How far backt to go in minutes.
-                   Default :: 1440
+lilith \[-c \<config\>\] -a get_short_class_snmp_list
 
---order <clm>      Column to order by.
-                   Default :: timestamp
+lilith \[-c \<config\>\] -a search \[--output \<return\>\] \[-t \<table\>\]
+\[-m \<minutes\>\] \[--order \<clm\>\] \[--limit \<int\>\] \[--offset \<int\>\]
+\[--orderdir \<dir\>\] \[--si \<src_ip\>\] \[--di \<dst_ip\>\] \[--ip \<ip\>\]
+\[--sp \<src_port\>\] \[--dp \<dst_port\>\] \[--port \<port\>\] \[--host \<host\>\]
+\[--hostl\] \[--hosN\] \[--ih \<host\>\] \[--ihl\] \[--ihN\] \[-i \<instance\>\]
+\[-il\] \[-iN\] \[-c \<class\>\] \[--cl\] \[--cN\] \[-s \<sig\>\] \[--sl\]
+\[--sN\] \[--if \<if\>\] \[--ifl\] \[--ifN\] \[--ap \<proto\>\] \[--apl\] \[--apN\]
+\[--gid \<gid\>\] \[--sid \<sid\>\] \[--rev \<rev\>\]
 
---limit <int>      Limit to return.
-                   Default :: undef
+### GENERAL SWITCHES
 
---offset <int>     Offset for a limited return.
-                   Default :: undef
+#### -a <action>
 
---orderdir <dir>   Direction to order in.
-                   Default :: ASC
+The action to perform.
 
+    - Default :: search
 
-* IP Options
+#### -c <config>
 
+The config file to use.
 
---si <src ip>    Source IP.
-                 Default :: undef
-                 Type :: string
+    - Default :: /usr/local/etc/lilith.toml
 
---di <dst ip>    Destination IP.
-                 Default :: undef
-                 Type :: string
+#### -t <table>
 
---ip <ip>        IP, either dst or src.
-                 Default :: undef
-                 Type :: complex
+Table to operate on.
 
+    - Default :: suricata
 
-* Port Options
+### ACTIONS
 
---sp <src port>  Source port.
-                 Default :: undef
-                 Type :: integer
+#### run
 
---dp <dst port>  Destination port.
-                 Default :: undef
-                 Type :: integer
+Start processing the EVE logs and daemonize.
 
--p <port>        Port, either dst or src.
-                 Default :: undef
-                 Type :: complex
+#### class_map
 
+Print a table of class mapping from long name to the short name used for display in the search results.
 
-* Host Options
+#### create_tables
 
---host <host>   Host.
-                Default :: undef
-                Type :: string
+Create the tables in the DB.
 
---hostl         Use like for matching host.
-                Default :: undef
+#### dump_self
 
---hostN         Invert host matching.
-                Default :: undef
+Initiate Lilith and then dump it via Data::Dumper.
 
---ih <host>     Instance host.
-                Default :: undef
-                Type :: string
+#### event
 
---ihl           Use like for matching instance host.
-                Default :: undef
+Fetches a event. The table to use can be specified via -t.
 
---ihN           Invert instance host matching.
-                Default :: undef
+##### --id <row_id>
 
+Fetch event via row ID.
 
-* Instance Options
+##### --event <event_id>
 
---i <instance>  Instance.
-                Default :: undef
-                Type :: string
+Fetch the event via the event ID.
 
---il            Use like for matching instance.
-                Default :: undef
+##### --raw
 
---iN            Invert instance matching.
-                Default :: undef
+Do not decode the EVE JSON.
 
+##### --pcap <file>
 
-* Class Options
+Fetch the remote PCAP via Virani and write it to the file. Only usable for with Suricata tables.
 
--c <class>      Classification.
-                Default :: undef
-                Type :: string
+Default :: undef
 
--cl             Use like for matching classification.
-                Default :: undef
+##### --virani <conf>
 
---cN            Invert class matching.
-                Default :: undef
+Virani setting to pass to -r.
 
+Default :: instance name in alert
 
-* Signature Options
+##### --buffer <secs>
 
--s <sig>        Signature.
-                Default :: undef
-                Type :: string
+How many seconds to pad the start and end time with.
 
--sl             Use like for matching signature.
-                Default :: undef
+Default :: 60
 
---sN            Invert signature matching.
-                Default :: undef
+#### extend
 
+Prints a LibreNMS style extend.
 
-* In Interface Options
+##### -Z
 
--if <if>        Interface.
-                Default :: undef
-                Type :: string
+Enable Gzip+Base64 LibreNMS style extend compression.
 
--ifl            Use like for matching interface.
-                Default :: undef
+##### -m <minutes>
 
---ifN           Invert interface matching.
-                Default :: undef
+How far back to search. For the extend action, 5 minutes
+is the default.
 
+#### generate_baphomet_yamls
 
-* App Proto Options
+Generate the YAMLs for Baphomet.
 
--ap <proto>     App proto.
-                Default :: undef
-                Type :: string
+##### -d <dir>
 
--apl            Use like for matching app proto.
-                Default :: undef
+The directory to write it out too.
 
---apN           Invert app proto matching.
-                Default :: undef
+#### get_short_class_snmp_list
 
+Print a list of shorted class names for use wit SNMP.
 
-* Rule Options
+#### search
 
---gid <gid>     GID.
-                Default :: undef
-                Type :: integer
+Search the DB. The table may be specified via -t.
 
---sid <sid>     SID.
-                Default :: undef
-                Type :: integer
+The common option types for search are as below.
 
---rev <rev>     Rev.
-                Default :: undef
-                Type :: integer
+    - Integer :: A comma seperated list of integers to check for. Any number
+                 prefixed with a ! will be negated.
+    - String :: A string to check for. May be matched using like or negated via
+                the proper options.
+    - Complex :: A item to match.
 
-* Types
+##### General Search Options
 
-Integer :: A comma seperated list of integers to check for. Any number
-           prefixed with a ! will be negated.
-String :: A string to check for. May be matched using like or negated via
-          the proper options.
-Complex :: A item to match.
-```
+###### --output <return>
+
+The output type.
+
+    - Values :: table,json
+    - Default :: table
+
+###### -m <minute>
+
+How far back to to in minutes.
+
+    - Default :: 1440
+
+    - Default, extend :: 5
+
+###### --order <column>
+
+Column to use for sorting by.
+
+    - Default :: timestamp
+
+###### --orderdir <direction>
+
+Direction to order in.
+
+    - Values :: ASC,DSC
+    - Default :: ASC
+
+##### IP Options
+
+###### --si <src IP>
+
+Source IP.
+
+    - Default :: undef
+    - Type :: string
+
+######  --di <dst IP>
+
+Destination IP.
+
+    - Default :: undef
+    - Type :: string
+
+######  --ip <IP>
+
+IP, either dst or src.
+
+    - Default :: undef
+    - Type :: complex
+
+#####  Port Options
+
+###### --sp <src port>
+
+Source port.
+
+    - Default :: undef
+    - Type :: integer
+
+######  --dp <dst port>
+
+Destination port.
+
+    - Default :: undef
+    - Type :: integer
+
+###### -p <port>
+
+Port, either dst or src.
+
+    - Default :: undef
+    - Type :: complex
+
+##### Host Options
+
+    Sagan :: Host is the sending system and instance host is the host the
+             instance is running on.
+
+    Suricata :: Host is the system the instance is running on. There is no
+                instance host.
+
+###### --host <host>
+
+Host.
+
+    - Default :: undef
+    - Type :: string
+
+###### --hostl
+
+Use like for matching host.
+
+    - Default :: undef
+
+###### --hostN
+
+Invert host matching.
+
+    - Default :: undef
+
+##### Instance Options
+
+###### --ih <host>
+
+Instance host.
+
+    - Default :: undef
+    - Type :: string
+
+###### --ihl
+
+Use like for matching instance host.
+
+    - Default :: undef
+
+###### --ihN
+
+Invert instance host matching.
+
+    - Default :: undef
+
+##### Instance Options
+
+=head4 -i  <instance>
+
+Instance.
+
+    - Default :: undef
+    - Type :: string
+
+###### --il
+
+Use like for matching instance.
+
+    - Default :: undef
+
+###### --iN
+
+Invert instance matching.
+
+    - Default :: undef
+
+##### Class Options
+
+###### -c <class>
+
+Classification.
+
+    - Default :: undef
+    - Type :: string
+
+###### --cl
+
+Use like for matching classification.
+
+    - Default :: undef
+
+###### --cN
+
+Invert class matching.
+
+    - Default :: undef
+
+##### Signature Options
+
+###### -s <sig>
+
+Signature.
+
+    - Default :: undef
+    - Type :: string
+
+###### --sl
+
+Use like for matching signature.
+
+    - Default :: undef
+
+###### --sN
+
+Invert signature matching.
+
+    - Default :: undef
+
+##### In Interface Options
+
+###### --if <if>
+
+Interface.
+
+    - Default :: undef
+    - Type :: string
+
+###### --ifl
+
+Use like for matching interface.
+
+    - Default :: undef
+
+###### --ifN
+
+Invert interface matching.
+
+    - Default :: undef
+
+##### App Proto Options
+
+###### --ap <proto>
+
+App proto.
+
+    - Default :: undef
+    - Type :: string
+
+###### --apl
+
+Use like for matching app proto.
+
+    - Default :: undef
+
+###### --apN
+
+Invert app proto matching.
+
+    - Default :: undef
+
+##### Rule Options
+
+###### --gid <gid>
+
+GID.
+
+    - Default :: undef
+    - Type :: integer
+
+###### --sid <sid>
+
+SID.
+
+    - Default :: undef
+    - Type :: integer
+
+###### --rev <rev>
+
+Rev.
+
+    - Default :: undef
+    - Type :: integer
+
+## ENVIROMENTAL VARIABLES
+
+### Lilith_table_color
+
+The L<Text::ANSITable> table color to use.
+
+    - Default :: Text::ANSITable::Standard::NoGradation
+
+### Lilith_table_border
+
+The L<Text::ANSITable> border type to use.
+
+    - Default :: ASCII::None
+
+### Lilith_IP_color
+
+Perl boolean for if IPs should be colored or not.
+
+    - Default :: 1
+
+### Lilith_IP_private_color
+
+ANSI color to use for private IPs.
+
+    - Default :: bright_green
+
+### Lilith_IP_remote_color
+
+ANSI color to use for remote IPs.
+
+    - Default :: bright_yellow
+
+### Lilith_IP_local_color
+
+ANSI color to use for local IPs.
+
+    - Default :: bright_red
+
+### Lilith_timesamp_drop_micro
+
+Perl boolean for if microseconds should be dropped or not.
+
+    - Default :: 1
+
+### Lilith_instance_color
+
+If the lilith instance colomn info should be colored.
+
+    - Default :: 1
+
+### Lilith_instance_type_color
+
+Color for the instance name.
+
+    - Default :: bright_blue
+
+### Lilith_instance_slug_color
+
+Color for the insance slug.
+
+    - Default :: bright_magenta
+
+### Lilith_instance_loc_color
+
+Color for the insance loc.
+
+	- Default :: bright_cyan.
+

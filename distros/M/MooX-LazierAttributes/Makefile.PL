@@ -21,9 +21,9 @@ WriteMakefile(
         'Test::Requires' => 0,
     },
     PREREQ_PM => {
-        'MooX::ReturnModifiers' => '0.03',
+        'MooX::ReturnModifiers' => '1.000001',
         'namespace::clean' => '0.27',
-		'Clone' => '0.39',
+	'Clone' => '0.39',
         'constant' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

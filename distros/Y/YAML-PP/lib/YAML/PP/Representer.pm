@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Representer;
 
-our $VERSION = '0.036'; # VERSION
+our $VERSION = 'v0.37.0'; # VERSION
 
 use Scalar::Util qw/ reftype blessed refaddr /;
 

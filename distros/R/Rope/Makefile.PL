@@ -13,6 +13,7 @@ my %WriteMakefileArgs = (
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
 	'Type::Tiny' => '0',
+	'Want' => '0'
     },
     TEST_REQUIRES => {
         'Test::More' => '0',

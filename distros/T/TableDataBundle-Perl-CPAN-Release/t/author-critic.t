@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/TableData/Perl/CPAN/Release/Static.pm','lib/TableData/Perl/CPAN/Release/Static/FromNewest.pm','lib/TableDataBundle/Perl/CPAN/Release.pm'];
+my $filenames = ['lib/Bencher/Scenario/TableData/Perl/CPAN/Release/Static.pm','lib/TableData/Perl/CPAN/Release/Static.pm','lib/TableData/Perl/CPAN/Release/Static/FromNewest.pm','lib/TableData/Perl/CPAN/Release/Static/GroupedDaily.pm','lib/TableData/Perl/CPAN/Release/Static/GroupedMonthly.pm','lib/TableData/Perl/CPAN/Release/Static/GroupedWeekly.pm','lib/TableDataBundle/Perl/CPAN/Release.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

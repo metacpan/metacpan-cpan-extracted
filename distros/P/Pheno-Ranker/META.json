@@ -80,7 +80,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/pheno-ranker"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

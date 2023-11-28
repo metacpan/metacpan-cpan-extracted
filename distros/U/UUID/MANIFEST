@@ -1,10 +1,11 @@
 Changes
-License
+LICENSE                                  
+MANIFEST
+META.json                                
+META.yml                                 
 Makefile.PL
-MANIFEST			This list of files
-META.json
-META.yml
-README
-t/test.t
+README                                   
 UUID.pm
 UUID.xs
+t/0gen.t
+t/test.t

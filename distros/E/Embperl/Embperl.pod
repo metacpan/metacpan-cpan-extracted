@@ -136,7 +136,7 @@ of different documents and cleanup after the request is finished, but in special
 necessary. For example, if you want to recursively call an Embperl document via Execute.
 
 There is a second reason to use the [* Perl code *] instead of the [- Perl Code -]. If you like
-to use perl's control structures. Perl's if, while, for etc. can B<not> span mulitple [- Perl Code -]
+to use perl's control structures. Perl's if, while, for etc. can B<not> span multiple [- Perl Code -]
 blocks, but it can span multiple [* Perl Code *]. 
 
   Example:
@@ -259,21 +259,21 @@ first B<Arg> accordingly.
 =item B<next>
 
 Inside of looks same as Perl next statement. You could also use the following
-syntax, which allows you to add an addtional condition (or any other Perl code):
+syntax, which allows you to add an additional condition (or any other Perl code):
 
     [* next if ($foo) *]
 
 =item B<last>
 
 Inside of looks same as Perl last statement. You could also use the following
-syntax, which allows you to add an addtional condition (or any other Perl code):
+syntax, which allows you to add an additional condition (or any other Perl code):
 
     [* last if ($foo) *]
 
 =item B<redo>
 
 Inside of looks same as Perl redo statement. You could also use the following
-syntax, which allows you to add an addtional condition (or any other Perl code):
+syntax, which allows you to add an additional condition (or any other Perl code):
 
     [* redo if ($foo) *]
 
@@ -424,7 +424,7 @@ Output to the page output
 
 =item pre
 
-Same as C<out>, but suround with a <pre> tag. This is the default, if
+Same as C<out>, but surrounded with a <pre> tag. This is the default, if
 the output parameter is omitted.
 
 =item log
@@ -828,10 +828,10 @@ together.
 Turn HTML and URL escaping on and off.  The default is on ($escmode =
 3).
 
-B<NOTE:> Normaly you can disable escaping by preceding the item that
+B<NOTE:> Normally you can disable escaping by preceding the item that
 normally is escaped with a backslash. While this is a handy thing, it could
 be very dangerous in situations, where content that is inserted by some
-user is redisplayed, because they can enter arbitrary HTML and preceed them
+user is redisplayed, because they can enter arbitrary HTML and precede them
 with a backslash to avoid correct escaping when their input is redisplayed
 again. To avoid this problem, add 4 to the values below. This will cause
 Embperl to ignore the backslash when it does output escaping at all.
@@ -878,7 +878,7 @@ B<SEE ALSO:> Configuration directive EMBPERL_INPUT_ESCMODE (was optRawInput in E
 
 This variable is only available when running under control of
 mod_perl.  It contains the request record needed to access the Apache
-server API.  See B<perldoc Apache> for more information.
+server API.  See B<perldoc Apache2::RequestRec> for more information.
 
 =head2 LOG
 
@@ -915,12 +915,12 @@ You can put any http headers you want to send into this hash.
 If you set a location header,
 Embperl will automatically set the status to 301 (Redirect). Example:
 
-  [- $http_headers_out{'Location'} = "http://www.ecos.de/embperl/" -]
+  [- $http_headers_out{'Location'} = "https://www.actevy.io/embperl/" -]
 
 however, it is possible to specify a two element array for Location, the second
 element of which gives the desired HTTP status:
 
-  [- $http_headers_out{Location} = [ "http://www.ecos.de/embperl/", 303 ]; -]
+  [- $http_headers_out{Location} = [ "https://www.actevy.io/embperl/", 303 ]; -]
 
 Starting with version 1.3.2 all headers with the exception of
 "Content-Type" can take multiple values.
@@ -986,7 +986,7 @@ install Apache::SessionX or set
     PerlSetEnv EMBPERL_SESSION_HANDLER_CLASS "Embperl::Session"
 
 to get the old behaviour. If you have Apache::SessionX installed, you
-don't have to make addtional configuration, otherwise you must do the following
+don't have to make additional configuration, otherwise you must do the following
 things. You are also able to override the Apache::SessionX defaults, by
 using the following parameters:
 
@@ -1127,7 +1127,7 @@ a Embperl::Req object, which is passed as first parameter to every Embperl page 
 
 =head2 Embperl::Req::RefreshSession / $r -> RefreshSession [1.3b6+]
 
-Triggers a resend of the cookie. Normaly the cookie is only send the first time.
+Triggers a resend of the cookie. Normally the cookie is only sent the first time.
 If called as a method C<$r> must be 
 a Embperl::Req object, which is passed as first parameter to every Embperl page in @_ .
 
@@ -1349,7 +1349,7 @@ data from forms should be validated. This done by the module L<Embperl::Form::Va
 This module is able to do client side verification by generation JavaScript code 
 and server side verification by providing a Perl method to validate the data.
 Embperl::Form::Validate comes with a lot of standard tests and you can extent it
-by providing your own test classes, which can inherit from the shiped test classes.
+by providing your own test classes, which can inherit from the shipped test classes.
 
 For further details see perldoc L<Embperl::Form::Validate|EmbperlFormValidate.pod>.
 
@@ -1431,7 +1431,7 @@ Here is an example:
         }
 
     # Code ref works too...
-    @{$r -> messages} = (\&ecos::I18L::translate::gettext) ;
+    @{$r -> messages} = (\&I18L::translate::gettext) ;
 
     # and gettext is defined as
     sub gettext 
@@ -1538,7 +1538,7 @@ messages and/or all error objects.
     -]
     
     [$if @errors$]
-        The following errors had occured:<br>
+        The following errors had occurred:<br>
         [$foreach $err (@errors)$]
             [+ $err +]<br>         
         [$endforeach$]
@@ -1549,7 +1549,7 @@ In case you call C<die> inside the executed page and pass an object (or a refere
 to C<die> instead of a string this will also show up in @errors. The last object 
 passed to C<die> is also available via C<$epreq -> errobj>.
 
-C<$epreq -> error> can be used to test if an error occured so far during the
+C<$epreq -> error> can be used to test if an error occurred so far during the
 current request. You can also set C<$epreq -> error> to false to reset Embperl's
 internal error condition.
 
@@ -1577,7 +1577,7 @@ If you specify $ReturnField the value of that formfield will be used
 as B<Return-Path>. Usually, this will be the field where the user enters his
 e-mail address in the form.
 
-If you specifiy the following example code as the action in your form
+If you specify the following example code as the action in your form
 
   <FORM ACTION="x/feedback.htm" METHOD="POST"
         ENCTYPE="application/x-www-form-urlencoded">
@@ -1625,7 +1625,7 @@ when running under mod_perl).
 
 =head1 Performance
 
-To get the best performace from Embperl, it is necessary to restrict
+To get the best performance from Embperl, it is necessary to restrict
 logging to a minimum.  You can drastically slow down Embperl if you
 enable all logging options.  (This is why `make test' takes a while to
 run.)  You should B<never> enable B<dbgFlushOutput> or B<dbgFlushLog>
@@ -1646,57 +1646,6 @@ performance.
 
 None known.
 
-=head1 Compatibility
-
-I have tested Embperl successfully
-
-=head2 on Linux 2.x/3.x with
-
-=over 4
-
-=item perl5.005_03, 5.6.x, 5.8.x, 5.10.x, 5.12.x, 5.14.x, 5.16.x, 5.18.x
-
-=item apache_1.3.0 - apache_1.3.31, apache 2.0.x, apache 2.2.x, apache 2.4.x
-
-=item apache_ssl (Ben SSL)
-
-=item Stronghold 2.2
-
-=item Stronghold 2.4.1
-
-=item Apache_1.3.x with mod_ssl 2.x.x
-
-=back
-
-I know from other people that it works on many other UNIX systems
-
-=head2 on Windows NT 4.0 with
-
-=over 4
-
-=item perl5.004_04
-
-=item perl5.005
-
-=item perl5.6.1
-
-=item perl5.8.x
-
-=item apache_1.3.0 - apache_1.3.31
-
-=back
-
-=head2 on Windows 95/98 with
-
-=over 4
-
-=item perl5.004_02 (binary distribution, only Offline Mode)
-
-=item perl5.005_02 + apache_1.3.6
-
-
-=back
-
 =head1 Support
 
 =head2 Feedback and Bug Reports
@@ -1714,89 +1663,46 @@ To subscribe to this list, send mail to embperl-subscribe@perl.apache.org.
 To unsubscribe send email to embperl-unsubscribe@perl.apache.org . 
 
 There is an archive for the Embperl mailing list at 
-http://mail-archives.apache.org/mod_mbox/perl-embperl
+https://mail-archives.apache.org/mod_mbox/perl-embperl
 
 For mod_perl related questions you may search the mod_perl mailing list
-archive at http://mail-archives.apache.org/mod_mbox/perl-modperl
+archive at https://mail-archives.apache.org/mod_mbox/perl-modperl
 
 
 =head2 Commerical Support
 
-You can get free support on the Embperl mailing list (see above).  If
-you need commercial support, ecos can provide it for you. We offer:
+You can get free support on the embperl mailing list. If you need
+commercial support for Embperl, please send email to 
+richter at embperl dot org.
 
-=over 4
-
-=item * Consulting and assistance for you and your programmers
-
-=item * Planning of your dynamic website
-
-=item * Creating of parts or a whole website
-
-=item * Fixing bugs in Embperl (also available for mod_perl)
-
-=item * Adding new features
-
-=back
-
-You can reach us via http://www.ecos.de or info@ecos.de 
-
-
-=head2 How to Support the Development of Embperl
-
-If you use and like Embperl and want to support it's ongoing development
-you have two possibilities:
-
-=over 4
-
-=item 1 
-
-Send me patches for things you like to see in Embperl
-
-=item 2
-
-Donate money to Embperl. See http://perl.apache.org/donate.htm
-
-=item 3
-
-Buy commercial support (see above). Also you B<may> get the same answers
-to your questions on the mailing list, by buying the commercial support
-you not only buy support for yourself and can be sure you get an answer,
-you also give us the possibility to put more power in the further
-development of Embperl.
-
-=back
+You can reach us via https://www.actevy.io or richter at embperl dot org
 
 
 =head1 Links and Download
 
 =head2 Information
 
-mod_perl                http://perl.apache.org/
+mod_perl                https://perl.apache.org/
 
-Embperl                 http://perl.apache.org/embperl/
+Embperl                 https://perl.apache.org/embperl/
 
-Embperl (german)        http://www.ecos.de/embperl/
+Embperl (german)        https://www.actevy.io/embperl/de/
 
-DBIx::Recordset	        http://search.cpan.org/~grichter/
+DBIx::Recordset	        https://metacpan.org/author/GRICHTER
 
-Apache web server       http://www.apache.org/
+Apache web server       https://www.apache.org/
+
+More Apache Perl modules https://perl.apache.org/src/apache-modlist.html
 
 =head2 Download
 
-mod_perl                http://perl.apache.org/dist/
+mod_perl                https://perl.apache.org/download/index.html
 
-Apache Perl Modules     http://www.perl.com/CPAN/modules/by-module/Apache/
+Apache Perl Modules     https://www.perl.com/CPAN/modules/by-module/Apache/
 
-Embperl                 http://www.embperl.org/downloads
+Embperl                 https://www.embperl.org/downloads
 
-DBIx::Recordset	        http://search.cpan.org/~grichter/
-
-PPM for ActiveState  
-
-- Perl 5.6.x            http://theoryx5.uwinnipeg.ca/ppmpackages/
-
-- Perl 5.8.x            http://theoryx5.uwinnipeg.ca/ppms
+DBIx::Recordset	        https://metacpan.org/author/GRICHTER
 
 B<Informations on how to install Embperl can be found in> L<INSTALL.pod>
 
@@ -1815,10 +1721,10 @@ From: Erik Arneson [erik@mind.net]
 Here's the amount of documentation I've got right now.
 
 They need to get mmm.el from this URL:
-http://mmm-mode.sourceforge.net/
+https://mmm-mode.sourceforge.net/
 
 Then download my mmm-embperl.el from this one:
-http://www.aarg.net/erik/mmm-embperl.el
+https://www.aarg.net/erik/mmm-embperl.el
 
 The documentation for using these is included in those two elisp files.
 
@@ -1827,16 +1733,16 @@ The documentation for using these is included in those two elisp files.
 Vim Syntaxfile for Vim 5.x & 6.x from Lukas Zapletal with syntax highliting for JavaScript, VBScript,
 Perl+Embperl, CSS and HTML, yellow background for Perl`s code (like M$ Interdev) and
 working Perl folding can be found at
-http://vim.sourceforge.net/script.php?script_id=61 
+https://vim.sourceforge.net/script.php?script_id=61 
 
-Vim Syntaxfile from Steve Willer can be found at http://www.interlog.com/~willer/embperl.vim
+Vim Syntaxfile from Steve Willer can be found at https://www.interlog.com/~willer/embperl.vim
 
-Vim Syntaxfile from Kee Hinckley can be found at http://www.somewhere.com/software/
+Vim Syntaxfile from Kee Hinckley can be found at https://www.somewhere.com/software/
 
 =head2 Dreamweaver
 
 Dreamweaver extension which tells Dreamweaver not to touch Embperl code can 
-be found at http://www.somewhere.com/software/
+be found at https://www.somewhere.com/software/
 
 
 =head1 AUTHOR

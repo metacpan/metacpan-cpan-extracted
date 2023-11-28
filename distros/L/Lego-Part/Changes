@@ -1,3 +1,15 @@
+0.04 2023-11-24T22:24:12+01:00
+ - Add tests.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-09-23T23:30:47+02:00
  - Add tests for Lego::Part class.
  - Move author tests to xt/ directory.

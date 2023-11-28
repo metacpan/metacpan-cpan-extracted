@@ -7,9 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-# copyright at the end of the file in the pod section
-
-package Config::Model::TkUI 1.376;
+package Config::Model::TkUI 1.377;
 
 use 5.10.1;
 use strict;
@@ -22,7 +20,7 @@ use subs qw/menu_struct/;
 use Scalar::Util qw/weaken/;
 use Log::Log4perl 1.11;
 use Path::Tiny;
-use YAML qw/LoadFile DumpFile/;
+use YAML::PP;
 use File::HomeDir;
 
 use Pod::POM;
@@ -97,10 +95,11 @@ my $main_window;
 my $home_str = File::HomeDir->my_home || '/tmp/';
 my $config_path = path($home_str)->child('.cme/config/');
 my $config_file = $config_path->child('tkui.yml');
+my $ypp = YAML::PP->new;
 
 $config_path -> mkpath;
 
-my $config = $config_file->is_file ? LoadFile($config_file) : $default_config ;
+my $config = $config_file->is_file ? $ypp->load_file($config_file) : $default_config ;
 
 # Tk::CmdLine::SetArguments( -font => $config->{font} ) ;
 
@@ -121,7 +120,7 @@ sub set_font {
         $main_window->RefontTree(-font => $tk_font);
         $config->{font} = {$tk_font->actual} ;
         $cw->ConfigSpecs( -font => ['DESCENDANTS', 'font','Font', $tk_font ]);
-        DumpFile($config_file->stringify, $config);
+        $ypp->dump_file($config_file->stringify, $config);
     }
 }
 
@@ -188,10 +187,6 @@ sub Populate {
         [ command => 'check for warnings',   -command => sub { $cw->check( 1, 1 ) } ],
         [ command => 'show unsaved changes', -command => sub { $cw->show_changes; } ],
         [ command => 'save (Ctrl-s)', -command => sub { $cw->save } ],
-        [
-            command  => 'save in dir ...',
-            -command => sub { $cw->save_in_dir; }
-        ],
         @$extra_menu,
         [
             command  => 'debug ...',
@@ -221,32 +216,41 @@ sub Populate {
     ];
     $menubar->cascade( -label => 'Edit', -menuitems => $edit_items );
 
-    my $option_items = [
-        [ command => 'Font',  '-command', sub { $cw->set_font(); } ],
-    ];
-    $menubar->cascade( -label => 'Options', -menuitems => $option_items );
+    my $option_menu = $menubar->cascade( -label => 'Options');
+    $option_menu->command( -label => 'Font', -command => sub { $cw->set_font(); });
+
+    # create 'hide empty values'
+    $cw->{hide_empty_values} = 0;
+    $option_menu->checkbutton(
+        -label  => "Hide empty values",
+        -variable => \$cw->{hide_empty_values},
+        -command  => sub { $cw->reload($cw->{location}) },
+    );
+
+    # create 'show only custom values'
+    $cw->{show_only_custom} = 0;
+    $option_menu->checkbutton(
+        -label => 'Show only custom values',
+        -variable => \$cw->{show_only_custom},
+        -command  => sub { $cw->reload($cw->{location}) },
+    );
+
+    # create 'show only custom values'
+    $cw->{auto_save_mode} = 0;
+    $option_menu->checkbutton(
+        -label => 'Auto save',
+        -variable => \$cw->{auto_save_mode},
+    );
+
+    $cw->{instance}->on_change_cb( sub {
+        $cw->save if $cw->{auto_save_mode};;
+    });
 
     # create frame for location entry
     my $loc_frame =
         $cw->Frame( -relief => 'sunken', -borderwidth => 1 )->pack( -pady => 0, -fill => 'x' );
     $loc_frame->Label( -text => 'location :' )->pack( -side => 'left' );
     $loc_frame->Label( -textvariable => \$cw->{location} )->pack( -side => 'left' );
-
-    # create 'show only custom values'
-    $cw->{show_only_custom} = 0;
-    $loc_frame->Checkbutton(
-        -variable => \$cw->{show_only_custom},
-        -command  => sub { $cw->reload },
-    )->pack( -side => 'right' );
-    $loc_frame->Label( -text => 'show only custom values' )->pack( -side => 'right' );
-
-    # create 'hide empty values'
-    $cw->{hide_empty_values} = 0;
-    $loc_frame->Checkbutton(
-        -variable => \$cw->{hide_empty_values},
-        -command  => sub { $cw->reload },
-    )->pack( -side => 'right' );
-    $loc_frame->Label( -text => 'hide empty values' )->pack( -side => 'right' );
 
     # add bottom frame
     my $bottom_frame = $cw->Frame->pack(qw/-pady 0 -fill both -expand 1/);
@@ -504,16 +508,6 @@ sub close_item {
     my @children = $tktree->infoChildren($path);
     $logger->trace("close_item hide @children");
     map { $tktree->hide( -entry => $_ ); } @children;
-}
-
-sub save_in_dir {
-    my $cw = shift;
-    require Tk::DirSelect;
-    $cw->{save_dir} = $cw->DirSelect()->Show;
-
-    # chooseDirectory does not work correctly.
-    #$cw->{save_dir} = $cw->chooseDirectory(-mustexist => 'no') ;
-    $cw->save();
 }
 
 sub check {

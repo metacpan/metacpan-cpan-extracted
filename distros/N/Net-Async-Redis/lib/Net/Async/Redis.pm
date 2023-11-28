@@ -1,15 +1,15 @@
 package Net::Async::Redis;
 # ABSTRACT: Redis support for IO::Async
 
+use Object::Pad;
+class Net::Async::Redis :isa(IO::Async::Notifier);
 use strict;
 use warnings;
+use experimental qw(signatures);
 
-use parent qw(
-    Net::Async::Redis::Commands
-    IO::Async::Notifier
-);
+use parent qw(Net::Async::Redis::Commands);
 
-our $VERSION = '4.002';
+our $VERSION = '5.001';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -170,6 +170,7 @@ use Syntax::Keyword::Dynamically;
 use Syntax::Keyword::Match;
 use curry::weak;
 use Future::AsyncAwait;
+use Future::Queue;
 use IO::Async::Stream;
 use Ryu::Async;
 use URI;
@@ -293,8 +294,7 @@ Note that enabling C<hashrefs> will cause connections to fail if the server does
 
 =cut
 
-sub configure {
-    my ($self, %args) = @_;
+method configure (%args) {
     for (qw(
         host
         port
@@ -350,7 +350,7 @@ Returns the host or IP address for the Redis server.
 
 =cut
 
-sub host { shift->{host} }
+method host { $self->{host} }
 
 =head2 port
 
@@ -358,7 +358,7 @@ Returns the port used for connecting to the Redis server.
 
 =cut
 
-sub port { shift->{port} }
+method port { $self->{port} }
 
 =head2 database
 
@@ -368,7 +368,7 @@ See the L<Net::Async::Redis::Commands/select> method for details.
 
 =cut
 
-sub database { shift->{database} }
+method database { $self->{database} }
 
 =head2 uri
 
@@ -376,7 +376,7 @@ Returns the Redis endpoint L<URI> instance.
 
 =cut
 
-sub uri { shift->{uri} //= URI->new('redis://localhost') }
+method uri { $self->{uri} //= URI->new('redis://localhost') }
 
 =head2 stream_read_len
 
@@ -389,7 +389,7 @@ value.
 
 =cut
 
-sub stream_read_len { shift->{stream_read_len} //= 1048576 }
+method stream_read_len { $self->{stream_read_len} //= 1048576 }
 
 =head2 stream_write_len
 
@@ -399,7 +399,7 @@ See L</stream_read_len>.
 
 =cut
 
-sub stream_write_len { shift->{stream_write_len} //= 1048576 }
+method stream_write_len { $self->{stream_write_len} //= 1048576 }
 
 =head2 client_name
 
@@ -407,7 +407,7 @@ Returns the name used for this client when connecting.
 
 =cut
 
-sub client_name { shift->{client_name} }
+method client_name { $self->{client_name} }
 
 =head1 METHODS - Connection
 
@@ -422,8 +422,16 @@ will be preserved for subsequent L</connect> calls.
 
 =cut
 
-sub connect : method {
-    my ($self, %args) = @_;
+method connect (%args) {
+    return $self->{connection} if $self->{connection};
+    my $f = $self->connect_to_server(%args)->on_ready(sub {
+        $log->tracef('connection call complete - %s', $_[0]->state);
+        delete $self->{connection} unless shift->is_done
+    });
+    return $self->{connection} = $f;
+}
+
+async method connect_to_server (%args) {
     $self->configure(%args) if %args;
     my $uri = $self->uri->clone;
     for (qw(host port)) {
@@ -446,7 +454,9 @@ sub connect : method {
     $log->tracef('About to start connection to %s', "$uri");
     my $tls = $self->{tls} // $uri->secure // 0;
     require IO::Async::SSL if $tls;
-    $self->{connection} //= $self->loop->connect(
+    await $self->loop->later;
+
+    my $sock = await $self->loop->connect(
         service => $uri->port // 6379,
         host    => $uri->host,
         socktype => 'stream',
@@ -454,92 +464,89 @@ sub connect : method {
             extensions => ['SSL'],
             $self->ssl_options->%*,
         ) : (),
-    )->then(async sub {
-        my ($sock) = @_;
-        $self->{endpoint} = join ':', $sock->peerhost, $sock->peerport;
-        $self->{local_endpoint} = join ':', $sock->sockhost, $sock->sockport;
-        my $proto = $self->wire_protocol;
-        my $stream = IO::Async::Stream->new(
-            handle              => $sock,
-            read_len            => $self->stream_read_len,
-            write_len           => $self->stream_write_len,
-            # Arbitrary multipliers for our stream values,
-            # in a memory-constrained environment it's expected
-            # that ->stream_read_len would be configured with
-            # low enough values for this not to be a concern.
-            read_high_watermark => 16 * $self->stream_read_len,
-            read_low_watermark  => 2 * $self->stream_read_len,
-            on_closed           => $self->curry::weak::notify_close,
-            on_read             => sub {
-                $proto->parse($_[1]);
-                0
-            }
-        );
-        $self->add_child($stream);
-        Scalar::Util::weaken(
-            $self->{stream} = $stream
-        );
-
-        try {
-            # Pretend we tried and failed if the old version was specifically requested
-            die 'ERR unknown command' if $self->{protocol} and $self->{protocol} eq 'resp2';
-
-            # Try issuing a HELLO to detect RESP3 or above
-            dynamically $self->{connection_in_progress} = 1;
-            await $self->hello(
-                3, defined($auth) ? (
-                    qw(AUTH), $username, $auth
-                ) : (), defined($self->client_name) ? (
-                    qw(SETNAME), $self->client_name
-                ) : ()
-            );
-            $log->tracef('RESP3 detected');
-            $self->{protocol_level} = 'resp3';
-
-            $proto->{hashrefs} = $self->{hashrefs};
-            $proto->{protocol} = $self->{protocol_level};
-        } catch {
-            # If we had an auth failure or invalid client name, all bets are off:
-            # immediately raise those back to the caller
-            die $@ unless $@ =~ /ERR unknown command/;
-
-            $log->tracef('Older Redis version detected, dropping back to RESP2 protocol');
-            $self->{protocol_level} = 'resp2';
-
-            die 'extended data structures require RESP3 (Redis version 6+)' if $self->{hashrefs};
-
-            $proto->{hashrefs} = $self->{hashrefs};
-            $proto->{protocol} = $self->{protocol_level};
-
-            dynamically $self->{connection_in_progress} = 1;
-            await $self->auth($auth) if defined $auth;
-            dynamically $self->{connection_in_progress} = 1;
-            await $self->client_setname($self->client_name) if defined $self->client_name;
+    );
+    $self->{endpoint} = join ':', $sock->peerhost, $sock->peerport;
+    $self->{local_endpoint} = join ':', $sock->sockhost, $sock->sockport;
+    my $proto = $self->wire_protocol;
+    my $stream = IO::Async::Stream->new(
+        handle              => $sock,
+        read_len            => $self->stream_read_len,
+        write_len           => $self->stream_write_len,
+        # Arbitrary multipliers for our stream values,
+        # in a memory-constrained environment it's expected
+        # that ->stream_read_len would be configured with
+        # low enough values for this not to be a concern.
+        read_high_watermark => 16 * $self->stream_read_len,
+        read_low_watermark  => 2 * $self->stream_read_len,
+        on_closed           => $self->curry::weak::notify_close,
+        on_read             => sub {
+            $proto->parse($_[1]);
+            0
         }
+    );
+    $self->add_child($stream);
+    Scalar::Util::weaken(
+        $self->{stream} = $stream
+    );
+
+    try {
+        # Pretend we tried and failed if the old version was specifically requested
+        die 'ERR unknown command' if $self->{protocol} and $self->{protocol} eq 'resp2';
+
+        # Try issuing a HELLO to detect RESP3 or above
+        dynamically $self->{connection_in_progress} = 1;
+        await $self->hello(
+            3, defined($auth) ? (
+                qw(AUTH), $username, $auth
+            ) : (), defined($self->client_name) ? (
+                qw(SETNAME), $self->client_name
+            ) : ()
+        );
+        $log->tracef('RESP3 detected');
+        $self->{protocol_level} = 'resp3';
+
+        $proto->{hashrefs} = $self->{hashrefs};
+        $proto->{protocol} = $self->{protocol_level};
+    } catch {
+        # If we had an auth failure or invalid client name, all bets are off:
+        # immediately raise those back to the caller
+        die $@ unless $@ =~ /ERR unknown command/;
+
+        $log->tracef('Older Redis version detected, dropping back to RESP2 protocol');
+        $self->{protocol_level} = 'resp2';
+
+        die 'extended data structures require RESP3 (Redis version 6+)' if $self->{hashrefs};
+
+        $proto->{hashrefs} = $self->{hashrefs};
+        $proto->{protocol} = $self->{protocol_level};
 
         dynamically $self->{connection_in_progress} = 1;
-        if($uri->database) {
-            try {
-                $log->tracef('Select database %s', $uri->database);
-                await $self->select($uri->database);
-            } catch($e) {
-                die 'Failed to switch database on Redis connection - ' . $e;
-            }
+        await $self->auth($auth) if defined $auth;
+        dynamically $self->{connection_in_progress} = 1;
+        await $self->client_setname($self->client_name) if defined $self->client_name;
+    }
+
+    dynamically $self->{connection_in_progress} = 1;
+    if($uri->database) {
+        try {
+            $log->tracef('Select database %s', $uri->database);
+            await $self->select($uri->database);
+        } catch($e) {
+            die 'Failed to switch database on Redis connection - ' . $e;
         }
-        if($self->is_client_side_cache_enabled) {
-            try {
-                $log->tracef('Client-side cache requested');
-                await $self->client_side_connection;
-                $log->tracef('Client-side connection established');
-            } catch($e) {
-                die 'This version of Redis does not support clientside caching' if $e =~ /Unknown subcommand .*tracking/i;
-                $log->errorf('Clientside cache setup failure in ->connect - %s', $e);
-                die 'Failed to enable clientside caching on Redis connection - ' . $e;
-            }
+    }
+    if($self->is_client_side_cache_enabled) {
+        try {
+            $log->tracef('Client-side cache requested');
+            await $self->client_side_connection;
+            $log->tracef('Client-side connection established');
+        } catch($e) {
+            die 'This version of Redis does not support clientside caching' if $e =~ /Unknown subcommand .*tracking/i;
+            $log->errorf('Clientside cache setup failure in ->connect - %s', $e);
+            die 'Failed to enable clientside caching on Redis connection - ' . $e;
         }
-        return;
-    })->on_fail(sub { delete $self->{connection} })
-      ->on_cancel(sub { delete $self->{connection} });
+    }
+    return $stream;
 }
 
 =head2 connected
@@ -549,8 +556,7 @@ L<Future> instance.
 
 =cut
 
-sub connected {
-    my ($self) = @_;
+method connected {
     return $self->{connection} if $self->{connection};
     $self->connect;
 }
@@ -561,7 +567,7 @@ The string describing the remote endpoint.
 
 =cut
 
-sub endpoint { shift->{endpoint} }
+method endpoint { $self->{endpoint} }
 
 =head2 local_endpoint
 
@@ -569,7 +575,7 @@ A string describing the local endpoint, usually C<host:port>.
 
 =cut
 
-sub local_endpoint { shift->{local_endpoint} }
+method local_endpoint { $self->{local_endpoint} }
 
 =head1 METHODS - Subscriptions
 
@@ -733,37 +739,15 @@ Example:
 
 =cut
 
-async sub multi {
-    my ($self, $code) = @_;
+async method multi ($code) {
     die 'Need a coderef' unless $code and reftype($code) eq 'CODE';
 
     my $multi = Net::Async::Redis::Multi->new(
         redis => $self,
     );
-    my @pending = @{$self->{pending_multi}};
-
-    $log->tracef('Have %d pending MULTI transactions',
-        0 + @pending
-    );
-    push @{$self->{pending_multi}}, $self->loop->new_future->set_label($self->command_label('multi'));
-
-    await Future->wait_all(
-        @pending
-    ) if @pending;
-    await do {
-        dynamically $self->{_is_multi} = 1;
-        Net::Async::Redis::Commands::multi($self);
-    };
-    return await $multi->exec($code)
+    await $self->next::method;
+    return await $multi->exec($code);
 }
-
-around [qw(discard exec)] => sub {
-    my ($code, $self, @args) = @_;
-    dynamically $self->{_is_multi} = 1;
-    my $f = $self->$code(@args);
-    (shift @{$self->{pending_multi}})->done;
-    $f->retain
-};
 
 =head1 METHODS - Clientside caching
 
@@ -805,8 +789,8 @@ are changing.
 
 =cut
 
-sub clientside_cache_events {
-    shift->{clientside_cache_events} // die 'no client-side cache available yet'
+method clientside_cache_events {
+    $self->{clientside_cache_events} // die 'no client-side cache available yet'
 }
 
 =head2 client_side_cache_ready
@@ -816,8 +800,7 @@ if there is one.
 
 =cut
 
-sub client_side_cache_ready {
-    my ($self) = @_;
+method client_side_cache_ready {
     my $f = $self->{client_side_cache_ready} or return Future->fail('client-side cache is not enabled');
     return $f->without_cancel;
 }
@@ -828,8 +811,7 @@ Returns the L<Cache::LRU> instance used for the client-side cache.
 
 =cut
 
-sub client_side_cache {
-    my ($self) = @_;
+method client_side_cache {
     $self->{client_side_cache} //= Cache::LRU->new(
         size => $self->client_side_cache_size,
     );
@@ -841,7 +823,7 @@ Returns true if the client-side cache is enabled.
 
 =cut
 
-sub is_client_side_cache_enabled { (shift->{client_side_cache_size} // 0) > 0 }
+method is_client_side_cache_enabled { ($self->{client_side_cache_size} // 0) > 0 }
 
 =head2 client_side_cache_size
 
@@ -849,7 +831,7 @@ Returns the current client-side cache size, as a number of entries.
 
 =cut
 
-sub client_side_cache_size { shift->{client_side_cache_size} }
+method client_side_cache_size { $self->{client_side_cache_size} }
 
 # For now, we're only caching the GET/SET requests. Client-side caching
 # support in the Redis server covers other commands, though: eventually
@@ -899,8 +881,7 @@ around get => async sub {
 
 =cut
 
-sub keys : method {
-    my ($self, $match) = @_;
+method keys ($match) {
     $match //= '*';
     return $self->next::method($match);
 }
@@ -955,7 +936,7 @@ See L<https://redis.io/topics/pipelining> for more details on this concept.
 
 =cut
 
-sub pipeline_depth { shift->{pipeline_depth} //= 100 }
+method pipeline_depth { $self->{pipeline_depth} //= 100 }
 
 =head2 opentracing
 
@@ -963,7 +944,7 @@ Indicates whether L<OpenTracing::Any> support is enabled.
 
 =cut
 
-sub opentracing { shift->{opentracing} }
+method opentracing { $self->{opentracing} }
 
 =head1 METHODS - Deprecated
 
@@ -971,8 +952,8 @@ This are still supported, but no longer recommended.
 
 =cut
 
-sub bus {
-    shift->{bus} //= do {
+method bus {
+    $self->{bus} //= do {
         require Mixin::Event::Dispatch::Bus;
         Mixin::Event::Dispatch::Bus->VERSION(2.000);
         Mixin::Event::Dispatch::Bus->new
@@ -992,9 +973,7 @@ item, depending on whether we're dealing with subscriptions at the moment.
 
 =cut
 
-sub on_message {
-    my ($self, $data) = @_;
-
+method on_message ($data) {
     $log->tracef('Incoming message: %s, pending = %s', $data, join ',', map { $_->[0] } $self->{pending}->@*) if $log->is_trace;
 
     if($self->{protocol_level} eq 'resp2' and exists $self->{pubsub} and exists $SUBSCRIPTION_COMMANDS{uc $data->[0]}) {
@@ -1004,8 +983,7 @@ sub on_message {
     return $self->complete_message($data);
 }
 
-sub complete_message {
-    my ($self, $data) = @_;
+method complete_message ($data) {
     my $next = shift @{$self->{pending}} or die "No pending handler";
     $self->next_in_pipeline if @{$self->{awaiting_pipeline}};
     return if $next->[1]->is_cancelled;
@@ -1022,8 +1000,7 @@ Attempt to process next pending request when in pipeline mode.
 
 =cut
 
-sub next_in_pipeline {
-    my ($self) = @_;
+method next_in_pipeline {
     my $depth = $self->pipeline_depth;
     until($depth and $self->{pending}->@* >= $depth) {
         return unless my $next = shift @{$self->{awaiting_pipeline}};
@@ -1043,8 +1020,7 @@ Called when there's an error response.
 
 =cut
 
-sub on_error_message {
-    my ($self, $data) = @_;
+method on_error_message ($data) {
     $log->tracef('Incoming error message: %s', $data);
 
     my $next = shift @{$self->{pending}} or die "No pending handler";
@@ -1059,8 +1035,7 @@ Deal with an incoming pubsub-related message.
 
 =cut
 
-sub handle_pubsub_message {
-    my ($self, $type, @details) = @_;
+method handle_pubsub_message ($type, @details) {
     $type = lc $type;
     if($type eq 'message' or $type eq 'smessage') {
         my ($channel, $payload) = @details;
@@ -1110,8 +1085,7 @@ sub handle_pubsub_message {
     return $self->handle_pubsub_response($type, @details);
 }
 
-sub handle_pubsub_response {
-    my ($self, $type, @details) = @_;
+method handle_pubsub_response ($type, @details) {
     my ($channel, $payload) = @details;
     $type = lc $type;
     my $k = (substr $type, 0, 1) eq 'p' ? 'subscription_pattern_channel' : 'subscription_channel';
@@ -1143,7 +1117,7 @@ Represents the L<IO::Async::Stream> instance for the active Redis connection.
 
 =cut
 
-sub stream { shift->{stream} }
+method stream { $self->{stream} }
 
 =head2 notify_close
 
@@ -1151,8 +1125,7 @@ Called when the socket is closed.
 
 =cut
 
-sub notify_close {
-    my ($self) = @_;
+method notify_close {
     # Also clear our connection future so that the next request is triggered appropriately
     my $conn = delete $self->{connection};
     $self->{connection}->fail if $self->{connection} and not $self->{connection}->is_ready;
@@ -1186,80 +1159,108 @@ Generate a label for the given command list.
 
 =cut
 
-sub command_label {
-    my ($self, @cmd) = @_;
+method command_label (@cmd) {
     return join ' ', @cmd if $cmd[0] eq 'KEYS';
     return $cmd[0];
 }
 
 =head2 execute_command
 
-Queues or executes the given command.
+Queues the given command for execution.
 
 =cut
 
 sub execute_command {
     my ($self, @cmd) = @_;
 
+    # This represents the completion of the command
+    my $f = $self->loop->new_future->set_label(
+        $self->command_label(@cmd)
+    );
+    $tracer->span_for_future($f) if $self->opentracing;
+
+    my $item = [ \@cmd, $f];
+    if($self->{connection_in_progress}) {
+        $self->handle_command($item);
+        return $f->retain;
+    }
+    my $queue = $self->{_is_multi} // $self->command_queue;
+    # We register this as a command we want to run - it'll be
+    # send to the server once nothing else is in the way
+    return $queue->push($item)->then(sub { $f })->retain;
+}
+
+method command_queue {
+    return $self->{command_queue} if $self->{command_queue};
+    $self->{command_queue} = my $queue = Future::Queue->new(
+        (
+            $self->pipeline_depth
+            ? (max_items => $self->pipeline_depth)
+            : ()
+        ),
+        prototype => $self->future
+    );
+    $self->{command_processing} = $self->command_processing->on_ready(sub { delete $self->{command_processing} });
+    return $queue;
+}
+
+async method command_processing {
+    my $queue = $self->{command_queue};
+    await $self->connected;
+    while(1) {
+        # An active MULTI always takes priority over regular commands
+        if(my $queue = $self->{multi_queue}) {
+            while(my $next = await $queue->shift) {
+                $self->handle_command($next);
+            }
+            delete $self->{multi_queue};
+        }
+        my $queue = $self->{command_queue};
+        my $next = await $queue->shift
+            or last;
+        $self->handle_command($next);
+    }
+}
+
+method handle_command ($details) {
+    my @cmd = $details->[0]->@*;
+    my $f = $details->[1];
+
     # First, the rules: pubsub or plain
     my $is_sub_command = (
         $self->{protocol_level} eq 'resp2' and exists $SUBSCRIPTION_COMMANDS{$cmd[0]}
     );
 
-    return Future->fail(
+    return $f->fail(
         'Currently in pubsub mode, cannot send regular commands until unsubscribed',
         redis =>
             0 + (keys %{$self->{subscription_channel}}),
             0 + (keys %{$self->{subscription_pattern_channel}})
     ) if $self->{protocol_level} ne 'resp3' and exists $self->{pubsub} and not exists $ALLOWED_SUBSCRIPTION_COMMANDS{$cmd[0]};
 
-    my $f = $self->loop->new_future->set_label(
-        $self->command_label(@cmd)
-    );
-    $tracer->span_for_future($f) if $self->opentracing;
-    $log->tracef("Will have to wait for %d MULTI tx", 0 + @{$self->{pending_multi}}) unless $self->{_is_multi};
-    my $code = sub {
-        my $cmd = join ' ', @cmd;
-        $log->tracef('Outgoing [%s]', $cmd);
-        my $depth = $self->pipeline_depth;
-        $log->tracef("Pipeline depth now %d/%d", 0 + @{$self->{pending}}, $depth);
-        if($depth && $self->{pending}->@* >= $depth) {
-            $log->tracef("Pipeline full, deferring %s (%d others in that queue)", $cmd, 0 + @{$self->{awaiting_pipeline}});
-            push @{$self->{awaiting_pipeline}}, [ \@cmd, $f ];
-            return $f;
-        }
-        my $data = $self->wire_protocol->encode_from_client(@cmd);
+    my $cmd = join ' ', @cmd;
 
-        push @{$self->{pending}}, [ $cmd, $f ];
+    $log->tracef('Outgoing [%s]', $cmd);
+    my $data = $self->wire_protocol->encode_from_client(@cmd);
+    push @{$self->{pending}}, [ $cmd, $f ];
 
-        # Void-context write allows IaStream to combine multiple writes on the same connection.
-        $self->stream->write($data);
-        return $f
-    };
-    $log->tracef(
-        'Multi %s with %d pending and connected state %s',
-        $self->{_is_multi},
-        0 + @{$self->{pending_multi}},
-        $self->connected->state,
-    );
-    return (
-        # Is this a command issued during the initial connection phase?
-        $self->{connection_in_progress}
-        ? Future->done
-        # Are we the owner of a current MULTI transaction?
-        : $self->{_is_multi}
-        ? $self->connected
-        : Future->wait_all(
-            $self->connected,
-            @{$self->{pending_multi}}
-        )
-    )->then($code)
-     ->retain;
+    # Void-context write allows IaStream to combine multiple writes on the same connection.
+    $self->stream->write($data);
+    if(lc($cmd[0]) eq 'multi') {
+        $self->{multi_queue} = Future::Queue->new(
+            (
+                $self->pipeline_depth
+                ? (max_items => $self->pipeline_depth)
+                : ()
+            ),
+            prototype => $self->future
+        );
+    }
+    return;
 }
 
-around [qw(xread xreadgroup)] => async sub {
-    my ($code, $self, @args) = @_;
-    my $response = await $self->$code(@args);
+async method xread (@args) {
+    my $response = await $self->next::method(@args);
     return [] unless ref $response;
 
     # protocol_level is detected while connecting checking before this point is wrong.
@@ -1269,29 +1270,42 @@ around [qw(xread xreadgroup)] => async sub {
     $log->tracef('Transformed response of xread/xreadgroup into RESP2 format: from %s to %s', $response, $compatible_response);
 
     return $compatible_response;
-};
+}
+
+async method xreadgroup (@args) {
+    my $response = await $self->next::method(@args);
+    return [] unless ref $response;
+
+    # protocol_level is detected while connecting checking before this point is wrong.
+    return $response if $self->{protocol_level} eq 'resp2' || $self->{hashrefs};
+
+    my $compatible_response = [ pairmap { [ $a, $b ] } $response->@* ];
+    $log->tracef('Transformed response of xread/xreadgroup into RESP2 format: from %s to %s', $response, $compatible_response);
+
+    return $compatible_response;
+}
 
 # These have different behaviours depending on whether we use the RESP3
 # data structures (hashes etc.) or original RESP2 everything-is-an-array.
-for my $method (qw(zrange zrangebyscore zrevrange zrevrangebyscore)) {
-    around $method => async sub {
-        my ($code, $self, @args) = @_;
-        return await $self->$code(@args) if $self->{hashrefs};
-
-        my $response = await $self->$code(@args);
-        return $response unless ref $response->[0] eq 'ARRAY';
-
-        my $compatible_response = [ map { $_->@* } $response->@* ];
-        $log->tracef(
-            'Transformed response of %s into RESP2 format: from %s, to %s',
-            $method,
-            $response,
-            $compatible_response
-        );
-
-        return $compatible_response;
-    };
-}
+#for my $method (qw(zrange zrangebyscore zrevrange zrevrangebyscore)) {
+#    around $method => async sub {
+#        my ($code, $self, @args) = @_;
+#        return await $self->$code(@args) if $self->{hashrefs};
+#
+#        my $response = await $self->$code(@args);
+#        return $response unless ref $response->[0] eq 'ARRAY';
+#
+#        my $compatible_response = [ map { $_->@* } $response->@* ];
+#        $log->tracef(
+#            'Transformed response of %s into RESP2 format: from %s, to %s',
+#            $method,
+#            $response,
+#            $compatible_response
+#        );
+#
+#        return $compatible_response;
+#    };
+#}
 
 =head2 ryu
 
@@ -1299,8 +1313,7 @@ A L<Ryu::Async> instance for source/sink creation.
 
 =cut
 
-sub ryu {
-    my ($self) = @_;
+method ryu {
     $self->{ryu} ||= do {
         $self->add_child(
             my $ryu = Ryu::Async->new
@@ -1315,8 +1328,7 @@ Factory method for creating new L<Future> instances.
 
 =cut
 
-sub future {
-    my ($self) = @_;
+method future {
     return $self->loop->new_future(@_);
 }
 
@@ -1327,8 +1339,7 @@ encoding and decoding messages.
 
 =cut
 
-sub wire_protocol {
-    my ($self) = @_;
+method wire_protocol {
     $self->{wire_protocol} ||= do {
         require Net::Async::Redis::Protocol;
         Net::Async::Redis::Protocol->new(
@@ -1383,8 +1394,7 @@ async sub enable_clientside_cache {
 
 =cut
 
-sub _init {
-    my ($self, @args) = @_;
+method _init (@args) {
     $self->{protocol_level} //= 'resp2';
     $self->{pending_multi} //= [];
     $self->{pending} //= [];
@@ -1399,8 +1409,7 @@ sub _init {
 
 =cut
 
-sub _add_to_loop {
-    my ($self, $loop) = @_;
+method _add_to_loop ($loop) {
     delete $self->{client_side_connection};
 }
 
@@ -1478,8 +1487,7 @@ Returns a list of keys.
 my $keyspec_cache = Cache::LRU->new(
     size => 10_000
 );
-sub extract_keys_for_command {
-    my ($class, $command, $def) = @_;
+sub extract_keys_for_command ($class, $command, $def = undef) {
     my $cache = 0;
     unless($def) {
         my $cached = $keyspec_cache->get(join "\x{01FF}", $command->@*);
@@ -1598,8 +1606,7 @@ to C<< $loop->connect >>.
 
 =cut
 
-sub ssl_options {
-    my ($self) = @_;
+method ssl_options {
     return {
         map {
             defined $self->{"tls_$_"} ? (
@@ -1670,5 +1677,5 @@ tests and feedback:
 
 =head1 LICENSE
 
-Copyright Tom Molesworth and others 2015-2022.
+Copyright Tom Molesworth and others 2015-2023.
 Licensed under the same terms as Perl itself.

@@ -25,7 +25,6 @@
             "File::Spec" : "0",
             "File::Temp" : "0",
             "Getopt::Long" : "0",
-            "IPC::Run3" : "0",
             "JSON" : "0",
             "List::Util" : "0",
             "Music::AtonalUtil" : "1.17",
@@ -56,7 +55,7 @@
    "provides" : {
       "App::MusicTools" : {
          "file" : "lib/App/MusicTools.pm",
-         "version" : "1.35"
+         "version" : "1.37"
       }
    },
    "release_status" : "stable",
@@ -68,6 +67,6 @@
          "url" : "https://thrig.me/src/App-MusicTools.git"
       }
    },
-   "version" : "1.35",
+   "version" : "1.37",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

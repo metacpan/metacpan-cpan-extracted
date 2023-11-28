@@ -9,9 +9,9 @@ use Data::Sah::FilterCommon;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-21'; # DATE
+our $DATE = '2023-08-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 our @EXPORT_OK = qw(gen_filter);
 
@@ -119,7 +119,7 @@ Data::Sah::Filter - Filtering for Data::Sah
 
 =head1 VERSION
 
-This document describes version 0.021 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
+This document describes version 0.022 of Data::Sah::Filter (from Perl distribution Data-Sah-Filter), released on 2023-08-16.
 
 =head1 SYNOPSIS
 
@@ -136,16 +136,19 @@ This document describes version 0.021 of Data::Sah::Filter (from Perl distributi
 =head1 DESCRIPTION
 
 This distribution contains a standard set of filter rules for L<Data::Sah> (to
-be used in C<prefilters> and C<postfilter> cause). It is separated from the
+be used in C<prefilters> and C<postfilters> clauses). It is separated from the
 C<Data-Sah> distribution and can be used independently.
 
 A filter rule is put in C<Data::Sah::Filter::$COMPILER::$CATEGORY:$DESCRIPTION>
 module, for example: L<Data::Sah::Filter::perl::Str::trim> for trimming
 whitespace at the beginning and end of string.
 
-Basically, a filter rule will provide an expression (C<expr_filter>) to convert
-data to another. Multiple filter rules will be combined to form the final
-filtering code.
+Basically, a filter rule will provide a Perl expression (C<expr_filter>) to
+convert one data to another. Multiple filter rules can be combined to form the
+final filtering code. This code can be used by C<Data::Sah> when generating
+validator code from L<Sah> schema, or can be used directly. Some projects which
+use filtering rules directly include: L<App::orgadb> (which lets users specify
+filters from the command-line).
 
 =head2 meta()
 

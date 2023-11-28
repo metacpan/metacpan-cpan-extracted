@@ -17,7 +17,7 @@ do { my $x = {
                                       'Data::OptList' => '0.100',
                                       'Params::Util' => '0.14',
                                       'Sub::Install' => '0.92',
-                                      'perl' => 'v5.8.0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

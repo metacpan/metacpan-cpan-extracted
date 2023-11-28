@@ -1,8 +1,8 @@
 bin/cpan-get
 Changes
 CONCEPT
-examples/ex1.pl
-examples/ex2.pl
+examples/download_app_pod_example.pl
+examples/process_module_name_and_version.pl
 Get.pm
 Get/Utils.pm
 inc/Module/Install.pm

@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-08-07'; # DATE
 our $DIST = 'App-TrashUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our %SPEC;
 
@@ -106,6 +106,9 @@ $SPEC{trash_list_trashes} = {
     v => 1.1,
     summary => 'List trash directories',
     args => {
+        home_only => {
+            schema => 'bool*',
+        },
     },
 };
 sub trash_list_trashes {
@@ -113,7 +116,9 @@ sub trash_list_trashes {
 
     my %args = @_;
 
-    my @trashes = File::Trash::FreeDesktop->new->list_trashes;
+    my @trashes = File::Trash::FreeDesktop->new(
+        home_only => $args{home_only},
+    )->list_trashes;
     [200, "OK", \@trashes];
 }
 
@@ -335,7 +340,7 @@ App::TrashUtils - Utilities related to desktop trash
 
 =head1 VERSION
 
-This document describes version 0.003 of App::TrashUtils (from Perl distribution App-TrashUtils), released on 2023-08-06.
+This document describes version 0.004 of App::TrashUtils (from Perl distribution App-TrashUtils), released on 2023-08-07.
 
 =head1 DESCRIPTION
 
@@ -446,13 +451,22 @@ Return value:  (any)
 
 Usage:
 
- trash_list_trashes() -> [$status_code, $reason, $payload, \%result_meta]
+ trash_list_trashes(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List trash directories.
 
 This function is not exported.
 
-No arguments.
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<home_only> => I<bool>
+
+(No description)
+
+
+=back
 
 Returns an enveloped result (an array).
 

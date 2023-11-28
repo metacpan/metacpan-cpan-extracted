@@ -61,7 +61,7 @@ nav:
           - PXF: pxf.md
           - Other formats: other-formats.md
   - 'Download & Installation': download-and-installation.md
-  - Web App User interface: https://convert-pheno.cnag.cat
+  - Web App User interface: https://pheno-ranker.cnag.eu
   - Modes of operation:
       - Cohort mode: cohort.md 
       - Patient mode: patient.md
@@ -71,11 +71,13 @@ nav:
   - Technical details:
       - Implementation: implementation.md
 #      - Algorithm: algorithm.md
+#      - Federated version: federated-version.md
   - Help:
       - Tutorial: tutorial.md
       - Google colab: https://colab.research.google.com/drive/1n3Etu4fnwuDWNveSMb1SzuN50O2a05Rg#scrollTo=8tbJ0f5-hJAB
       - Usage: usage.md
       - FAQs: faq.md
+      - 'Addendum: openEHR': addendum-open-ehr.md
   - About:
       - About: about.md
       - Citation: citation.md
@@ -98,7 +100,8 @@ theme:
     toggle:
       icon: material/lightbulb-outline
       name: Switch to dark mode
-  logo: img/PR-logo.png
+  logo: img/iconhex.svg
+  favicon: img/favicon-2x.png
   icon:
       repo: fontawesome/brands/github-alt 
   features:

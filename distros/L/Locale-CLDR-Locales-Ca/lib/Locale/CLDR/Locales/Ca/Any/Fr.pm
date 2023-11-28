@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ca::Any::Fr - Package for language Catalan
 
 package Locale::CLDR::Locales::Ca::Any::Fr;
 # This file auto generated from Data\common\main\ca_FR.xml
-#	on Fri 13 Oct  9:09:24 am GMT
+#	on Sat  4 Nov  5:56:05 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

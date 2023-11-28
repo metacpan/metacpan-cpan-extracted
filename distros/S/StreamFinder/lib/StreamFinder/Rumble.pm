@@ -561,17 +561,26 @@ sub new
 							unless (defined $streamHash{$stream}
 									|| ($self->{'secure'} && $stream !~ /^https/o)
 									|| $class > $self->{'quality'}) {
-$stream =~ s#hugh\.cdn\.rumble\.cloud\/video\/#sp\.rmbl\.ws\/#o;  #JWT:RANDOMLY GETTING THIS SITE THAT DOESN'T WORK?!
+#$stream =~ s#hugh\.cdn\.rumble\.cloud\/video\/#sp\.rmbl\.ws\/#o;  #JWT:RANDOMLY GETTING THIS SITE THAT DOESN'T WORK?!
+print STDERR "w:Rumble converted $stream!\n"  if ($stream =~ s#hugh\.cdn\.rumble\.cloud\/video\/#sp\.rmbl\.ws\/#o);  #JWT:RANDOMLY GETTING THIS SITE THAT DOESN'T WORK?!
 								push @{$self->{'streams'}}, $stream;
 								$streamHash{$stream} = $stream;
 							}
 						}
 					}
 				}
-			}			
+			}
+			if ($html =~ m#\"author\"\:\{\"name\"\:\"([^\"]+)\"\,\"url\"\:\"([^\"]+)#s) {
+				$self->{'artist'} ||= $1;
+				$self->{'albumartist'} ||= $2;
+			}
 			if ($html =~ m#\"pubDate\"\:\"([^\"]+)#s) {
 				$self->{'created'} = $1;
 				$self->{'year'} ||= $1  if ($self->{'created'} =~ /(\d\d\d\d)/);
+			}
+			if ($html =~ m#\"i\"\:\"([^\"]+)#s) {  #GRAB EMBEDDED IMAGE URL IN CASE MAIN PAGE IS "PRIVATE"(UNFETCHABLE):
+				$self->{'iconurl'} ||= $1;
+				$self->{'imageurl'} ||= $self->{'iconurl'};
 			}
 			return $url2;
 		} else {

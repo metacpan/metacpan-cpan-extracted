@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::dirnames::exist;
 
-our $DATE = '2023-10-29'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2023-11-23'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 our $rschema = do{my$var={base=>"array",clsets_after_base=>[{of=>["dirname::exists",{}],summary=>"List of directory names, all must exist on filesystem"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::dirnames::exist - List of directory names, all must exist on files
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::SchemaR::dirnames::exist (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::SchemaR::dirnames::exist (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 DESCRIPTION
 

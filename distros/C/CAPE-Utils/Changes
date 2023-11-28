@@ -1,5 +1,12 @@
 Revision history for CAPE-Utils
 
+2.8.0   2023-11-27/11:00
+		- convert to Pod::Usage
+		- replace CryptX with cli utils
+
+2.7.1   2023-11-15/10:00
+		- fix tempdir cleanup
+
 2.7.0   2023-06-18/19:30
 		- doc cleanup for suricata_extract_submit_extend
 		- mojo_cape_submit_extend doc update and now update app protos and max size

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Pr - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Pr;
 # This file auto generated from Data\common\main\es_PR.xml
-#	on Fri 13 Oct  9:14:12 am GMT
+#	on Sat  4 Nov  6:00:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

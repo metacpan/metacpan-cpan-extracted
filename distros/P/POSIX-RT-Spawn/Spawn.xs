@@ -9,15 +9,59 @@
 #ifndef strBEGINs
 #define strBEGINs(s1,s2) (strncmp(s1,"" s2 "", sizeof(s2)-1) == 0)
 #endif
-/* From embed.h, but only defined #ifdef PERL_CORE */
+/* From embed.h, but Perl_signal_* is internal as of 5.38 */
 #ifndef rsignal_save
-#define rsignal_save(a,b,c) Perl_rsignal_save(aTHX_ a,b,c)
-#define rsignal_restore(a,b) Perl_rsignal_restore(aTHX_ a,b)
+#define rsignal_save(a,b,c) my_rsignal_save(aTHX_ a,b,c)
+#define rsignal_restore(a,b) my_rsignal_restore(aTHX_ a,b)
 #endif
 
 #include <spawn.h>
 
 extern char **environ;
+
+
+/* borrowed from Perl's util.c */
+int
+my_rsignal_save(pTHX_ int signo, Sighandler_t handler, Sigsave_t *save)
+{
+    dVAR;
+    struct sigaction act;
+
+    /* PERL_ARGS_ASSERT_RSIGNAL_SAVE; */
+    assert(save);
+
+#ifdef USE_ITHREADS
+    /* only "parent" interpreter can diddle signals */
+    if (PL_curinterp != aTHX)
+        return -1;
+#endif
+
+    act.sa_handler = (void(*)(int))handler;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = 0;
+#ifdef SA_RESTART
+    if (PL_signals & PERL_SIGNALS_UNSAFE_FLAG)
+        act.sa_flags |= SA_RESTART;     /* SVR4, 4.3+BSD */
+#endif
+#if defined(SA_NOCLDWAIT) && !defined(BSDish) /* See [perl #18849] */
+    if (signo == SIGCHLD && handler == (Sighandler_t) SIG_IGN)
+        act.sa_flags |= SA_NOCLDWAIT;
+#endif
+    return sigaction(signo, &act, save);
+}
+
+int
+my_rsignal_restore(pTHX_ int signo, Sigsave_t *save)
+{
+    dVAR;
+#ifdef USE_ITHREADS
+    /* only "parent" interpreter can diddle signals */
+    if (PL_curinterp != aTHX)
+        return -1;
+#endif
+
+    return sigaction(signo, save, (struct sigaction *)NULL);
+}
 
 
 Pid_t
@@ -40,9 +84,8 @@ static void
 S_posix_spawn_failed (pTHX_ const char *cmd)
 {
     const int e = errno;
-    /* PERL_ARGS_ASSERT_EXEC_FAILED */
+    /* PERL_ARGS_ASSERT_EXEC_FAILED; */
     assert(cmd);
-
     if (ckWARN(WARN_EXEC))
         Perl_warner(aTHX_ packWARN(WARN_EXEC), "Can't spawn \"%s\": %s",
                     cmd, Strerror(e));
@@ -79,8 +122,8 @@ do_posix_spawn3 (pTHX_ SV *really, SV **mark, SV **sp)
             SAVEFREEPV(tmps);
         }
         if ((!really && argv[0] && *argv[0] != '/') ||
-            (really && *tmps != '/'))		/* will posix_spawn use PATH? */
-            TAINT_ENV();		/* testing IFS here is overkill, probably */
+            (really && *tmps != '/'))           /* will posix_spawn use PATH? */
+            TAINT_ENV();                /* testing IFS here is overkill, probably */
         PERL_FPU_PRE_EXEC
         if (really && *tmps) {
             pid = do_posix_spawn(tmps,EXEC_ARGV_CAST(argv));
@@ -181,7 +224,7 @@ do_posix_spawn1 (pTHX_ const char *incmd)
 
     s = cmd;
     while (isWORDCHAR(*s))
-        s++;	/* catch VAR=val gizmo */
+        s++;    /* catch VAR=val gizmo */
     if (*s == '=')
         goto doshell;
 
@@ -237,7 +280,7 @@ do_posix_spawn1 (pTHX_ const char *incmd)
         pid = do_posix_spawn(argv[0],EXEC_ARGV_CAST(argv));
         PERL_FPU_POST_EXEC
         if (pid) return pid;
-        if (errno == ENOEXEC)		/* for system V NIH syndrome */
+        if (errno == ENOEXEC)           /* for system V NIH syndrome */
             goto doshell;
         S_posix_spawn_failed(aTHX_ argv[0]);
     }

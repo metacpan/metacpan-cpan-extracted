@@ -2,16 +2,18 @@ NAME
     App::GUI::Cellgraph - draw pattern by cellular automata
 
 SYNOPSIS
-    1.  start the program (cellgraph)
+    1.  read this POD
 
-    2.  push buttons and see patterns change
+    2.  start the program (cellgraph)
 
-    3.  push button *Draw* in right bottom corner to get a full picture
+    3.  push buttons and see patterns change
 
-    4.  choose *"Save"* in Image menu (or "Ctrl+S") to store image in a PNG
+    4.  push button *Draw* in right bottom corner to get a full picture
+
+    5.  choose *"Save"* in Image menu (or "Ctrl+S") to store image in a PNG
         / JPEG / SVG file (choose image size in menu beforehand)
 
-    5.  choose *Write* in settings menu ("Ctrl+W") to save settings into an
+    6.  choose *Write* in settings menu ("Ctrl+W") to save settings into an
         INI file for loading in and tweaking the parameters later
 
         After first use of the program, a config file will be created under
@@ -200,11 +202,13 @@ GUI
     settings.
 
 SEE ALSO
+    App::GUI::Harmonograph
+
+    App::GUI::Juliagraph
+
     App::GUI::Chaosgraph
 
     App::GUI::Dynagraph
-
-    App::GUI::Harmonograph
 
     App::GUI::Sierpingraph
 

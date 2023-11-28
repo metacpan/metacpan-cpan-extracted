@@ -8,7 +8,7 @@ Mojolicious::Plugin::ConfigGeneral - Config::General Configuration Plugin for Mo
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -52,6 +52,12 @@ Default configuration
 
 Path to configuration file, absolute or relative to the application home directory, defaults to the value of the
 C<MOJO_CONFIG> environment variable or C<$moniker.conf> in the application home directory.
+
+=head2 noload
+
+    plugin ConfigGeneral => {noload => 1};
+
+This option disables loading config file
 
 =head2 opts
 
@@ -146,7 +152,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Mojo::Base 'Mojolicious::Plugin';
 use Config::General qw//;
@@ -165,10 +171,15 @@ has 'config_pointer' => sub { Mojo::JSON::Pointer->new };
 sub register {
     my ($self, $app, $args) = @_;
 
+    # NoLoad
+    my $noload = $args->{noload} || 0;
+
     # Config file
     my $file = $args->{file} || $ENV{MOJO_CONFIG};
        $file ||= $app->home->child($app->moniker . '.conf'); # Relative to the home directory by default
-    die sprintf("Configuration file \"%s\" not found", $file) unless -r $file;
+    unless ($noload) {
+        die sprintf("Configuration file \"%s\" not found", $file) unless -r $file;
+    }
 
     # Config::General Options
     my $opts    = $args->{options} || $args->{opts} || {};
@@ -177,11 +188,15 @@ sub register {
        $options{'-ConfigFile'} = $file;
 
     # Load
-    my $cfg = eval { Config::General->new(%options) };
-    die sprintf("Can't load configuration from file \"%s\": %s", $file, $@) if $@;
-    die sprintf("Configuration file \"%s\" did not return a Config::General object", $file) unless ref $cfg eq 'Config::General';
-    my %config = $cfg->getall;
-    my @files = $cfg->files;
+    my %config = ();
+    my @files = ();
+    unless ($noload) {
+        my $cfg = eval { Config::General->new(%options) };
+        die sprintf("Can't load configuration from file \"%s\": %s", $file, $@) if $@;
+        die sprintf("Configuration file \"%s\" did not return a Config::General object", $file) unless ref $cfg eq 'Config::General';
+        %config = $cfg->getall;
+        @files = $cfg->files;
+    }
 
     # Merge defaults
     my $defaults = $args->{defaults} || $args->{default} || {};

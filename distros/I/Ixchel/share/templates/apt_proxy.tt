@@ -1,0 +1,36 @@
+# generated via Ixchel
+[% IF ! config.apt.proxy.global %]
+# using .config.apt.proxy
+[% IF config.apt.proxy.http %]
+Acquire::http::proxy "[% config.apt.proxy.http %]";
+[% ELSE %]
+# no HTTP proxy specified via .config.apt.proxy.http
+[% END %]
+[% IF config.apt.proxy.https %]
+Acquire::https::proxy "[% config.apt.proxy.https %]";
+[% ELSE %]
+# no HTTPS proxy specified via .config.apt.proxy.https
+[% END %]
+[% IF config.apt.proxy.ftp %]
+Acquire::ftp::proxy "[% config.apt.proxy.ftp %]";
+[% ELSE %]
+# no FTP proxy specified .config.apt.proxy.ftp
+[% END %]
+[% ELSE %]
+# using .config.proxy
+[% IF config.proxy.http %]
+Acquire::http::proxy "[% config.proxy.http %]";
+[% ELSE %]
+# no HTTP proxy specified via .config.proxy.http
+[% END %]
+[% IF config.proxy.https %]
+Acquire::https::proxy "[% config.proxy.https %]";
+[% ELSE %]
+# no HTTPS proxy specified via .config.proxy.https
+[% END %]
+[% IF config.proxy.ftp %]
+Acquire::ftp::proxy "[% config.proxy.ftp %]";
+[% ELSE %]
+# no FTP proxy specified via .config.proxy.ftp
+[% END %]
+[% END %]

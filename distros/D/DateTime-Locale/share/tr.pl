@@ -28,7 +28,7 @@
     M => "L",
     MEd => "d/MM E",
     MMM => "LLL",
-    MMMEd => "d MMMM E",
+    MMMEd => "d MMM E",
     MMMMEd => "d MMMM E",
     "MMMMW-count-one" => "MMMM 'ay\N{U+0131}n\N{U+0131}n' W. 'haftas\N{U+0131}'",
     "MMMMW-count-other" => "MMMM 'ay\N{U+0131}n\N{U+0131}n' W. 'haftas\N{U+0131}'",
@@ -272,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

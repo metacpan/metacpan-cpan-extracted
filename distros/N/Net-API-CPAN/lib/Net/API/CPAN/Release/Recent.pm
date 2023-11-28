@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Meta CPAN API - ~/lib/Net/API/CPAN/Release/Recent.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/25
-## Modified 2023/09/26
+## Modified 2023/11/24
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,7 @@ BEGIN
     use warnings;
     use parent qw( Net::API::CPAN::Generic );
     use vars qw( $VERSION );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -33,13 +33,16 @@ sub init
     $self->{author}       = undef unless( CORE::exists( $self->{author} ) );
     $self->{date}         = undef unless( CORE::exists( $self->{date} ) );
     $self->{distribution} = undef unless( CORE::exists( $self->{distribution} ) );
+    $self->{maturity}     = undef unless( CORE::exists( $self->{maturity} ) );
     $self->{name}         = undef unless( CORE::exists( $self->{name} ) );
     $self->{object}       = 'release_recent';
     $self->{status}       = undef unless( CORE::exists( $self->{status} ) );
     $self->{_init_strict_use_sub} = 1;
     $self->{_exception_class} = 'Net::API::CPAN::Exception';
     $self->SUPER::init( @_ ) || return( $self->pass_error );
-    $self->{fields} = [qw( abstract author date distribution name status )];
+    $self->{fields} = [qw(
+        abstract author date distribution maturity name status
+    )];
     return( $self );
 }
 
@@ -50,6 +53,8 @@ sub author { return( shift->_set_get_scalar_as_object( 'author', @_ ) ); }
 sub date { return( shift->_set_get_datetime( 'date', @_ ) ); }
 
 sub distribution { return( shift->_set_get_scalar_as_object( 'distribution', @_ ) ); }
+
+sub maturity { return( shift->_set_get_scalar_as_object( 'maturity', @_ ) ); }
 
 sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
 
@@ -75,6 +80,7 @@ Net::API::CPAN::Release::Recent - Meta CPAN API Release::Recent Class
       author => "MOMOTARO",
       date => "2023-07-29T05:10:12",
       distribution => "Folklore-Japan",
+      maturity => "developer",
       name => "Folklore-Japan-v1.2.3",
       status => "latest",
     } ) || die( Net::API::CPAN::Release::Recent->error );
@@ -83,13 +89,14 @@ Net::API::CPAN::Release::Recent - Meta CPAN API Release::Recent Class
     my $string = $obj->author;
     my $date = $obj->date;
     my $string = $obj->distribution;
+    my $string = $obj->maturity;
     my $string = $obj->name;
     my $str = $obj->object;
     my $string = $obj->status;
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -135,6 +142,13 @@ Sets or gets a datetime value, and returns a L<DateTime object|DateTime> that st
 
 Sets or gets a string and returns a L<scalar object|Module::Generic::Scalar>, even if there is no value.
 
+=head2 maturity
+
+    $obj->maturity( "developer" );
+    my $string = $obj->maturity;
+
+Sets or gets a string and returns a L<scalar object|Module::Generic::Scalar>, even if there is no value.
+
 =head2 name
 
     $obj->name( "Folklore-Japan-v1.2.3" );
@@ -160,6 +174,7 @@ Sets or gets a string and returns a L<scalar object|Module::Generic::Scalar>, ev
         "author" : "MOMOTARO",
         "date" : "2023-07-29T05:10:12",
         "distribution" : "Folklore-Japan",
+        "maturity" : "developer",
         "name" : "Folklore-Japan-v1.2.3",
         "status" : "latest"
     }

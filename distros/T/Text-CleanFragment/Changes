@@ -1,3 +1,9 @@
+0.07 2023-07-07
+  * Don't remove [] from filenames anymore qr// takes a character list, not a
+    character class
+  * Also remove backticks just like other quote characters
+  * add clean_fragment_filename() which only removes very specific characters
+
 0.06 2023-07-07
   * Remove -T from tests
   * Documentation updates

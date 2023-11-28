@@ -206,7 +206,7 @@ sub process_request {
             last;
         }
         
-        my $msg = $self->device->receive_fsk_message( ENERGENIE_DEFAULT_CRYPTSEED );
+        my $msg = $self->device->receive_fsk_message( { cryptseed => ENERGENIE_DEFAULT_CRYPTSEED } );
         
         if ( $msg ) {
             

@@ -1,0 +1,63 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Coroutine : pointer {
+  allow Go::Poll;
+  allow Go::Schedule;
+  allow Go::Schedule::Task;
+  allow Go::Channel;
+  
+  use Callback;
+  
+  use Sys::Time::Timespec;
+  
+  use Go::Channel;
+  
+  # Fields
+  has return_back : Go::Coroutine;
+  
+  has task : Callback;
+  
+  has finished : byte;
+  
+  has deadline_base_timer : Sys::Time::Timespec;
+  
+  has after : double;
+  
+  has deadline_base_io_timeout : Sys::Time::Timespec;
+  
+  has io_timeout : double;
+  
+  has io_timeout_occur : byte;
+  
+  has fd : int;
+  
+  has is_write : byte;
+  
+  has poll_index : int;
+  
+  has disable : byte;
+  
+  # Class Methods
+  static method new : Go::Coroutine ($task :  Callback = undef, $return_back : Go::Coroutine = undef) {
+    
+    my $self = new Go::Coroutine;
+    
+    $self->{task} = $task;
+    
+    $self->{return_back} = $return_back;
+    
+    $self->init_coroutine;
+    
+    $self->{fd} = -1;
+    
+    return $self;
+  }
+  
+  native static method transfer : void ($from : Go::Coroutine, $to : Go::Coroutine);
+  
+  # Instance Methods
+  native private method init_coroutine : void ();
+  
+  native method DESTROY : void ();
+}

@@ -1,5 +1,20 @@
 Revision history for App-RunStopRun
 
+0.08  Sun Nov 26 20:38:16 UTC 2023
+    - Re-enable signal tests; skip child test if parent didn't reap it.
+    - Add verbose message upon receipt of SIGCHLD.
+
+0.07_01  Sun Nov 26 16:08:13 UTC 2023
+    - Re-throw handled signal in controller.
+    - Disable failing signal tests; print diagnostics.
+
+0.07  Thu Nov 23 22:42:42 UTC 2023
+    - Skip signal test if system has issues with it.
+    - Fix operator precedence in call to exit. (RT #150537)
+
+0.06  Wed Nov 15 09:28:22 UTC 2023
+    - Fix the INT and TERM signal handlers to exit with the correct status.
+
 0.05  Fri Dec 16 04:20:09 UTC 2022
     - Convert the limit to a percentage if given as a decimal fraction.
 

@@ -4,7 +4,7 @@
       "Milan Straka <straka@ufal.mff.cuni.cz>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4232",
    "license" : [
       "unknown"
    ],
@@ -29,50 +29,50 @@
    "provides" : {
       "Ufal::NameTag" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::Forms" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::Ints" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::NamedEntities" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::NamedEntity" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::Ner" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::TokenRange" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::TokenRanges" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::Tokenizer" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTag::Version" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       },
       "Ufal::NameTagc" : {
          "file" : "lib/Ufal/NameTag.pm",
-         "version" : "v1.2.0.1"
+         "version" : "v1.2.1.1"
       }
    },
    "release_status" : "stable",
-   "version" : "v1.2.0.1",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v1.2.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

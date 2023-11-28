@@ -1,5 +1,14 @@
 Revision history for Perl extension Text-VisualPrintf
 
+4.03 2023-11-23T01:22:11Z
+
+    - Remove description about $IS_TARGET and $VISUAL_WIDTH
+      Use Text::Conecal to implement similar functionality
+
+4.02 2023-11-22T02:52:09Z
+
+    - Introduce $REORDER variable and support positional argument
+
 4.01 2020-11-19T02:56:21Z
 
     - Release VisualPrintf/Transform.pm as Text::Conceal module.

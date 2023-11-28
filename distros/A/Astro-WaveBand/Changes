@@ -1,5 +1,9 @@
 Revision history for Astro::WaveBand
 
+0.11 2023-11-24
+
+  - Add Kuntur receiver for JCMT.
+
 0.10 2023-04-17
 
   - Add Namakanui receivers for JCMT.

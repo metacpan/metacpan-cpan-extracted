@@ -1,0 +1,303 @@
+class TestCase::Go::Poll {
+  use Go;
+  use Sys::Socket;
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::OS;
+  use Sys::IO::Constant as IO;
+  use Sys::Ioctl::Constant as IOCTL;
+  use Sys::Socket::Util;
+  use Errno;
+  use StringList;
+  use Sys::Socket::Errno;
+  
+  our $RESULT : StringList;
+  
+  our $RESULTS : StringList[];
+  
+  static method basic : int ($port : int) {
+    
+    $RESULTS = new StringList[2];
+    
+    $RESULTS->[0] = StringList->new;
+    
+    Go->go([$port : int] method : void () {
+      my $id = 0;
+      &go_send_and_recv($port, $id);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_string($RESULTS->[0]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    $RESULTS = undef;
+    
+    return 1;
+  }
+  
+  static method parallel : int ($port : int) {
+    
+    $RESULTS = new StringList[2];
+    
+    $RESULTS->[0] = StringList->new;
+    
+    $RESULTS->[1] = StringList->new;
+    
+    Go->go([$port : int] method : void () {
+      my $id = 0;
+      &go_send_and_recv($port, $id);
+    });
+    
+    Go->go([$port : int] method : void () {
+      my $id = 1;
+      &go_send_and_recv($port, $id);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_string($RESULTS->[0]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    unless (Array->equals_string($RESULTS->[1]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    $RESULTS = undef;
+    
+    return 1;
+  }
+  
+  static method timeout : int ($port : int) {
+    
+    $RESULTS = new StringList[3];
+    
+    $RESULTS->[0] = StringList->new;
+    
+    $RESULTS->[1] = StringList->new;
+    
+    $RESULTS->[2] = StringList->new;
+    
+    Go->go([$port : int] method : void () {
+      my $id = 0;
+      &go_send_and_recv($port, $id, 2);
+    });
+    
+    Go->go([$port : int] method : void () {
+      my $id = 1;
+      my $timeout = 1.0;
+      
+      eval { &go_send_and_recv($port, $id, 0, $timeout); }
+      
+      my $timeout_ok = 0;
+      
+      if ($@) {
+        if (eval_error_id is_error Go::Error::IOTimeout) {
+          $timeout_ok = 1;
+        }
+        else {
+          die $@;
+        }
+      }
+      
+      $RESULTS->[2]->push($timeout_ok);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_string($RESULTS->[0]->to_array, ["4", "2", "0", "3", "abc", "3", "def", "0"])) {
+      return 0;
+    }
+    
+    unless (Array->equals_string($RESULTS->[2]->to_array, ["1"])) {
+      return 0;
+    }
+    
+    unless (Array->equals_string($RESULTS->[1]->to_array, ["4", "2", "0"])) {
+      return 0;
+    }
+    
+    $RESULTS = undef;
+    
+    return 1;
+  }
+  
+  static method go_send_and_recv : int ($port : int, $id : int, $sleep_after_connect : double = 0, $timeout : double = 0) {
+    
+    my $status = 0;
+    
+    my $socket_domain = SOCKET->AF_INET;
+    
+    my $socket_type = SOCKET->SOCK_STREAM;
+    
+    my $socket_protocol = 0;
+    
+    my $socket = -1;
+    Sys->socket(\$socket, $socket_domain, $socket_type, $socket_protocol);
+    
+    Fn->defer([$socket : int] method :void () {
+      Sys::Socket->close($socket);
+    });
+    
+    # IPv4 address
+    my $in_addr = Sys::Socket::Util->inet_aton("127.0.0.1");
+    my $sockaddr = Sys::Socket::Util->sockaddr_in($port, $in_addr);
+    
+    my $blocking = 0;
+    
+    # Enable non-blocking IO
+    if (Sys::OS->is_windows) {
+      my $flags = [(int)!$blocking];
+      Sys->ioctl($socket, IOCTL->FIONBIO, $flags);
+    }
+    else {
+      my $newmode = Sys->fcntl($socket, IO->F_GETFL);
+      
+      if ($blocking == 0) {
+        $newmode &= ~IO->O_NDELAY;
+        $newmode |= IO->O_NONBLOCK;
+      }
+      else {
+        $newmode &= ~(IO->O_NDELAY|IO->O_NONBLOCK);
+      }
+      
+      Sys->fcntl($socket,IO->F_SETFL, $newmode);
+    }
+    
+    # Connect
+    &go_connect($socket, $sockaddr);
+    
+    if ($sleep_after_connect > 0) {
+      Go->sleep($sleep_after_connect);
+    }
+    
+    {
+      my $send_buffer = "abcd";
+      
+      my $send_length = &go_send($socket, $send_buffer, 0);
+      
+      $RESULTS->[$id]->push($send_length);
+    }
+    
+    {
+      my $send_buffer = "ef";
+      
+      my $send_length = &go_send($socket, $send_buffer, 0);
+      
+      $RESULTS->[$id]->push($send_length);
+    }
+    
+    my $status_shutdown = Sys::Socket->shutdown($socket, SOCKET->SHUT_WR);
+    
+    $RESULTS->[$id]->push($status_shutdown);
+    
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      
+      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0, $timeout);
+      
+      if ($recv_length < 0) {
+        return 1;
+      }
+      
+      $RESULTS->[$id]->push($recv_length);
+      
+      $RESULTS->[$id]->push($recv_buffer);
+    }
+    
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      
+      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0, $timeout);
+      
+      if ($recv_length < 0) {
+        return 1;
+      }
+      
+      $RESULTS->[$id]->push($recv_length);
+      
+      $RESULTS->[$id]->push($recv_buffer);
+    }
+    
+    {
+      my $recv_buffer = (mutable string)new_string_len 3;
+      
+      my $recv_length = &go_recv($socket, $recv_buffer, length $recv_buffer, 0, $timeout);
+      
+      if ($recv_length < 0) {
+        return 1;
+      }
+      
+      $RESULTS->[$id]->push($recv_length);
+    }
+    
+    return $status;
+  }
+  
+  static method go_connect : void ($socket : int, $addr : Sys::Socket::Sockaddr, $timeout : double = 0) {
+    
+    eval { Sys->connect($socket, $addr); }
+    
+    if ($@) {
+      my $again = 
+        Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK
+        || Sys::Socket->socket_errno == Sys::Socket::Errno->EINPROGRESS
+        || Sys::Socket->socket_errno == Errno->EINTR
+      ;
+      
+      if ($again) {
+        Go->gosched_io_write($socket, $timeout);
+      }
+      else {
+        die $@;
+      }
+    }
+  }
+  
+  static method go_recv : int ($socket : int, $buf : mutable string, $count : int, $buf_offset : int = 0, $timeout : double = 0) {
+    
+    my $recv_length = -1;
+    while (1) {
+      eval { $recv_length = Sys->recv($socket, $buf, length $buf, 0); }
+      
+      if ($@) {
+        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket->socket_errno == Errno->EINTR) {
+          Go->gosched_io_read($socket, $timeout);
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $recv_length;
+  }
+  
+  static method go_send : int ($socket : int, $buf : string, $flags : int, $addr : Sys::Socket::Sockaddr = undef, $timeout : double = 0) {
+    
+    my $send_length = -1;
+    while (1) {
+      
+      eval { $send_length = Sys->send($socket, $buf, 0, undef); }
+      
+      if ($@) {
+        if (Sys::Socket->socket_errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket->socket_errno == Errno->EINTR) {
+          Go->gosched_io_write($socket, $timeout);
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
+    }
+    
+    return $send_length;
+  }
+  
+}

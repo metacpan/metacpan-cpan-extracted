@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::ImageSaveOptions
+# AsposeCellsCloud::Object::ImageSaveOptions 
 
 ## Load the model package
 ```perl
@@ -8,27 +8,26 @@ use AsposeCellsCloud::Object::ImageSaveOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**enable_http_compression** | **boolean** |  | [optional] 
-**save_format** | **string** |  | [optional] 
-**clear_data** | **boolean** | Make the workbook empty after saving the file. | [optional] 
-**cached_file_folder** | **string** | The cached file folder is used to store some large data. | [optional] 
-**validate_merged_areas** | **boolean** | Indicates whether validate merged areas before saving the file. The default value is false.              | [optional] 
-**refresh_chart_cache** | **boolean** |  | [optional] 
-**create_directory** | **boolean** | If true and the directory does not exist, the directory will be automatically created before saving the file.              | [optional] 
-**sort_names** | **boolean** |  | [optional] 
-**chart_image_type** | **string** |  | [optional] 
-**embeded_image_name_in_svg** | **string** |  | [optional] 
-**horizontal_resolution** | **int** |  | [optional] 
-**image_format** | **string** |  | [optional] 
-**is_cell_auto_fit** | **boolean** |  | [optional] 
-**one_page_per_sheet** | **boolean** |  | [optional] 
-**only_area** | **boolean** |  | [optional] 
-**printing_page** | **string** |  | [optional] 
-**print_with_status_dialog** | **int** |  | [optional] 
-**quality** | **int** |  | [optional] 
-**tiff_compression** | **string** |  | [optional] 
-**vertical_resolution** | **int** |  | [optional] 
+**ChartImageType** | **string** | Indicate the chart imagetype when converting. |
+**EmbededImageNameInSvg** | **string** | Indicate the filename of embeded image in svg. This should be full path with directory like "c:\\xpsEmbeded" |
+**HorizontalResolution** | **int** | Gets or sets the horizontal resolution for generated images, in dots per inch.                 Applies generating image method except Emf format images.               The default value is 96. |
+**ImageFormat** | **string** | Gets or sets the format of the generated images.  Don't apply the method that returns a Bitmap object.             The default value is ImageFormat.Bmp.  Don't apply the method that returns a Bitmap object. |
+**IsCellAutoFit** | **boolean** | Indicates whether the width and height of the cells is automatically fitted by cell value. The default value is false. |
+**OnePagePerSheet** | **boolean** | If OnePagePerSheet is true , all content of one sheet will output to only                one page in result. The paper size of pagesetup will be invalid, and the                other settings of pagesetup will still take effect. |
+**OnlyArea** | **boolean** | If this property is true , onle Area will be output, and no scale will take effect. |
+**PrintingPage** | **string** | Indicates which pages will not be printed. |
+**PrintWithStatusDialog** | **boolean** | If PrintWithStatusDialog = true , there will be a dialog that shows current print status.  else no such dialog will show. |
+**Quality** | **int** | Gets or sets a value determining the quality of the generated images to apply only when saving pages to the Jpeg format.            Has effect only when saving to JPEG.  The value must be between 0 and 100. The default value is 100. |
+**TiffCompression** | **string** | Gets or sets the type of compression to apply only when saving pages to the Tiff format.            Has effect only when saving to TIFF.  The default value is Lzw. |
+**VerticalResolution** | **int** | Gets or sets the vertical resolution for generated images, in dots per inch.            Applies generating image method except Emf format image.            The default value is 96. |
+**SaveFormat** | **string** |  |
+**CachedFileFolder** | **string** |  |
+**ClearData** | **boolean** |  |
+**CreateDirectory** | **boolean** |  |
+**EnableHTTPCompression** | **boolean** |  |
+**RefreshChartCache** | **boolean** |  |
+**SortNames** | **boolean** |  |
+**ValidateMergedAreas** | **boolean** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

@@ -1,32 +1,37 @@
-0.57    2017-07-10 (PERLANCAR)
+0.580   2023-11-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Remove use of smartmatch.
+
+
+0.57    2017-07-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace Log::Any with Log::ger.
 
 
-0.56    2016-06-10 (PERLANCAR)
+0.56    2016-06-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Bump prereq version Perinci::Access::Schemeless -> 0.87.
 
 
-0.55    2016-03-16 (PERLANCAR)
+0.55    2016-03-16  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Replace JSON with JSON::MaybeXS.
 
 
-0.54    2015-10-22 (PERLANCAR)
+0.54    2015-10-22  Released-By: PERLANCAR
 
         - No functional changes.
 
         - Replace File::Flock with the more lightweight File::Flock::Retry.
 
 
-0.53    2015-09-04 (PERLANCAR)
+0.53    2015-09-04  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -35,21 +40,21 @@
 	  requirement.
 
 
-0.52    2015-08-19 (PERLANCAR)
+0.52    2015-08-19  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Hide package declaration so it can be indexed by PAUSE.
 
 
-0.51    2015-08-18 (PERLANCAR)
+0.51    2015-08-18  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Switch from Log::Any to Log::Any::IfLOG.
 
 
-0.50    2014-12-05 (PERLANCAR)
+0.50    2014-12-05  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -57,21 +62,21 @@
 	  Package::MoreUtil.
 
 
-0.49     2014-05-01 (SHARYANTO)
+0.49     2014-05-01  Released-By: SHARYANTO
 
          - [Bugfix] Make sure subtest has at least one test (previously
            {before,after}_{do,undo} can fail if the hook doesn't specify any
            testing.
 
 
-0.48     2014-05-01 (SHARYANTO)
+0.48     2014-05-01  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Bump prereq version to avoid fail reports [CT].
 
 
-0.47     2014-03-31 (SHARYANTO)
+0.47     2014-03-31  Released-By: SHARYANTO
 
          [INTERNAL]
 
@@ -80,20 +85,20 @@
            tracing/debugging.
 
 
-0.46     2014-03-30 (SHARYANTO)
+0.46     2014-03-30  Released-By: SHARYANTO
 
          - No functional changes.
 
          - Some minor updates.
 
 
-0.45     2013-09-08 (SHARYANTO)
+0.45     2013-09-08  Released-By: SHARYANTO
 
          - No functional changes. Update to Perinci::Access::Schemeless (which
            replaces Perinci::Access::InProcess).
 
 
-0.44     2012-12-21 (SHARYANTO)
+0.44     2012-12-21  Released-By: SHARYANTO
 
          - No functional changes. Remove circular dependency because we depended
            on Perinci::Examples and it in turn depends on Perinci::CmdLine
@@ -102,14 +107,14 @@
            argument validation).
 
 
-0.43     2012-10-10 (SHARYANTO)
+0.43     2012-10-10  Released-By: SHARYANTO
 
          [BUG FIXES]
 
          - Can now load functions from main:: or already-loaded package.
 
 
-0.42     2012-09-05 (SHARYANTO)
+0.42     2012-09-05  Released-By: SHARYANTO
 
          [BUG FIXES]
 
@@ -120,45 +125,45 @@
          - Tweak log messages to aid debugging.
 
 
-0.41     2012-09-05 (SHARYANTO)
+0.41     2012-09-05  Released-By: SHARYANTO
 
          - Test::Perinci::Tx::Manager: Execute 'after_do' and 'after_undo' hooks
            even if 'status' != 200.
 
 
-0.40     2012-09-04 (SHARYANTO)
+0.40     2012-09-04  Released-By: SHARYANTO
 
          - Tweak log level for check_state status 200 message (debug instead of
            info).
 
 
-0.39     2012-09-04 (SHARYANTO)
+0.39     2012-09-04  Released-By: SHARYANTO
 
          - Allow function to skip logging check_state status 200 message by
            using empty string.
 
 
-0.38     2012-09-04 (SHARYANTO)
+0.38     2012-09-04  Released-By: SHARYANTO
 
          - Log check_state status 200 message @info (Rinci 1.1.29).
 
 
-0.37     2012-08-29 (SHARYANTO)
+0.37     2012-08-29  Released-By: SHARYANTO
 
          - Fix a couple SQL syntax error (steven--).
 
 
-0.36     2012-08-29 (SHARYANTO)
+0.36     2012-08-29  Released-By: SHARYANTO
 
          - Update to Rinci 1.1.28 (pass '-tx_action_id' to function).
 
 
-0.35     2012-08-29 (SHARYANTO)
+0.35     2012-08-29  Released-By: SHARYANTO
 
          - Some fixes and tweaks for Test::Perinci::Tx::Manager.
 
 
-0.34     2012-08-28 (SHARYANTO)
+0.34     2012-08-28  Released-By: SHARYANTO
 
          - test_tx_action(): Add 'before_undo' parameter for testing change of
            state between do and undo.
@@ -166,26 +171,26 @@
          - Nicer error message for undo() & redo(), like action().
 
 
-0.33     2012-08-28 (SHARYANTO)
+0.33     2012-08-28  Released-By: SHARYANTO
 
          - Pass special arguments to functions: '-tx_recovery' => 1 when during
            recovery, and '-tx_rollback' => 1 when during rollback, for
            informative purposes.
 
 
-0.32     2012-08-28 (SHARYANTO)
+0.32     2012-08-28  Released-By: SHARYANTO
 
          - Implement confirmation (Rinci 1.1.27). Pass 'confirm' => 1 to action()
            to pass '-confirm' special argument to function.
 
 
-0.31     2012-08-25 (SHARYANTO)
+0.31     2012-08-25  Released-By: SHARYANTO
 
          - No functional changes. Fix bug in recovery of crashed redo. Add more
            tests.
 
 
-0.30     2012-08-24 (SHARYANTO)
+0.30     2012-08-24  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -198,7 +203,7 @@
          - Various other small fixes.
 
 
-0.29     2012-08-16 (SHARYANTO)
+0.29     2012-08-16  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -214,7 +219,7 @@
            already work with this new version.
 
 
-0.28     2012-08-10 (SHARYANTO)
+0.28     2012-08-10  Released-By: SHARYANTO
 
          - First release, split to make Perinci dist empty (that dist was a
            growing mixed bag and caused headache in dependencies).

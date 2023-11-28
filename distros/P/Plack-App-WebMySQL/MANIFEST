@@ -8,10 +8,7 @@ lib/Plack/App/WebMySQL.pm
 lib/Plack/App/WebMySQL/General.pm
 lib/Plack/App/WebMySQL/Key.pm
 lib/Plack/App/WebMySQL/Sql.pm
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
 share/cgi-bin/webmysql/keys/.gitkeep
 share/cgi-bin/webmysql/templates/choosecriteria.html
@@ -58,3 +55,6 @@ share/htdocs/back.jpg
 share/htdocs/main.css
 t/00_use.t
 t/01_webmysql.t
+Makefile.PL
+META.yml
+META.json

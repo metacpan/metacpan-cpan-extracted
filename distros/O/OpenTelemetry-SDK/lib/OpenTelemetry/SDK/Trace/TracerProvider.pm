@@ -3,19 +3,17 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::TracerProvider;
 
-our $VERSION = '0.011';
+our $VERSION = '0.020';
 
 use OpenTelemetry;
 
 class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::TracerProvider) {
     use Feature::Compat::Try;
     use Future::AsyncAwait;
-    use Future;
+    use List::Util 'any';
     use Mutex;
-
-    use OpenTelemetry::Constants -trace_export;
-
     use OpenTelemetry::Common qw( config timeout_timestamp maybe_timeout );
+    use OpenTelemetry::Constants -trace_export;
     use OpenTelemetry::Propagator::TraceContext::TraceFlags;
     use OpenTelemetry::SDK::InstrumentationScope;
     use OpenTelemetry::SDK::Resource;
@@ -34,9 +32,9 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
     field $id_generator :param = 'OpenTelemetry::Trace';
     field $span_limits  :param //= OpenTelemetry::SDK::Trace::SpanLimits->new;
     field $resource     :param //= OpenTelemetry::SDK::Resource->new;
-    field $stopped             = 0;
+    field $stopped;
     field %registry;
-    field @span_processors;
+    field @processors;
 
     field $lock          //= Mutex->new;
     field $registry_lock //= Mutex->new;
@@ -125,7 +123,7 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
             );
 
             $span{context}    = $context;
-            $span{processors} = [ @span_processors ];
+            $span{processors} = [ @processors ];
 
             return OpenTelemetry::SDK::Trace::Span->new(%span);
         }
@@ -185,63 +183,66 @@ class OpenTelemetry::SDK::Trace::TracerProvider :isa(OpenTelemetry::Trace::Trace
         });
     }
 
-    async method $atomic_call_on_processors ( $method, $timeout ) {
+    method $atomic_call_on_processors ( $method, $timeout ) {
         my $start = timeout_timestamp;
 
         my $result = TRACE_EXPORT_SUCCESS;
 
-        for my $processor ( @span_processors ) {
+        for my $processor ( @processors ) {
             my $remaining = maybe_timeout $timeout, $start;
 
-            if ( defined $remaining && $remaining == 0 ) {
+            if ( $timeout && ! $remaining ) {
                 $result = TRACE_EXPORT_TIMEOUT;
                 last;
             }
 
-            my $res = $processor->$method($remaining);
+            my $res = $processor->$method($remaining)->get;
             $result = $res if $res > $result;
         }
 
-        $stopped = 1;
 
         return $result;
     }
 
-    method shutdown ( $timeout = undef ) {
-        if ( $stopped ) {
-            OpenTelemetry->logger->warn('Attempted to shutdown a TraceProvider more than once');
-            return TRACE_EXPORT_FAILURE;
-        }
-
-        $lock->enter(
-            sub {
-                $self->$atomic_call_on_processors( 'shutdown', $timeout );
-            }
-        );
-    }
-
-    method force_flush ( $timeout = undef ) {
+    async method shutdown ( $timeout = undef ) {
         return TRACE_EXPORT_SUCCESS if $stopped;
 
         $lock->enter(
             sub {
-                $self->$atomic_call_on_processors( 'force_flush', $timeout );
+                $stopped = 1;
+                $self->$atomic_call_on_processors( shutdown => $timeout );
+            }
+        );
+    }
+
+    async method force_flush ( $timeout = undef ) {
+        return TRACE_EXPORT_SUCCESS if $stopped;
+
+        $lock->enter(
+            sub {
+                $self->$atomic_call_on_processors( force_flush => $timeout );
             }
         );
     }
 
     method add_span_processor ($processor) {
-        if ( $stopped ) {
-            OpenTelemetry->logger->warn('Attempted to add a span processor to a TraceProvider after shutdown');
-            return $self;
-        }
+        $lock->enter( sub {
+            return OpenTelemetry->logger
+                ->warn('Attempted to add a span processor to a TraceProvider after shutdown')
+                if $stopped;
 
-        $lock->enter(
-            sub {
-                push @span_processors, $processor;
-                Future->done;
-            }
-        );
+            return OpenTelemetry->logger
+                ->warn('Attempted to add an object that does not do the OpenTelemetry::Trace::Span::Processor role as a span processor to a TraceProvider')
+                unless $processor->DOES('OpenTelemetry::Trace::Span::Processor');
+
+            my $candidate = ref $processor;
+
+            return OpenTelemetry->logger
+                ->warn("Attempted to add a $candidate span processor to a TraceProvider more than once")
+                if any { $_ isa $candidate } @processors;
+
+            push @processors, $processor;
+        });
 
         $self;
     }

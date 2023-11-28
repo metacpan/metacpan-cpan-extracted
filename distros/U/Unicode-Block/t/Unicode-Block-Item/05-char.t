@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Encode qw(decode_utf8);
+use Unicode::UTF8 qw(decode_utf8);
 use Test::More 'tests' => 6;
 use Test::NoWarnings;
 use Unicode::Block::Item;

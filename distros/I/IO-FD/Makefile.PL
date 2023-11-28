@@ -63,7 +63,9 @@ WriteMakefile(
 	MIN_PERL_VERSION=> "v5.36",
     NAME              => 'IO::FD',
     VERSION_FROM      => 'lib/IO/FD.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {
+      "constant::more"=>"v0.3.0"
+    }, 
     ABSTRACT_FROM     => 'lib/IO/FD.pod', # retrieve abstract from module
     AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',
     LICENSE           => 'mit',
@@ -80,9 +82,12 @@ WriteMakefile(
 			repository =>{
 				type => "git",
 				url => "git://github.com/drclaw1394/perl-io-fd.git",
-				web => "http://github.com/drclaw1394/perl-io-fd",
+				web => "https://github.com/drclaw1394/perl-io-fd",
 			}
-		}
+		},
+    bugtracker => {
+			web => 'https://github.com/drclaw1394/perl-io-fd/issues'
+    },
 	}
 
 );

@@ -1,6 +1,6 @@
 package CodeGen::Cpppp::Output;
 
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 # ABSTRACT: Collect text output into named sections
 
 use v5.20;
@@ -114,10 +114,6 @@ __END__
 
 CodeGen::Cpppp::Output - Collect text output into named sections
 
-=head1 VERSION
-
-version 0.002
-
 =head1 DESCRIPTION
 
 C code usually needs generated in different parts, like a public header,
@@ -218,6 +214,10 @@ defined, but empty.
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
+
+=head1 VERSION
+
+version 0.003
 
 =head1 COPYRIGHT AND LICENSE
 

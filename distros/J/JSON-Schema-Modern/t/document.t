@@ -7,13 +7,9 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
 use Test::Deep::UnorderedPairs;
 use Test::Fatal;
 use Test::Memory::Cycle;
-use JSON::Schema::Modern;
 use List::Util 'unpairs';
 use lib 't/lib';
 use Helper;
@@ -35,6 +31,7 @@ subtest 'boolean document' => sub {
         },
       ],
       canonical_uri => [ str('') ],
+      _entities => [ { '' => 0 } ],
     ),
     'boolean schema with no canonical_uri',
   );
@@ -66,6 +63,7 @@ subtest 'boolean document' => sub {
         },
       ],
       canonical_uri => [ str('https://foo.com') ],
+      _entities => [ { '' => 0 } ],
     ),
     'boolean schema with valid canonical_uri',
   );
@@ -85,6 +83,7 @@ subtest 'object document' => sub {
         },
       ],
       canonical_uri => [ str('') ],
+      _entities => [ { '' => 0 } ],
     ),
     'object schema with no canonical_uri, no root $id',
   );
@@ -106,6 +105,7 @@ subtest 'object document' => sub {
         },
       ],
       canonical_uri => [ str('https://foo.com') ],
+      _entities => [ { '' => 0 } ],
     ),
     'object schema with valid canonical_uri, no root $id',
   );
@@ -127,6 +127,7 @@ subtest 'object document' => sub {
         },
       ],
       canonical_uri => [ str('https://bar.com') ], # note canonical_uri has been overwritten
+      _entities => [ { '' => 0 } ],
     ),
     'object schema with no canonical_uri, and absolute root $id',
   )
@@ -175,6 +176,7 @@ subtest 'object document' => sub {
         },
       ),
       canonical_uri => [ str('https://bar.com') ],
+      _entities => [ { map +($_ => 0), '', '/allOf/0', '/allOf/1' } ],
     ),
     'object schema with canonical_uri and root $id, and additional resource schemas as well',
   );
@@ -206,6 +208,7 @@ subtest 'object document' => sub {
           configs => {},
         },
       ),
+      _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
     'relative uri for root $id',
   );
@@ -236,6 +239,7 @@ subtest 'object document' => sub {
           configs => {},
         },
       ),
+      _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
     'no root $id; absolute uri with path in subschema resource',
   );
@@ -260,6 +264,7 @@ subtest '$id and $anchor as properties' => sub {
           configs => {},
         },
       ],
+      _entities => [ { map +($_ => 0), '', '/properties/$id', '/properties/$anchor' } ],
     ),
     'did not index the $id and $anchor properties as if they were identifier keywords',
   );
@@ -292,6 +297,7 @@ subtest '$id with an empty fragment' => sub {
           configs => {},
         },
       ),
+      _entities => [ { map +($_ => 0), '', '/$defs/foo' } ],
     ),
     '$id is stored with the empty fragment stripped',
   );
@@ -426,6 +432,7 @@ subtest '$anchor and $id below an $id that is not at the document root' => sub {
           configs => {},
         },
       ),
+      _entities => [ { map +($_ => 0), '', '/allOf/0', '/allOf/0/not', '/allOf/0/not/not' } ],
     ),
     'canonical_uri uses the path from the innermost $id, not document root $id',
   );
@@ -433,7 +440,7 @@ subtest '$anchor and $id below an $id that is not at the document root' => sub {
 
 subtest 'JSON pointer and URI escaping' => sub {
   cmp_deeply(
-    JSON::Schema::Modern::Document->new(
+    my $doc = JSON::Schema::Modern::Document->new(
       schema => {
         '$defs' => {
           foo => {
@@ -517,9 +524,21 @@ subtest 'JSON pointer and URI escaping' => sub {
           configs => {},
         },
       ),
+      _entities => [ { map +($_ => 0),
+        '',
+        '/$defs/foo',
+        '/$defs/foo/patternProperties/~0',
+        '/$defs/foo/patternProperties/~0/properties/~0~1',
+        '/$defs/foo/patternProperties/~1',
+        '/$defs/foo/patternProperties/~1/properties/~0~1',
+        '/$defs/foo/patternProperties/[~0~1]',
+        '/$defs/foo/patternProperties/[~0~1]/properties/~0~1',
+      }],
     ),
     'properly escaped special characters in JSON pointers and URIs',
   );
+  is($doc->get_entity_at_location('/$defs/foo/patternProperties/~0'), 'schema', 'schema locations are tracked');
+  is($doc->get_entity_at_location('/$defs/foo/patternProperties'), '', 'non-schema locations are also tracked');
 };
 
 subtest 'resource collisions' => sub {

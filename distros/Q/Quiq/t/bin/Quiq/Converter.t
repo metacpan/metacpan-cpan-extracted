@@ -85,7 +85,7 @@ sub test_germanNumber : Test(2) {
 
 # -----------------------------------------------------------------------------
 
-sub test_germanMoneyAmount : Test(2) {
+sub test_germanMoneyAmount : Test(3) {
     my $self = shift;
 
     my $x = Quiq::Converter->germanMoneyAmount('12,343');
@@ -93,6 +93,10 @@ sub test_germanMoneyAmount : Test(2) {
 
     $x = Quiq::Converter->germanMoneyAmount('12.345,6755');
     $self->is($x,'12345.68');
+
+    $x = Quiq::Converter->germanMoneyAmount('5,7');
+    $self->is($x,'5.70');
+
 }
 
 # -----------------------------------------------------------------------------

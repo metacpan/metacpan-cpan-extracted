@@ -1,9 +1,10 @@
+## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::language::code::alpha2;
 
-our $DATE = '2020-05-27'; # DATE
-our $VERSION = '0.004'; # VERSION
+our $DATE = '2023-08-07'; # DATE
+our $VERSION = '0.005'; # VERSION
 
-our $rschema = ["str",[{description=>"\nAccept only current (not retired) codes. Only alpha-2 codes are accepted.\n\n",examples=>[{valid=>0,value=>""},{summary=>"Indonesian (2 letter)",valid=>1,validated_value=>"id",value=>"ID"},{summary=>"Indonesian (3 letter, rejected)",valid=>0,value=>"IND"},{summary=>"Unknown language code",valid=>0,value=>"qq"}],in=>["aa","ab","ae","af","ak","am","an","ar","as","av","ay","az","ba","be","bg","bh","bi","bm","bn","bo","br","bs","ca","ce","ch","co","cr","cs","cu","cv","cy","da","de","dv","dz","ee","el","en","eo","es","et","eu","fa","ff","fi","fj","fo","fr","fy","ga","gd","gl","gn","gu","gv","ha","he","hi","ho","hr","ht","hu","hy","hz","ia","id","ie","ig","ii","ik","io","is","it","iu","ja","jv","ka","kg","ki","kj","kk","kl","km","kn","ko","kr","ks","ku","kv","kw","ky","la","lb","lg","li","ln","lo","lt","lu","lv","mg","mh","mi","mk","ml","mn","mr","ms","mt","my","na","nb","nd","ne","ng","nl","nn","no","nr","nv","ny","oc","oj","om","or","os","pa","pi","pl","ps","pt","qu","rm","rn","ro","ru","rw","sa","sc","sd","se","sg","sh","si","sk","sl","sm","sn","so","sq","sr","ss","st","su","sv","sw","ta","te","tg","th","ti","tk","tl","tn","to","tr","ts","tt","tw","ty","ug","uk","ur","uz","ve","vi","vo","wa","wo","xh","yi","yo","za","zh","zu"],match=>"\\A[a-z]{2}\\z",summary=>"Language code (alpha-2)","x.perl.coerce_rules"=>["From_str::to_lower"]}],["str"]];
+our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nAccept only current (not retired) codes. Only alpha-2 codes are accepted.\n\n",examples=>[{valid=>0,value=>""},{summary=>"Indonesian (2 letter)",valid=>1,validated_value=>"id",value=>"ID"},{summary=>"Indonesian (3 letter, rejected)",valid=>0,value=>"IND"},{summary=>"Unknown language code",valid=>0,value=>"qq"}],in=>["km","nn","vo","fa","rm","en","aa","oc","mr","ab","tn","lu","oj","cy","sv","lt","sl","tr","lb","la","jv","ps","nr","pi","bm","dv","mn","or","af","ny","ff","ht","ie","tk","ty","ha","cr","su","av","lv","ja","st","id","bh","da","be","my","vi","sa","mk","gd","hu","qu","pl","nd","sw","mh","fo","si","zh","ss","ee","sg","ne","lo","kk","ky","ik","th","te","hi","bn","ch","ce","pt","ho","kr","kj","li","pa","gn","lg","as","so","fi","rn","om","br","ug","kn","ms","ku","ng","iu","mi","se","sh","ru","de","ba","tg","gu","ts","sq","co","ti","am","ia","he","ka","tw","it","os","es","ga","sd","mg","eo","no","to","wa","cs","sm","gv","gl","ae","kl","kv","nv","el","hz","bo","nl","sr","ay","cu","tl","ak","fy","yo","xh","sc","sn","dz","ko","io","ml","hr","ca","ro","uk","bg","ks","ii","ur","ki","rw","is","et","zu","hy","wo","nb","ta","kw","tt","az","na","an","ve","ln","fr","za","ar","yi","sk","cv","eu","mt","kg","bs","fj","bi","ig","uz"],match=>"\\A[a-z]{2}\\z",summary=>"Language code (alpha-2)","x.in.summaries"=>["Central Khmer","Norwegian Nynorsk","Volapuk","Persian","Romansh","English","Afar","Occitan (post 1500)","Marathi","Abkhazian","Tswana","Luba-Katanga","Ojibwa","Welsh","Swedish","Lithuanian","Slovenian","Turkish","Luxembourgish","Latin","Javanese","Pushto","Ndebele, South","Pali","Bambara","Divehi","Mongolian","Oriya","Afrikaans","Chichewa","Fulah","Haitian","Interlingue","Turkmen","Tahitian","Hausa","Cree","Sundanese","Avaric","Latvian","Japanese","Sotho, Southern","Indonesian","Bihari languages","Danish","Belarusian","Burmese","Vietnamese","Sanskrit","Macedonian","Gaelic","Hungarian","Quechua","Polish","Ndebele, North","Swahili","Marshallese","Faroese","Sinhala","Chinese","Swati","Ewe","Sango","Nepali","Lao","Kazakh","Kirghiz","Inupiaq","Thai","Telugu","Hindi","Bengali","Chamorro","Chechen","Portuguese","Hiri Motu","Kanuri","Kuanyama","Limburgan","Panjabi","Guarani","Ganda","Assamese","Somali","Finnish","Rundi","Oromo","Breton","Uighur","Kannada","Malay","Kurdish","Ndonga","Inuktitut","Maori","Northern Sami","Serbo-Croatian","Russian","German","Bashkir","Tajik","Gujarati","Tsonga","Albanian","Corsican","Tigrinya","Amharic","Interlingua (International Auxiliary Language Association)","Hebrew","Georgian","Twi","Italian","Ossetian","Spanish","Irish","Sindhi","Malagasy","Esperanto","Norwegian","Tonga (Tonga Islands)","Walloon","Czech","Samoan","Manx","Galician","Avestan","Kalaallisut","Komi","Navajo","Greek, Modern (1453-)","Herero","Tibetan","Dutch","Serbian","Aymara","Church Slavic","Tagalog","Akan","Western Frisian","Yoruba","Xhosa","Sardinian","Shona","Dzongkha","Korean","Ido","Malayalam","Croatian","Catalan","Romanian","Ukrainian","Bulgarian","Kashmiri","Sichuan Yi","Urdu","Kikuyu","Kinyarwanda","Icelandic","Estonian","Zulu","Armenian","Wolof","Bokmal, Norwegian","Tamil","Cornish","Tatar","Azerbaijani","Nauru","Aragonese","Venda","Lingala","French","Zhuang","Arabic","Yiddish","Slovak","Chuvash","Basque","Maltese","Kongo","Bosnian","Fijian","Bislama","Igbo","Uzbek"],"x.perl.coerce_rules"=>["From_str::to_lower"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Language code (alpha-2)
@@ -20,7 +21,7 @@ Sah::SchemaR::language::code::alpha2 - Language code (alpha-2)
 
 =head1 VERSION
 
-This document describes version 0.004 of Sah::SchemaR::language::code::alpha2 (from Perl distribution Sah-Schemas-Language), released on 2020-05-27.
+This document describes version 0.005 of Sah::SchemaR::language::code::alpha2 (from Perl distribution Sah-Schemas-Language), released on 2023-08-07.
 
 =head1 DESCRIPTION
 
@@ -36,6 +37,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Language>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-Language>
@@ -43,16 +73,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2019, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

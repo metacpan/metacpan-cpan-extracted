@@ -11,11 +11,11 @@ Log::Dispatch::Email::Sendmail - Subclass of Log::Dispatch::Email that sends e-m
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ fork/exec so it should only be used where really needed.
       ],
     );
 
-    $log->emerg("Something bad is happening");
+    $log->emerg('Something bad is happening');
 
 =head1 SUBROUTINES/METHODS
 
@@ -57,6 +57,7 @@ sub send_email {
 		# Don't warn - it could send a message back through
 		# here
 		# warn 'To whom should I be sending this e-mail?';
+		print STDERR "To whom should I be sending this e-mail?\n";
 		return;
 	}
 
@@ -74,16 +75,31 @@ sub send_email {
 
 	if($mail) {
 		print $mail "To: $to\n";
-		if($self->{from}) {
-			my $from = $self->{from};
+		if(my $from = $self->{from}) {
 			print $mail "From: $from\n";
 		}
 		my $subject = $self->{subject};
 		print $mail "Subject: $subject\n\n", $p{message};
 
 		close $mail;
+
+		delete $p{'buffer'};
+		$self->{'buffer'} = [];
 	} else {
 		warn "/usr/sbin/sendmail: $?";
+	}
+}
+
+sub DESTROY {
+	if(defined($^V) && ($^V ge 'v5.14.0')) {
+		return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
+	}
+	
+	my $self = shift;
+	return unless(ref($self));
+
+	if($self->{buffered} && @{$self->{buffer}}) {
+		$self->flush();
 	}
 }
 
@@ -117,10 +133,6 @@ L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Log::Dispatch::Log::Sendmail>
 
 L<http://annocpan.org/dist/Log-Dispatch-Log-Sendmail>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Log-Dispatch-Log-Sendmail>
-
 =item * Search CPAN
 
 L<http://search.cpan.org/dist/Log-Dispatch-Log-Sendmail/>
@@ -133,7 +145,7 @@ Kudos to Dave Rolksy for the entire Log::Dispatch framework.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2022 Nigel Horne.
+Copyright 2013-2023 Nigel Horne.
 
 This program is released under the following licence: GPL
 

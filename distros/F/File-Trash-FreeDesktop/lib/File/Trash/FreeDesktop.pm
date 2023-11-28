@@ -6,12 +6,12 @@ use warnings;
 use Log::ger;
 
 use Fcntl;
-use File::MoreUtil qw(file_exists l_abs_path);
+use File::Util::Test qw(file_exists l_abs_path);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-07'; # DATE
+our $DATE = '2023-11-21'; # DATE
 our $DIST = 'File-Trash-FreeDesktop'; # DIST
-our $VERSION = '0.205'; # VERSION
+our $VERSION = '0.207'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -304,7 +304,7 @@ sub recover {
     $opts->{on_target_exists} //= 'die';
     my ($file0, $trash_dir) = @_;
 
-    $opts->{filename} //= $file0;
+    $opts->{path} //= $file0;
     my @ct = $self->list_contents($opts, $trash_dir);
 
   ENTRY:
@@ -389,7 +389,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.205 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2023-08-07.
+This document describes version 0.207 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2023-11-21.
 
 =head1 SYNOPSIS
 
@@ -602,12 +602,18 @@ pick a unique suffix.
 
 =back
 
-=head2 $trash->recover([\%opts, ]$file[, $trash_dir])
+=head2 $trash->recover([\%opts, $orig_path, $trash_dir])
 
 Recover a file or multiple files from trash.
 
 Unless C<$trash_dir> is specified, will search in all existing user's trash
 dirs. Will die on errors.
+
+You need to specify the original path of the file before it was trashed, but you
+can also specify unqualified filename (without path) and/or path patterns via
+options (see below) instead.
+
+If no files are found, the method will simply return.
 
 If first argument is a hashref, it will be accepted as options. Known options:
 

@@ -1,5 +1,7 @@
 bin/purl-tool
 Changes
+examples/cpan-dist-download-and-test.sh
+examples/rpm-to-purl.sh
 INSTALL.md
 lib/URI/PackageURL.pm
 lib/URI/PackageURL/CLI.pm

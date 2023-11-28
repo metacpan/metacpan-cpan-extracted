@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
-    "File::Trash::FreeDesktop" => "0.204",
+    "File::Trash::FreeDesktop" => "0.205",
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
@@ -47,7 +47,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.004",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +62,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "File::Spec" => 0,
-  "File::Trash::FreeDesktop" => "0.204",
+  "File::Trash::FreeDesktop" => "0.205",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",

@@ -16,7 +16,7 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.28
+Version 4.29
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ Version 4.28
     --color=when	'always' (default), 'never' or 'auto'
     --nocolor		--color=never
     --colormap, --cm	specify color map
-    --colortable	show color table
+    --colortable[=#]	show color table (optional #: 6, 12, 24)
     --[no]256		on/off ANSI 256 color mode (default on)
 
     --man		display manual page
@@ -145,7 +145,7 @@ use Getopt::EX::Hashed; {
     has 256            => '  !  ' , default => $default_256 ;
     has cdif           => '  :s ' , default => '';
     has cdifopts       => '  =s ' ;
-    has colortable     => '     ' ;
+    has colortable     => '  :s ' , any => qr/^(|6|12|24)$/;
     has lenience       => '  !  ' , default => $default_lenience ;
     has visible        => '  =i%' , default => {} ;
     has tabstop        => '  =i ' , default => 8;
@@ -380,8 +380,9 @@ sub column_width {
 ##
 ## --colortable
 ##
-if ($app->colortable) {
-    Getopt::EX::Colormap::colortable($screen_width);
+if (defined(my $n = $app->colortable)) {
+    no strict 'refs';
+    &{"Getopt::EX::Colormap::colortable$n"}($screen_width);
     exit;
 }
 
@@ -616,9 +617,14 @@ while (<DIFF>) {
 	    };
 
 	    my @mrg;
-	    my $mrg = first { $old[$_] =~ /^\Q|||||||\E/ } 0 .. $#old;
-	    if (defined $mrg) {
-		($c3, @mrg) = splice @old, $mrg;
+	    my $mrg = first { $old[$_] =~ /^\Q|||||||\E/ } keys @old;
+	    if (defined $mrg or $app->parallel > 2) {
+		if (defined $mrg) {
+		    ($c3, @mrg) = splice @old, $mrg;
+		} else {
+		    @mrg = @old;
+		    @old = @new;
+		}
 		s/^/--/ for @old, @new;
 		s/^/++/ for @mrg;
 		flush_buffer_3([], \@old, \@new, \@mrg);
@@ -881,7 +887,7 @@ sub print_command_n {
     $opt->{type} //= 'COMMAND';
     my @color = map { $_ . $opt->{type} } "O", "N", "M";
 
-    for my $i (0 .. $#_) {
+    for my $i (keys @_) {
 	local $_ = $_[$i];
 	chomp if defined;
 	($_) = ansi_fold($_, $width);
@@ -897,10 +903,9 @@ sub print_command_n {
 
 sub print_field_n {
     if (@column >= @_) {
-	@_ = @_[ @column[ 0 .. $#_ ] ];
+	@_ = @_[ @column[ keys @_ ] ];
     }
-    for my $i (0 .. $#_) {
-	my $f = $_[$i];
+    while (my($i, $f) = each @_) {
 	my $markpos = $i < @markpos ? $markpos[$i] : $markpos[-1];
 	local $_;
 	$_ = $f->{"MARK"} and print if $markpos eq LEFT;
@@ -934,8 +939,9 @@ marked with period C<.>.
 
 It also reads and formats the output from B<diff> command from
 standard input.  Besides normal diff output, context diff B<-c> and
-unified diff B<-u> output will be handled properly.  Combined diff
-format is also supported, but currently limited up to three files.
+unified diff B<-u> output will be handled properly.  Combined diff and
+conflict marker styles are also supported, but currently limited up to
+three files.
 
 If you want to just show multiple files side-by-side in parallel, and
 do not concern about the difference of them, use L<App::ansicolumn>
@@ -1142,9 +1148,12 @@ Use ANSI color escape sequence for output.  Default is true.
 
 Use ANSI 256 color mode.  Default is true.
 
-=item B<--colortable>
+=item B<--colortable>[=6,12,24]
 
-Show table of ANSI 216 colors.
+Show table of ANSI 216 colors, when used without parameter.
+
+Given the parameters, it displays 6x6, 12x12, and 24,24 color
+matrices, respectively.
 
 =item B<-v>, B<--view>
 

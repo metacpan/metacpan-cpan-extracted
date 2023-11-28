@@ -1,3 +1,9 @@
+4.15 2023-11-27
+
+- [feature] Implement built-in vns "func" and "with" commands
+- [feature] Implement Venus::Set
+- [update] Emit errors during Venus::Run execution
+
 4.11 2023-09-13
 
 - [feature] Implement Venus::Assert#includes

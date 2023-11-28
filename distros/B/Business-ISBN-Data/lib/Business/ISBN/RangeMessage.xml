@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>0b39dc7b-15d3-4c87-b7be-05f4a138cc67</MessageSerialNumber>
-  <MessageDate>Thu, 2 Nov 2023 03:41:12 GMT</MessageDate>
+  <MessageSerialNumber>fcd87940-78d0-41b3-bd2d-daa03c111597</MessageSerialNumber>
+  <MessageDate>Sat, 25 Nov 2023 03:41:11 GMT</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -485,7 +485,15 @@
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>2000000-6889999</Range>
+          <Range>2000000-3899999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>3900000-3999999</Range>
+          <Length>2</Length>
+        </Rule>
+        <Rule>
+          <Range>4000000-6889999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
@@ -846,7 +854,7 @@
     </Group>
     <Group>
       <Prefix>978-605</Prefix>
-      <Agency>Turkey</Agency>
+      <Agency>Türkiye</Agency>
       <Rules>
         <Rule>
           <Range>0000000-0299999</Range>
@@ -961,7 +969,15 @@
           <Length>5</Length>
         </Rule>
         <Rule>
-          <Range>6000000-7499999</Range>
+          <Range>6000000-6949999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>6950000-6999999</Range>
+          <Length>5</Length>
+        </Rule>
+        <Rule>
+          <Range>7000000-7499999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
@@ -1356,7 +1372,7 @@
     </Group>
     <Group>
       <Prefix>978-625</Prefix>
-      <Agency>Turkey</Agency>
+      <Agency>Türkiye</Agency>
       <Rules>
         <Rule>
           <Range>0000000-0199999</Range>
@@ -3274,7 +3290,7 @@
     </Group>
     <Group>
       <Prefix>978-975</Prefix>
-      <Agency>Turkey</Agency>
+      <Agency>Türkiye</Agency>
       <Rules>
         <Rule>
           <Range>0000000-0199999</Range>
@@ -3911,11 +3927,11 @@
           <Length>0</Length>
         </Rule>
         <Rule>
-          <Range>4000000-5299999</Range>
+          <Range>4000000-5599999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>5300000-6999999</Range>
+          <Range>5600000-6999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>
@@ -4700,7 +4716,7 @@
     </Group>
     <Group>
       <Prefix>978-9944</Prefix>
-      <Agency>Turkey</Agency>
+      <Agency>Türkiye</Agency>
       <Rules>
         <Rule>
           <Range>0000000-0999999</Range>
@@ -7513,19 +7529,27 @@
       <Agency>Macau</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-1999999</Range>
+          <Range>0000000-0999999</Range>
           <Length>1</Length>
+        </Rule>
+        <Rule>
+          <Range>1000000-1399999</Range>
+          <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>1400000-1499999</Range>
+          <Length>3</Length>
+        </Rule>
+        <Rule>
+          <Range>1500000-1999999</Range>
+          <Length>2</Length>
         </Rule>
         <Rule>
           <Range>2000000-2199999</Range>
           <Length>3</Length>
         </Rule>
         <Rule>
-          <Range>2200000-2399999</Range>
-          <Length>0</Length>
-        </Rule>
-        <Rule>
-          <Range>2400000-7499999</Range>
+          <Range>2200000-7499999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
@@ -7893,8 +7917,12 @@
           <Length>5</Length>
         </Rule>
         <Rule>
-          <Range>8500000-9999999</Range>
+          <Range>8500000-9849999</Range>
           <Length>0</Length>
+        </Rule>
+        <Rule>
+          <Range>9850000-9999999</Range>
+          <Length>6</Length>
         </Rule>
       </Rules>
     </Group>

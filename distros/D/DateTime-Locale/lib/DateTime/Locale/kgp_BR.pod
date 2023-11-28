@@ -483,12 +483,6 @@ Kaingang Brazil locale.
    1995-12-22T09:05:02 = pén., 22 ne 12-Kysã
   -0010-09-15T04:44:23 = sav., 15 ne 9-Kysã
 
-=head3 MMMMW-count-one ('simỹnỹ' W 'ne' MMMM)
-
-   2008-02-05T18:30:30 = simỹnỹ 1 ne 2-Kysã
-   1995-12-22T09:05:02 = simỹnỹ 3 ne 12-Kysã
-  -0010-09-15T04:44:23 = simỹnỹ 2 ne 9-Kysã
-
 =head3 MMMMW-count-other ('simỹnỹ' W 'ne' MMMM)
 
    2008-02-05T18:30:30 = simỹnỹ 1 ne 2-Kysã
@@ -638,12 +632,6 @@ Kaingang Brazil locale.
    2008-02-05T18:30:30 = 1ⁿ kysã-tẽgtũ, 2008
    1995-12-22T09:05:02 = 4ⁿ kysã-tẽgtũ, 1995
   -0010-09-15T04:44:23 = 3ⁿʰ kysã-tẽgtũ, -10
-
-=head3 yw-count-one ('simỹnỹ' w, Y)
-
-   2008-02-05T18:30:30 = simỹnỹ 6, 2008
-   1995-12-22T09:05:02 = simỹnỹ 51, 1995
-  -0010-09-15T04:44:23 = simỹnỹ 37, -10
 
 =head3 yw-count-other ('simỹnỹ' w, Y)
 

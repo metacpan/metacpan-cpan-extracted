@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX;
-$Sys::Info::Driver::OSX::VERSION = '0.7960';
+$Sys::Info::Driver::OSX::VERSION = '0.7961';
 use strict;
 use warnings;
 use parent qw( Exporter Sys::Info::Base );
@@ -25,6 +25,7 @@ our @EXPORT  = qw(
     fsysctl
     nsysctl
     plist
+    powermetrics
     sw_vers
     system_profiler
     vm_stat
@@ -220,6 +221,34 @@ sub _sysctl_not_exists {
     return 0;
 }
 
+sub powermetrics {
+    my @opt = @_;
+    if ( $< ) {
+        croak sprintf 'powermetrics can only be executed as root and not %s (%s)',
+                (getpwuid $<)[0],
+                $<,
+        ;
+    }
+    my $success;
+    my($out, $error) = capture {
+        $success = ! system "/usr/bin/powermetrics @opt";
+    };
+
+    $_ = __PACKAGE__->trim( $_ ) for $out, $error;
+
+    croak "Unable to capture `powermetrics`: $error" if $error || ! $success;
+
+    my @info = split m{ [\n]+ }xms, $out;
+    my %info;
+    for my $i ( @info ) {
+        next if $i =~ m{ \A [*] }xms;
+        my($k, $v) = split m{[:]}xms, $i, 2;
+        $info{$k} = $v;
+    }
+
+    return %info;
+}
+
 1;
 
 __END__
@@ -234,7 +263,7 @@ Sys::Info::Driver::OSX
 
 =head1 VERSION
 
-version 0.7960
+version 0.7961
 
 =head1 SYNOPSIS
 
@@ -261,6 +290,10 @@ f(atal)sysctl().
 =head2 nsysctl
 
 n(ormal)sysctl.
+
+=head2 powermetrics
+
+System call to powermetrics. Needs sudo/root.
 
 =head2 system_profiler
 

@@ -1,7 +1,7 @@
 requires 'perl', '5.014';
 
 requires 'JSON';
-requires 'List::Util';
+requires 'List::Util', '1.56';
 requires 'Hash::Util';
 requires 'Clipboard';
 requires 'File::Share';
@@ -18,4 +18,5 @@ on 'test' => sub {
 on 'develop' => sub {
     recommends 'Pod::Markdown';
     recommends 'App::Greple::xp', '0.04';
+    recommends 'App::Greple::subst::desumasu';
 };

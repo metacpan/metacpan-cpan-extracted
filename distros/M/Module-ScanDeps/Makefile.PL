@@ -17,6 +17,7 @@ WriteMakefile1(
       'File::Temp'       => 0,
       'File::Spec'       => 0,
       'Getopt::Long'     => 0,
+      'List::Util'       => '1.33',
       'Module::Metadata' => 0,
       'Text::ParseWords' => 0,
       'version'          => 0,

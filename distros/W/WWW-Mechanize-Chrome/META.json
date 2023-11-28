@@ -4,7 +4,7 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -37,7 +37,6 @@
             "Exporter" : "5",
             "File::Basename" : "0",
             "File::Spec" : "0",
-            "Filter::signatures" : "0.16",
             "Future" : "0.35",
             "Future::HTTP" : "0.06",
             "HTML::Selector::XPath" : "0",
@@ -53,6 +52,7 @@
             "Log::Log4perl" : "0",
             "MIME::Base64" : "0",
             "Moo" : "2",
+            "MooX::Role::EventEmitter" : "0",
             "Net::Async::WebSocket::Client" : "0.12",
             "Object::Import" : "0",
             "POSIX" : "0",
@@ -64,7 +64,7 @@
             "URI::file" : "0",
             "URI::ws" : "0",
             "WWW::Mechanize::Link" : "0",
-            "perl" : "5.010"
+            "perl" : "5.020"
          }
       },
       "test" : {
@@ -94,7 +94,7 @@
          "web" : "https://github.com/Corion/WWW-Mechanize-Chrome"
       }
    },
-   "version" : "0.71",
-   "x_serialization_backend" : "JSON::PP version 4.11",
+   "version" : "0.72",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

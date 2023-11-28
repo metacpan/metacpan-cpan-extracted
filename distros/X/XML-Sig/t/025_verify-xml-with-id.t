@@ -1,23 +1,10 @@
 # -*- perl -*-
 
-use strict;
-use warnings;
-
-use Test::More;
-use Test::Exception;
+use Test::Lib;
+use Test::XML::Sig;
 use MIME::Base64;
 
-use_ok('XML::Sig');
-
-sub slurpy {
-    my $file = shift;
-    open my $fh, $file or die "No file to be opened";
-    local undef $/;
-    my $content = <$fh>;
-    return $content;
-}
-
-my $xml = slurpy('t/signed/saml_request-xmlsec1-rsa-signed.xml');
+my $xml = slurp_file('t/signed/saml_request-xmlsec1-rsa-signed.xml');
 my @certs = qw(t/rsa.cert.pem);
 
 my %args = (
@@ -29,7 +16,7 @@ my %args = (
 );
 
 foreach (@certs) {
-    my $txt = slurpy($_);
+    my $txt = slurp_file($_);
 
     my $sig = XML::Sig->new({%args, cert_text => $txt});
     isa_ok($sig, 'XML::Sig');

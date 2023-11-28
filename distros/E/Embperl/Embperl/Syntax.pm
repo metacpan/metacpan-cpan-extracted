@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,8 +12,7 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: Syntax.pm 1578075 2014-03-16 14:01:14Z richter $
-#
+
 ###################################################################################
  
 
@@ -21,6 +21,8 @@ package Embperl::Syntax ;
 
 use strict ;
 use vars qw{@ISA @EXPORT_OK %EXPORT_TAGS %DocumentRoot %Syntax} ;
+
+no warnings "uninitialized" ;
 
 @ISA = qw{Exporter} ;
 
@@ -129,7 +131,7 @@ sub AddToRoot
 
 # ---------------------------------------------------------------------------------
 #
-#   Adds code that is execute everytime after the compile of a document
+#   Adds code that is execute every time after the compile of a document
 #       start and end of the execution of a document
 #
 # ---------------------------------------------------------------------------------
@@ -318,7 +320,7 @@ sub CloneHash
 %DocumentRoot = (
     '-lsearch' => 1,
 
-    # The document node is generated always and is not parserd, but can be used to include code
+    # The document node is generated always and is not parsed, but can be used to include code
     'Document' => {
         'nodename'  => 'Document',
         'nodetype'  => ntypDocument, 
@@ -328,8 +330,10 @@ sub CloneHash
 # any initialisation could be put here
 #$DB::single = 1 ;
 $maxrow=100;$maxcol=10;
+no warnings "uninitialized" ;
 },
                 compiletimeperlcode => q{
+no warnings "uninitialized" ;
 use vars ('$_ep_DomTree', '@ISA', '@param') ;
 *_ep_rp=\\&XML::Embperl::DOM::Node::iReplaceChildWithCDATA;
 *_ep_rpid=\\&XML::Embperl::DOM::Node::iReplaceChildWithMsgId;
@@ -352,7 +356,7 @@ Embperl::Util::CreateAliases ;
                 }
             },
         },
-    # The document fraq node is generated always and is not parserd, but can be used to include code
+    # The document fraq node is generated always and is not parsed, but can be used to include code
     'DocumentFraq' => {
         'nodename'  => 'DocumentFraq',
         'nodetype'  => ntypDocumentFraq, 
@@ -361,8 +365,10 @@ Embperl::Util::CreateAliases ;
                 perlcode    => q{ 
 #my $_ep_param_save = \@param ; 
 #*param = $Embperl::req -> component -> param -> param || [];
+no warnings "uninitialized" ;
 },
                 compiletimeperlcode => q{
+no warnings "uninitialized" ;
 use vars ('$_ep_DomTree', '@ISA', '@param') ;
 *_ep_rp=\\&XML::Embperl::DOM::Node::iReplaceChildWithCDATA;
 *_ep_rpid=\\&XML::Embperl::DOM::Node::iReplaceChildWithMsgId;
@@ -490,7 +496,7 @@ best thing is to take a look at the syntax classes that comes with Embperl.
 For example if you want to add new html tags, derive from I<Embperl::Syntax::HTML>,
 if you want to add new metacommands derive from I<Embperl::Syntax::EmbperlBlocks>.
 
-Some of the classes define addtionaly methods to easily add new tags. See the 
+Some of the classes define additional methods to easily add new tags. See the
 respective pod file, which methods are available for a certain class.
 
 I<Embperl::Syntax> defines the basic methods to create a syntax:
@@ -514,7 +520,7 @@ This gives you the possibility to add some Perl code, that is always executed
 at the beginning of a document (C<$initcode>), at the end of the document
 (C<$termcode>) or at compile time (C<$compiletimecode>). The three strings must
 be valid Perl code. See I<Embperl::Syntax::SSI> for an example. C<$procinfo>
-is a hashref that can consits of addtional processor infos (see below) for the
+is a hashref that can consits of additional processor infos (see below) for the
 document.
 
 =head2 $self -> GetRoot
@@ -549,7 +555,7 @@ with a dash:
 
 =item    '-lsearch' => 1
 
-Do an linear serach instead of a binary search. This is necessary if the 
+Do an linear search instead of a binary search. This is necessary if the
 tokens can't clearly separated.
 
 =item     '-defnodetype' => ntypText,
@@ -656,7 +662,7 @@ Processor info. Hashref with information how to process this token.
 The processor info gives information how to compile this token to valid
 code that can be executed later on by the processor. There could be
 information for multiple processors. At the moment only the I<embperl>
-processor is defined. Normaly you must not worry about different
+processor is defined. Normally you must not worry about different
 processor, because the syntax object knows inside that all procinfo is
 for the I<embperl> processor. I<procinfo> is a parameter to many methods,
 it is a hashref and can take the following items:
@@ -905,7 +911,7 @@ include the same specical values as C<perlcode>
 
 =item switchcodetype => <1/2>
 
-1 means put the following code into normal code which is executed everytime the page is
+1 means put the following code into normal code which is executed every time the page is
 requested
 
 2 means put the following code put into code which is executed direct after compilation.

@@ -22,11 +22,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.32
+Version 0.34
 
 =cut
 
-our $VERSION = '0.32';
+our $VERSION = '0.34';
 
 our $alternatives;
 our $abbreviations;
@@ -168,22 +168,36 @@ my %common_words = (
 
 sub geocode {
 	my $self = shift;
-	my %param;
+	my %params;
 
-	if(ref($_[0]) eq 'HASH') {
-		%param = %{$_[0]};
+	# Try hard to support whatever API that the user wants to use
+	if(!ref($self)) {
+		if(scalar(@_)) {
+			return(__PACKAGE__->new()->geocode(@_));
+		} elsif(!defined($self)) {
+			# Geo::Coder::Free->geocode()
+			Carp::croak('Usage: ', __PACKAGE__, '::geocode(location => $location|scantext => $text)');
+		} elsif($self eq __PACKAGE__) {
+			Carp::croak("Usage: $self", '::geocode(location => $location|scantext => $text)');
+		}
+		return(__PACKAGE__->new()->geocode($self));
+	} elsif(ref($self) eq 'HASH') {
+		return(__PACKAGE__->new()->geocode($self));
+	} elsif(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	# } elsif(ref($_[0]) && (ref($_[0] !~ /::/))) {
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
-	} elsif(@_ % 2 == 0) {
-		%param = @_;
+		Carp::croak('Usage: ', __PACKAGE__, '::geocode(location => $location|scantext => $text)');
+	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
+		%params = @_;
 	} else {
-		$param{'location'} = shift;
+		$params{'location'} = shift;
 	}
 
 	if($self->{'openaddr'}) {
 		if(wantarray) {
-			my @rc = $self->{'openaddr'}->geocode(\%param);
-			if((my $scantext = $param{'scantext'}) && (my $region = $param{'region'})) {
+			my @rc = $self->{'openaddr'}->geocode(\%params);
+			if((my $scantext = $params{'scantext'}) && (my $region = $params{'region'})) {
 				$scantext =~ s/\W+/ /g;
 				foreach my $word(List::MoreUtils::uniq(split(/\s/, $scantext))) {
 					# FIXME:  There are a *lot* of false positives
@@ -205,19 +219,19 @@ sub geocode {
 				}
 			}
 			return @rc if(scalar(@rc) && $rc[0]);
-		} elsif(my $rc = $self->{'openaddr'}->geocode(\%param)) {
+		} elsif(my $rc = $self->{'openaddr'}->geocode(\%params)) {
 			return $rc;
 		}
-		if((!$param{'scantext'}) && (my $alternatives = $self->{'alternatives'})) {
+		if((!$params{'scantext'}) && (my $alternatives = $self->{'alternatives'})) {
 			# Try some alternatives, would be nice to read this from somewhere on line
-			my $location = $param{'location'};
+			my $location = $params{'location'};
 			while (my($key, $value) = each %{$alternatives}) {
 				if($location =~ $key) {
 					# ::diag("$key=>$value");
 					my $keep = $location;
 					$location =~ s/$key/$value/;
-					$param{'location'} = $location;
-					if(my $rc = $self->geocode(\%param)) {
+					$params{'location'} = $location;
+					if(my $rc = $self->geocode(\%params)) {
 						return $rc;
 					}
 					# Try without the commas, for "Tyne and Wear"
@@ -226,8 +240,8 @@ sub geocode {
 						$string =~ s/,//g;
 						$location = $keep;
 						$location =~ s/$key/$string/;
-						$param{'location'} = $location;
-						if(my $rc = $self->geocode(\%param)) {
+						$params{'location'} = $location;
+						if(my $rc = $self->geocode(\%params)) {
 							return $rc;
 						}
 					}
@@ -237,14 +251,14 @@ sub geocode {
 	}
 
 	# FIXME:  scantext only works if OPENADDR_HOME is set
-	if($param{'location'}) {
+	if($params{'location'}) {
 		if(wantarray) {
-			my @rc = $self->{'maxmind'}->geocode(\%param);
+			my @rc = $self->{'maxmind'}->geocode(\%params);
 			return @rc;
 		}
-		return $self->{'maxmind'}->geocode(\%param);
+		return $self->{'maxmind'}->geocode(\%params);
 	}
-	if(!$param{'scantext'}) {
+	if(!$params{'scantext'}) {
 		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
 	}
 }
@@ -259,36 +273,48 @@ To be done.
 
 sub reverse_geocode {
 	my $self = shift;
-	my %param;
+	my %params;
 
-	if(ref($_[0]) eq 'HASH') {
-		%param = %{$_[0]};
+	# Try hard to support whatever API that the user wants to use
+	if(!ref($self)) {
+		if(scalar(@_)) {
+			return(__PACKAGE__->new()->reverse_geocode(@_));
+		} elsif(!defined($self)) {
+			# Geo::Coder::Free->reverse_geocode()
+			Carp::croak('Usage: ', __PACKAGE__, '::reverse_geocode(latlng => "$lat,$long")');
+		} elsif($self eq __PACKAGE__) {
+			Carp::croak("Usage: $self", '::reverse_geocode(latlng => "$lat,$long")');
+		}
+		return(__PACKAGE__->new()->reverse_geocode($self));
+	} elsif(ref($self) eq 'HASH') {
+		return(__PACKAGE__->new()->reverse_geocode($self));
+	} elsif(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	# } elsif(ref($_[0]) && (ref($_[0] !~ /::/))) {
 	} elsif(ref($_[0])) {
-		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
-	} elsif(scalar(@_) % 2 == 0) {
-		%param = @_;
-	} elsif(scalar(@_) == 1) {
-		$param{location} = shift;
+		Carp::croak('Usage: ', __PACKAGE__, '::reverse_geocode(latlng => "$lat,$long")');
+	} elsif(scalar(@_) && (scalar(@_) % 2 == 0)) {
+		%params = @_;
 	} else {
-		Carp::croak('Usage: geocode(location => $location|scantext => $text)');
+		$params{'latlng'} = shift;
 	}
 
 	# The drivers don't yet support it
 	if($self->{'openaddr'}) {
 		if(wantarray) {
-			my @rc = $self->{'openaddr'}->geocode(\%param);
+			my @rc = $self->{'openaddr'}->reverse_geocode(\%params);
 			return @rc;
-		} elsif(my $rc = $self->{'openaddr'}->geocode(\%param)) {
+		} elsif(my $rc = $self->{'openaddr'}->reverse_geocode(\%params)) {
 			return $rc;
 		}
 	}
 
-	if($param{'location'}) {
+	if($params{'latlng'}) {
 		if(wantarray) {
-			my @rc = $self->{'maxmind'}->geocode(\%param);
+			my @rc = $self->{'maxmind'}->reverse_geocode(\%params);
 			return @rc;
 		}
-		return $self->{'maxmind'}->geocode(\%param);
+		return $self->{'maxmind'}->reverse_geocode(\%params);
 	}
 
 	Carp::croak('Reverse lookup is not yet supported');
@@ -379,6 +405,23 @@ install L<App::csv2sqlite>;
 optionally set the environment variable OPENADDR_HOME to point to an empty directory and download the data from L<http://results.openaddresses.io> into that directory;
 optionally set the environment variable WHOSONFIRST_HOME to point to an empty directory and download the data using L<https://github.com/nigelhorne/NJH-Snippets/blob/master/bin/wof-sqlite-download>.
 You do not need to download the MaxMind data, that will be downloaded automatically.
+
+You will need to create the database used by Geo::Coder::Free.
+In the bin directory there are some helper scripts to do this.
+You will need to tailor them to your set up, but that's not that hard as the
+scripts are trivial
+
+1. Download_databases - this will download the WhosOnFirst and Openaddr
+databases.
+The Makefile.PL file will download the MaxMind database.
+2. create_db - this creates the database used by G:C:F.
+It's called openaddr.sql,
+but that's historical before I added the WhosOnFirst database.
+The names are a bit of a mess because of that.
+I should rename it, though it doesn't contain the Maxmind data.
+3. create_sqlite - converts the Maxmind database from CSV to SQLite.
+
+See the comment at the start of createdatabase.PL for further reading.
 
 =head1 MORE INFORMATION
 

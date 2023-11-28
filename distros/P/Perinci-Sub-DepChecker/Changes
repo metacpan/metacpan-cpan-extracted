@@ -1,3 +1,18 @@
+0.128   2023-11-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix CPAN Testers failures (RT#150379, thanks Andreas Koenig).
+
+          Under some circumstances, the output of perl -v includes a '*' in the
+          perl version. On top of that, not all perls always had the parens
+          around the version number.
+
+
+0.127   2023-11-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq version Version::Util -> 0.732 to see erroneous
+          version number in error message.
+
+
 0.126   2023-07-08  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

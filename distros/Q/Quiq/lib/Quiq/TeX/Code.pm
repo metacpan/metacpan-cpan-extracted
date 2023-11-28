@@ -27,7 +27,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.212';
+our $VERSION = '1.213';
 
 use Quiq::Option;
 use Scalar::Util ();
@@ -147,7 +147,7 @@ sub c {
     my $nl = 1;
     my $pnl = 0;
 
-    Quiq::Option->extract(\@_,
+    Quiq::Option->extract(-mode=>'sloppy',\@_,
         -nl => \$nl,
         -pnl => \$pnl,
     );
@@ -609,7 +609,7 @@ sub toLength {
 
 =head1 VERSION
 
-1.212
+1.213
 
 =head1 AUTHOR
 

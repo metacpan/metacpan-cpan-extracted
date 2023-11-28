@@ -7,9 +7,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-21'; # DATE
+our $DATE = '2023-11-21'; # DATE
 our $DIST = 'NumSeq-Iter'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 our @EXPORT_OK = qw(numseq_iter numseq_parse);
 
@@ -39,7 +39,8 @@ sub _numseq_parse_or_iter {
     }
     die "Extraneous token in number sequence: $numseq, please only use 'a,b,c, ...' or 'a,b,c,...,z'" if length $numseq;
 
-    my ($is_arithmetic, $is_geometric, $inc);
+    my $type = '';
+    my $inc;
   CHECK_SEQ_TYPE: {
         last unless $has_ellipsis;
 
@@ -51,7 +52,7 @@ sub _numseq_parse_or_iter {
                     last CHECK_ARITHMETIC;
                 }
             }
-            $is_arithmetic++;
+            $type = 'arithmetic';
             $inc = $inc0;
             last CHECK_SEQ_TYPE;
         }
@@ -68,8 +69,18 @@ sub _numseq_parse_or_iter {
                     }
                 }
             }
-            $is_geometric++;
+            $type = 'geometric';
             $inc = $inc0;
+            last CHECK_SEQ_TYPE;
+        }
+
+      CHECK_FIBONACCI: {
+            last if @nums < 3;
+            last if defined $last_num; # currently not supported
+            for (2..$#nums) {
+                last unless $nums[$_] == $nums[$_-1]+$nums[$_-2];
+            }
+            $type = 'fibonacci';
             last CHECK_SEQ_TYPE;
         }
 
@@ -81,21 +92,22 @@ sub _numseq_parse_or_iter {
             numbers => \@nums,
             has_ellipsis => $has_ellipsis,
             ($has_ellipsis ? (last_number => $last_num) : ()),
-            type => $is_arithmetic ? 'arithmetic' : ($is_geometric ? 'geometric' : 'itemized'),
-            inc => $inc,
+            type => $type || 'itemized',
+            (defined $inc ? (inc => $inc) : ()),
         };
     }
 
     my $i = 0;
     my $cur;
     my $ends;
+    my @buf;
     return sub {
         return undef if $ends; ## no critic: Subroutines::ProhibitExplicitReturnUndef
         return $nums[$i++] if $i <= $#nums;
         if (!$has_ellipsis) { $ends++; return undef } ## no critic: Subroutines::ProhibitExplicitReturnUndef
 
         $cur //= $nums[-1];
-        if ($is_arithmetic) {
+        if ($type eq 'arithmetic') {
             $cur += $inc;
             if (defined $last_num) {
                 if ($inc >= 0 && $cur > $last_num || $inc < 0 && $cur < $last_num) {
@@ -104,7 +116,7 @@ sub _numseq_parse_or_iter {
                 }
             }
             return $cur;
-        } elsif ($is_geometric) {
+        } elsif ($type eq 'geometric') {
             $cur *= $inc;
             if (defined $last_num) {
                 if ($inc >= 1 && $cur > $last_num || $inc < 1 && $cur < $last_num) {
@@ -113,6 +125,13 @@ sub _numseq_parse_or_iter {
                 }
             }
             return $cur;
+        } elsif ($type eq 'fibonacci') {
+            @buf = ($nums[-1], $nums[-2]) unless @buf;
+            $cur = $buf[1] + $buf[0];
+            unshift @buf, $cur; pop @buf;
+            return $cur;
+        } else {
+            die "BUG: Can't generate items for sequence of type '$type'";
         }
     };
 }
@@ -149,7 +168,7 @@ NumSeq::Iter - Generate a coderef iterator from a number sequence specification 
 
 =head1 VERSION
 
-This document describes version 0.005 of NumSeq::Iter (from Perl distribution NumSeq-Iter), released on 2022-01-21.
+This document describes version 0.008 of NumSeq::Iter (from Perl distribution NumSeq-Iter), released on 2023-11-21.
 
 =head1 SYNOPSIS
 
@@ -167,7 +186,8 @@ This document describes version 0.005 of NumSeq::Iter (from Perl distribution Nu
   my $res = numseq_parse('1,2,3,...');    # [200, "OK", {numbers=>[1,2,3], has_ellipsis=>1, type=>'arithmetic', inc=>1, last_number=>undef}]
   my $res = numseq_parse('1,3,9,...');    # [200, "OK", {numbers=>[1,3,9], has_ellipsis=>1, type=>'geometric',  inc=>3, last_number=>undef}]
   my $res = numseq_parse('1,3,5,...,13'); # [200, "OK", {numbers=>[1,3,5], has_ellipsis=>1, type=>'arithmetic', inc=>2, last_number=>13}]
-  my $res = numseq_parse('2,3,5,...');    # [400, "Parse fail: Can't determine the pattern from number sequence: 2, 3, 5"]
+  my $res = numseq_parse('2,3,5,...');    # [200, "OK", {numbers=>[1,3,5], has_ellipsis=>1, type=>'fibonacci'}]
+  my $res = numseq_parse('2,3,7,...');    # [400, "Parse fail: Can't determine the pattern from number sequence: 2, 3, 7"]
 
 =head1 DESCRIPTION
 
@@ -182,8 +202,18 @@ an ellipsis (e.g. '1,2,3,...' or '1, 3, 5, ..., 10').
 When the sequence has an ellipsis, there must be at least three numbers before
 the ellipsis. There can optionally be another number after the ellipsis to make
 the sequence finite; but the last number can also be Inf, +Inf, or -Inf.
-Currently only simple arithmetic sequence ('1,3,5') or simple geometric sequence
-('2,6,18') is recognized.
+
+Currently these sequences are recognized:
+
+=over
+
+=item * simple arithmetic sequence ('1,3,5')
+
+=item * simple geometric sequence ('2,6,18')
+
+=item * fibonacci ('2,3,5')
+
+=back
 
 =for Pod::Coverage .+
 
@@ -243,13 +273,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

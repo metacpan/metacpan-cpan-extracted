@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Az::Latn::Az - Package for language Azerbaijani
 
 package Locale::CLDR::Locales::Az::Latn::Az;
 # This file auto generated from Data\common\main\az_Latn_AZ.xml
-#	on Fri 13 Oct  9:06:34 am GMT
+#	on Sat  4 Nov  5:53:28 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

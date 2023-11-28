@@ -1,0 +1,41 @@
+{
+   "abstract" : "Communicate with a smart card using PC/SC from a Perl script",
+   "author" : [
+      "Ludovic ROUSSEAU <ludovic.rousseau@free.fr>",
+      "Lionel VICTOR"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Chipcard-PCSC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://pcsc-perl.apdu.fr/"
+   },
+   "version" : "v1.4.16",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

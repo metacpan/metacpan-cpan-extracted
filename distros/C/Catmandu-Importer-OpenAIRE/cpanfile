@@ -8,3 +8,4 @@ on 'test', sub {
 };
 
 requires 'Catmandu', '>=1.0306';
+requires 'JSON','>=2.90';

@@ -1,6 +1,10 @@
 
 Revision history for WebService-Async-Onfido
 
+0.007     2023-11-09 21:34:34+00:00 UTC
+
+    Check PDF download
+
 0.006     2023-07-02 15:36:03+00:00 UTC
     Add hook
 

@@ -62,6 +62,7 @@ my $do_prompt     = !$o->{yes};
 my $hide_skipped  = !$o->{all};
 my $mime_match    = $o->{mime};
 my $sort          = $o->{sort};
+my $split         = $o->{split};
 my $basedir       = $o->{basedir};
 
 chop $basedir if (defined $basedir and $basedir =~ /\/$/);
@@ -151,7 +152,14 @@ foreach my $filepath ( @FILE_LIST ) {
     # since this loop isn't to big, the additional check isn't really an issue.
     chop($filepath) if ($filepath =~ m/\r$/); # deal with dos input
 
-    my @content = read_file( $filepath, binmode => ':utf8' ) ;
+    my @content;
+    if ($o->{split}) {
+        local $/ = $o->{split};
+        @content = read_file( $filepath, binmode => ':utf8' ) ;
+    }
+    else {
+        @content = read_file( $filepath, binmode => ':utf8' ) ;
+    }
 
     # try to detect MIME-type
     my $mimetype = '';
@@ -190,9 +198,9 @@ foreach my $filepath ( @FILE_LIST ) {
 
 my $now      = DateTime->now;
 my $comparer = School::Code::Compare->new()
-                                    ->set_max_relative_difference(2)
+                                    ->set_max_relative_difference(1.4)
                                     ->set_min_char_total        (20)
-                                    ->set_max_relative_distance(0.8);
+                                    ->set_max_relative_distance(0.6);
 
 my %info = (
     visibles =>
@@ -385,7 +393,7 @@ compare-code - find files with similar code
 
 =head1 VERSION
 
-version 0.104
+version 0.201
 
 =head1 SYNOPSIS
 
@@ -413,13 +421,13 @@ If you are unfamiliar with GNU/Linux you might want to read L<doc::Windows> in t
 =head2 Options
 
  compare-code [DIR...] [OPTIONS...]
-
+  
  Arguments:
    DIR             analyse files in given directory
                    Input can otherwise also be specified over:
                      - the option --file / -f
                      - STDIN, receiving filepaths (e.g. from a find command)
-
+  
  Options:
    --all,     -a   show all results in output
                    Don't hide skipped comparisons.
@@ -427,6 +435,7 @@ If you are unfamiliar with GNU/Linux you might want to read L<doc::Windows> in t
    --basedir, -b   skip comparisons within projects under base directory
                    Folders one below will be seen as project directories.
                    Files inside projects will not be compared with each other.
+                   (This will currently not work on Windows)
    --charset, -c   chars used for comparison
                    Define one or more subsets of chars, used to compare the files:
                      - visibles
@@ -438,11 +447,12 @@ If you are unfamiliar with GNU/Linux you might want to read L<doc::Windows> in t
    --file,    -f   file to read from (containing filepaths)
    --help,    -h   show this manual
    --in,      -i   input format, optimize for language
+                   Comments get stripped from code.
                    Supportet arguments:
                      - hashy:  python, perl, bash
                      - slashy: php, js, java, cpp, cs, c
                      - html, xml
-                     - txt (default)
+                     - txt (default, no effect)
    --mime,    -m   only compare if same MIME-type
                    This options needs the Perl Library File::LibMagic installed.
                    You will also need libmagic development files on your system.
@@ -456,7 +466,10 @@ If you are unfamiliar with GNU/Linux you might want to read L<doc::Windows> in t
                      - comparison_[year-month-day-hour-minute]_[method].[format]
    --sort,    -s   sort data by line before comparison
                    Useful to ignore order of method declaration.
-                   Will most likely also find more false positives.
+                   See --split if you need to sort by something else then by line.
+   --split,   -t   Split files on something else then newline
+                   You might want to split for sentences with '\.' in normal text.
+                   Use this option together with --sort.
    --verbose, -v   show actually compared data on STDERR
    --yes,     -y   Don't prompt for questions
                    Program will start working without further confirmation.
@@ -468,7 +481,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Boris Däppen.
+This software is copyright (c) 2023 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

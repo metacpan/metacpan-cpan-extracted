@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ro::Any::Md - Package for language Romanian
 
 package Locale::CLDR::Locales::Ro::Any::Md;
 # This file auto generated from Data\common\main\ro_MD.xml
-#	on Fri 13 Oct  9:35:10 am GMT
+#	on Sat  4 Nov  6:21:17 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

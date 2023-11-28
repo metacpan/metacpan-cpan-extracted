@@ -23,7 +23,7 @@ WriteMakefile(
                      'Scalar::Util' => 0,
                     },
    ( $mm_ver < 6.63_03 ? 'BUILD_REQUIRES' : 'TEST_REQUIRES' ) => {
-                     'IO::CaptureOutput' => 0,
+                     'Capture::Tiny' => 0,
                      'Test::Simple' => 0.44,
                     },
     LICENSE      => "perl",

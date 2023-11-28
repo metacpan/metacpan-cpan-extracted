@@ -274,11 +274,15 @@ for my $class (@$classes) {
     }
 
     # Setting both the accuracy and the precision to defined values is an
-    # error.
+    # error. Avoid the "noise" from carp().
+
+    require File::Spec;
+    open STDERR, '>', File::Spec -> devnull();
 
     for my $entry (@$table2) {
-        my $test = $class . " -> " . $entry;
+        my $x;
+        my $test = "\$x = " . $class . " -> " . $entry;
         eval $test;
-        like($@, qr/specify both accuracy and precision/, $test);
+        is($x, "NaN", $test);
     }
 }

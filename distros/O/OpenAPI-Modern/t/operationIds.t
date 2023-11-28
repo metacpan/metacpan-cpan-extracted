@@ -1,3 +1,4 @@
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
@@ -67,7 +68,7 @@ YAML
 
   ok(!$doc->errors, 'no errors when parsing this document');
   cmp_deeply(
-    $doc->{operationIds},
+    $doc->_operationIds,
     {
       operation_id_a => '/components/callbacks/callback_a/$url_a/patch',
       operation_id_b => '/webhooks/webhook_b/put',

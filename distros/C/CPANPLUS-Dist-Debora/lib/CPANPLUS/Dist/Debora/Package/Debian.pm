@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use parent qw(CPANPLUS::Dist::Debora::Package);
 
@@ -926,7 +926,7 @@ CPANPLUS::Dist::Debora::Package::Debian - Create Debian packages
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -967,7 +967,7 @@ Installs the package.
 =head2 outputname
 
 Returns the package filename, for example
-F<~/.cpanplus/5.34.0/build/XXXX/libsome-module-perl_1.0-1cpanplus_all.deb>.
+F<~/.cpanplus/5.36.1/build/XXXX/libsome-module-perl_1.0-1cpanplus_all.deb>.
 
 =head2 arch
 
@@ -995,7 +995,7 @@ suffix 'cpanplus'.
   my $debiandir = $package->debiandir;
 
 Returns the path to the debian subdirectory, e.g.
-F<~/.cpanplus/5.34.0/build/XXXX/Some-Module-1.0/debian>.
+F<~/.cpanplus/5.36.1/build/XXXX/Some-Module-1.0/debian>.
 
 =head2 provides
 
@@ -1056,7 +1056,7 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-This module cannot be used in taint mode.
+None known.
 
 =head1 SEE ALSO
 
@@ -1068,7 +1068,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2023 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

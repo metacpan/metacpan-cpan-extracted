@@ -2547,6 +2547,10 @@
                                 {
                                     type => 'string',
                                 },
+                                maturity =>
+                                {
+                                    type => 'string',
+                                },
                                 name =>
                                 {
                                     type => 'string',

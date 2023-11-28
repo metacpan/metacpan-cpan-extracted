@@ -1,5 +1,6 @@
 package Sys::Info::Driver::OSX::Device::CPU;
-$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7960';
+$Sys::Info::Driver::OSX::Device::CPU::VERSION = '0.7961';
+use 5.010;
 use strict;
 use warnings;
 use parent qw(Sys::Info::Base);
@@ -62,6 +63,38 @@ sub identify {
             $speed =~ s{ [,] }{.}xms;
             $speed *= 1000;
         }
+        else {
+            if ( $arch eq 'arm64' ) {
+                if ( $< ) {
+                    state $warned_non_root;
+                    my $me = getpwuid $<;
+                    if ( ! $warned_non_root++ ) {
+                        warn "We can't probe for CPU speed for Apple Silicon with the current user $me and need root/sudo to be able to collect more information.";
+                    }
+                }
+                else {
+                    my %pm = powermetrics(
+                                -s => 'cpu_power',
+                                -n => 1,
+                                -i => 1,
+                            );
+                    my %af = map { $_ => $pm{ $_ } }
+                            grep { $pm{$_} ne ' 0 MHz' }
+                            grep { $_ =~ m{ \QHW active frequency\E }xms }
+                            keys %pm;
+                    my @clusters_speed = sort { $a <=> $b}
+                                            map {
+                                                (
+                                                    split m{\s+}xms,
+                                                        __PACKAGE__->trim( $_ )
+                                                )[0]
+                                            }
+                                            values %af;
+                    # get the max. Likely P-N cluster.
+                    $speed = $clusters_speed[-1];
+                }
+            }
+        }
 
         my $proc_num = $cpu->{number_processors};
         $proc_num =~ s/proc (\d+).*/$1/; # M1 asymmetric cores
@@ -74,7 +107,7 @@ sub identify {
             address_width                => undef,
             bus_speed                    => $cpu->{bus_speed},
             speed                        => $speed,
-            name                         => $cpu->{cpu_type} || $name,
+            name                         => $cpu->{chip_type} || $cpu->{cpu_type} || $name,
             family                       => $mcpu->{family}{value},
             manufacturer                 => $mcpu->{vendor}{value},
             model                        => $mcpu->{model}{value},
@@ -108,6 +141,10 @@ sub bitness {
 
     my @flags;
     foreach my $cpu ( grep { ref $_ eq 'HASH' } @cpus ) {
+        if ( my $arch = $cpu->{architecture} ) {
+            # Apple Silicon
+            return '64' if $arch eq 'arm64';
+        }
         next if ref $cpu->{flags} ne 'ARRAY';
         push @flags, @{ $cpu->{flags} };
     }
@@ -131,7 +168,7 @@ Sys::Info::Driver::OSX::Device::CPU
 
 =head1 VERSION
 
-version 0.7960
+version 0.7961
 
 =head1 SYNOPSIS
 

@@ -7,9 +7,9 @@ use warnings;
 use Complete::Util qw(hashify_answer);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-01'; # DATE
+our $DATE = '2023-11-18'; # DATE
 our $DIST = 'Perinci-Sub-XCompletion'; # DIST
-our $VERSION = '0.104'; # VERSION
+our $VERSION = '0.106'; # VERSION
 
 our %SPEC;
 
@@ -77,7 +77,7 @@ Perinci::Sub::XCompletion::comma_sep - Generate completion for completing a comm
 
 =head1 VERSION
 
-This document describes version 0.104 of Perinci::Sub::XCompletion::comma_sep (from Perl distribution Perinci-Sub-XCompletion), released on 2023-03-01.
+This document describes version 0.106 of Perinci::Sub::XCompletion::comma_sep (from Perl distribution Perinci-Sub-XCompletion), released on 2023-11-18.
 
 =head1 SYNOPSIS
 

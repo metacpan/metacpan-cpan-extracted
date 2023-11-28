@@ -18,19 +18,19 @@ name: Travel-Status-DE-VRR
 provides:
   Travel::Status::DE::EFA:
     file: lib/Travel/Status/DE/EFA.pm
-    version: '1.22'
+    version: '1.23'
   Travel::Status::DE::EFA::Line:
     file: lib/Travel/Status/DE/EFA/Line.pm
-    version: '1.22'
+    version: '1.23'
   Travel::Status::DE::EFA::Result:
     file: lib/Travel/Status/DE/EFA/Result.pm
-    version: '1.22'
+    version: '1.23'
   Travel::Status::DE::EFA::Stop:
     file: lib/Travel/Status/DE/EFA/Stop.pm
-    version: '1.22'
+    version: '1.23'
   Travel::Status::DE::VRR:
     file: lib/Travel/Status/DE/VRR.pm
-    version: '1.22'
+    version: '1.23'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -43,5 +43,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-VRR
-version: '1.22'
+version: '1.23'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

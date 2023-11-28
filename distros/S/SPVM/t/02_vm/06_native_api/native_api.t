@@ -30,12 +30,35 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
 }
 
 {
-  ok(SPVM::TestCase::NativeAPI->check_native_api_indexes);
+  ok(SPVM::TestCase::NativeAPI->check_native_api_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_allocator_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_arg_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_basic_type_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_class_file_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_class_var_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_compiler_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_field_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_internal_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_method_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_mutex_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_runtime_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_string_buffer_ids);
+  
+  ok(SPVM::TestCase::NativeAPI->check_native_api_type_ids);
+  
   ok(SPVM::TestCase::NativeAPI->check_native_api_constant_values);
-  ok(SPVM::TestCase::NativeAPI->check_native_api_compiler_indexes);
-  ok(SPVM::TestCase::NativeAPI->check_native_api_string_buffer_indexes);
-  ok(SPVM::TestCase::NativeAPI->check_native_api_runtime_indexes);
-  ok(SPVM::TestCase::NativeAPI->check_native_api_allocator_indexes);
 }
 
 # get_field_string_chars_by_name
@@ -298,6 +321,12 @@ ok(SPVM::TestCase::NativeAPI->runtime_get_method_is_enum);
 {
   ok(SPVM::TestCase::NativeAPI->get_object_basic_type_name);
 }
+
+ok(SPVM::TestCase::NativeAPI->spvm_stdin);
+
+ok(SPVM::TestCase::NativeAPI->spvm_stdout);
+
+ok(SPVM::TestCase::NativeAPI->spvm_stderr);
 
 # Clear exception
 SPVM::api->set_exception(undef);

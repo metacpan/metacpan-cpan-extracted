@@ -56,6 +56,7 @@ case $1 in
 	echo 'dummy: /something'
 	# Some of these mocked results are suppressed in some tests:
 	output=''
+case $2 in */lib*so*) echo "DPKG-QUERY	$2">/dev/tty;; esac
 	case $2 in
 	    /bin/dash)		output='dash: /bin/dash';;
 	    /bin/ls)		echo 'coreutils: /bin/ls';;
@@ -67,6 +68,13 @@ case $1 in
 	    */busybox)		# Some smokers use busybox as ls (soft-link)!
 		echo 'coreutils: /bin/ls'
 		echo "coreutils: $2"
+		;;
+	    */lib*/*/libc.so*|\
+		*/lib*/libc.so*|\
+		*/lib*/ld-linux-*.so*|\
+		*/lib*/ld-musl-*.so*)
+		output="libc6: $2"
+echo 'LIBC'>/dev/tty
 		;;
 	    */pactl)		output="pulseaudio-utils: $2";;
 	    */su)		output="util-linux: $2";;

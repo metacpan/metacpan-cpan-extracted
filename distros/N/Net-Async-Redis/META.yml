@@ -34,37 +34,40 @@ no_index:
 provides:
   Net::Async::Redis:
     file: lib/Net/Async/Redis.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Cluster:
     file: lib/Net/Async/Redis/Cluster.pm
-    version: '4.002'
+    version: '5.001'
+  Net::Async::Redis::Cluster::Multi:
+    file: lib/Net/Async/Redis/Cluster/Multi.pm
+    version: '5.001'
   Net::Async::Redis::Cluster::Node:
     file: lib/Net/Async/Redis/Cluster/Node.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Commands:
     file: lib/Net/Async/Redis/Commands.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Multi:
     file: lib/Net/Async/Redis/Multi.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Protocol:
     file: lib/Net/Async/Redis/Protocol.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Server:
     file: lib/Net/Async/Redis/Server.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Server::Connection:
     file: lib/Net/Async/Redis/Server/Connection.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Server::Database:
     file: lib/Net/Async/Redis/Server/Database.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Subscription:
     file: lib/Net/Async/Redis/Subscription.pm
-    version: '4.002'
+    version: '5.001'
   Net::Async::Redis::Subscription::Message:
     file: lib/Net/Async/Redis/Subscription/Message.pm
-    version: '4.002'
+    version: '5.001'
 requires:
   Cache::LRU: '0.04'
   Class::Method::Modifiers: '0'
@@ -74,12 +77,14 @@ requires:
   File::ShareDir::Install: '0'
   Future: '0.47'
   Future::AsyncAwait: '0.48'
+  Future::Queue: '0.50'
   IO::Async: '0'
   List::BinarySearch::XS: '0.09'
   List::Util: '1.55'
   Log::Any: '1.708'
   Math::Random::Secure: '0'
   Metrics::Any: '0'
+  Object::Pad: '0.800'
   OpenTracing::Any: '1.003'
   Path::Tiny: '0'
   Ryu: '2.009'
@@ -96,10 +101,11 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis
   repository: https://github.com/team-at-cpan/Net-Async-Redis.git
-version: '4.002'
+version: '5.001'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Eyad Arnabeh <eyadof@gmail.com>'
+  - 'Tom Molesworth <tom@audioboundary.com>'
   - 'Paul "LeoNerd" Evans <leonerd@leonerd.org.uk>'
   - 'Tom Molesworth <tom@deriv.com>'
   - 'tm604 <tom@perlsite.co.uk>'

@@ -1,3 +1,13 @@
+0.006     2023-11-10 02:30:25-03:00 America/Sao_Paulo
+    [BugFixes]
+    - Copy dependency checks and compilation tests to fullfil github actions tests
+0.005     2023-11-10 02:08:58-03:00 America/Sao_Paulo
+    [BugFixes]
+    - Add prereqs
+    [Improvments]
+    - Github actions workflow
+0.004     2023-11-09 01:29:54-03:00 America/Sao_Paulo
+    - Add MetaProvides::Package
 0.003     2023-10-15 23:39:20-03:00 America/Sao_Paulo
     - Fix readme and include perlcritic and perltidy to build
 0.002     2023-10-14 22:04:48-03:00 America/Sao_Paulo

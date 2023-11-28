@@ -5,11 +5,11 @@
 # the SWIG interface file instead.
 
 package Ufal::UDPipe;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use base qw(Exporter);
 use base qw(DynaLoader);
 package Ufal::UDPipec;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 bootstrap Ufal::UDPipe;
 package Ufal::UDPipe;
 @EXPORT = qw();
@@ -55,7 +55,7 @@ package Ufal::UDPipe;
 ############# Class : Ufal::UDPipe::Children ##############
 
 package Ufal::UDPipe::Children;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -100,7 +100,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Bytes ##############
 
 package Ufal::UDPipe::Bytes;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -145,7 +145,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Comments ##############
 
 package Ufal::UDPipe::Comments;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -190,7 +190,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::ProcessingError ##############
 
 package Ufal::UDPipe::ProcessingError;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -231,7 +231,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Token ##############
 
 package Ufal::UDPipe::Token;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -285,7 +285,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Word ##############
 
 package Ufal::UDPipe::Word;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe::Token Ufal::UDPipe );
 %OWNER = ();
@@ -341,7 +341,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Words ##############
 
 package Ufal::UDPipe::Words;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -386,7 +386,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::MultiwordToken ##############
 
 package Ufal::UDPipe::MultiwordToken;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe::Token Ufal::UDPipe );
 %OWNER = ();
@@ -428,7 +428,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::MultiwordTokens ##############
 
 package Ufal::UDPipe::MultiwordTokens;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -473,7 +473,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::EmptyNode ##############
 
 package Ufal::UDPipe::EmptyNode;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -529,7 +529,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::EmptyNodes ##############
 
 package Ufal::UDPipe::EmptyNodes;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -574,7 +574,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Sentence ##############
 
 package Ufal::UDPipe::Sentence;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -636,7 +636,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Sentences ##############
 
 package Ufal::UDPipe::Sentences;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -681,7 +681,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::InputFormat ##############
 
 package Ufal::UDPipe::InputFormat;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -727,7 +727,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::OutputFormat ##############
 
 package Ufal::UDPipe::OutputFormat;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -773,7 +773,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Model ##############
 
 package Ufal::UDPipe::Model;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -813,7 +813,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Pipeline ##############
 
 package Ufal::UDPipe::Pipeline;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -861,7 +861,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Trainer ##############
 
 package Ufal::UDPipe::Trainer;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -902,7 +902,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Evaluator ##############
 
 package Ufal::UDPipe::Evaluator;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();
@@ -947,7 +947,7 @@ sub ACQUIRE {
 ############# Class : Ufal::UDPipe::Version ##############
 
 package Ufal::UDPipe::Version;
-our $VERSION = '1.3.0.1';
+our $VERSION = '1.3.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::UDPipe );
 %OWNER = ();

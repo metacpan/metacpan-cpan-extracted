@@ -47,6 +47,7 @@ my %WriteMakefileArgs = (
     "List::UtilsBy" => 0,
     "Log::Any" => 0,
     "Log::Any::Adapter" => 0,
+    "MIME::Base64" => 0,
     "Net::Async::HTTP" => 0,
     "Net::Async::HTTP::Server" => 0,
     "Path::Tiny" => 0,
@@ -85,7 +86,7 @@ my %WriteMakefileArgs = (
     "Test::NoWarnings" => 0,
     "URI" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -117,6 +118,7 @@ my %FallbackPrereqs = (
   "List::UtilsBy" => 0,
   "Log::Any" => 0,
   "Log::Any::Adapter" => 0,
+  "MIME::Base64" => 0,
   "Net::Async::HTTP" => 0,
   "Net::Async::HTTP::Server" => 0,
   "Path::Tiny" => 0,

@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,8 +12,7 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: POD.pm 1578075 2014-03-16 14:01:14Z richter $
-#
+
 ###################################################################################
  
 
@@ -297,6 +297,14 @@ my %Escape2 = (
         },
     'http link' => {
 	'text' => 'http://',
+        'nodename' => 'xlink',
+        'nodetype'  => ntypStartEndTag,
+        'contains'   => '/.-:~?&=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789',
+        'cdatatype' => ntypText,
+        'donteat'   => 1,
+        },
+    'https link' => {
+	'text' => 'https://',
         'nodename' => 'xlink',
         'nodetype'  => ntypStartEndTag,
         'contains'   => '/.-:~?&=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789',
@@ -750,7 +758,7 @@ to use it.
 
 =head1 TODO
 
-Documenation of the resulting XML format still has to be written...
+Documentation of the resulting XML format still has to be written...
 
 
 =head1 Methods

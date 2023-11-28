@@ -1,0 +1,75 @@
+---
+X_No_Archive: Yes
+abstract: 'The AT Protocol for Social Networking'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: At
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  At:
+    file: lib/At.pm
+    version: '0.02'
+  At::Bluesky:
+    file: lib/At/Bluesky.pm
+  At::Bluesky::Facet:
+    file: lib/At/Lexicons/app/bsky/richtext/facet.pm
+    version: '1'
+  At::Bluesky::Facet::byteSlice:
+    file: lib/At/Lexicons/app/bsky/richtext/facet.pm
+  At::Bluesky::Facet::link:
+    file: lib/At/Lexicons/app/bsky/richtext/facet.pm
+  At::Bluesky::Facet::tag:
+    file: lib/At/Lexicons/app/bsky/richtext/facet.pm
+  At::Bluesky::Post:
+    file: lib/At/Lexicons/app/bsky/feed/post.pm
+    version: '1'
+  At::Lexicon::AtProto::Repo:
+    file: lib/At.pm
+  At::Lexicon::AtProto::Server:
+    file: lib/At.pm
+  At::Lexicons::app::bsky::feed::post:
+    file: lib/At/Lexicons/app/bsky/feed/post.pm
+    version: '0.02'
+  At::Lexicons::app::bsky::richtext::facet:
+    file: lib/At/Lexicons/app/bsky/richtext/facet.pm
+    version: '0.02'
+  At::Protocol::DID:
+    file: lib/At.pm
+  At::Protocol::Session:
+    file: lib/At.pm
+  At::UserAgent:
+    file: lib/At.pm
+recommends:
+  Mojo::UserAgent: '0'
+requires:
+  DateTime::Tiny: '0'
+  IO::Socket::SSL: '1.42'
+  JSON::Tiny: '0'
+  Net::SSLeay: '1.49'
+  URI: '0'
+  perl: v5.38.0
+resources:
+  bugtracker: https://github.com/sanko/At.pm/issues
+  homepage: https://github.com/sanko/At.pm
+  repository: https://github.com/sanko/At.pm.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

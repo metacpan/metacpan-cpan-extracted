@@ -272,5 +272,5 @@
   time_format_medium => "ah:mm:ss",
   time_format_short => "ah:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.2103 2023-11-28T00:23:14Z
+
+    - Validate given width is an integer.
+
 2.2102 2023-02-20T09:52:02Z
 
     - Fix a bug of Hangul word bondary length calculation.

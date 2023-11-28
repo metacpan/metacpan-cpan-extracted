@@ -387,7 +387,6 @@ sub new
 	my $domainName = '';
 	my $baseURL = '';
 	$url2fetch = 'https://' . $url  unless ($url =~ m#^https?\:\/\/#);
-#x	$self->{'id'} = ($url2fetch =~ m#\/\/([^\/\?\&\#]+)#) ? $1 : 'no_id';
 	my $t = $url2fetch;
 	if ($t =~ s#(https?\:\/\/)([^\/\?\&\#]+).?##) {
 		$urlPrefix = $1;
@@ -470,16 +469,24 @@ sub new
 			&& $streamLimiter <= $self->{'maxstreams'}) {
 		(my $one = $1 . $2) =~ s#\\\/#\/#gs;
 		my $ext = $3;
+		$one =~ s/\\u00([0-9A-Fa-f]{2})/chr(hex($1))/eg;
 		my $streamURL = $one.'.'.$ext;
 		print STDERR "--1: streamURL=$streamURL= baseURL=$baseURL=\n"  if ($DEBUG);
 		my $tmpbase = $baseURL;
 		while ($streamURL =~ s#\.\.\/##o) {
 			$tmpbase =~ s#[^\/]+\/$##o;
 		}
-		if ($streamURL =~ m#^\/#o) {  #STREAM URL STARTS WITH "/", ASSUME ABSOLUTE TO BASE PAGE URL ("TITLE"):
+		if ($streamURL =~ m#^\/\/#o) {  #STREAM URL STARTS WITH "//", ASSUME ABSOLUTE:
+			if ($baseURL =~ /http\:/io) {
+				$streamURL = 'http:' . $streamURL;
+			} else {
+				$streamURL = 'https:' . $streamURL;
+			}
+			print STDERR "--2a: stream=$streamURL=\n"  if ($DEBUG);
+		} elsif ($streamURL =~ m#^\/#o) {  #STREAM URL STARTS WITH "/", ASSUME ABSOLUTE TO BASE PAGE URL ("TITLE"):
 			$tmpbase =~ s#\/$##o;
 			$streamURL = $tmpbase . $streamURL;
-			print STDERR "--2a: baseURL=$tmpbase= stream=$streamURL=\n"  if ($DEBUG);
+			print STDERR "--2b: baseURL=$tmpbase= stream=$streamURL=\n"  if ($DEBUG);
 		} elsif ($streamURL !~ /^http/o) {  #NO PREFIX, ASSUME RELATIVE TO THE FETCHED URL ("LONG DESC."):
 			if ($isHLSpage) {
 				$tmpbase .= '/'  unless ($tmpbase =~ m#\/$#o);
@@ -487,7 +494,7 @@ sub new
 			} else {
 				$streamURL = $url2fetch . '/' . $streamURL;
 			}
-			print STDERR "--2b: baseURL=$tmpbase= stream=$streamURL=\n"  if ($DEBUG);
+			print STDERR "--2c: baseURL=$tmpbase= stream=$streamURL=\n"  if ($DEBUG);
 		} #OTHERWISE STREAM URL IS A FULL URL (NO CHANGE).
 		$streams .= "$ext=$streamURL|"  unless ($self->{'secure'} && $streamURL !~ /^https/o);
 		$streamLimiter++;

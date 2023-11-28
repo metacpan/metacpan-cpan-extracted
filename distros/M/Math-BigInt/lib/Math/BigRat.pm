@@ -21,7 +21,7 @@ use Scalar::Util    qw< blessed >;
 
 use Math::BigFloat ();
 
-our $VERSION = '2.000000';
+our $VERSION = '2.001001';
 $VERSION =~ tr/_//d;
 
 our @ISA = qw(Math::BigFloat);
@@ -199,7 +199,8 @@ use overload
   ;
 
 BEGIN {
-    *objectify = \&Math::BigInt::objectify;  # inherit this from BigInt
+    *objectify = \&Math::BigInt::objectify;
+
     *AUTOLOAD  = \&Math::BigFloat::AUTOLOAD; # can't inherit AUTOLOAD
     *as_number = \&as_int;
     *is_pos = \&is_positive;
@@ -2312,13 +2313,15 @@ sub as_int {
 
     return $x -> copy() if $x -> isa("Math::BigInt");
 
-    # disable upgrading and downgrading
+    # Disable upgrading and downgrading.
 
     require Math::BigInt;
     my $upg = Math::BigInt -> upgrade();
     my $dng = Math::BigInt -> downgrade();
     Math::BigInt -> upgrade(undef);
     Math::BigInt -> downgrade(undef);
+
+    # Copy the value.
 
     my $y;
     if ($x -> is_inf()) {
@@ -2331,10 +2334,43 @@ sub as_int {
         $y = $y -> bneg() if $x -> is_neg();
     }
 
-    # reset upgrading and downgrading
+    # Copy the remaining instance variables.
+
+    ($y->{_a}, $y->{_p}) = ($x->{_a}, $x->{_p});
+
+    # Restore upgrading and downgrading.
 
     Math::BigInt -> upgrade($upg);
     Math::BigInt -> downgrade($dng);
+
+    return $y;
+}
+
+sub as_rat {
+    my ($class, $x, @r) = ref($_[0]) ? (ref($_[0]), @_) : objectify(1, @_);
+    carp "Rounding is not supported for ", (caller(0))[3], "()" if @r;
+
+    return $x -> copy() if $x -> isa("Math::BigRat");
+
+    # Disable upgrading and downgrading.
+
+    my $upg = Math::BigRat -> upgrade();
+    my $dng = Math::BigRat -> downgrade();
+    Math::BigRat -> upgrade(undef);
+    Math::BigRat -> downgrade(undef);
+
+    # Copy the value.
+
+    my $y = Math::BigRat -> new($x);
+
+    # Copy the remaining instance variables.
+
+    ($y->{_a}, $y->{_p}) = ($x->{_a}, $x->{_p});
+
+    # Restore upgrading and downgrading
+
+    Math::BigRat -> upgrade($upg);
+    Math::BigRat -> downgrade($dng);
 
     return $y;
 }
@@ -2344,13 +2380,15 @@ sub as_float {
 
     return $x -> copy() if $x -> isa("Math::BigFloat");
 
-    # disable upgrading and downgrading
+    # Disable upgrading and downgrading.
 
     require Math::BigFloat;
     my $upg = Math::BigFloat -> upgrade();
     my $dng = Math::BigFloat -> downgrade();
     Math::BigFloat -> upgrade(undef);
     Math::BigFloat -> downgrade(undef);
+
+    # Copy the value.
 
     my $y;
     if ($x -> is_inf()) {
@@ -2366,7 +2404,11 @@ sub as_float {
         }
     }
 
-    # reset upgrading and downgrading
+    # Copy the remaining instance variables.
+
+    ($y->{_a}, $y->{_p}) = ($x->{_a}, $x->{_p});
+
+    # Restore upgrading and downgrading.
 
     Math::BigFloat -> upgrade($upg);
     Math::BigFloat -> downgrade($dng);
@@ -2537,9 +2579,10 @@ sub from_oct {
 
 sub import {
     my $class = shift;
+    $IMPORT++;                  # remember we did import()
     my @a;                      # unrecognized arguments
-    my $lib_param = '';
-    my $lib_value = '';
+
+    my @import = ();
 
     while (@_) {
         my $param = shift;
@@ -2601,12 +2644,18 @@ sub import {
             next;
         }
 
+        # Fall-back accuracy.
+
+        if ($param eq 'div_scale') {
+            $class -> div_scale(shift);
+            next;
+        }
+
         # Backend library.
 
         if ($param =~ /^(lib|try|only)\z/) {
-            # alternative library
-            $lib_param = $param;        # "lib", "try", or "only"
-            $lib_value = shift;
+            push @import, $param;
+            push @import, shift() if @_;
             next;
         }
 
@@ -2624,19 +2673,13 @@ sub import {
         push @a, $param;
     }
 
-    require Math::BigInt;
-
-    my @import = ('objectify');
-    push @import, $lib_param, $lib_value if $lib_param ne '';
     Math::BigInt -> import(@import);
 
-    # find out which one was actually loaded
+    # find out which library was actually loaded
     $LIB = Math::BigInt -> config("lib");
 
-    # any non :constant stuff is handled by Exporter (loaded by parent class)
-    # even if @_ is empty, to give it a chance
-    $class->SUPER::import(@a);           # for subclasses
-    $class->export_to_level(1, $class, @a); # need this, too
+    $class -> SUPER::import(@a);                        # for subclasses
+    $class -> export_to_level(1, $class, @a) if @a;     # need this, too
 }
 
 1;

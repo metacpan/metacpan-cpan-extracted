@@ -1,4 +1,4 @@
-#!perl -wT
+#!/usr/bin/env perl
 
 use warnings;
 use strict;
@@ -10,17 +10,25 @@ BEGIN {
 
 TZ: {
 	SKIP: {
-		if(defined($ENV{'TIMEZONEDB_KEY'})) {
-			# Ramsgate
-			my $point = new_ok('Geo::Location::Point' => [
-				latitude => 51.34,
-				longitude => 1.42,
-				key => $ENV{'TIMEZONEDB_KEY'}
-			]);
+		if($ENV{'TIMEZONEDB_KEY'}) {
+			eval {
+				require TimeZone::TimeZoneDB;
+			};
+			if($@) {
+				skip('TimeZone::TimeZoneDB not installed', 2);
+			} else {
+				import TimeZone::TimeZoneDB;
+				# Ramsgate
+				my $point = new_ok('Geo::Location::Point' => [
+					latitude => 51.34,
+					longitude => 1.42,
+					key => $ENV{'TIMEZONEDB_KEY'}
+				]);
 
-			cmp_ok($point->tz(), 'eq', 'Europe/London', 'Ramsgate is in the UK timezone');
+				cmp_ok($point->tz(), 'eq', 'Europe/London', 'Ramsgate is in the UK timezone');
+				done_testing();
+			}
 		} else {
-			diag('Set TIMEZONEDB_KEY for your API key to timezonedb.com');
 			skip('Set TIMEZONEDB_KEY for your API key to timezonedb.com', 2);
 		}
 	}

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.573';
+our $VERSION = '0.575';
 
 use 5.020;
 use Moo;
@@ -143,7 +143,7 @@ sub keywords {
     'relative-json-pointer' => sub { $_[0] =~ m{^(?:0|[1-9][0-9]*)(?:#$|$|/)} && $_[0] !~ m{~(?![01])} },
     regex => sub {
       local $SIG{__WARN__} = sub { die @_ };
-      eval { qr/$_[0]/; 1 ? 1 : 0 };
+      eval { qr/$_[0]/; 1 };
     },
 
     'iri-reference' => sub { 1 },
@@ -174,18 +174,18 @@ sub keywords {
   $formats_by_spec_version{'draft2019-09'} =
   $formats_by_spec_version{'draft2020-12'} = [$formats_by_spec_version{draft7}->@*, qw(duration uuid)];
 
-  sub _get_default_format_validation ($self, $state, $format) {
+  sub _get_default_format_validation ($class, $state, $format) {
     return $formats->{$format}
       if grep $format eq $_, $formats_by_spec_version{$state->{spec_version}}->@*;
   }
 }
 
-sub _traverse_keyword_format ($self, $schema, $state) {
+sub _traverse_keyword_format ($class, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'string');
   return 1;
 }
 
-sub _eval_keyword_format ($self, $data, $schema, $state) {
+sub _eval_keyword_format ($class, $data, $schema, $state) {
   abort($state, 'unimplemented format "%s"', $schema->{format})
     if $schema->{format} eq 'uri-template';
 
@@ -214,7 +214,7 @@ sub _eval_keyword_format ($self, $data, $schema, $state) {
   # first check the subrefs from JSON::Schema::Modern->new(format_validations => { ... })
   # and fall back to the default formats, which are all defined only for strings
   my $evaluator_spec = $state->{evaluator}->_get_format_validation($schema->{format});
-  my $default_spec = $self->_get_default_format_validation($state, $schema->{format});
+  my $default_spec = $class->_get_default_format_validation($state, $schema->{format});
 
   my $spec =
     $evaluator_spec ? ($default_spec ? +{ type => 'string', sub => $evaluator_spec } : $evaluator_spec)
@@ -222,8 +222,8 @@ sub _eval_keyword_format ($self, $data, $schema, $state) {
       : undef;
 
   A($state, $schema->{format});
-  return E($state, 'not a%s %s', $schema->{format} =~ /^[aeio]/ ? 'n' : '', $schema->{format})
-    if $spec and is_type($spec->{type}, $data) and not $spec->{sub}->($data);
+  return E($state, 'not a valid %s', $schema->{format}) if $spec and is_type($spec->{type}, $data)
+    and not $spec->{sub}->($data);
 
   return 1;
 }
@@ -242,7 +242,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.573
+version 0.575
 
 =head1 DESCRIPTION
 

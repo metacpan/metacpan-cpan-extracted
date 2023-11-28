@@ -14,7 +14,8 @@ my $conf_cmd = [
   '--disable-scripts',      '--disable-mibs',
   '--enable-ipv6',          '--with-mibs=""',
   '--with-perl-modules',    '--disable-embedded-perl',
-  '--disable-manuals',      '--with-defaults',
+  '--disable-manuals',      '--enable-blumenthal-aes',
+  '--with-defaults',
 ];
 
 my %module_build_args = (
@@ -33,7 +34,7 @@ my %module_build_args = (
     protocol       => 'https',
     host           => 'github.com',
     location       => '/netdisco/upstream-sources/blob/master/net-snmp/',
-    exact_filename => 'net-snmp-5.9.3.tar.gz?raw=true',
+    exact_filename => 'net-snmp-5.9.4.tar.gz?raw=true',
   },
   alien_stage_install => 0,
   build_requires      => {

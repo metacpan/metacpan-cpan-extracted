@@ -1,8 +1,22 @@
 Revision history for Plack-Middleware-TrafficAdvice:
 
+v0.3.0    2023-11-07 13:00:52+00:00 Europe/London
+  [Documentation]
+  - Correct typo in Changes for v0.2.5: Plack minimum version has not changed.
+
+  [Tests]
+  - Switched package used for the release manifest.
+
+  - Add author tests for Changes.
+
+  - Removed unnecessary test prerequisite.
+
+  [Other]
+  - Version bumped to v0.3.0 due to bump in minimum Perl version in v0.2.5.
+
 v0.2.5    2023-10-28 09:50:44+01:00 Europe/London
   [Incompatible Changes]
-  - Bumped minimum Perl version to v5.12, in line with the minimum Plack version.
+  - Bumped minimum Perl version to v5.12.
 
   [Tests]
   - Enabled "use strict" Kwalitee test.

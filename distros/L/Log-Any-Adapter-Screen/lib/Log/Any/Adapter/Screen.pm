@@ -1,8 +1,5 @@
 package Log::Any::Adapter::Screen;
 
-our $DATE = '2018-12-22'; # DATE
-our $VERSION = '0.140'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -10,6 +7,11 @@ use warnings;
 use Log::Any;
 use Log::Any::Adapter::Util qw(make_method);
 use parent qw(Log::Any::Adapter::Base);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-21'; # DATE
+our $DIST = 'Log-Any-Adapter-Screen'; # DIST
+our $VERSION = '0.141'; # VERSION
 
 my $CODE_RESET = "\e[0m"; # PRECOMPUTED FROM: do { require Term::ANSIColor; Term::ANSIColor::color('reset') }
 my $DEFAULT_COLORS = {alert=>"\e[31m",critical=>"\e[31m",debug=>"",emergency=>"\e[31m",error=>"\e[35m",info=>"\e[32m",notice=>"\e[32m",trace=>"\e[33m",warning=>"\e[1;34m"}; # PRECOMPUTED FROM: do { require Term::ANSIColor; my $tmp = {trace=>'yellow', debug=>'', info=>'green',notice=>'green',warning=>'bold blue',error=>'magenta',critical=>'red',alert=>'red',emergency=>'red'}; for (keys %$tmp) { if ($tmp->{$_}) { $tmp->{$_} = Term::ANSIColor::color($tmp->{$_}) } }; $tmp }
@@ -46,7 +48,7 @@ sub init {
         } elsif (defined $ENV{COLOR}) {
             $ENV{COLOR};
         } else {
-            (-t STDOUT);
+            (-t STDOUT); ## no critic: InputOutput::ProhibitInteractiveTest
         }
     };
     if ($self->{colors}) {
@@ -60,6 +62,8 @@ sub init {
     } else {
         $self->{colors} = $DEFAULT_COLORS;
     }
+    $self->{min_level} = $self->{log_level} if(exists $self->{log_level} && ! exists $self->{min_level});
+    delete $self->{log_level};
     $self->{min_level} //= $self->_min_level;
     if (!$self->{formatter}) {
         if (($ENV{LOG_PREFIX} // '') eq 'elapsed') {
@@ -127,7 +131,7 @@ for my $method (Log::Any->detection_methods()) {
 }
 
 1;
-# ABSTRACT: Send logs to screen, with colors and some other features
+# ABSTRACT: (ADOPTME) Send logs to screen, with colors and some other features
 
 __END__
 
@@ -137,11 +141,11 @@ __END__
 
 =head1 NAME
 
-Log::Any::Adapter::Screen - Send logs to screen, with colors and some other features
+Log::Any::Adapter::Screen - (ADOPTME) Send logs to screen, with colors and some other features
 
 =head1 VERSION
 
-This document describes version 0.140 of Log::Any::Adapter::Screen (from Perl distribution Log-Any-Adapter-Screen), released on 2018-12-22.
+This document describes version 0.141 of Log::Any::Adapter::Screen (from Perl distribution Log-Any-Adapter-Screen), released on 2023-11-21.
 
 =head1 SYNOPSIS
 
@@ -167,12 +171,17 @@ Parameters:
 
 =item * min_level => STRING
 
+=item * log_level => STRING
+
 Set logging level. Default is warning. If LOG_LEVEL environment variable is set,
 it will be used instead. If TRACE environment variable is set to true, level
 will be set to 'trace'. If DEBUG environment variable is set to true, level will
 be set to 'debug'. If VERBOSE environment variable is set to true, level will be
 set to 'info'.If QUIET environment variable is set to true, level will be set to
 'error'.
+
+Log::Any adapters use parameter C<log_level> instead of C<min_level>.
+If both are present C<min_level> takes precedence.
 
 =item * use_color => BOOL
 
@@ -263,15 +272,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Log-Any-Ad
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/perlancar/perl-Log-Any-Adapter-ScreenColoredLevel>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Any-Adapter-Screen>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Source repository is at L<https://github.com/perlancar/perl-Log-Any-Adapter-Screen>.
 
 =head1 SEE ALSO
 
@@ -289,11 +290,53 @@ L<Term::ANSIColor>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTORS
+
+=for stopwords Mikko Koivunalho Steven Haryanto
+
+=over 4
+
+=item *
+
+Mikko Koivunalho <mikkoi@cpan.org>
+
+=item *
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=back
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2016, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2018, 2016, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Any-Adapter-Screen>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

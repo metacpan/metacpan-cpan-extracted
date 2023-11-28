@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Sx - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Sx;
 # This file auto generated from Data\common\main\en_SX.xml
-#	on Fri 13 Oct  9:13:30 am GMT
+#	on Sat  4 Nov  6:00:03 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

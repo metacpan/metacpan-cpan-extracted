@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -10,8 +11,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id: Default.pm 1578075 2014-03-16 14:01:14Z richter $
 #
 ###################################################################################
 
@@ -21,10 +20,36 @@ package Embperl::Form::Validate::Default;
 use strict;
 use vars qw($VERSION %error_messages %script_functions %prefixes);
 
-$VERSION = '2.0.0' ;
+$VERSION = '3.0.0' ;
 
 %script_functions = ();
 %prefixes = ();
+use utf8 ;
+
+my %errutf8 =
+    (
+	validate_required => 'Bitte Feld "%0" ausfÃ¼llen',
+	validate_eq => 'Falscher Inhalt "%1" des Feldes "%0": Erwartet wird "%2"',
+	validate_same => '"%0" stimmt nicht mit "%2" Ã¼berein',
+	validate_lt => '"%0" muÃŸ kleiner als %2 sein',
+	validate_gt => '"%0" muÃŸ grÃ¶ÃŸer als %2 sein',
+	validate_le => '"%0" muÃŸ kleiner oder gleich wie %2 sein',
+	validate_ge => '"%0" muÃŸ grÃ¶ÃŸer oder gleich %2 sein',
+	validate_ne => '"%0" muÃŸ ungleich %2 sein',
+	validate_length_max => 'Inhalt des Feldes "%0" ist zu lang, maximale LÃ¤nge sind %2, eingegeben wurden %1 Zeichen',
+	validate_length_min => 'Inhalt des Feldes "%0" ist zu kurz, minimal LÃ¤nge sind %2, eingegeben wurden %1 Zeichen',
+	validate_length_eq => 'Inhalt des Feldes "%0" hat die falsche LÃ¤nge: Er sollte %2 Zeichen lang sein, ist aber %1 lang',
+	validate_matches_regex => 'Inhalt "%1" des Feldes "%0" entspricht nicht dem regulÃ¤ren Ausdruck /%2/',
+	validate_matches_regex_js => 'Inhalt "%1" des Feldes "%0" entspricht nicht dem regulÃ¤ren Ausdruck /%2/',
+	validate_not_matches_regex => 'Inhalt "%1" des Feldes "%0" darf nicht dem regulÃ¤ren Ausdruck /%2/ entsprechen',
+	validate_not_matches_regex_js => 'Inhalt "%1" des Feldes "%0" darf nicht dem regulÃ¤ren Ausdruck /%2/ entsprechen',
+	validate_matches_wildcard => 'Inhalt "%1" des Feldes "%0" entspricht nicht dem Wildcard-Ausdruck "%2"',
+	validate_must_only_contain => 'Das Feld "%0" darf nur folgende Zeichen enthalten: "%2"',
+	validate_must_contain_one_of => 'Das Feld "%0" muÃŸ mindestens eines der folgenden Zeichen enthalten: "%2"',
+	validate_must_not_contain => 'Das Feld "%0" darf folgende Zeichen nicht enthalten: "%2"'
+    ) ;
+
+no utf8 ;
 
 %error_messages = 
 (
@@ -33,68 +58,47 @@ $VERSION = '2.0.0' ;
 	validate_required => 'Bitte Feld "%0" ausfüllen',
 	validate_eq => 'Falscher Inhalt "%1" des Feldes "%0": Erwartet wird "%2"',
 	validate_same => '"%0" stimmt nicht mit "%2" überein',
-	validate_lt => '%0 muß kleiner als %2 sein',
-	validate_gt => '%0 muß größer als %2 sein',
-	validate_le => '%0 muß kleiner oder gleich wie %2 sein',
-	validate_ge => '%0 muß größer oder gleich %2 sein',
-	validate_ne => '%0 muß ungleich %2 sein',
-	validate_length_max => 'Inhalt des Feldes %0 ist zu lang, maximale Länge sind %2, eingegeben wurden %1 Zeichen',
-	validate_length_min => 'Inhalt des Feldes %0 ist zu kurz, minimal Länge sind %2, eingegeben wurden %1 Zeichen',
-	validate_length_eq => 'Inhalt des Feldes %0 hat die falsche Länge: Er sollte %2 Zeichen lang sein, ist aber %1 lang',
-	validate_matches_regex => 'Inhalt "%1" des Feldes %0 entspricht nicht dem regulären Ausdruck /%2/',
-	validate_matches_regex_js => 'Inhalt "%1" des Feldes %0 entspricht nicht dem regulären Ausdruck /%2/',
-	validate_not_matches_regex => 'Inhalt "%1" des Feldes %0 darf nicht dem regulären Ausdruck /%2/ entsprechen',
-	validate_not_matches_regex_js => 'Inhalt "%1" des Feldes %0 darf nicht dem regulären Ausdruck /%2/ entsprechen',
-	validate_matches_wildcard => 'Inhalt "%1" des Feldes %0 entspricht nicht dem Wildcard-Ausdruck "%2"',
-	validate_must_only_contain => 'Das Feld %0 darf nur folgende Zeichen enthalten: "%2"',
-	validate_must_contain_one_of => 'Das Feld %0 muß mindestens eines der folgenden Zeichen enthalten: "%2"',
-	validate_must_not_contain => 'Das Feld %0 darf folgende Zeichen nicht enthalten: "%2"'
+	validate_lt => '"%0" muß kleiner als %2 sein',
+	validate_gt => '"%0" muß größer als %2 sein',
+	validate_le => '"%0" muß kleiner oder gleich wie %2 sein',
+	validate_ge => '"%0" muß größer oder gleich %2 sein',
+	validate_ne => '"%0" muß ungleich %2 sein',
+	validate_length_max => 'Inhalt des Feldes "%0" ist zu lang, maximale Länge sind %2, eingegeben wurden %1 Zeichen',
+	validate_length_min => 'Inhalt des Feldes "%0" ist zu kurz, minimal Länge sind %2, eingegeben wurden %1 Zeichen',
+	validate_length_eq => 'Inhalt des Feldes "%0" hat die falsche Länge: Er sollte %2 Zeichen lang sein, ist aber %1 lang',
+	validate_matches_regex => 'Inhalt "%1" des Feldes "%0" entspricht nicht dem regulären Ausdruck /%2/',
+	validate_matches_regex_js => 'Inhalt "%1" des Feldes "%0" entspricht nicht dem regulären Ausdruck /%2/',
+	validate_not_matches_regex => 'Inhalt "%1" des Feldes "%0" darf nicht dem regulären Ausdruck /%2/ entsprechen',
+	validate_not_matches_regex_js => 'Inhalt "%1" des Feldes "%0" darf nicht dem regulären Ausdruck /%2/ entsprechen',
+	validate_matches_wildcard => 'Inhalt "%1" des Feldes "%0" entspricht nicht dem Wildcard-Ausdruck "%2"',
+	validate_must_only_contain => 'Das Feld "%0" darf nur folgende Zeichen enthalten: "%2"',
+	validate_must_contain_one_of => 'Das Feld "%0" muß mindestens eines der folgenden Zeichen enthalten: "%2"',
+	validate_must_not_contain => 'Das Feld "%0" darf folgende Zeichen nicht enthalten: "%2"'
     },
-
-    'de.utf-8' => 
-    {
-	validate_required => 'Bitte Feld "%0" ausfÃ¼llen',
-	validate_eq => 'Falscher Inhalt "%1" des Feldes "%0": Erwartet wird "%2"',
-	validate_same => '"%0" stimmt nicht mit "%2" Ã¼berein',
-	validate_lt => '%0 muÃŸ kleiner als %2 sein',
-	validate_gt => '%0 muÃŸ grÃ¶ÃŸer als %2 sein',
-	validate_le => '%0 muÃŸ kleiner oder gleich wie %2 sein',
-	validate_ge => '%0 muÃŸ grÃ¶ÃŸer oder gleich %2 sein',
-	validate_ne => '%0 muÃŸ ungleich %2 sein',
-	validate_length_max => 'Inhalt des Feldes %0 ist zu lang, maximale LÃ¤nge sind %2, eingegeben wurden %1 Zeichen',
-	validate_length_min => 'Inhalt des Feldes %0 ist zu kurz, minimal LÃ¤nge sind %2, eingegeben wurden %1 Zeichen',
-	validate_length_eq => 'Inhalt des Feldes %0 hat die falsche LÃ¤nge: Er sollte %2 Zeichen lang sein, ist aber %1 lang',
-	validate_matches_regex => 'Inhalt "%1" des Feldes %0 entspricht nicht dem regulÃ¤ren Ausdruck /%2/',
-	validate_matches_regex_js => 'Inhalt "%1" des Feldes %0 entspricht nicht dem regulÃ¤ren Ausdruck /%2/',
-	validate_not_matches_regex => 'Inhalt "%1" des Feldes %0 darf nicht dem regulÃ¤ren Ausdruck /%2/ entsprechen',
-	validate_not_matches_regex_js => 'Inhalt "%1" des Feldes %0 darf nicht dem regulÃ¤ren Ausdruck /%2/ entsprechen',
-	validate_matches_wildcard => 'Inhalt "%1" des Feldes %0 entspricht nicht dem Wildcard-Ausdruck "%2"',
-	validate_must_only_contain => 'Das Feld %0 darf nur folgende Zeichen enthalten: "%2"',
-	validate_must_contain_one_of => 'Das Feld %0 muÃŸ mindestens eines der folgenden Zeichen enthalten: "%2"',
-	validate_must_not_contain => 'Das Feld %0 darf folgende Zeichen nicht enthalten: "%2"'
-    },
-
+    
+    'de.utf8' => \%errutf8,
+    
     en =>
     {
-	validate_required => 'Please enter a value in %0',
-	validate_eq => 'Wrong content "%1" of field %0: Expected "%2"',
+	validate_required => 'Please enter a value in "%0"',
+	validate_eq => 'Wrong content "%1" of field "%0": Expected "%2"',
 	validate_same => '"%0" does not match "%2"',
-	validate_lt => '%0 must be less then %2',
-	validate_gt => '%0 must be greater then %2',
-	validate_le => '%0 must be less or equal then %2',
-	validate_ge => '%0 must be greater or equal then %2',
-	validate_ne => 'Wrong content "%1" of field %0: Expected not "%2"',
-	validate_length_max => 'Content of field %0 is too long, has %1 characters, maximum is %2 characters',
-	validate_length_min => 'Content of field %0 is too short, has %1 characters, minimum is %2 characters',
-	validate_length_eq => 'Content of field %0 has wrong length: It is %1 characters long, but should be %2 characters long',
-	validate_matches_regex => 'Field %0 doesn"t match regexp /%2/',
-	validate_matches_regex_js => 'Field %0 doesn"t match regexp /%2/',
-	validate_not_matches_regex => 'Field %0 must not match regexp /%2/',
-	validate_not_matches_regex_js => 'Field %0 must not match regexp /%2/',
-	validate_matches_wildcard => 'Field %0 doesn"t match wildcard expression "%2"',
-	validate_must_only_contain => 'Field %0 must contain only the following characters: "%2"',
-	validate_must_contain_one_of => 'Field %0 must contain one of the following characters: "%2"',
-	validate_must_not_contain => 'Field %0 must not contain the following characters: "%2"'
+	validate_lt => '"%0" must be less then %2',
+	validate_gt => '"%0" must be greater then %2',
+	validate_le => '"%0" must be less or equal then %2',
+	validate_ge => '"%0" must be greater or equal then %2',
+	validate_ne => 'Wrong content "%1" of field "%0": Expected not "%2"',
+	validate_length_max => 'Content of field "%0" is too long, has %1 characters, maximum is %2 characters',
+	validate_length_min => 'Content of field "%0" is too short, has %1 characters, minimum is %2 characters',
+	validate_length_eq => 'Content of field "%0" has wrong length: It is %1 characters long, but should be %2 characters long',
+	validate_matches_regex => 'Field "%0" doesn"t match regexp /%2/',
+	validate_matches_regex_js => 'Field "%0" doesn"t match regexp /%2/',
+	validate_not_matches_regex => 'Field "%0" must not match regexp /%2/',
+	validate_not_matches_regex_js => 'Field "%0" must not match regexp /%2/',
+	validate_matches_wildcard => 'Field "%0" doesn"t match wildcard expression "%2"',
+	validate_must_only_contain => 'Field "%0" must contain only the following characters: "%2"',
+	validate_must_contain_one_of => 'Field "%0" must contain one of the following characters: "%2"',
+	validate_must_not_contain => 'Field "%0" must not contain the following characters: "%2"'
     }
  );
 
@@ -248,7 +252,7 @@ sub getscript_same
     my ($key2, $name2) = split (/:/, $arg) ;
     $name2 ||= $key2 ;
 
-    return ("obj.value == document.$form\['$key2'\].value", ['validate_same', "+'obj.value'+", $name2]) ;
+    return ("obj.value == formelem\['$key2'\].value", ['validate_same', "+'obj.value'+", $name2]) ;
     }
 
 # --------------------------------------------------------------

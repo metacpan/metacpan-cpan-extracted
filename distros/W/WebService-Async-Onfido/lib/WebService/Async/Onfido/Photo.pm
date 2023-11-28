@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(WebService::Async::Onfido::Base::Photo);
 
-our $VERSION = '0.006';    # VERSION
+our $VERSION = '0.007';    # VERSION
 
 =head1 NAME
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Event.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/11
-## Modified 2022/09/18
+## Modified 2023/11/06
 ## All rights reserved
 ## 
 ## 
@@ -18,7 +18,6 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( @EXPORT_OK %EXPORT_TAGS $VERSION );
-    use Nice::Try;
     use Time::HiRes ();
     use constant {
         NONE            => 0,
@@ -71,7 +70,7 @@ BEGIN
         )],
         'phase' => [qw( NONE CAPTURING_PHASE AT_TARGET BUBBLING_PHASE )]
     );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -195,7 +194,9 @@ sub setTimestamp
 {
     my $self = shift( @_ );
     my $now  = scalar( @_ ) ? shift( @_ ) : Time::HiRes::time();
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         my $dt;
         unless( $self->_is_a( $now => 'DateTime' ) )
@@ -203,11 +204,12 @@ sub setTimestamp
             $dt = DateTime->from_epoch( epoch => $now );
         }
         return( $self->_set_get_datetime( timeStamp => $dt ) );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error setting event timestamp: $e" ) );
+        return( $self->error( "Error setting event timestamp: $@" ) );
     }
+    return( $rv );
 }
 
 sub stopImmediatePropagation
@@ -253,7 +255,7 @@ HTML::Object::Event - HTML Object Event Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

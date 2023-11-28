@@ -1,10 +1,8 @@
 #!/usr/bin/env perl
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Graph::Reader::TGF::CSV;
 use IO::Barf qw(barf);
 use File::Temp qw(tempfile);

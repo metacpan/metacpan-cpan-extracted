@@ -8,12 +8,12 @@ use AsposeCellsCloud::Object::ComboBox;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**DropDownLines** | **int** |  |
+**DropDownLines** | **int** | Gets or sets the number of list lines displayed in the drop-down portion of a combo box. |
 **InputRange** | **string** |  |
-**SelectedCell** | **LinkElement** |  |
-**SelectedIndex** | **int** |  |
-**SelectedValue** | **string** |  |
-**Shadow** | **boolean** |  |
+**SelectedCell** | **LinkElement** | Gets the selected cell in the input range of the combo box. |
+**SelectedIndex** | **int** | Gets or sets the index number of the currently selected item in a list box or combo box.                        Zero-based. |
+**SelectedValue** | **string** | Gets the selected value of the combox box. |
+**Shadow** | **boolean** | Indicates whether the combobox has 3-D shading. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

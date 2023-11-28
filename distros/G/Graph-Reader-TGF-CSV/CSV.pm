@@ -1,16 +1,13 @@
 package Graph::Reader::TGF::CSV;
 
-# Pragmas.
 use base qw(Graph::Reader::TGF);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure qw(err);
 use Text::CSV;
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Edge callback.
 sub _edge_callback {
@@ -71,6 +68,7 @@ Graph::Reader::TGF::CSV - Perl class for reading a graph from TGF format with CS
 =head1 SYNOPSIS
 
  use Graph::Reader::TGF::CSV;
+
  my $obj = Graph::Reader::TGF::CSV->new;
  my $graph = $obj->read_graph($tgf_csv_file);
 
@@ -116,11 +114,9 @@ Graph::Reader::TGF::CSV - Perl class for reading a graph from TGF format with CS
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Graph::Reader::TGF::CSV;
  use IO::Barf qw(barf);
  use File::Temp qw(tempfile);
@@ -176,21 +172,22 @@ Install the Graph::Reader modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Graph-Reader-TGF-CSV>
+L<https://github.com/michal-josef-spacek/Graph-Reader-TGF-CSV>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

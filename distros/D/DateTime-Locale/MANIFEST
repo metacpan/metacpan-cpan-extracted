@@ -1119,6 +1119,8 @@ share/be-tarask.pl
 share/be.pl
 share/bem-ZM.pl
 share/bem.pl
+share/bew-ID.pl
+share/bew.pl
 share/bez-TZ.pl
 share/bez.pl
 share/bg-BG.pl
@@ -1133,6 +1135,8 @@ share/bgn-PK.pl
 share/bgn.pl
 share/bho-IN.pl
 share/bho.pl
+share/blo-BJ.pl
+share/blo.pl
 share/blt-VN.pl
 share/blt.pl
 share/bm-ML.pl
@@ -1190,6 +1194,8 @@ share/co-FR.pl
 share/co.pl
 share/cs-CZ.pl
 share/cs.pl
+share/csw-CA.pl
+share/csw.pl
 share/cu-RU.pl
 share/cu.pl
 share/cv-RU.pl
@@ -1273,6 +1279,7 @@ share/en-GM.pl
 share/en-GU.pl
 share/en-GY.pl
 share/en-HK.pl
+share/en-ID.pl
 share/en-IE.pl
 share/en-IL.pl
 share/en-IM.pl
@@ -1520,6 +1527,8 @@ share/ia-001.pl
 share/ia.pl
 share/id-ID.pl
 share/id.pl
+share/ie-EE.pl
+share/ie.pl
 share/ig-NG.pl
 share/ig.pl
 share/ii-CN.pl
@@ -1580,6 +1589,7 @@ share/km-KH.pl
 share/km.pl
 share/kn-IN.pl
 share/kn.pl
+share/ko-CN.pl
 share/ko-KP.pl
 share/ko-KR.pl
 share/ko.pl
@@ -1603,6 +1613,15 @@ share/ku-TR.pl
 share/ku.pl
 share/kw-GB.pl
 share/kw.pl
+share/kxv-Deva-IN.pl
+share/kxv-Deva.pl
+share/kxv-Latn-IN.pl
+share/kxv-Latn.pl
+share/kxv-Orya-IN.pl
+share/kxv-Orya.pl
+share/kxv-Telu-IN.pl
+share/kxv-Telu.pl
+share/kxv.pl
 share/ky-KG.pl
 share/ky.pl
 share/la-VA.pl
@@ -1658,6 +1677,8 @@ share/mgo-CM.pl
 share/mgo.pl
 share/mi-NZ.pl
 share/mi.pl
+share/mic-CA.pl
+share/mic.pl
 share/mk-MK.pl
 share/mk.pl
 share/ml-IN.pl
@@ -1766,6 +1787,7 @@ share/pis.pl
 share/pl-PL.pl
 share/pl.pl
 share/prg-001.pl
+share/prg-PL.pl
 share/prg.pl
 share/ps-AF.pl
 share/ps-PK.pl
@@ -1866,6 +1888,8 @@ share/sid-ET.pl
 share/sid.pl
 share/sk-SK.pl
 share/sk.pl
+share/skr-PK.pl
+share/skr.pl
 share/sl-SI.pl
 share/sl.pl
 share/sma-NO.pl
@@ -1968,6 +1992,8 @@ share/tt-RU.pl
 share/tt.pl
 share/twq-NE.pl
 share/twq.pl
+share/tyv-RU.pl
+share/tyv.pl
 share/tzm-MA.pl
 share/tzm.pl
 share/ug-CN.pl
@@ -1996,6 +2022,8 @@ share/vec-IT.pl
 share/vec.pl
 share/vi-VN.pl
 share/vi.pl
+share/vmw-MZ.pl
+share/vmw.pl
 share/vo-001.pl
 share/vo.pl
 share/vun-TZ.pl
@@ -2012,11 +2040,14 @@ share/wo-SN.pl
 share/wo.pl
 share/xh-ZA.pl
 share/xh.pl
+share/xnr-IN.pl
+share/xnr.pl
 share/xog-UG.pl
 share/xog.pl
 share/yav-CM.pl
 share/yav.pl
 share/yi-001.pl
+share/yi-UA.pl
 share/yi.pl
 share/yo-BJ.pl
 share/yo-NG.pl
@@ -2030,6 +2061,8 @@ share/yue-Hans.pl
 share/yue-Hant-HK.pl
 share/yue-Hant.pl
 share/yue.pl
+share/za-CN.pl
+share/za.pl
 share/zgh-MA.pl
 share/zgh.pl
 share/zh-Hans-HK.pl
@@ -2063,6 +2096,7 @@ t/zzz-check-breaks.t
 tools/generate-modules
 tools/lib/ModuleGenerator.pm
 tools/lib/ModuleGenerator/Locale.pm
+tools/regen-stopwords.pl
 tools/templates/locale.pod
 xt/author/00-compile.t
 xt/author/clean-namespaces.t

@@ -27,7 +27,6 @@ my $builder = Module::Build->new(
         'File::Spec'              => 0,
         'File::Temp'              => 0,
         'Getopt::Long'            => 0,
-        'IPC::Run3'               => 0,
         'JSON'                    => 0,
         'List::Util'              => 0,
         'Music::AtonalUtil'       => 1.17,
@@ -57,8 +56,10 @@ my $builder = Module::Build->new(
             },
         },
     },
-    meta_merge =>
-      { resources => { repository => 'https://thrig.me/src/App-MusicTools.git' } },
+    meta_merge => {
+        resources =>
+          { repository => 'https://thrig.me/src/App-MusicTools.git' }
+    },
 );
 
 $builder->create_build_script();

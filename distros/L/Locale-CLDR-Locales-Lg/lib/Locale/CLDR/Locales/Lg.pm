@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lg - Package for language Ganda
 
 package Locale::CLDR::Locales::Lg;
 # This file auto generated from Data\common\main\lg.xml
-#	on Fri 13 Oct  9:25:27 am GMT
+#	on Sat  4 Nov  6:11:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

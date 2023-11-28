@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,33 +12,36 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: Number.pm 1578075 2014-03-16 14:01:14Z richter $
-#
 ###################################################################################
 
 
 package Embperl::Form::Validate::Number ;
 
 use base qw(Embperl::Form::Validate::Default);
+use utf8 ;
 
 my
-$VERSION = '2.0.0' ;
+$VERSION = '3.0.0' ;
+
+my %errutf8 =
+    (
+	validate_number => '"%0" muÃŸ eine Zahl sein',
+    ) ;
+
+no utf8 ;
 
 my %error_messages = 
 (
     de => 
     {
-	validate_number => '%0 muß eine Zahl sein',
+	validate_number => '"%0" muß eine Zahl sein',
     },
 
-    'de.utf-8' => 
-    {
-	validate_number => '%0 muÃŸ eine Zahl sein',
-    },
+    'de.utf-8' => \%errutf8,
 
     en =>
     {
-	validate_number => '%0 must be a number',
+	validate_number => '"%0" must be a number',
     }
  );
 

@@ -1,5 +1,18 @@
 Revision history for Plack-Middleware-EmulateOPTIONS:
 
+v0.3.2    2023-11-07 13:00:11+00:00 Europe/London
+  [Documentation]
+  - Removed unnecessary SEE ALSO section.
+
+  [Tests]
+  - Migrated to Test2.
+
+  - Switched package used for the release manifest.
+
+  - Add author tests for Changes.
+
+  - Removed unnecessary test prerequisite.
+
 v0.3.1    2023-01-10 10:57:23+00:00 Europe/London
   No Changes since v0.3.0
 

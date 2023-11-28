@@ -10,7 +10,10 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(dump_partial dumpp);
 
-our $VERSION = '0.05'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-08-07'; # DATE
+our $DIST = 'Data-Dump-Partial'; # DIST
+our $VERSION = '0.06'; # VERSION
 
 sub _dmp { Data::Dump::Filtered::dump_filtered(@_, undef) }
 
@@ -96,21 +99,21 @@ sub dump_partial {
                     my $mk = $opts->{max_keys};
                     {
                         if ($opts->{hide_keys}) {
-                            for (sort keys %hash) {
-                                delete $hash{$_} if $_ ~~ @{$opts->{hide_keys}};
+                            for my $k (sort keys %hash) {
+                                delete $hash{$k} if grep { $_ eq $k } @{$opts->{hide_keys}};
                             }
                         }
                         last if keys(%hash) <= $mk;
                         if ($opts->{worthless_keys}) {
-                            for (sort keys %hash) {
+                            for my $k (sort keys %hash) {
                                 last if keys(%hash) <= $mk;
-                                delete $hash{$_} if $_ ~~ @{$opts->{worthless_keys}};
+                                delete $hash{$k} if grep { $_ eq $k } @{$opts->{worthless_keys}};
                             }
                         }
                         last if keys(%hash) <= $mk;
-                        for (reverse sort keys %hash) {
-                            delete $hash{$_} if !$opts->{precious_keys} ||
-                                !($_ ~~ @{$opts->{precious_keys}});
+                        for my $k (reverse sort keys %hash) {
+                            delete $hash{$k} if !$opts->{precious_keys} ||
+                                !(grep { $_ eq $k } @{$opts->{precious_keys}});
                             last if keys(%hash) <= $mk;
                         }
                     }
@@ -169,7 +172,7 @@ Data::Dump::Partial - Dump data structure compactly and potentially partially
 
 =head1 VERSION
 
-version 0.05
+This document describes version 0.06 of Data::Dump::Partial (from Perl distribution Data-Dump-Partial), released on 2023-08-07.
 
 =head1 SYNOPSIS
 
@@ -182,10 +185,10 @@ version 0.05
  dumpp($data, $more_data, {max_total_len => 50, max_keys => 4});
 
  # mask passwords specified in hash key values
- dumpp({auth_info=>{user=>"steven", password=>"secret"}, foo=>1, bar=>2},
+ dumpp({auth_info=>{user=>"jajang", password=>"secret"}, foo=>1, bar=>2},
        {mask_keys_regex=>qr/\Apass\z|passw(or)?d/i});
  # prints something like:
- # {auth_info=>{user=>"steven", password=>"***"}, foo=>1, bar=>2}
+ # {auth_info=>{user=>"jajang", password=>"***"}, foo=>1, bar=>2}
 
 =head1 DESCRIPTION
 
@@ -289,17 +292,52 @@ need it to be complete, for example when logging to log files or database.
 
 Sometimes it is/will, sometimes it does/will not if it gets truncated.
 
-=head1 SEE ALSO
-
-L<Data::Dump::Filtered>
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Data-Dump-Partial>.
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Data-Dump-Partial>.
+Source repository is at L<https://github.com/perlancar/perl-Data-Dump-Partial>.
+
+=head1 SEE ALSO
+
+L<Data::Dump::Filtered>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2014, 2012, 2010 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =head1 BUGS
 
@@ -308,16 +346,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-Steven Haryanto <stevenharyanto@gmail.com>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2014 by Steven Haryanto.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

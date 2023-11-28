@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2023 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.805;
+package Object::Pad 0.806;
 
 use v5.14;
 use warnings;
@@ -658,9 +658,12 @@ class-based dispatch to invoke class-level methods to help provide values.
 Field initialier expressions were originally experimental, but I<since version
 0.800> no longer emit experimental warnings.
 
-I<Since version 0.76> expressions that are purely compiletime constants
-(either as single scalars or entire lists of constants) are no longer
-considered experimental. They can be used without silencing the warning.
+I<Since version 0.806> fields already declared in a class are visible during
+the initialisation expression of later fields, and their assigned value can be
+used here. If the earlier field had a C<:param> declaration, it will have been
+assigned from the value passed to the constructor. Note however that all
+C<ADJUST> blocks happen I<after> field initialisation expressions, so any
+modified values set in such blocks will not be visible at this time.
 
 Control flow that attempts to leave a field initialiser expression or block is
 not permitted. This includes any C<return> expression, any C<next/last/redo>

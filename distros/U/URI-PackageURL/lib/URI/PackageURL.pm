@@ -9,9 +9,11 @@ use Carp;
 use Exporter              qw(import);
 use URI::PackageURL::Util qw(purl_to_urls);
 
+use constant PURL_DEBUG => $ENV{PURL_DEBUG};
+
 use overload '""' => 'to_string', fallback => 1;
 
-our $VERSION = '2.02';
+our $VERSION = '2.04';
 our @EXPORT  = qw(encode_purl decode_purl);
 
 my $PURL_REGEXP = qr{^pkg:[A-Za-z\\.\\-\\+][A-Za-z0-9\\.\\-\\+]*/.+};
@@ -21,12 +23,14 @@ sub new {
     my ($class, %params) = @_;
 
     my $scheme     = delete $params{scheme} // 'pkg';
-    my $type       = delete $params{type} or Carp::croak "Invalid PackageURL: 'type' component is required";
+    my $type       = delete $params{type} or Carp::croak "Invalid Package URL: 'type' component is required";
     my $namespace  = delete $params{namespace};
-    my $name       = delete $params{name} or Carp::croak "Invalid PackageURL: 'name' component is required";
+    my $name       = delete $params{name} or Carp::croak "Invalid Package URL: 'name' component is required";
     my $version    = delete $params{version};
     my $qualifiers = delete $params{qualifiers} // {};
     my $subpath    = delete $params{subpath};
+
+    Carp::croak "Invalid Package URL: '$scheme' is not a valid scheme" if (!$scheme eq 'pkg');
 
     $type = lc $type;
 
@@ -41,33 +45,53 @@ sub new {
     }
 
     foreach my $qualifier (keys %{$qualifiers}) {
-        Carp::croak "Invalid PackageURL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\s/);
+        Carp::croak "Invalid Package URL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\s/);
+        Carp::croak "Invalid Package URL: '$qualifier' is not a valid qualifier" if ($qualifier =~ /\%/);
     }
 
     $name =~ s/_/-/g  if $type eq 'pypi';
     $name =~ s/::/-/g if $type eq 'cpan';
 
     if ($type eq 'swift') {
-        Carp::croak "Invalid PackageURL: Swift 'version' is required"   unless defined $version;
-        Carp::croak "Invalid PackageURL: Swift 'namespace' is required" unless defined $namespace;
+        Carp::croak "Invalid Package URL: Swift 'version' is required"   unless defined $version;
+        Carp::croak "Invalid Package URL: Swift 'namespace' is required" unless defined $namespace;
     }
 
     if ($type eq 'cran') {
-        Carp::croak "Invalid PackageURL: Cran 'version' is required" unless defined $version;
+        Carp::croak "Invalid Package URL: Cran 'version' is required" unless defined $version;
     }
 
     if ($type eq 'conan') {
 
         if ($namespace && $namespace ne '') {
             if (!defined $qualifiers->{channel}) {
-                Carp::croak "Invalid PackageURL: Conan 'channel' qualifier does not exist for namespace '$namespace'";
+                Carp::croak "Invalid Package URL: Conan 'channel' qualifier does not exist for namespace '$namespace'";
             }
         }
         else {
             if (defined $qualifiers->{channel}) {
-                Carp::croak "Invalid PackageURL: Conan 'namespace' does not exist for channel '$qualifiers->{channel}'";
+                Carp::croak "Invalid Package URL: Conan 'namespace' does not exist for channel '$qualifiers->{channel}'";
             }
         }
+
+    }
+
+    if ($type eq 'mlflow') {
+
+        # The "name" case sensitivity depends on the server implementation:
+        #   - Azure ML: it is case sensitive and must be kept as-is in the package URL.
+        #   - Databricks: it is case insensitive and must be lowercased in the package URL.
+
+        if (defined $qualifiers->{repository_url} && $qualifiers->{repository_url} =~ /azuredatabricks/) {
+            $name = lc $name;
+        }
+
+    }
+
+    if ($type eq 'huggingface') {
+
+  # The version is the model revision Git commit hash. It is case insensitive and must be lowercased in the package URL.
+        $version = lc $version;
 
     }
 
@@ -93,20 +117,20 @@ sub version    { shift->{version} }
 sub qualifiers { shift->{qualifiers} }
 sub subpath    { shift->{subpath} }
 
-sub encode_purl {
-    return URI::PackageURL->new(@_)->to_string;
-}
-
-sub decode_purl {
-    return URI::PackageURL->from_string(shift);
-}
+sub encode_purl { __PACKAGE__->new(@_)->to_string }
+sub decode_purl { __PACKAGE__->from_string(shift) }
 
 sub from_string {
 
     my ($class, $string) = @_;
 
+    # Strip slash / after scheme
+    while ($string =~ m|^pkg:/|) {
+        $string =~ s|^pkg:/|pkg:|;
+    }
+
     if ($string !~ /$PURL_REGEXP/) {
-        Carp::croak 'Malformed PackageURL string';
+        Carp::croak 'Malformed Package URL string';
     }
 
     my %components = ();
@@ -158,7 +182,7 @@ sub from_string {
                 $value = [split(',', $value)];
             }
 
-            $components{qualifiers}->{$key} = $value;
+            $components{qualifiers}->{lc $key} = $value;
 
         }
 
@@ -200,8 +224,8 @@ sub from_string {
     #     Apply type-specific normalization to the name if needed
     #     This is the name
 
-    my @s6 = split('/', $s5[0], 2);
-    $components{name} = (scalar @s6 > 1) ? _url_decode($s6[1]) : _url_decode($s6[0]);
+    my @s6 = split('/', $s5[0], -1);
+    $components{name} = _url_decode(pop @s6);
 
 
     # Split the remainder on '/'
@@ -212,9 +236,17 @@ sub from_string {
     #     Join segments back with a '/'
     #     This is the namespace
 
-    if (scalar @s6 > 1) {
-        my @s7 = split('/', $s6[0]);
-        $components{namespace} = join '/', map { _url_decode($_) } @s7;
+    if (@s6) {
+        $components{namespace} = join '/', map { _url_decode($_) } @s6;
+    }
+
+    if (PURL_DEBUG) {
+        say STDERR "-- S1: @s1";
+        say STDERR "-- S2: @s2";
+        say STDERR "-- S3: @s3";
+        say STDERR "-- S4: @s4";
+        say STDERR "-- S5: @s5";
+        say STDERR "-- S6: @s6";
     }
 
     return $class->new(%components);
@@ -244,7 +276,9 @@ sub to_string {
     # Qualifiers
     if (my $qualifiers = $self->qualifiers) {
 
-        my @qualifiers = map { sprintf('%s=%s', $_, _url_encode($qualifiers->{$_})) } sort keys %{$qualifiers};
+        my @qualifiers = map { sprintf('%s=%s', lc $_, _url_encode($qualifiers->{$_})) }
+            grep { $qualifiers->{$_} } sort keys %{$qualifiers};
+
         push @purl, ('?', join('&', @qualifiers)) if (@qualifiers);
 
     }
@@ -286,9 +320,13 @@ sub _url_encode {
 }
 
 sub _url_decode {
+
     my $string = shift;
+    return unless $string;
+
     $string =~ s/%([0-9a-fA-F]{2})/chr hex $1/ge;
     return $string;
+
 }
 
 1;
@@ -304,26 +342,26 @@ URI::PackageURL - Perl extension for Package URL (aka "purl")
 
   # OO-interface
   
-  # Encode components in PackageURL string
+  # Encode components in Package URL string
   $purl = URI::PackageURL->new(
     type      => cpan,
     namespace => 'GDT',
     name      => 'URI-PackageURL',
-    version   => '2.02'
+    version   => '2.04'
   );
   
-  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.02
+  say $purl; # pkg:cpan/GDT/URI-PackageURL@2.04
 
-  # Parse PackageURL string
-  $purl = URI::PackageURL->from_string('pkg:cpan/URI-PackageURL@2.02');
+  # Parse Package URL string
+  $purl = URI::PackageURL->from_string('pkg:cpan/URI-PackageURL@2.04');
 
   # exported funtions
 
-  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.02');
+  $purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.04');
   say $purl->type;  # cpan
 
-  $purl_string = encode_purl(type => cpan, name => 'URI-PackageURL', version => '2.02');
-  say $purl_string; # pkg:cpan/URI-PackageURL@2.02
+  $purl_string = encode_purl(type => cpan, name => 'URI-PackageURL', version => '2.04');
+  say $purl_string; # pkg:cpan/URI-PackageURL@2.04
 
 =head1 DESCRIPTION
 
@@ -439,7 +477,11 @@ Helper method for JSON modules (L<JSON>, L<JSON::PP>, L<JSON::XS>, L<Mojo::JSON>
 
     use Mojo::JSON qw(encode_json);
 
-    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.02"}
+    say encode_json($purl);  # {"name":"URI-PackageURL","namespace":"GDT","qualifiers":null,"subpath":null,"type":"cpan","version":"2.04"}
+
+=item $purl = URI::PackageURL->from_string($purl_string);
+
+Converts the given "purl" string to Package URL components. Croaks on error.
 
 =back
 

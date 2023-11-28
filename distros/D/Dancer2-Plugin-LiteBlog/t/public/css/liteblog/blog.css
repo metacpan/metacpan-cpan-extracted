@@ -21,13 +21,17 @@
     flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
-    padding: 20px;
+    padding: 0px;
+}
+
+div.container.category_page {
+    max-width:1200px;
 }
 
 .blog-card {
     position: relative; /* Needed for absolute positioning of the ribbon */
     
-    width: calc(40% - 20px);
+    width: calc(33.3% - 20px);
     min-width: 350px; 
     max-width: 420px !important;
     
@@ -47,8 +51,7 @@
 }
 
 .blog-card p.post-excerpt {
-    font-style: italic;
-    font-size: 0.9em;
+    font-size: 1em;
     text-align: left;
 }
 

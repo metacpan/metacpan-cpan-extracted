@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-Author-AJNN
 
+0.06  2023-11-14
+
+ - Put OVERVIEW before SYNOPSIS in pod
+ - Update metacpan link in readme
+
 0.05  2023-01-04
 
  - Fix PruneAliases test failure

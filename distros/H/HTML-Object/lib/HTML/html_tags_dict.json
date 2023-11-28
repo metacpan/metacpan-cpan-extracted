@@ -1113,6 +1113,12 @@
          ],
          "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script"
       },
+      "search" : {
+         "description" : "Defines a search in a document that contains a set of form controls or other content related to performing a search or filtering operation.",
+         "is_empty" : false,
+         "is_inline" : false,
+         "ref" : "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/search"
+      },
       "section" : {
          "description" : "Defines a section in a document",
          "is_empty" : false,

@@ -261,7 +261,7 @@ Sub::Exporter::Tutorial - a friendly guide to exporting with Sub::Exporter
 
 =head1 VERSION
 
-version 0.990
+version 0.991
 
 =head1 DESCRIPTION
 

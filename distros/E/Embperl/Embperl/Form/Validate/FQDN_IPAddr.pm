@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,26 +12,30 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: FQDN_IPAddr.pm 1578075 2014-03-16 14:01:14Z richter $
-#
 ###################################################################################
 
 
 package Embperl::Form::Validate::FQDN_IPAddr ;
 
 use base qw(Embperl::Form::Validate::Default);
+use utf8 ;
+
+
+my %errutf8 =
+    (
+	validate_fqdn_ipaddr => 'Feld %0: "%1" ist keine gültiger Hostname oder IP-Adresse.',
+    ) ;
+
+no utf8 ;
 
 my %error_messages = 
 (
     de => 
     {
-	validate_fqdn_ipaddr => 'Feld %0: "%1" ist keine g�ltiger Hostname oder IP-Adresse.',
+	validate_fqdn_ipaddr => 'Feld %0: "%1" ist keine g�ltiger Hostname oder IP-Adresse.',
     },
 
-    'de.utf-8' => 
-    {
-	validate_fqdn_ipaddr => 'Feld %0: "%1" ist keine gültiger Hostname oder IP-Adresse.',
-    },
+    'de.utf-8' => \%errutf8,
 
     en =>
     {

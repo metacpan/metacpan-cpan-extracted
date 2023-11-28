@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-my $VERSION = (qw$LastChangedRevision: 1811 $)[1];
+my $VERSION = (qw$LastChangedRevision: 1944 $)[1];
 
 =head1 NAME
 
@@ -114,7 +114,7 @@ This is not guaranteed to work in non-Unix environments.
 
 =head1 COPYRIGHT
 
-(c) 2003-2011  Dick Franks E<lt>rwfranks[...]acm.orgE<gt>
+(c)2003-2011,2014  Dick Franks E<lt>rwfranks[...]acm.orgE<gt>
 
 All rights reserved.
 
@@ -150,12 +150,6 @@ O'Reilly, 2000.
 =cut
 
 
-use constant UTF8 => scalar eval {	## not UTF-EBCDIC  [see UTR#16 3.6]
-	require Encode;
-	Encode::encode_utf8( chr(182) ) eq pack( 'H*', 'C2B6' );
-};
-
-
 my $self = $0;							# script
 
 my $options = 'dnstv';						# options
@@ -171,9 +165,7 @@ die eval { system("perldoc -F $self"); "" }, <<END unless scalar @ARGV;
 END
 
 
-my ( $target, @nameserver ) = @ARGV;
-
-my $domain = UTF8 && $target =~ /[^\000-\177]/ ? Encode::decode_utf8($target) : $target;
+my ( $domain, @nameserver ) = @ARGV;
 
 require Net::DNS;
 
@@ -201,16 +193,10 @@ my $resolver = Net::DNS::Resolver->new(@conf);			# create resolver object
 $resolver->nameservers(@nameserver) or die $resolver->string;
 
 
-my $question  = Net::DNS::Question->new($domain);		# invert IP address/prefix
-my $name      = lc $question->qname;
-my $NetDNSrev = &Net::DNS::version;
-die "\tFeature not supported by Net::DNS $NetDNSrev\n" if $name =~ m#[:/\s]|\.\d+$#;
+my $zone = find_zonecut($domain);				# (also inverts IP address/prefix)
 
-my $packet = $resolver->send( "_nx_.$name", 'CNAME' ) or die $resolver->errorstring;
-my ($zone) = map { lc( $_->name ) } $packet->authority;
-
-my @ns = ( $zone or $name eq '.' ) ? NS($zone) : ();		# find NS serving name
-die "\nno such zone: $name\n\n", $resolver->string unless @ns;	# game over
+my @ns = ( $zone ne '.' ) ? NS($zone) : ();			# find NS serving zone
+die "\ninvalid: $domain\n\n", $resolver->string unless @ns;	# game over
 
 
 my @nsname = grep { $_ ne $zone } map { $_->nsdname } @ns;	# extract server names from NS records
@@ -273,7 +259,7 @@ displayRR( $zone, 'NS' ) if @nameserver;			# show NS if testing specific nameser
 
 $resolver->usevc(1);						# no longer ok to query ANY over UDP
 $resolver->nameservers(@server);
-displayRR( $name, 'ANY' );
+displayRR( $domain, 'ANY' );
 
 print "----\n";
 
@@ -521,20 +507,28 @@ sub NS {				## find NS records for domain
 }
 
 
+sub find_zonecut {
+	my $name = shift;
+	require Net::DNS::Resolver::Recurse;
+	my $resolver = Net::DNS::Resolver::Recurse->new();
+	my $response = $resolver->send( $name, 'NULL' ) || die $resolver->errorstring;
+	my ($cut)    = map { $_->name } $response->authority;
+	return $cut || die "failed to find zone cut for $name";
+}
+
+
 sub ordered {				## irreflexive 32-bit partial ordering
-	use integer;
-	my ( $l, $r ) = @_;
+	my ( $n1, $n2 ) = @_;
 
-	return defined $r unless defined $l;			# ( undef, any )
-	return 0 unless defined $r;				# ( any, undef )
+	return 0 unless defined $n2;				# ( any, undef )
+	return 1 unless defined $n1;				# ( undef, any )
 
-	# unwise to assume 32-bit arithmetic, or that integer overflow goes unpunished
-	if ( $l < 0 ) {						# translate $a<0 region
-		$l = ( $l ^ 0x80000000 ) & 0xFFFFFFFF;		#  0	 <= $l < 2**31
-		$r = ( $r ^ 0x80000000 ) & 0xFFFFFFFF;		# -2**31 <= $r < 2**32
-	}
+	# unwise to assume 64-bit arithmetic, or that 32-bit integer overflow goes unpunished
+	use integer;						# fold, leaving $n2 non-negative
+	$n1 = ( $n1 & 0xFFFFFFFF ) ^ ( $n2 & 0x80000000 );	# -2**31 <= $n1 < 2**32
+	$n2 = ( $n2 & 0x7FFFFFFF );				#  0	 <= $n2 < 2**31
 
-	return $l < $r ? ( $l > ( $r - 0x80000000 ) ) : ( $b < ( $l - 0x80000000 ) );
+	return $n1 < $n2 ? ( $n1 > ( $n2 - 0x80000000 ) ) : ( $n2 < ( $n1 - 0x80000000 ) );
 }
 
 

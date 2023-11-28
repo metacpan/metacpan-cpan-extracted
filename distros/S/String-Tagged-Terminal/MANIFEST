@@ -1,17 +1,19 @@
+.editorconfig
 Build.PL
 Changes
 examples/ex.pl
 examples/random.pl
 lib/String/Tagged/Terminal.pm
 lib/String/Tagged/Terminal/Win32Console.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01build.t
+t/02parse.t
 t/10formatting.t
 t/20print.t
 t/30print-win32.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

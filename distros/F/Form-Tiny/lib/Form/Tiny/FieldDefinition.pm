@@ -1,5 +1,5 @@
 package Form::Tiny::FieldDefinition;
-$Form::Tiny::FieldDefinition::VERSION = '2.21';
+$Form::Tiny::FieldDefinition::VERSION = '2.22';
 use v5.10;
 use strict;
 use warnings;
@@ -9,6 +9,7 @@ use Types::Common::String qw(NonEmptySimpleStr);
 use Types::TypeTiny qw(StringLike);
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
+use Data::Dumper;
 
 use Form::Tiny::Utils qw(try has_form_meta);
 use Form::Tiny::Error;
@@ -173,7 +174,7 @@ sub get_default
 	my $default = $self->default->($form);
 	if ($self->is_subform) {
 		my $subform = $self->type;
-		croak 'subform default input is not valid'
+		croak 'subform default input is not valid. ' . Data::Dumper->Dump([$subform->errors_hash], ['errors'])
 			unless $subform->check($default);
 
 		$default = $subform->fields;

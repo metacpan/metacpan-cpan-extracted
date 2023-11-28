@@ -1,7 +1,7 @@
 ---
 abstract: 'utilities for filesystem: read, write, find, replace files, etc'
 author:
-  - 'Yaroslav O. Kosmina LL<mailto:dart@cpan.org>'
+  - 'Yaroslav O. Kosmina L<mailto:dart@cpan.org>'
 build_requires:
   Test::More: '0.98'
 configure_requires:
@@ -26,7 +26,7 @@ no_index:
 provides:
   Aion::Fs:
     file: lib/Aion/Fs.pm
-    version: v0.0.3
+    version: v0.0.6
 requires:
   Time::HiRes: '0'
   common::sense: '0'
@@ -36,10 +36,10 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-fs/issues
   homepage: https://github.com/darviarush/perl-aion-fs
   repository: https://github.com/darviarush/perl-aion-fs.git
-version: 0.0.3
+version: 0.0.6
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'
   - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1
+x_static_install: 0

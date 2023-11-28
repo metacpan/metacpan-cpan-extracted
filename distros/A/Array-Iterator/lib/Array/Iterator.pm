@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-26'; # DATE
+our $DATE = '2023-11-21'; # DATE
 our $DIST = 'Array-Iterator'; # DIST
-our $VERSION = '0.131'; # VERSION
+our $VERSION = '0.132'; # VERSION
 
 ### constructor
 
@@ -167,7 +167,7 @@ sub get_length {
 sub getLength { my $self = shift; $self->get_length(@_) }
 
 1;
-# ABSTRACT: A simple class for iterating over Perl arrays
+# ABSTRACT: (ADOPTME) A simple class for iterating over Perl arrays
 
 __END__
 
@@ -177,11 +177,11 @@ __END__
 
 =head1 NAME
 
-Array::Iterator - A simple class for iterating over Perl arrays
+Array::Iterator - (ADOPTME) A simple class for iterating over Perl arrays
 
 =head1 VERSION
 
-This document describes version 0.131 of Array::Iterator (from Perl distribution Array-Iterator), released on 2021-09-26.
+This document describes version 0.132 of Array::Iterator (from Perl distribution Array-Iterator), released on 2023-11-21.
 
 =head1 SYNOPSIS
 
@@ -480,7 +480,7 @@ stevan little, E<lt>stevan@iinteractive.comE<gt>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexey Surikov Florian Schlichting Mohammad S Anwar Neil Bowers Steven Haryanto (on PC)
+=for stopwords Alexey Surikov Florian Schlichting Mohammad S Anwar Neil Bowers Steven Haryanto
 
 =over 4
 
@@ -502,7 +502,7 @@ Neil Bowers <neil@bowers.com>
 
 =item *
 
-Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =back
 
@@ -519,13 +519,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2017, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

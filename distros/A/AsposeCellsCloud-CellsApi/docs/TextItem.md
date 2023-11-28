@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::TextItem
+# AsposeCellsCloud::Object::TextItem 
 
 ## Load the model package
 ```perl
@@ -8,9 +8,8 @@ use AsposeCellsCloud::Object::TextItem;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**link** | [**Link**](Link.md) |  | [optional] 
-**text** | **string** |  | [optional] 
+**Text** | **string** |  |
+**link** | **Link** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

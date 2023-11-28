@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(WebService::Async::Onfido::Base::Check);
 
-our $VERSION = '0.006';    # VERSION
+our $VERSION = '0.007';    # VERSION
 
 =head1 NAME
 
@@ -35,6 +35,14 @@ sub reports {
         check_id => $self->id,
         %args
     )->map(sub { $log->debugf('Have report %s', $_->as_string); $_->{check} = $self; $_ });
+}
+
+sub download {
+    my ($self) = @_;
+
+    return $self->onfido->download_check(
+        check_id => $self->id,
+    );
 }
 
 1;

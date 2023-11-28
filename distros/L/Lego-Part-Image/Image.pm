@@ -1,10 +1,8 @@
 package Lego::Part::Image;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Readonly;
@@ -13,8 +11,7 @@ use Scalar::Util qw(blessed);
 # Constants.
 Readonly::Scalar our $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -46,15 +43,19 @@ sub new {
 # Get image.
 sub image {
 	my $self = shift;
+
 	# TODO Implement getting of image with cache.
 	err "This is abstract class. image() method not implemented.";
+
 	return;
 }
 
 # Get image URL.
 sub image_url {
 	my $self = shift;
+
 	err "This is abstract class. image_url() method not implemented.";
+
 	return;
 }
 
@@ -73,38 +74,44 @@ Lego::Part::Image - Lego part image abstract class.
 =head1 SYNOPSIS
 
  use Lego::Part::Image;
+
  my $obj = Lego::Part::Image->new;
  $obj->image;
  $obj->image_url;
 
 =head1 METHODS
 
-=over 8
+=head2 * C<new>
 
-=item * C<new()>
+ my $obj = Lego::Part::Image->new;
 
- Constructor.
- Returns object.
+Constructor.
 
 =over 8
 
 =item * C<part>
 
- Lego::Part object.
- It is required.
- Default value is undef.
+L<Lego::Part> object.
+
+It is required.
+
+Default value is undef.
 
 =back
 
-=item * C<image()>
+Returns instance of object.
 
- Abstract method for getting image.
+=head2 C<image>
 
-=item * C<image_url()>
+ $obj->image;
 
- Abstract method for getting image url.
+Abstract method for getting image.
 
-=back
+=head2 C<image_url>
+
+ $obj->image_url;
+
+Abstract method for getting image url.
 
 =head1 ERRORS
 
@@ -122,11 +129,11 @@ Lego::Part::Image - Lego part image abstract class.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=abstract_class.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Lego::Part;
  use Lego::Part::Image;
 
@@ -178,21 +185,22 @@ Install the Lego modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Lego-Part-Image>
+L<https://github.com/michal-josef-spacek/Lego-Part-Image>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- BSD 2-Clause License
+© 2015-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

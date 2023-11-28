@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Hr::Any::Ba - Package for language Croatian
 
 package Locale::CLDR::Locales::Hr::Any::Ba;
 # This file auto generated from Data\common\main\hr_BA.xml
-#	on Fri 13 Oct  9:20:01 am GMT
+#	on Sat  4 Nov  6:06:13 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

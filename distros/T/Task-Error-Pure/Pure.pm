@@ -1,11 +1,9 @@
 package Task::Error::Pure;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 1;
 
@@ -30,6 +28,34 @@ Task::Error::Pure - Install the Error::Pure modules.
 =item L<Error::Pure>
 
 Perl module for structured errors.
+
+=item L<Error::Pure::ANSIColor>
+
+Error::Pure modules with Term::ANSIColor support.
+
+=item L<Error::Pure::ANSIColor::AllError>
+
+Error::Pure module with full backtrace.
+
+=item L<Error::Pure::ANSIColor::Die>
+
+Error::Pure module with classic die.
+
+=item L<Error::Pure::ANSIColor::Error>
+
+Error::Pure module with error on one line with informations.
+
+=item L<Error::Pure::ANSIColor::ErrorList>
+
+Error::Pure module with list of errors in one line with informations.
+
+=item L<Error::Pure::ANSIColor::Print>
+
+Error::Pure module for simple error print.
+
+=item L<Error::Pure::ANSIColor::PrintVar>
+
+Error::Pure module for simple error print with all variables with ANSIColor support.
 
 =item L<Error::Pure::AllError>
 
@@ -87,6 +113,10 @@ Error::Pure module for JSON output with additional parameters.
 
 Error::Pure module for simple print instead die.
 
+=item L<Error::Pure::Output::ANSIColor>
+
+ANSIColor Output subroutines for Error::Pure.
+
 =item L<Error::Pure::Output::JSON>
 
 Output JSON subroutines for Error::Pure.
@@ -111,7 +141,7 @@ Error::Pure module for simple error print with all variables.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Task-Error-Pure>
+L<https://github.com/michal-josef-spacek/Task-Error-Pure>
 
 =head1 AUTHOR
 
@@ -121,12 +151,14 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2015-2023 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

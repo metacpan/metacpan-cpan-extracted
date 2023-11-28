@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 989c609dae7a8870529342c936cd565117f11648960d1fbe695d0b6c00bf38e2 AUTHOR_PLEDGE
+SHA256 dd4ca2f953a92d8a7e038258c57bbca27ccf7eae85bec08248d02dce658ae103 CODE_OF_CONDUCT.md
+SHA256 d5d4321d2b49562c062cf2c4752d8058ab080c989673329718e851844fa094d4 Changes
+SHA256 d823877add1fa3ad53c87a94b0842a72900b361e1a819c8b1402a8fa0d089852 INSTALL
+SHA256 08a65f64b584f97c72f0cd60dcb71909d145d643bd7f86d41a574fae876d30f9 LICENSE
+SHA256 43862665e8bd1299bdf5c3c3170adcb47e090e7f6018a33ff40f06f7371a872b MANIFEST
+SHA256 ccddc313422055dbf5c1a8dc2522b20c3c7000792ac2e9a1eff0ff26fffb32e6 META.json
+SHA256 0407a7a2217b5788c03e48424c2ae12f6b48813733f63bb34408eee5e490e880 META.yml
+SHA256 e6dfb78130829e9b8e2cc247746131e8468c8db620569fc47e3a672b87fa0d7e Makefile.PL
+SHA256 b2e3debcd0706dbe5da15a748dfa2285e9031cc11837ce312ac4f30b2e08a0d9 README.mkdn
+SHA256 2c287ccf6608738db47f0468018b154157434dc31535c998bef3e55018362374 Taskfile.yaml
+SHA256 62f12377da61c38e31bef247ad29d1c054dc548062171895c02f4bbab6703464 cpanfile
+SHA256 8935950247fa4ee6d67939cdb74224fd9c0da61f4385d9e5847ead33dd830962 dist.ini
+SHA256 7b6cb65f33b036fa2398fd422a060e72fcb0f1d618fd1995237e0651c79f0ba3 doap.xml
+SHA256 a810251d437adcc780b5d9ab90b54c73480b171fa4f7e355a0a135a21c0de0a9 lib/Dancer2/Plugin/JsonApi.pm
+SHA256 1683fa9e52df90caa16b3de65ef6dbdc46c31134e938fbe50071195bb6ef9c43 lib/Dancer2/Plugin/JsonApi/Registry.pm
+SHA256 d475bc7047069950b2ac025250af562fd18929e9cbc605a91d2dc8ca908621ca lib/Dancer2/Plugin/JsonApi/Schema.pm
+SHA256 c2a37eb8a8dc813146679de0465124702868bcfdb1610cdef7678c3e1dd96a42 lib/Dancer2/Serializer/JsonApi.pm
+SHA256 a8cb9bbb2ecd439f8a19e74cebc8898a94ae575ba82a624ab3ca5b51fc5d97b3 t/00-compile.t
+SHA256 d0527628f512aa5d9a77331528a92d268c91d797aa8ad60f0b8b59dc26997ed2 t/00-report-prereqs.dd
+SHA256 5996417e8ae9973f82860dcf6d5f180d285d5c4b046e0346d06ed22802a3452b t/00-report-prereqs.t
+SHA256 6798698cac0d92137027673adc7c533a531c2466c24ca836c62bc1cda163835d t/compile.t
+SHA256 f57a5288274810800e8b6e118cd7dbffb2d8ff6e4cf2430b1cb15b63fa750548 t/example.t
+SHA256 4c21d52fc485a5e48bbcbdb754fdd5e1b6aa60126cf9355df784572d908471a4 t/plugin.t
+SHA256 a57d28faa03420c1de6de67615f4dcb2a536099a01766ca950aae1e747cb60a9 t/registry.t
+SHA256 2801b30d49189cffbc30540ccc0613de70427cd6eb2ad3890e0ab041cdd3e6cb t/relationships.t
+SHA256 e393cbc6b7eb58b771adcf5fdd0f347f2747e767ae86a720b8a5f503bc285c3b t/schema.t
+SHA256 f0eb1005224fee55eda3fc1cd062da5b6421fb2ee4a8d194331176a1fc9dea0f t/serializer.t
+SHA256 7cb36898b96bf51d8a002391feb5eb0845f0389d90cd3e56937c870d3c1d2430 t/todos.t
+SHA256 54e22e20806155d2385161be926e03534f36ba39269df8342053c16368661611 xt/added-test.t
+SHA256 673ab29d17116fa37acce51229b2e07bd0a1eba9c545416b3d12757af4479491 xt/perltidy.t
+SHA256 d34f839d8340478663bd6ae59c72760d7e1a2b7a2d4879ad1ec97db1a2271b2f xt/release/unused-vars.t
+SHA256 ba8b12c702e9f9121c2935650fd1b70b42c0560117fc07d2f90eeccf9297442e xt/worktree-clean.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQS4RMr2LZlyA/IlbHHfgfB/4bALjAUCZVUa0QAKCRDfgfB/4bAL
+jBA6AKC1ke/Y6H2T5nULomPqMnLu6DmnqQCg0TFPbvC6Z10deiX2ha10+Yp69RI=
+=TFDX
+-----END PGP SIGNATURE-----

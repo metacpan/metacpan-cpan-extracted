@@ -3,7 +3,7 @@ package Data::Clone;
 use 5.008_001;
 use strict;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -27,7 +27,7 @@ Data::Clone - Polymorphic data cloning
 
 =head1 VERSION
 
-This document describes Data::Clone version 0.004.
+This document describes Data::Clone version 0.006.
 
 =head1 SYNOPSIS
 

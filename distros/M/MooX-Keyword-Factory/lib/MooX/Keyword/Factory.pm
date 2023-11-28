@@ -1,6 +1,6 @@
 package MooX::Keyword::Factory;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use Factory::Sub; use Moo;
 
 our %FACTORY;
@@ -32,7 +32,7 @@ MooX::Keyword::Factory - Moo attribute factories
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 

@@ -136,6 +136,17 @@ this method to return a true value.
 sub has_routes { 0 }
 
 
+=head2 has_rss 
+
+Returns true if the widget is supposed to expose a RSS feed. 
+Defaults to false. If set to true in the child class, attribute 
+C<mount> must be defined as well to construct the feed URL, and a 
+C<mount/rss/> route must be declared.
+
+=cut
+
+sub has_rss { 0 }
+
 =head2 declare_routes($self, $plugin, $config)
 
 Any widget intending to declare its own routes should implement this method.
@@ -154,6 +165,35 @@ and the Widget's config section.
 
 sub declare_routes { 
     croak "Must be implemented by chikld class";
+}
+
+=head2 cache ($key[, $val])
+
+  $widget->cache($key, $value);  # set
+  my $value = $widget->cache($key);  # get
+
+Provides a simple caching interface within a widget, storing values in a
+private singleton hash. Cache keys are constructed uniquely for each calling class and
+the provided key to avoid collisions, formatted as "ClassName[$key]". When
+called with a single argument, it acts as a getter, returning the value for the
+given key if present. With two arguments, it stores the value under the
+specified key, acting as a setter.
+
+=cut
+
+my $_cache = {};
+sub cache {
+    my ($self, $key, $val) = @_;
+    
+    my ($package) = caller();
+    my $cache_key = "${package}[$key]";
+
+    # getter
+    if (@_ == 2) {
+        return $_cache->{$cache_key};
+    }
+
+    return $_cache->{$cache_key} = $val;
 }
 
 1;

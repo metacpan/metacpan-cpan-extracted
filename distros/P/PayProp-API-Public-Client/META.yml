@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/Humanstate/api-client-public-module/issues
   homepage: https://github.com/Humanstate/api-client-public-module
   repository: https://github.com/Humanstate/api-client-public-module.git
-version: '0.02'
+version: '0.03'
 x_contributors:
   - 'yangakandeni <kandeni.yanga@gmail.com>'
 x_generated_by_perl: v5.32.0

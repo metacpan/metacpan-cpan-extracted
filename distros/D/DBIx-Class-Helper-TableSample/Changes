@@ -1,5 +1,15 @@
 Revision history for DBIx-Class-Helper-TableSample:
 
+v0.5.0    2023-11-21 17:19:41+00:00 Europe/London
+  [Enhancements]
+  - Added the tablesample method, GH#3.
+
+  [Documentation]
+  - Reorganised POD.
+
+  [Tests]
+  - Cleaned up prerequisite reports.
+
 v0.4.0    2023-05-08 20:15:52+01:00 Europe/London
   [Incompatible Changes]
   - Perl v5.14 or later is required to use this module.

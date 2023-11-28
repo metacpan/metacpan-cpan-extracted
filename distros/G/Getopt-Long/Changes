@@ -1,7 +1,37 @@
+Changes in version 2.57
+-----------------------
+
+* Adapt tests for perl core, thanks to James Keenan.
+  Packaging changes only, no functional changes.
+
+Changes in version 2.56
+-----------------------
+
+* Do not use Getopt::Long to establish Getopt::Long::Parser version.
+  Packaging changes only, no functional changes.
+
+Changes in version 2.55
+-----------------------
+
+* Move Getopt::Long::Parser to a separate module and add
+  documentation. Note that Getopt::Long uses Getopt::Long::Parser, so
+  programs that use Getopt::Long and call the oo interface will still
+  work.
+
+* Allow periods in option names, e.g. to indicate levels in a
+  hierarchical configuration. Since periods in option names have never
+  been valid, they are now allowed by default unless pass_through is
+  enabled.
+
+* Fix long standing bug that duplicate options were not detected when
+  the options differ in case while ignore_case is in effect.
+  This will now yield a warning and become a fatal error in a future
+  release.
+
 Changes in version 2.54
 -----------------------
 
-* Fix compatibility with Perl 5.8.
+* Small fix for 5.8 compatibility. Thanks to Graham Knop.
 
 Changes in version 2.53
 -----------------------

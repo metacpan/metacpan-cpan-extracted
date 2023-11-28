@@ -82,6 +82,7 @@ SKIP: {
     skip "Current git checkout is not the Doit git checkout", 1 # ... but probably a git directory in an upper directory
 	if realpath("$FindBin::RealBin/..") ne realpath($self_git);
     skip "shallow repositories cannot be cloned", 1 if $d->git_is_shallow;
+    skip "unexpected current branch", 1 if $d->git_current_branch ne 'master';
 
     my $workdir = "$dir/doit";
 

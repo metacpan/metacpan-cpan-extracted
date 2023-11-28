@@ -1,6 +1,8 @@
 use Test::More;
 use DBI;
 use PGObject;
+use strict;
+use warnings;
 
 
 plan skip_all => 'Not set up for db tests' unless $ENV{DB_TESTING};
@@ -9,7 +11,7 @@ my $dbh1 = DBI->connect('dbi:Pg:', 'postgres');
 
 plan skip_all => 'Needs superuser connection for this test script' unless $dbh1;
 
-plan tests => 17;
+plan tests => 20;
 
 
 $dbh1->do('CREATE DATABASE pgobject_test_db');
@@ -83,6 +85,57 @@ my @expected = (4, 2, 1, 3);
 for my $num (0 .. 3){
    is($resultset[$num]->{col1}, $expected[$num], "simple reverse ordering, correct result for item $num");
 }
+
+
+
+$dbh->do(q|
+   CREATE OR REPLACE FUNCTION pgobject_order_test(id int)
+   RETURNS TABLE(col1 int, col2 text, col3 int)
+   language sql as
+   $$
+      SELECT 1, 'group1', 1
+      union
+      select 2, 'group2', 2
+      union 
+      select 3, 'group1', 2
+      union
+      select 4, 'group2', 1
+   $$;
+|);
+    PGObject::clear_info_cache();
+    eval {
+        PGObject->function_info(
+            funcname   => 'pgobject_order_test',
+            dbh        => $dbh,
+        );
+        ok(0, 'Should have died') or diag 'Should have died';
+    };
+    {   local $_ = $@;
+        is($_->{state}, '42A01', 'Errored on duplicate function');
+    }
+    eval {
+        PGObject->function_info(
+            funcname   => 'pgobject_ordering_foo',
+            dbh        => $dbh
+        );
+        ok(0, 'Should have died') or diag 'Should have died';
+    };
+    {
+        local $_ = $@;
+        is($_->{state}, '26A01', 'Errored on duplicate function');
+    }
+$dbh->do(q| DROP FUNCTION pgobject_order_test(); |);
+    eval {
+        PGObject->call_procedure(
+            funcname   => 'pgobject_order_test',
+            dbh        => $dbh,
+            args       => ['foo'],
+        );
+    };
+    {
+        local $_ = $@;
+        is($_->{state}, '22P02', 'Got correct state back');
+    }
 
 
 # Teardown connections

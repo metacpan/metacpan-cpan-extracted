@@ -4,7 +4,7 @@ use warnings;
 use strict;
 eval "use feature 'evalbytes'";         # Experimental fix for Perl 5.16
 
-our $VERSION = '0.002006';
+our $VERSION = '0.002007';
 
 # Handle Perl 5.18's new-found caution...
 no if $] >= 5.018, warnings => "experimental::smartmatch";
@@ -228,7 +228,7 @@ sub _load_config {
     # Configure how whitespace is displayed...
     my $show_ws = $config{show_ws};
     if (defined $show_ws) {
-        if ($show_ws ~~ @SHOW_WS_OPTIONS) {
+        if (grep {$show_ws eq $_} @SHOW_WS_OPTIONS) {
             $config[-1]{show_ws} = $show_ws;
         }
         else {
@@ -3416,7 +3416,7 @@ Regexp::Debugger - Visually debug regexes in-place
 
 =head1 VERSION
 
-This document describes Regexp::Debugger version 0.002006
+This document describes Regexp::Debugger version 0.002007
 
 
 =head1 SYNOPSIS
@@ -3571,7 +3571,7 @@ When prompted for a filename:
 
 You can configure the debugger by setting up a F<.rxrx> file in
 in the current directory or in your home directory. This configuration
-consists of I<key>:I<value> pairs
+consists of single-line I<key>:I<value> pairs
 (everything else in the file is silently ignored).
 
 =head2 Display mode configuration

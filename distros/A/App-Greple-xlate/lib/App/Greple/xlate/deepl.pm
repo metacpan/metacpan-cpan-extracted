@@ -1,6 +1,6 @@
 package App::Greple::xlate::deepl;
 
-our $VERSION = "0.25";
+our $VERSION = "0.28";
 
 use v5.14;
 use warnings;
@@ -9,6 +9,9 @@ use Data::Dumper;
 
 use List::Util qw(sum);
 use App::cdif::Command;
+
+use App::Greple::xlate qw(opt);
+use App::Greple::xlate::Lang qw(%LANGNAME);
 
 our $lang_from //= 'ORIGINAL';
 our $lang_to   //= 'JA';
@@ -45,13 +48,19 @@ sub clipboard {
     return $to;
 }
 
+sub _progress {
+    print STDERR @_ if opt('progress');
+}
+
 sub xlate_each {
     my $call = $param{$method}->{sub} // die;
     my @count = map { int tr/\n/\n/ } @_;
+    _progress("From:\n", map s/^/\t< /mgr, @_);
     my $to = $call->(join '', @_);
     my @out = $to =~ /.*\n/g;
+    _progress("To:\n", map s/^/\t> /mgr, @out);
     if (@out < sum @count) {
-	die "Unexpected response from deepl command:\n\n$to\n";
+	die "Unexpected response:\n\n$to\n";
     }
     map { join '', splice @out, 0, $_ } @count;
 }

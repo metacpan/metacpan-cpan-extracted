@@ -26,12 +26,16 @@ License: perl
 
 $| = 1;
 
+use strict;
+
+use File::Basename qw(basename);
 use Getopt::Long;  # because of some special handling on numeric options
 
-use strict;
+use constant EX_SUCCESS => 0;
+use constant EX_FAILURE => 1;
+
 use vars qw($opt_b $opt_c $opt_f $opt_h $opt_n $opt_r);
 
-use File::Basename;
 my $me = basename $0;
 
 sub usage($;$)
@@ -55,12 +59,12 @@ my $block_size = 512;
 sub check_number($)
 {
     my $opt = shift;
-    if ($opt =~ /\+(\d+)$/) {
-    return $1+0;
-    } elsif      ($opt =~ /-?(\d+)$/) {
-    return -($1+0);
+    if ($opt =~ m/\A\+(\d+)\Z/) {
+        return $1+0;
+    } elsif ($opt =~ m/\A\-?(\d+)\Z/) {
+        return -($1+0);
     } else {
-    usage(1);
+        usage(1, "invalid number '$opt'");
     }
 }
 
@@ -86,9 +90,18 @@ sub parse_args()
     usage 1, "-f and -r cannot be used together"
         if $opt_f and $opt_r;
 
-    $point = check_number($opt_b), $type = "b" if $opt_b;
-    $point = check_number($opt_c), $type = "c" if $opt_c;
-    $point = check_number($opt_n), $type = "n" if $opt_n;
+    if (defined $opt_b) {
+        $point = check_number($opt_b);
+        $type = 'b';
+    }
+    if (defined $opt_c) {
+        $point = check_number($opt_c);
+        $type = 'c';
+    }
+    if (defined $opt_n) {
+        $point = check_number($opt_n);
+        $type = 'n';
+    }
 
     for (@ARGV) {
         $point = check_number($1), shift @ARGV, last
@@ -360,14 +373,20 @@ sub handle_INT()
 sub handle_args($$$)
 {
     my ($point, $type, $files_) = @_;
+    my $rc = EX_SUCCESS;
 
     # Expand the directories (but not the sub-directories)
     my @files;
     my @dirs;
 
     for my $f (@$files_) {
-        if(-d $f) {
-             push @dirs, $f;
+        if (-d $f) {
+            if ($opt_f) {
+                push @dirs, $f;
+            } else {
+                warn "$me: '$f' is a directory\n";
+                $rc = EX_FAILURE;
+            }
         } else {
             push @files, $f;
         }
@@ -382,10 +401,11 @@ sub handle_args($$$)
         # do not die if the file does not exist, when -f is used
         next if(!-e $file and ($opt_f or $me eq "xtail"));
 
-        open FH, '<', $file
-        or do { print STDERR
-                "Couldn't open $file for reading: $!\n";
-                exit 1 };
+        unless (open FH, '<', $file) {
+            warn "$me: Couldn't open '$file': $!\n";
+            $rc = EX_FAILURE;
+            next;
+        }
 
         # Do not print the tail of the files if we are using xtail
         unless($me eq "xtail") {
@@ -405,13 +425,11 @@ sub handle_args($$$)
         print_tail \*STDIN, "stdout", $point, $type;
         # Ignore the -f option
     }
-
+    return $rc;
 }
 
 my ($point, $type, $files) = parse_args();
-handle_args($point, $type, $files);
-
-exit 0;
+exit handle_args($point, $type, $files);
 
 __END__
 

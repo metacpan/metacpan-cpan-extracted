@@ -5,12 +5,19 @@
     --text-color: #333;
     --background-color: #f4f4f4;
     --header-bg-color: #2d2d2d;
+    --header-text-color: #777;
+    --header-link-color: #bbb;
     --link-color: #007BFF;
     --link-hover-color: #0056b3;
+
+    --liteblog-title-family: 'Roboto', 'Open Sans', 'Arial', sans-serif;
+    --liteblog-content-family: 'Merriweather', 'Georgia', source-serif-pro, 'Times', 'Times New Roman', serif;
+    --liteblog-ui-family: 'Lato', sans-serif;
+    --liteblog-dark-bg-title-color: #e3e3e3;
 }
 
 body {
-    font-family: 'Roboto', 'Arial', sans-serif;
+    font-family: var(--liteblog-content-family);
     background-color: var(--background-color);
 
     margin: 0;
@@ -22,6 +29,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600; /* slightly bold but not too heavy */
+    font-family: var(--liteblog-title-family); 
 }
 h1 {
     font-size: 2.5rem;
@@ -70,6 +78,10 @@ a:focus, button:focus, .btn:focus {
 /* CSS for the mobile header */
 #mobile-menu-container {
     position: relative; /* to hold the popup menu */
+}
+
+.hero-bar-hidden {
+    display: none;
 }
 
 #mobile-header {
@@ -185,7 +197,78 @@ a:focus, button:focus, .btn:focus {
     text-align: center; /* Center text horizontally */
 }
 
-/* Home Page Layout */
+
+/* The small navigation bar */
+
+.hero-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: height 0.3s ease;
+    background-color: #2D2D2D;
+
+    position: sticky;
+    top: 0;
+    z-index: 1000; 
+    height: 55px;
+}
+
+.hero-banner a {
+    color: #CCC;
+}
+.hero-banner a:hover {
+    color: #FFF;
+}
+
+.hero-banner-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 20px; /* side padding */
+}
+
+#hero-banner .site-title {
+	font-family: "Roboto", "Open Sans", sans-serif;
+    font-size: 1.5em;
+	color: #999;
+    font-weight: normal;
+    font-size: 1.2rem;
+}
+
+/* Navigation elements */
+
+nav {
+    display: flex;
+    gap: 1em;
+    margin-right: 2rem;
+	font-family: "Roboto", "Open Sans", sans-serif;
+}
+
+nav a {
+    text-decoration: none;
+	color: #B0B0B0;
+    padding: 0.5em 1em;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav a:hover {
+    color: #2D2D2D; /* Dark background color for text on hover */
+    background-color: #FFA500; /* Orange color on hover */
+}
+
+/* Small version of the site's logo */
+
+.avatar-logo {
+	margin-top: 5px;
+    width: 40px;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* End of Hero Banner */
+
+/* Big Hero Header Section for Home Page Layout */
 
 #hero {
     background-color: #2d2d2d;
@@ -199,6 +282,19 @@ a:focus, button:focus, .btn:focus {
     height: 150px;
     border-radius: 50%;
     margin-bottom: 20px;
+}
+
+/* For smooth transition */
+.hidden-hero {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 0.3s, opacity 0.3s linear;
+}
+
+.visible-hero {
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s linear 0s, opacity 0.3s linear;
 }
 
 h1 {
@@ -238,10 +334,51 @@ section#main-page {
     margin: auto;
 }
 
+/* Footer */
+/* Footer Styles */
+.site-footer {
+  padding: 20px;
+  background-color: var(--header-bg-color);
+  color: var(--header-text-color);
+  text-align: center;
+  font-family: var(--liteblog-ui-family);
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.site-footer .footer-content p.debug-infos {
+    font-size: 0.7rem;
+
+}
+
+.site-footer .footer-content p {
+  margin: 0;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+.site-footer a {
+    color: var(--header-link-color);
+    text-decoration: none;
+}
+.site-footer a:hover {
+    text-decoration: underline;
+}
+
+
 /* For mobile responsiveness */
 
 @media screen and (max-width: 768px) {
     
+    /* Hide the big Header and show the navigation bar */
+    #hero-banner {
+        display: none;
+    }
+
+    #mobile-header {
+        display: flex;
+    }
+
     body {
         font-size: 14px;
     }
@@ -253,4 +390,9 @@ section#main-page {
         max-width: 100%;
         margin: auto;
     }
+  
+    .site-footer .footer-content p {
+    font-size: 14px;
+  }
 }
+

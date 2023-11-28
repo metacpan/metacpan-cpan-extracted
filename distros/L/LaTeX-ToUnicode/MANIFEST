@@ -8,7 +8,6 @@ t/release-synopsis.t
 README
 script/ltx2unitxt
 script/convert.pl
-script/UnicodeData.txt
 lib/LaTeX/ToUnicode/Tables.pm
 lib/LaTeX/ToUnicode.pm
 Makefile.PL

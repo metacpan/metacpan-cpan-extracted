@@ -4,19 +4,18 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 our $schema = ['dirname' => {
     summary => 'Directory name, default to current directory',
     description => <<'_',
 
 Note: be careful when using this schema for actions that are destructive,
-because a user can perform those actions without giving an argument (e.g. a
-`delete-files-in` script). It is safer to use this schema to perform a
-non=destructive action (e.g. `ls`) and/or operate in dry-run mode by
-default.
+because a user can perform those actions without giving an argument (e.g. in a
+`delete-files-in` script). It is safer to use this schema when performing a
+non=destructive action (e.g. `ls`) and/or operate in dry-run mode by default.
 
 _
 
@@ -42,7 +41,7 @@ Sah::Schema::dirname::default_curdir - Directory name, default to current direct
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::Schema::dirname::default_curdir (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::Schema::dirname::default_curdir (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 SYNOPSIS
 
@@ -162,10 +161,9 @@ L<Type::Tiny> as well as L<Type::FromSah>):
 =head1 DESCRIPTION
 
 Note: be careful when using this schema for actions that are destructive,
-because a user can perform those actions without giving an argument (e.g. a
-C<delete-files-in> script). It is safer to use this schema to perform a
-non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by
-default.
+because a user can perform those actions without giving an argument (e.g. in a
+C<delete-files-in> script). It is safer to use this schema when performing a
+non=destructive action (e.g. C<ls>) and/or operate in dry-run mode by default.
 
 =head1 HOMEPAGE
 
@@ -174,6 +172,10 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah-Schema
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-Path>.
+
+=head1 SEE ALSO
+
+L<Sah::Schema::dirname::default_curdir_abs>
 
 =head1 AUTHOR
 

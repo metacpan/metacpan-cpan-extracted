@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Module::Metadata: '1.000033'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,14 +22,14 @@ no_index:
 provides:
   MooX::LazierAttributes:
     file: lib/MooX/LazierAttributes.pm
-    version: '1.07008'
+    version: '1.07009'
 requires:
   Clone: '0.39'
-  MooX::ReturnModifiers: '0.03'
+  MooX::ReturnModifiers: '1.000001'
   constant: '0'
   namespace::clean: '0.27'
   perl: '5.006'
 resources:
   repository: https://github.com/ThisUsedToBeAnEmail/MooX-LazierAttributes.git
-version: '1.07008'
+version: '1.07009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

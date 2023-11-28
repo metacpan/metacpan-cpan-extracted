@@ -19,7 +19,7 @@ name: Acme-CPANModules-LanguageCodes
 provides:
   Acme::CPANModules::LanguageCodes:
     file: lib/Acme/CPANModules/LanguageCodes.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Acme::CPANModulesUtil::Misc: '0'
   strict: '0'
@@ -27,7 +27,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-LanguageCodes
   homepage: https://metacpan.org/release/Acme-CPANModules-LanguageCodes
   repository: git://github.com/perlancar/perl-Acme-CPANModules-LanguageCodes.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.038000'

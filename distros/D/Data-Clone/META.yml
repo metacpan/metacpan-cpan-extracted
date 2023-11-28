@@ -3,34 +3,50 @@ abstract: 'Polymorphic data cloning'
 author:
   - 'Goro Fuji (gfx) <gfuji(at)cpan.org>'
 build_requires:
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.59
-  Test::More: 0.88
-  Test::Requires: 0.03
+  Devel::PPPort: '3.19'
+  ExtUtils::MakeMaker: '6.59'
+  ExtUtils::ParseXS: '3.18'
+  Module::Build: '0'
+  Module::Build::XSUtil: '0'
+  Test::More: '0.88'
+  Test::Requires: '0.03'
 configure_requires:
-  Devel::PPPort: 3.19
-  ExtUtils::MakeMaker: 6.59
-  ExtUtils::ParseXS: 3.18
-distribution_type: module
-dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.03'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
-module_name: Data::Clone
+  version: '1.4'
 name: Data-Clone
 no_index:
   directory:
-    - example
-    - inc
     - t
     - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Clone:
+    file: lib/Data/Clone.pm
+    version: '0.006'
 requires:
-  XSLoader: 0.02
-  parent: 0
-  perl: 5.8.1
+  XSLoader: '0.02'
+  parent: '0'
+  perl: '5.008001'
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/gfx/p5-Data-Clone.git
-version: 0.004
+  bugtracker: https://github.com/gfx/p5-Data-Clone/issues
+  homepage: https://github.com/gfx/p5-Data-Clone
+  repository: https://github.com/gfx/p5-Data-Clone.git
+version: '0.006'
+x_contributors:
+  - 'Fuji, Goro (gfx) <gfuji@cpan.org>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Tom Hukins <tom@eborcom.com>'
+  - 'Yves Orton <demerphq@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

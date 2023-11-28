@@ -4,7 +4,7 @@ no warnings 'experimental::class';
 use open qw( :utf8 :std );
 
 package Video::NRK::Cache::Store;  # Dist::Zilla doesn't know about class yet
-$Video::NRK::Cache::Store::VERSION = '3.00';
+$Video::NRK::Cache::Store::VERSION = '3.01';
 class Video::NRK::Cache::Store;
 # ABSTRACT: Store NRK Video on Demand cache on disk (abstract base class)
 
@@ -146,7 +146,7 @@ Video::NRK::Cache::Store - Store NRK Video on Demand cache on disk (abstract bas
 
 =head1 VERSION
 
-version 3.00
+version 3.01
 
 =head1 SYNOPSIS
 

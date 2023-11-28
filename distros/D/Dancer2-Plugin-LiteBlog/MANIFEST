@@ -4,6 +4,7 @@ ignore.txt
 lib/Dancer2/Plugin/LiteBlog.pm
 lib/Dancer2/Plugin/LiteBlog/Activities.pm
 lib/Dancer2/Plugin/LiteBlog/Article.pm
+lib/Dancer2/Plugin/LiteBlog/Splash.pm
 lib/Dancer2/Plugin/LiteBlog/Blog.pm
 lib/Dancer2/Plugin/LiteBlog/Scaffolder.pm
 lib/Dancer2/Plugin/LiteBlog/Scaffolder/Data.pm
@@ -21,6 +22,7 @@ t/03_dancerapp.t
 t/04_scaffold.t
 t/05_activities.t
 t/06_emptyapp.t
+t/07_app_root_blog.t
 t/activities.yml
 t/articles/blog-meta.yml
 t/articles/contact/content.md
@@ -34,6 +36,12 @@ t/articles/tech/the-last-article-in-tech/content.md
 t/articles/tech/the-last-article-in-tech/meta.yml
 t/articles/perl/liteblog-a-minimalist-file-based-blog-engine-for-perl/content.md
 t/articles/perl/liteblog-a-minimalist-file-based-blog-engine-for-perl/meta.yml
+t/articles/perl/article-perl-dup2/content.md
+t/articles/perl/article-perl-dup2/meta.yml
+t/articles/perl/article-perl-dup3/content.md
+t/articles/perl/article-perl-dup3/meta.yml
+t/articles/perl/article-perl-dup4/content.md
+t/articles/perl/article-perl-dup4/meta.yml
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

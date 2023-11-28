@@ -22,16 +22,16 @@ name: Locale-CLDR-Locales-Ak
 provides:
   Locale::CLDR::Locales::Ak:
     file: lib/Locale/CLDR/Locales/Ak.pm
-    version: v0.34.2
+    version: v0.34.3
   Locale::CLDR::Locales::Ak::Any:
     file: lib/Locale/CLDR/Locales/Ak/Any.pm
-    version: v0.34.2
+    version: v0.34.3
   Locale::CLDR::Locales::Ak::Any::Gh:
     file: lib/Locale/CLDR/Locales/Ak/Any/Gh.pm
-    version: v0.34.2
+    version: v0.34.3
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.34.2
+  Locale::CLDR: v0.34.3
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -41,5 +41,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.2
+version: v0.34.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

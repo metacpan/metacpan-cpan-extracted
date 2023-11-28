@@ -10,10 +10,5 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-share/countries.json
-share/continent.json
-share/currency.json
-share/eu.json
-share/flags.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

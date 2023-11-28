@@ -4,7 +4,7 @@ use exact::cli;
 
 # PODNAME: linda
 # ABSTRACT: Plausibly helpful (and probably drunk) wrapper around morbo
-our $VERSION = '1.02'; # VERSION
+our $VERSION = '1.03'; # VERSION
 
 use MojoX::Linda;
 
@@ -27,7 +27,7 @@ usage($help_man) if $help_man;
 my $conf = MojoX::Linda::conf( options( qw{
     silent|s
     app|a=s
-    mode|m=s
+    production|prod|p
     backend|b=s
     listen|l=s@
     watch|w=s@
@@ -49,7 +49,7 @@ linda - Plausibly helpful (and probably drunk) wrapper around morbo
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
 =head1 AUTHOR
 

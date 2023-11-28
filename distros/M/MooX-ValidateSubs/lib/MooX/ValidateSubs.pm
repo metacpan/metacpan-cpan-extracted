@@ -5,11 +5,11 @@ use warnings;
 
 use MooX::ReturnModifiers;
 use B;
-our $VERSION = '1.012006';
+our $VERSION = '1.012008';
 
 sub import {
 	my $target	= caller;
-	my %modifiers = return_modifiers($target, [qw/has with around/]);
+	my %modifiers = return_modifiers($target, [qw/has with around sub/]);
 	
 	my $raise_context_error = sub {
 		my ($error, $c) = @_;
@@ -76,11 +76,8 @@ sub import {
 	};
 
 	$target->can('_validate_sub') or $modifiers{with}->('MooX::ValidateSubs::Role');
-
-	{
-		no strict 'refs';
-		*{"${target}::validate_subs"} = $validate_subs;
-	}
+	
+	$modifiers{sub}->('validate_subs', $validate_subs);
 
 	return 1;
 }
@@ -95,7 +92,7 @@ MooX::ValidateSubs - Validating sub routines via Type::Tiny.
 
 =head1 VERSION
 
-Version 1.012006
+Version 1.012008
 
 =cut
 

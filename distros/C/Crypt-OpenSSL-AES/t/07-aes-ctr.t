@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 16;
 use MIME::Base64 qw/encode_base64 decode_base64/;
 
 use Crypt::OpenSSL::Guess qw/openssl_version/;
@@ -10,8 +10,8 @@ my ($major, $minor, $patch) = openssl_version();
 BEGIN { use_ok('Crypt::OpenSSL::AES') };
 
 SKIP: {
-    skip "AES CTR is not supported before OpenSSL 1.0.1", 6 if($major lt "1.0");
-    skip "AES CTR is not supported before OpenSSL 1.0.1", 6 if($major le "1.0" && $minor lt "1");
+    skip "AES CTR is not supported before OpenSSL 1.0.1", 15 if($major lt "1.0");
+    skip "AES CTR is not supported before OpenSSL 1.0.1", 15 if($major le "1.0" && $minor lt "1");
 
     # key = substr(sha512_256_hex(rand(1000)), 0, ($ks/4));
     my %key = (
@@ -48,6 +48,35 @@ SKIP: {
 
         my $plaintext = $coa->decrypt(decode_base64($encrypted{$ks}));
         ok($plaintext eq "Hello World. 123", "Crypt::Mode::CTR ($ks) - Decrypted with Crypt::OpenSSL::AES");
+    }
+
+    foreach my $ks (@keysize) {
+        my $padding = 1;
+        my $msg = $padding ? "Padding" : "No Padding";
+        foreach my $iks (@keysize) {
+            next if ($ks eq $iks);
+            my $coa;
+            eval {
+                $coa = Crypt::OpenSSL::AES->new(pack("H*", $key{$ks}),
+                                    {
+                                        cipher  => "AES-$iks-ECB",
+                                        padding => $padding,
+                                    });
+            };
+            like($@, qr/unsupported cipher for this keysize/, "Mismatch of keysize ($ks) and cipher ($iks)");
+        }
+        foreach my $iks (@keysize) {
+            next if ($ks ne $iks);
+            my $coa;
+            eval {
+                $coa = Crypt::OpenSSL::AES->new(pack("H*", $key{$ks}),
+                                    {
+                                        cipher  => "AES-$iks-ECB",
+                                        padding => $padding,
+                                    });
+            };
+            like($@, qr//, "Match of keysize ($ks) and cipher ($iks)");
+        }
     }
 }
 done_testing;

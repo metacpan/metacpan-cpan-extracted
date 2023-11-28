@@ -1,15 +1,17 @@
 package File::Trash::Undoable;
 
-our $DATE = '2020-06-03'; # DATE
-our $VERSION = '0.230'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-use File::MoreUtil qw(l_abs_path);
+use File::Util::Test qw(l_abs_path);
 use File::Trash::FreeDesktop;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-21'; # DATE
+our $DIST = 'File-Trash-Undoable'; # DIST
+our $VERSION = '0.231'; # VERSION
 
 our %SPEC;
 
@@ -243,7 +245,7 @@ File::Trash::Undoable - Trash files, with undo/redo capability
 
 =head1 VERSION
 
-This document describes version 0.230 of File::Trash::Undoable (from Perl distribution File-Trash-Undoable), released on 2020-06-03.
+This document describes version 0.231 of File::Trash::Undoable (from Perl distribution File-Trash-Undoable), released on 2023-11-21.
 
 =head1 SYNOPSIS
 
@@ -263,7 +265,7 @@ Screenshots:
 
 Usage:
 
- empty_trash() -> [status, msg, payload, meta]
+ empty_trash() -> [$status_code, $reason, $payload, \%result_meta]
 
 Empty trash.
 
@@ -273,12 +275,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -288,7 +290,7 @@ Return value:  (any)
 
 Usage:
 
- list_trash_contents() -> [status, msg, payload, meta]
+ list_trash_contents() -> [$status_code, $reason, $payload, \%result_meta]
 
 List contents of trash directory.
 
@@ -298,12 +300,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -313,7 +315,7 @@ Return value:  (any)
 
 Usage:
 
- trash(%args) -> [status, msg, payload, meta]
+ trash(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Trash a file.
 
@@ -332,7 +334,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<path>* => I<str>
 
+(No description)
+
 =item * B<suffix> => I<str>
+
+(No description)
 
 
 =back
@@ -365,12 +371,12 @@ For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -380,7 +386,7 @@ Return value:  (any)
 
 Usage:
 
- trash_files(%args) -> [status, msg, payload, meta]
+ trash_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Trash files (with undo support).
 
@@ -430,12 +436,12 @@ For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -445,7 +451,7 @@ Return value:  (any)
 
 Usage:
 
- untrash(%args) -> [status, msg, payload, meta]
+ untrash(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Untrash a file.
 
@@ -465,7 +471,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<path>* => I<str>
 
+(No description)
+
 =item * B<suffix> => I<str>
+
+(No description)
 
 
 =back
@@ -498,12 +508,12 @@ For more information on transaction, see LE<lt>Rinci::TransactionE<gt>.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -516,14 +526,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-Trash
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-File-Trash-Undoable>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-Undoable>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -549,11 +551,43 @@ support per-filesystem trash (everything goes into home trash).
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-Undoable>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

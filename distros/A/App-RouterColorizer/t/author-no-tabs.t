@@ -41,14 +41,14 @@ my @files = (
     't/07-cisco.t',
     't/08-ciena.t',
     't/90-meta-mode.t',
+    't/91-junos-security-sessions.t',
     't/author-critic.t',
     't/author-no-tabs.t',
     't/author-pod-syntax.t',
     't/author-test-version.t',
     't/release-changes_has_content.t',
     't/release-kwalitee.t',
-    't/release-trailing-space.t',
-    't/release-unused-vars.t'
+    't/release-trailing-space.t'
 );
 
 notabs_ok($_) foreach @files;

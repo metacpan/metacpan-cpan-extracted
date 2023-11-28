@@ -1,5 +1,15 @@
 Revision history for File-LoadLines
 
+1.040	2023-11-20
+
+	Add loadblob(), exported on demand.
+	Enhance documentation.
+
+1.030	2023-11-19
+
+	Add support for blob, soft failures and network fetching.
+	(With chomp=0) Allow final line to not be terminated.
+
 1.021	2021-08-16
 
 	Re-align version numbering.

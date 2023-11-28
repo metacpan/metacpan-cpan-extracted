@@ -1,9 +1,9 @@
-package EAI::DateUtil 1.5;
+package EAI::DateUtil 1.902;
 
 use strict; use warnings; use feature 'unicode_strings'; use utf8;
 use Exporter qw(import); use Time::Local qw( timelocal_modern timegm_modern ); use Time::localtime; use POSIX qw(mktime);
 
-our @EXPORT = qw(monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addDatePart subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD);
+our @EXPORT = qw(monthsToInt intToMonths addLocaleMonths get_curdate get_curdatetime get_curdate_dot formatDate formatDateFromYYYYMMDD get_curdate_dash get_curdate_gen get_curdate_dash_plus_X_years get_curtime get_curtime_HHMM get_lastdateYYYYMMDD get_lastdateDDMMYYYY is_first_day_of_month is_last_day_of_month get_last_day_of_month weekday is_weekend is_holiday is_easter addCalendar first_week first_weekYYYYMMDD last_week last_weekYYYYMMDD convertDate convertDateFromMMM convertDateToMMM convertToDDMMYYYY addDays addDaysHol addDatePart subtractDays subtractDaysHol convertcomma convertToThousendDecimal get_dateseries parseFromDDMMYYYY parseFromYYYYMMDD convertEpochToYYYYMMDD make_time formatTime get_curtime_epochs localtime timelocal_modern);
 
 my %monthsToInt = (
 	"en" => {"jan" => "01","feb" => "02","mar" => "03","apr" => "04","may" => "05","jun" => "06","jul" => "07","aug" => "08","sep" => "09","oct" => "10","nov" => "11","dec" => "12"},
@@ -112,6 +112,7 @@ sub get_curdate_dash_plus_X_years ($;$$) {
 	return undef if !$y;
 	my ($year,$mon,$day) = $_[1] =~ /(.{4})(..)(..)/ if $_[1];
 	my $daysToSubtract = $_[2] if $_[2];
+	# date given as second argument: add X years (minus daysToSubtract) from that date
 	if ($year) {
 		my $dateval;
 		if ($daysToSubtract) {
@@ -121,6 +122,7 @@ sub get_curdate_dash_plus_X_years ($;$$) {
 		}
 		return sprintf("%02d-%02d-%04d",$dateval->mday(), $dateval->mon()+1, $dateval->year()+ 1900 + $y);
 	} else {
+		# add X years (minus daysToSubtract) from today
 		return sprintf("%02d-%02d-%04d",localtime->mday(), localtime->mon()+1, localtime->year()+ 1900 + $y);
 	}
 }
@@ -130,15 +132,49 @@ sub get_curtime (;$$) {
 	my $secondsToAdd = $_[1];
 	$format = "%02d:%02d:%02d" if !$format;
 	if ($secondsToAdd) {
-		my $dateval = localtime(time()+$secondsToAdd);
-		return sprintf($format,$dateval->hour(),$dateval->min(),$dateval->sec());
+		my $timeval = localtime(time()+$secondsToAdd);
+		# include 1 before to indicate overflow
+		return ($timeval->mday() ne localtime(time())->mday() ? "1" : "").sprintf($format,$timeval->hour(),$timeval->min(),$timeval->sec());
 	} else {
 		return sprintf($format,localtime->hour(),localtime->min(),localtime->sec());
 	}
 }
 
+sub get_curtime_epochs {
+	return time();
+}
+
 sub get_curtime_HHMM {
 	return sprintf("%02d%02d",localtime->hour(),localtime->min());
+}
+
+sub make_time ($;$) {
+	return undef if !$_[0];
+	my $secondsToAdd = $_[1];
+	$secondsToAdd = 0 if !$secondsToAdd;
+	my ($hour,$min,$sec) = $_[0] =~ /(..)(..)(..)/;
+	return localtime(timelocal_modern($sec,$min,$hour,1,0,1900) + $secondsToAdd);
+}
+
+sub formatTime ($;$) {
+	my ($timeval,$format) = @_;
+	$format = "%02d:%02d:%02d" if !$format;
+	# if $timeval given in epochs create a localtime object first
+	$timeval = localtime($timeval) if ref($timeval) ne "Time::tm";
+	if ($format =~ /^[^d]*d[^d]*d[^d]*d[^d]*d$/) {
+		# four decimals: day hour min sec (practical in case of overflow)
+		return sprintf($format,$timeval->mday()-1,$timeval->hour(),$timeval->min(),$timeval->sec());
+	} elsif ($format =~ /^[^d]*d[^d]*d[^d]*d$/) {
+		# three decimals: hour min sec
+		return sprintf($format,$timeval->hour(),$timeval->min(),$timeval->sec());
+	} elsif ($format =~ /^[^d]*d[^d]*d$/) {
+		# two decimals: hour min
+		return sprintf($format,$timeval->hour(),$timeval->min());
+	} elsif ($format =~ /^[^d]*d$/) {
+		# one decimal: hour 
+		return sprintf($format,$timeval->hour());
+	}
+	return undef; # error, unsupported format
 }
 
 sub is_first_day_of_month ($) {
@@ -539,6 +575,9 @@ EAI::DateUtil - Date and Time helper functions for L<EAI::Wrap>
  get_curdate_gen ([$template])
  get_curdate_dash ()
  get_curdate_dash_plus_X_years ($years)
+ get_curtime_epochs ()
+ make_time ($time, [$secondsToAdd])
+ formatTime ($timeval [$format])
  get_curtime ([$format, $secondsToAdd])
  get_curtime_HHMM ()
  is_first_day_of_month ($date YYYYMMDD)
@@ -654,9 +693,13 @@ returns current date in format DD-MM-YYYY
 
 returns (current or given) date + X years in format DD-MM-YYYY
 
+=item get_curtime_epochs
+
+returns current time in epochs as from builtin function time()
+
 =item get_curtime (;$$)
 
-returns current time in format HH:MM:SS + optional $secondsToAdd (or as given in formatstring $format, however ordering of format is always hour, minute and second)
+returns current time in format HH:MM:SS + optional $secondsToAdd (or as given in formatstring $format, however ordering of format is always hour, minute and second). Additionally 1 is put in front if adding $secondsToAdd lead to a day overflow.
 
  $format .. optional sprintf format string (e.g. %02d:%02d:%02d) for hour, minute and second. If less than three tags are passed then a warning is "Redundant argument in sprintf at ..." is thrown here.
  $secondsToAdd .. optional seconds to add to current time before returning
@@ -664,6 +707,20 @@ returns current time in format HH:MM:SS + optional $secondsToAdd (or as given in
 =item get_curtime_HHMM
 
 returns current time in format HHMM
+
+=item make_time ($;$)
+
+returns localtime datastructure from given $time argument (format HHMMSS) optionally adding $secondsToAdd
+
+ $time .. time in format HHMMSS to make a localtime datastructure
+ $secondsToAdd .. optional seconds to add to current time before returning
+
+=item formatTime ($;$)
+
+returns formatted time from localtime datastructure $timeval using optional format string $format (defaulting to %02d:%02d:%02d). Supported are format strings containing 1, 2, 3 or 4 %d placeholders.
+
+ $timeval .. localtime datastructure that should be formatted
+ $format .. optional sprintf format string (e.g. %02d %02d:%02d:%02d) for (maximum) day, hour, minute and second to return. There can also be three decimals, (hour, minute and second), two (hour, minute) and one (only hour).
 
 =item is_first_day_of_month ($)
 

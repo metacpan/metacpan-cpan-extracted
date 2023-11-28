@@ -1,0 +1,46 @@
+0.005001 2023-11-26
+  [Test Fix]
+    * Catch up with the latest Sys class.
+  [Internal Changes]
+    * Do not use the signal_go class in the Sys::Signal class.
+0.005 2023-11-18
+  [New Features]
+    * Add the Go::Error::IOTimeout class.
+  [Incompatible Changes]
+    * If IO timeout occurs, an exception is thrown set eval_error_id to the basic type ID of the Go::Error::IOTimeout.
+    * Changes the definitions of the following methods in the Go class.
+    
+    [Before]
+    static method gosched_io_read : void ($fd : int, $timeout_ref : double[] = undef);
+    static method gosched_io_write : void ($fd : int, $timeout_ref : double[] = undef);
+    
+    [After]
+    static method gosched_io_read : void ($fd : int, $timeout : double = 0);
+    static method gosched_io_write : void ($fd : int, $timeout : double = 0);
+    
+0.004 2023-11-17
+  [Requirement Changes]
+    * Require SPVM::Sys 0.500.
+  [New Featrues]
+    * Add a Go::OS::Signal class.
+  [Incompatible Changes]
+    * The value of $timeout_ref must be greater than 0. Otherwise an exception is thrown.
+0.003 2023-11-15
+  [Requirement Changes]
+    * Require SPVM::Thread 0.001.
+  [Incompatible Changes]
+    * Go->goshced, Go->gosched_io_write, Go->gosched_io_read, Go->sleep methods must be called from the main thread. Otherwise an exception is thrown.
+  [Test Improvement]
+    * Add thread-safe tests of Go::WaitGroup.
+0.002 2023-11-14
+  [Requirement Changes]
+    * Require SPVM 0.989061.
+    * Require SPVM::Sys 0.495001.
+  [Incompatible Changes]
+    * The return types of Go->goshced and Go->sleep become void.
+  [New Features]
+    * Add the gosched_io_read and gosched_io_write methods are added to the Go class.
+    
+0.001 2023-11-08
+  [Changes]
+    * First release.

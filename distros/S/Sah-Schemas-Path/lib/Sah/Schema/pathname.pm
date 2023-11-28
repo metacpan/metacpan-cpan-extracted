@@ -3,9 +3,9 @@ package Sah::Schema::pathname;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 our $schema = [str => {
     summary => 'Filesystem path name',
@@ -58,7 +58,7 @@ Sah::Schema::pathname - Filesystem path name
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::Schema::pathname (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::Schema::pathname (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "foo";
+ $data = "foo/bar";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -101,8 +101,8 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "foo";
- my $res = $validator->($data); # => ["","foo"]
+ $data = "foo/bar";
+ my $res = $validator->($data); # => ["","foo/bar"]
  
  # a sample invalid data
  $data = "";

@@ -1,7 +1,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -9,8 +10,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id: Mail.pm 1578075 2014-03-16 14:01:14Z richter $
 #
 ###################################################################################
 
@@ -28,11 +27,13 @@ use vars qw(
     $VERSION
     ) ;
 
+no warnings "uninitialized" ;
+
 
 @ISA = qw(Embperl);
 
 
-$VERSION = '2.1.0';
+$VERSION = '3.0.0';
 
 
 sub _quote_hdr
@@ -234,7 +235,7 @@ Array ref of additional mail headers
 =item headerencoding (2.0b9+)
 
 Tells Embperl::Mail which charset definition to include in any header
-that contains character code 128-255 and therfore needs encoding. 
+that contains character code 128-255 and therefore needs encoding.
 Defaults to iso-8859-1. Pass
 empty string to turn encoding of header fields of.
 

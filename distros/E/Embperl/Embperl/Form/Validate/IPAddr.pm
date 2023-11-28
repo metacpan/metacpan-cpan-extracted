@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,14 +12,20 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: IPAddr.pm 1578075 2014-03-16 14:01:14Z richter $
-#
 ###################################################################################
 
 
 package Embperl::Form::Validate::IPAddr ;
 
 use base qw(Embperl::Form::Validate::Default);
+use utf8 ;
+
+my %errutf8 =
+    (
+	validate_ipaddr => 'Feld %0: "%1" ist keine gültige IP-Adresse. Geben Sie die IP-Adresse in der Form nnn.nnn.nnn.nnn ein',
+    ) ;
+
+no utf8 ;
 
 my %error_messages = 
 (
@@ -27,10 +34,7 @@ my %error_messages =
 	validate_ipaddr => 'Feld %0: "%1" ist keine g�ltige IP-Adresse. Geben Sie die IP-Adresse in der Form nnn.nnn.nnn.nnn ein',
     },
 
-    'de.utf-8' => 
-    {
-	validate_ipaddr => 'Feld %0: "%1" ist keine gültige IP-Adresse. Geben Sie die IP-Adresse in der Form nnn.nnn.nnn.nnn ein',
-    },
+    'de.utf-8' => \%errutf8,
 
     en =>
     {
@@ -56,17 +60,17 @@ sub validate
     {
     my ($self, $key, $value, $fdat, $pref) = @_ ;
     
-    if ($value =~ /^(\d+)\.(\d+).(\d+)\.(\d+)$/)
-	{
-	if ($1 < 0 || $1 > 255 ||
-	    $2 < 0 || $2 > 255 ||
-	    $3 < 0 || $3 > 255 ||
-	    $4 < 0 || $4 > 255)
-	    {
-            return ['validate_ipaddr', $value] ;		
-	    }
-	return undef ;
-	}
+    if ($value =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/)
+        {
+        if ($1 < 0 || $1 > 255 ||
+            $2 < 0 || $2 > 255 ||
+            $3 < 0 || $3 > 255 ||
+            $4 < 0 || $4 > 255)
+            {
+                return ['validate_ipaddr', $value] ;		
+            }
+        return undef ;
+        }
     return ['validate_ipaddr', $value] ; 
     }
 
@@ -76,7 +80,7 @@ sub getscript_validate
     {
     my ($self, $arg, $pref) = @_ ;
     
-    return ('obj.value.search(/^\d+\.\d+.\d+.\d+$/) >= 0', ['validate_ipaddr', "'+obj.value+'"]) ;
+    return ('obj.value.search(/^\d+\.\d+\.\d+.\d+$/) >= 0', ['validate_ipaddr', "'+obj.value+'"]) ;
     }
 
 

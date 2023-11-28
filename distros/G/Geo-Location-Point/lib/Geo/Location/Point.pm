@@ -21,11 +21,11 @@ Geo::Location::Point - Location information
 
 =head1 VERSION
 
-Version 0.09
+Version 0.11
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -189,6 +189,7 @@ sub not_equal {
 =head2	tz
 
 Returns the timezone of the location.
+Needs L<TimeZone::TimeZoneDB>.
 
 =cut
 
@@ -317,6 +318,9 @@ Get/set location attributes, e.g. city
     print $location->as_string(), "\n";
     print "$location\n";	# Calls as_string
 
+Because of the way that the cache works, the location() value is cleared by this, so
+you may wish to manually all location() afterwards to set the value.
+
 =cut
 
 sub AUTOLOAD {
@@ -330,8 +334,8 @@ sub AUTOLOAD {
 	my $self = shift;
 
 	if(my $value = shift) {
-		$self->{$key} = $value;
 		delete $self->{'location'};	# Invalidate the cache
+		$self->{$key} = $value;
 	}
 
 	return $self->{$key};

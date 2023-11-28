@@ -34,15 +34,32 @@ is $a->title, 'A super Tech Blog Post', "find_article works with '/'";
 
 
 subtest 'select articles' => sub {
-    my $pages = $blog->select_articles();
-    is scalar(@$pages), 1, "found 1 page";
-    is $pages->[0]->slug, 'contact', "contact page found"; 
+    my $articles = $blog->select_articles();
+    grep { print "#   - ".$_->title."\n" } @$articles;
+    is scalar(@$articles), 6, "6 articles found";
 
-    my $articles = $blog->select_articles(
+    my $nb_perl = 0;
+    my $nb_tech = 0;
+    my $nb_pages = 0;
+    foreach my $a (@$articles) {
+        $nb_perl++ if $a->category eq 'perl';
+        $nb_tech++ if $a->category eq 'tech';
+        $nb_pages++ if $a->is_page;
+    }
+    is $nb_perl, 4, "4 articles found in the perl category";
+    is $nb_tech, 2, "2 articles found in the tech category";
+    is $nb_pages, 0, "select_articles never returns pages";
+    
+    $articles = $blog->select_articles(limit => 3);
+    is scalar(@$articles), 3, "select with a limit works";
+
+    grep { print "#   - ".$_->title."\n" } @$articles;
+
+    $articles = $blog->select_articles(
         limit => 3,
         category => 'tech',
     );
-    is scalar(@$articles), 2, "Found 2 tech articles";
+    is scalar(@$articles), 2, "select with a category works";
 
     done_testing();
 };

@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 1930 2023-08-21 14:10:10Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 1947 2023-11-23 09:40:45Z willem $)[2];
 
 
 #
@@ -443,13 +443,13 @@ sub _send_tcp {
 		$self->errorstring($!);
 
 		my $buffer = _read_tcp($socket);
-		$self->{replyfrom} = $ip;
-		$self->_diag( 'reply from', "[$ip]", length($buffer), 'bytes' );
+		my $peer   = $self->{replyfrom} = $socket->peerhost;
+		$self->_diag( 'packet from', "[$peer]", length($buffer), 'octets' );
 
 		my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 		$self->errorstring($@);
 		next unless $self->_accept_reply( $reply, $query );
-		$reply->from($ip);
+		$reply->from($peer);
 
 		if ( $self->{tsig_rr} && !$reply->verify($query) ) {
 			$self->errorstring( $reply->verifyerr );
@@ -509,10 +509,10 @@ NAMESERVER: foreach my $ns (@ns) {
 
 			my $reply;
 			while ( my ($socket) = $select->can_read($timeout) ) {
-				my $peer = $self->{replyfrom} = $socket->peerhost;
+				my $buffer = _read_udp($socket);
 
-				my $buffer = _read_udp( $socket, $self->_packetsz );
-				$self->_diag( "reply from [$peer]", length($buffer), 'bytes' );
+				my $peer = $self->{replyfrom} = $socket->peerhost;
+				$self->_diag( "packet from [$peer]", length($buffer), 'octets' );
 
 				my $packet = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 				$self->errorstring($@);
@@ -621,15 +621,16 @@ sub bgbusy {				## no critic		# overwrites user UDP handle
 	my ( $expire, $query, $read ) = @$appendix;
 	return if ref($read);
 
-	return time() <= $expire unless IO::Select->new($handle)->can_read(0);
+	return time() < $expire unless IO::Select->new($handle)->can_read(0);
 
 	return unless $query;					# SpamAssassin 3.4.1 workaround
-	return if $self->{igntc};
 	return unless $handle->socktype() == SOCK_DGRAM;
 
 	my $ans = $self->_bgread($handle);
+	$$appendix[0] = time();
 	$$appendix[2] = [$ans];
 	return unless $ans;
+	return if $self->{igntc};
 	return unless $ans->header->tc;
 
 	$self->_diag('packet truncated: retrying using TCP');
@@ -661,20 +662,17 @@ sub _bgread {
 	my ( $expire, $query, $read ) = @$appendix;
 	return shift(@$read) if ref($read);
 
-	my $select = IO::Select->new($handle);
-	unless ( $select->can_read(0) ) {
-		$self->errorstring('timed out');
-		return;
-	}
-
-	my $peer = $self->{replyfrom} = $handle->peerhost;
+	return unless IO::Select->new($handle)->can_read(0);
 
 	my $dgram  = $handle->socktype() == SOCK_DGRAM;
-	my $buffer = $dgram ? _read_udp( $handle, $self->_packetsz ) : _read_tcp($handle);
-	$self->_diag( "reply from [$peer]", length($buffer), 'bytes' );
+	my $buffer = $dgram ? _read_udp($handle) : _read_tcp($handle);
+
+	my $peer = $self->{replyfrom} = $handle->peerhost;
+	$self->_diag( "packet from [$peer]", length($buffer), 'octets' );
 
 	my $reply = Net::DNS::Packet->decode( \$buffer, $self->{debug} );
 	$self->errorstring($@);
+
 	return unless $self->_accept_reply( $reply, $query );
 	$reply->from($peer);
 
@@ -692,7 +690,7 @@ sub _accept_reply {
 	my $header = $reply->header;
 	return unless $header->qr;
 
-	return if $query && $header->id != $query->header->id;
+	return if $query && ( $header->id != $query->header->id );
 
 	return $self->errorstring( $header->rcode );		# historical quirk
 }
@@ -746,7 +744,7 @@ sub axfr_start {			## historical
 	my ( $self, @argument ) = @_;				# uncoverable pod
 	$self->_deprecate('prefer  $iterator = $self->axfr(...)');
 	my $iterator = $self->axfr(@argument);
-	( $self->{axfr_iter} ) = grep {defined} ( $iterator, sub {} );
+	( $self->{axfr_iter} ) = grep {defined} ( $iterator, sub { } );
 	return defined($iterator);
 }
 
@@ -838,18 +836,18 @@ sub _read_tcp {
 
 
 #
-# Usage:  $data = _read_udp($socket, $length);
+# Usage:  $data = _read_udp($socket);
 #
 sub _read_udp {
 	my $socket = shift;
 	my $buffer = '';
-	$socket->recv( $buffer, shift );
+	$socket->recv( $buffer, 9000 );	## payload limit for Ethernet "Jumbo" packet
 	return $buffer;
 }
 
 
 sub _create_tcp_socket {
-	my ( $self, $ip ) = @_;
+	my ( $self, $ip, @sockopt ) = @_;
 
 	my $socket;
 	my $sock_key = "TCP[$ip]";
@@ -867,6 +865,7 @@ sub _create_tcp_socket {
 		PeerPort  => $self->{port},
 		Proto	  => 'tcp',
 		Timeout	  => $self->{tcp_timeout},
+		@sockopt
 		)
 			if USE_SOCKET_IP;
 
@@ -878,6 +877,7 @@ sub _create_tcp_socket {
 			PeerPort  => $self->{port},
 			Proto	  => 'tcp',
 			Timeout	  => $self->{tcp_timeout},
+			@sockopt
 			)
 				unless $ip6_addr;
 	}
@@ -888,7 +888,7 @@ sub _create_tcp_socket {
 
 
 sub _create_udp_socket {
-	my ( $self, $ip ) = @_;
+	my ( $self, $ip, @sockopt ) = @_;
 
 	my $socket;
 	my $sock_key = "UDP[$ip]";
@@ -899,7 +899,8 @@ sub _create_udp_socket {
 		LocalAddr => $ip6_addr ? $self->{srcaddr6} : $self->{srcaddr4},
 		LocalPort => $self->{srcport},
 		Proto	  => 'udp',
-		Type	  => SOCK_DGRAM
+		Type	  => SOCK_DGRAM,
+		@sockopt
 		)
 			if USE_SOCKET_IP;
 
@@ -908,7 +909,8 @@ sub _create_udp_socket {
 			LocalAddr => $self->{srcaddr4},
 			LocalPort => $self->{srcport} || undef,
 			Proto	  => 'udp',
-			Type	  => SOCK_DGRAM
+			Type	  => SOCK_DGRAM,
+			@sockopt
 			)
 				unless $ip6_addr;
 	}

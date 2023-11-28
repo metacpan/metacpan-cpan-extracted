@@ -1,3 +1,20 @@
+1.377 2023-11-18
+
+  Main UI changes:
+    * move "show custom value" checkbutton in Options menu
+    * move "hide empty value" checkbutton in Options menu
+    * add "auto save" option
+    * remove save_in_dir command from Files menu
+
+  Bug fixes:
+    * show selected entry when disabling show custom value
+    * improve list of showed items when using element filter
+      with "show custom values" option
+
+  Dependency changes:
+    * Runtime: replace YAML with YAML::PP
+    * Tests: replace YAML::XS with YAML::PP
+
 1.376 2022-12-27
 
    Bug fixes:

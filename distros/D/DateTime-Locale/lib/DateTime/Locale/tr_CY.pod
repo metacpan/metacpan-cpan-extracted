@@ -471,11 +471,11 @@ Turkish Cyprus locale.
    1995-12-22T09:05:02 = Ara
   -0010-09-15T04:44:23 = Eyl
 
-=head3 MMMEd (d MMMM E)
+=head3 MMMEd (d MMM E)
 
-   2008-02-05T18:30:30 = 5 Şubat Sal
-   1995-12-22T09:05:02 = 22 Aralık Cum
-  -0010-09-15T04:44:23 = 15 Eylül Cmt
+   2008-02-05T18:30:30 = 5 Şub Sal
+   1995-12-22T09:05:02 = 22 Ara Cum
+  -0010-09-15T04:44:23 = 15 Eyl Cmt
 
 =head3 MMMMEd (d MMMM E)
 

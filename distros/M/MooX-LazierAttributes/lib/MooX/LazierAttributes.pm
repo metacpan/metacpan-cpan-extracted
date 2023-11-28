@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use Moo;
 use Clone qw/clone/;
-use MooX::ReturnModifiers qw/return_has/;
+use MooX::ReturnModifiers qw/return_has return_sub/;
 use namespace::clean ();
 
-our $VERSION = '1.07008';
+our $VERSION = '1.07009';
 
 use constant ro => 'ro';
 use constant is_ro => ( is => ro );
@@ -32,7 +32,7 @@ sub import {
 	my ($package, @export) = @_;
 	my $target = caller;
 	my $has = return_has($target);
-
+	my $sub = return_sub($target);
 	my $attributes = sub {
 		my @attr = @_;
 		while (@attr) {
@@ -55,13 +55,12 @@ sub import {
 		? grep { !ref $_ } @export
 		: qw/ro is_ro rw is_rw nan lzy bld lzy_bld trg clr req coe lzy_hash lzy_array/; # back compat as import used to accept a {}
 
-	{
+	$sub->('attributes', $attributes);
+	
+	{ 
 		no strict 'refs';
 		${"${target}::"}{$_} = ${"${package}::"}{$_}
 			foreach @ex;
-
-		*{"${target}::attributes"} = $attributes;
-
 		namespace::clean->import(
 			-cleanee => $target,
 			@ex, 'attributes'
@@ -91,15 +90,14 @@ __END__
 MooX::LazierAttributes - Lazier Attributes.
 
 =for html
+
 <a href="https://travis-ci.org/ThisUsedToBeAnEmail/MooX-LazierAttributes"><img src="https://travis-ci.org/ThisUsedToBeAnEmail/MooX-LazierAttributes.svg?branch=master" alt="Build Status"></a>
 <a href="https://coveralls.io/r/ThisUsedToBeAnEmail/MooX-LazierAttributes?branch=master"><img src="https://coveralls.io/repos/ThisUsedToBeAnEmail/MooX-LazierAttributes/badge.svg?branch=master" alt="Coverage Status"></a>
 <a href="https://metacpan.org/pod/MooX-LazierAttributes"><img src="https://badge.fury.io/pl/MooX-LazierAttributes.svg" alt="CPAN version"></a>
 
-=cut
-
 =head1 VERSION
 
-Version 1.07008
+Version 1.07009
 
 =cut
 

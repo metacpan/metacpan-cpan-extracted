@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -36,9 +37,13 @@ __EMBPERL__
 my $span = ($self->{width_percent});
 my $state   = $self -> {state} ;
 $state =~ s/[^-a-zA-Z0-9_]/_/g ;
+my $srctext = $self -> {showtext}?($self->{text}):$self -> form -> convert_text ($self, undef, undef, $req) ;
+my @text = split /\n/, $srctext ;
+
 $]<table class="ef-element ef-element-width-[+ $self -> {width_percent} +][+ ' '+][+ $state +]">
   <tr>
-<td [+ do { local $escmode = 0 ; $self -> get_std_control_attr($req, undef, 'readonly', 'ef-control-info') } +] >[$ if $self -> {image} $]<img class="cControlButtonSymbol" src="[+ $self -> {image} +]">[$endif$][+ $self -> {showtext}?($self->{text}):$self -> form -> convert_text ($self, undef, undef, $req) +]&nbsp;</td>
+<td [+ do { local $escmode = 0 ; $self -> get_std_control_attr($req, undef, 'readonly', 'ef-control-info') } +] >[$ if $self -> {image} $]<img class="cControlButtonSymbol" src="[+ $self -> {image} +]">[$endif$]
+[+ shift @text +][$ foreach my $val (@text) $]<br>[+ $val +][$endforeach$]&nbsp;</td>
 </tr>
   </table>[$endsub$]
 

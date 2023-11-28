@@ -58,4 +58,15 @@ use Object::Pad ':experimental(init_expr)';
    is( $init_called{two}, 2, 'unpassed :param still ran initexpr' );
 }
 
+# field initexprs can see earlier fields
+{
+   class FieldsSeeFields {
+      field $one   :param;
+      field $two           = 2;
+      field $three :reader = $one + $two;
+   }
+
+   is( FieldsSeeFields->new( one => 1 )->three, 3, 'field initialised from fields' );
+}
+
 done_testing;

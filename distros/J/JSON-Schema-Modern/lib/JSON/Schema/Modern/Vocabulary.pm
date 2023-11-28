@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.573';
+our $VERSION = '0.575';
 
 use 5.020;
 use Moo::Role;
@@ -26,16 +26,18 @@ requires qw(vocabulary keywords);
 
 sub evaluation_order { 999 }  # override, if needed
 
-sub traverse ($self, $schema, $state) {
+sub BUILD { die 'these classes are never instantiated' }
+
+sub traverse ($class, $schema, $state) {
   $state->{evaluator}->_traverse_subschema($schema, $state);
 }
 
-sub traverse_subschema ($self, $schema, $state) {
+sub traverse_subschema ($class, $schema, $state) {
   $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}},
     +{ %$state, schema_path => $state->{schema_path}.'/'.$state->{keyword} });
 }
 
-sub traverse_array_schemas ($self, $schema, $state) {
+sub traverse_array_schemas ($class, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'array');
   return E($state, '%s array is empty', $state->{keyword}) if not $schema->{$state->{keyword}}->@*;
 
@@ -47,7 +49,7 @@ sub traverse_array_schemas ($self, $schema, $state) {
   return $valid;
 }
 
-sub traverse_object_schemas ($self, $schema, $state) {
+sub traverse_object_schemas ($class, $schema, $state) {
   return if not assert_keyword_type($state, $schema, 'object');
 
   my $valid = 1;
@@ -58,20 +60,22 @@ sub traverse_object_schemas ($self, $schema, $state) {
   return $valid;
 }
 
-sub traverse_property_schema ($self, $schema, $state, $property) {
+sub traverse_property_schema ($class, $schema, $state, $property) {
   return if not assert_keyword_type($state, $schema, 'object');
 
   $state->{evaluator}->_traverse_subschema($schema->{$state->{keyword}}{$property},
     +{ %$state, schema_path => jsonp($state->{schema_path}, $state->{keyword}, $property) });
 }
 
-sub eval ($self, $data, $schema, $state) {
+sub eval ($class, $data, $schema, $state) {
   $state->{evaluator}->_eval_subschema($data, $schema, $state);
 }
 
-sub eval_subschema_at_uri ($self, $data, $schema, $state, $uri) {
+sub eval_subschema_at_uri ($class, $data, $schema, $state, $uri) {
   my $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
   abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not $schema_info;
+  abort($state, 'EXCEPTION: bad reference to %s: not a schema', $schema_info->{canonical_uri})
+    if $schema_info->{document}->get_entity_at_location($schema_info->{document_path}) ne 'schema';
 
   my $vocabularies = $schema_info->{vocabularies};
   if ($state->{validate_formats}) {
@@ -112,7 +116,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.573
+version 0.575
 
 =head1 SYNOPSIS
 
@@ -128,6 +132,8 @@ must compose, describing the basic structure expected of a vocabulary class.
 =head1 ATTRIBUTES
 
 =head1 METHODS
+
+=for Pod::Coverage BUILD
 
 =for stopwords schema subschema
 

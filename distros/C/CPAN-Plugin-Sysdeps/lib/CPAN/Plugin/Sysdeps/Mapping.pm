@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 # shortcuts
 #  os and distros
@@ -1932,6 +1932,15 @@ sub mapping {
        [package => []]], # ... and even worse: if t1lib is installed, then the Imager 1.008 test suite fails (https://rt.cpan.org/Ticket/Display.html?id=128145). So don't install it at all.
      ],
 
+     [cpanmod => 'Imager::zxing',
+      [os_freebsd,
+       [package => 'zxing-cpp']],
+      [like_debian,
+       [package => 'libzxingcore-dev']],
+      [like_fedora,
+       [package => 'zxing-cpp-devel']],
+     ],
+
      # modules just needing java and nothing else:
      [cpanmod => ['Inline::Java', 'Bio::AssemblyImprovement', 'DBD::JDBC'],
       [os_freebsd,
@@ -3643,9 +3652,9 @@ sub mapping {
 
      [cpanmod => 'X11::XCB',
       [os_freebsd,
-       [package => 'xcb-util-wm']],
+       [package => ['expat', 'pkgconf', 'xcb-proto', 'xcb-util-wm']]],
       [like_debian,
-       [package => ['xsltproc', 'xcb-proto', 'libxcb-util0-dev', 'libxcb-xinerama0-dev', 'libxcb-icccm4-dev']]]],
+       [package => ['libxcb-ewmh-dev', 'libxcb-icccm4-dev', 'libxcb-randr0-dev', 'libxcb-render0-dev', 'libxcb-util-dev', 'libxcb-util0-dev', 'libxcb-xinerama0-dev', 'libxcb-xinput-dev', 'libxcb-xkb-dev', 'libxcb-xtest0-dev', 'libxcb1-dev', 'xcb-proto', 'xsltproc']]]],
 
      [cpanmod => 'X11::Xlib',
       [os_freebsd,

@@ -1,6 +1,7 @@
-Build.PL
-Changes.txt
+Makefile.PL
+Changes
 MANIFEST
+MANIFEST.SKIP
 README.txt
 lib/XML/Catalogs/HTML.pm
 share/html/catalog.xml
@@ -17,8 +18,12 @@ share/html/xhtml1-frameset.dtd
 share/html/xhtml1-strict.dtd
 share/html/xhtml1-transitional.dtd
 t/00_load.t
-t/01_libxml.t
-t/devel-pod-coverage.t
-t/pod.t
+t/01_devel_mark_check.t
+t/02_devel_version_check.t
+t/03_devel_whitespace.t
+t/04_devel_permissions.t
+t/05_pod.t
+t/06_devel_pod_coverage.t
+t/10_libxml.t
 META.yml
 META.json

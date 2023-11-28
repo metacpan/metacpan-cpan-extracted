@@ -78,7 +78,7 @@ __END__
 
 =head1 NAME
 
-	PayProp::API::Public::Client::Authorization::Base - Base module for authorization modules.
+PayProp::API::Public::Client::Authorization::Base - Base module for authorization modules.
 
 =head1 SYNOPSIS
 
@@ -97,21 +97,21 @@ __END__
 
 =head1 DESCRIPTION
 
-	*DO NOT INSTANTIATE THIS MODULE DIRECTLY*
+*DO NOT INSTANTIATE THIS MODULE DIRECTLY*
 
-	Base authorization module for alternative implementations. This module expects for C<PayProp::API::Public::Client::Authorization::*>
-	modules to define their own implementation on how the token should be returned. The base module will handle retrieving token either
-	directly or from a defined storage solution.
+Base authorization module for alternative implementations. This module expects for C<PayProp::API::Public::Client::Authorization::*>
+modules to define their own implementation on how the token should be returned. The base module will handle retrieving token either
+directly or from a defined storage solution.
 
-	The only requirement this module has is for extending modules to override C<_token_request_p> method that returns a C<Mojo::Promise>
-	containing C<token> and C<token_type> in a HashRef.
+The only requirement this module has is for extending modules to override C<_token_request_p> method that returns a C<Mojo::Promise>
+containing C<token> and C<token_type> in a HashRef.
 
-	See L<PayProp::API::Public::Client::Authorization::ClientCredentials> implementation using storage and request pattern, and
-	L<PayProp::API::Public::Client::Authorization::APIKey> for returning token information directly.
+See L<PayProp::API::Public::Client::Authorization::ClientCredentials> implementation using storage and request pattern, and
+L<PayProp::API::Public::Client::Authorization::APIKey> for returning token information directly.
 
 =head1 ATTRIBUTES
 
-	C<PayProp::API::Public::Client::Authorization::Base> implements the following attributes.
+C<PayProp::API::Public::Client::Authorization::Base> implements the following attributes.
 
 =head2 is_token_from_storage
 
@@ -153,23 +153,23 @@ __END__
 
 =head1 AUTHOR
 
-	Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
 
-	Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-	Copyright 2023- PayProp
+Copyright 2023- PayProp
 
 =head1 LICENSE
 
-	This library is free software; you can redistribute it and/or modify
-	it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
-	If you would like to contribute documentation
-	or file a bug report then please raise an issue / pull request:
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
 
-	L<https://github.com/Humanstate/api-client-public-module>
+L<https://github.com/Humanstate/api-client-public-module>
 
 =cut
 

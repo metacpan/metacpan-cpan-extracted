@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Lexer;
 
-our $VERSION = '0.036'; # VERSION
+our $VERSION = 'v0.37.0'; # VERSION
 
 use constant TRACE => $ENV{YAML_PP_TRACE} ? 1 : 0;
 use constant DEBUG => ($ENV{YAML_PP_DEBUG} || $ENV{YAML_PP_TRACE}) ? 1 : 0;
@@ -373,7 +373,7 @@ sub fetch_plain {
     }
 
     my @tokens;
-    unless ($$yaml =~ s/\A($REGEX)//) {
+    unless ($$yaml =~ s/\A($REGEX(?:[:]+(?=\:(\s|\z)))?)//) {
         $self->_push_tokens(\@tokens);
         $self->exception("Invalid plain scalar");
     }

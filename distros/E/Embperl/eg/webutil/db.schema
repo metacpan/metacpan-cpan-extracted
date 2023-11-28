@@ -1,7 +1,8 @@
 ##############################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -10,8 +11,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id: db.schema 1578075 2014-03-16 14:01:14Z richter $
 #
 ##############################################################################
 
@@ -79,8 +78,8 @@
     '!PrimKey' => 'id',
     '!Init' =>
         [
-        { id => 1, item_id => 1, heading => '28.7.2001', language_id => 'de', description => 'David Lloyd wird einen Vortrag über Embperl auf der L<"AUUG Annual Conference"|http://www.auug.org.au/winter/auug2001/> in Sydney, Australien, am 26, 27 and 28 September 2001 halten.' },
-        { id => 2, item_id => 1, heading => '7/28/2001', language_id => 'en', description => 'David Lloyd is makeing a talk at the L<"AUUG Annual Conference"|http://www.auug.org.au/winter/auug2001/>, which will be held in Sydney, Australia, on 26, 27 and 28 September 2001 ' },
+        { id => 1, item_id => 1, heading => '28.7.2001', language_id => 'de', description => 'David Lloyd wird einen Vortrag über Embperl auf der L<"AUUG Annual Conference"|https://www.auug.org.au/winter/auug2001/> in Sydney, Australien, am 26, 27 and 28 September 2001 halten.' },
+        { id => 2, item_id => 1, heading => '7/28/2001', language_id => 'en', description => 'David Lloyd is makeing a talk at the L<"AUUG Annual Conference"|https://www.auug.org.au/winter/auug2001/>, which will be held in Sydney, Australia, on 26, 27 and 28 September 2001 ' },
 
         { id => 3, item_id => 2, heading => '20.11.2001', language_id => 'de', description => 'Embperl 2.0b4 freigegeben. Neu ist die Unterstützung für XML und XSLT, sowie das Zusammensetzen des Ergebnisses eines Requests durch mehrere frei kombinierbare Provider.' },
         { id => 4, item_id => 2, heading => '11/20/2001', language_id => 'en', description => 'Embperl 2.0b4 released. This release introduces XML and XSLT support into Embperl, along with a new way of creating a request from a series of providers, which pluged together in a hierachial tree structure.' },
@@ -97,14 +96,14 @@
         { id =>11, item_id => 6, heading => '3/21/2002', language_id => 'en', description => 'Embperl 2.0b7 released ' },
         { id =>12, item_id => 6, heading => '21.3.2002', language_id => 'de', description => 'Embperl 2.0b7 freigegeben' },
 
-        { id =>13, item_id => 7, heading => '28.5.2002', language_id => 'de', description => 'Auch auf der diesjährigen L<"O\'Reilly Open-Source Convention"|http://conferences.oreillynet.com/os2002/> in San Diego wird es wieder ein Vortrag über Embperl geben.' },
-        { id =>14, item_id => 7, heading => '5/28/2002', language_id => 'en', description => 'Again this year there will be a talk about Embperl at the L<"O\'Reilly Open-Source Convention"|http://conferences.oreillynet.com/os2002/> in San Diego in July.' },
+        { id =>13, item_id => 7, heading => '28.5.2002', language_id => 'de', description => 'Auch auf der diesjährigen L<"O\'Reilly Open-Source Convention"|https://conferences.oreillynet.com/os2002/> in San Diego wird es wieder ein Vortrag über Embperl geben.' },
+        { id =>14, item_id => 7, heading => '5/28/2002', language_id => 'en', description => 'Again this year there will be a talk about Embperl at the L<"O\'Reilly Open-Source Convention"|https://conferences.oreillynet.com/os2002/> in San Diego in July.' },
 
         { id =>15, item_id => 8, heading => '6/25/2002', language_id => 'en', description => 'Embperl 2.0b8 released. Contains many bugfixes, runs with mod_perl 2.' },
         { id =>16, item_id => 8, heading => '25.6.2002', language_id => 'de', description => 'Embperl 2.0b8 freigegeben. Enthält viel Fehlerkorrekturen und läuft mit mod_perl 2.' },
 
-        { id => 17, item_id => 9, heading => 'http://bilder.ecos.de - Gerald Richter [richter@ecos.de]', language_id => 'de', description => 'Dies ist die Site für die Embperl ursprünglich geschrieben wurde. Es ist eine einfache Bilddatenbank die touristische Bilder aus Rheinland-Pflaz enthält. ' },
-        { id => 18, item_id => 9, heading => 'http://bilder.ecos.de - Gerald Richter [richter@ecos.de]', language_id => 'en', description => 'This was the site Embperl was originally written for. It\'s a simple picture database which contains pictures and tourist information for Rheinland-Pfalz/Germany. It\'s intended as press information, to reduce the need for sending photographs by real mail. You can view and search the pictures via the Internet or via a direct dial-in. Download is only available for valid users and via direct dial-in. It is also possible to maintain the database via the web and insert new pictures and descriptions and change or delete old ones.' },
+        { id => 17, item_id => 9, heading => 'https://bilder.ecos.de - Gerald Richter [richter at embperl dot org]', language_id => 'de', description => 'Dies ist die Site für die Embperl ursprünglich geschrieben wurde. Es ist eine einfache Bilddatenbank die touristische Bilder aus Rheinland-Pflaz enthält. ' },
+        { id => 18, item_id => 9, heading => 'https://bilder.ecos.de - Gerald Richter [richter at embperl dot org]', language_id => 'en', description => 'This was the site Embperl was originally written for. It\'s a simple picture database which contains pictures and tourist information for Rheinland-Pfalz/Germany. It\'s intended as press information, to reduce the need for sending photographs by real mail. You can view and search the pictures via the Internet or via a direct dial-in. Download is only available for valid users and via direct dial-in. It is also possible to maintain the database via the web and insert new pictures and descriptions and change or delete old ones.' },
         ]
     },
 

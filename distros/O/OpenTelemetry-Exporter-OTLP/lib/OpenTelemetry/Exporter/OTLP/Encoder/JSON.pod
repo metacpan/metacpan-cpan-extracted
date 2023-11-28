@@ -1,0 +1,80 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::Exporter::OTLP::Encoder::JSON - A JSON encoder for the OTLP exporter
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry::Exporter::OTLP::Encoder::JSON;
+
+    my $encoded = OpenTelemetry::Exporter::OTLP::Encoder::JSON->new
+        ->encode(\@spans);
+
+=head1 DESCRIPTION
+
+This is an encoder class used by L<OpenTelemetry::Exporter::OTLP> when using
+the "http/json" protocol. It encodes telemetry data as a JSON string
+complying with the 1.0.0 version of
+L<the OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0>.
+
+This encoder uses L<JSON::MaybeXS> to find a suitable JSON encoder. Please
+refer to the documentation of that module for details on how you can control
+which encoder to use.
+
+This class is unlikely to be of use outside the OTLP exporter.
+
+=head1 METHODS
+
+=head2 new
+
+    $encoder = OpenTelemetry::Exporter::OTLP::Encoder::JSON->new;
+
+Constructs a new instance of the OpenTelemetry::Exporter::OTLP::Encoder::JSON
+encoder. This method takes no arguments.
+
+=head2 encode
+
+    $encoded = $encoder->encode(\@spans);
+
+It takes a reference to a Perl data structure, and encodes it as appropriate
+for this encoder. In this case, it restructures the data to suit the OTLP
+schema, and runs it through L</serialise> before returning it.
+
+=head2 serialise
+
+    $serialised = $encoder->serialise($data);
+
+Takes a Perl data structure and returns it as serialised data according to
+the format used by this encoder. For this encoder, this returns the payload
+as a JSON string.
+
+=head2 content_type
+
+    $mime = $encoder->content_type;
+
+Returns the MIME type appropriate for the encoding used by this encoder,
+as a value suitable to be used as the Content-Type header in an HTTP request.
+For this encoder, this is equal to "application/json".
+
+=head1 SEE ALSO
+
+=over
+
+=item L<OpenTelemetry::Exporter::OTLP>
+
+=item L<The OTLP specification|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Special thanks to L<CV-Library Ltd.|https://cv-library.co.uk> for their
+support in the development of this library.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

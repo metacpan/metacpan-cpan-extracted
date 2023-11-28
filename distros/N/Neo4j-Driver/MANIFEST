@@ -35,6 +35,7 @@ lib/Neo4j/Driver/Type/Path.pm
 lib/Neo4j/Driver/Type/Point.pm
 lib/Neo4j/Driver/Type/Relationship.pm
 lib/Neo4j/Driver/Type/Temporal.pm
+lib/Neo4j/Driver/Types.pod
 t/bolt.t
 t/config.t
 t/deprecated.t

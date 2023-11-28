@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Software::License::Custom;
+package Software::License::Custom 0.104005;
 # ABSTRACT: custom license handler
-$Software::License::Custom::VERSION = '0.104004';
+
 use parent 'Software::License';
 
 use Carp;
@@ -213,7 +213,7 @@ Software::License::Custom - custom license handler
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 DESCRIPTION
 
@@ -362,7 +362,7 @@ version
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

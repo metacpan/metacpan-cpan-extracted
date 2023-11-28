@@ -7,12 +7,12 @@ build_requires:
   Crypt::OpenSSL::Guess: '0'
   Exporter: '0'
   File::Spec::Functions: '0'
+  File::Temp: '0'
   File::Which: '0'
   Import::Into: '0'
   Test::Exception: '0'
   Test::Lib: '0'
   Test::More: '0'
-  namespace::autoclean: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -25,7 +25,7 @@ name: XML-Sig
 provides:
   XML::Sig:
     file: lib/XML/Sig.pm
-    version: '0.64'
+    version: '0.65'
 requires:
   Carp: '0'
   Class::Accessor: '0'
@@ -50,7 +50,7 @@ requires:
 resources:
   bugtracker: https://github.com/perl-net-saml2/perl-XML-Sig/issues
   repository: git://github.com/perl-net-saml2/perl-XML-Sig.git
-version: '0.64'
+version: '0.65'
 x_contributors:
   - 'Byrne Reese <byrne@cpan.org>'
   - 'Chris Andrews <chris@nodnol.org>'
@@ -60,7 +60,7 @@ x_contributors:
   - 'Peter Marschall <peter@adpm.de>'
   - 'Michael Hendricks <michael@ndrix.org>'
   - 'Timothy Legge <timlegge@gmail.com>'
-x_generated_by_perl: v5.36.1
+x_generated_by_perl: v5.38.0
 x_maintainers:
   - 'Timothy Legge <timlegge@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.74'

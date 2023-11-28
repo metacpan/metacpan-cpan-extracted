@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use Carp qw(croak);
 use Config;
@@ -415,6 +415,7 @@ sub sanitize_stagingdir {
             else {
                 if (   $entry eq 'perllocal.pod'
                     || $entry eq '.packlist'
+                    || $entry =~ m{[.]la \z}xms
                     || ($entry =~ m{[.]bs \z}xms && -z $path))
                 {
                     if (!unlink $path) {
@@ -831,6 +832,7 @@ sub _get_dependencies {
         'Catalyst-Runtime' => sub {0},
         'CGI-Simple'       => sub {0},
         'DBD-Pg'           => sub { $self->_unnumify_version($_[0]) },
+        'Time-Local'       => sub {0},
     );
 
     my %dependency;
@@ -1217,7 +1219,7 @@ CPANPLUS::Dist::Debora::Package - Base class for package formats
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -1318,21 +1320,21 @@ Returns the last modification time of the source.
   my $builddir = $package->builddir;
 
 Returns the directory the source archive was extracted to, e.g.
-F<~/.cpanplus/5.34.0/build/XXXX/Some-Module-1.0>.
+F<~/.cpanplus/5.36.1/build/XXXX/Some-Module-1.0>.
 
 =head2 outputdir
 
   my $outputdir = $package->outputdir;
 
 Returns the build directory's parent directory, e.g.
-F<~/.cpanplus/5.34.0/build/XXXX>.
+F<~/.cpanplus/5.36.1/build/XXXX>.
 
 =head2 stagingdir
 
   my $stagingdir = $package->stagingdir;
 
 Returns the staging directory where CPANPLUS installs the Perl distribution,
-e.g. F<~/.cpanplus/5.34.0/build/XXXX/stagingYYYY>.
+e.g. F<~/.cpanplus/5.36.1/build/XXXX/stagingYYYY>.
 
 =head2 shared_objects
 
@@ -1555,8 +1557,6 @@ Some operating systems numify Perl distribution versions but not consistently.
 This module sticks closely to the version string, which seems to be the most
 common approach.
 
-This module cannot be used in taint mode.
-
 =head1 SEE ALSO
 
 L<CPANPLUS::Dist::Debora::Package::Debian>,
@@ -1572,7 +1572,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2023 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

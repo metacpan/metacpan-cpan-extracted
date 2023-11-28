@@ -501,7 +501,7 @@ METHODS - Internal
 
  execute_command
 
-    Queues or executes the given command.
+    Queues the given command for execution.
 
  ryu
 
@@ -610,6 +610,6 @@ CONTRIBUTORS
 
 LICENSE
 
-    Copyright Tom Molesworth and others 2015-2022. Licensed under the same
+    Copyright Tom Molesworth and others 2015-2023. Licensed under the same
     terms as Perl itself.
 

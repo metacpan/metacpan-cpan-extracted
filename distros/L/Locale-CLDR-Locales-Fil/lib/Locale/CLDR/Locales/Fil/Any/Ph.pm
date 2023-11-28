@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fil::Any::Ph - Package for language Filipino
 
 package Locale::CLDR::Locales::Fil::Any::Ph;
 # This file auto generated from Data\common\main\fil_PH.xml
-#	on Fri 13 Oct  9:16:06 am GMT
+#	on Sat  4 Nov  6:02:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

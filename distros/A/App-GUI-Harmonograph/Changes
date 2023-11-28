@@ -1,3 +1,27 @@
+0.71  2023-11-17  lichtkind
+-------
+    * = minor fix
+    * / simplified API to drawing board
+    * ! fix link in about dialog
+    * ! tiny bug in save status
+
+0.70  2023-11-05  lichtkind
+-------
+    * = minor fix
+    * ! append image file ending only if it really missing
+
+0.70  2023-11-05  lichtkind
+-------
+    * = cleanup cleanup release
+    * ' remove POD mentioning removed dialogs
+    * ' minor POD updates to recent changes
+    * ~ sketches also can draw dots if wanted
+    * ~ line checkbox also triggers new sketch (but colors still don't)
+    * ~ reopen recent menu has right order
+    * / remove some dead code
+    * ! dont use deleted dialogs
+    * ! all dialogs remember dir
+
 0.69  2023-10-31  lichtkind
 -------
     * = cleanup release
@@ -31,7 +55,7 @@
     * = mid feature release
     * configurable R pendulum rotation matrix
     * configurable computation variables for all major ops in mod matrix
-    + introdus radius damping for pendulum R
+    + introduce radius damping for pendulum R
 
 0.61  2023-09-30  lichtkind
 -------

@@ -516,7 +516,7 @@ sub new
 					}
 				}
 			}
-print STDERR "--Brighteon: okStreams=".join('|',@okStreams)."= channel=".$self->{'albumartist'}."=\n";
+			print STDERR "--Brighteon: okStreams=".join('|',@okStreams)."= channel=".$self->{'albumartist'}."=\n"  if ($DEBUG);
 			foreach my $streamtype (@okStreams) {
 				$streams = $savestreams;
 				if ($streamtype =~ /^stream$/i) {

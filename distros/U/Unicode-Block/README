@@ -3,32 +3,43 @@ NAME
 
 SYNOPSIS
      use Unicode::Block;
+
      my $obj = Unicode::Block->new(%parameters);
      my $item = $obj->next;
 
 METHODS
-    "new(%parameters)"
-            Constructor.
+  "new"
+     my $obj = Unicode::Block->new(%parameters);
 
-            *       "char_from"
+    Constructor.
 
-                     Character from.
-                     Default value is '0000'.
+    *       "char_from"
 
-            *       "char_to"
+            Character from.
 
-                     Character to.
-                     Default value is '007f'.
+            Default value is '0000'.
 
-            *       "title"
+    *       "char_to"
 
-                     Title of block.
-                     Default value is undef.
+            Character to.
 
-    "next()"
-             Get next character.
-             Returns Unicode::Block::Item object for character, if character exists.
-             Returns undef, if character doesn't exist.
+            Default value is '007f'.
+
+    *       "title"
+
+            Title of block.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "next"
+     my $item = $obj->next;
+
+    Get next character.
+
+    Returns Unicode::Block::Item object for character, if character exists.
+    Returns undef, if character doesn't exist.
 
 ERRORS
      new():
@@ -39,8 +50,8 @@ EXAMPLE
      use strict;
      use warnings;
 
-     use Encode qw(encode_utf8);
      use Unicode::Block;
+     use Unicode::UTF8 qw(encode_utf8);
 
      # Object.
      my $obj = Unicode::Block->new;
@@ -89,9 +100,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2013-2017 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2013-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

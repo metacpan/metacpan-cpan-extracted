@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '4.002'; # VERSION
+our $VERSION = '5.001'; # VERSION
 
 =head1 NAME
 
@@ -77,7 +77,7 @@ sub stream { shift->{stream} }
 
 sub on_close {
     my ($self) = @_;
-    $log->infof('Closing server connection');
+    $log->tracef('Connection to server closing');
     $self->server->client_disconnect($self);
 }
 
@@ -175,5 +175,5 @@ L<Net::Async::Redis/CONTRIBUTORS>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2022. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2023. Licensed under the same terms as Perl itself.
 

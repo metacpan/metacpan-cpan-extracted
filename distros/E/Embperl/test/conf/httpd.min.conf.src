@@ -1,6 +1,4 @@
 
-# $Id: httpd.min.conf.src 1571436 2014-02-24 20:55:11Z richter $
-
 $minstartup = $EPSTARTUP ;
 $minstartup =~ s/startup.pl/startup_dso.pl/ ;
 
@@ -20,8 +18,12 @@ Listen $EPPORT
 
 EOD
 
+print OFH "$EPMODPERL\n" ;
+
+print OFH "LoadModule embperl_module \"$EPPATH/blib/arch/auto/Embperl/Embperl.so\"\n" if ($MP2) ;
+
 if ($^O ne 'MSWin32')
-	{
+        {
 print OFH <<EOD ;
 
 User $EPUSER
@@ -36,11 +38,6 @@ MaxRequestsPerChild 0
 
 EOD
     }
-
-print OFH "$EPMODPERL\n" ;
-
-print OFH "LoadModule embperl_module \"$EPPATH/blib/arch/auto/Embperl/Embperl.so\"\n" if ($MP2) ;
-
 
 print OFH <<EOD ;
 ErrorLog tmp/httpd.err.log

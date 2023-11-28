@@ -5,21 +5,23 @@ App::Greple::xlate - translation support module for greple
 
 # SYNOPSIS
 
+    greple -Mxlate -e ENGINE --xlate pattern target-file
+
     greple -Mxlate::deepl --xlate pattern target-file
 
 # VERSION
 
-Version 0.25
+Version 0.28
 
 # DESCRIPTION
 
 **Greple** **xlate** module find text blocks and replace them by the
-translated text.  Currently only DeepL service is supported by the
-**xlate::deepl** module.
+translated text.  Currently DeepL (`deepl.pm`) and ChatGPT
+(`gpt3.pm`) module are implemeted as a back-end engine.
 
-If you want to translate normal text block in [pod](https://metacpan.org/pod/pod) style document,
-use **greple** command with `xlate::deepl` and `perl` module like
-this:
+If you want to translate normal text blocks written in the [pod](https://metacpan.org/pod/pod)
+style, use **greple** command with `xlate::deepl` and `perl` module
+like this:
 
     greple -Mxlate::deepl -Mperl --pod --re '^(\w.*\n)+' --all foo.pm
 
@@ -38,8 +40,8 @@ find and replace them by the **deepl** command output.
 
 By default, original and translated text is printed in the "conflict
 marker" format compatible with [git(1)](http://man.he.net/man1/git).  Using `ifdef` format, you
-can get desired part by [unifdef(1)](http://man.he.net/man1/unifdef) command easily.  Format can be
-specified by **--xlate-format** option.
+can get desired part by [unifdef(1)](http://man.he.net/man1/unifdef) command easily.  Output format
+can be specified by **--xlate-format** option.
 
 <div>
     <p>
@@ -47,9 +49,9 @@ specified by **--xlate-format** option.
     </p>
 </div>
 
-If you want to translate entire text, use **--match-all** option.
-This is a short-cut to specify the pattern matches entire text
-`(?s).+`.
+If you want to translate entire text, use **--match-all** option.  This
+is a short-cut to specify the pattern `(?s).+` which matches entire
+text.
 
 # OPTIONS
 
@@ -77,9 +79,9 @@ This is a short-cut to specify the pattern matches entire text
 
 - **--xlate-engine**=_engine_
 
-    Specify the translation engine to be used.  You don't have to use this
-    option because module `xlate::deepl` declares it as
-    `--xlate-engine=deepl`.
+    Specifies the translation engine to be used. If you specify the engine
+    module directly, such as `-Mxlate::deepl`, you do not need to use
+    this option.
 
 - **--xlate-labor**
 - **--xlabor**
@@ -139,9 +141,10 @@ This is a short-cut to specify the pattern matches entire text
 - **--xlate-maxlen**=_chars_ (Default: 0)
 
     Specify the maximum length of text to be sent to the API at once.
-    Default value is set as for free account service: 128K for the API
-    (**--xlate**) and 5000 for the clipboard interface (**--xlate-labor**).
-    You may be able to change these value if you are using Pro service.
+    Default value is set as for free DeepL account service: 128K for the
+    API (**--xlate**) and 5000 for the clipboard interface
+    (**--xlate-labor**).  You may be able to change these value if you are
+    using Pro service.
 
 - **--**\[**no-**\]**xlate-progress** (Default: True)
 
@@ -210,19 +213,43 @@ language invoking it with prefix argument.
 
     Set your authentication key for DeepL service.
 
+- OPENAI\_API\_KEY
+
+    OpenAI authentication key.
+
 # INSTALL
 
 ## CPANMINUS
 
     $ cpanm App::Greple::xlate
 
+## TOOLS
+
+You have to install command line tools for DeepL and ChatGPT.
+
+[https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
+
+[https://github.com/tecolicom/App-gpty](https://github.com/tecolicom/App-gpty)
+
 # SEE ALSO
 
 [App::Greple::xlate](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate)
 
+[App::Greple::xlate::deepl](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Adeepl)
+
+[App::Greple::xlate::gpt3](https://metacpan.org/pod/App%3A%3AGreple%3A%3Axlate%3A%3Agpt3)
+
 - [https://github.com/DeepLcom/deepl-python](https://github.com/DeepLcom/deepl-python)
 
     DeepL Python library and CLI command.
+
+- [https://github.com/openai/openai-python](https://github.com/openai/openai-python)
+
+    OpenAI Python Library
+
+- [https://github.com/tecolicom/App-gpty](https://github.com/tecolicom/App-gpty)
+
+    OpenAI command line interface
 
 - [App::Greple](https://metacpan.org/pod/App%3A%3AGreple)
 

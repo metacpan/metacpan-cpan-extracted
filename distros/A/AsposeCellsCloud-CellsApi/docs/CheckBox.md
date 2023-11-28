@@ -8,9 +8,9 @@ use AsposeCellsCloud::Object::CheckBox;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CheckedValue** | **string** |  |
-**Shadow** | **boolean** |  |
-**Value** | **boolean** |  |
+**CheckedValue** | **string** | Gets or set checkbox' value. |
+**Shadow** | **boolean** | Indicates whether the combobox has 3-D shading. |
+**Value** | **boolean** | Indicates if the checkbox is checked or not. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

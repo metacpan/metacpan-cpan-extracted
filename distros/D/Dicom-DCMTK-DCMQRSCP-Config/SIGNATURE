@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,46 +12,51 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 398d128d439b66ceb1811d28b299d26107b41983 Changes
-SHA1 2497df53875103a8a68356a0681324b29dda5ee6 Config.pm
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
-SHA1 77ec45008ce7e1d96e6b16bca9ec723bc62f5659 MANIFEST
-SHA1 cecd861fe4b88243baaf29e7e780e0bd35888b7d META.yml
-SHA1 2bae58808fa2a6380340dfc437a10a43c07680a5 Makefile.PL
-SHA1 9e82c54ea85899d9b68e5b31afdba64507dacfcd README
-SHA1 8211ffdbc766f0669c9f10838c77a13b11c3b35b doc/dcmqrcnf.txt
-SHA1 a2ce8b69f428c0abfc1b19436bde18385fe46fc9 examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 71985e896dba4f1f207d35541dda1afbe393b5a3 t/Dicom-DCMTK-DCMQRSCP-Config/01-use.t
-SHA1 9e6a1dc39769a0fdee838046ce57c805a84de901 t/Dicom-DCMTK-DCMQRSCP-Config/02-version.t
-SHA1 390712d657feb60e2b8f43d8c7e7df4e7a655fc6 t/Dicom-DCMTK-DCMQRSCP-Config/03-new.t
-SHA1 3e34a0424474a2366836f94e9e52b77914291597 t/Dicom-DCMTK-DCMQRSCP-Config/04-parse.t
-SHA1 249f6842aad644c5f3bde7fc76e9a3f9dbaafba5 t/Dicom-DCMTK-DCMQRSCP-Config/05-serialize.t
-SHA1 73085fd26eef2ab24860c4cd1213d75e185e7b9b t/data/ex1.conf
-SHA1 512967dccdd35e47bc5b76f4e9f1b316081cb61f t/data/ex2.conf
-SHA1 d3e6c58d8c1bd1479dee051a87a044ba4456e6b2 t/data/ex3.conf
-SHA1 38be8b791e0f43ee0fd351b2788560dc6b2278bb xt/Dicom-DCMTK-DCMQRSCP-Config/01-pod_coverage.t
-SHA1 ebdab77f9f54244b90eef000892f680f796e16a7 xt/Dicom-DCMTK-DCMQRSCP-Config/02-pod.t
+SHA256 f52eb0a1c411cb421401c9455b51e71233ba4e8ed9d1ca9a56ad1ebcf66dd554 Changes
+SHA256 bd148e5814b212ca71c0fe163c44da051159e8c1188350ba5aa00ceee132164a Config.pm
+SHA256 bb21e21e0f3e33f0870057aa51c2073bf720004b7848a58e997bbbef4ae5d653 LICENSE
+SHA256 2719cf902cbe198e273a31e47d5831070c57bd6c2c692b559bbbbf8bd7931d49 MANIFEST
+SHA256 7c35c25a68812d315e5af920f988c1bd9c92171a1f58e48ccf3b04bcf7a6cc44 META.yml
+SHA256 544f3def562419ad23133481380d95e1bb18bac2e66689892b6d787504efbd28 Makefile.PL
+SHA256 cb6feb3dd53aa641333a776a51a8561551cdc5e23c9cfffba98364a82cef9beb README
+SHA256 c2999b8e49e0c664ea97255cc86974052a8e19f83fbb0bfa60ce09e6e25f8da0 doc/dcmqrcnf.txt
+SHA256 6a32614ba7aa68ecd17dd26ebc5465325bd5d502cd9034d54b39f33a725e969b examples/serialize_example_config.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 3627383a4ef088de98d8a67faae8e879ddcf1221478b73d6bcfe57806b91d017 t/Dicom-DCMTK-DCMQRSCP-Config/01-use.t
+SHA256 09aad593225c48110dfda7a6e70d57841c6e7f3b5631b13e3219a226ffae0aee t/Dicom-DCMTK-DCMQRSCP-Config/02-version.t
+SHA256 1e5e7e2ee2411a385ed4e259fb9eda0d0d938a5859772fea1eee2fb043c62098 t/Dicom-DCMTK-DCMQRSCP-Config/03-new.t
+SHA256 7d83f97c188f78e29748ec4c182c30b496dad2c8749454d8a46359363fcd0c4d t/Dicom-DCMTK-DCMQRSCP-Config/04-parse.t
+SHA256 644bf27c6b28a5040fc71513da0bc13b3389f5c177d989e56aa432f31a1c6ade t/Dicom-DCMTK-DCMQRSCP-Config/05-serialize.t
+SHA256 1d4a7f7fa10ddd7032d7218f796050d0fa41cdf9b5b217cccfddfb9b32d9d9f8 t/data/ex1.conf
+SHA256 dae1c747124e52e36c4f9ae4875bf813ada9bded941eb17c70c87aa3ef6dea97 t/data/ex2.conf
+SHA256 f715f4f4d6f137b542b5d9464639ddfbc0af1823b297816dcf3a0739a141f083 t/data/ex3.conf
+SHA256 24ac48274f057f126c7cd6f186c1ede935aa514278e2056ad53bad10e6bcd958 xt/Dicom-DCMTK-DCMQRSCP-Config/01-pod_coverage.t
+SHA256 93e546800f7b7afff217bdb00e1946954fb5a22f728ba3334138df0b4b4d7833 xt/Dicom-DCMTK-DCMQRSCP-Config/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWFsH4AAoJEJe+XXKaIuTlIo0H/Aj3a9Wj6zc2bLxOOdSUS8lN
-oczuRMokSVJtqXokSsL9vaVa9Y8fTYCyKUniyMUgsVJRU5qVrmULa6Gf8YznKUdo
-qEUHaKzam8E0UZFQFsc08ENh7tCVhLQl0/od5AKpiVuf8bqevjuAE79btOrocYmS
-FJmOVos1Mj2+2ygEqnMjIeF7vGfrfGF+5B+tMdlwzm6VLAnLFosdd8ZL7/bxe2E9
-USKqQ0tVZ0EEyIUGbFnXuD81SA62x5IzGAUfMQ8lTjkzY90AxLuTJ+8tOZWFsgDT
-+WCzytnCOiRPTC5nuunlNGbpOHrYC3gXDMjzPQVqrFRTMSoE8xARxn49jmY2vyw=
-=vtkv
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVfMV0ACgkQojV9Rpe/
+B8uewg/+NImr5qUBZ6KZd/XitBDvWTZvkbJpEuSkqanHlsPkk4FWlcfbyCbEIWom
+R7yfsUULcuSayF1L2om3++/fKNimm5fHdY+P/1jMUBhH0e970vc5VfXQ02WBE5J9
+nZbfYlEjqgOCyFnEqGUujEWPFbwGEh2ouYssrZ3ixbUdulglzk/XIGalHvIrY0TI
+M2VndjjtJnWN0kWDf6VRgfcvng6zdtw0a2JYyCvDGtxqz/pSN7EcHK5nMATH+Juz
+pC+mzJJu9nS3+lfYadejWP3zZgCvGyAChAe0oDFknEJtTLMSWAtpISfSnti5ZVvU
+CmO5elf7e9hrw3e/TTs/JZn3fBnRjwON0ywIiK2ivokEYULpJPI9nPCAh3G0lGM0
+MIhh9qnhEAf7VC8dF8mTwuq3/9Dh5d2Ct+PFMufcPLbkU+7ufocunCwnxtJ6s3Ni
+BVIy3Hc5ECIkS9qJDtar8i99y3K3bUGe+FoiCOi/52sjSDYNWu1QHI5SHVhoDDW0
+3RZbqYNfSbAosIkzAg/oAvt2pxNBUNhptVTrz7sl8PqkVL4PKKBq6NYQc48sTKha
+RADLnJkYJdOhD8loanoOYSPTuPsYA3jaCkmeYoxed+OA+l64aSZRbZYPJCpB3umB
+TVgaNMtjDpaYfAZWjW8DulpzDzKUBqbM1bTRdztYEzTpqlgQD9Q=
+=V056
 -----END PGP SIGNATURE-----

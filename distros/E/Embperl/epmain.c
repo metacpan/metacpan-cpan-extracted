@@ -1,7 +1,8 @@
 /*###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -10,8 +11,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id: epmain.c 1578075 2014-03-16 14:01:14Z richter $
 #
 ###################################################################################*/
 
@@ -127,7 +126,7 @@ static char * DoLogError (/*i/o*/ struct tReq * r,
         case rcWriteErr:                msg ="[%d]ERR:  %d: %s File write Error%s%s" ; break ;
         case rcUnknownNameSpace:        msg ="[%d]ERR:  %d: %s Namespace %s unknown%s" ; break ;
         case rcInputNotSupported:       msg ="[%d]ERR:  %d: %s Input not supported in mod_perl mode%s%s" ; break ;
-        case rcCannotUsedRecursive:     msg ="[%d]ERR:  %d: %s Cannot be called recursivly in mod_perl mode%s%s" ; break ;
+        case rcCannotUsedRecursive:     msg ="[%d]ERR:  %d: %s Cannot be called recursively in mod_perl mode%s%s" ; break ;
         case rcEndtableWithoutTablerow: msg ="[%d]ERR:  %d: %s </tr> without <tr>%s%s" ; break ;
         case rcEndtextareaWithoutTextarea: msg ="[%d]ERR:  %d: %s </textarea> without <textarea>%s%s" ; break ;
         case rcEvalErr:                 msg ="[%d]ERR:  %d: %s Error in Perl code: %s%s" ; break ;
@@ -1506,8 +1505,8 @@ int     embperl_ExecuteRequest  (/*in*/ pTHX_
 #ifdef DMALLOC
 			    /* unsigned long mark, int not_freed_b, int freed_b, int details_b */
     dmalloc_log_changed (nMemCheckpoint, 1, 0, 1) ;
-    dmalloc_message ( "[%d]Request freed. Exit-SVs: %d -OBJs: %d\n", getpid(),
-	    sv_count, sv_objcount) ;
+    dmalloc_message ( "[%d]Request freed. Exit-SVs: %d\n", getpid(),
+	    sv_count) ;
     if (nMemCheckpoint2)
         {
         dmalloc_message ( "***TO PREVIOUS REQUEST***\n") ;

@@ -1,3 +1,4 @@
+.mailmap
 bin/hafas-m
 Build.PL
 Changelog
@@ -7,6 +8,7 @@ Dockerfile
 lib/Travel/Status/DE/DeutscheBahn.pm
 lib/Travel/Status/DE/HAFAS.pm
 lib/Travel/Status/DE/HAFAS/Journey.pm
+lib/Travel/Status/DE/HAFAS/Location.pm
 lib/Travel/Status/DE/HAFAS/Message.pm
 lib/Travel/Status/DE/HAFAS/Polyline.pm
 lib/Travel/Status/DE/HAFAS/Stop.pm

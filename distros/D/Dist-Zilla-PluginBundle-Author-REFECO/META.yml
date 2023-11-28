@@ -17,10 +17,19 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-PluginBundle-Author-REFECO
+provides:
+  Dist::Zilla::PluginBundle::Author::REFECO:
+    file: lib/Dist/Zilla/PluginBundle/Author/REFECO.pm
+    version: '0.006'
+requires:
+  Dist::Zilla: '6.030'
+  Moose: '2.2206'
+  namespace::clean: '0.27'
+  perl: v5.26.0
 resources:
   homepage: https://github.com/refeco/Dist-Zilla-PluginBundle-Author-REFECO
   repository: https://github.com/refeco/Dist-Zilla-PluginBundle-Author-REFECO.git
-version: '0.003'
+version: '0.006'
 x_authority: cpan:REFECO
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'

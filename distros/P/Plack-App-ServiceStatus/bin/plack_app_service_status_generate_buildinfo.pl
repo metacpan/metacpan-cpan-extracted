@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: Script to generate buildinfo.json for Plack::App::ServiceStatus
 # PODNAME: plack_app_service_status_generate_buildinfo.pl
-our $VERSION = '0.911'; # VERSION
+our $VERSION = '0.912'; # VERSION
 
 use POSIX qw(strftime);
 use Getopt::Long;
@@ -66,7 +66,7 @@ plack_app_service_status_generate_buildinfo.pl - Script to generate buildinfo.js
 
 =head1 VERSION
 
-version 0.911
+version 0.912
 
 =head1 SYNOPSIS
 

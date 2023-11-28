@@ -1,9 +1,11 @@
 package WWW::Mechanize::Chrome;
-use strict;
-use warnings;
-use Filter::signatures;
-no warnings 'experimental::signatures';
+use 5.020;
+
 use feature 'signatures';
+no warnings 'experimental::signatures';
+
+use feature 'current_sub';
+
 use PerlX::Maybe;
 use File::Spec;
 use HTTP::Response;
@@ -28,8 +30,11 @@ use Future::Utils 'repeat';
 use Time::HiRes ();
 use Encode 'encode';
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 our @CARP_NOT;
+
+# We don't yet inherit from Moo 2, so patch up things manually
+use parent 'MooX::Role::EventEmitter';
 
 # add Browser.setPermission , .grantPermission for
 # restricting/allowing recording, clipboard, idleDetection, ...
@@ -436,6 +441,7 @@ sub build_command_line {
     $program = File::Spec->rel2abs( $program ) || $program;
 
     $options->{ launch_arg } ||= [];
+    $options->{ exclude_switches } ||= [];
 
     # We want to read back the URL we can use to talk to Chrome
     if( $^O =~ /mswin/i ) {
@@ -485,8 +491,12 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--profile-directory=$profile";
     };
 
-    if( ! exists $options->{enable_automation} || $options->{enable_automation}) {
+    if( $options->{enable_automation}) {
         push @{ $options->{ launch_arg }}, "--enable-automation";
+    };
+
+    if( $options->{infobars}) {
+        push @{ $options->{ launch_arg }}, "--enable-infobars";
     };
 
     if( ! exists $options->{enable_first_run} || ! $options->{enable_first_run}) {
@@ -497,14 +507,18 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--mute-audio";
     };
 
+    if( ! exists $options->{default_browser_check} || $options->{default_browser_check}) {
+        push @{ $options->{ launch_arg }}, "--no-default-browser-check";
+    };
+
     my $no_sandbox = $options->{no_sandbox} || ! (exists $options->{no_zygote});
     if( ! $no_sandbox) {
         push @{ $options->{ launch_arg }}, "--no-zygote";
     };
 
-    if( $no_sandbox) {
-        push @{ $options->{ launch_arg }}, "--no-sandbox";
-    };
+    #if( $no_sandbox) {
+    #    push @{ $options->{ launch_arg }}, "--no-sandbox";
+    #};
 
     if( $options->{hide_scrollbars}) {
         push @{ $options->{ launch_arg }}, "--hide-scrollbars";
@@ -516,10 +530,6 @@ sub build_command_line {
         push @{ $options->{ launch_arg }}, "--safebrowsing-disable-auto-update";
     };
 
-    if( ! exists $options->{default_browser_check} || ! $options->{default_browser_check}) {
-        push @{ $options->{ launch_arg }}, "--no-default-browser-check";
-    };
-
     if( exists $options->{disable_prompt_on_repost}) {
         carp "Option 'disable_prompt_on_repost' is deprecated, use prompt_on_repost instead";
         $options->{prompt_on_repost} = !$options->{disable_prompt_on_repost};
@@ -527,17 +537,23 @@ sub build_command_line {
 
     for my $option (qw(
         background_networking
+        background_timer_throttling
+        backgrounding_occluded_windows
         breakpad
+        default_apps
+        dev_shm_usage
+        domain_reliability
+        gpu
+        ipc_flooding_protection
         client_side_phishing_detection
         component_update
         hang_monitor
-        prompt_on_repost
-        sync
-        web_resources
-        default_apps
         popup_blocking
-        gpu
-        domain_reliability
+        prompt_on_repost
+        renderer_backgrounding
+        sync
+        translate
+        web_resources
     )) {
         (my $optname = $option) =~ s!_!-!g;
         if( ! exists $options->{$option}) {
@@ -550,8 +566,18 @@ sub build_command_line {
     push @{ $options->{ launch_arg }}, "--headless"
         if $options->{ headless };
 
-    push @{ $options->{ launch_arg }}, "$options->{start_url}"
-        if exists $options->{start_url};
+    if( $options->{ app } ) {
+        $options->{start_url} //= 'data:text/html,<html></html>';
+        push @{ $options->{ launch_arg }}, "--app=$options->{start_url}";
+
+    } elsif( exists $options->{start_url}) {
+        push @{ $options->{ launch_arg }}, "$options->{start_url}"
+            ;
+    }
+
+    if( @{ $options->{exclude_switches}}) {
+        push @{ $options->{ launch_arg }}, "--exclude-switches=" . join ",", @{ $options->{exclude_switches }}
+    }
 
     my $quoted_program = ($^O =~ /mswin/i and $program =~ /[\s|<>&]/)
         ?  qq("$program")
@@ -806,8 +832,8 @@ sub spawn_child( $self, $method, @cmd ) {
     return ($pid,$to_chrome,$from_chrome, $chrome_stdout)
 }
 
-sub read_devtools_url( $self, $fh, $lines = 10 ) {
-    # We expect the output within the first 10 lines...
+sub read_devtools_url( $self, $fh, $lines = 50 ) {
+    # We expect the output within the first 50 lines...
     my $devtools_url;
 
     while( $lines-- and ! defined $devtools_url and ! eof($fh)) {
@@ -833,7 +859,7 @@ sub _build_log( $self ) {
 
 # The generation of node ids
 sub _generation( $self, $val=undef ) {
-    @_ == 2 and $self->{_generation} = $_[1];
+    if( defined $val ) { $self->{_generation} = $val; };
     $self->{_generation}
 };
 
@@ -1147,6 +1173,8 @@ sub _connect( $self, %options ) {
             #$self->target->send_message('Debugger.enable'), # capture "script compiled" messages
             $s->set_download_directory_future($self->{download_directory}),
 
+            $s->_listen_for_popup_f(1),
+
             keys %{$options{ extra_headers }} ? $s->_set_extra_headers_future( %{$options{ extra_headers }} ) : (),
 
             # do a dummy search so no nodeId 0 gets used (?!)
@@ -1389,6 +1417,7 @@ sub new_tab_future( $self, %options ) {
         headless         => $self->{headless},
         driver           => $self->driver,
         driver_transport => $self->transport,
+        autoclose_tab    => 1,
     );
 }
 
@@ -1396,10 +1425,12 @@ sub new_tab( $self, %options ) {
     $self->new_tab_future( %options )->get
 };
 
-=head2 C<< $mech->on_popup >>
+=head1 EVENTS
+
+=head2 C<< popup >>
 
     my $opened;
-    $mech->on_popup(sub( $tab_f ) {
+    $mech->on( 'popup' => sub( $mech, $tab_f ) {
         # This is a bit heavyweight, but ...
         $tab_f->on_done(sub($tab) {
             say "New window/tab was popped up:";
@@ -1417,14 +1448,15 @@ sub new_tab( $self, %options ) {
         say "Did not find new tab?";
     };
 
-Callback whenever a new tab/window gets popped up or created. The callback
-is handed a complete WWW::Mechanize::Chrome instance. Note that depending on
-your event loop, you are quite restricted on what synchronous methods you can
-call from within the callback.
+This event is sent whenever a new tab/window gets popped up or created. The
+callback is handed the current and a second WWW::Mechanize::Chrome instance.
+Note that depending on your event loop, you are quite restricted on what
+synchronous methods you can call from within the callback.
 
 =cut
 
-sub on_popup( $self, $popup ) {
+sub _listen_for_popup_f( $self, $popup ) {
+    my $res;
     if( $popup ) {
         # Remember all known targets, because setDiscoverTargets will list all
         # existing targets too :-/
@@ -1434,28 +1466,32 @@ sub on_popup( $self, $popup ) {
             Future->done(1);
         });
 
+        weaken( my $s = $self );
         $self->{target_created} = $self->add_listener('Target.targetCreated' => sub($targetInfo) {
-            #use Data::Dumper; warn Dumper $targetInfo;
-            my $id = $targetInfo->{params}->{targetInfo}->{targetId};
-            if( $targetInfo->{params}->{targetInfo}->{type} eq 'page'
-                && ! $known_targets{ $id }
-            ) {
-                # use Data::Dumper; warn "--- New target"; warn Dumper $targetInfo;
-                my $tab = $self->new_tab_future( tab => $targetInfo->{params}->{targetInfo});
-                $popup->($tab);
-            } else {
-                # warn "...- already know it";
+
+            if( $s && $s->has_subscribers('popup') ) {
+                #use Data::Dumper; warn Dumper $targetInfo;
+                my $id = $targetInfo->{params}->{targetInfo}->{targetId};
+                if( $targetInfo->{params}->{targetInfo}->{type} eq 'page'
+                    && ! $known_targets{ $id }
+                ) {
+                    my $tab = $s->new_tab_future( tab => $targetInfo->{params}->{targetInfo});
+                    $s->emit('popup', $tab);
+                } else {
+                    # warn "...- already know it";
+                };
             };
         });
 
-        weaken( my $s = $self );
-        $setup->then(sub {
+        $res = $setup->then(sub {
             $s->target->send_message('Target.setDiscoverTargets' => discover => JSON::true() )
-        })->get;
+        });
     } else {
-        $self->target->send_message('Target.setDiscoverTargets' => discover => JSON::false() )->get;
+        $res = $self->target->send_message('Target.setDiscoverTargets' => discover => JSON::false() );
         delete $self->{target_created};
     };
+
+    return $res
 };
 
 sub autodie {
@@ -2003,7 +2039,7 @@ sub kill_child( $self, $signal, $pid, $wait_file ) {
         undef $!;
         if( ! kill $signal => $pid ) {
             # The child already has gone away?!
-            warn "Couldn't kill browser child process $pid with $_[0]->{cleanup_signal}: $!";
+            warn "Couldn't kill browser child process $pid with $self->{cleanup_signal}: $!";
             # Gobble up any exit status
             warn waitpid -1, WNOHANG;
         } else {
@@ -2163,13 +2199,13 @@ sub _collectEvents( $self, @info ) {
     my $done = $self->target->future;
     my $s = $self;
     weaken $s;
-    $self->target->on_message( sub( $message ) {
+    $self->target->on( 'message' => sub( $target, $message ) {
         push @events, $message;
         if( $predicate->( $events[-1] )) {
             my $frameId = $events[-1]->{params}->{frameId};
             $s->log( 'debug', "Received final message, unwinding", sprintf "(%s)", $frameId || '-');
             $s->log( 'trace', "Received final message, unwinding", $events[-1] );
-            $s->target->on_message( undef );
+            $target->unsubscribe('message', __SUB__);
             $done->done( @info, @events );
         };
     });
@@ -3467,7 +3503,7 @@ sub base {
     my ($self) = @_;
     (my $base) = $self->selector('base');
     $base = $base->get_attribute('href', live => 1)
-        if $base;
+        if $base && defined ($base->{nodeId});
     $base ||= $self->uri;
 };
 
@@ -5698,7 +5734,8 @@ L<< /$mech->xpath|xpath >> or L<< /$mech->selector|selector >> method.
 
 =cut
 
-sub is_visible ( $self, @ ) {
+sub is_visible {
+    my( $self, @args ) = @_;
     my %options;
     if (2 == @_) {
         ($self,$options{dom}) = @_;
@@ -5809,7 +5846,8 @@ passing the selector.
 
 =cut
 
-sub wait_until_invisible( $self, %options ) {
+sub wait_until_invisible {
+    my( $self, %options );
     if (2 == @_) {
         ($self,$options{dom}) = @_;
     } else {

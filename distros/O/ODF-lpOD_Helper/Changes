@@ -1,3 +1,5 @@
+6.009 - Fix typo (caught only with older Perls)
+6.008 - Add hyperlink suport
 6.007 - Provide FRAME_FILTER & SPAN_FILTER (not exported by default)
 6.006 - Make fmt_node() return characters even in :bytes mode.
 6.005 - dumpodf --help improved.  ODF::ODF_Helper Documentation tweaks.

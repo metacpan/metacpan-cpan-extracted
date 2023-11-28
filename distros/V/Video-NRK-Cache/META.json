@@ -28,9 +28,9 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::Long" : "2.33",
+            "IO::Socket::SSL" : "1.56",
+            "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
-            "Pod::Usage" : "0",
             "perl" : "v5.37.9"
          }
       },
@@ -45,23 +45,23 @@
    "provides" : {
       "Video::NRK::Cache" : {
          "file" : "lib/Video/NRK/Cache.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Video::NRK::Cache::ProgramId" : {
          "file" : "lib/Video/NRK/Cache/ProgramId.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Video::NRK::Cache::Store" : {
          "file" : "lib/Video/NRK/Cache/Store.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Video::NRK::Cache::Ytdl" : {
          "file" : "lib/Video/NRK/Cache/Ytdl.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       },
       "Video::NRK::Cache::Ytdlp" : {
          "file" : "lib/Video/NRK/Cache/Ytdlp.pm",
-         "version" : "3.00"
+         "version" : "3.01"
       }
    },
    "release_status" : "stable",
@@ -75,9 +75,9 @@
          "web" : "https://github.com/johannessen/nrkcache"
       }
    },
-   "version" : "3.00",
-   "x_generated_by_perl" : "v5.37.9",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "version" : "3.01",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "CC0-1.0"
 }
 

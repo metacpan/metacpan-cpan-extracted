@@ -1,29 +1,31 @@
- ## no critic: TestingAndDebugging::RequireUseStrict
- package TableDataRole::Spec::Basic;
+## no critic: TestingAndDebugging::RequireUseStrict
+package TableDataRole::Spec::Basic;
 
 use Role::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-04-19'; # DATE
+our $DATE = '2023-11-25'; # DATE
 our $DIST = 'TableData'; # DIST
-our $VERSION = '0.2.3'; # VERSION
+our $VERSION = '0.2.6'; # VERSION
 
-# constructor
+### constructor
+
 requires 'new';
 
-# mixin
+### mixins
+
 with 'Role::TinyCommons::Iterator::Resettable';
 
-# additional method names to return hashref
+### additional method names to return hashref
+
 requires 'get_next_row_hashref';
 
-# column information
+### column information
+
 requires 'get_column_count';
 requires 'get_column_names';
 
-###
-
-# aliases, for convenience and clarity
+### aliases, for convenience and clarity
 
 sub has_next_row {
     my $self = shift;
@@ -76,6 +78,28 @@ sub each_row_hashref {
     return 1;
 }
 
+sub convert_row_arrayref_to_hashref {
+    my ($self, $row_arrayref) = @_;
+
+    my $row_hashref = {};
+    my @column_names = $self->get_column_names;
+    for my $i (0 .. $#column_names) {
+        $row_hashref->{ $column_names[$i] } = $row_arrayref->[$i];
+    }
+    $row_hashref;
+}
+
+sub convert_row_hashref_to_arrayref {
+    my ($self, $row_hashref) = @_;
+
+    my $row_arrayref = [];
+    my @column_names = $self->get_column_names;
+    for my $i (0 .. $#column_names) {
+        $row_arrayref->[$i] = $row_hashref->{ $column_names[$i] };
+    }
+    $row_arrayref;
+}
+
 1;
 # ABSTRACT: Basic interface for all TableData::* modules
 
@@ -91,7 +115,7 @@ TableDataRole::Spec::Basic - Basic interface for all TableData::* modules
 
 =head1 VERSION
 
-This document describes version 0.2.3 of TableDataRole::Spec::Basic (from Perl distribution TableData), released on 2023-04-19.
+This document describes version 0.2.6 of TableDataRole::Spec::Basic (from Perl distribution TableData), released on 2023-11-25.
 
 =head1 DESCRIPTION
 
@@ -99,27 +123,34 @@ C<TableData::*> modules let you iterate rows using a resettable iterator
 interface (L<Role::TinyCommons::Iterator::Resettable>). They also let you get
 information about the columns.
 
- category                     method name                note
- --------                     -----------                -------
- instantiating                new(%args)
+ category                     method name                note                        modifies iterator?
+ --------                     -----------                -------                     ------------------
+ instantiating                new(%args)                                             N/A
 
- iterating rows               has_next_item()
-                              has_next_row()             Alias for has_next_item()
-                              get_next_item()
-                              get_next_row_arrayref()    Alias for get_next_item()
-                              get_next_row_hashref()
-                              reset_iterator()
+ iterating rows               has_next_item()                                        no
+                              has_next_row()             Alias for has_next_item()   no
+                              get_next_item()                                        yes (moves forward 1 position)
+                              get_next_row_arrayref()    Alias for get_next_item()   yes (moves forward 1 position)
+                              get_next_row_hashref()                                 yes *moves forward 1 position)
+                              reset_iterator()                                       yes (resets)
 
- iterating rows (alt)         each_item()
-                              each_row_arrayref()        Alias for each_item()
-                              each_row_hashref()
+ iterating rows (alt)         each_item()                                            yes (resets)
+                              each_row_arrayref()        Alias for each_item()       yes (resets)
+                              each_row_hashref()                                     yes (resets)
 
- getting all rows             get_all_items()
-                              get_all_rows_arrayref()    Alias for get_all_items()
-                              get_all_rows_hashref()
+ getting all rows             get_all_items()                                        yes (resets)
+                              get_all_rows_arrayref()    Alias for get_all_items()   yes (resets)
+                              get_all_rows_hashref()                                 yes (resets)
 
- getting column information   get_column_names()
-                              get_column_count()
+ getting row count            get_item_count()                                       yes (resets) / no (for some implementations)
+                              get_row_count()            Alias for get_item_count()  yes (resets) / no (for some implementations)
+
+ getting column information   get_column_names()                                     no
+                              get_column_count()                                     no
+
+
+ utility: convert row format  convert_row_arrayref_to_hashref()                      no
+                              convert_row_hashref_to_arrayref()                      no
 
 =head1 REQUIRED METHODS
 
@@ -188,6 +219,8 @@ Must return the number of columns of the table.
 
 All tables must have finite number of columns.
 
+Should not reset iterator.
+
 =head2 get_column_names
 
 Usage:
@@ -198,6 +231,8 @@ Usage:
 Must return a list (or arrayref) containing the names of columns, ordered. For
 ease of use, when in list context the method must return a list, and in scalar
 context must return an arrayref.
+
+Should not reset iterator.
 
 =head1 PROVIDED METHODS
 
@@ -321,6 +356,18 @@ Basically:
  return 1;
 
 See also L</each_row_arrayref> (a.k.a. L</each_item>).
+
+=head2 convert_row_arrayref_to_hashref
+
+Usage:
+
+ my $row_hashref = $td->convert_row_arrayref_to_hashref($row_arrayref);
+
+=head2 convert_row_hashref_to_arrayref
+
+Usage:
+
+ my $row_arrayref = $td->convert_row_hashref_to_arrayref($row_hashref);
 
 =head1 HOMEPAGE
 

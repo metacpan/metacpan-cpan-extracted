@@ -1,5 +1,26 @@
 Revision history for XML-Sig
 
+0.65 -- Tue Nov 21 18:35:23 AST 2023
+
+  [Notable Changes since 0.64]
+  Mostly minor fixes to the test suite.
+  Change to how a Signature is added to the signed document to improve compatibility
+
+  - 58b41bb Remove eol spaces
+  - 57d1835 Skip xmlsec1 tests for sha1 digests or signature algorithms if sha1 is disabled
+  - 496d413 Add test for fix_namespace
+  - e03af99 Change how the Signature is added to a signed document
+              The namespace xmlns:dsig="http://www.w3.org/2000/09/xmldsig#"
+              should be kept at the Signature level not moved to the Signed tag
+  - 3442140 Remove unused code
+  - 3243b61 Remove useless signing test
+  - 23a688d Fix developer test for t/008-sign_saml.t
+  - 5084ea4 Remove namespace::autoclean
+  - 6ff436d Run CI with Net::SAML2 install
+  - ee583a2 Add Coveralls to XML::Sig
+  - c70914b Update testsuite
+  - f1b8710 v0.64
+
 0.64 -- Mon Jun 26 19:02:28 ADT 2023
 
   [Notable Changes since 0.64]

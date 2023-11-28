@@ -1,9 +1,8 @@
 use strict;
 use warnings;
-use 5.006; # warnings
-package Software::License;
+package Software::License 0.104005;
 # ABSTRACT: packages that provide templated software licenses
-$Software::License::VERSION = '0.104004';
+
 use Data::Section -setup => { header_re => qr/\A__([^_]+)__\Z/ };
 use Text::Template ();
 
@@ -54,7 +53,7 @@ sub new {
 #pod
 #pod =cut
 
-sub year   { defined $_[0]->{year} ? $_[0]->{year} : (localtime)[5]+1900 }
+sub year   { $_[0]->{year} // (localtime)[5]+1900 }
 sub holder { $_[0]->{holder}     }
 
 sub _dotless_holder {
@@ -269,7 +268,7 @@ Software::License - packages that provide templated software licenses
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 SYNOPSIS
 
@@ -556,11 +555,11 @@ to Software::License.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Justin Baker Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia Marcel Telka mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Petr Písař Shlomi Fish srchulo Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
+=for stopwords Alex Kapranoff Andrew Grangaard Axel Beckert Bernardo Rechea Bernhard Amann bowtie Brian Cassidy Phillips Craig Scrivner Curtis Brandt Dave Rolsky David E. Wheeler Golden Dominique Dumont Dylan William Hardison Flavio Poletti Florian Ragwitz Graham Knop Justin Baker Kang-min Liu Karen Etheridge Kenichi Ishigaki Kivanc Yazan Leon Timmermans magnolia Marcel Telka mikegrb Neil Bowers Nicolas Rochelemagne Olivier Mengué Pablo Rodríguez González Petr Písař Ricardo Signes Shlomi Fish srchulo Syohei YOSHIDA Tomasz Konojacki Van de Bugger Wesley Schwengle
 
 =over 4
 
@@ -691,6 +690,10 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 =item *
 
 Petr Písař <ppisar@redhat.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

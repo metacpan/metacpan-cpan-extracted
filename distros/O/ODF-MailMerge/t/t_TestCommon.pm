@@ -245,12 +245,19 @@ sub string_to_tempfile($@) {
 #        Otherwise wide chars will be corrupted
 #
 #
+require Carp::Always;
 sub run_perlscript(@) {
   my @tfs; # keep in scope until no longer needed
   my @perlargs = ("-CIOE", @_);
   @perlargs = ((map{ "-I$_" } @INC), @perlargs);
-  unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
-  unshift @perlargs, "-MCarp::Always=verbose" if $Carp::Always::Verbose;
+  #unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
+  #unshift @perlargs, "-MCarp::Always=verbose" if $Carp::Always::Verbose;
+
+  # For unknown reason some smokers running older perls die with
+  # "...undef value as a subroutine reference at site_perl/5.20.3/TAP/Harness.pm line 612
+  # So trying to see what is happening...
+  unshift @perlargs, "-MCarp::Always=verbose";
+
   if ($^O eq "MSWin32") {
     for (my $ix=0; $ix <= $#perlargs; $ix++) {
       if ($perlargs[$ix] =~ /^-(w?)([Ee])$/) {

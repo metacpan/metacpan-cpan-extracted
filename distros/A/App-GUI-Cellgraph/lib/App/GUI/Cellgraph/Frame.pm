@@ -15,8 +15,6 @@ use App::GUI::Cellgraph::Frame::Panel::Rules;
 use App::GUI::Cellgraph::Frame::Panel::Mobile;
 use App::GUI::Cellgraph::Frame::Panel::Color;
 use App::GUI::Cellgraph::Frame::Part::Board;
-use App::GUI::Cellgraph::Dialog::Function;
-use App::GUI::Cellgraph::Dialog::Interface;
 use App::GUI::Cellgraph::Dialog::About;
 use App::GUI::Cellgraph::Settings;
 use App::GUI::Cellgraph::Config;
@@ -28,6 +26,7 @@ sub new {
     $self->CreateStatusBar( 1 );
     #$self->SetStatusWidths(2, 800, 100);
     Wx::InitAllImageHandlers();
+    $self->{'title'} = $title;
     $self->{'config'} = App::GUI::Cellgraph::Config->new();
     $self->{'img_size'} = 700;
     $self->{'img_format'} = 'png';
@@ -50,8 +49,6 @@ sub new {
 
     $self->{'board'}               = App::GUI::Cellgraph::Frame::Part::Board->new( $self , 800, 800 );
     $self->{'dialog'}{'about'}     = App::GUI::Cellgraph::Dialog::About->new();
-    # $self->{'dialog'}{'interface'} = App::GUI::Cellgraph::Dialog::Interface->new();
-    # $self->{'dialog'}{'function'}  = App::GUI::Cellgraph::Dialog::Function->new();
     $self->{'btn'}{'draw'} = $self->{'btn'}{'draw'}      = Wx::Button->new( $self, -1, '&Draw', [-1,-1],[50, 40] );
 
     Wx::Event::EVT_AUINOTEBOOK_PAGE_CHANGED( $self, $self->{'tabs'}, sub {
@@ -89,14 +86,12 @@ sub new {
 
 
     my $image_menu = Wx::Menu->new();
-    # $image_menu->Append( 12300, "&Draw\tCtrl+D", "complete a sketch drawing" );
+    $image_menu->Append( 12300, "&Draw\tCtrl+D", "complete a sketch drawing" );
     $image_menu->Append( 12100, "S&ize",  $image_size_menu,   "set image size" );
     $image_menu->Append( 12400, "&Save\tCtrl+S", "save currently displayed image" );
 
 
     my $help_menu = Wx::Menu->new();
-    #$help_menu->Append( 13100, "&Function\tAlt+F", "Dialog with information how an Cellgraph works" );
-    #$help_menu->Append( 13200, "&Knobs\tAlt+K", "Dialog explaining the layout and function of knobs" );
     $help_menu->Append( 13300, "&About\tAlt+A", "Dialog with general information about the program" );
 
     my $menu_bar = Wx::MenuBar->new();
@@ -111,8 +106,6 @@ sub new {
     Wx::Event::EVT_MENU( $self, 11500, sub { $self->Close });
     Wx::Event::EVT_MENU( $self, 12300, sub { $self->draw });
     Wx::Event::EVT_MENU( $self, 12400, sub { $self->save_image_dialog });
-    Wx::Event::EVT_MENU( $self, 13100, sub { $self->{'dialog'}{'function'}->ShowModal });
-    Wx::Event::EVT_MENU( $self, 13200, sub { $self->{'dialog'}{'interface'}->ShowModal });
     Wx::Event::EVT_MENU( $self, 13300, sub { $self->{'dialog'}{'about'}->ShowModal });
 
     my $std_attr = &Wx::wxALIGN_LEFT|&Wx::wxGROW|&Wx::wxALIGN_CENTER_HORIZONTAL;
@@ -140,7 +133,7 @@ sub new {
     $setting_sizer->AddSpacer(5);
     $setting_sizer->Add( $cmd_sizer,      0,  0, 0);
     $setting_sizer->AddSpacer(5);
-    #$setting_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
+    # $setting_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $main_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     $main_sizer->Add( $board_sizer, 0, &Wx::wxEXPAND, 0);
@@ -154,17 +147,35 @@ sub new {
     $self->SetMinSize($size);
     $self->SetMaxSize($size);
 
+    $self->update_recent_settings_menu();
     $self->init();
     $self->SetStatusText( "settings in init state", 0 );
     $self->{'last_file_settings'} = $self->get_settings;
     $self;
 }
 
+sub update_recent_settings_menu {
+    my ($self) = @_;
+    my $recent = $self->{'config'}->get_value('last_settings');
+    return unless ref $recent eq 'ARRAY';
+    my $set_menu_ID = 11300;
+    $self->{'setting_menu'}->Destroy( $set_menu_ID );
+    my $Recent_ID = $set_menu_ID + 1;
+    $self->{'recent_menu'} = Wx::Menu->new();
+    for (reverse @$recent){
+        my $path = $_;
+        $self->{'recent_menu'}->Append($Recent_ID, $path);
+        Wx::Event::EVT_MENU( $self, $Recent_ID++, sub { $self->open_setting_file( $path ) });
+    }
+    $self->{'setting_menu'}->Insert( 2, $set_menu_ID, '&Recent', $self->{'recent_menu'}, 'recently saved settings' );
+}
+
 sub init {
     my ($self) = @_;
     $self->{'panel'}{ $_ }->init() for @{$self->{'panel_names'}};
-    $self->draw( );
+    $self->sketch( );
     $self->SetStatusText( "all settings are set to default", 0);
+    $self->set_settings_save(1);
 }
 
 sub get_settings {
@@ -178,6 +189,12 @@ sub set_settings {
     $self->{'panel'}{ $_ }->set_settings( $settings->{ $_ } ) for @{$self->{'panel_names'}};
     $self->spread_setting_changes;
     $self->{'panel'}{ $_ }->set_settings( $settings->{ $_ } ) for @{$self->{'panel_names'}};
+}
+
+sub set_settings_save {
+    my ($self, $status)  = @_;
+    $self->{'saved'} = $status;
+    $self->SetTitle( $self->{'title'} .($self->{'saved'} ? '': ' *'));
 }
 
 sub spread_setting_changes {
@@ -196,6 +213,7 @@ sub sketch {
     $self->spread_setting_changes();
     $self->{'board'}->sketch( $self->get_settings );
     $self->{'progress'}->reset;
+    $self->set_settings_save( 0 );
 }
 
 sub draw {
@@ -207,7 +225,7 @@ sub draw {
 
 sub open_settings_dialog {
     my ($self) = @_;
-    my $dialog = Wx::FileDialog->new ( $self, "Select a settings file to load", '.', '',
+    my $dialog = Wx::FileDialog->new ( $self, "Select a settings file to load", $self->{'config'}->get_value('open_dir'), '',
                    ( join '|', 'INI files (*.ini)|*.ini', 'All files (*.*)|*.*' ), &Wx::wxFD_OPEN );
     return if $dialog->ShowModal == &Wx::wxID_CANCEL;
     my $path = $dialog->GetPath;
@@ -215,13 +233,14 @@ sub open_settings_dialog {
     if (not ref $ret) { $self->SetStatusText( $ret, 0) }
     else {
         my $dir = App::GUI::Cellgraph::Settings::extract_dir( $path );
+        $self->{'config'}->set_value('open_dir', $dir);
         $self->SetStatusText( "loaded settings from ".$dialog->GetPath, 0);
     }
 }
 
 sub write_settings_dialog {
     my ($self) = @_;
-    my $dialog = Wx::FileDialog->new ( $self, "Select a file name to store data", '.', '',
+    my $dialog = Wx::FileDialog->new ( $self, "Select a file name to store data", $self->{'config'}->get_value('write_dir'), '',
                ( join '|', 'INI files (*.ini)|*.ini', 'All files (*.*)|*.*' ), &Wx::wxFD_SAVE );
     return if $dialog->ShowModal == &Wx::wxID_CANCEL;
     my $path = $dialog->GetPath;
@@ -232,26 +251,38 @@ sub write_settings_dialog {
               Wx::MessageDialog->new( $self, "\n\nReally overwrite the settings file?", 'Confirmation Question',
                                       &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
     $self->write_settings_file( $path );
-    #~ my $dir = App::GUI::Cellgraph::Settings::extract_dir( $path );
-    #~ $self->{'config'}->set_value('write_dir', $dir);
+    $self->update_recent_settings_menu();
+    my $dir = App::GUI::Cellgraph::Settings::extract_dir( $path );
+    $self->{'config'}->set_value('write_dir', $dir);
 }
 
 sub save_image_dialog {
     my ($self) = @_;
     my @wildcard = ( 'SVG files (*.svg)|*.svg', 'PNG files (*.png)|*.png', 'JPEG files (*.jpg)|*.jpg');
     my $wildcard = '|All files (*.*)|*.*';
-    $wildcard = ( join '|', @wildcard[1,0,2]) . $wildcard;
+    my $default_ending = $self->{'config'}->get_value('file_base_ending');
+    $wildcard = ($default_ending eq 'jpg') ? ( join '|', @wildcard[2,1,0]) . $wildcard :
+                ($default_ending eq 'png') ? ( join '|', @wildcard[1,0,2]) . $wildcard :
+                                             ( join '|', @wildcard[0,1,2]) . $wildcard ;
+    my @wildcard_ending = ($default_ending eq 'jpg') ? (qw/jpg png svg/) :
+                          ($default_ending eq 'png') ? (qw/png svg jpg/) :
+                                                       (qw/svg jpg png/) ;
 
-    my $dialog = Wx::FileDialog->new ( $self, "select a file name to save image", '.', '', $wildcard, &Wx::wxFD_SAVE );
+    my $dialog = Wx::FileDialog->new ( $self, "select a file name to save image", $self->{'config'}->get_value('save_dir'), '', $wildcard, &Wx::wxFD_SAVE );
     return if $dialog->ShowModal == &Wx::wxID_CANCEL;
     my $path = $dialog->GetPath;
     return if -e $path and
               Wx::MessageDialog->new( $self, "\n\nReally overwrite the image file?", 'Confirmation Question',
                                       &Wx::wxYES_NO | &Wx::wxICON_QUESTION )->ShowModal() != &Wx::wxID_YES;
+    my $file_ending = lc substr ($path, -4);
+    unless ($dialog->GetFilterIndex == 3 or # filter set to all endings
+            ($file_ending eq '.jpg' or $file_ending eq '.png' or $file_ending eq '.svg')){
+            $path .= '.' . $wildcard_ending[$dialog->GetFilterIndex];
+    }
     my $ret = $self->write_image( $path );
     if ($ret){ $self->SetStatusText( $ret, 0 ) }
+    else     { $self->{'config'}->set_value('save_dir', App::GUI::Cellgraph::Settings::extract_dir( $path )) }
 }
-
 
 sub open_setting_file {
     my ($self, $file ) = @_;
@@ -259,29 +290,15 @@ sub open_setting_file {
     if (ref $settings) {
         $self->set_settings( $settings );
         $self->draw;
-        my $dir = App::GUI::Cellgraph::Settings::extract_dir( $file );
         $self->SetStatusText( "loaded settings from ".$file, 0) ;
+        my $dir = App::GUI::Cellgraph::Settings::extract_dir( $file );
+        $self->{'config'}->add_setting_file( $file ); # remember file in recents menu
         $self->update_recent_settings_menu();
+        $self->set_settings_save(1);
         $settings;
     } else {
          $self->SetStatusText( $settings, 0);
     }
-}
-
-sub update_recent_settings_menu {
-    my ($self) = @_;
-    #    my $recent = $self->{'config'}->get_value('last_settings');
-    # return unless ref $recent eq 'ARRAY';
-#    my $set_menu_ID = 11300;
-#    $self->{'setting_menu'}->Destroy( $set_menu_ID );
- #   my $Recent_ID = $set_menu_ID + 1;
-  #  $self->{'recent_menu'} = Wx::Menu->new();
-   # for (@$recent){
-#        my $path = $_;
- #       $self->{'recent_menu'}->Append($Recent_ID, $path);
-  #      Wx::Event::EVT_MENU( $self, $Recent_ID++, sub { $self->open_setting_file( $path ) });
-   # }
-    #$self->{'setting_menu'}->Insert( 2, $set_menu_ID, '&Recent', $self->{'recent_menu'}, 'recently saved settings' );
 }
 
 sub write_settings_file {
@@ -294,8 +311,10 @@ sub write_settings_file {
     my $ret = App::GUI::Cellgraph::Settings::write( $file, $settings );
     if ($ret){ $self->SetStatusText( $ret, 0 ) }
     else     {
+        $self->{'config'}->add_setting_file( $file ); # remember file in recents menu
         $self->update_recent_settings_menu();
         $self->SetStatusText( "saved settings into file $file", 0 );
+        $self->set_settings_save(1);
     }
 }
 

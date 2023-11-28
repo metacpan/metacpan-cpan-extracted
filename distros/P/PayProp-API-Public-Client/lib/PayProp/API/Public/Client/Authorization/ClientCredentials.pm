@@ -91,66 +91,66 @@ __END__
 
 =head1 NAME
 
-	PayProp::API::Public::Client::Authorization::ClientCredentials - Client credentials authorization module.
+PayProp::API::Public::Client::Authorization::ClientCredentials - Client credentials authorization module.
 
 =head1 SYNOPSIS
 
-	use PayProp::API::Public::Client::Authorization::ClientCredentials;
+use PayProp::API::Public::Client::Authorization::ClientCredentials;
 
-	my $ClientCredentials = PayProp::API::Public::Client::Authorization::ClientCredentials->new(
-		client => 'OAUTH_CLIENT',        # Required: OAuth v2.0 client.
-		secret => 'OAUTH_CLIENT_SECRET', # Required: OAuth v2.0 client secret.
-		domain => 'API-DOMAIN.com',      # Required: API server domain name.
-		application_user_id => 123456,   # Required: Client for which to request OAuth v2.0 access token.
+my $ClientCredentials = PayProp::API::Public::Client::Authorization::ClientCredentials->new(
+	client => 'OAUTH_CLIENT',        # Required: OAuth v2.0 client.
+	secret => 'OAUTH_CLIENT_SECRET', # Required: OAuth v2.0 client secret.
+	domain => 'API-DOMAIN.com',      # Required: API server domain name.
+	application_user_id => 123456,   # Required: Client for which to request OAuth v2.0 access token.
 
-		scheme => 'https',          # Optional: API domain URL scheme. Default C<https>.
-		storage_key => 'CACHE_KEY', # Optional: Token storage key. This *should* be unique per C<application_user_id> if overridden.
-		storage => C<PayProp::API::Public::Client::Authorization::Storage::*>, # Optional: One of available storage solutions.
-	);
+	scheme => 'https',          # Optional: API domain URL scheme. Default C<https>.
+	storage_key => 'CACHE_KEY', # Optional: Token storage key. This *should* be unique per C<application_user_id> if overridden.
+	storage => C<PayProp::API::Public::Client::Authorization::Storage::*>, # Optional: One of available storage solutions.
+);
 
 =head1 DESCRIPTION
 
-	Client credentials authorization module type to be provided for C<PayProp::API::Public::Client> initialization.
+Client credentials authorization module type to be provided for C<PayProp::API::Public::Client> initialization.
 
 =head1 ATTRIBUTES
 
-	C<PayProp::API::Public::Client::Authorization::ClientCredentials> implements the following attributes.
+C<PayProp::API::Public::Client::Authorization::ClientCredentials> implements the following attributes.
 
 =head2 client
 
-	OAuth v2.0 client.
+OAuth v2.0 client.
 
 =head2 secret
 
-	OAuth v2.0 client secret.
+OAuth v2.0 client secret.
 
 =head2 domain
 
-	API server domain name.
+API server domain name.
 
 =head2 application_user_id
 
-	Client for which to request OAuth v2.0 access token.
+Client for which to request OAuth v2.0 access token.
 
 =head1 AUTHOR
 
-	Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
 
-	Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-	Copyright 2023- PayProp
+Copyright 2023- PayProp
 
 =head1 LICENSE
 
-	This library is free software; you can redistribute it and/or modify
-	it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
-	If you would like to contribute documentation
-	or file a bug report then please raise an issue / pull request:
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
 
-	L<https://github.com/Humanstate/api-client-public-module>
+L<https://github.com/Humanstate/api-client-public-module>
 
 =cut
 

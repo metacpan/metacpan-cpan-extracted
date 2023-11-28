@@ -18,6 +18,11 @@ use lib "$FindBin::Bin/../lib";
     set liteblog => {
         title => "My Testing Liteblog",
         logo => '/images/liteblog.jpg',
+        favicon => '/images/liteblog.jpg',
+        base_url => 'http://localhost:4000/',
+        description => 'Some general description of the testing app',
+        tags => ['foo', 'bar', 'baz'],
+        show_render_time => 1,
         feature => {
             highlight => 1,
         },
@@ -29,13 +34,30 @@ use lib "$FindBin::Bin/../lib";
             { label => 'Contact', link => '/'},
         ],
         widgets => [
-            { name => 'activities',
-              params => { source => 'activities.yml' }},
-            { name => 'blog',
-              params => {
-                title => "Stories of my Test App",
-                mount => '/blog',
-                root => 't/articles' }},
+            {
+                name => 'splash',
+                params => {
+                    title => 'Splash Title',
+                    image => '/blog/tech/first-article/featured.jpg',
+                    baseline => 'A great and minimalist blog engine for Dancer2',
+                    cta => {
+                        label => 'Subscribe!',
+                        link => '/subscribe',
+                    }
+                }
+            },
+            { 
+                name => 'blog',
+                params => {
+                    title => "Stories of my Test App",
+                    mount => '/blog',
+                    root => 't/articles' }
+            },
+            { 
+                name => 'activities',
+                params => { source => 'activities.yml' }
+            },
+    
         ],
     };
     require 'Dancer2/Plugin/LiteBlog.pm';

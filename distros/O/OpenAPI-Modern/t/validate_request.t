@@ -834,10 +834,11 @@ YAML
   );
 
   TODO: {
-    local $TODO = 'mojo will strip the content body when parsing a request without Content-Length'
-      if $::TYPE eq 'lwp';
+    local $TODO = 'mojo will strip the content body when parsing a stringified request that lacks Content-Length'
+      if $::TYPE eq 'lwp' or $::TYPE eq 'plack';
+
     $request = request('POST', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'éclair');
-    $request->headers->${$request->isa('Mojo::Message::Request') ? \'remove' : \'remove_header'}('Content-Length');
+    remove_header($request, 'Content-Length');
 
     cmp_deeply(
       ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -1261,7 +1262,7 @@ YAML
         },
       ],
     },
-    'missing Content-Type does not cause an exception',
+    'missing Content-Type is an error, not an exception',
   );
 
   # bypass auto-initialization of Content-Length, Content-Type; leave Content-Length empty
@@ -1577,6 +1578,10 @@ paths:
         in: header
         schema:
           \$ref: '#/components/schemas/i_do_not_exist'
+      - name: MultipleValuesAsRawString
+        in: header
+        schema:
+          const: 'one , two  , three'
 YAML
 
   my $request = request('GET', 'http://example.com/foo', [ SingleValue => '  mystring  ']);
@@ -1586,23 +1591,26 @@ YAML
     'a single header value has its leading and trailing whitespace stripped',
   );
 
-  $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsString => '  one , two  , three  ']);
+  $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsRawString => '  one , two  , three  ']);
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     { valid => true },
-    'multiple values in a single header are validated as a string, with leading and trailing whitespace stripped',
+    'multiple values in a single header are validated as a string, with only leading and trailing whitespace stripped',
   );
 
+  TODO: {
   $request = request('GET', 'http://example.com/foo', [
       MultipleValuesAsString => '  one ',
       MultipleValuesAsString => ' two  ',
       MultipleValuesAsString => 'three  ',
     ]);
+  local $TODO = 'HTTP::Message::to_psgi fetches all headers as a single concatenated string' if $::TYPE eq 'plack';
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     { valid => true },
     'multiple headers on separate lines are validated as a string, with leading and trailing whitespace stripped',
   );
+  }
 
   $request = request('GET', 'http://example.com/foo', [ MultipleValuesAsArray => '  one, two, three  ']);
   cmp_deeply(
@@ -1853,6 +1861,9 @@ YAML
     'no errors from POST with body',
   );
 
+SKIP: {
+  # "Bad Content-Length: maybe client disconnect? (1 bytes remaining)"
+  skip 'plack dies on this input', 3 if $::TYPE eq 'plack';
   cmp_deeply(
     ($result = $openapi->validate_request(request($_, 'https://example.com/foo', [ 'Content-Length' => 1])))->TO_JSON,
     {
@@ -1874,6 +1885,7 @@ YAML
     { valid => true },
     'no errors from POST with Content-Length',
   );
+} # end SKIP
 };
 
 subtest 'custom error messages for false schemas' => sub {

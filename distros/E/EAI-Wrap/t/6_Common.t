@@ -1,24 +1,24 @@
 use strict; use warnings; use Data::Dumper;
 use EAI::Common; use EAI::DateUtil; use Test::More; use Test::File; use File::Spec;
-use Test::More tests => 21;
+use Test::More tests => 23;
 
 require './t/setup.pl';
 chdir "./t";
-our %config = (sensitive => {db => {user => "sensitiveDBuserInfo", pwd => "sensitiveDBPwdInfo"},ftp => {user => {Test => "sensitiveFTPuserInfo", Prod => ""}, pwd => {Test => "sensitiveFTPPwdInfo", Prod => ""}}});
+our %config = (sensitive => {db => {user => "sensitiveDBuserInfo", pwd => "sensitiveDBPwdInfo"},ftp => {user => {Test => "sensitiveFTPuserInfo", Prod => ""}, pwd => {Test => "sensitiveFTPPwdInfo", Prod => ""}}}, FTP => {ftpprefix => {remoteHost => "theRemoteHost"},}, DB => {dbprefix => {DSN => {Test => "theSetDSN", Prod=>""}}});
 our %execute = (env => "Test");
 
 # 1 sensitive info direct set
-is(getSensInfo("db","user"),"sensitiveDBuserInfo","sensitive info direct set");
+is(getKeyInfo("db","user","sensitive"),"sensitiveDBuserInfo","sensitive info direct set");
 
 # 2 sensitive info environment lookup
-is(getSensInfo("ftp","pwd"),"sensitiveFTPPwdInfo","sensitive info environment lookup");
+is(getKeyInfo("ftp","pwd","sensitive"),"sensitiveFTPPwdInfo","sensitive info environment lookup");
 
 # 3 merge configs
 $config{process} = {uploadCMD => "testcmd",};
 %common = (process => {uploadCMDPath => "path_to_testcmd"});
 # first prevents inheritance from %common (but NOT from %config!), second inherits from %common
 @loads = ({process_ => {}},{process => {uploadCMDLogfile => "testcmd.log"}});
-my @loads_expected=({process=>{uploadCMDPath=>undef,uploadCMD=>'testcmd'},File=>{},DB=>{},FTP=>{}},{process=>{uploadCMDPath=>'path_to_testcmd',uploadCMD=>'testcmd',uploadCMDLogfile=>'testcmd.log'},File=>{},DB=>{},FTP=>{}});
+my @loads_expected=({process=>{uploadCMDPath=>undef,uploadCMD=>'testcmd'},File=>{},DB=>{},FTP=>{ftpprefix=>{remoteHost=>'theRemoteHost'}},DB=>{dbprefix=>{DSN=>{Test =>'theSetDSN', Prod=>''}}}},{process=>{uploadCMDPath=>'path_to_testcmd',uploadCMD=>'testcmd',uploadCMDLogfile=>'testcmd.log'},File=>{},DB=>{},FTP=>{ftpprefix=>{remoteHost=>'theRemoteHost'}},DB=>{dbprefix=>{DSN=>{Test =>'theSetDSN', Prod=>''}}}});
 setupConfigMerge();
 is_deeply(\@loads,\@loads_expected,"merge configs");
 
@@ -94,6 +94,11 @@ is(checkHash(\%config,"config"),0,"detected invalid key value in hash having alt
 # 21 invalid key value exception thrown
 like($@, qr/wrong numeric type for value: \$config\{executeOnInit\}/, "invalid key value exception");
 
+# 22 ftpprefix info direct set
+is(getKeyInfo("ftpprefix","remoteHost","FTP"),"theRemoteHost","remoteHost info set via ftpprefix");
+
+# 23 dbprefix info direct set, regarding environment
+is(getKeyInfo("dbprefix","DSN","DB"),"theSetDSN","DSN info set via dbprefix regarding environment");
 
 
 unlink "config/site.config";

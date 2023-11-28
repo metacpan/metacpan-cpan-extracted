@@ -1,12 +1,13 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Apache2 API Framework - ~/lib/Apache2/API/DateTime.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/05/30
-## Modified 2023/05/30
+## Modified 2023/10/21
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -21,8 +22,7 @@ BEGIN
 	use APR::Date;
 	use DateTime;
 	use Devel::Confess;
-	use Nice::Try;
-	our $VERSION = 'v0.1.0';
+	our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -79,13 +79,15 @@ sub parse_datetime
     }
     else
     {
-        try
+        # try-catch
+        local $@;
+        eval
         {
             $dt = DateTime->from_epoch( epoch => $time );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Error instantiating a DateTime object with the epoch value equivalent of the date provided $date: $e" ) );
+            return( $self->error( "Error instantiating a DateTime object with the epoch value equivalent of the date provided $date: $@" ) );
         }
         return( $dt );
     }
@@ -158,7 +160,7 @@ Apache2::API::DateTime - HTTP DateTime Manipulation and Formatting
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

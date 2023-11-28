@@ -74,8 +74,8 @@ my $build = Module::Build->subclass(
     meta_add => { no_index => { directory => [ 'utils' ] } },
     meta_merge => {
         resources => {
-            repository => 'https://github.com/DrHyde/perl-modules-DBM-Deep',
-            bugtracker => 'https://github.com/DrHyde/perl-modules-DBM-Deep/issues',
+            repository => 'https://github.com/DBM-Deep/DBM-Deep',
+            bugtracker => 'https://github.com/DBM-Deep/DBM-Deep/issues',
         }
     },
 );

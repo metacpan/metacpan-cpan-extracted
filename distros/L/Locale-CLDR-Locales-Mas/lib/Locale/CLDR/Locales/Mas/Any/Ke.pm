@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mas::Any::Ke - Package for language Masai
 
 package Locale::CLDR::Locales::Mas::Any::Ke;
 # This file auto generated from Data\common\main\mas_KE.xml
-#	on Fri 13 Oct  9:26:37 am GMT
+#	on Sat  4 Nov  6:12:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

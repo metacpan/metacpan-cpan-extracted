@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Yue::Hans - Package for language Cantonese
 
 package Locale::CLDR::Locales::Yue::Hans;
 # This file auto generated from Data\common\main\yue_Hans.xml
-#	on Fri 13 Oct  9:48:49 am GMT
+#	on Sat  4 Nov  6:30:44 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

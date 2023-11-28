@@ -16,7 +16,7 @@ use lib 't/lib';
 
 my ($model, $trace, $args) = init_test('show');
 
-note("You can play with the widget if you run the test with 's' argument");
+note("You can play with the widget if you run the test with '--show' option");
 
 my $wr_root = setup_test_dir;
 
@@ -78,25 +78,37 @@ SKIP: {
                                       -store_cb => sub{},
                                   ) ;
 
-    my $delay = 1000 ;
-
-    sub inc_d { $delay += 500 } ;
-
-    my @test ;
-    foreach (1 .. 4 ) {
-        push @test, sub {$cmw->{keep_wiz_editor} = 0 ; $cmw->{wizard}->go_forward; } ;
-    }
-
-    foreach (1 .. 2 ) {
-        push @test, sub {$cmw->{keep_wiz_editor} = 0 ; $cmw->{wizard}->go_backward;} ;
-    }
-
-    # no problem if too many subs are defined: programs will exit
-    foreach (1 .. 100 ) {
-        push @test, sub {$cmw->{keep_wiz_editor} = 0 ; $cmw->{wizard}->go_forward; } ;
-    }
-
     unless ($args->{show}) {
+        my $delay = 1000 ;
+
+        sub inc_d { $delay += 800 } ;
+
+        my @test ;
+        foreach (1 .. 4 ) {
+            push @test, sub {
+                $cmw->{keep_wiz_editor} = 0 ;
+                $cmw->{wizard}->go_forward;
+                ok(1,"Going forward");
+            } ;
+        }
+
+        foreach (1 .. 2 ) {
+            push @test, sub {
+                $cmw->{keep_wiz_editor} = 0 ;
+                $cmw->{wizard}->go_backward;
+                ok(1,"Going backward");
+            } ;
+        }
+
+        # no problem if too many subs are defined: programs will exit
+        foreach (1 .. 10 ) {
+            push @test, sub {
+                $cmw->{keep_wiz_editor} = 0 ;
+                $cmw->{wizard}->go_forward;
+                ok(1,"Going forward");
+            } ;
+        }
+
         foreach my $t (@test) {
             $mw->after($delay, $t);
             inc_d ;

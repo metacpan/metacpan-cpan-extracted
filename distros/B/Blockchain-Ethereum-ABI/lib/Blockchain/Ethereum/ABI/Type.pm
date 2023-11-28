@@ -1,11 +1,17 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad ':experimental(init_expr)';
 
 package Blockchain::Ethereum::ABI::Type;
 class Blockchain::Ethereum::ABI::Type;
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.013';          # VERSION
+our $VERSION   = '0.015';          # VERSION
 
 use Carp;
 use Module::Load;
@@ -197,7 +203,7 @@ Blockchain::Ethereum::ABI::Type
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 

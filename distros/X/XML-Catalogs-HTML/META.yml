@@ -1,24 +1,31 @@
 ---
 abstract: 'Catalog of HTML and XHTML DTDs'
 author:
-  - 'Eric Brine, C<< <ikegami@adaelis.com> >>'
+  - 'Eric Brine <ikegami@adaelis.com>'
 build_requires:
-  Test::More: 0
+  Test::More: '0'
 configure_requires:
-  Module::Build: 0.36
+  ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: XML-Catalogs-HTML
-provides:
-  XML::Catalogs::HTML:
-    file: lib/XML/Catalogs/HTML.pm
-    version: v1.0.3
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-  File::ShareDir: 1.00
-  XML::Catalogs: 0
-  version: 0
-version: v1.0.3
+  XML::Catalogs: '0'
+  parent: '0'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ikegami/perl-XML-Catalogs-HTML/issues
+  homepage: http://search.cpan.org/dist/XML-Catalogs-HTML/
+  repository: https://github.com/ikegami/perl-XML-Catalogs-HTML.git
+version: v1.6.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

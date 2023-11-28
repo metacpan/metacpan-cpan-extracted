@@ -7,10 +7,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
-use JSON::Schema::Modern;
 use JSON::Schema::Modern::Utilities 'canonical_uri';
 use lib 't/lib';
 use Helper;
@@ -80,9 +76,55 @@ subtest 'traversal with callbacks' => sub {
     },
     'extracted all the real $refs out of the schema, with locations and canonical targets',
   );
+
+  cmp_deeply(
+    $state->{subschemas},
+    bag(
+      '',
+      '/$defs/bar',
+      '/$defs/bar/properties/description',
+      '/$defs/foo',
+      '/$defs/foo/additionalProperties',
+      '/allOf/0',
+      '/allOf/1',
+      '/allOf/2',
+      '/if',
+    ),
+    'identified all subschemas',
+  );
 };
 
-subtest 'vocabularies used during traversal' => sub {
+subtest 'errors when parsing $schema keyword' => sub {
+  my $js = JSON::Schema::Modern->new;
+
+  my $state = $js->traverse({ '$schema' => true });
+  cmp_deeply(
+    [ map $_->TO_JSON, $state->{errors}->@* ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$schema',
+        error => '$schema value is not a string',
+      },
+    ],
+    '$schema is not a string',
+  );
+
+  $state = $js->traverse({ '$schema' => 'whargarbl' });
+  cmp_deeply(
+    [ map $_->TO_JSON, $state->{errors}->@* ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$schema',
+        error => '"whargarbl" is not a valid URI',
+      },
+    ],
+    '$schema is not a URI',
+  );
+};
+
+subtest 'default metaschema' => sub {
   my $js = JSON::Schema::Modern->new;
   my $state = $js->traverse(
     {
@@ -95,6 +137,18 @@ subtest 'vocabularies used during traversal' => sub {
   );
 
   cmp_deeply(
+    $state,
+    superhashof({
+      spec_version => 'draft2020-12',
+      vocabularies => [
+        map 'JSON::Schema::Modern::Vocabulary::'.$_,
+          qw(Core Validation FormatAnnotation Applicator Content MetaData Unevaluated),
+      ],
+    }),
+    'dialect is properly determined',
+  );
+
+  cmp_deeply(
     [ map $_->TO_JSON, $state->{errors}->@* ],
     [
       {
@@ -104,6 +158,145 @@ subtest 'vocabularies used during traversal' => sub {
       },
     ],
     'error within $defs is found, showing both Core and Applicator vocabularies are used',
+  );
+};
+
+subtest 'traversing a dialect with different core keywords' => sub {
+  my $js = JSON::Schema::Modern->new;
+
+  my $state = $js->traverse(
+    {
+      '$id' => 'http://localhost:1234/root',
+      '$schema' => 'http://json-schema.org/draft-07/schema#',
+      definitions => {
+        alpha => 1,
+      },
+    },
+  );
+  cmp_deeply(
+    [ map $_->TO_JSON, $state->{errors}->@* ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/definitions/alpha',
+        absoluteKeywordLocation => 'http://localhost:1234/root#/definitions/alpha',
+        error => 'invalid schema type: integer',
+      },
+    ],
+    'dialect changes at root, with $id - dialect is switched in time to get a new keyword list for the core vocabulary',
+  );
+
+  $state = $js->traverse(
+    {
+      '$id' => '#hello',
+      '$schema' => 'http://json-schema.org/draft-07/schema#',
+      definitions => {
+        bloop => {
+          '$id' => '/bloop',
+          type => 'object',
+        },
+      },
+    },
+  );
+
+  cmp_deeply($state->{errors}, [], 'no errors when parsing this schema');
+  cmp_deeply(
+    $state->{identifiers},
+    [
+      str('#hello'), {
+        path => '',
+        canonical_uri => str(''),
+        specification_version => 'draft7',
+        configs => {},
+        vocabularies => [
+          map 'JSON::Schema::Modern::Vocabulary::'.$_,
+            qw(Core Validation FormatAnnotation Applicator Content MetaData),
+        ],
+      },
+      str('/bloop'), {
+        path => '/definitions/bloop',
+        canonical_uri => str('/bloop'),
+        specification_version => 'draft7',
+        configs => {},
+        vocabularies => [
+          map 'JSON::Schema::Modern::Vocabulary::'.$_,
+            qw(Core Validation FormatAnnotation Applicator Content MetaData),
+        ],
+      },
+    ],
+    'switched dialect in time to extract all identifiers, from root and definition',
+  );
+
+  $state = $js->traverse(
+    {
+      '$schema' => 'http://json-schema.org/draft-07/schema#',
+      definitions => {
+        alpha => 1,
+      },
+    },
+  );
+  cmp_deeply(
+    [ map $_->TO_JSON, $state->{errors}->@* ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/definitions/alpha',
+        error => 'invalid schema type: integer',
+      },
+    ],
+    'dialect changes at root, no $id - dialect is switched in time to get a new keyword list for the core vocabulary',
+  );
+
+  $state = $js->traverse(
+    {
+      '$defs' => {
+        alpha => {
+          '$id' => 'http://localhost:1234/inner',
+          '$schema' => 'http://json-schema.org/draft-07/schema#',
+          definitions => {
+            alpha => 1,
+          },
+        },
+      },
+    },
+  );
+  cmp_deeply(
+    [ map $_->TO_JSON, $state->{errors}->@* ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$defs/alpha/definitions/alpha',
+        absoluteKeywordLocation => 'http://localhost:1234/inner#/definitions/alpha',
+        error => 'invalid schema type: integer',
+      },
+    ],
+    'dialect changes below root - dialect is switched in time to get a new keyword list for the core vocabulary',
+  );
+};
+
+subtest '$schema without an $id, below the root' => sub {
+  my $js = JSON::Schema::Modern->new;
+
+  my $state = $js->traverse(
+    {
+      '$defs' => {
+        alpha => {
+          '$schema' => 'https://json-schema.org/draft/2019-09/schema',
+          minimum => 2,
+        },
+      },
+    },
+  );
+  cmp_deeply(
+    [ map $_->TO_JSON, $state->{errors}->@* ],
+    [
+      {
+        instanceLocation => '',
+        keywordLocation => '/$defs/alpha/$schema',
+        error => '$schema can only appear at the schema resource root',
+      },
+    ],
+    '$schema cannot exist without an $id, or at the root',
   );
 };
 
@@ -264,15 +457,15 @@ subtest 'start traversing below the document root' => sub {
     [
       {
         instanceLocation => '',
-        keywordLocation => '/components/alpha/subid/properties/myprop/allOf/0/properties/foo',
-        absoluteKeywordLocation => 'dir/inner_document#/properties/foo',
-        error => 'invalid schema type: string',
-      },
-      {
-        instanceLocation => '',
         keywordLocation => '/components/alpha/subid/type',
         absoluteKeywordLocation => 'dir/my_subdocument#/subid/type',
         error => 'unrecognized type "not a valid type"',
+      },
+      {
+        instanceLocation => '',
+        keywordLocation => '/components/alpha/subid/properties/myprop/allOf/0/properties/foo',
+        absoluteKeywordLocation => 'dir/inner_document#/properties/foo',
+        error => 'invalid schema type: string',
       },
     ],
     'identified the overridden location of all errors during traverse',

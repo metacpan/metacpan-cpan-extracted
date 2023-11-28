@@ -28,13 +28,12 @@ requires:
   Archive::Extract: '0'
   DBD::ODBC: '0'
   DBI: '0'
-  Data::XLSX::Parser: '0'
+  Data::XLSX::Parser: '0.2'
   Excel::Writer::XLSX: '0'
   HTML::HTML5::Entities: '0'
   Log::Dispatch::Email::MIMELite: '0'
   Log::Log4perl: '0'
   MIME::Lite: '0'
-  Module::Refresh: '0'
   Net::FTP: '0'
   Net::SFTP::Foreign: '0'
   Spreadsheet::ParseExcel: '0'
@@ -47,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/rkapl123/EAI-Wrap/issues
   repository: https://github.com/rkapl123/EAI-Wrap.git
-version: '1.5'
+version: '1.902'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

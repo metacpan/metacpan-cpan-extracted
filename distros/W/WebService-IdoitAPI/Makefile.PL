@@ -18,6 +18,7 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     EXE_FILES => [
+        'bin/idoit-object',
         'bin/idoit-reports',
     ],
     META_MERGE => {

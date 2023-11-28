@@ -1,0 +1,481 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/DownloadsDirUtils/mv_newest_download_here
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-16'; # DATE
+our $DIST = 'App-DownloadsDirUtils'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/DownloadsDirUtils/mv_newest_download_here",
+    program_name => "mv-newest-download-here",
+    log => 1,
+    log_level => "info",
+    config_filename => "downloadsdirutils.ini",
+);
+
+$cmdline->run;
+
+# ABSTRACT: Move the newest file(s) from the downloads directories to current directory
+# PODNAME: mv-newest-download-here
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mv-newest-download-here - Move the newest file(s) from the downloads directories to current directory
+
+=head1 VERSION
+
+This document describes version 0.003 of mv-newest-download-here (from Perl distribution App-DownloadsDirUtils), released on 2023-11-16.
+
+=head1 SYNOPSIS
+
+B<mv-newest-download-here> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<mv-newest-download-here> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<mv-newest-download-here> [B<L<--all|/"--all, -a">>|B<L<-a|/"--all, -a">>] [B<L<--config-path|/"--config-path=s, -c">>=I<path>|B<L<-c|/"--config-path=s, -c">>|B<L<--no-config|/"--no-config, -C">>|B<L<-C|/"--no-config, -C">>] [B<L<--config-profile|/"--config-profile=s, -P">>=I<profile>|B<L<-P|/"--config-profile=s, -P">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [(B<L<--dir|/"--dirs-json=s">>=I<L<dirname|Sah::Schema::dirname>>)+|B<L<--dirs-json|/"--dirs-json=s">>=I<json>] [B<L<--dry-run|/"--dry-run">>] [B<L<--exclude-filename-pattern|/"--exclude-filename-pattern=s, -X">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-X|/"--exclude-filename-pattern=s, -X">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--include-filename-pattern|/"--include-filename-pattern=s, -I">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-I|/"--include-filename-pattern=s, -I">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--no-env|/"--no-env">>] [B<L<--num-ranks|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>|B<L<-N|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>] [B<L<--num-results|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--recursive|/"--recursive, -R">>|B<L<-R|/"--recursive, -R">>] [B<L<--to-dir|/"--to-dir=s">>=I<L<dirname|Sah::Schema::dirname>>] [B<L<--type|/"--type=s, -t">>=I<str>|B<L<-d|/"--type=s, -t">>|B<L<-f|/"--type=s, -t">>|B<L<-t|/"--type=s, -t">>=I<str>] -- [I<L<dir|/"--dirs-json=s">>] ...
+
+=head1 DESCRIPTION
+
+This is a thin wrapper for the L<newest_download> utility; the wrapper
+moves the files to current directory. It hopes to be a convenient helper to
+organize your downloads.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--num-ranks>=I<s>, B<-N>
+
+Number of ranks to return.
+
+Difference between C<num_results> and C<num_ranks>: C<num_results> (C<-n> option)
+specifies number of results regardless of ranks while C<num_ranks> (C<-N> option)
+returns number of ranks. For example, if sorting is by reverse size and if
+C<num_results> is set to 1 and there are 2 files with the same largest size then
+only 1 of those files will be returned. With C<num_ranks> set to 1, both files
+will be returned because are they both rank #1.
+
+
+=item B<--num-results>=I<s>, B<-n>
+
+Number of results to return.
+
+=item B<--to-dir>=I<s>
+
+Default value:
+
+ "."
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<s>, B<-c>
+
+Set path to configuration file.
+
+Can actually be specified multiple times to instruct application to read from
+multiple configuration files (and merge them).
+
+
+=item B<--config-profile>=I<s>, B<-P>
+
+Set configuration profile to use.
+
+A single configuration file can contain profiles, i.e. alternative sets of
+values that can be selected. For example:
+
+ [profile=dev]
+ username=foo
+ pass=beaver
+ 
+ [profile=production]
+ username=bar
+ pass=honey
+
+When you specify C<--config-profile=dev>, C<username> will be set to C<foo> and
+C<password> to C<beaver>. When you specify C<--config-profile=production>,
+C<username> will be set to C<bar> and C<password> to C<honey>.
+
+
+=item B<--no-config>, B<-C>
+
+Do not use any configuration file.
+
+If you specify C<--no-config>, the application will not read any configuration
+file.
+
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+If you specify C<--no-env>, the application wil not read any environment
+variable.
+
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--all>, B<-a>
+
+Do not ignore entries starting with ..
+
+=item B<--exclude-filename-pattern>=I<s>, B<-X>
+
+Exclude filenames that match a regex pattern.
+
+Default value:
+
+ "/\\.part\\z/"
+
+=item B<--include-filename-pattern>=I<s>, B<-I>
+
+Only include filenames that match a regex pattern.
+
+=item B<--type>=I<s>, B<-t>
+
+Only include files of certain type.
+
+Valid values:
+
+ ["file","dir"]
+
+=item B<-d>
+
+Shortcut for `--type=dir`.
+
+See C<--type>.
+
+=item B<-f>
+
+Shortcut for `--type=file`.
+
+See C<--type>.
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--dir>=I<s@>
+
+Directory to sort files of, defaults to current directory.
+
+Default value:
+
+ ["/home/u1/Downloads"]
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--dirs-json>=I<s>
+
+Directory to sort files of, defaults to current directory (JSON-encoded).
+
+See C<--dir>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--recursive>, B<-R>
+
+Recurse into subdirectories.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--detail>, B<-l>
+
+(No description)
+
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--dry-run>
+
+Run in simulation mode (also via DRY_RUN=1).
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C mv-newest-download-here mv-newest-download-here
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete mv-newest-download-here 'p/*/`mv-newest-download-here`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration files. Configuration files are in the format of L<IOD>, which is basically INI with some extra features.
+
+By default, these names are searched for configuration filenames (can be changed using C<--config-path>): F</home/u1/.config/downloadsdirutils.ini>, F</home/u1/downloadsdirutils.ini>, or F</etc/downloadsdirutils.ini>.
+
+All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SOMESECTION profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+You can also put configuration for multiple programs inside a single file, and use filter C<program=NAME> in section names, e.g. C<[program=NAME ...]> or C<[SOMESECTION program=NAME]>. The section will then only be used when the reading program matches.
+
+You can also filter a section by environment variable using the filter C<env=CONDITION> in section names. For example if you only want a section to be read if a certain environment variable is true: C<[env=SOMEVAR ...]> or C<[SOMESECTION env=SOMEVAR ...]>. If you only want a section to be read when the value of an environment variable equals some string: C<[env=HOSTNAME=blink ...]> or C<[SOMESECTION env=HOSTNAME=blink ...]>. If you only want a section to be read when the value of an environment variable does not equal some string: C<[env=HOSTNAME!=blink ...]> or C<[SOMESECTION env=HOSTNAME!=blink ...]>. If you only want a section to be read when the value of an environment variable includes some string: C<[env=HOSTNAME*=server ...]> or C<[SOMESECTION env=HOSTNAME*=server ...]>. If you only want a section to be read when the value of an environment variable does not include some string: C<[env=HOSTNAME!*=server ...]> or C<[SOMESECTION env=HOSTNAME!*=server ...]>. Note that currently due to simplistic parsing, there must not be any whitespace in the value being compared because it marks the beginning of a new section filter or section name.
+
+To load and configure plugins, you can use either the C<-plugins> parameter (e.g. C<< -plugins=DumpArgs >> or C<< -plugins=DumpArgs@before_validate_args >>), or use the C<[plugin=NAME ...]> sections, for example:
+
+ [plugin=DumpArgs]
+ -event=before_validate_args
+ -prio=99
+ 
+ [plugin=Foo]
+ -event=after_validate_args
+ arg1=val1
+ arg2=val2
+
+ 
+
+which is equivalent to setting C<< -plugins=-DumpArgs@before_validate_args@99,-Foo@after_validate_args,arg1,val1,arg2,val2 >>.
+
+List of available configuration parameters:
+
+ all (see --all)
+ detail (see --detail)
+ dirs (see --dir)
+ exclude_filename_pattern (see --exclude-filename-pattern)
+ format (see --format)
+ include_filename_pattern (see --include-filename-pattern)
+ log_level (see --log-level)
+ naked_res (see --naked-res)
+ num_ranks (see --num-ranks)
+ num_results (see --num-results)
+ recursive (see --recursive)
+ to_dir (see --to-dir)
+ type (see --type)
+
+=head1 ENVIRONMENT
+
+=head2 MV_NEWEST_DOWNLOAD_HERE_OPT
+
+String. Specify additional command-line options.
+
+=head1 FILES
+
+=head2 /home/u1/.config/downloadsdirutils.ini
+
+=head2 /home/u1/downloadsdirutils.ini
+
+=head2 /etc/downloadsdirutils.ini
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DownloadsDirUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DownloadsDirUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DownloadsDirUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

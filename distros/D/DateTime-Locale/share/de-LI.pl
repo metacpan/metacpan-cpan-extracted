@@ -45,7 +45,7 @@
     hmv => "h:mm\N{U+202f}a v",
     ms => "mm:ss",
     y => "y",
-    yM => "MM/y",
+    yM => "M/y",
     yMEd => "E, d.M.y",
     yMM => "MM.y",
     yMMM => "MMM y",
@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

@@ -1,0 +1,56 @@
+help: compare-code [DIR...] [OPTIONS...]
+
+  Arguments:
+    DIR             analyse files in given directory
+                    Input can otherwise also be specified over:
+                      - the option --file / -f
+                      - STDIN, receiving filepaths (e.g. from a find command)
+
+  Options:
+    --all,     -a   show all results in output
+                    Don't hide skipped comparisons.
+                    Will somethimes cause a lot of output.
+    --basedir, -b   skip comparisons within projects under base directory
+                    Folders one below will be seen as project directories.
+                    Files inside projects will not be compared with each other.
+                    (This will currently not work on Windows)
+    --charset, -c   chars used for comparison
+                    Define one or more subsets of chars, used to compare the files:
+                      - visibles
+                          all chars without witespace
+                      - numsignes (default)
+                          like visibles, but words ignored in meaning (but not in position)
+                      - signes
+                          only special chars, no words or numbers
+    --file,    -f   file to read from (containing filepaths)
+    --help,    -h   show this manual
+    --in,      -i   input format, optimize for language
+                    Comments get stripped from code.
+                    Supportet arguments:
+                      - hashy:  python, perl, bash
+                      - hashy:  python, perl, bash
+                      - slashy: php, js, java, cpp, cs, c
+                      - html, xml
+                      - txt (default, no effect)
+    --mime,    -m   only compare if same MIME-type
+                    This options needs the Perl Library File::LibMagic installed.
+                    You will also need libmagic development files on your system.
+    --out,     -o   output format
+                    You can define an output format:
+                      - html
+                      - tab (default)
+                      - csv
+    --persist, -p   print result to file (instead STDOUT)
+                    Saved in local directory with name pattern:
+                      - comparison_[year-month-day-hour-minute]_[method].[format]
+    --sort,    -s   sort data by line before comparison
+                    Useful to ignore order of method declaration.
+                    See --split if you need to sort by something else then by line.
+    --split,   -t   Split files on something else then newline
+                    You might want to split for sentences with '\.' in normal text.
+                    Use this option together with --sort.
+    --verbose, -v   show actually compared data on STDERR
+    --yes,     -y   Don't prompt for questions
+                    Program will start working without further confirmation.
+                    (Answer all user prompts with [yes])
+

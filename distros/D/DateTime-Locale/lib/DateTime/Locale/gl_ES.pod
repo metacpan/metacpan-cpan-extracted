@@ -61,23 +61,23 @@ Galician Spain locale.
 
 =head3 Wide (stand-alone)
 
-  Luns
-  Martes
-  Mércores
-  Xoves
-  Venres
-  Sábado
-  Domingo
+  luns
+  martes
+  mércores
+  xoves
+  venres
+  sábado
+  domingo
 
 =head3 Abbreviated (stand-alone)
 
-  Luns
-  Mar.
-  Mér.
-  Xov.
-  Ven.
-  Sáb.
-  Dom.
+  luns
+  mar.
+  mér.
+  xov.
+  ven.
+  sáb.
+  dom.
 
 =head3 Narrow (stand-alone)
 
@@ -139,33 +139,33 @@ Galician Spain locale.
 
 =head3 Wide (stand-alone)
 
-  Xaneiro
-  Febreiro
-  Marzo
-  Abril
-  Maio
-  Xuño
-  Xullo
-  Agosto
-  Setembro
-  Outubro
-  Novembro
-  Decembro
+  xaneiro
+  febreiro
+  marzo
+  abril
+  maio
+  xuño
+  xullo
+  agosto
+  setembro
+  outubro
+  novembro
+  decembro
 
 =head3 Abbreviated (stand-alone)
 
-  Xan.
-  Feb.
-  Mar.
-  Abr.
-  Maio
-  Xuño
-  Xul.
-  Ago.
-  Set.
-  Out.
-  Nov.
-  Dec.
+  xan.
+  feb.
+  mar.
+  abr.
+  maio
+  xuño
+  xul.
+  ago.
+  set.
+  out.
+  nov.
+  dec.
 
 =head3 Narrow (stand-alone)
 
@@ -347,9 +347,9 @@ Galician Spain locale.
 
 =head3 E (ccc)
 
-   2008-02-05T18:30:30 = Mar.
-   1995-12-22T09:05:02 = Ven.
-  -0010-09-15T04:44:23 = Sáb.
+   2008-02-05T18:30:30 = mar.
+   1995-12-22T09:05:02 = ven.
+  -0010-09-15T04:44:23 = sáb.
 
 =head3 EBhm (E, h:mm B)
 
@@ -467,9 +467,9 @@ Galician Spain locale.
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = Feb.
-   1995-12-22T09:05:02 = Dec.
-  -0010-09-15T04:44:23 = Set.
+   2008-02-05T18:30:30 = feb.
+   1995-12-22T09:05:02 = dec.
+  -0010-09-15T04:44:23 = set.
 
 =head3 MMMEd (E, d 'de' MMM)
 
@@ -648,7 +648,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (Luns)
+1 (luns)
 
 =head2 Strftime Patterns
 

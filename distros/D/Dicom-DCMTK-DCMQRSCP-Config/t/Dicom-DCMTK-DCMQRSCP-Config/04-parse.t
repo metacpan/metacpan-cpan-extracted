@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Dicom::DCMTK::DCMQRSCP::Config;
 use File::Object;
 use Perl6::Slurp qw(slurp);

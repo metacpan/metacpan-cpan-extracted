@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Perinci/Sub/XCompletion.pm','lib/Perinci/Sub/XCompletion/comma_sep.pm','lib/Perinci/Sub/XCompletion/dirname.pm','lib/Perinci/Sub/XCompletion/filename.pm'];
+my $filenames = ['lib/Perinci/Sub/XCompletion.pm','lib/Perinci/Sub/XCompletion/comma_sep.pm','lib/Perinci/Sub/XCompletion/dirname.pm','lib/Perinci/Sub/XCompletion/dirname_curdir.pm','lib/Perinci/Sub/XCompletion/filename.pm','lib/Perinci/Sub/XCompletion/filename_curdir.pm','lib/Perinci/Sub/XCompletion/pathname_curdir.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

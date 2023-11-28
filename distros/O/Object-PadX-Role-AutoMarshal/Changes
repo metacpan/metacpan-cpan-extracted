@@ -1,0 +1,6 @@
+1.1 2023-11-19 Minor changes
+	- Use keyword/function version of the equ operator, thus not needing 5.38
+	- Reduce perl version requirement to 5.26 as a minimum needed for role features
+
+1.0 2023-11-15 Initial release
+	- First public release

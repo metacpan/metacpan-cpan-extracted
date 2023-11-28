@@ -1,5 +1,9 @@
 Revision history for Iterator-Flex
 
+0.18      2023-11-03 19:44:53-04:00 America/New_York
+
+    * add Stack and istack to iterate and manipulate a stack of iterators
+
 0.17      2023-10-30 23:13:49-04:00 America/New_York
 
   [ENHANCEMENT]

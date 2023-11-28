@@ -1,6 +1,6 @@
 package MooX::Keyword::Random;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 use Moo;
 use MooX::Keyword {
 	random => {
@@ -26,7 +26,7 @@ MooX::Keyword::Random - return a random result!
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 

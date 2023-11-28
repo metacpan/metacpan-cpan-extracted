@@ -5,19 +5,11 @@ use Test::More;
 
 require_ok('URI::PackageURL');
 
-my $test_suite_data_json = '';
+sub test_purl_encode {
 
-while (<DATA>) {
-    $test_suite_data_json .= $_;
-}
+    my ($test) = @_;
 
-my $test_suite_data = JSON::decode_json($test_suite_data_json);
-
-foreach my $test (@{$test_suite_data}) {
-
-    my $is_invalid = $test->{is_invalid};
-    my $expected   = $test->{canonical_purl};
-    my $test_name  = $test->{description};
+    my $test_name = $test->{description};
 
     my $purl = eval {
         URI::PackageURL->new(
@@ -30,14 +22,60 @@ foreach my $test (@{$test_suite_data}) {
         );
     };
 
-    if ($is_invalid) {
-        like($@, qr/Invalid PackageURL/i, $test_name);
-        next;
+    if ($test->{is_invalid}) {
+        like($@, qr/Invalid Package URL/i, "ENCODE: $test_name");
+        return;
     }
 
-    my $got = $purl->to_string;
+    if (!$test->{is_invalid} && $@) {
+        fail("ENCODE: $test_name");
+        return;
+    }
 
-    is($got, $expected, $test_name);
+    if (!$test->{is_invalid}) {
+        is($purl->to_string, $test->{canonical_purl}, "ENCODE: $test_name");
+        return;
+    }
+
+}
+
+sub test_purl_decode {
+
+    my ($test) = @_;
+
+    my $test_name = $test->{description};
+
+    my $purl = eval { URI::PackageURL->from_string($test->{purl}) };
+
+    if ($test->{is_invalid}) {
+        like($@, qr/(Invalid|Malformed) Package URL/i, "DECODE: $test_name");
+        return;
+    }
+
+    if (!$test->{is_invalid} && $@) {
+        fail("DECODE: $test_name");
+        return;
+    }
+
+    if (!$test->{is_invalid}) {
+        is($purl->to_string, $test->{canonical_purl}, "DECODE: $test_name");
+        return;
+    }
+
+}
+
+my $test_suite_data_json = '';
+
+while (<DATA>) {
+    $test_suite_data_json .= $_;
+}
+
+my $test_suite_data = JSON::decode_json($test_suite_data_json);
+
+foreach my $test (@{$test_suite_data}) {
+
+    test_purl_encode($test);
+    test_purl_decode($test);
 
 }
 

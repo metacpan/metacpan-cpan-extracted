@@ -3,7 +3,8 @@ use strictures 2;
 use 5.020;
 use Test::More 0.88;
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use experimental qw(signatures postderef);
+use stable 0.031 'postderef';
+use experimental 'signatures';
 use if "$]" >= 5.022, experimental => 're_strict';
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
@@ -13,8 +14,19 @@ use Test::Deep;
 use Mojolicious::Plugin::OpenAPI::Modern;
 use Path::Tiny;
 use Test::Mojo;
+use Test::Memory::Cycle;
 use constant { true => JSON::PP::true, false => JSON::PP::false };
 use JSON::Schema::Modern::Utilities 'jsonp';
+
+# TODO: instead, Test::Warnings::allow_warnings(qr/^Unhandled type: REGEXP at /);
+BEGIN {
+  my $old_handler = $SIG{__WARN__}; # the Test::Warnings hook, and maybe also Devel::Confess
+  $SIG{__WARN__} = sub {
+    return if $_[0] =~ /^Unhandled type: REGEXP at /;  # a regex in our route definition
+    warn @_;
+    $old_handler->(@_) if $old_handler;
+  };
+}
 
 use lib 't/lib';
 
@@ -80,7 +92,7 @@ paths:
         400:
           $ref: '#/components/responses/validation_response'
         500:
-          description: available upon request
+          description: this response code is produced via ?status=500 in the request
           content:
             application/json:
               schema: false
@@ -89,7 +101,7 @@ paths:
       operationId: operation_skip_validate_request
       responses:
         200:
-          description: request not validated
+          description: request not validated; response body not permitted
           content:
             text/plain:
               schema:
@@ -111,6 +123,8 @@ YAML
         ],
       },
     });
+
+  memory_cycle_ok($t->app);
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
@@ -149,6 +163,8 @@ YAML
         ],
       },
     });
+
+  memory_cycle_ok($t->app);
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
@@ -189,6 +205,8 @@ YAML
         ],
       },
     });
+
+  memory_cycle_ok($t->app);
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
@@ -232,6 +250,8 @@ YAML
       },
     });
 
+  memory_cycle_ok($t->app);
+
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
     {
@@ -250,6 +270,8 @@ YAML
     ->json_is({
       result => { valid => true },
     });
+
+  memory_cycle_ok($t->app);
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,
@@ -290,6 +312,8 @@ YAML
   $t->get_ok('/skip_validate_request')
     ->status_is(200)
     ->content_is('ok');
+
+  memory_cycle_ok($t->app);
 
   cmp_deeply(
     $BasicApp::LAST_VALIDATE_REQUEST_STASH,

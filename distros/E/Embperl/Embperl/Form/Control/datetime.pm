@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -48,6 +49,97 @@ sub init
     
 # ------------------------------------------------------------------------------------------
 #
+#   get_display_text - returns the text that should be displayed
+#
+
+sub get_display_text
+    {
+    my ($self, $req, $time) = @_ ;
+    
+    $time = $self -> get_value ($req) if (!defined ($time)) ;
+    return $time if ($self -> {format} eq '-' || ($time =~ /\./)) ;
+    return if ($time eq '' && !exists $self -> {onempty}) ;
+
+    if ($self -> {dynamic} && ($time =~ /^\s*((?:s|i|h|d|w|m|y|q)(?:\+|-)?(?:\d+)?)\s*/))
+        {
+        return $time ;#$1 ;
+        }
+    
+
+    my ($y, $m, $d, $h, $min, $s, $z) ;
+
+    if ($self -> {onempty})
+        {
+        ($s,$min,$h,$d,$m,$y) = localtime ;
+        $m++ ;
+        $y += 1900 ;
+        if ($self -> {onempty} eq 'b')
+            { 
+            $h = $min = $s = 0 ;
+            }
+        elsif ($self -> {onempty} eq 'e')
+            { 
+            $h   = 23 ;
+            $min = 59 ;
+            $s   = 59 ;
+            }
+        }
+    else
+        {
+        ($y, $m, $d, $h, $min, $s, $z) = (($time . '00000000000000Z') =~ /^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(.)/) ;
+        }
+
+    my $date ;
+    if ($time =~ /^(\d\d\d\d)-(\d+)$/)
+        {
+        $date = $time ;    
+        }
+    elsif ($d == 0 && $m == 0)
+        {
+        $date = $y ;    
+        }
+    elsif ($d == 0)
+        {
+        $date = "$m.$y" ;    
+        }
+    else
+        {
+        # Getting the local timezone
+
+        $date = eval
+            {
+            my @time = gmtime(timegm_nocheck($s,$min,$h,$d,$m-1,$y-1900)+($tz_local*60));
+
+            my $format = $self -> {notime} || ($s == 0 && $h == 0 && $min == 0)?'%d.%m.%Y':'%d.%m.%Y, %H:%M' ;
+            $format = '%d.%m.%Y, %H:%M:%S' if ($self -> {fulltime}) ;
+            strftime ($format, @time[0..5]) ;
+            } ;
+        }
+
+    if ($time && !$date && ($time =~ /\d+\.\d+\.\d+/))
+        {
+        $date = $time ;
+        }
+
+    return $date ;
+    }
+
+
+# ------------------------------------------------------------------------------------------
+#
+#   get_sort_value - returns the value that should be used to sort
+#
+
+sub get_sort_value
+    {
+    my ($self, $req, $value) = @_ ;
+    
+    $value = $self -> get_value ($req) if (!defined ($value)) ;
+    return $value ;
+    }
+    
+# ------------------------------------------------------------------------------------------
+#
 #   init_data - daten aufteilen
 #
 
@@ -58,62 +150,39 @@ sub init_data
     my $fdat  = $req -> {docdata} || \%fdat ;
     my $name    = $self->{name} ;
     my $time    = $fdat->{$name} ;
-    return if ($time eq '' || ($req -> {"ef_datetime_init_done_$name"} && !$force)) ;
 
-    if ($self -> {dynamic} && ($time =~ /^\s*((?:d|m|y|q)(?:\+|-)?(?:\d+)?)\s*$/))
-        {
-        $fdat->{$name} = $1 ;
+    return if (($time eq '' && !exists $self -> {onempty}) || $self -> {format} eq '-' || ($req -> {"ef_datetime_init_done_$name"} && !$force)) ;
 
-        $req -> {"ef_datetime_init_done_$name"} = 1 ;
-        return ;
-        }
-    
-    
-    my ($y, $m, $d, $h, $min, $s, $z) = ($time =~ /^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(.)/) ;
-
-    # Getting the local timezone
-
-    my $date = eval
-        {
-        my @time = gmtime(timegm_nocheck($s,$min,$h,$d,$m-1,$y-1900)+($tz_local*60));
-
-        my $format = $self -> {notime} || ($s == 0 && $h == 0 && $min == 0)?'%d.%m.%Y':'%d.%m.%Y, %H:%M' ;
-        strftime ($format, @time[0..5]) ;
-        } ;
-
-    if ($time && !$date && ($time =~ /\d+\.\d+\.\d+/))
-        {
-        $date = $time ;
-        }
-
-    $fdat->{$name} = $date ;
+    $fdat->{$name} = $self -> get_display_text ($req, $time) ;
     $req -> {"ef_datetime_init_done_$name"} = 1 ;
     }
 
-# ------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 #
-#   prepare_fdat - daten zusammenfuehren
+#   init_markup - add any dynamic markup to the form data
 #
 
-sub prepare_fdat
+sub init_markup
+
     {
-    my ($self, $req) = @_ ;
+    my ($self, $req, $parentctl, $method) = @_ ;
 
-    return if ($self -> is_readonly ($req)) ;
+    return if (!$self -> is_readonly($req) && (! $parentctl || ! $parentctl -> is_readonly($req))) ;
     
-    my $fdat  = $req -> {form} || \%fdat ;
-    my $name    = $self->{name} ;
-    my $date    = $fdat -> {$name} ;
-    return if ($date eq '') ;
+    return $self -> init_data ($req, $parentctl) ;
+    }
 
-    if ($self -> {dynamic} && ($date =~ /^\s*((?:d|m|y|q)\s*(?:\+|-)?\s*(?:\d+)?)\s*$/))
-        {
-        $fdat->{$name} = $1 ;
-        $fdat->{$name} =~ s/\s//g ;
-        return ;
-        }
-    
-    
+
+# ---------------------------------------------------------------------------
+#
+#   str2time
+#
+
+sub str2time
+
+    {
+    my ($date) = @_ ;
+
     my ($year, $mon, $day, $hour, $min, $sec) ;
     if ($date eq '*' || $date eq '.')
         {
@@ -161,7 +230,36 @@ sub prepare_fdat
                             0, 0, -$tz_local, 0) if ($hour || $min || $sec) ;
         }
 
-    $fdat -> {$name} = $year?sprintf ('%04d%02d%02d%02d%02d%02dZ', $year, $mon, $day, $hour, $min, $sec):'' ;
+    return $year?sprintf ('%04d%02d%02d%02d%02d%02dZ', $year, $mon, $day, $hour, $min, $sec):'' ;
+    }
+
+
+# ------------------------------------------------------------------------------------------
+#
+#   prepare_fdat - daten zusammenfuehren
+#
+
+sub prepare_fdat
+    {
+    my ($self, $req) = @_ ;
+
+    return if ($self -> is_readonly ($req) || $self -> {format} eq '-') ;
+    
+    my $fdat  = $req -> {form} || \%fdat ;
+    my $name    = $self->{name} ;
+    return if (!exists $fdat->{$name}) ;
+    my $date    = $fdat -> {$name} ;
+    return if ($date eq '') ;
+
+    if ($self -> {dynamic} && ($date =~ /^\s*((?:s|i|h|d|w|m|y|q)\s*(?:\+|-)?\s*(?:\d+)?)\s*/))
+        {
+        $fdat->{$name} = $date ; #$1 ;
+        $fdat->{$name} =~ s/\s//g ;
+        return ;
+        }
+    
+    
+    $fdat -> {$name} = str2time ($date) ;
     }
 
 # ---------------------------------------------------------------------------
@@ -235,7 +333,7 @@ Used to create a datetime input control inside an Embperl Form.
 Will format number as a date/time.
 See Embperl::Form on how to specify parameters.
 
-Datetime format in %fdat is excpected as YYYYMMTTHHMMSSZ
+Datetime format in %fdat is expected as YYYYMMTTHHMMSSZ
 
 =head2 PARAMETER
 

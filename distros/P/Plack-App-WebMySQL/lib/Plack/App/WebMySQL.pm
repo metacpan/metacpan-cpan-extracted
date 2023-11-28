@@ -12,7 +12,7 @@ use File::Share ':all';
 use File::Spec;
 our %form;	#data from the previous page
 our $error = "";	#error flag
-our $VERSION ="4.0";	#version of this software
+our $VERSION ="4.01";	#version of this software
 our @ISA = qw(Exporter);
 our @EXPORT = qw(%form $error $VERSION);
 ###############################################################################

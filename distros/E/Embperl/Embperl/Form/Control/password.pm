@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -55,6 +56,7 @@ sub prepare_fdat
 
     my $fdat  = $req -> {form} || \%fdat ;
     my $name    = $self->{name} ;
+    return if (!exists $fdat->{$name}) ;
 
     delete $fdat -> {$name} if ($fdat -> {$name} eq '********') ;
     }
@@ -70,7 +72,10 @@ sub get_validate_auto_rules
     my ($self, $req) = @_ ;
     
     return [ ($self -> {required}?(required => 1):(emptyok => 1)), length_min => 4 ] if (!$self->{retype_name}) ;
-    return [ "same", $self->{retype_name}, ($self -> {required}?(required => 1):(emptyok => 1)), length_min => 4 ] ;
+
+    $req ||= $Embperl::req ;
+    my $text = $self -> form -> convert_label ($self, $self->{retype_name}, undef, $req) ;
+    return [ -frontend_only, "same", $self->{retype_name} . ':' . $text, ($self -> {required}?(required => 1):(emptyok => 1)), length_min => 4 ] ;
     }
 
 

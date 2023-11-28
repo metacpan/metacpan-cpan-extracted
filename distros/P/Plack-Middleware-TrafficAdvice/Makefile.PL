@@ -35,12 +35,11 @@ my %WriteMakefileArgs = (
     "Plack::Test" => 0,
     "Test2::Tools::Compare" => 0,
     "Test2::V0" => 0,
-    "Test::Differences" => 0,
     "Test::More" => 0,
     "strict" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.2.5",
+  "VERSION" => "v0.3.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,7 +61,6 @@ my %FallbackPrereqs = (
   "Plack::Test" => 0,
   "Test2::Tools::Compare" => 0,
   "Test2::V0" => 0,
-  "Test::Differences" => 0,
   "Test::More" => 0,
   "parent" => 0,
   "strict" => 0,

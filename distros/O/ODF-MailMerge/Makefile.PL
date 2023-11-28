@@ -59,6 +59,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
+    "Carp::Always" => "0.16",
     "Cwd" => 0,
     "Data::Dumper" => 0,
     "DateTime::Format::Strptime" => 0,
@@ -83,7 +84,7 @@ my %WriteMakefileArgs = (
     "multidimensional" => 0,
     "parent" => 0
   },
-  "VERSION" => "1.005",
+  "VERSION" => "1.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -93,6 +94,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Carp" => 0,
+  "Carp::Always" => "0.16",
   "Clone" => 0,
   "Cwd" => 0,
   "Data::Dumper" => 0,

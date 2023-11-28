@@ -2,7 +2,7 @@ package Catmandu::Fix;
 
 use Catmandu::Sane;
 
-our $VERSION = '1.2020';
+our $VERSION = '1.2021';
 
 use Moo;
 use Catmandu::Fix::Parser;
@@ -859,7 +859,8 @@ or double quotes:
 
 Most of the Fix commands use paths to point to values
 in a data record. E.g. 'foo.2.bar' is a key 'bar' which is the 3-rd value of the
-key 'foo'.
+key 'foo'. E.g. "foo.''" is a an empty string key which is the value of the key
+'foo'.
 
 A special case is when you want to point to all items in an array. In this case
 the wildcard '*' can be used. E.g. 'foo.*' points to all the items in the 'foo'
@@ -1013,6 +1014,10 @@ Using this code the fix statement can be used like:
     # Will add 'meow' = 'purrpurrpurrpurr'
     meow('purr', count: 4)
 
+To allow using the fix as inline function in Perl code use L<Catmandu::Fix::Inlineable>:
+
+    with 'Catmandu::Fix::Inlineable';
+    
 =head1 SEE ALSO
 
 L<Catmandu::Fixable>,

@@ -5,11 +5,11 @@
 # the SWIG interface file instead.
 
 package Ufal::NameTag;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use base qw(Exporter);
 use base qw(DynaLoader);
 package Ufal::NameTagc;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 bootstrap Ufal::NameTag;
 package Ufal::NameTag;
 @EXPORT = qw();
@@ -55,7 +55,7 @@ package Ufal::NameTag;
 ############# Class : Ufal::NameTag::Ints ##############
 
 package Ufal::NameTag::Ints;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();
@@ -100,7 +100,7 @@ sub ACQUIRE {
 ############# Class : Ufal::NameTag::Forms ##############
 
 package Ufal::NameTag::Forms;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();
@@ -145,7 +145,7 @@ sub ACQUIRE {
 ############# Class : Ufal::NameTag::TokenRange ##############
 
 package Ufal::NameTag::TokenRange;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();
@@ -187,7 +187,7 @@ sub ACQUIRE {
 ############# Class : Ufal::NameTag::TokenRanges ##############
 
 package Ufal::NameTag::TokenRanges;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();
@@ -232,7 +232,7 @@ sub ACQUIRE {
 ############# Class : Ufal::NameTag::NamedEntity ##############
 
 package Ufal::NameTag::NamedEntity;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();
@@ -276,7 +276,7 @@ sub ACQUIRE {
 ############# Class : Ufal::NameTag::NamedEntities ##############
 
 package Ufal::NameTag::NamedEntities;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();
@@ -321,7 +321,7 @@ sub ACQUIRE {
 ############# Class : Ufal::NameTag::Version ##############
 
 package Ufal::NameTag::Version;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();
@@ -368,7 +368,7 @@ sub ACQUIRE {
 ############# Class : Ufal::NameTag::Tokenizer ##############
 
 package Ufal::NameTag::Tokenizer;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();
@@ -403,7 +403,7 @@ sub ACQUIRE {
 ############# Class : Ufal::NameTag::Ner ##############
 
 package Ufal::NameTag::Ner;
-our $VERSION = '1.2.0.1';
+our $VERSION = '1.2.1.1';
 use vars qw(@ISA %OWNER %ITERATORS %BLESSEDMEMBERS);
 @ISA = qw( Ufal::NameTag );
 %OWNER = ();

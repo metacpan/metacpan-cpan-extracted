@@ -12,12 +12,7 @@ class HTTP::Minimal::Socket {
   use Format;
   use Regex;
   use Regex::ReplaceInfo;
-  use Errno;
-  use Sys::Socket::Constant as SOCKET;
-  use Sys::Signal;
-  use Sys::Signal::Constant as SIGNAL;
   use IO::Socket::INET;
-  use IO::Select;
   
   # Enumerations
   private enum {
@@ -25,7 +20,7 @@ class HTTP::Minimal::Socket {
   }
   
   # Fields
-  has timeout : int;
+  has timeout : double;
   
   has socket : IO::Socket;
   
@@ -42,7 +37,7 @@ class HTTP::Minimal::Socket {
     $self->{response_buffer} = $response_buffer;
     
     # The timeout field
-    my $timeout = $options_h->delete_or_default_int("timeout", 60);
+    my $timeout = $options_h->delete_or_default_double("timeout", 60.0);
     $self->{timeout} = $timeout;
     
     return $self;
@@ -142,32 +137,9 @@ class HTTP::Minimal::Socket {
   
   private method write : void ($buffer : string) {
     
-    unless (Sys::OS->is_windows) {
-      my $old_pipe_signal = Sys::Signal->signal(SIGNAL->SIGPIPE, Sys::Signal->SIG_IGN);
-      my $restore_signal = Scope::Guard->new([has old_pipe_signal : Sys::Signal::Handler = $old_pipe_signal] method : void () {
-        Sys::Signal->signal(Sys::Signal::Constant->SIGPIPE, $self->{old_pipe_signal});
-      });
-    }
-    
-    my $can_write = $self->can_write($self->{timeout});
-    unless ($can_write) {
-      die "Timed out while waiting for socket to become ready for writing";
-    }
-    
     my $socket = $self->{socket};
     
-    my $write_length = -1;
-    eval { $socket->write($buffer); }
-    
-    if (my $exception = $@) {
-      my $errno = Errno->errno;
-      if ($errno == Errno->EPIPE) {
-        die "Socket closed by remote server: $exception";
-      }
-      elsif ($errno != Errno->EINTR) {
-        die "Could not write to socket: $exception";
-      }
-    }
+    $socket->write($buffer);
   }
   
   private method read_response : HTTP::Minimal::Message::Response () {
@@ -261,20 +233,7 @@ class HTTP::Minimal::Socket {
         last;
       }
       
-      my $can_read = $self->can_read($self->{timeout});
-      unless ($can_read) {
-        die "Timed out while waiting for socket to become ready for reading";
-      }
-      
-      my $read_length = -1;
-      eval { $read_length = $handle->read($read_buffer, &READ_BUFFER_SIZE); }
-      
-      if ($@) {
-        my $errno = Errno->errno;
-        if ($errno != Errno->EINTR) {
-          die "Could not read from socket: \"$@\"";
-        }
-      }
+      my $read_length = $handle->read($read_buffer, &READ_BUFFER_SIZE);
       
       if ($read_length == 0) {
         last;
@@ -340,42 +299,14 @@ class HTTP::Minimal::Socket {
       $length -= $take;
     }
     
-    unless (Sys::OS->is_windows) {
-      my $old_pipe_signal = Sys::Signal->signal(SIGNAL->SIGPIPE, Sys::Signal->SIG_IGN);
-      my $restore_signal = Scope::Guard->new([has old_pipe_signal : Sys::Signal::Handler = $old_pipe_signal] method : void () {
-        Sys::Signal->signal(Sys::Signal::Constant->SIGPIPE, $self->{old_pipe_signal});
-      });
-    }
-    
     my $buffer = (mutable string)new_string_len(&READ_BUFFER_SIZE);
     
     while ($length > 0) {
-      my $can_read = $self->can_read($self->{timeout});
-      
-      unless ($can_read) {
-        die "Timed out while waiting for socket to become ready for reading";
-      }
-      
       my $socket = $self->{socket};
       
-      Errno->set_errno(0);
-      
-      my $read_length = $socket->read($buffer, length $buffer - $leftover_length, $leftover_length);
-      
-      my $errno = Errno->errno;
-      
-      if ($read_length >= 0) {
-        Fn->shorten($buffer, $read_length);
-        
-        if ($read_length == 0) {
-          last;
-        }
-        $length -= $read_length;
-      }
-      elsif ($errno != Errno->EINTR) {
-        die "Could not read from socket.";
-      }
+      $socket->read($buffer, length $buffer - $leftover_length, $leftover_length);
     }
+    
     if ($length && !$allow_partial) {
       die "Unexpected end of stream";
     }
@@ -383,74 +314,6 @@ class HTTP::Minimal::Socket {
     my $ret = $leftover . $buffer;
     
     return $ret;
-  }
-  
-  private method can_read : int ($type : string, $timeout : int = -1) {
-    
-    my $can_read = $self->do_timeout("read", $timeout);
-    
-    return $can_read;
-  }
-  
-  private method can_write : int ($type : string, $timeout : int = -1) {
-    
-    my $can_write = $self->do_timeout("write", $timeout);
-    
-    return $can_write;
-  }
-  
-  private method do_timeout : int ($type : string, $timeout : int) {
-    
-    if ($timeout < 0) {
-      $timeout = $self->{timeout};
-    }
-    
-    my $handle_fileno = $self->{socket}->fileno;
-    
-    unless ($handle_fileno >= 0) {
-      die("select(2): Bad file descriptor");
-    }
-    
-    my $initial = Sys::Time->time;
-    my $pending = $timeout;
-    
-    my $select = IO::Select->new;
-    
-    $select->add($handle_fileno);
-    
-    my $nfound = 0;
-    while ($nfound == 0) {
-      eval {
-        if ($type eq "read") {
-          my $readable_handles = $select->can_read($timeout);
-          if (@$readable_handles) {
-            $nfound = 1;
-          }
-        }
-        else {
-          my $writable_handles = $select->can_write($timeout);
-          if (@$writable_handles) {
-            $nfound = 1;
-          }
-        }
-      }
-      
-      
-      if ($@) {
-        my $errno = Errno->errno;
-        unless ($errno == Errno->EINTR) {
-          die $@;
-        }
-        
-        if ($timeout < 0 || ($pending = $timeout - (int)(Sys::Time->time - $initial)) > 0) {
-          next;
-        }
-        
-        $nfound = 0;
-      }
-    }
-    
-    return $nfound;
   }
   
   private method to_printable : string ($string : string) {

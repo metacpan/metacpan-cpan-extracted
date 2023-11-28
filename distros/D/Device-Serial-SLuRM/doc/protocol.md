@@ -9,14 +9,23 @@ A NOTIFY message is a simple notification from one peer to the other, that does 
 
 A REQUEST message carries typically some sort of command instruction, to which the peer should respond with a RESPONSE or ERR packet. Replies to a REQUEST message do not have to be sent sequentially.
 
+Topology
+--------
+
+There are two variants of the protocol, for different topology situations, which use different header formats.
+
+* 3-byte header: Used between exactly two endpoints connected by a full-duplex asynchronous serial connection, such as RS-232 or TTL UART. In this situation, node IDs are not needed as a message transmitted by either node will only be received by the other. Any received message is already received by only the intended node.
+
+* 4-byte header: Used on an entire bus of two or more endpoints connected by a shared half-duplex asynchronous serial connection, such as RS-485. One endpoint is distinguished as being special; the "controller". This is typically a computer (or at least, the endpoint with the most compute power and memory) controlling the bus. All other endpoints are called "nodes", and are distinguished by having unique 7-bit ID numbers. The controller does not need an ID number. All messages are sent from the controller to some node, or from a node to the controller; non-controller nodes do not communicate directly. This variant is called "MSLµRM", for "Multidrop SLµRM".
+
 Packets
 -------
 
 Packets are variable-length over async serial at an application-defined baud rate. 8 bits are required. Parity checking is not required as higher-level checksumming is employed by the protocol.
 
-Each packet consists of a SYNC byte (0x55), followed by a 3-byte header, a variable-length application data payload, and a final checksum byte.
+Each packet consists of a SYNC byte (0x55), followed by a 3- or 4-byte header, a variable-length application data payload, and a final checksum byte.
 
-The 3-byte header consists of a packet-control field, a length field, and a CRC which protects the header itself:
+The 3-byte header is used in full-duplex 2-node situations, and consists of a packet-control field, a length field, and a CRC which protects the header itself:
 
 ```
   0x55  PKTCTRL LENGTH HEADER-CRC body... PACKET-CRC
@@ -24,7 +33,15 @@ The 3-byte header consists of a packet-control field, a length field, and a CRC 
         +--------------------------------------||
 ```
 
-The HEADER-CRC is the CRC8 checksum of the two preceeding header bytes. The PACKET-CRC is the CRC8 checksum of the entire packet, including all three header bytes and the entire body. LENGTH gives the number of bytes in the body section; this may be zero. The initial sync byte is not included in either CRC check.
+The 4-byte header is used in multi-drop situations, and adds a node addressing field to the header:
+
+```
+  0x55  PKTCTRL ADDR LENGTH HEADER-CRC body... PACKET-CRC
+        +-----------------------||                  ||
+        +-------------------------------------------||
+```
+
+The HEADER-CRC is the CRC8 checksum of the preceeding header bytes. The PACKET-CRC is the CRC8 checksum of the entire packet, including all the header bytes and the entire body. LENGTH gives the number of bytes in the body section; this may be zero. The initial sync byte is not included in either CRC check.
 
 Example: The "trivial" packet consisting of a zero PKTCTRL field and no body bytes:
 
@@ -40,10 +57,18 @@ A packet with PKTCTRL=0x12 and three body bytes ("ABC"):
 
 The PKTCTRL field itself is broken into two 4-bit sub-fields; the packet type occupies the upper 4 bits, the sequence number the lower 4. The above packet has packet type 0x10, sequence number 2, and the body bytes "ABC".
 
+The ADDR field is broken into a single bit indicating direction, and a 7-bit field containing the node ID. The topmost bit of the ADDR field is 1 for messages transmitted by the controller to a node, and 0 for messages transmitted by nodes to the controller. The remaining 7 bits encode the ID number of the destination or source node.
+
+The ADDR field gives a simple way for endpoints to filter received packets for interest; as on a shared bus system such as RS-485 each node will receive messages destined for others, and may also receive reflections of its own transmissions. The controller must ignore any incoming packet with the direction bit high, and other nodes must ignore any packet with the direction bit low, or whose ID number does not match its own.
+
+On a multi-drop system, after packets are filtered, the remaining packet semantics work the same as for the direct two-endopoint case described below.
+
 Messages
 --------
 
 The packet type field indicates the type of message being conveyed. Regular messages use a non-zero packet type. In this case, the sequence number field contains an integer that is incremented for each new message. Transmitters may wish to transmit packets more than once for reliability; receivers should discard duplicates based on the sequence number. Reply packets (those with packet type 0x80 or above) use the sequence number of the originating message they reply to, and *not* the next sequence number the transmitting party would have sent.
+
+When implementing the controller of a multi-drop system, remember that sequence numbers apply per node ID and each must be handled independently.
 
 Packets whose packet type is zero are protocol-control messages, not for delivery to the application. Instead they are interpreted internally within the protocol. They use the sequence number field of the PKTCTRL byte 
 

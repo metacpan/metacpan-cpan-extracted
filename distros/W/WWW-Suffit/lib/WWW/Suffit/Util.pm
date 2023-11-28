@@ -10,7 +10,7 @@ WWW::Suffit::Util - The Suffit utilities
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,37 @@ Version 1.01
 
 Exported utility functions
 
-=head3 dformat
+=head2 color
+
+    say color(blue => "Format %s %s" => "text", "foo");
+    say color(cyan => "text");
+    say color("red on_bright_yellow" => "text");
+    say STDERR color("red on_bright_yellow" => "text");
+
+Returns colored formatted string if is session was runned from terminal
+
+Supported normal foreground colors:
+
+    black, red, green, yellow, blue, magenta, cyan, white
+
+Bright foreground colors:
+
+    bright_black, bright_red,     bright_green, bright_yellow
+    bright_blue,  bright_magenta, bright_cyan,  bright_white
+
+Normal background colors:
+
+    on_black, on_red,     on_green, on yellow
+    on_blue,  on_magenta, on_cyan,  on_white
+
+Bright background color:
+
+    on_bright_black, on_bright_red,     on_bright_green, on_bright_yellow
+    on_bright_blue,  on_bright_magenta, on_bright_cyan,  on_bright_white
+
+See also L<Term::ANSIColor>
+
+=head2 dformat
 
     $string = dformat( $mask, \%replacehash );
     $string = dformat( $mask, %replacehash );
@@ -148,9 +178,10 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 =cut
 
 use vars qw/ $VERSION @EXPORT_OK @EXPORT /;
-$VERSION = '1.01';
+$VERSION = '1.02';
 
 use Carp;
+use Term::ANSIColor qw/colored/;
 use POSIX qw/ ceil strftime /;
 use Digest::MD5;
 
@@ -158,7 +189,7 @@ use Mojo::Util qw/ trim /;
 use Mojo::JSON qw/ decode_json encode_json /;
 use Mojo::File qw/ path /;
 
-use WWW::Suffit::Const qw/ DATE_FORMAT DATETIME_FORMAT /;
+use WWW::Suffit::Const qw/ IS_TTY DATE_FORMAT DATETIME_FORMAT /;
 
 use base qw/Exporter/;
 @EXPORT = (qw/
@@ -169,6 +200,7 @@ use base qw/Exporter/;
         dformat
         md5sum
         json_load json_save
+        color
     /, @EXPORT);
 
 use constant HUMAN_SUFFIXES => {
@@ -302,6 +334,14 @@ sub dformat {
     my $d = @_ ? @_ > 1 ? {@_} : {%{$_[0]}} : {};
     $f =~ s/\[([A-Z0-9_\-.]+?)\]/(defined($d->{$1}) ? $d->{$1} : "[$1]")/eg;
     return $f;
+}
+
+# Colored helper function
+sub color {
+    my $clr = shift;
+    my $txt = (scalar(@_) == 1) ? shift(@_) : sprintf(shift(@_), @_);
+    return $txt unless defined($clr) && length($clr);
+    return IS_TTY ? colored([$clr], $txt) : $txt;
 }
 
 1;

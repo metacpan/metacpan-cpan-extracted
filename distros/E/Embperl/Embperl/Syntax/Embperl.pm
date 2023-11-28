@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,8 +12,7 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: Embperl.pm 1578075 2014-03-16 14:01:14Z richter $
-#
+
 ###################################################################################
  
 
@@ -65,7 +65,7 @@ Embperl::Syntax::Embperl - Embperl syntax module for Embperl.
 
 =head1 DESCRIPTION
 
-This module provides the default syntax for Embperl and include all defintions
+This module provides the default syntax for Embperl and include all definitions
 from EmbperlHTML and EmbperlBlocks.
 
 =head1 Author

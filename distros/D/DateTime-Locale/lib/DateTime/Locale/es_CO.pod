@@ -52,7 +52,7 @@ Spanish Colombia locale.
 
   L
   M
-  M
+  m
   J
   V
   S

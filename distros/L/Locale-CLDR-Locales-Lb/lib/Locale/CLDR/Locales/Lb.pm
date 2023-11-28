@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lb - Package for language Luxembourgish
 
 package Locale::CLDR::Locales::Lb;
 # This file auto generated from Data\common\main\lb.xml
-#	on Fri 13 Oct  9:25:14 am GMT
+#	on Sat  4 Nov  6:11:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';
@@ -461,6 +461,10 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(null),
 				},
+				'x.x' => {
+					divisor => q(1),
+					rule => q(=%spellout-cardinal-masculine=),
+				},
 				'1' => {
 					base_value => q(1),
 					divisor => q(1),
@@ -524,13 +528,9 @@ has 'algorithmic_number_format_data' => (
 					divisor => q(1),
 					rule => q(net eng Nummer),
 				},
-				'x.x' => {
-					divisor => q(1),
-					rule => q(=%spellout-cardinal-masculine=),
-				},
 				'max' => {
 					divisor => q(1),
-					rule => q(=%spellout-cardinal-masculine=),
+					rule => q(net eng Nummer),
 				},
 			},
 		},

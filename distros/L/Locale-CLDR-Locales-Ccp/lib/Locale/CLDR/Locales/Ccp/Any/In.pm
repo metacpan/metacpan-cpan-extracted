@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ccp::Any::In - Package for language Chakma
 
 package Locale::CLDR::Locales::Ccp::Any::In;
 # This file auto generated from Data\common\main\ccp_IN.xml
-#	on Fri 13 Oct  9:09:43 am GMT
+#	on Sat  4 Nov  5:56:24 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

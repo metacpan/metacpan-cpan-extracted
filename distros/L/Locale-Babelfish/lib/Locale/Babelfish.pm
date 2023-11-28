@@ -2,7 +2,7 @@ package Locale::Babelfish;
 
 # ABSTRACT: Perl I18n using https://github.com/nodeca/babelfish format.
 
-our $VERSION = '2.10'; # VERSION
+our $VERSION = '2.12'; # VERSION
 
 
 use utf8;
@@ -107,13 +107,11 @@ sub look_for_watchers {
 sub t_or_undef {
     my ( $self, $dictname_key, $params, $custom_locale ) = @_;
 
-
     confess 'No dictname_key' unless $dictname_key;
     # запрещаем ключи не ASCII
     confess("wrong dictname_key: $dictname_key")  if $dictname_key =~ m/\P{ASCII}/;
 
     my $locale = $custom_locale ? $self->detect_locale( $custom_locale ) : $self->{locale};
-
     my $r = $self->{dictionaries}->{$locale}->{$dictname_key};
 
     if ( defined $r ) {
@@ -123,8 +121,7 @@ sub t_or_undef {
             );
         }
         elsif ( ref( $r ) eq 'ARRAY' ) {
-            $self->{dictionaries}{$locale}{$dictname_key} = $r
-                                                          = _process_list_items( $r, $locale );
+            $self->{dictionaries}{$locale}{$dictname_key} = $r = _process_list_items( $r, $locale );
         }
     }
      # fallbacks
@@ -371,12 +368,15 @@ sub _process_list_items {
             }
             # Нужно скомпилить значения в хэшрефе
             elsif ( ref( $item ) eq 'HASH' ) {
+                my $new_item = {};
                 while ( my ( $key, $value ) = each ( %$item ) ) {
                     if ( ref ($value) eq 'CODE' ) {
-                        $item->{$key}  = $value->(@_);
+                        $new_item->{$key}  = $value->(@_);
+                    } else {
+                        $new_item->{$key} = $value;
                     }
                 }
-                push @{ $results }, $item;
+                push @{ $results }, $new_item;
             }
             else {
                 push @{ $results }, $item;
@@ -413,7 +413,7 @@ Locale::Babelfish - Perl I18n using https://github.com/nodeca/babelfish format.
 
 =head1 VERSION
 
-version 2.10
+version 2.12
 
 =head1 DESCRIPTION
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 11;
+use Test::More;
 use Scalar::Util qw< refaddr >;
 
 use Math::BigInt;
@@ -113,3 +113,36 @@ subtest '$y = Math::BigInt -> as_float("3.5");' => sub {
     is(ref($y), 'Math::BigFloat', 'class of $y');
     cmp_ok($y -> numify(), "==", 3.5, 'value of $y');
 };
+
+note("as_float() preserves all instance variables");
+
+Math::BigInt -> upgrade(undef);
+Math::BigFloat -> downgrade(undef);
+Math::BigFloat -> upgrade(undef);
+
+$x = Math::BigInt -> new("3");
+
+$x -> accuracy(2);
+$y = $x -> as_float();
+
+subtest '$x = Math::BigInt -> new("3"); $x -> accuracy(2); $y = $x -> as_float()'
+  => sub {
+      plan tests => 4;
+      is($x -> accuracy(), 2, 'accuracy of $x');
+      is($x -> precision(), undef, 'precision of $x');
+      is($y -> accuracy(), $x -> accuracy(), 'accuracy of $y');
+      is($y -> precision(), $x -> precision(), 'precision of $y');
+  };
+
+$x -> precision(2);
+$y = $x -> as_float();
+
+subtest '$x = Math::BigInt -> new("3"); $x -> precision(2); $y = $x -> as_float()'
+  => sub {
+      is($x -> accuracy(), undef, 'accuracy of $x');
+      is($x -> precision(), 2, 'precision of $x');
+      is($y -> accuracy(), $x -> accuracy(), 'accuracy of $y');
+      is($y -> precision(), $x -> precision(), 'precision of $y');
+  };
+
+done_testing();

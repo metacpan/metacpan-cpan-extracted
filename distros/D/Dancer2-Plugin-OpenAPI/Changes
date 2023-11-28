@@ -1,0 +1,40 @@
+Revision history for Dancer2-Plugin-OpenAPI
+
+1.0.1 2023-11-18
+ [BUG FIXES]
+ - Default for the main_api_module isn't properly resolved for Perl <
+   v5.36.0. (GH#4, bug report by eserte)
+
+1.0.0 2023-11-16
+ [API CHANGES]
+ - Port to Dancer2 (was Dancer-Plugin-Swagger)
+
+0.2.0 2016-04-02
+ [ENHANCEMENTS]
+ - Paths can now have tags.
+ - Add sugar to 'swagger_path'.
+ - 'swagger_definition' now returns the schema ref.
+ - Updated to Swagger-UI 2.1.4.
+
+ [STATISTICS]
+ - code churn: 23 files changed, 15378 insertions(+), 20894 deletions(-)
+
+0.1.0 2016-01-03
+ [ENHANCEMENTS]
+ - Responses can now be validated via JSON::Schemas::AsType.
+
+ [STATISTICS]
+ - code churn: 5 files changed, 45 insertions(+), 13 deletions(-)
+
+0.0.2 2016-01-03
+ [BUG FIXES]
+ - POD syntax fixes (GH#1, moltar)
+
+ [STATISTICS]
+ - code churn: 3 files changed, 19 insertions(+), 2 deletions(-)
+
+0.0.1 2015-12-22
+ - First version, unleashed on an unsuspecting world.
+
+ [STATISTICS]
+ - code churn: 5 files changed, 290 insertions(+), 253 deletions(-)

@@ -8,7 +8,7 @@ use Cwd 'abs_path';
 use Scalar::Util 'blessed', 'looks_like_number';
 use CodeGen::Cpppp::Template;
 
-our $VERSION= '0.002'; # VERSION
+our $VERSION= '0.003'; # VERSION
 # ABSTRACT: The C Perl-Powered Pre-Processor
 
 
@@ -19,6 +19,11 @@ sub autoindent($self, $newval=undef) {
 sub autocolumn($self, $newval=undef) {
    $self->{autocolumn}= $newval if defined $newval;
    $self->{autocolumn} // 1;
+}
+
+sub convert_linecomment_to_c89($self, $newval=undef) {
+   $self->{convert_linecomment_to_c89}= $newval if defined $newval;
+   $self->{convert_linecomment_to_c89} // 0;
 }
 
 
@@ -127,14 +132,8 @@ sub _gen_perl_template_package($self, $parse, %opts) {
       ("use CodeGen::Cpppp::Template -setup => $cpppp_ver;")x!($tpl_use_line),
       # All the rest of the user's use/no statements
       @global,
-      # Everything after that goes into a sub
-      "sub BUILD(\$self, \$constructor_parameters=undef) {",
-      "  Scalar::Util::weaken(\$self);",
-      # Inject all the lexical functions that need to be in scope
-      $pkg->_gen_perl_scope_functions($cpppp_ver),
-      qq{# line $src_lineno "$src_filename"},
-      $perl,
-      "}",
+      # Everything after that goes into a BUILD method
+      $pkg->_gen_BUILD_method($cpppp_ver, $perl, $src_filename, $src_lineno),
       "1";
 }
 
@@ -422,8 +421,29 @@ sub backup_and_overwrite_file($self, $fname, $new_content) {
 }
 
 
-sub write_sections_to_file($self, $sections, $fname, $patch_markers=undef) {
+sub get_filtered_output($self, $sections) {
    my $content= $self->output->get($sections);
+   if ($self->convert_linecomment_to_c89) {
+      # rewrite '//' comments as '/*' comments
+      require CodeGen::Cpppp::CParser;
+      my @tokens= CodeGen::Cpppp::CParser->tokenize($content);
+      my $ofs= 0;
+      for (@tokens) {
+         $_->[2] += $ofs;
+         if ($_->type eq 'comment') {
+            if (substr($content, $_->src_pos, 2) eq '//') {
+               substr($content, $_->src_pos, $_->src_len, '/*'.$_->value.' */');
+               $ofs += 3;
+            }
+         }
+      }
+   }
+   $content;
+}
+
+
+sub write_sections_to_file($self, $sections, $fname, $patch_markers=undef) {
+   my $content= $self->get_filtered_output($sections);
    if (defined $patch_markers) {
       $self->patch_file($fname, $patch_markers, $content);
    } else {
@@ -451,9 +471,51 @@ __END__
 
 CodeGen::Cpppp - The C Perl-Powered Pre-Processor
 
-=head1 VERSION
+=head1 RATIONALE
 
-version 0.002
+I<It's very special, because, if you can see, the preprocessor, goes up, to
+C<perl>.  Look, right across the directory, C<perl>, C<perl>, C<perl>.>
+
+=over
+
+I<And most distributions go up to C<m4> >
+
+=back
+
+I<Exactly>
+
+=over
+
+I<Does that mean it's more powerful?  ...Is it more powerful?>
+
+=back
+
+I<Well, it's one layer of abstraction higher, isn't it?  It's not C<m4>.
+You see, most blokes gonna be templating with C<cpp> or C<m4>, you're on C<m4>
+here all the way up, all the way up, aaaall the way up, you're at C<m4> for your
+pre-processing, Where can you go from there? Where?  Nowhere!  Exactly.>
+
+I<What we do is if we need that extra, push over the cliff, you know what we do?>
+
+=over
+
+I<put it up to C<perl> >
+
+=back
+
+I< C<perl>, exactly. One higher. >
+
+=over
+
+I<Why don't you just download the C<cpp> source, and enhance it with the
+abstractions you need?  Make C<cpp> more powerful, and make C<cpp> be the
+preprocessor?>
+
+=back
+
+I<...>
+
+I<... These go to B<perl>.>
 
 =head1 SYNOPSIS
 
@@ -508,6 +570,12 @@ B<Output:>
              right: 15;
   };
 
+=head1 SECURITY
+
+B<Templates are equivalent to perl scripts>.  Use the same caution when
+using cpppp templates that you would use when running perl scripts.
+Do not load, compile, or render templates from un-trusted authors.
+
 =head1 DESCRIPTION
 
 This module is a preprocessor for C, or maybe more like a perl template engine
@@ -548,58 +616,6 @@ Directly perform the work of inlining one function into another.
 
 =back
 
-=head1 RATIONALE
-
-I<It's very special, because, if you can see, the preprocessor, goes up, to
-C<perl>.  Look, right across the directory, C<perl>, C<perl>, C<perl>.>
-
-=over
-
-I<And most distributions go up to C<m4> >
-
-=back
-
-I<Exactly>
-
-=over
-
-I<Does that mean it's more powerful?  ...Is it more powerful?>
-
-=back
-
-I<Well, it's one layer of abstraction higher, isn't it?  It's not C<m4>.
-You see, most blokes gonna be templating with C<cpp> or C<m4>, you're on C<m4>
-here all the way up, all the way up, aaaall the way up, you're at C<m4> for your
-pre-processing, Where can you go from there? Where?  Nowhere!  Exactly.>
-
-I<What we do is if we need that extra, push over the cliff, you know what we do?>
-
-=over
-
-I<put it up to C<perl> >
-
-=back
-
-I< C<perl>, exactly. One higher. >
-
-=over
-
-I<Why don't you just download the C<cpp> source, and enhance it with the
-abstractions you need?  Make C<cpp> more powerful, and make C<cpp> be the
-preprocessor?>
-
-=back
-
-I<...>
-
-I<... These go to B<perl>.>
-
-=head1 SECURITY NOTICE
-
-B<Templates are equivalent to perl scripts>.  Use the same caution when
-using cpppp templates that you would use when running perl scripts.
-Do not load, compile, or render templates from un-trusted authors.
-
 =head1 ATTRIBUTES
 
 =head2 autoindent
@@ -612,6 +628,11 @@ variables that expand in the source code will automatically have indent applied.
 Default value for new templates; enables the feature that detects column layout
 in the source template, and attempts to line up those same elements in the
 output after variables have been expanded.
+
+=head2 convert_linecomment_to_c89
+
+If true, rewrite the output to convert newer '//' comments into traditional
+'/*' comments.
 
 =head2 include_path
 
@@ -692,18 +713,29 @@ Create a backup of $filename if it already exists, and then write a new file
 containing C<$new_content>.  The backup is created by appending a ".N" to the
 filename, choosing the first available "N" counting upward from 0.
 
+=head2 get_filtered_output
+
+  my $text= $cpppp->get_filtered_output($sections);
+
+Like C<< $cpppp->output->get >>, but also apply filters to the output, like
+L</convert_linecomment_to_c89>.
+
 =head2 write_sections_to_file
 
   $cpppp->write_sections_to_file($section_spec, $filename);
   $cpppp->write_sections_to_file($section_spec, $filename, $patch_markers);
 
 This is a simple wrapper around L<CodeGen::Cpppp::Output/get> and either
-C</backup_and_overwrite_file> or L</patch_file>, depending on whether you
+L</backup_and_overwrite_file> or L</patch_file>, depending on whether you
 supply C<$patch_markers>.
 
 =head1 AUTHOR
 
 Michael Conrad <mike@nrdvana.net>
+
+=head1 VERSION
+
+version 0.003
 
 =head1 COPYRIGHT AND LICENSE
 

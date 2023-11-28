@@ -1,5 +1,9 @@
 Revision history for AnyEvent-Connector
 
+0.04    2023-11-07
+        [Bug fix]
+        fix probable memory leak (gh#2)
+
 0.03    2018-04-02
         [Bug fix]
         fix exception (warning) when the proxy responds with non-2XX HTTP status.

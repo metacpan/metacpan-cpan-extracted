@@ -149,6 +149,7 @@ my @files = (
     't/zzz-acceptance-draft2020-12.t',
     't/zzz-acceptance-draft7-format.t',
     't/zzz-acceptance-draft7.t',
+    't/zzz-check-breaks.t',
     'xt/author/00-compile.t',
     'xt/author/clean-namespaces.t',
     'xt/author/distmeta.t',

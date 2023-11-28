@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/text_post.pl
+lib/At.pm
+lib/At/Bluesky.pm
+lib/At/Lexicons/app/bsky/feed/post.pm
+lib/At/Lexicons/app/bsky/richtext/facet.pm
+minil.toml
+t/00_compile.t
+t/02_com_atproto_server.t
+t/10_did.t
+META.yml
+MANIFEST

@@ -1,4 +1,10 @@
 use v5.26;
+
+use strict;
+use warnings;
+no indirect;
+use feature 'signatures';
+
 use Object::Pad;
 # ABSTRACT: Solidity uint/int/bool type interface
 
@@ -8,13 +14,17 @@ class Blockchain::Ethereum::ABI::Type::Int
     :does(Blockchain::Ethereum::ABI::TypeRole);
 
 our $AUTHORITY = 'cpan:REFECO';    # AUTHORITY
-our $VERSION   = '0.013';          # VERSION
+our $VERSION   = '0.015';          # VERSION
 
 use Carp;
 use Math::BigInt try => 'GMP';
 use Scalar::Util qw(looks_like_number);
 
-use constant DEFAULT_INT_SIZE => 256;
+use constant {
+    DEFAULT_INT_SIZE => 256,
+    HFF              => '0x' . 'F' x 64,
+    HMAX             => '0x8' . '0' x 63
+};
 
 method _configure { return }
 
@@ -37,6 +47,8 @@ method encode {
     croak "Invalid bool data it must be 1 or 0 but given @{[$self->data]}"
         if !$bdata->is_zero && !$bdata->is_one && $self->signature =~ /^bool/;
 
+    $bdata->bneg->bxor(HFF)->binc if $bdata->is_neg;
+
     $self->_push_static($self->pad_left($bdata->to_hex));
 
     return $self->_encoded;
@@ -44,7 +56,11 @@ method encode {
 
 method decode {
 
-    return Math::BigInt->from_hex($self->data->[0]);
+    my $bdata = Math::BigInt->from_hex(ref $self->data eq 'ARRAY' ? $self->data->[0] : $self->data);
+
+    $bdata->bxor(HFF)->binc->bneg if $bdata->copy->band(HMAX);
+
+    return $bdata;
 }
 
 method fixed_length :override {
@@ -69,7 +85,7 @@ Blockchain::Ethereum::ABI::Type::Int - Solidity uint/int/bool type interface
 
 =head1 VERSION
 
-version 0.013
+version 0.015
 
 =head1 SYNOPSIS
 

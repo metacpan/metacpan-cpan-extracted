@@ -46,6 +46,7 @@ do { my $x = {
                                       'List::UtilsBy' => '0',
                                       'Log::Any' => '0',
                                       'Log::Any::Adapter' => '0',
+                                      'MIME::Base64' => '0',
                                       'Net::Async::HTTP' => '0',
                                       'Net::Async::HTTP::Server' => '0',
                                       'Path::Tiny' => '0',

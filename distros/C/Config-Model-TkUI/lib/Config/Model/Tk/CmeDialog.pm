@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::CmeDialog 1.376;
+package Config::Model::Tk::CmeDialog 1.377;
 
 use strict;
 use warnings;

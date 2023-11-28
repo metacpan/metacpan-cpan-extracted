@@ -81,13 +81,13 @@ send(fd,data,flags, ...)
           buf=SvPVX(data);
           ret=send(SvIV(fd), buf, len, flags);
         }
-      }
-      if(ret<0){
+        if(ret<0){
 
-        RETVAL=&PL_sv_undef;
-      }
-      else{
-        RETVAL=newSViv(ret);
+          RETVAL=&PL_sv_undef;
+        }
+        else{
+          RETVAL=newSViv(ret);
+        }
       }
     }
     else{

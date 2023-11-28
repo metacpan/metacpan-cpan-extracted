@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Moo' => 0,
-	'MooX::Keyword' => '0.04'
+	'MooX::Keyword' => '0.05'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'MooX-Keyword-Field-*' },

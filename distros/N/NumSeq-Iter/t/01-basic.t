@@ -30,7 +30,7 @@ subtest intrange_iter => sub {
     dies_ok { numseq_iter('1,2,...') } 'not enough number before ellipsis';
     dies_ok { numseq_iter('1,2,3,...10') } 'missing comma before last number';
     dies_ok { numseq_iter('1,2,3,...,10,11') } 'too many numbers after ellipsis';
-    dies_ok { numseq_iter('2,3,5,...,100') } 'unknown pattern';
+    dies_ok { numseq_iter('2,3,7,...,100') } 'unknown pattern';
 
     is_deeply(iter_vals(numseq_iter('1')), [1]);
     is_deeply(iter_vals(numseq_iter('1,3,2')), [1,3,2]);
@@ -52,6 +52,8 @@ subtest intrange_iter => sub {
     is_deeply(iter_vals(numseq_iter('1,3,9,...,100')), [1,3,9,27,81]);
     is_deeply(iter_vals(numseq_iter('81,27,9,...,1')), [81,27,9,3,1]);
     is_deeply(iter_vals(numseq_iter('81,27,9,...,2')), [81,27,9,3]);
+    # fibonacci
+    is_deeply(iter_vals_some(numseq_iter('1,1,2,...')), [1,1,2,3,5,8]);
 };
 
 done_testing;

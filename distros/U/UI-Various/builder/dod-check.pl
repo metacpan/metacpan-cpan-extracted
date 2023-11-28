@@ -78,11 +78,10 @@ use File::Remove;
 #########################
 
 # path to package and some of its files / paths:
-use constant DIR0 => abs_path($0);
-# s/.../.../r needs Perl 5.22, so we use more complicated expressions here:
-use constant ROOT_PATH	=> eval{ $_ = DIR0; s|/[^/]+/[^/]+$||; $_ };
-use constant MY_DIR	=> eval{ $_ = DIR0; s|^.*/([^/]+)/[^/]+$|$1|; $_ };
-use constant ID		=> eval{ $_ = ROOT_PATH; s|^.*/||; $_ };
+use constant DIR0	=> abs_path(substr($0, 0, rindex($0, '/')));
+use constant ROOT_PATH	=> abs_path(substr(DIR0, 0, rindex(DIR0, '/')));
+use constant MY_DIR	=> substr(DIR0, rindex(DIR0, '/') + 1);
+use constant ID		=> substr(ROOT_PATH, rindex(ROOT_PATH, '/') + 1);
 use constant ID_DIR	=> eval{ $_ = ID; tr|-|/|; $_ };
 use constant ID_MOD	=> eval{ $_ = ID; s|-|::|g; $_ };
 use constant CODE_DIRS => (glob("builder*"),

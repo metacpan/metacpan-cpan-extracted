@@ -9,7 +9,7 @@ build_requires:
   SQL::Abstract::Test: '0'
   Task::Weaken: '0'
 configure_requires:
-  Module::Build: '0.42'
+  Module::Build: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -20,7 +20,7 @@ name: DBIx-DataModel
 provides:
   DBIx::DataModel:
     file: lib/DBIx/DataModel.pm
-    version: '3.05'
+    version: '3.06'
   DBIx::DataModel::Compatibility::V0:
     file: lib/DBIx/DataModel/Compatibility/V0.pm
   DBIx::DataModel::Compatibility::V1:
@@ -117,7 +117,7 @@ requires:
   Module::Load: '0'
   Params::Validate: '0'
   SQL::Abstract::Classic: '1.91'
-  SQL::Abstract::More: '1.39'
+  SQL::Abstract::More: '1.4'
   Scalar::Util: '1.07'
   Storable: '0'
   Try::Tiny: '0'
@@ -127,5 +127,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/damil/DBIx-DataModel
-version: '3.05'
+version: '3.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

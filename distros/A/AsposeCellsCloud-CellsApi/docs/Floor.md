@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::Floor;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Border** | **Line** |  |
+**Border** | **Line** | Gets or sets the border . |
 **BackgroundColor** | **Color** |  |
 **FillFormat** | **FillFormat** |  |
 **ForegroundColor** | **Color** |  |

@@ -29,7 +29,7 @@ B<-- 불연속> 옵션과 함께 사용할 경우 입력 및 출력 데이터의
 
 =head1 VERSION
 
-Version 0.9901
+Version 0.9902
 
 =head1 OPTIONS
 
@@ -43,19 +43,25 @@ Version 0.9901
 
 필터 명령에 전달하기 전에 빈 줄이 아닌 일련의 줄을 한 줄로 결합합니다. 넓은 문자 사이의 개행 문자는 삭제되고 다른 개행 문자는 공백으로 바뀝니다.
 
-=item B<--blockmatch>
+=item B<--blocks>
 
 일반적으로 지정된 검색 패턴과 일치하는 영역이 외부 명령으로 전송됩니다. 이 옵션을 지정하면 일치하는 영역이 아니라 해당 패턴이 포함된 전체 블록이 처리됩니다.
 
 예를 들어 C<foo> 패턴이 포함된 줄을 외부 명령으로 보내려면 전체 줄에 일치하는 패턴을 지정해야 합니다:
 
-    greple -Mtee cat -n -- '^.*foo.*\n'
+    greple -Mtee cat -n -- '^.*foo.*\n' --all
 
-하지만 B<--blockmatch> 옵션을 사용하면 다음과 같이 간단하게 수행할 수 있습니다:
+하지만 B<--블록> 옵션을 사용하면 다음과 같이 간단하게 수행할 수 있습니다:
 
-    greple -Mtee cat -n -- foo
+    greple -Mtee cat -n -- foo --blocks
 
-B<--blockmatch> 옵션을 사용하면 이 모듈은 L<teip(1)>의 B<-g> 옵션과 비슷하게 동작합니다.
+B<--블록> 옵션을 사용하면 이 모듈은 L<teip(1)>의 B<-g> 옵션처럼 동작합니다. 그렇지 않으면 B<-o> 옵션이 있는 L<teip(1)>와 동작이 유사합니다.
+
+블록이 전체 데이터가 되므로 B<--블록>을 B<--all> 옵션과 함께 사용하지 마십시오.
+
+=item B<--squeeze>
+
+두 개 이상의 연속된 개행 문자를 하나로 결합합니다.
 
 =back
 
@@ -158,118 +164,3 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-
-package App::Greple::tee;
-
-our $VERSION = "0.9901";
-
-use v5.14;
-use warnings;
-use Carp;
-use List::Util qw(sum first);
-use Text::ParseWords qw(shellwords);
-use App::cdif::Command;
-use Data::Dumper;
-
-our $command;
-our $blockmatch;
-our $discrete;
-our $fillup;
-
-my($mod, $argv);
-
-sub initialize {
-    ($mod, $argv) = @_;
-    if (defined (my $i = first { $argv->[$_] eq '--' } keys @$argv)) {
-	if (my @command = splice @$argv, 0, $i) {
-	    $command = \@command;
-	}
-	shift @$argv;
-    }
-}
-
-use Unicode::EastAsianWidth;
-
-sub fillup_paragraph {
-    (my $s1, local $_, my $s2) = $_[0] =~ /\A(\s*)(.*?)(\s*)\z/s or die;
-    s/(?<=\p{InFullwidth})\n(?=\p{InFullwidth})//g;
-    s/\s+/ /g;
-    $s1 . $_ . $s2;
-}
-
-sub call {
-    my $data = shift;
-    $command // return $data;
-    state $exec = App::cdif::Command->new;
-    if ($fillup) {
-	$data =~ s/^.+(?:\n.+)*/fillup_paragraph(${^MATCH})/pmge;
-    }
-    if (ref $command ne 'ARRAY') {
-	$command = [ shellwords $command ];
-    }
-    $exec->command($command)->setstdin($data)->update->data // '';
-}
-
-sub jammed_call {
-    my @need_nl = grep { $_[$_] !~ /\n\z/ } keys @_;
-    my @from = @_;
-    $from[$_] .= "\n" for @need_nl;
-    my @lines = map { int tr/\n/\n/ } @from;
-    my $from = join '', @from;
-    my $out = call $from;
-    my @out = $out =~ /.*\n/g;
-    if (@out < sum @lines) {
-	die "Unexpected response from command:\n\n$out\n";
-    }
-    my @to = map { join '', splice @out, 0, $_ } @lines;
-    $to[$_] =~ s/\n\z// for @need_nl;
-    return @to;
-}
-
-my @jammed;
-
-sub postgrep {
-    my $grep = shift;
-    if ($blockmatch) {
-	$grep->{RESULT} = [
-	    [ [ 0, length ],
-	      map {
-		  [ $_->[0][0], $_->[0][1], 0, $grep->{callback}->[0] ]
-	      } $grep->result
-	    ] ];
-    }
-    return if $discrete;
-    @jammed = my @block = ();
-    for my $r ($grep->result) {
-	my($b, @match) = @$r;
-	for my $m (@match) {
-	    push @block, $grep->cut(@$m);
-	}
-    }
-    @jammed = jammed_call @block if @block;
-}
-
-sub callback {
-    if ($discrete) {
-	call { @_ }->{match};
-    }
-    else {
-	shift @jammed // die;
-    }
-}
-
-1;
-
-__DATA__
-
-builtin --blockmatch $blockmatch
-builtin --discrete!  $discrete
-builtin --fillup!    $fillup
-
-option default \
-	--postgrep &__PACKAGE__::postgrep \
-	--callback &__PACKAGE__::callback
-
-option --tee-each --discrete
-
-#  LocalWords:  greple tee teip DeepL deepl perl xlate

@@ -109,3 +109,6 @@ Revision history for Perl extension WebService::Browshot.
 
 1.24.0 Tue Aug 18 21:20:00
 	- screenshot_thumbnail_file creates the directory structure as needed
+
+1.29.0 Wed Nov 22 18:20:00
+	- add suport for crawls

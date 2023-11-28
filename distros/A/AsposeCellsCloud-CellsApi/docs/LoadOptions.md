@@ -9,16 +9,16 @@ use AsposeCellsCloud::Object::LoadOptions;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **ConvertNumericData** | **string** |  |
-**InterruptMonitor** | **string** |  |
-**LanguageCode** | **string** |  |
+**InterruptMonitor** | **string** | Gets and sets the interrupt monitor. |
+**LanguageCode** | **string** | Gets or sets the user interface language of the Workbook version based on CountryCode that has saved the file. |
 **LoadDataOptions** | **string** |  |
-**LoadFormat** | **string** |  |
+**LoadFormat** | **string** | Gets the load format. |
 **OnlyLoadDocumentProperties** | **string** |  |
-**ParsingFormulaOnOpen** | **string** |  |
-**Password** | **string** |  |
-**Region** | **string** |  |
-**StandardFont** | **string** |  |
-**StandardFontSize** | **double** |  |  
+**ParsingFormulaOnOpen** | **string** | Indicates whether parsing the formula when reading the file. |
+**Password** | **string** | Gets and set the password of the workbook. |
+**Region** | **string** | Gets or sets the system regional settings based on CountryCode at the time the file was loaded. |
+**StandardFont** | **string** | Sets the default standard font name |
+**StandardFontSize** | **double** | Sets the default standard font size. |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

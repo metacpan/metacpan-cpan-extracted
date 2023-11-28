@@ -200,6 +200,17 @@ DESCRIPTION
 
     Returns a Future which will resolve with the result.
 
+ download_check
+
+    Gets the PDF report for a given WebService::Async::Onfido::Check.
+
+    Takes the following named parameters:
+
+      * check_id - the "id" in WebService::Async::Onfido::Check for the
+      check to query
+
+    Returns a PDF file blob
+
  download_photo
 
     Gets a live_photo in a form of binary data for a given

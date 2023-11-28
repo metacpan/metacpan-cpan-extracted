@@ -63,14 +63,8 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "23.10"
-      },
-      "AsposeCellsCloud::LiteCellsApi" : {
-         "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
-      },
-      "AsposeCellsCloud::LightCellsApi" : {
-         "file" : "lib/AsposeCellsCloud/LightCellsApi.pm"
-      },      
+         "version" : "23.11"
+      },   
       "AsposeCellsCloud::Configuration" : {
          "file" : "lib/AsposeCellsCloud/Configuration.pm"
       },
@@ -902,6 +896,9 @@
       "AsposeCellsCloud::Object::CreatePivotTableRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm"
       },
+      "AsposeCellsCloud::Object::ImportJsonRequest" : {
+         "file" : "lib/AsposeCellsCloud/Object/ImportJsonRequest.pm"
+      },
       "AsposeCellsCloud::Object::ImportXMLRequest" : {
          "file" : "lib/AsposeCellsCloud/Object/ImportXMLRequest.pm"
       },
@@ -1553,6 +1550,21 @@
       "AsposeCellsCloud::Request::PostConvertWorkbookToCSVRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostConvertWorkbookToCSVRequest.pm"
       },
+      "AsposeCellsCloud::Request::PostExportRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostExportRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookExportXMLRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookExportXMLRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookImportJsonRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookImportJsonRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostWorkbookImportXMLRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookImportXMLRequest.pm"
+      },
+      "AsposeCellsCloud::Request::PostImportDataRequest" : {
+         "file" : "lib/AsposeCellsCloud/Request/PostImportDataRequest.pm"
+      },
       "AsposeCellsCloud::Request::GetWorksheetHyperlinksRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/GetWorksheetHyperlinksRequest.pm"
       },
@@ -1576,9 +1588,6 @@
       },
       "AsposeCellsCloud::Request::PostCompressRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostCompressRequest.pm"
-      },
-      "AsposeCellsCloud::Request::PostExportRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostExportRequest.pm"
       },
       "AsposeCellsCloud::Request::PostMergeRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostMergeRequest.pm"
@@ -1982,9 +1991,6 @@
       "AsposeCellsCloud::Request::PostWorkbookSplitRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorkbookSplitRequest.pm"
       },
-      "AsposeCellsCloud::Request::PostImportDataRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostImportDataRequest.pm"
-      },
       "AsposeCellsCloud::Request::PostWorkbookCalculateFormulaRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/PostWorkbookCalculateFormulaRequest.pm"
       },
@@ -2147,12 +2153,6 @@
       "AsposeCellsCloud::Request::DeleteWorksheetValidationsRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DeleteWorksheetValidationsRequest.pm"
       },
-      "AsposeCellsCloud::Request::PostWorkbookExportXMLRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookExportXMLRequest.pm"
-      },
-      "AsposeCellsCloud::Request::PostWorkbookImportXMLRequest" : {
-         "file" : "lib/AsposeCellsCloud/Request/PostWorkbookImportXMLRequest.pm"
-      },
       "AsposeCellsCloud::Request::DownloadFileRequest" : {
          "file" : "lib/AsposeCellsCloud/Request/DownloadFileRequest.pm"
       },
@@ -2203,6 +2203,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "23.10",
+   "version" : "23.11",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

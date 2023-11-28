@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ExcelFeed;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =head1 NAME
 
@@ -45,6 +45,20 @@ May need root permissions
     rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
+
+=back
+
+=head1 CONFIGURATION
+
+=over
+
+=item C<$HideChartDownloadButton>
+
+By default, a "Download as Microsoft Execel Spreadsheet" button is enabled
+on Charts. You can disable it by adding the following config to your
+RT_SiteConfig.pm:
+
+    Set( $HideChartDownloadButton, 1 );
 
 =back
 

@@ -1,5 +1,24 @@
 Revision history for Perl extension App-Greple-xlate
 
+0.28 2023-11-10T06:32:41Z
+
+    - update cache management strategy
+    - make -t option and XLATE_LANG required
+    - make -n works for normal execution
+    - make .stxt file for .docx and such
+    - do not process -G option on docker
+    - add xlate -v option
+    - add --xlate-debug option
+
+0.27 2023-11-07T15:57:53Z
+
+    - use monotone colormap
+    - add Minilla release.hooks
+
+0.26 2023-11-07T10:22:47Z
+
+    - support ChatGPT-3.5 (gpt3) translation engine
+
 0.25 2023-06-28T04:04:11Z
 
     - new docker image release

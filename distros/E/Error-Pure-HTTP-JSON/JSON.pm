@@ -1,22 +1,19 @@
 package Error::Pure::HTTP::JSON;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Error::Pure::Output::JSON qw(err_json);
 use Error::Pure::Utils qw(err_helper);
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Ignore die signal.
 $SIG{__DIE__} = 'IGNORE';
@@ -67,26 +64,25 @@ Error::Pure::HTTP::JSON - Error::Pure module for JSON output over HTTP.
 =head1 SYNOPSIS
 
  use Error::Pure::HTTP::JSON qw(err);
+
  err 'This is a fatal error', 'name', 'value';
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<err>
 
-=item B<err(@messages)>
+ err 'This is a fatal error', 'name', 'value';
 
- Process error in JSON format with messages @messages over HTTP.
- Output affects $Error::Pure::Output::JSON::PRETTY variable.
-
-=back
+Process error in JSON format with messages C<@messages> over HTTP.
+Output affects C<$Error::Pure::Output::JSON::PRETTY> variable.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=http_json_error.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::HTTP::JSON qw(err);
 
  # Error.
@@ -99,11 +95,11 @@ Error::Pure::HTTP::JSON - Error::Pure module for JSON output over HTTP.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=http_json_error_with_options.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::HTTP::JSON qw(err);
 
  # Error.
@@ -116,11 +112,11 @@ Error::Pure::HTTP::JSON - Error::Pure module for JSON output over HTTP.
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=http_json_pretty.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::JSON;
  use Error::Pure::HTTP::JSON qw(err);
 
@@ -155,7 +151,7 @@ Error::Pure::HTTP::JSON - Error::Pure module for JSON output over HTTP.
 L<Error::Pure::Utils>,
 L<Error::Pure::Output::JSON>,
 L<Exporter>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -170,21 +166,22 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-HTTP-JSON>
+L<https://github.com/michal-josef-spacek/Error-Pure-HTTP-JSON>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2015 Michal Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

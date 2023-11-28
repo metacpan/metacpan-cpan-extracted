@@ -1,5 +1,5 @@
 package Sys::Info::Driver::OSX::OS;
-$Sys::Info::Driver::OSX::OS::VERSION = '0.7960';
+$Sys::Info::Driver::OSX::OS::VERSION = '0.7961';
 use strict;
 use warnings;
 
@@ -40,18 +40,31 @@ my %FILE = (
     cdis            => '/var/log/CDIS.custom',
 );
 
-my $EDITION = {
+my $XEDITION = {
     # taken from Wikipedia
-    0 => 'Cheetah',
-    1 => 'Puma',
-    2 => 'Jaguar',
-    3 => 'Panther',
-    4 => 'Tiger',
-    5 => 'Leopard',
-    6 => 'Snow Leopard',
-    7 => 'Lion',
-    8 => 'Mountain Lion',
-    9 => 'Mavericks',
+    0  => 'Cheetah',
+    1  => 'Puma',
+    2  => 'Jaguar',
+    3  => 'Panther',
+    4  => 'Tiger',
+    5  => 'Leopard',
+    6  => 'Snow Leopard',
+    7  => 'Lion',
+    8  => 'Mountain Lion',
+    9  => 'Mavericks',
+    10 => 'Yosemite',
+    11 => 'El Capitan',
+    12 => 'Sierra',
+    13 => 'High Sierra',
+    14 => 'Mojave',
+    15 => 'Catalina',
+};
+
+my $MACOS = {
+    11 => 'Big Sur',
+    12 => 'Monterey',
+    13 => 'Ventura',
+    14 => 'Sonoma',
 };
 
 # unimplemented
@@ -200,6 +213,7 @@ sub bitness {
     my $v    = $self->uname->{version} || q{};
     return $v =~ m{ [/]RELEASE_X86_64 \z }xms ? 64
         :  $v =~ m{ [/]RELEASE_I386      }xms ? 32
+        :  $v =~ m{ [/]RELEASE_ARM64     }xms ? 64
         : do {
             my($sw) = system_profiler( 'SPSoftwareDataType' );
             return if ref $sw ne 'HASH';
@@ -279,9 +293,10 @@ sub _file_has_substr {
 }
 
 sub _probe_edition {
-    my($self, $v) = @_;
-    my($major, $minor, $patch) = split m{[.]}xms, $v;
-    return $EDITION->{ $minor };
+    my($self, $major, $minor, $patc) = @_;
+    my $name = $major == 10 ? $XEDITION->{ $minor }
+                            : $MACOS->{ $major };
+    return $name || 'Unknown macOS';
 }
 
 sub _populate_osversion {
@@ -297,24 +312,27 @@ sub _populate_osversion {
     my %sw_vers    = sw_vers();
     my $build_date = $stamp ? $self->date2time( $stamp ) : undef;
     my $build      = $sw_vers{BuildVersion} || $stamp;
-    my $edition    = $self->_probe_edition(
-                        $sw_vers{ProductVersion} || $uname->{release}
-                    );
+    my $raw_version = __PACKAGE__->trim( $sw_vers{ProductVersion} || $uname->{release} );
+    my($major, $minor, $patch) = split m{[.]}xms, $raw_version;
+    my $edition    = $self->_probe_edition( $major, $minor, $patch );
 
-    my $sysname = $uname->{sysname} eq 'Darwin' ? 'Mac OSX' : $uname->{sysname};
+    my $sysname = $uname->{sysname} eq 'Darwin'
+                ? ( $major == 10 ? 'Mac OSX' : 'macOS' )
+                : $uname->{sysname};
 
+    my %v = (
+        BUILD      => defined $build      ? __PACKAGE__->trim($build)      : 0,
+        BUILD_DATE => defined $build_date ? __PACKAGE__->trim($build_date) : 0,
+        EDITION    => $edition,
+    );
     %OSVERSION = (
-        NAME             => $sysname,
-        NAME_EDITION     => $edition ? "$sysname ($edition)" : $sysname,
+        KERNEL           => undef,
         LONGNAME         => q{}, # will be set below
         LONGNAME_EDITION => q{}, # will be set below
-        VERSION  => $sw_vers{ProductVersion} || $uname->{release},
-        KERNEL   => undef,
-        RAW      => {
-                        BUILD      => defined $build      ? $build      : 0,
-                        BUILD_DATE => defined $build_date ? $build_date : 0,
-                        EDITION    => $edition,
-                    },
+        NAME             => $sysname,
+        NAME_EDITION     => $edition ? "$sysname ($edition)" : $sysname,
+        RAW              => { %v },
+        VERSION          => $raw_version,
     );
 
     $OSVERSION{LONGNAME}         = sprintf '%s %s',
@@ -338,7 +356,7 @@ Sys::Info::Driver::OSX::OS
 
 =head1 VERSION
 
-version 0.7960
+version 0.7961
 
 =head1 SYNOPSIS
 

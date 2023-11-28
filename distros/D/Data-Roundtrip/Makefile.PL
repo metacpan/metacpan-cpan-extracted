@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
     TEST_REQUIRES => {
 	# we need at least v1.28 because of script_fails()
         'Test::Script' => '1.28',
+	'Test::Taint' => '0',
         'Test::Pod' => '1.51',
         'Test::More' => '0',
 	'Test2::Plugin::UTF8' => '0', # rids of the Wide Character in TAP message!

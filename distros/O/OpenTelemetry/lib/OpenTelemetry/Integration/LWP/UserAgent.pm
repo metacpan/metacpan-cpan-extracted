@@ -1,7 +1,7 @@
 package OpenTelemetry::Integration::LWP::UserAgent;
 # ABSTRACT: OpenTelemetry integration for LWP::UserAgent
 
-our $VERSION = '0.011';
+our $VERSION = '0.018';
 
 use strict;
 use warnings;
@@ -140,8 +140,12 @@ sub install ( $class, %config ) {
             return $response;
         }
         catch ($error) {
+            my ($description) = split /\n/, $error =~ s/^\s+|\s+$//gr, 2;
+            $description =~ s/ at \S+ line \d+\.$//a;
+
             $span->record_exception($error);
-            $span->set_status( SPAN_STATUS_ERROR, $error );
+            $span->set_status( SPAN_STATUS_ERROR, $description );
+
             die $error;
         }
         finally {

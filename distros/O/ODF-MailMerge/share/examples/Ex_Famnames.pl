@@ -25,7 +25,7 @@ sub commify_number($) {
   scalar reverse (reverse($_[0]) =~ s/(\d\d\d)(?=\d)(?!\d*\.)/$1,/gr)
 }
 
-my ($outpath, $also_pdf, $also_txt, $skelpath, $dbpath);
+my ($outpath, $also_pdf, $also_txt, $skelpath, $dbpath, $quiet);
 decode_argv( Encode::FB_CROAK );
 GetOptions(
   'o|outpath=s'  => \$outpath,
@@ -33,6 +33,7 @@ GetOptions(
   '--txt'        => \$also_txt,
   's|skelpath=s' => \$skelpath,
   'd|dbpath=s'   => \$dbpath,
+  'q|quiet'      => \$quiet,
 ) or die "bad arguments";
 
 $skelpath //= "$Bin/Ex_Famnames_Skeleton.odt";
@@ -47,14 +48,14 @@ $dbpath //= "$Bin/family_names.csv";
 ############################
 # Load the 'skeleton' document
 ############################
-warn "> Loading $skelpath\n";
+warn "> Loading $skelpath\n" unless $quiet;
 my $doc = odf_get_document($skelpath, read_only => 1) // die "$skelpath : $!";
 my $body = $doc->get_body;
 
 ############################
 # Read the "data base" (just a .csv file)
 ############################
-warn "> Reading $dbpath\n";
+warn "> Reading $dbpath\n" unless $quiet;
 read_spreadsheet($dbpath);
 
 # Make alias identifiers for column titles matched by regular expressions.
@@ -174,18 +175,18 @@ replace_tokens($body, { "Database Date" => $dbpath_mt_string })
 ########################################
 # Write out the result
 ########################################
-warn "> Writing $outpath\n";
+warn "> Writing $outpath\n" unless $quiet;
 $doc->save(target => $outpath);
 
 if ($also_pdf) {
   my @cmd = ("libreoffice", "--convert-to", "pdf", $outpath);
-  warn "> ", qshlist(@cmd),"\n";
+  warn "> ", qshlist(@cmd),"\n" unless $quiet;
   system @cmd;
 }
 if ($also_txt) {
   # C.F. https://help.libreoffice.org/latest/en-US/text/shared/guide/convertfilters.html
   my @cmd = ("libreoffice", "--convert-to", "txt:Text (encoded):UTF8", $outpath);
-  warn "> ", qshlist(@cmd),"\n";
+  warn "> ", qshlist(@cmd),"\n" unless $quiet;
   system @cmd;
 }
 

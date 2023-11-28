@@ -1,7 +1,8 @@
 /*###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -10,8 +11,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id: mod_embperl.c 1578075 2014-03-16 14:01:14Z richter $
 #
 ###################################################################################*/
 
@@ -35,14 +34,17 @@
 #undef getpid
 
 /* define get thread id if not already done by Apache */
+/* 05/06/23: Marcus Doemling: do not define gettid for glibc >= 2.30 */
+#if !defined(_GNU_SOURCE) || !defined(__GLIBC__) || __GLIBC__ < 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ < 30)
 #ifndef gettid
 #ifdef WIN32
 #define gettid GetCurrentThreadId
 #else
-static int gettid()
+int gettid()
     {
     return 0 ;
     }
+#endif
 #endif
 #endif
 
@@ -722,8 +724,10 @@ static void *embperl_create_server_config(apr_pool_t * p, server_rec *s)
 static void *embperl_merge_dir_config (apr_pool_t *p, void *basev, void *addv)
     {
     if (!basev)
+        {
         return addv ;
-    
+        }
+    else
         {
         tApacheDirConfig *mrg ; /*= (tApacheDirConfig *)ap_palloc (p, sizeof(tApacheDirConfig)); */
         tApacheDirConfig *base = (tApacheDirConfig *)basev;

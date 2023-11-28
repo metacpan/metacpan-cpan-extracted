@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN::Readme;
 # ABSTRACT: Build a README file for AJNN's distributions
-$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.05';
+$Dist::Zilla::PluginBundle::Author::AJNN::Readme::VERSION = '0.06';
 
 use Dist::Zilla;
 use Dist::Zilla::File::FromCode;
@@ -61,7 +61,7 @@ sub _readme_header {
 	$description =~ s/\n\n.*$//;  # only keep the first paragraph
 	
 	my $link = $self->zilla->distmeta->{resources}{repository}{web};
-	$link = "https://metacpan.org/release/$dist_name" if $self->cpan_release;
+	$link = "https://metacpan.org/dist/$dist_name" if $self->cpan_release;
 	
 	return <<END;
 $main_module $dist_version$trial_rel
@@ -186,7 +186,7 @@ Dist::Zilla::PluginBundle::Author::AJNN::Readme - Build a README file for AJNN's
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 DESCRIPTION
 

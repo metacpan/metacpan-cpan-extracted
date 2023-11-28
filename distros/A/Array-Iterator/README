@@ -1,9 +1,10 @@
 NAME
-    Array::Iterator - A simple class for iterating over Perl arrays
+    Array::Iterator - (ADOPTME) A simple class for iterating over Perl
+    arrays
 
 VERSION
-    This document describes version 0.131 of Array::Iterator (from Perl
-    distribution Array-Iterator), released on 2021-09-26.
+    This document describes version 0.132 of Array::Iterator (from Perl
+    distribution Array-Iterator), released on 2023-11-21.
 
 SYNOPSIS
       use Array::Iterator;
@@ -110,7 +111,7 @@ OTHER ITERATOR MODULES
         many of the more advanced features of this module.
 
 ACKNOWLEDGEMENTS
-    Thanks to Hugo Cornelis for pointing out a bug in "peek()"
+    Thanks to Hugo Cornelis for pointing out a bug in peek()
     Thanks to Phillip Moore for providing the patch to allow single element
     iteration through the hash-ref constructor parameter.
 
@@ -142,7 +143,7 @@ METHODS
           $i->has_next(2);  # 2nd next element
           $i->has_next(10); # 10th next element
 
-        Note that has_next(1) is the same as "has_next()".
+        Note that has_next(1) is the same as has_next().
 
         Throws an exception if $n <= 0.
 
@@ -184,7 +185,7 @@ METHODS
           $i->peek(2);  # gives you 2nd next element
           $i->peek(10); # gives you 10th next element
 
-        Note that peek(1) is the same as "peek()".
+        Note that peek(1) is the same as peek().
 
         Throws an exception if $n <= 0.
 
@@ -271,7 +272,7 @@ CONTRIBUTORS
 
     *   Neil Bowers <neil@bowers.com>
 
-    *   Steven Haryanto (on PC) <stevenharyanto@gmail.com>
+    *   Steven Haryanto <stevenharyanto@gmail.com>
 
 CONTRIBUTING
     To contribute, you can send patches by email/via RT, or send pull
@@ -284,14 +285,14 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2017, 2013, 2012, 2011 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2021, 2017, 2013, 2012, 2011 by
+    perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

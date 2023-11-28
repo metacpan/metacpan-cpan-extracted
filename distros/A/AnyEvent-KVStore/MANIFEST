@@ -1,0 +1,17 @@
+Changes
+lib/AnyEvent/KVStore.pm
+lib/AnyEvent/KVStore/Driver.pm
+lib/AnyEvent/KVStore/Hash.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-hashdriver.t
+t/02-hashkvstore.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

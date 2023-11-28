@@ -1,7 +1,7 @@
 package Minion::Worker;
 use Mojo::Base 'Mojo::EventEmitter';
 
-use Carp qw(croak);
+use Carp       qw(croak);
 use Mojo::Util qw(steady_time);
 
 has [qw(commands status)] => sub { {} };
@@ -62,6 +62,7 @@ sub run {
   $status->{repair_interval} -= int rand $status->{repair_interval} / 2;
   $status->{spare}              //= 1;
   $status->{spare_min_priority} //= 1;
+  $status->{type}               //= 'Perl';
 
   # Reset event loop
   Mojo::IOLoop->reset;

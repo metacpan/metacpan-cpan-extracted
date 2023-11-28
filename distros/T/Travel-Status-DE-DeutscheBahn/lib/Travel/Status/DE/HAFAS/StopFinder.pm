@@ -5,14 +5,12 @@ use warnings;
 use 5.014;
 use utf8;
 
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
-
 use Carp   qw(confess);
 use Encode qw(decode);
 use JSON;
 use LWP::UserAgent;
 
-our $VERSION = '4.18';
+our $VERSION = '5.01';
 
 # {{{ Constructors
 
@@ -182,7 +180,7 @@ finder services
 
 =head1 VERSION
 
-version 4.18
+version 5.01
 
 =head1 DESCRIPTION
 
@@ -192,6 +190,10 @@ available at L<https://reiseauskunft.bahn.de/bin/ajax-getstop.exe/dn>.
 
 It takes a string (usually a location or station name) and reports all
 stations and stops which are lexically similar to it.
+
+StopFinder typically gives less coarse results than
+Travel::Status::DE::HAFAS(3pm)'s locationSearch method. However, it is unclear
+whether HAFAS instances will continue supporting it in the future.
 
 =head1 METHODS
 
@@ -292,7 +294,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2017 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

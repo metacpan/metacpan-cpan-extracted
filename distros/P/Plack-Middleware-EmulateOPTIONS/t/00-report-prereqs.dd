@@ -7,6 +7,8 @@ do { my $x = {
        'develop' => {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Changes' => '0.500002',
+                                      'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Kwalitee' => '1.21',
@@ -43,8 +45,8 @@ do { my $x = {
                                    'Plack::Middleware::Static' => '0',
                                    'Plack::Response' => '0',
                                    'Plack::Test' => '0',
-                                   'Test::Differences' => '0',
-                                   'Test::More' => '1.302008',
+                                   'Test2::V0' => '0',
+                                   'Test::More' => '1.302176',
                                    'strict' => '0'
                                  }
                  }

@@ -3,24 +3,24 @@ require 5.036;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'INSTALLDIRS' => 'site',
-  'EXE_FILES' => [],
   'NAME' => 'Plack::App::WebMySQL',
+  'PL_FILES' => {},
   'PREREQ_PM' => {
                    'Plack::Builder' => '0',
-                   'Module::Build::Pluggable' => '0',
-                   'CGI::Compile' => '0',
-                   'File::Share' => '0',
-                   'DBI' => '0',
-                   'Module::Build::Pluggable::CPANfile' => '0.05',
-                   'File::Spec' => '0',
-                   'CGI' => '0',
                    'File::ShareDir' => '1.00',
                    'DBD::MariaDB' => '0',
+                   'File::Spec' => '0',
+                   'CGI::Emulate::PSGI' => '0',
+                   'DBI' => '0',
+                   'CGI::Compile' => '0',
+                   'File::Share' => '0',
+                   'CGI' => '0',
                    'Plack::App::MCCS' => '0',
-                   'CGI::Emulate::PSGI' => '0'
+                   'Module::Build::Pluggable::CPANfile' => '0.05',
+                   'Module::Build::Pluggable' => '0'
                  },
-  'PL_FILES' => {},
-  'VERSION_FROM' => 'lib/Plack/App/WebMySQL.pm'
+  'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/Plack/App/WebMySQL.pm',
+  'EXE_FILES' => []
 )
 ;

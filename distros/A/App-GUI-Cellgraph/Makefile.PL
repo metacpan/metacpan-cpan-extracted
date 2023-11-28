@@ -20,14 +20,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.012000",
   "NAME" => "App::GUI::Cellgraph",
   "PREREQ_PM" => {
+    "File::HomeDir" => 1,
     "File::Spec" => 3,
+    "FindBin" => 1,
     "Graphics::Toolkit::Color" => "1.71",
     "Wx" => "0.9"
   },
   "TEST_REQUIRES" => {
     "Test::More" => "1.3"
   },
-  "VERSION" => "0.26",
+  "VERSION" => "0.32",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +37,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "File::HomeDir" => 1,
   "File::Spec" => 3,
+  "FindBin" => 1,
   "Graphics::Toolkit::Color" => "1.71",
   "Test::More" => "1.3",
   "Wx" => "0.9"

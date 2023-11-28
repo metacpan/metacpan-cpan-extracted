@@ -6,6 +6,55 @@
 
 To install on unix perform the following steps:
 
+=head2 Prerequisite
+
+Here are a lit of packages you should install for getting Embperl to work. 
+C<mod_perl>, C<Apache::Session>, C<Apache::SessionX>, C<libxml2>, C<libxlst> are 
+optional and need only to be install when you require their functionality.
+
+=head3 debian & ubunutu
+
+debian comes with the package `libembperl-perl/stable 2.5.0-17 amd64`. So just run
+
+  sudo apt install libembperl-perl
+
+and you are done. If you want to install a newer version from the source, continue to read.
+Install prerequistite
+
+  sudo apt update 
+  sudo apt -y install libextutils-xsbuilder-perl libapache2-mod-perl2-dev apache2-dev \
+    libcgi-pm-perl libapache-sessionx-perl libextutils-pkgconfig-perl libxml2-dev libxslt1-dev
+
+=head3 fedora
+
+Not all module are available as precomipled packages, so you have to install some from cpan:
+
+  yum -y install mod_perl-devel perl-Apache-Session perl-ExtUtils-PkgConfig || exit 1
+  cpan LWP::UserAgent 
+  cpan ExtUtils::XSBuilder
+  cpan -f Apache::SessionX
+
+=head3 almalinux
+
+  yum -y install epel-release # required for mod_perl
+  dnf --enablerepo=epel -y install mod_perl-devel perl-Apache-Session perl-ExtUtils-PkgConfig
+  cpan LWP::UserAgent
+  cpan ExtUtils::XSBuilder
+  cpan -f Apache::SessionX
+
+=head3 amazon linux
+
+  yum -y install mod_perl-devel perl-Apache-Session perl-ExtUtils-PkgConfig || exit 1
+  cpan LWP::UserAgent 
+  cpan ExtUtils::XSBuilder
+  cpan -f Apache::SessionX
+
+=head2 Installing from source
+
+You can download Embperl from CPAN or from https://www.embperl.org/downloads
+
+Beta Versions and release candidates are only available from https://www.embperl.org/downloads
+
 =over
 
 =item B<Unpack the archive>
@@ -81,7 +130,7 @@ Starting with Embperl 2.0b4 it has a build in XSLT support. You can
 use Gnome libxml and libxslt.
 Embperl is currently tested with libxslt 1.0.4 and newer.
 
-To use libxml/libxslt, download them from http://xmlsoft.org/ and install
+To use libxml/libxslt, download them from https://xmlsoft.org/ and install
 them on your system. Makefile.PL will automatically detect the installed
 libraries and linked them into Embperl. (you have to make sure
 that xml2-config and xslt-config can be found and run by Makefile.PL)
@@ -98,7 +147,8 @@ To compile Embperl you need to install apache2-dev and libapache2-mod-perl2-dev.
 =head2 UNIX (without Apache Source)
 
 If you have an UNIX with preinstalled Apache and mod_perl (e.g. a Linux 
-distribution), you need to locate the following files on your disk:
+distribution), you need to locate the following files on your disk, in case 
+C<Makefile.PL> does not find them automatically:
 
 =over
 
@@ -110,7 +160,7 @@ distribution), you need to locate the following files on your disk:
 
 =back
 
-For example in SuSE Linux 7.1 they could be found at
+For example they could be found at
 
 =over
 
@@ -219,21 +269,21 @@ will already be there.
 
 =head2 Win32 with ActiveState Perl and Apache 1.3.x
 
-First get and install ActiveState Perl from http://www.activestate.com/
+First get and install ActiveState Perl from https://www.activestate.com/
 
 You can skip the installation of Apache and mod_perl, if you only want
 to use Embperl offline or as CGI.
 
 Next get the Apache binary (including the source e.g.
 apache_1.3.31-win32-x86-src.msi) from
-http://www.apache.org/dist/httpd/binaries/win32/ or a mirror. (You may
+https://www.apache.org/dist/httpd/binaries/win32/ or a mirror. (You may
 need to install the windows MSI installer from the same page too, and
 be sure to read the README at the end of the file list for further
 requirements of some windows versions, especially Windows 95 and
 XP). Now run the installation.
 
 Then install mod_perl. How to do this is described very detailed at
-http://perl.apache.org/docs/1.0/os/win32/install.html#PPM_Packages
+https://perl.apache.org/docs/1.0/os/win32/install.html#PPM_Packages
 
 In this file, you'll find a short summary of that page.
 
@@ -242,7 +292,7 @@ There are two ways to install mod_perl:
 + Easy version:
 
   Download the perl script
-  http://perl.apache.org/docs/1.0/os/win32/mpinstall and execute it
+  https://perl.apache.org/docs/1.0/os/win32/mpinstall and execute it
   with "perl mpinstall". It will interactively install you the right
   mod_perl version.
 
@@ -252,11 +302,11 @@ There are two ways to install mod_perl:
 
   - If you have Perl 5.8.x:
 
-    ppm install http://theoryx5.uwinnipeg.ca/ppms/mod_perl-1.ppd
+    ppm install https://theoryx5.uwinnipeg.ca/ppms/mod_perl-1.ppd
 
   - If you have Perl 5.6.x:
 
-    ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/mod_perl.ppd
+    ppm install https://theoryx5.uwinnipeg.ca/ppmpackages/mod_perl.ppd
 
 
   If you get asked for the Apache directory, enter the C<modules>
@@ -269,7 +319,7 @@ As last step you can install the Embperl ppd:
 
 + If you have Perl 5.8.x:
 
-    ppm install http://theoryx5.uwinnipeg.ca/ppms/Embperl-1.ppd
+    ppm install https://theoryx5.uwinnipeg.ca/ppms/Embperl-1.ppd
 
   This is an Embperl 2 ppd, the "-1" at the end of the package name
   denotes that this ppd is for mod_perl 1.x. There is no Embperl 1 ppd
@@ -279,11 +329,11 @@ As last step you can install the Embperl ppd:
 
   - Embperl 1:
 
-    ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/HTML-Embperl.ppd
+    ppm install https://theoryx5.uwinnipeg.ca/ppmpackages/HTML-Embperl.ppd
 
   - Embperl 2:
 
-    ppm install http://theoryx5.uwinnipeg.ca/ppmpackages/Embperl.ppd
+    ppm install https://theoryx5.uwinnipeg.ca/ppmpackages/Embperl.ppd
 
 
 
@@ -367,7 +417,7 @@ See L<"perldoc Embperl"|"Embperl.pod"> for complete documentation.
 See L<"perldoc TipsAndTricks"|"TipsAndTricks.pod"> for Tips and Tricks 
 around Embperl.
 
-or you can view it online on http://perl.apache.org/embperl/
-and http://www.ecos.de/embperl/
+or you can view it online on https://perl.apache.org/embperl/
+and https://www.actevy.io/embperl/
 
 

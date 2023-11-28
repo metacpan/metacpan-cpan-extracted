@@ -1,10 +1,9 @@
 package Chrome::DevToolsProtocol::Transport;
 use strict;
-use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 =head1 NAME
 

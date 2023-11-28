@@ -10,4 +10,6 @@ use SPVM 'TestCase::HTTP::Minimal';
 
 ok(SPVM::TestCase::HTTP::Minimal->test);
 
+ok(SPVM::TestCase::HTTP::Minimal->go);
+
 done_testing;

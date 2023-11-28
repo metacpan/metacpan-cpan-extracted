@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2023-04-28)
+##	(last updated 2023-11-08)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 1921 2023-05-08 18:39:59Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 1945 2023-11-22 08:02:31Z willem $)[2];
 
 use integer;
 use Carp;
@@ -112,8 +112,8 @@ my @typebyname = (
 	OPENPGPKEY => 61,					# RFC7929
 	CSYNC	   => 62,					# RFC7477
 	ZONEMD	   => 63,					# RFC8976
-	SVCB	   => 64,					# RFC-ietf-dnsop-svcb-https-12
-	HTTPS	   => 65,					# RFC-ietf-dnsop-svcb-https-12
+	SVCB	   => 64,					# RFC9460
+	HTTPS	   => 65,					# RFC9460
 	SPF	   => 99,					# RFC7208
 	UINFO	   => 100,					# IANA-Reserved
 	UID	   => 101,					# IANA-Reserved
@@ -137,6 +137,7 @@ my @typebyname = (
 	AVC	   => 258,					#
 	DOA	   => 259,					# draft-durand-doa-over-dns
 	AMTRELAY   => 260,					# RFC8777
+	RESINFO	   => 261,					# draft-ietf-add-resolver-info-06
 	TA	   => 32768,					# http://cameo.library.cmu.edu/ http://www.watson.org/~weiler/INI1999-19.pdf
 	DLV	   => 32769,					# RFC8749 RFC4431
 	);

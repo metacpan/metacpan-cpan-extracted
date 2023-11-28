@@ -352,12 +352,13 @@ td > form.nd_inline-form {
 }
 
 /* set default state of collapsible lists as collapsed (hidden) */
-.nd_collapse-pre-hidden {
+.nd_collapse-pre-hidden, .nd_disabled-feature {
   display: none;
 }
 
 /* for the tagged vlans total when hiding the full list */
-.nd_vlan-total {
+/* and external links from node search */
+.nd_vlan-total, .nd_node-ext-link {
   float: right;
 }
 
@@ -494,7 +495,12 @@ td > form.nd_inline-form {
   vertical-align: text-bottom;
 }
 #nd_vlan-entry {
+  margin-top: 7px;
   width: 45px;
+}
+#nd_mapshow-hops {
+  width: 30px;
+  margin-bottom: 0px;
 }
 
 /* netmap maximise icon */

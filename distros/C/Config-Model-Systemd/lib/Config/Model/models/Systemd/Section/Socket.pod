@@ -375,7 +375,7 @@ I< Optional. Type list of uniline.  >
 Takes one of C<udplite>
 or C<sctp>. The socket will use the UDP-Lite
 (C<IPPROTO_UDPLITE>) or SCTP
-(C<IPPROTO_SCTP>) protocol, respectively. I< Optional. Type enum. choice: 'udplite', 'sctp'.  > 
+(C<IPPROTO_SCTP>) protocol, respectively. I< Optional. Type enum. choice: 'sctp', 'udplite'.  > 
 
 =head2 BindIPv6Only
 
@@ -391,16 +391,17 @@ surprise!), the system wide default setting is used, as
 controlled by
 C</proc/sys/net/ipv6/bindv6only>, which in
 turn defaults to the equivalent of
-C<both>. I< Optional. Type enum. choice: 'default', 'both', 'ipv6-only'.  > 
+C<both>. I< Optional. Type enum. choice: 'both', 'default', 'ipv6-only'.  > 
 
 =head2 Backlog
 
-Takes an unsigned integer argument. Specifies
-the number of connections to queue that have not been accepted
-yet. This setting matters only for stream and sequential
-packet sockets. See
-L<listen(2)>
-for details. Defaults to SOMAXCONN (128). I< Optional. Type uniline.  > 
+Takes an unsigned 32-bit integer argument. Specifies the number of connections to
+queue that have not been accepted yet. This setting matters only for stream and sequential packet
+sockets. See
+L<listen(2)> for
+details. Note that this value is silently capped by the C<net.core.somaxconn> sysctl,
+which typically defaults to 4096. By default this is set to 4294967295, so that the sysctl takes full
+effect. I< Optional. Type uniline.  > 
 
 =head2 BindToDevice
 
@@ -463,6 +464,11 @@ C<Accept=yes> set. Setting C<Accept=yes> is mostly useful to allow
 daemons designed for usage with L<inetd(8)> to work
 unmodified with systemd socket activation.
 
+Note that depending on this setting the services activated by units of this type are either
+regular services (in case of C<Accept>C<no>) or instances of templated
+services (in case of C<Accept>C<yes>). See the Description section
+above for a more detailed discussion of the naming rules of triggered services.
+
 For IPv4 and IPv6 connections, the C<REMOTE_ADDR> environment variable will
 contain the remote IP address, and C<REMOTE_PORT> will contain the remote port. This
 is the same as the format used by CGI. For C<SOCK_RAW>, the port is the IP
@@ -524,7 +530,17 @@ socket option (see
 L<socket(7)>
 and the L<TCP
 Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.)
-Defaults value is 7200 seconds (2 hours). I< Optional. Type integer.  > 
+Default value is 7200 seconds (2 hours). I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+7200
+
+=back
+
+
 
 =head2 KeepAliveIntervalSec
 
@@ -532,7 +548,17 @@ Takes time (in seconds) as argument between individual keepalive probes, if the
 socket option C<SO_KEEPALIVE> has been set on this socket. This controls the
 C<TCP_KEEPINTVL> socket option (see L<socket(7)> and
 the L<TCP Keepalive
-HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Defaults value is 75 seconds. I< Optional. Type integer.  > 
+HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Default value is 75 seconds. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+75
+
+=back
+
+
 
 =head2 KeepAliveProbes
 
@@ -542,8 +568,18 @@ connection dead and notifying the application layer. This
 controls the TCP_KEEPCNT socket option (see
 L<socket(7)>
 and the L<TCP
-Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Defaults value is
+Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Default value is
 9. I< Optional. Type integer.  > 
+
+=over 4
+
+=item upstream_default value :
+
+9
+
+=back
+
+
 
 =head2 NoDelay
 
@@ -745,10 +781,10 @@ C<false>. I< Optional. Type boolean.  >
 =head2 Timestamping
 
 Takes one of C<off>, C<us> (alias:
-C<usec>, C<µs>) or C<ns> (alias:
+C<usec>, C<μs>) or C<ns> (alias:
 C<nsec>). This controls the C<SO_TIMESTAMP> or
 C<SO_TIMESTAMPNS> socket options, and enables whether ingress network traffic shall
-carry timestamping metadata. Defaults to C<off>. I< Optional. Type enum. choice: 'off', 'us', 'usec', 'µs', 'ns', 'nsec'.  > 
+carry timestamping metadata. Defaults to C<off>. I< Optional. Type enum. choice: 'ns', 'nsec', 'off', 'us', 'usec', 'μs'.  > 
 
 =head2 TCPCongestion
 

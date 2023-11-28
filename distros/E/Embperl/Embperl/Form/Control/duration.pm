@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -34,11 +35,47 @@ sub init
     {
     my ($self) = @_ ;
 
-    $self->{unit}      ||= '' ;
+    $self->{unit}      ||= 'hh:mm' ;
     
     return $self ;
     }
     
+# ------------------------------------------------------------------------------------------
+#
+#   get_display_text - returns the text that should be displayed
+#
+
+sub get_display_text
+    {
+    my ($self, $req, $val) = @_ ;
+    
+    return if ($val eq '') ;
+
+    my $aval = abs ($val) ;
+    my $sec = $aval % 60 ;
+    my $min = int ($aval / 60) % 60 ;
+    my $hour = int($aval / 3600) ;
+    my $days ;
+    if ($self -> {days})
+        {    
+        $hour %= 24 ;
+        $days = int($aval / 86400) ;
+        }
+
+    my $duration = ($val<0?'-':'') . (sprintf('%d:%02d', $hour, $min)) ;
+    if ($sec != 0 && !$self -> {nosec})
+        {
+        $duration .= sprintf (':%02d', $sec) ;
+        }
+    if ($days != 0)
+        {
+        $duration = sprintf ('%dd %s', $days, $duration) ;
+        }
+    $duration = '-' . $duration if ($val<0) ;
+
+    return $duration ;
+    }
+
 # ------------------------------------------------------------------------------------------
 #
 #   init_data - daten aufteilen
@@ -46,24 +83,30 @@ sub init
 
 sub init_data
     {
-    my ($self, $req, $parentctrl) = @_ ;
-    
+    my ($self, $req, $parentctrl, $force) = @_ ;
+
     my $fdat  = $req -> {docdata} || \%fdat ;
     my $name    = $self->{name} ;
-    my $val     = $fdat->{$name} ;
-    return if ($val eq '') ;
+    my $time    = $fdat->{$name} ;
+    return if ($time eq '' || ($req -> {"ef_duration_init_done_$name"} && !$force)) ;
 
-    my $aval = abs ($val) ;
-    my $sec = $aval % 60 ;
-    my $min = int ($aval / 60) % 60 ;
-    my $hour = int($aval / 3600) ;
+    $fdat->{$name} = $self -> get_display_text ($req, $time) ;
+    $req -> {"ef_duration_init_done_$name"} = 1 ;
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   init_markup - add any dynamic markup to the form data
+#
+
+sub init_markup
+
+    {
+    my ($self, $req, $parentctl, $method) = @_ ;
+
+    return if (!$self -> is_readonly($req) && (! $parentctl || ! $parentctl -> is_readonly($req))) ;
     
-    my $duration = ($val<0?'-':'') . ($hour?sprintf('%d:%02d', $hour, $min):$min) ;
-    if ($sec != 0)
-	{
-	$duration .= sprintf (':%02d', $sec) ;
-	}
-    $fdat->{$name} = $duration ;
+    return $self -> init_data ($req, $parentctl) ;
     }
 
 # ------------------------------------------------------------------------------------------
@@ -77,8 +120,18 @@ sub prepare_fdat
 
     my $fdat  = $req -> {form} || \%fdat ;
     my $name    = $self->{name} ;
+    return if (!exists $fdat->{$name}) ;
     my $val     = $fdat->{$name} ;
     return if ($val eq '') ;
+    
+    if ($val =~ /[dhms]$/)
+        {
+        my %factor = ( 's' => 1, 'm' => 60, 'h' => 60 * 60, 'd' => 24 * 60 * 60 ) ;
+        my ($value, $unit) = ($val =~ /(\d+)([dhms])/ ) ;
+        my $factor = $factor { $unit } || 1 ;
+        $fdat->{$name} = $value * $factor ;
+        return ;
+        }
     
     my $neg = 0 ;
     $neg = 1 if ($val =~ s/^\s*-//) ;
@@ -113,6 +166,8 @@ __END__
 
 =pod
 
+=encoding iso8859-1
+
 =head1 NAME
 
 Embperl::Form::Control::price - A price input control with optional unit inside an Embperl Form
@@ -131,7 +186,7 @@ Embperl::Form::Control::price - A price input control with optional unit inside 
 
 Used to create a price input control inside an Embperl Form.
 Will format number as a money ammout.
-Optionaly it can display an unit after the input field.
+Optionally it can display an unit after the input field.
 See Embperl::Form on how to specify parameters.
 
 =head2 PARAMETER
@@ -159,11 +214,18 @@ Gives the maximun length in characters
 =head3 unit
 
 Gives a string that should be displayed right of the input field.
-(Default: €)
 
 =head3 use_comma
 
 If set the decimal character is comma instead of point (Default: on)
+
+=head3 days
+
+Show days, e.g. 1d 22:30
+
+=head3 nosec
+
+Do not show seconds
 
 =head1 Author
 

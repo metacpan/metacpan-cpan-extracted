@@ -66,7 +66,10 @@ contained in the same slice and for all its parent slices
 and the units contained therein. The system default for this
 setting may be controlled with
 C<DefaultCPUAccounting> in
-L<systemd-system.conf(5)>.',
+L<systemd-system.conf(5)>.
+
+Under the unified cgroup hierarchy, CPU accounting is available for all units and this
+setting has no effect.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -76,29 +79,47 @@ L<systemd-system.conf(5)>.',
       },
       'CPUWeight',
       {
-        'description' => 'These options accept an integer value or a the special string "idle":
+        'description' => 'These settings control the C<cpu> controller in the unified hierarchy.
+
+These options accept an integer value or a the special string "idle":
 
 While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
 the startup and shutdown phases. Using C<StartupCPUWeight> allows prioritizing specific services at
-boot-up and shutdown differently than during normal runtime.',
+boot-up and shutdown differently than during normal runtime.
+
+In addition to the resource allocation performed by the C<cpu> controller, the
+kernel may automatically divide resources based on session-id grouping, see "The autogroup feature"
+in L<sched(7)>.
+The effect of this feature is similar to the C<cpu> controller with no explicit
+configuration, so users should be careful to not mistake one for the other.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'StartupCPUWeight',
       {
-        'description' => 'These options accept an integer value or a the special string "idle":
+        'description' => 'These settings control the C<cpu> controller in the unified hierarchy.
+
+These options accept an integer value or a the special string "idle":
 
 While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
 the startup and shutdown phases. Using C<StartupCPUWeight> allows prioritizing specific services at
-boot-up and shutdown differently than during normal runtime.',
+boot-up and shutdown differently than during normal runtime.
+
+In addition to the resource allocation performed by the C<cpu> controller, the
+kernel may automatically divide resources based on session-id grouping, see "The autogroup feature"
+in L<sched(7)>.
+The effect of this feature is similar to the C<cpu> controller with no explicit
+configuration, so users should be careful to not mistake one for the other.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'CPUQuota',
       {
-        'description' => 'Assign the specified CPU time quota to the processes executed. Takes a percentage value, suffixed with
+        'description' => 'This setting controls the C<cpu> controller in the unified hierarchy.
+
+Assign the specified CPU time quota to the processes executed. Takes a percentage value, suffixed with
 "%". The percentage specifies how much CPU time the unit shall get at maximum, relative to the total CPU time
 available on one CPU. Use values > 100% for allotting CPU time on more than one CPU. This controls the
 C<cpu.max> attribute on the unified control group hierarchy and
@@ -114,7 +135,9 @@ Example: C<CPUQuota=20%> ensures that the executed processes will never get more
       },
       'CPUQuotaPeriodSec',
       {
-        'description' => 'Assign the duration over which the CPU time quota specified by C<CPUQuota> is measured.
+        'description' => 'This setting controls the C<cpu> controller in the unified hierarchy.
+
+Assign the duration over which the CPU time quota specified by C<CPUQuota> is measured.
 Takes a time duration value in seconds, with an optional suffix such as "ms" for milliseconds (or "s" for seconds.)
 The default setting is 100ms. The period is clamped to the range supported by the kernel, which is [1ms, 1000ms].
 Additionally, the period is adjusted up so that the quota interval is also at least 1ms.
@@ -131,7 +154,9 @@ Example: C<CPUQuotaPeriodSec=10ms> to request that the CPU quota is measured in 
       },
       'AllowedCPUs',
       {
-        'description' => 'Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
+        'description' => 'This setting controls the C<cpuset> controller in the unified hierarchy.
+
+Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
 whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
 
 Setting C<AllowedCPUs> or C<StartupAllowedCPUs> doesn\'t guarantee that all
@@ -149,7 +174,9 @@ This setting is supported only with the unified control group hierarchy.',
       },
       'StartupAllowedCPUs',
       {
-        'description' => 'Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
+        'description' => 'This setting controls the C<cpuset> controller in the unified hierarchy.
+
+Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
 whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
 
 Setting C<AllowedCPUs> or C<StartupAllowedCPUs> doesn\'t guarantee that all
@@ -165,47 +192,11 @@ This setting is supported only with the unified control group hierarchy.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
-      'AllowedMemoryNodes',
-      {
-        'description' => 'Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
-or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
-NUMA nodes indices separated by a dash.
-
-Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn\'t
-guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
-The effective configuration is reported as C<EffectiveMemoryNodes>.
-
-While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
-C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
-the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
-boot-up and shutdown differently than during normal runtime.
-
-This setting is supported only with the unified control group hierarchy.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'StartupAllowedMemoryNodes',
-      {
-        'description' => 'Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
-or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
-NUMA nodes indices separated by a dash.
-
-Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn\'t
-guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
-The effective configuration is reported as C<EffectiveMemoryNodes>.
-
-While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
-C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
-the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
-boot-up and shutdown differently than during normal runtime.
-
-This setting is supported only with the unified control group hierarchy.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
       'MemoryAccounting',
       {
-        'description' => 'Turn on process and kernel memory accounting for this
+        'description' => 'This setting controls the C<memory> controller in the unified hierarchy.
+
+Turn on process and kernel memory accounting for this
 unit. Takes a boolean argument. Note that turning on memory
 accounting for one unit will also implicitly turn it on for
 all units contained in the same slice and for all its parent
@@ -222,7 +213,9 @@ L<systemd-system.conf(5)>.',
       },
       'MemoryMin',
       {
-        'description' => 'Specify the memory usage protection of the executed processes in this unit.
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the memory usage protection of the executed processes in this unit.
 When reclaiming memory, the unit is treated as if it was using less memory resulting in memory
 to be preferentially reclaimed from unprotected units.
 Using C<MemoryLow> results in a weaker protection where memory may still
@@ -247,17 +240,68 @@ Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>
 Units may have their children use a default C<memory.min> or
 C<memory.low> value by specifying C<DefaultMemoryMin> or
 C<DefaultMemoryLow>, which has the same semantics as
-C<MemoryMin> and C<MemoryLow>.
+C<MemoryMin> and C<MemoryLow>, or C<DefaultStartupMemoryLow>
+which has the same semantics as C<StartupMemoryLow>.
 This setting does not affect C<memory.min> or C<memory.low>
 in the unit itself.
 Using it to set a default child allocation is only useful on kernels older than 5.7,
-which do not support the C<memory_recursiveprot> cgroup2 mount option.',
+which do not support the C<memory_recursiveprot> cgroup2 mount option.
+
+While C<StartupMemoryLow> applies to the startup and shutdown phases of the system,
+C<MemoryMin> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryLow> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StartupMemoryLow',
+      {
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the memory usage protection of the executed processes in this unit.
+When reclaiming memory, the unit is treated as if it was using less memory resulting in memory
+to be preferentially reclaimed from unprotected units.
+Using C<MemoryLow> results in a weaker protection where memory may still
+be reclaimed to avoid invoking the OOM killer in case there is no other reclaimable memory.
+
+For a protection to be effective, it is generally required to set a corresponding
+allocation on all ancestors, which is then distributed between children
+(with the exception of the root slice).
+Any C<MemoryMin> or C<MemoryLow> allocation that is not
+explicitly distributed to specific children is used to create a shared protection for all children.
+As this is a shared protection, the children will freely compete for the memory.
+
+Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the installed physical memory on the
+system. If assigned the special value C<infinity>, all available memory is protected, which may be
+useful in order to always inherit all of the protection afforded by ancestors.
+This controls the C<memory.min> or C<memory.low> control group attribute.
+For details about this control group attribute, see L<Memory Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+Units may have their children use a default C<memory.min> or
+C<memory.low> value by specifying C<DefaultMemoryMin> or
+C<DefaultMemoryLow>, which has the same semantics as
+C<MemoryMin> and C<MemoryLow>, or C<DefaultStartupMemoryLow>
+which has the same semantics as C<StartupMemoryLow>.
+This setting does not affect C<memory.min> or C<memory.low>
+in the unit itself.
+Using it to set a default child allocation is only useful on kernels older than 5.7,
+which do not support the C<memory_recursiveprot> cgroup2 mount option.
+
+While C<StartupMemoryLow> applies to the startup and shutdown phases of the system,
+C<MemoryMin> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryLow> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'MemoryHigh',
       {
-        'description' => 'Specify the throttling limit on memory usage of the executed processes in this unit. Memory usage may go
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the throttling limit on memory usage of the executed processes in this unit. Memory usage may go
 above the limit if unavoidable, but the processes are heavily slowed down and memory is taken away
 aggressively in such cases. This is the main mechanism to control memory usage of a unit.
 
@@ -267,13 +311,43 @@ percentage value may be specified, which is taken relative to the installed phys
 system. If assigned the
 special value C<infinity>, no memory throttling is applied. This controls the
 C<memory.high> control group attribute. For details about this control group attribute, see
-L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.',
+L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryHigh> applies to the startup and shutdown phases of the system,
+C<MemoryHigh> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryHigh> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StartupMemoryHigh',
+      {
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the throttling limit on memory usage of the executed processes in this unit. Memory usage may go
+above the limit if unavoidable, but the processes are heavily slowed down and memory is taken away
+aggressively in such cases. This is the main mechanism to control memory usage of a unit.
+
+Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the installed physical memory on the
+system. If assigned the
+special value C<infinity>, no memory throttling is applied. This controls the
+C<memory.high> control group attribute. For details about this control group attribute, see
+L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryHigh> applies to the startup and shutdown phases of the system,
+C<MemoryHigh> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryHigh> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'MemoryMax',
       {
-        'description' => 'Specify the absolute limit on memory usage of the executed processes in this unit. If memory usage
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on memory usage of the executed processes in this unit. If memory usage
 cannot be contained under the limit, out-of-memory killer is invoked inside the unit. It is recommended to
 use C<MemoryHigh> as the main control mechanism and use C<MemoryMax> as the
 last line of defense.
@@ -283,35 +357,174 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), re
 percentage value may be specified, which is taken relative to the installed physical memory on the system. If
 assigned the special value C<infinity>, no memory limit is applied. This controls the
 C<memory.max> control group attribute. For details about this control group attribute, see
-L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.',
+L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryMax> applies to the startup and shutdown phases of the system,
+C<MemoryMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StartupMemoryMax',
+      {
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on memory usage of the executed processes in this unit. If memory usage
+cannot be contained under the limit, out-of-memory killer is invoked inside the unit. It is recommended to
+use C<MemoryHigh> as the main control mechanism and use C<MemoryMax> as the
+last line of defense.
+
+Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the installed physical memory on the system. If
+assigned the special value C<infinity>, no memory limit is applied. This controls the
+C<memory.max> control group attribute. For details about this control group attribute, see
+L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryMax> applies to the startup and shutdown phases of the system,
+C<MemoryMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'MemorySwapMax',
       {
-        'description' => 'Specify the absolute limit on swap usage of the executed processes in this unit.
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on swap usage of the executed processes in this unit.
 
 Takes a swap size in bytes. If the value is suffixed with K, M, G or T, the specified swap size is
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
-special value C<infinity>, no swap limit is applied. This controls the
+special value C<infinity>, no swap limit is applied. These settings control the
 C<memory.swap.max> control group attribute. For details about this control group attribute,
-see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.',
+see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemorySwapMax> applies to the startup and shutdown phases of the system,
+C<MemorySwapMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemorySwapMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StartupMemorySwapMax',
+      {
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on swap usage of the executed processes in this unit.
+
+Takes a swap size in bytes. If the value is suffixed with K, M, G or T, the specified swap size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
+special value C<infinity>, no swap limit is applied. These settings control the
+C<memory.swap.max> control group attribute. For details about this control group attribute,
+see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemorySwapMax> applies to the startup and shutdown phases of the system,
+C<MemorySwapMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemorySwapMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'MemoryZSwapMax',
+      {
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on zswap usage of the processes in this unit. Zswap is a lightweight compressed
+cache for swap pages. It takes pages that are in the process of being swapped out and attempts to compress them into a
+dynamically allocated RAM-based memory pool. If the limit specified is hit, no entries from this unit will be
+stored in the pool until existing entries are faulted back or written out to disk. See the kernel\'s
+L<Zswap|https://www.kernel.org/doc/html/latest/admin-guide/mm/zswap.html> documentation for more details.
+
+Takes a size in bytes. If the value is suffixed with K, M, G or T, the specified size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
+special value C<infinity>, no limit is applied. These settings control the
+C<memory.zswap.max> control group attribute. For details about this control group attribute,
+see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryZSwapMax> applies to the startup and shutdown phases of the system,
+C<MemoryZSwapMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryZSwapMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StartupMemoryZSwapMax',
+      {
+        'description' => 'These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on zswap usage of the processes in this unit. Zswap is a lightweight compressed
+cache for swap pages. It takes pages that are in the process of being swapped out and attempts to compress them into a
+dynamically allocated RAM-based memory pool. If the limit specified is hit, no entries from this unit will be
+stored in the pool until existing entries are faulted back or written out to disk. See the kernel\'s
+L<Zswap|https://www.kernel.org/doc/html/latest/admin-guide/mm/zswap.html> documentation for more details.
+
+Takes a size in bytes. If the value is suffixed with K, M, G or T, the specified size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
+special value C<infinity>, no limit is applied. These settings control the
+C<memory.zswap.max> control group attribute. For details about this control group attribute,
+see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryZSwapMax> applies to the startup and shutdown phases of the system,
+C<MemoryZSwapMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryZSwapMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'AllowedMemoryNodes',
+      {
+        'description' => 'These settings control the C<cpuset> controller in the unified hierarchy.
+
+Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
+or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
+NUMA nodes indices separated by a dash.
+
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn\'t
+guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
+The effective configuration is reported as C<EffectiveMemoryNodes>.
+
+While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
+C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
+
+This setting is supported only with the unified control group hierarchy.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'StartupAllowedMemoryNodes',
+      {
+        'description' => 'These settings control the C<cpuset> controller in the unified hierarchy.
+
+Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
+or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
+NUMA nodes indices separated by a dash.
+
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn\'t
+guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
+The effective configuration is reported as C<EffectiveMemoryNodes>.
+
+While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
+C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
+
+This setting is supported only with the unified control group hierarchy.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
       'TasksAccounting',
       {
-        'description' => 'Turn on task accounting for this unit. Takes a
-boolean argument. If enabled, the system manager will keep
-track of the number of tasks in the unit. The number of
-tasks accounted this way includes both kernel threads and
-userspace processes, with each thread counting
-individually. Note that turning on tasks accounting for one
-unit will also implicitly turn it on for all units contained
-in the same slice and for all its parent slices and the
-units contained therein. The system default for this setting
-may be controlled with
-C<DefaultTasksAccounting> in
+        'description' => 'This setting controls the C<pids> controller in the unified hierarchy.
+
+Turn on task accounting for this unit. Takes a boolean argument. If enabled, the kernel will
+keep track of the total number of tasks in the unit and its children. This number includes both
+kernel threads and userspace processes, with each thread counted individually. Note that turning on
+tasks accounting for one unit will also implicitly turn it on for all units contained in the same
+slice and for all its parent slices and the units contained therein. The system default for this
+setting may be controlled with C<DefaultTasksAccounting> in
 L<systemd-system.conf(5)>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -322,7 +535,9 @@ L<systemd-system.conf(5)>.',
       },
       'TasksMax',
       {
-        'description' => 'Specify the maximum number of tasks that may be created in the unit. This ensures that the
+        'description' => 'This setting controls the C<pids> controller in the unified hierarchy.
+
+Specify the maximum number of tasks that may be created in the unit. This ensures that the
 number of tasks accounted for the unit (see above) stays below a specific limit. This either takes
 an absolute number of tasks or a percentage value that is taken relative to the configured maximum
 number of tasks on the system. If assigned the special value C<infinity>, no tasks
@@ -339,7 +554,9 @@ L<systemd-system.conf(5)>.',
       },
       'IOAccounting',
       {
-        'description' => 'Turn on Block I/O accounting for this unit, if the unified control group hierarchy is used on the
+        'description' => 'This setting controls the C<io> controller in the unified hierarchy.
+
+Turn on Block I/O accounting for this unit, if the unified control group hierarchy is used on the
 system. Takes a boolean argument. Note that turning on block I/O accounting for one unit will also implicitly
 turn it on for all units contained in the same slice and all for its parent slices and the units contained
 therein. The system default for this setting may be controlled with C<DefaultIOAccounting>
@@ -354,7 +571,9 @@ L<systemd-system.conf(5)>.',
       },
       'IOWeight',
       {
-        'description' => 'Set the default overall block I/O weight for the executed processes, if the unified control
+        'description' => 'These settings control the C<io> controller in the unified hierarchy.
+
+Set the default overall block I/O weight for the executed processes, if the unified control
 group hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the
 default block I/O weight. This controls the C<io.weight> control group attribute,
 which defaults to 100. For details about this control group attribute, see L<IO
@@ -374,7 +593,9 @@ and shutdown differently than during runtime.',
       },
       'StartupIOWeight',
       {
-        'description' => 'Set the default overall block I/O weight for the executed processes, if the unified control
+        'description' => 'These settings control the C<io> controller in the unified hierarchy.
+
+Set the default overall block I/O weight for the executed processes, if the unified control
 group hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the
 default block I/O weight. This controls the C<io.weight> control group attribute,
 which defaults to 100. For details about this control group attribute, see L<IO
@@ -394,7 +615,9 @@ and shutdown differently than during runtime.',
       },
       'IODeviceWeight',
       {
-        'description' => 'Set the per-device overall block I/O weight for the executed processes, if the unified control group
+        'description' => 'This setting controls the C<io> controller in the unified hierarchy.
+
+Set the per-device overall block I/O weight for the executed processes, if the unified control group
 hierarchy is used on the system. Takes a space-separated pair of a file path and a weight value to specify
 the device specific weight value, between 1 and 10000. (Example: C</dev/sda 1000>). The file
 path may be specified as path to a block device node or as any other file, in which case the backing block
@@ -415,7 +638,9 @@ does not cover complex storage and in particular RAID and volume management stor
       },
       'IOReadBandwidthMax',
       {
-        'description' => 'Set the per-device overall block I/O bandwidth maximum limit for the executed processes, if the unified
+        'description' => 'These settings control the C<io> controller in the unified hierarchy.
+
+Set the per-device overall block I/O bandwidth maximum limit for the executed processes, if the unified
 control group hierarchy is used on the system. This limit is not work-conserving and the executed processes
 are not allowed to use more even if the device has idle capacity.  Takes a space-separated pair of a file
 path and a bandwidth value (in bytes per second) to specify the device specific bandwidth. The file path may
@@ -433,7 +658,9 @@ Similar restrictions on block device discovery as for C<IODeviceWeight> apply, s
       },
       'IOWriteBandwidthMax',
       {
-        'description' => 'Set the per-device overall block I/O bandwidth maximum limit for the executed processes, if the unified
+        'description' => 'These settings control the C<io> controller in the unified hierarchy.
+
+Set the per-device overall block I/O bandwidth maximum limit for the executed processes, if the unified
 control group hierarchy is used on the system. This limit is not work-conserving and the executed processes
 are not allowed to use more even if the device has idle capacity.  Takes a space-separated pair of a file
 path and a bandwidth value (in bytes per second) to specify the device specific bandwidth. The file path may
@@ -451,7 +678,9 @@ Similar restrictions on block device discovery as for C<IODeviceWeight> apply, s
       },
       'IOReadIOPSMax',
       {
-        'description' => 'Set the per-device overall block I/O IOs-Per-Second maximum limit for the executed processes, if the
+        'description' => 'These settings control the C<io> controller in the unified hierarchy.
+
+Set the per-device overall block I/O IOs-Per-Second maximum limit for the executed processes, if the
 unified control group hierarchy is used on the system. This limit is not work-conserving and the executed
 processes are not allowed to use more even if the device has idle capacity.  Takes a space-separated pair of
 a file path and an IOPS value to specify the device specific IOPS. The file path may be a path to a block
@@ -469,7 +698,9 @@ Similar restrictions on block device discovery as for C<IODeviceWeight> apply, s
       },
       'IOWriteIOPSMax',
       {
-        'description' => 'Set the per-device overall block I/O IOs-Per-Second maximum limit for the executed processes, if the
+        'description' => 'These settings control the C<io> controller in the unified hierarchy.
+
+Set the per-device overall block I/O IOs-Per-Second maximum limit for the executed processes, if the
 unified control group hierarchy is used on the system. This limit is not work-conserving and the executed
 processes are not allowed to use more even if the device has idle capacity.  Takes a space-separated pair of
 a file path and an IOPS value to specify the device specific IOPS. The file path may be a path to a block
@@ -487,7 +718,9 @@ Similar restrictions on block device discovery as for C<IODeviceWeight> apply, s
       },
       'IODeviceLatencyTargetSec',
       {
-        'description' => 'Set the per-device average target I/O latency for the executed processes, if the unified control group
+        'description' => 'This setting controls the C<io> controller in the unified hierarchy.
+
+Set the per-device average target I/O latency for the executed processes, if the unified control group
 hierarchy is used on the system. Takes a file path and a timespan separated by a space to specify
 the device specific latency target. (Example: "/dev/sda 25ms"). The file path may be specified
 as path to a block device node or as any other file, in which case the backing block device of the file
@@ -558,7 +791,7 @@ ultimately activated services for it. Conversely, the IP access list configured 
 not applied to any sockets passed into the service via socket activation. Thus, it is usually a
 good idea to replicate the IP access lists on both the socket and the service unit. Nevertheless,
 it may make sense to maintain one list more open and the other one more restricted, depending on
-the usecase.
+the use case.
 
 If these settings are used multiple times in the same unit the specified lists are combined. If an
 empty string is assigned to these settings the specific access list is reset and all previous settings undone.
@@ -604,7 +837,7 @@ ultimately activated services for it. Conversely, the IP access list configured 
 not applied to any sockets passed into the service via socket activation. Thus, it is usually a
 good idea to replicate the IP access lists on both the socket and the service unit. Nevertheless,
 it may make sense to maintain one list more open and the other one more restricted, depending on
-the usecase.
+the use case.
 
 If these settings are used multiple times in the same unit the specified lists are combined. If an
 empty string is assigned to these settings the specific access list is reset and all previous settings undone.
@@ -616,76 +849,6 @@ Note that these settings might not be supported on some systems (for example if 
 support is not enabled in the underlying kernel or container manager). These settings will have no effect in
 that case. If compatibility with such systems is desired it is hence recommended to not exclusively rely on
 them for IP security.",
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'IPIngressFilterPath',
-      {
-        'description' => 'Add custom network traffic filters implemented as BPF programs, applying to all IP packets
-sent and received over C<AF_INET> and C<AF_INET6> sockets.
-Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
-
-The filters configured with this option are applied to all sockets created by processes
-of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
-to filters any of the parent slice units this unit might be a member of as well as any
-C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
-By default there are no filters specified.
-
-If these settings are used multiple times in the same unit all the specified programs are attached. If an
-empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
-
-If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
-is already being handled by C<BPFProgram> ingress hook, e.g.
-C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
-the assignment will be still considered valid and the program will be attached to a cgroup. Same for
-C<IPEgressFilterPath> path and C<egress> hook.
-
-Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
-all sockets associated with it directly, but not to any sockets created by the ultimately activated services
-for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
-the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
-the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
-one more restricted, depending on the usecase.
-
-Note that these settings might not be supported on some systems (for example if eBPF control group
-support is not enabled in the underlying kernel or container manager). These settings will fail the service in
-that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
-(requires C<Delegate>C<yes>) instead of using this setting.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'IPEgressFilterPath',
-      {
-        'description' => 'Add custom network traffic filters implemented as BPF programs, applying to all IP packets
-sent and received over C<AF_INET> and C<AF_INET6> sockets.
-Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
-
-The filters configured with this option are applied to all sockets created by processes
-of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
-to filters any of the parent slice units this unit might be a member of as well as any
-C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
-By default there are no filters specified.
-
-If these settings are used multiple times in the same unit all the specified programs are attached. If an
-empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
-
-If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
-is already being handled by C<BPFProgram> ingress hook, e.g.
-C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
-the assignment will be still considered valid and the program will be attached to a cgroup. Same for
-C<IPEgressFilterPath> path and C<egress> hook.
-
-Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
-all sockets associated with it directly, but not to any sockets created by the ultimately activated services
-for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
-the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
-the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
-one more restricted, depending on the usecase.
-
-Note that these settings might not be supported on some systems (for example if eBPF control group
-support is not enabled in the underlying kernel or container manager). These settings will fail the service in
-that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
-(requires C<Delegate>C<yes>) instead of using this setting.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -900,6 +1063,127 @@ Programs in the unit will be only able to use the eth2 network interface.
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'IPIngressFilterPath',
+      {
+        'description' => 'Add custom network traffic filters implemented as BPF programs, applying to all IP packets
+sent and received over C<AF_INET> and C<AF_INET6> sockets.
+Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
+
+The filters configured with this option are applied to all sockets created by processes
+of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
+to filters any of the parent slice units this unit might be a member of as well as any
+C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
+By default there are no filters specified.
+
+If these settings are used multiple times in the same unit all the specified programs are attached. If an
+empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
+
+If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
+is already being handled by C<BPFProgram> ingress hook, e.g.
+C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
+the assignment will be still considered valid and the program will be attached to a cgroup. Same for
+C<IPEgressFilterPath> path and C<egress> hook.
+
+Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
+all sockets associated with it directly, but not to any sockets created by the ultimately activated services
+for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
+the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
+the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
+one more restricted, depending on the use case.
+
+Note that these settings might not be supported on some systems (for example if eBPF control group
+support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
+(requires C<Delegate>C<yes>) instead of using this setting.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'IPEgressFilterPath',
+      {
+        'description' => 'Add custom network traffic filters implemented as BPF programs, applying to all IP packets
+sent and received over C<AF_INET> and C<AF_INET6> sockets.
+Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
+
+The filters configured with this option are applied to all sockets created by processes
+of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
+to filters any of the parent slice units this unit might be a member of as well as any
+C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
+By default there are no filters specified.
+
+If these settings are used multiple times in the same unit all the specified programs are attached. If an
+empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
+
+If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
+is already being handled by C<BPFProgram> ingress hook, e.g.
+C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
+the assignment will be still considered valid and the program will be attached to a cgroup. Same for
+C<IPEgressFilterPath> path and C<egress> hook.
+
+Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
+all sockets associated with it directly, but not to any sockets created by the ultimately activated services
+for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
+the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
+the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
+one more restricted, depending on the use case.
+
+Note that these settings might not be supported on some systems (for example if eBPF control group
+support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
+(requires C<Delegate>C<yes>) instead of using this setting.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'BPFProgram',
+      {
+        'description' => 'C<BPFProgram> allows attaching custom BPF programs to the cgroup of a
+unit. (This generalizes the functionality exposed via C<IPEgressFilterPath> and
+and C<IPIngressFilterPath> for other hooks.)  Cgroup-bpf hooks in the form of BPF
+programs loaded to the BPF filesystem are attached with cgroup-bpf attach flags determined by the
+unit. For details about attachment types and flags see
+L<C<bpf.h>|https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/include/uapi/linux/bpf.h>. Also
+refer to the general L<BPF documentation|https://docs.kernel.org/bpf/>.
+
+The specification of BPF program consists of a pair of BPF program type and program path in
+the file system, with C<:> as the separator:
+type:program-path.
+
+The BPF program type is equivalent to the BPF attach type used in
+bpftool. It may be one of C<egress>,
+C<ingress>, C<sock_create>, C<sock_ops>,
+C<device>, C<bind4>, C<bind6>,
+C<connect4>, C<connect6>, C<post_bind4>,
+C<post_bind6>, C<sendmsg4>, C<sendmsg6>,
+C<sysctl>, C<recvmsg4>, C<recvmsg6>,
+C<getsockopt>, C<setsockopt>.
+
+The specified program path must be an absolute path referencing a BPF program inode in the
+bpffs file system (which generally means it must begin with C</sys/fs/bpf/>). If
+a specified program does not exist (i.e. has not been uploaded to the BPF subsystem of the kernel
+yet), it will not be installed but unit activation will continue (a warning will be printed to the
+logs).
+
+Setting C<BPFProgram> to an empty value makes previous assignments
+ineffective.
+
+Multiple assignments of the same program type/path pair have the same effect as a single
+assignment: the program will be attached just once.
+
+If BPF C<egress> pinned to program-path path is already being
+handled by C<IPEgressFilterPath>, C<BPFProgram>
+assignment will be considered valid and C<BPFProgram> will be attached to a cgroup.
+Similarly for C<ingress> hook and C<IPIngressFilterPath> assignment.
+
+BPF programs passed with C<BPFProgram> are attached to the cgroup of a unit
+with BPF attach flag C<multi>, that allows further attachments of the same
+type within cgroup hierarchy topped by the unit cgroup.
+
+Examples:
+    BPFProgram=egress:/sys/fs/bpf/egress-hook
+    BPFProgram=bind6:/sys/fs/bpf/sock-addr-hook
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'DeviceAllow',
       {
         'cargo' => {
@@ -992,50 +1276,81 @@ L<systemd.service(5)>, section
       },
       'Delegate',
       {
-        'description' => 'Turns on delegation of further resource control partitioning to processes of the unit. Units where this
-is enabled may create and manage their own private subhierarchy of control groups below the control group of
-the unit itself. For unprivileged services (i.e. those using the C<User> setting) the unit\'s
-control group will be made accessible to the relevant user. When enabled the service manager will refrain
-from manipulating control groups or moving processes below the unit\'s control group, so that a clear concept
-of ownership is established: the control group tree above the unit\'s control group (i.e. towards the root
-control group) is owned and managed by the service manager of the host, while the control group tree below
-the unit\'s control group is owned and managed by the unit itself. Takes either a boolean argument or a list
-of control group controller names. If true, delegation is turned on, and all supported controllers are
-enabled for the unit, making them available to the unit\'s processes for management. If false, delegation is
-turned off entirely (and no additional controllers are enabled). If set to a list of controllers, delegation
-is turned on, and the specified controllers are enabled for the unit. Note that additional controllers than
-the ones specified might be made available as well, depending on configuration of the containing slice unit
-or other units contained in it. Note that assigning the empty string will enable delegation, but reset the
-list of controllers, all assignments prior to this will have no effect.  Defaults to false.
+        'description' => 'Turns on delegation of further resource control partitioning to processes of the unit. Units
+where this is enabled may create and manage their own private subhierarchy of control groups below
+the control group of the unit itself. For unprivileged services (i.e. those using the
+C<User> setting) the unit\'s control group will be made accessible to the relevant
+user.
 
-Note that controller delegation to less privileged code is only safe on the unified control group
-hierarchy. Accordingly, access to the specified controllers will not be granted to unprivileged services on
-the legacy hierarchy, even when requested.
+When enabled the service manager will refrain from manipulating control groups or moving
+processes below the unit\'s control group, so that a clear concept of ownership is established: the
+control group tree at the level of the unit\'s control group and above (i.e. towards the root
+control group) is owned and managed by the service manager of the host, while the control group
+tree below the unit\'s control group is owned and managed by the unit itself.
 
-Not all of these controllers are available on all kernels however, and some are
-specific to the unified hierarchy while others are specific to the legacy hierarchy. Also note that the
-kernel might support further controllers, which aren\'t covered here yet as delegation is either not supported
-at all for them or not defined cleanly.
+Takes either a boolean argument or a (possibly empty) list of control group controller names.
+If true, delegation is turned on, and all supported controllers are enabled for the unit, making
+them available to the unit\'s processes for management. If false, delegation is turned off entirely
+(and no additional controllers are enabled). If set to a list of controllers, delegation is turned
+on, and the specified controllers are enabled for the unit. Assigning the empty string will enable
+delegation, but reset the list of controllers, and all assignments prior to this will have no
+effect. Note that additional controllers other than the ones specified might be made available as
+well, depending on configuration of the containing slice unit or other units contained in it.
+Defaults to false.
+
+Note that controller delegation to less privileged code is only safe on the unified control
+group hierarchy. Accordingly, access to the specified controllers will not be granted to
+unprivileged services on the legacy hierarchy, even when requested.
+
+Not all of these controllers are available on all kernels however, and some are specific to
+the unified hierarchy while others are specific to the legacy hierarchy. Also note that the kernel
+might support further controllers, which aren\'t covered here yet as delegation is either not
+supported at all for them or not defined cleanly.
+
+Note that because of the hierarchical nature of cgroup hierarchy, any controllers that are
+delegated will be enabled for the parent and sibling units of the unit with delegation.
 
 For further details on the delegation model consult L<Control Group APIs and
 Delegation|https://systemd.io/CGROUP_DELEGATION>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'DelegateSubgroup',
+      {
+        'description' => 'Place unit processes in the specified subgroup of the unit\'s control group. Takes a valid
+control group name (not a path!) as parameter, or an empty string to turn this feature
+off. Defaults to off. The control group name must be usable as filename and avoid conflicts with
+the kernel\'s control group attribute files (i.e. C<cgroup.procs> is not an
+acceptable name, since the kernel exposes a native control group attribute file by that name). This
+option has no effect unless control group delegation is turned on via C<Delegate>,
+see above. Note that this setting only applies to "main" processes of a unit, i.e. for services to
+C<ExecStart>, but not for C<ExecReload> and similar. If
+delegation is enabled, the latter are always placed inside a subgroup named
+C<.control>. The specified subgroup is automatically created (and potentially
+ownership is passed to the unit\'s configured user/group) when a process is started in it.
+
+This option is useful to avoid manually moving the invoked process into a subgroup after it
+has been started. Since no processes should live in inner nodes of the control group tree it\'s
+almost always necessary to run the main ("supervising") process of a unit that has delegation
+turned on in a subgroup.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'DisableControllers',
       {
-        'description' => 'Disables controllers from being enabled for a unit\'s children. If a controller listed is already in use
-in its subtree, the controller will be removed from the subtree. This can be used to avoid child units being
-able to implicitly or explicitly enable a controller. Defaults to not disabling any controllers.
-
-It may not be possible to successfully disable a controller if the unit or any child of the unit in
-question delegates controllers to its children, as any delegated subtree of the cgroup hierarchy is unmanaged
-by systemd.
+        'description' => 'Disables controllers from being enabled for a unit\'s children. If a controller listed is
+already in use in its subtree, the controller will be removed from the subtree. This can be used to
+avoid configuration in child units from being able to implicitly or explicitly enable a controller.
+Defaults to empty.
 
 Multiple controllers may be specified, separated by spaces. You may also pass
 C<DisableControllers> multiple times, in which case each new instance adds another controller
 to disable. Passing C<DisableControllers> by itself with no controller name present resets
-the disabled controller list.',
+the disabled controller list.
+
+It may not be possible to disable a controller after units have been started, if the unit or
+any child of the unit in question delegates controllers to its children, as any delegated subtree
+of the cgroup hierarchy is unmanaged by systemd.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -1116,8 +1431,8 @@ L<oomd.conf(5)>.
       'ManagedOOMPreference',
       {
         'choice' => [
-          'none',
           'avoid',
+          'none',
           'omit'
         ],
         'description' => 'Allows deprioritizing or omitting this unit\'s cgroup as a candidate when
@@ -1129,10 +1444,10 @@ When calculating candidates to relieve swap usage, systemd-oomd will
 only respect these extended attributes if the unit\'s cgroup is owned by root.
 
 When calculating candidates to relieve memory pressure, systemd-oomd
-will only respect these extended attributes if the unit\'s cgroup owner, and the
-owner of the monitored ancestor cgroup are the same. For example, if systemd-oomd
-is calculating candidates for C<-.slice>, then extended attributes set
-on descendants of C</user.slice/user-1000.slice/user@1000.service/>
+will only respect these extended attributes if the unit\'s cgroup is owned by root, or if the
+unit\'s cgroup owner, and the owner of the monitored ancestor cgroup are the same. For example,
+if systemd-oomd is calculating candidates for C<-.slice>,
+then extended attributes set on descendants of C</user.slice/user-1000.slice/user@1000.service/>
 will be ignored because the descendants are owned by UID 1000, and C<-.slice>
 is owned by UID 0. But, if calculating candidates for
 C</user.slice/user-1000.slice/user@1000.service/>, then extended attributes set
@@ -1157,9 +1472,62 @@ and L<oomd.conf(5)>.
 ',
         'type' => 'leaf',
         'value_type' => 'enum'
+      },
+      'MemoryPressureWatch',
+      {
+        'choice' => [
+          'auto',
+          'off',
+          'on',
+          'skip'
+        ],
+        'description' => 'Controls memory pressure monitoring for invoked processes. Takes one of
+C<off>, C<on>, C<auto> or C<skip>. If
+C<off> tells the service not to watch for memory pressure events, by setting the
+C<$MEMORY_PRESSURE_WATCH> environment variable to the literal string
+C</dev/null>. If C<on> tells the service to watch for memory
+pressure events. This enables memory accounting for the service, and ensures the
+C<memory.pressure> cgroup attribute files is accessible for read and write to the
+service\'s user. It then sets the C<$MEMORY_PRESSURE_WATCH> environment variable for
+processes invoked by the unit to the file system path to this file. The threshold information
+configured with C<MemoryPressureThresholdSec> is encoded in the
+C<$MEMORY_PRESSURE_WRITE> environment variable. If the C<auto> value
+is set the protocol is enabled if memory accounting is anyway enabled for the unit, and disabled
+otherwise. If set to C<skip> the logic is neither enabled, nor disabled and the two
+environment variables are not set.
+
+Note that services are free to use the two environment variables, but it\'s unproblematic if
+they ignore them. Memory pressure handling must be implemented individually in each service, and
+usually means different things for different software. For further details on memory pressure
+handling see L<Memory Pressure Handling in
+systemd|https://systemd.io/MEMORY_PRESSURE>.
+
+Services implemented using
+L<sd-event(3)> may use
+L<sd_event_add_memory_pressure(3)>
+to watch for and handle memory pressure events.
+
+If not explicit set, defaults to the C<DefaultMemoryPressureWatch> setting in
+L<systemd-system.conf(5)>.',
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
+      'MemoryPressureThresholdSec',
+      {
+        'description' => "Sets the memory pressure threshold time for memory pressure monitor as configured via
+C<MemoryPressureWatch>. Specifies the maximum allocation latency before a memory
+pressure event is signalled to the service, per 2s window. If not specified defaults to the
+C<DefaultMemoryPressureThresholdSec> setting in
+L<systemd-system.conf(5)>
+(which in turn defaults to 200ms). The specified value expects a time unit such as
+C<ms> or C<\x{3bc}s>, see
+L<systemd.time(7)> for
+details on the permitted syntax.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 252 doc',
+    'generated_by' => 'parse-man.pl from systemd 254 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

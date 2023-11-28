@@ -264,8 +264,8 @@ sub colgroups {
   # mark primary keys
   $columns->{$_}{is_pk} = 1 foreach @pk;
 
-  # attach paths to relevant columns
-  foreach my $path (values %paths) {
+  # attach paths (in alphabetic order) to relevant columns
+  foreach my $path (map {$paths{$_}} sort keys %paths) {
     # name of column(s) from which this path starts
     my %path_on             = $path->on;
     my ($col_name, @others) = keys %path_on;

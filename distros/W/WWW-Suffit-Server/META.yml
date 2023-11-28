@@ -20,11 +20,12 @@ no_index:
     - inc
 requires:
   Mojolicious: '7.94'
+  Sys::Syslog: '0'
   WWW::Suffit: '1'
   perl: '5.020'
 resources:
   homepage: https://sourceforge.net/projects/www-suffit-server/
   license: https://dev.perl.org/licenses
   repository: https://abalama@git.code.sf.net/p/www-suffit-server/code
-version: '1.00'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element.pm
-## Version v0.3.0
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.3.1
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2023/05/07
+## Modified 2023/11/06
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,6 @@ BEGIN
     use parent qw( HTML::Object::DOM::Node );
     use vars qw( @EXPORT_OK $VERSION );
     use HTML::Object::Exception;
-    use Nice::Try;
     use Scalar::Util ();
     use URI;
     use Want;
@@ -29,7 +28,7 @@ BEGIN
         DOCUMENT_POSITION_PRECEDING DOCUMENT_POSITION_FOLLOWING DOCUMENT_POSITION_CONTAINS 
         DOCUMENT_POSITION_CONTAINED_BY DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
     );
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -954,14 +953,16 @@ sub matches
     $self->_load_class( 'HTML::Selector::XPath', { version => '0.20' } ) ||
         return( $self->pass_error );
     my $xpath;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         my $sel = HTML::Selector::XPath->new( $selector, %$params );
         $xpath = $sel->to_xpath( %$params );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Error trying to get the xpath value for selector \"$selector\": $e" ) );
+        return( $self->error( "Error trying to get the xpath value for selector \"$selector\": $@" ) );
     }
     my $xp = $self->{_xp};
     $self->message( 4, "Calling xp->matches for xpath '$xpath' with context '", $self->as_string, "'" ); 
@@ -1707,15 +1708,18 @@ sub _set_get_anchor_uri
     my $self = shift( @_ );
     my $link = $self->href;
     # We constantly get a new URI object, because the value of the href attribute may have been altered by other means
-    try
+    # try-catch
+    local $@;
+    my $rv = eval
     {
         return( $link ) if( $self->_is_a( $link => 'URI' ) );
         return( ( defined( $link ) && CORE::length( "$link" ) ) ? URI->new( $link ) : URI->new );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Unable to create a URI object from \"$link\" (", overload::StrVal( $link ), "): $e" ) );
+        return( $self->error( "Unable to create a URI object from \"$link\" (", overload::StrVal( $link ), "): $@" ) );
     }
+    return( $rv );
 }
 
 sub _set_get_form_attribute : lvalue
@@ -1786,16 +1790,19 @@ sub _set_get_property : lvalue
             if( $def->{is_datetime} )
             {
                 my $val = $self->attr( $attr );
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     my $dt = $self->_parse_timestamp( $val );
                     return( $self->pass_error ) if( !defined( $dt ) );
                     return( $dt );
-                }
-                catch( $e )
+                };
+                if( $@ )
                 {
-                    return( $self->error( "Unable to parse datetime value \"$val\": $e" ) );
+                    return( $self->error( "Unable to parse datetime value \"$val\": $@" ) );
                 }
+                return( $rv );
             }
             elsif( $def->{is_number} )
             {
@@ -1812,17 +1819,20 @@ sub _set_get_property : lvalue
             {
                 my $val = $self->attr( $attr );
                 # We constantly get a new URI object, because the value of the href attribute may have been altered by other means
-                try
+                # try-catch
+                local $@;
+                my $rv = eval
                 {
                     return( $val ) if( $self->_is_a( $val => 'URI' ) );
                     return if( !defined( $val ) );
                     return( $val ) if( !CORE::length( "$val" ) );
                     return( URI->new( "$val" ) );
-                }
-                catch( $e )
+                };
+                if( $@ )
                 {
-                    return( $self->error( "Unable to create a URI object from \"$val\" (", overload::StrVal( $val ), "): $e" ) );
+                    return( $self->error( "Unable to create a URI object from \"$val\" (", overload::StrVal( $val ), "): $@" ) );
                 }
+                return( $rv );
             }
             elsif( $def->{callback} && ref( $def->{callback} ) eq 'CODE' )
             {
@@ -1855,14 +1865,16 @@ sub _set_get_property : lvalue
             # form target
             elsif( $def->{is_uri} )
             {
-                try
+                # try-catch
+                local $@;
+                eval
                 {
                     my $uri = URI->new( $arg );
                     $self->attr( $attr => $uri );
-                }
-                catch( $e )
+                };
+                if( $@ )
                 {
-                    die( "Unable to create an URI with \"$arg\": $e" );
+                    die( "Unable to create an URI with \"$arg\": $@" );
                 }
             }
             # Used for <option>
@@ -1907,59 +1919,61 @@ sub _set_get_uri_property : lvalue
             # It is convenient and let the user modify it directly if he wants.
             if( ref( $uri ) )
             {
-                try
+                my $meth = exists( $map->{ $prop } ) ? $map->{ $prop } : $prop;
+                my $code = $uri->can( $meth );
+                # User trying to access URI method like host port, etc on a generic URI
+                # which is ok for method like path, query, fragment
+                # So we convert what would otherwise be an error into an undef returned, meaning no value
+                if( !defined( $code ) )
                 {
-                    my $meth = exists( $map->{ $prop } ) ? $map->{ $prop } : $prop;
-                    my $code = $uri->can( $meth );
-                    # User trying to access URI method like host port, etc on a generic URI
-                    # which is ok for method like path, query, fragment
-                    # So we convert what would otherwise be an error into an undef returned, meaning no value
-                    if( !defined( $code ) )
+                    if( $uri->isa( 'URI::_generic' ) )
                     {
-                        if( $uri->isa( 'URI::_generic' ) )
-                        {
-                            return( $self->{ $prop } );
-                        }
-                        else
-                        {
-                            return( $self->error( "URI object has no method \"$meth\"." ) );
-                        }
-                    }
-                    my $val = $code->( $uri );
-                    # We assign the value from the URI method in case, the user would have modified the URI object directly
-                    # We need to stay synchronised.
-                    if( $prop eq 'username' || $prop eq 'password' )
-                    {
-                        if( defined( $val ) )
-                        {
-                            @$self{qw( username password )} = split( /:/, $val, 2 );
-                        }
-                        else
-                        {
-                            $self->{username} = undef;
-                            $self->{password} = undef;
-                        }
                         return( $self->{ $prop } );
                     }
-                    # We add back the colon, because URI stores the scheme without it, but our 'protocol' method returns the scheme with it.
-                    elsif( $prop eq 'protocol' )
+                    else
                     {
-                        $val .= ':' if( defined( $val ) );
+                        return( $self->error( "URI object has no method \"$meth\"." ) );
                     }
-                    elsif( $prop eq 'hash' )
-                    {
-                        substr( $val, 0, 0, '#' ) if( defined( $val ) );
-                    }
-                    elsif( $prop eq 'search' )
-                    {
-                        substr( $val, 0, 0, '?' ) if( defined( $val ) );
-                    }
-                    return( $self->{ $prop } = $val );
                 }
-                catch( $e )
+                # try-catch
+                local $@;
+                my $val = eval
                 {
-                    die( "Unable to get value for URI method \"${prop}\": $e" );
+                    $code->( $uri );
+                };
+                if( $@ )
+                {
+                    die( "Unable to get value for URI method \"${prop}\": $@" );
                 }
+                # We assign the value from the URI method in case, the user would have modified the URI object directly
+                # We need to stay synchronised.
+                if( $prop eq 'username' || $prop eq 'password' )
+                {
+                    if( defined( $val ) )
+                    {
+                        @$self{qw( username password )} = split( /:/, $val, 2 );
+                    }
+                    else
+                    {
+                        $self->{username} = undef;
+                        $self->{password} = undef;
+                    }
+                    return( $self->{ $prop } );
+                }
+                # We add back the colon, because URI stores the scheme without it, but our 'protocol' method returns the scheme with it.
+                elsif( $prop eq 'protocol' )
+                {
+                    $val .= ':' if( defined( $val ) );
+                }
+                elsif( $prop eq 'hash' )
+                {
+                    substr( $val, 0, 0, '#' ) if( defined( $val ) );
+                }
+                elsif( $prop eq 'search' )
+                {
+                    substr( $val, 0, 0, '?' ) if( defined( $val ) );
+                }
+                return( $self->{ $prop } = $val );
             }
             return( $self->{ $prop } );
         },
@@ -1971,42 +1985,44 @@ sub _set_get_uri_property : lvalue
             if( ref( $uri ) )
             {
                 my $uri_class = ref( $uri ); # URI::https or maybe URI::_generic ?
-                try
+                if( $prop eq 'username' || $prop eq 'password' )
                 {
-                    if( $prop eq 'username' || $prop eq 'password' )
+                    no warnings 'uninitialized';
+                    $arg = join( ':', @$self{ qw( username password ) } );
+                }
+                elsif( $prop eq 'protocol' )
+                {
+                    # Remove the trailing colon, because URI scheme method takes it without it
+                    $arg =~ s/\:$//;
+                }
+                elsif( $prop eq 'hash' )
+                {
+                    $arg =~ s/^\#//;
+                }
+                elsif( $prop eq 'search' )
+                {
+                    $arg =~ s/^\?//;
+                }
+                my $meth = exists( $map->{ $prop } ) ? $map->{ $prop } : $prop;
+                my $code = $uri->can( $meth );
+                # User trying to access URI method like host port, etc on a generic URI
+                # which is ok for method like path, query, fragment
+                # So we convert what would otherwise be an error into an undef returned, meaning no value
+                if( !defined( $code ) )
+                {
+                    if( $uri->isa( 'URI::_generic' ) )
                     {
-                        no warnings 'uninitialized';
-                        $arg = join( ':', @$self{ qw( username password ) } );
+                        return( $self->{ $prop } );
                     }
-                    elsif( $prop eq 'protocol' )
+                    else
                     {
-                        # Remove the trailing colon, because URI scheme method takes it without it
-                        $arg =~ s/\:$//;
+                        return( $self->error( "URI object has no method \"$meth\"." ) );
                     }
-                    elsif( $prop eq 'hash' )
-                    {
-                        $arg =~ s/^\#//;
-                    }
-                    elsif( $prop eq 'search' )
-                    {
-                        $arg =~ s/^\?//;
-                    }
-                    my $meth = exists( $map->{ $prop } ) ? $map->{ $prop } : $prop;
-                    my $code = $uri->can( $meth );
-                    # User trying to access URI method like host port, etc on a generic URI
-                    # which is ok for method like path, query, fragment
-                    # So we convert what would otherwise be an error into an undef returned, meaning no value
-                    if( !defined( $code ) )
-                    {
-                        if( $uri->isa( 'URI::_generic' ) )
-                        {
-                            return( $self->{ $prop } );
-                        }
-                        else
-                        {
-                            return( $self->error( "URI object has no method \"$meth\"." ) );
-                        }
-                    }
+                }
+                # try-catch
+                local $@;
+                eval
+                {
                     $code->( $uri, $arg );
                     # If the URI object was generic and we switched it to a non-generic one by setting the schem
                     # We also set other properties if we have them
@@ -2027,10 +2043,10 @@ sub _set_get_uri_property : lvalue
                         }
                     }
                     $self->attr( href => $uri );
-                }
-                catch( $e )
+                };
+                if( $@ )
                 {
-                    die( "Unable to set value \"${arg}\" for URI method \"${prop}\": $e" );
+                    die( "Unable to set value \"${arg}\" for URI method \"${prop}\": $@" );
                 }
             }
             $self->reset(1);
@@ -2059,7 +2075,7 @@ HTML::Object::DOM::Element - HTML Object
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 

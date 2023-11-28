@@ -29,7 +29,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.29';
+our $VERSION = '0.36';
 
 use App::LXC::Container::Data::common;
 use App::LXC::Container::Texts;
@@ -132,6 +132,8 @@ sub package_of($$)
     open my $dpkg, '-|', SEARCH . $file . ' 2>/dev/null'
 	or  fatal('internal_error__1',
 		  'error calling ' . SEARCH . $file . ': '. $!);
+    # escape special characters in file name:
+    $file =~ s/([]+*?{}[])/\\$1/;
     my $package = undef;
     while (<$dpkg>)
     {
@@ -147,7 +149,7 @@ sub package_of($$)
 
 ########################################################################
 
-=head2 paths_of - find package of file
+=head2 paths_of - get list of paths of package
 
     internal object-oriented implementation of the function
     L<App::LXC::Container::Data::paths_of>

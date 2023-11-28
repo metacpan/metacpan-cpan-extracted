@@ -65,4 +65,4 @@ resources:
   homepage: https://metacpan.org/pod/App::AutoCRUD
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/damil/App-AutoCRUD
-version: '0.14'
+version: '0.15'

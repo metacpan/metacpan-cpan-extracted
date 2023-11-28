@@ -23,6 +23,7 @@ t/01load.t
 t/alias.inc
 t/bare_mbf.t
 t/bare_mbi.t
+t/bare_mbr.t
 t/bare_mif.t
 t/bfround_numify.t
 t/big_ap.t
@@ -60,12 +61,13 @@ t/Math/BigInt/Lib/Minimal.pm
 t/Math/BigInt/Lib/TestUtil.pm
 t/Math/BigInt/Scalar.pm
 t/Math/BigInt/Subclass.pm
-t/Math/BigRat/Test.pm
+t/Math/BigRat/Subclass.pm
 t/mbf_ali.t
 t/mbi_ali.t
 t/mbi_rand.t
 t/mbimbf.inc
 t/mbimbf.t
+t/mbr_ali.t
 t/nan_cmp.t
 t/new_overloaded.t
 t/round.t
@@ -74,6 +76,7 @@ t/rt121139.t
 t/sub_ali.t
 t/sub_mbf.t
 t/sub_mbi.t
+t/sub_mbr.t
 t/sub_mif.t
 t/trap.t
 t/upgrade.inc
@@ -171,6 +174,7 @@ xt/author/bpow-mbi.t
 xt/author/brsft-mbi.t
 xt/author/bsgn-mbf.t
 xt/author/bsgn-mbi.t
+xt/author/bsqrt-mbi-mbf.t
 xt/author/bsstr-mbf.t
 xt/author/bsstr-mbi.t
 xt/author/btmod-btdiv-mbi.t
@@ -380,6 +384,12 @@ xt/author/to_oct-mbi.t
 xt/author/to_oct-mbr.t
 xt/author/upgrade-mbf-mbr.t
 xt/author/upgrade-mbi-mbf.t
+xt/author/use_accuracy-mbf.t
+xt/author/use_accuracy-mbi.t
+xt/author/use_accuracy-mbr.t
+xt/author/use_div_scale-mbf.t
+xt/author/use_div_scale-mbi.t
+xt/author/use_div_scale-mbr.t
 xt/author/use_lib1_mbf.t
 xt/author/use_lib1_mbr.t
 xt/author/use_lib2_mbf.t
@@ -392,6 +402,12 @@ xt/author/use_lib5_mbf.t
 xt/author/use_lib5_mbr.t
 xt/author/use_lib6_mbf.t
 xt/author/use_lib6_mbr.t
+xt/author/use_precision-mbf.t
+xt/author/use_precision-mbi.t
+xt/author/use_precision-mbr.t
+xt/author/use_round_mode-mbf.t
+xt/author/use_round_mode-mbi.t
+xt/author/use_round_mode-mbr.t
 xt/release/cpan-changes.t
 xt/release/dist-manifest.t
 xt/release/distmeta.t

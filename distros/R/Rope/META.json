@@ -28,7 +28,8 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Type::Tiny" : "0"
+            "Type::Tiny" : "0",
+            "Want" : "0"
          }
       },
       "runtime" : {
@@ -43,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

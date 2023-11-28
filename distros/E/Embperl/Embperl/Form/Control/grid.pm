@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -94,12 +95,12 @@ sub init
 
 sub init_data_hash
     {
-    my ($rowno, $fdat, $name, $fields) = @_ ;
+    my ($rowno, $hashdata, $fields) = @_ ;
     
     my $data ;
     map
         {
-        $data = $fdat->{$name}{$_} ;
+        $data = $hashdata -> {$_} ;
         my @data ;
         if (ref $data eq 'HASH')
             {
@@ -119,7 +120,7 @@ sub init_data_hash
             }
                     
         [$rowno++, @data ]
-        } keys %{$fdat->{$name}} ;
+        } sort keys %$hashdata ;
     
     }
 
@@ -138,7 +139,7 @@ sub init_data
     my $rowno   = 1 ;
     my $fields  = $self -> {fields} ;
     my @entries = ref $fdat->{$name} eq 'ARRAY'?@{$fdat->{$name}}:
-                  ref $fdat->{$name} eq 'HASH' ?init_data_hash ($rowno, $fdat, $name, $fields):
+                  ref $fdat->{$name} eq 'HASH' ?init_data_hash ($rowno, $fdat->{$name}, $fields):
                                                 split("\t",$fdat->{$name});
     my $line2   = $self -> {line2} ;
     my $order   = $self -> {order} ;
@@ -166,6 +167,7 @@ sub init_data
             }
         }
 
+    my $gridro = $self -> is_readonly ($req) ;
     my $coloffset = defined ($self -> {coloffset})?$self -> {coloffset}:1 ;
     my $data;
     my $i = 0 ;
@@ -175,7 +177,7 @@ sub init_data
     my @rowclass ;
     foreach my $entry (@entries)
         {
-        $data = ref $entry eq 'ARRAY'?$entry:[$ldap?ecos::LdapBase -> splitAttrValue($entry):$entry];
+        $data = ref $entry?$entry:[$ldap?ecos::LdapBase -> splitAttrValue($entry):$entry];
         if (ref $self -> {rowclass} eq 'CODE')
             {
             $rowclass[$i] = &{$self -> {rowclass}}($data, $self) ;
@@ -185,22 +187,29 @@ sub init_data
         $j = 0 ;
         foreach my $field ((@$fields, ($line2?($line2):())))
             {
-            $col = exists $field -> {col}?$field -> {col}:$j ;
-            if ($colval = $field -> {colval})
+            if (ref $data eq 'HASH')
                 {
-                $fdat->{"__${name}_${j}_$i"} = $data->[$col+$coloffset] =~ /\Q$colval\E/?1:0 ;
+                $fdat->{"__${name}_${j}_$i"} = $data->{$field->{name}} ;
                 }
             else
                 {
-                $fdat->{"__${name}_${j}_$i"} = $data->[$col+$coloffset] ;
+                $col = exists $field -> {col}?$field -> {col}:$j ;
+                if ($colval = $field -> {colval})
+                    {
+                    $fdat->{"__${name}_${j}_$i"} = ($data->[$col+$coloffset] =~ /\Q$colval\E/)?1:0 ;
+                    }
+                else
+                    {
+                    $fdat->{"__${name}_${j}_$i"} = $data->[$col+$coloffset] ;
+                    }
                 }
-            
+                
             if ($field -> can ('init_data'))
                 {
                 local $field->{name} = "__${name}_${j}_$i" ;
                 local $field -> {fullid} = "$self->{fullid}_${j}_$i" ;
                 local $field->{dataprefix} ;
-                $field -> init_data ($req, $self)  ;
+                $field -> init_data ($req, $self)  if (!$gridro && $field -> should_init_data($req)) ;
                 }
             $j++ ;    
             }
@@ -218,6 +227,8 @@ sub init_data
 sub init_markup
     {
     my ($self, $req, $grid, $method) = @_ ;
+    
+    $self -> init_data ($req) if ($self -> is_readonly()) ;
     
     my $fdat  = $req -> {docdata} || \%fdat ;
     my $name    = $self->{name} ;
@@ -242,6 +253,19 @@ sub init_markup
             $j++ ;    
             }
         }
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   should_init_data - returns true if init_data should be called for this control
+#
+
+sub should_init_data
+
+    {
+    my ($self, $req) = @_ ;
+
+    return !$self -> is_disabled ($req) ;
     }
 
 # ------------------------------------------------------------------------------------------
@@ -337,7 +361,14 @@ sub prepare_fdat
         }
     if ($self -> {datatype} eq 'hash')
         {
-        $fdat->{$name} = { map { ($_->[1] => $_->[2]) } @rows } ;
+        if (exists $self -> {hasharray})
+            {
+            $fdat->{$name} = { map { ( shift @$_ => \@$_ ) } @rows } ;
+            }
+        else
+            {        
+            $fdat->{$name} = { map { ($_->[1] => $_->[2]) } @rows } ;
+            }
         }
     else
         {
@@ -389,18 +420,39 @@ sub get_display_text
     my @data ;
     my $fieldname ;
     my $j ;
-    my @row ;
+    my @rows ;
     my $field ;
     my $text ;
-    foreach $fieldname (@$showfields)
+    my @value ;
+    my $coloffset = defined ($self -> {coloffset})?$self -> {coloffset}:1 ;
+    my $col ;
+    my $colval ;
+    my $val ;
+    @value = (ref ($value) eq 'HASH')?init_data_hash (1, $value, $fields):@$value ;
+    foreach my $rowval (@value)
         {
-        $j     = $allfields -> {$fieldname}  ;
-        $field = $fields -> [$j] ;
-        next if $field -> is_hidden ;
-        $text = $field -> get_display_text ($req, $value -> [$j+1]) ; 
-        push @row, $text if ($text ne '') ;
+        my @row ;
+        foreach $fieldname (@$showfields)
+            {
+            $j     = $allfields -> {$fieldname}  ;
+            $field = $fields -> [$j] ;
+            next if $field -> is_hidden ;
+            $col = exists $field -> {col}?$field -> {col}:$j ;
+            if ($colval = $field -> {colval})
+                {
+                $val = $rowval->[$col+$coloffset] =~ /\Q$colval\E/?1:0 ;
+                }
+            else
+                {
+                $val = $rowval->[$col+$coloffset] ;
+                }
+
+            $text = $field -> get_display_text ($req, $val, 1) ; 
+            push @row, $text if ($text ne '') ;
+            }
+        push @rows, join (', ', @row) if (@row) ;
         }
-    return join (', ', @row) ;
+    return join (' / ', @rows) ;    
     }
 1 ;
 
@@ -469,7 +521,8 @@ __EMBPERL__
     my $nsprefix = $self -> form -> {jsnamespace} ;
     my $max    = $fdat{"__${name}_max"} ||= 1 ;
     $self -> {fullid} = $req -> {uuid} . '_' . $self -> {id} ;
-$]<table class="ef-element ef-element-width-[+ $self -> {width_percent} +][+ ' ' +][+ $self -> {state} +]" _ef_attach="ef_grid">
+
+$]<table class="ef-element ef-element-width-[+ $self -> {width_percent} +][+ ' ' +][+ $self -> {state} +] ef-attach-always" _ef_attach="ef_grid">
   <tr>
   <td class="ui-label-box" colspan="[+ $span +]">
   [-
@@ -484,12 +537,14 @@ $]<table class="ef-element ef-element-width-[+ $self -> {width_percent} +][+ ' '
   </table>
   [- $self -> show_grid_title ($req)
             if ($max > $self -> {header_bottom} && !$self -> {disable_controls}) -]
+  [$ if (!$self -> {no_addrow}) $]
   <table class="ef-control-grid-newrow" style="display: none">
     [-
     local $req -> {epf_no_script} = 1 ;
     $self -> show_grid_table_row ($req, '%row%') ;
     -]
   </table>
+  [$endif$]
   </td>
   </tr>
   </table>
@@ -505,14 +560,16 @@ $]<table class="ef-element ef-element-width-[+ $self -> {width_percent} +][+ ' '
 $]
 <table class="cBase cGridTitle [+ $self -> {state} +]">
   <tr class="cTableRow">
-    <td class="cBase cGridLabelBox">[+ $self -> form -> convert_label ($self, undef, undef, $req) +]</td>
+    <td class="cBase cGridLabelBox" _ef_attr="[+ $self -> {name} +]">[+ $self -> form -> convert_label ($self, undef, undef, $req) +]</td>
     [$if !($self -> is_readonly ($req))  && !$self -> {disable_controls} $]
     <td class="cBase cGridControlBox">
       <div>
-      <span class="ui-icon ui-icon-circle-triangle-n ef-icon ef-control-grid-up" title="Zeile Hoch"></span>
-      <span class="ui-icon ui-icon-circle-triangle-s ef-icon ef-control-grid-down" title="Zeile Runter"></span>
-      <span class="ui-icon ui-icon-circle-plus ef-icon ef-control-grid-add" title="Zeile Hinzuf&uuml;gen"></span>
-      <span class="ui-icon ui-icon-circle-minus ef-icon ef-control-grid-del" title="Markierte Zeile L&ouml;schen"></span>
+      <span class="ui-icon ui-icon-circle-triangle-n ef-icon ef-control-grid-up" title="[= ctl:grid_up =]"></span>
+      <span class="ui-icon ui-icon-circle-triangle-s ef-icon ef-control-grid-down" title="[= ctl:grid_down =]"></span>
+      <span class="ui-icon ui-icon-circle-plus ef-icon ef-control-grid-add" title="[= ctl:grid_add =]"></span>
+      <span class="ui-icon ui-icon-circle-arrow-e ef-icon ef-control-grid-insert" title="[= ctl:grid_insert =]"></span>
+      <span class="ui-icon ui-icon-circle-arrow-s ef-icon ef-control-grid-copy" title="[= ctl:grid_copy =]"></span>
+      <span class="ui-icon ui-icon-circle-minus ef-icon ef-control-grid-del" title="[= ctl:grid_del =]"></span>
       </div>
     </td>
     [$endif$]
@@ -533,7 +590,7 @@ $]
          <tr class="cGridHeader">
          [$ foreach my $field (@$fields) $]
             [* next if ($field -> is_hidden ) ; *]
-            <td class="cGridHeader" style="[$if($width = $field->{width})$]width: [+$width+];[$endif$] [$if($width = $field->{min_width})$]min-width: [+$width+];[$endif$]" _colattr="[+ $field->{name} +]">[+ $self -> form -> convert_label ($self, $field->{name}, $field->{text}, $req) +]</td>
+            <td class="cGridHeader" style="[$if($width = $field->{width})$]width: [+$width+];[$endif$] [$if($width = $field->{min_width})$]min-width: [+$width+];[$endif$]" _colattr="[+ $field->{name} +]">[+ $self -> form -> convert_label ($self, $field->{nameprefix}?$field->{nameprefix} . $field->{name}:$field->{name}, $field->{text}, $req) +]</td>
          [$ endforeach $]
          </tr>
          </thead>
@@ -541,7 +598,7 @@ $]
 
 [# ---------------------------------------------------------------------------
 #
-#    show_grid_footer    Erzeugt den Tabellenfuß (Summenzeile)
+#    show_grid_footer    Erzeugt den Tabellenfuï¿½ (Summenzeile)
 #]
 
 [$ sub show_grid_footer ($self, $req)
@@ -584,9 +641,18 @@ $]
     my $gridro = $self -> is_readonly ($req) ;
     my $ro ;
     my $j = 0 ;
+    my $rowclass = $self -> {rowclasses}[$i];
+    if ($req -> {only_one_css_class})
+        {
+        $rowclass ||= 'cGridRow' ;
+        }
+    else
+        {
+        $rowclass = 'cGridRow ' . $rowclass ;    
+        }
     $]
-
-    <tr class="cGridRow [+ $self -> {rowclasses}[$i] +]" id="[+ "$id-row-$i" +]">
+      
+    <tr class="[+ $rowclass +]" id="[+ "$id-row-$i" +]">
         [$foreach $field (@$fields)$]
             [$if $field -> is_hidden $][-
                 local $field -> {name}  = "__${name}_${j}_$i" ;
@@ -709,7 +775,7 @@ string if set.
 
 =head3 line2
 
-field defintion wich is show in a second line, full width.
+field definition which is show in a second line, full width.
 
 =head3  disable_controls
 
@@ -737,10 +803,10 @@ If > 1, column number will set to the rownumber
 
 =head3 flat
 
-This can be used for readonly view of grid. Normaly readonly view will show
-the content as one large string. The flat attribute can contain a semikolon
-delimited list of fields that should be show in readony view. That allows
-to selectivly show fields in readonly view. 
+This can be used for readonly view of grid. Normally readonly view will show
+the content as one large string. The flat attribute can contain a semicolon
+delimited list of fields that should be shown in readony view. That allows
+to selectively show fields in readonly view.
 This can be used to show a readonly view of a grid inside of another grid.
 
 =head3 flatopt

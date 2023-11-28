@@ -8,8 +8,8 @@ configure_requires:
   Digest::MD5: '0'
   Exporter: '5.57'
   File::Path: '2'
-dynamic_config: 1
-generated_by: 'Doit version 0.027, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'Doit version 0.028, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,5 +24,5 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/eserte/Doit
-version: '0.027'
+version: '0.028'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

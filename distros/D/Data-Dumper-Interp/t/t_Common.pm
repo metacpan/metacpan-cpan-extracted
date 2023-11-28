@@ -3,6 +3,9 @@
 # The author, Jim Avera (jim.avera at gmail) has waived all copyright and
 # related or neighboring rights to the content of this file.
 # Attribution is requested but is not required.
+#
+# PLEASE NOTE that the above applies to THIS FILE ONLY.  Other files in the
+# same distribution or other collection may have more restrictive terms.
 
 # Common setup stuff, not specifically for test cases.
 # This file is intended to be identical in all my module distributions.
@@ -28,10 +31,16 @@ use Carp;
 
 sub oops(@) {
   my $pkg = caller;
-  my $pfx = "\n";
-  $pfx .= "$pkg " if $pkg ne 'main';
-  $pfx .= "oops:\n";
-  @_ = ($pfx, @_, "\n");
+  my $pfx = "\noops";
+  $pfx .= " in pkg '$pkg'" unless $pkg eq 'main';
+  $pfx .= ":\n";
+  if (defined(&Spreadsheet::Edit::logmsg)) {
+    # Show current apply sheet & row if any.
+    @_=($pfx, &Spreadsheet::Edit::logmsg(@_));
+  } else {
+    @_=($pfx, @_);
+  }
+  push @_,"\n" unless $_[-1] =~ /\R\z/;
   goto &Carp::confess
 }
 

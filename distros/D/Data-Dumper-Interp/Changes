@@ -1,5 +1,6 @@
 (Recent) Revision history for Perl extension Data-Dumper-Interp
 
+6.011 - Silence 'stty' message if no terminal width is available
 6.010 - trying to find mystery test failure on one Windows smoker host
 6.009 - Fix result-parsing bug with Deparse(1).
         Show (classname) before [] and {} from overloaded operators.

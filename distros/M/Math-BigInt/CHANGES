@@ -1,3 +1,23 @@
+2.001001 2023-11-21
+
+ * Fix CPAN RT #150469
+
+2.001000 2023-11-13
+
+ * Fix rounding bug in bsqrt() in Math::BigInt. Also make bsqrt() upgrade only
+   when necessary.
+
+ * Simplify and speed up bsqrt() (for computing the square root) in
+   Math::BigFloat. The computation time now mainly depends on the desired
+   accuracy, not the number of digits in the significand.
+
+ * Add support for using "div_scale" as import parameter, like this
+
+       use Math::BigFloat div_scale => 80;
+
+ * Add better argument checking when the "div_scale" value is set by the
+   user.
+
 2.000000 2023-10-29
 
  * Merge the Math-BigRat distribution into the Math-BigInt distribution. This

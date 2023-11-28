@@ -3,16 +3,32 @@ NAME
     ranges
 
 VERSION
-    This document describes version 0.001 of Acme::CPANModules::NumberRange
+    This document describes version 0.002 of Acme::CPANModules::NumberRange
     (from Perl distribution Acme-CPANModules-NumberRange), released on
-    2023-03-04.
+    2023-10-29.
 
 DESCRIPTION
     Checking membership, formatting
 
-    Array::IntSpan Array::RealSpan Number::Range Number::RangeTracker
-    Range::Object::Serial Set::IntSpan Set::IntSpan::Fast
-    Set::IntSpan::Fast::XS Set::IntSpan::Island Tie::Array::IntSpan
+    Array::IntSpan
+
+    Array::RealSpan
+
+    Number::Range
+
+    Number::RangeTracker
+
+    Range::Object::Serial
+
+    Set::IntSpan
+
+    Set::IntSpan::Fast
+
+    Set::IntSpan::Fast::XS
+
+    Set::IntSpan::Island
+
+    Tie::Array::IntSpan
 
     Partitioning
 
@@ -20,7 +36,9 @@ DESCRIPTION
 
     Formatting
 
-    Number::Continuation Set::IntSpan::Util
+    Number::Continuation
+
+    Set::IntSpan::Util
 
 ACME::CPANMODULES ENTRIES
     Array::IntSpan

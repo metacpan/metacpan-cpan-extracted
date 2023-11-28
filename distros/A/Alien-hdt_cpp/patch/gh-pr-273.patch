@@ -1,0 +1,23 @@
+From 36cbff62f3a51376fd9a447215b695adab21cd63 Mon Sep 17 00:00:00 2001
+From: Matthew Wootten <mmwootten@outlook.com>
+Date: Sun, 2 Jul 2023 21:27:46 -0400
+Subject: [PATCH] Fix undefined type in StopWatch::toHuman
+
+Use `unsigned long long` instead of `uint64_t` in StopWatch::toHuman. Since <cstdint> isn't explicitly imported, using `uint64_t` breaks compilation with gcc 13.1.1; it was probably included by another header in the past. Additionally, this makes it consistent with the rest of the function.
+---
+ libhdt/src/util/StopWatch.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libhdt/src/util/StopWatch.cpp b/libhdt/src/util/StopWatch.cpp
+index 2edc368a2f438e789d37b9b3af6b39928b7ecf69..3ea0b72ebb9673a5a3301b10c7a87af464fe0210 100644
+--- a/libhdt/src/util/StopWatch.cpp
++++ b/libhdt/src/util/StopWatch.cpp
+@@ -163,7 +163,7 @@ std::ostream &operator<<(std::ostream &stream, StopWatch &sw) {
+ }
+ 
+ std::string StopWatch::toHuman(unsigned long long time) {
+-    uint64_t tot_secs = time/1000000;
++        unsigned long long tot_secs = time/1000000;
+ 
+ 	unsigned int hours = tot_secs/3600;
+ 	unsigned int mins = (tot_secs/60) % 60;

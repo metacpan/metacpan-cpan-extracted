@@ -1,34 +1,32 @@
 package Excel::ValueReader::XLSX;
+use 5.12.1;
 use utf8;
 use Moose;
 use Module::Load          qw/load/;
 use Date::Calc            qw/Add_Delta_Days/;
 use POSIX                 qw/strftime modf/;
 use Carp                  qw/croak/;
-use feature 'state';
 
-our $VERSION = '1.10';
+our $VERSION = '1.13';
 
 #======================================================================
 # ATTRIBUTES
 #======================================================================
 
 # PUBLIC ATTRIBUTES
-has 'xlsx'            => (is => 'ro', isa => 'Str', required => 1);      # path of xlsx file
+has 'xlsx'            => (is => 'ro', isa => 'Str|FileHandle', required => 1);      # path of xlsx file
 has 'using'           => (is => 'ro', isa => 'Str', default => 'Regex'); # name of backend class
 has 'date_format'     => (is => 'ro', isa => 'Str', default => '%d.%m.%Y');
 has 'time_format'     => (is => 'ro', isa => 'Str', default => '%H:%M:%S');
-has 'datetime_format' => (is => 'ro', isa => 'Str',
-                          builder => '_datetime_format', lazy => 1);
-has 'date_formatter'  => (is => 'ro',   isa => 'Maybe[CodeRef]',
-                          builder => '_date_formatter', lazy => 1);
+has 'datetime_format' => (is => 'ro', isa => 'Str',            builder => '_datetime_format', lazy => 1);
+has 'date_formatter'  => (is => 'ro', isa => 'Maybe[CodeRef]', builder => '_date_formatter', lazy => 1);
 
 
 
 # ATTRIBUTES USED INTERNALLY, NOT DOCUMENTED
 has 'backend'         => (is => 'ro',   isa => 'Object', init_arg => undef,
                           builder => '_backend', lazy => 1,
-                          handles => [qw/values base_year sheets/]);
+                          handles => [qw/values base_year sheets active_sheet/]);
 
 #======================================================================
 # BUILDING
@@ -39,12 +37,8 @@ around BUILDARGS => sub {
   my $orig  = shift;
   my $class = shift;
 
-  if ( @_ == 1 && !ref $_[0] ) {
-    return $class->$orig(xlsx => $_[0]);
-  }
-  else {
-    return $class->$orig(@_);
-  }
+  return ( @_ == 1 && !ref $_[0] ) ? $class->$orig(xlsx => $_[0])
+                                   : $class->$orig(@_);
 };
 
 
@@ -260,7 +254,7 @@ sub _subrange {
 
   # restrict to the column range
   my @col_nums = map {$self->A1_to_num($_) - 1} ($col1, $col2);
-  if ($col_nums[0] > 1){ # THINK : should check if $colnum2 is smaller that the max row size ??
+  if ($col_nums[0] > 1){
     my @col_range = ($col_nums[0] .. $col_nums[1]);
     $values = [map { [ @$_[@col_range] ]} @$values];
   }
@@ -281,11 +275,11 @@ Excel::ValueReader::XLSX - extracting values from Excel workbooks in XLSX format
 
 =head1 SYNOPSIS
 
-  my $reader = Excel::ValueReader::XLSX->new(xlsx => $filename);
+  my $reader = Excel::ValueReader::XLSX->new(xlsx => $filename_or_handle);
   # .. or with syntactic sugar :
-  my $reader = Excel::ValueReader::XLSX->new($filename);
+  my $reader = Excel::ValueReader::XLSX->new($filename_or_handle);
   # .. or with LibXML backend :
-  my $reader = Excel::ValueReader::XLSX->new(xlsx => $filename,
+  my $reader = Excel::ValueReader::XLSX->new(xlsx => $filename_or_handle,
                                              using => 'LibXML');
   
   foreach my $sheet_name ($reader->sheet_names) {
@@ -302,8 +296,12 @@ Excel::ValueReader::XLSX - extracting values from Excel workbooks in XLSX format
      print "table $table_name has $n_data_rows rows and $n_columns columns; ",
            "column 'foo' in first row contains : ", $rows->[0]{foo};
   }
+  
+  my $first_grid = $reader->values(1); # if using numerical indices, start at 1
 
 =head1 DESCRIPTION
+
+=head2 Purpose
 
 This module reads the contents of an Excel file in XLSX format.
 Unlike other modules like L<Spreadsheet::ParseXLSX> or L<Spreadsheet::XLSX>, 
@@ -311,11 +309,13 @@ there is no support for reading formulas, formats or other Excel internal
 information; all you get are plain values -- but you get them much
 faster ! Besides, this module also has support for parsing Excel tables.
 
-This front module has two different backends for extracting values :
+=head2 Backends
+
+Two different backends may be used for extracting values :
 
 =over
 
-=item Regex (default)
+=item Regex
 
 this backend uses regular expressions to parse the XML content.
 
@@ -327,22 +327,33 @@ It is probably safer but about three times slower than the Regex backend
 
 =back
 
+The default is the C<Regex> backend.
+
+=head2 Sheet numbering
+
+Although worksheets are usually accessed by name, they may also
+be accessed by numerical indices, I<starting at value 1>.
+Some other Perl parsing modules use a different convention, where the first sheet has index 0.
+Here index 1 was chosen to be consistent with the common API for "collections" in
+Microsoft Office object model.
+
 
 =head1 METHODS
 
 =head2 new
 
-  my $reader = Excel::ValueReader::XLSX->new(xlsx  => $filename,
+  my $reader = Excel::ValueReader::XLSX->new(xlsx  => $filename_or_handle,
                                              using => $backend,
                                              %date_formatting_options);
 
-The C<xlsx> argument is mandatory and points to the C<.xlsx> file to be parsed.
+The C<xlsx> argument is mandatory and points to the C<.xlsx> file to be parsed,
+or is an open filehandle.
 The C<using> argument is optional; it specifies the backend to be used for parsing;
 default is 'Regex'.
 
 As syntactic sugar, a shorter form is admitted :
 
-  my $reader = Excel::ValueReader::XLSX->new($filename);
+  my $reader = Excel::ValueReader::XLSX->new($filename_or_handle);
 
 Optional parameters for formatting date and time values
 are described in the L</DATE AND TIME FORMATS> section below.
@@ -353,6 +364,13 @@ are described in the L</DATE AND TIME FORMATS> section below.
   my @sheets = $reader->sheet_names;
 
 Returns the list of worksheet names, in the same order as in the Excel file.
+
+=head2 active_sheet
+
+  my $active_sheet_number = $reader->active_sheet;
+
+Returns the numerical index (starting at 1) of the sheet that was active when the file was last saved.
+May return C<undef>.
 
 =head2 values
 
@@ -414,7 +432,7 @@ behaviour :
 
 a specific range of cells within the sheet that contain the table rows and columns.
 The range must be expressed using traditional Excel notation,
-like for example C<"C9:E23"> (colums 3 to 5, rows 9 to 23).
+like for example C<"C9:E23"> (columns 3 to 5, rows 9 to 23).
 
 =item columns
 
@@ -491,7 +509,7 @@ The L<POSIX/strftime> format for representing times. The default is C<%H:%M:%S>.
 
 The L<POSIX/strftime> format for representing date and time together.
 The default is the concatenation of C<date_format> and C<time_format>, with
-a space inbetween.
+a space in between.
 
 =back
 
@@ -527,8 +545,9 @@ depending on the position in the format string, it may represent either a "month
 =item *
 
 C<year> is the full year, such as 1993 or 2021. The date system of the Excel file (either 1900 or 1904,
-see L<https://support.microsoft.com/en-us/office/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487>) is properly taken into account. Excel has no support for dates prior to 1900 or 1904, so the
-C<year> component wil always be above this value.
+see L<https://support.microsoft.com/en-us/office/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487>)
+is properly taken into account. Excel has no support for dates prior to 1900 or 1904, so the
+C<year> component will always be above this value.
 
 =item *
 
@@ -608,7 +627,7 @@ C<Excel::Reader::XLSX> (unpublished) and L<Data::XLSX::Parser>
 are based on L<XML::LibXML> like L<Excel::ValueReader::XLSX::Backend::LibXML>;
 execution times for those three modules are very close.
 
-=head1 ACKNOWLEDGEMENTS
+=head1 ACKNOWLEDGMENTS
 
 =over
 
@@ -619,7 +638,11 @@ signaled that the 'r' attribute in cells is optional.
 
 =item *
 
-Ulibuck signaled bugs several minor bugs on the LibXML backend
+Ulibuck signaled bugs several minor bugs on the LibXML backend.
+
+=item *
+
+H.Merijn Brand suggested additions to the API and several improvements to the code source.
 
 =back
 
@@ -634,3 +657,6 @@ Copyright 2020-2023 by Laurent Dami.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
+

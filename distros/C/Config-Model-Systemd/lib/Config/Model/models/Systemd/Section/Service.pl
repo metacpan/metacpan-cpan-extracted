@@ -63,29 +63,38 @@ by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-
     'element' => [
       'Type',
       {
-        'description' => "Configures the process start-up type for this service unit. One of C<simple>,
-C<exec>, C<forking>, C<oneshot>, C<dbus>,
-C<notify> or C<idle>:
+        'description' => "Configures the mechanism via which the service notifies the manager that the service start-up
+has finished. One of C<simple>, C<exec>, C<forking>,
+C<oneshot>, C<dbus>, C<notify>,
+C<notify-reload>, or C<idle>:
 
-It is generally recommended to use C<Type>C<simple> for long-running
-services whenever possible, as it is the simplest and fastest option. However, as this service type won't
-propagate service start-up failures and doesn't allow ordering of other units against completion of
-initialization of the service (which for example is useful if clients need to connect to the service through
-some form of IPC, and the IPC channel is only established by the service itself \x{2014} in contrast to doing this
-ahead of time through socket or bus activation or similar), it might not be sufficient for many cases. If so,
-C<notify> or C<dbus> (the latter only in case the service provides a D-Bus
-interface) are the preferred options as they allow service program code to precisely schedule when to
-consider the service started up successfully and when to proceed with follow-up units. The
-C<notify> service type requires explicit support in the service codebase (as
-sd_notify() or an equivalent API needs to be invoked by the service at the appropriate
-time) \x{2014} if it's not supported, then C<forking> is an alternative: it supports the traditional
-UNIX service start-up protocol. Finally, C<exec> might be an option for cases where it is
-enough to ensure the service binary is invoked, and where the service binary itself executes no or little
-initialization on its own (and its initialization is unlikely to fail). Note that using any type other than
-C<simple> possibly delays the boot process, as the service manager needs to wait for service
-initialization to complete. It is hence recommended not to needlessly use any types other than
-C<simple>. (Also note it is generally not recommended to use C<idle> or
-C<oneshot> for long-running services.)",
+It is recommended to use C<Type>C<exec> for long-running
+services, as it ensures that process setup errors (e.g. errors such as a missing service
+executable, or missing user) are properly tracked. However, as this service type won't propagate
+the failures in the service's own startup code (as opposed to failures in the preparatory steps the
+service manager executes before execve()) and doesn't allow ordering of other
+units against completion of initialization of the service code itself (which for example is useful
+if clients need to connect to the service through some form of IPC, and the IPC channel is only
+established by the service itself \x{2014} in contrast to doing this ahead of time through socket or bus
+activation or similar), it might not be sufficient for many cases. If so, C<notify>,
+C<notify-reload>, or C<dbus> (the latter only in case the service
+provides a D-Bus interface) are the preferred options as they allow service program code to
+precisely schedule when to consider the service started up successfully and when to proceed with
+follow-up units. The C<notify>/C<notify-reload> service types require
+explicit support in the service codebase (as sd_notify() or an equivalent API
+needs to be invoked by the service at the appropriate time) \x{2014} if it's not supported, then
+C<forking> is an alternative: it supports the traditional heavy-weight UNIX service
+start-up protocol. Note that using any type other than C<simple> possibly delays the
+boot process, as the service manager needs to wait for at least some service initialization to
+complete. (Also note it is generally not recommended to use C<idle> or
+C<oneshot> for long-running services.)
+
+Note that various service settings (e.g. C<User>, C<Group>
+through libc NSS) might result in \"hidden\" blocking IPC calls to other services when
+used. Sometimes it might be advisable to use the C<simple> service type to ensure
+that the service manager's transaction logic is not affected by such potentially slow operations
+and hidden dependencies, as this is the only service type where the service manager will not wait
+for such service execution setup operations to complete before proceeding.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -146,9 +155,10 @@ by a privileged user, but if it is owned by an unprivileged user additional safe
 the file may not be a symlink to a file owned by a different user (neither directly nor indirectly), and the
 PID file must refer to a process already belonging to the service.
 
-Note that PID files should be avoided in modern projects. Use C<Type=notify> or
-C<Type=simple> where possible, which does not require use of PID files to determine the
-main process of a service and avoids needless forking.',
+Note that PID files should be avoided in modern projects. Use C<Type=notify>,
+C<Type=notify-reload> or C<Type=simple> where possible, which does not
+require use of PID files to determine the main process of a service and avoids needless
+forking.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -168,10 +178,8 @@ this.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Commands with their arguments that are
-executed when this service is started. The value is split into
-zero or more command lines according to the rules described
-below (see section "Command Lines" below).
+        'description' => 'Commands that are executed when this service is started. The value is split into zero
+or more command lines according to the rules described in the section "Command Lines" below.
 
 Unless C<Type> is C<oneshot>, exactly one command must be given. When
 C<Type=oneshot> is used, zero or more commands may be specified. Commands may be specified by
@@ -181,17 +189,6 @@ is reset, prior assignments of this option will have no effect. If no C<ExecStar
 specified, then the service must have C<RemainAfterExit=yes> and at least one
 C<ExecStop> line set. (Services lacking both C<ExecStart> and
 C<ExecStop> are not valid.)
-
-For each of the specified commands, the first argument must be either an absolute path to an executable
-or a simple file name without any slashes. Optionally, this filename may be prefixed with a number of special
-characters:
-
-C<@>, C<->, C<:>, and one of
-C<+>/C<!>/C<!!> may be used together and they can appear in any
-order. However, only one of C<+>, C<!>, C<!!> may be used at a
-time. Note that these prefixes are also supported for the other command line settings,
-i.e. C<ExecStartPre>, C<ExecStartPost>, C<ExecReload>,
-C<ExecStop> and C<ExecStopPost>.
 
 If more than one command is specified, the commands are
 invoked sequentially in the order they appear in the unit
@@ -226,12 +223,13 @@ all C<ExecStartPre> commands that were not prefixed
 with a C<-> exit successfully.
 
 C<ExecStartPost> commands are only run after the commands specified in
-C<ExecStart> have been invoked successfully, as determined by C<Type>
-(i.e. the process has been started for C<Type=simple> or C<Type=idle>, the last
-C<ExecStart> process exited successfully for C<Type=oneshot>, the initial
-process exited successfully for C<Type=forking>, C<READY=1> is sent for
-C<Type=notify>, or the C<BusName> has been taken for
-C<Type=dbus>).
+C<ExecStart> have been invoked successfully, as determined by
+C<Type> (i.e. the process has been started for C<Type=simple> or
+C<Type=idle>, the last C<ExecStart> process exited successfully for
+C<Type=oneshot>, the initial process exited successfully for
+C<Type=forking>, C<READY=1> is sent for
+C<Type=notify>/C<Type=notify-reload>, or the
+C<BusName> has been taken for C<Type=dbus>).
 
 Note that C<ExecStartPre> may not be
 used to start long-running processes. All processes forked
@@ -269,12 +267,13 @@ all C<ExecStartPre> commands that were not prefixed
 with a C<-> exit successfully.
 
 C<ExecStartPost> commands are only run after the commands specified in
-C<ExecStart> have been invoked successfully, as determined by C<Type>
-(i.e. the process has been started for C<Type=simple> or C<Type=idle>, the last
-C<ExecStart> process exited successfully for C<Type=oneshot>, the initial
-process exited successfully for C<Type=forking>, C<READY=1> is sent for
-C<Type=notify>, or the C<BusName> has been taken for
-C<Type=dbus>).
+C<ExecStart> have been invoked successfully, as determined by
+C<Type> (i.e. the process has been started for C<Type=simple> or
+C<Type=idle>, the last C<ExecStart> process exited successfully for
+C<Type=oneshot>, the initial process exited successfully for
+C<Type=forking>, C<READY=1> is sent for
+C<Type=notify>/C<Type=notify-reload>, or the
+C<BusName> has been taken for C<Type=dbus>).
 
 Note that C<ExecStartPre> may not be
 used to start long-running processes. All processes forked
@@ -319,29 +318,30 @@ exits, like the ones described above.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Commands to execute to trigger a configuration
-reload in the service. This argument takes multiple command
-lines, following the same scheme as described for
-C<ExecStart> above. Use of this setting is
-optional. Specifier and environment variable substitution is
-supported here following the same scheme as for
+        'description' => 'Commands to execute to trigger a configuration reload in the service. This argument
+takes multiple command lines, following the same scheme as described for
+C<ExecStart> above. Use of this setting is optional. Specifier and environment
+variable substitution is supported here following the same scheme as for
 C<ExecStart>.
 
-One additional, special environment variable is set: if
-known, C<$MAINPID> is set to the main process
-of the daemon, and may be used for command lines like the
-following:
+One additional, special environment variable is set: if known, C<$MAINPID> is
+set to the main process of the daemon, and may be used for command lines like the following:
 
-Note however that reloading a daemon by sending a signal
-(as with the example line above) is usually not a good choice,
-because this is an asynchronous operation and hence not
-suitable to order reloads of multiple services against each
-other. It is strongly recommended to set
-C<ExecReload> to a command that not only
-triggers a configuration reload of the daemon, but also
-synchronously waits for it to complete. For example,
-L<dbus-broker(1)>
-uses the following:',
+    ExecReload=kill -HUP $MAINPID
+
+Note however that reloading a daemon by enqueuing a signal (as with the example line above) is
+usually not a good choice, because this is an asynchronous operation and hence not suitable when
+ordering reloads of multiple services against each other. It is thus strongly recommended to either
+use C<Type>C<notify-reload> in place of
+C<ExecReload>, or to set C<ExecReload> to a command that not only
+triggers a configuration reload of the daemon, but also synchronously waits for it to complete. For
+example, L<dbus-broker(1)>
+uses the following:
+
+    ExecReload=busctl call org.freedesktop.DBus \\
+    /org/freedesktop/DBus org.freedesktop.DBus \\
+    ReloadConfig
+',
         'type' => 'list'
       },
       'ExecStop',
@@ -427,22 +427,45 @@ as "5min 20s". Defaults to 100ms.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'RestartSteps',
+      {
+        'description' => 'Configures the number of steps to take to increase the interval
+of auto-restarts from C<RestartSec> to C<RestartMaxDelaySec>.
+Takes a positive integer or 0 to disable it. Defaults to 0.
+
+This setting is effective only if C<RestartMaxDelaySec> is also set.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'RestartMaxDelaySec',
+      {
+        'description' => 'Configures the longest time to sleep before restarting a service
+as the interval goes up with C<RestartSteps>. Takes a value
+in the same format as C<RestartSec>, or C<infinity>
+to disable the setting. Defaults to C<infinity>.
+
+This setting is effective only if C<RestartSteps> is also set.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'TimeoutStartSec',
       {
-        'description' => "Configures the time to wait for start-up. If a daemon service does not signal start-up
-completion within the configured time, the service will be considered failed and will be shut down again. The
-precise action depends on the C<TimeoutStartFailureMode> option. Takes a unit-less value in
-seconds, or a time span value such as \"5min 20s\". Pass C<infinity> to disable the timeout logic.
-Defaults to C<DefaultTimeoutStartSec> from the manager configuration file, except when
+        'description' => "Configures the time to wait for start-up. If a daemon service does not signal
+start-up completion within the configured time, the service will be considered failed and will be
+shut down again. The precise action depends on the C<TimeoutStartFailureMode>
+option. Takes a unit-less value in seconds, or a time span value such as \"5min 20s\". Pass
+C<infinity> to disable the timeout logic. Defaults to
+C<DefaultTimeoutStartSec> set in the manager, except when
 C<Type=oneshot> is used, in which case the timeout is disabled by default (see
 L<systemd-system.conf(5)>).
 
-If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
-the start time to be extended beyond C<TimeoutStartSec>. The first receipt of this message
-must occur before C<TimeoutStartSec> is exceeded, and once the start time has extended beyond
-C<TimeoutStartSec>, the service manager will allow the service to continue to start, provided
-the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified until the service
-startup status is finished by C<READY=1>. (see
+If a service of C<Type=notify>/C<Type=notify-reload> sends
+C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause the start time to be extended beyond
+C<TimeoutStartSec>. The first receipt of this message must occur before
+C<TimeoutStartSec> is exceeded, and once the start time has extended beyond
+C<TimeoutStartSec>, the service manager will allow the service to continue to start,
+provided the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified
+until the service startup status is finished by C<READY=1>. (see
 L<sd_notify(3)>).
 ",
         'type' => 'leaf',
@@ -465,12 +488,14 @@ C<DefaultTimeoutStopSec> from the manager
 configuration file (see
 L<systemd-system.conf(5)>).
 
-If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
-the stop time to be extended beyond C<TimeoutStopSec>. The first receipt of this message
-must occur before C<TimeoutStopSec> is exceeded, and once the stop time has extended beyond
-C<TimeoutStopSec>, the service manager will allow the service to continue to stop, provided
-the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified, or terminates itself
-(see L<sd_notify(3)>).
+If a service of C<Type=notify>/C<Type=notify-reload> sends
+C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause the stop time to be extended beyond
+C<TimeoutStopSec>. The first receipt of this message must occur before
+C<TimeoutStopSec> is exceeded, and once the stop time has extended beyond
+C<TimeoutStopSec>, the service manager will allow the service to continue to stop,
+provided the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified,
+or terminates itself (see
+L<sd_notify(3)>).
 ",
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -492,13 +517,15 @@ C<infinity> to disable the timeout logic. Defaults to C<DefaultTimeoutAbortSec> 
 the manager configuration file (see
 L<systemd-system.conf(5)>).
 
-If a service of C<Type=notify> handles C<SIGABRT> itself (instead of relying
-on the kernel to write a core dump) it can send C<EXTEND_TIMEOUT_USEC=\x{2026}> to
-extended the abort time beyond C<TimeoutAbortSec>. The first receipt of this message
-must occur before C<TimeoutAbortSec> is exceeded, and once the abort time has extended beyond
-C<TimeoutAbortSec>, the service manager will allow the service to continue to abort, provided
-the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified, or terminates itself
-(see L<sd_notify(3)>).
+If a service of C<Type=notify>/C<Type=notify-reload> handles
+C<SIGABRT> itself (instead of relying on the kernel to write a core dump) it can
+send C<EXTEND_TIMEOUT_USEC=\x{2026}> to extended the abort time beyond
+C<TimeoutAbortSec>. The first receipt of this message must occur before
+C<TimeoutAbortSec> is exceeded, and once the abort time has extended beyond
+C<TimeoutAbortSec>, the service manager will allow the service to continue to abort,
+provided the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified,
+or terminates itself (see
+L<sd_notify(3)>).
 ",
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -515,9 +542,9 @@ C<TimeoutStopSec> to the specified value.
       'TimeoutStartFailureMode',
       {
         'choice' => [
-          'terminate',
           'abort',
-          'kill'
+          'kill',
+          'terminate'
         ],
         'description' => 'These options configure the action that is taken in case a daemon service does not signal
 start-up within its configured C<TimeoutStartSec>, respectively if it does not stop within
@@ -541,9 +568,9 @@ shutdown of failing services.
       'TimeoutStopFailureMode',
       {
         'choice' => [
-          'terminate',
           'abort',
-          'kill'
+          'kill',
+          'terminate'
         ],
         'description' => 'These options configure the action that is taken in case a daemon service does not signal
 start-up within its configured C<TimeoutStartSec>, respectively if it does not stop within
@@ -572,12 +599,13 @@ does not have any effect on C<Type=oneshot> services, as they terminate immediat
 activation completed. Pass C<infinity> (the default) to configure no runtime
 limit.
 
-If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause
-the runtime to be extended beyond C<RuntimeMaxSec>. The first receipt of this message
-must occur before C<RuntimeMaxSec> is exceeded, and once the runtime has extended beyond
-C<RuntimeMaxSec>, the service manager will allow the service to continue to run, provided
-the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified until the service
-shutdown is achieved by C<STOPPING=1> (or termination). (see
+If a service of C<Type=notify>/C<Type=notify-reload> sends
+C<EXTEND_TIMEOUT_USEC=\x{2026}>, this may cause the runtime to be extended beyond
+C<RuntimeMaxSec>. The first receipt of this message must occur before
+C<RuntimeMaxSec> is exceeded, and once the runtime has extended beyond
+C<RuntimeMaxSec>, the service manager will allow the service to continue to run,
+provided the service repeats C<EXTEND_TIMEOUT_USEC=\x{2026}> within the interval specified
+until the service shutdown is achieved by C<STOPPING=1> (or termination). (see
 L<sd_notify(3)>).
 ",
         'type' => 'leaf',
@@ -630,13 +658,13 @@ may be used to enable automatic watchdog notification support.
       'Restart',
       {
         'choice' => [
+          'always',
           'no',
-          'on-success',
-          'on-failure',
           'on-abnormal',
-          'on-watchdog',
           'on-abort',
-          'always'
+          'on-failure',
+          'on-success',
+          'on-watchdog'
         ],
         'description' => 'Configures whether the service shall be
 restarted when the service process exits, is killed, or a
@@ -703,8 +731,7 @@ Note that service restart is subject to unit start rate
 limiting configured with C<StartLimitIntervalSec>
 and C<StartLimitBurst>, see
 L<systemd.unit(5)>
-for details.  A restarted service enters the failed state only
-after the start limits are reached.
+for details.
 
 Setting this to C<on-failure> is the
 recommended choice for long-running services, in order to
@@ -714,6 +741,21 @@ own choice (and avoid immediate restarting),
 C<on-abnormal> is an alternative choice.',
         'type' => 'leaf',
         'value_type' => 'enum'
+      },
+      'RestartMode',
+      {
+        'description' => 'Takes a string value that specifies how a service should restart:
+If set to C<normal> (the default), the service restarts by
+going through a failed/inactive state.If set to C<direct>, the service transitions to the activating
+state directly during auto-restart, skipping failed/inactive state.
+C<ExecStopPost> is invoked.
+C<OnSuccess> and C<OnFailure> are skipped.
+
+This option is useful in cases where a dependency can fail temporarily
+but we don\'t want these temporary failures to make the dependent units fail.
+When this option is set to C<direct>, dependent units are not notified of these temporary failures.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
       },
       'SuccessExitStatus',
       {
@@ -816,22 +858,25 @@ false.',
       'NotifyAccess',
       {
         'choice' => [
-          'none',
-          'main',
+          'all',
           'exec',
-          'all'
+          'main',
+          'none'
         ],
         'description' => 'Controls access to the service status notification socket, as accessible via the
-L<sd_notify(3)> call. Takes one
-of C<none> (the default), C<main>, C<exec> or
-C<all>. If C<none>, no daemon status updates are accepted from the service
-processes, all status update messages are ignored. If C<main>, only service updates sent from the
-main process of the service are accepted. If C<exec>, only service updates sent from any of the
-main or control processes originating from one of the C<Exec*=> commands are accepted. If
-C<all>, all services updates from all members of the service\'s control group are accepted. This
-option should be set to open access to the notification socket when using C<Type=notify> or
-C<WatchdogSec> (see above). If those options are used but C<NotifyAccess> is
-not configured, it will be implicitly set to C<main>.
+L<sd_notify(3)>
+call. Takes one of C<none> (the default), C<main>, C<exec>
+or C<all>. If C<none>, no daemon status updates are accepted from the
+service processes, all status update messages are ignored. If C<main>, only service
+updates sent from the main process of the service are accepted. If C<exec>, only
+service updates sent from any of the main or control processes originating from one of the
+C<Exec*=> commands are accepted. If C<all>, all services updates from
+all members of the service\'s control group are accepted. This option should be set to open access to
+the notification socket when using
+C<Type=notify>/C<Type=notify-reload> or
+C<WatchdogSec> (see above). If those options are used but
+C<NotifyAccess> is not configured, it will be implicitly set to
+C<main>.
 
 Note that sd_notify() notifications may be attributed to units correctly only if
 either the sending process is still around at the time PID 1 processes the message, or if the sending process
@@ -885,7 +930,7 @@ L<sd_pid_notify_with_fds(3)>\'s
 C<FDSTORE=1> messages. This is useful for implementing services that can restart
 after an explicit request or a crash without losing state. Any open sockets and other file
 descriptors which should not be closed during the restart may be stored this way. Application state
-can either be serialized to a file in C</run/>, or better, stored in a
+can either be serialized to a file in C<RuntimeDirectory>, or stored in a
 L<memfd_create(2)>
 memory file descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service
 manager. All file descriptors passed to the service manager from a specific service are passed back
@@ -894,12 +939,54 @@ L<sd_listen_fds(3)> for
 details about the precise protocol used and the order in which the file descriptors are passed). Any
 file descriptors passed to the service manager are automatically closed when
 C<POLLHUP> or C<POLLERR> is seen on them, or when the service is
-fully stopped and no job is queued or being executed for it. If this option is used,
+fully stopped and no job is queued or being executed for it (the latter can be tweaked with
+C<FileDescriptorStorePreserve>, see below). If this option is used,
 C<NotifyAccess> (see above) should be set to open access to the notification socket
 provided by systemd. If C<NotifyAccess> is not set, it will be implicitly set to
-C<main>.',
+C<main>.
+
+The fdstore command of
+L<systemd-analyze(1)>
+may be used to list the current contents of a service\'s file descriptor store.
+
+Note that the service manager will only pass file descriptors contained in the file descriptor
+store to the service\'s own processes, never to other clients via IPC or similar. However, it does
+allow unprivileged clients to query the list of currently open file descriptors of a
+service. Sensitive data may hence be safely placed inside the referenced files, but should not be
+attached to the metadata (e.g. included in filenames) of the stored file
+descriptors.
+
+If this option is set to a non-zero value the C<$FDSTORE> environment variable
+will be set for processes invoked for this service. See
+L<systemd.exec(5)> for
+details.
+
+For further information on the file descriptor store see the L<File Descriptor
+Store|https://systemd.io/FILE_DESCRIPTOR_STORE> overview.',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'FileDescriptorStorePreserve',
+      {
+        'choice' => [
+          'no',
+          'restart',
+          'yes'
+        ],
+        'description' => "Takes one of C<no>, C<yes>,
+C<restart> and controls when to release the service's file descriptor store
+(i.e. when to close the contained file descriptors, if any). If set to C<no> the
+file descriptor store is automatically released when the service is stopped; if
+C<restart> (the default) it is kept around as long as the unit is neither inactive
+nor failed, or a job is queued for the service, or the service is expected to be restarted. If
+C<yes> the file descriptor store is kept around until the unit is removed from
+memory (i.e. is not referenced anymore and inactive). The latter is useful to keep entries in the
+file descriptor store pinned until the service manager exits.
+
+Use systemctl clean --what=fdstore \x{2026} to release the file descriptor store
+explicitly.",
+        'type' => 'leaf',
+        'value_type' => 'enum'
       },
       'USBFunctionDescriptors',
       {
@@ -925,26 +1012,27 @@ above.',
       },
       'OOMPolicy',
       {
-        'description' => 'Configure the out-of-memory (OOM) kernel killer policy. Note that the userspace OOM
+        'description' => 'Configure the out-of-memory (OOM) killing policy for the kernel and the userspace OOM
 killer
-L<systemd-oomd.service(8)>
-is a more flexible solution that aims to prevent out-of-memory situations for the userspace, not just
-the kernel.
+L<systemd-oomd.service(8)>.
+On Linux, when memory becomes scarce to the point that the kernel has trouble allocating memory for
+itself, it might decide to kill a running process in order to free up memory and reduce memory
+pressure. Note that C<systemd-oomd.service> is a more flexible solution that aims
+to prevent out-of-memory situations for the userspace too, not just the kernel, by attempting to
+terminate services earlier, before the kernel would have to act.
 
-On Linux, when memory becomes scarce to the point that the kernel has trouble allocating memory
-for itself, it might decide to kill a running process in order to free up memory and reduce memory
-pressure. This setting takes one of C<continue>, C<stop> or
-C<kill>. If set to C<continue> and a process of the service is
-killed by the kernel\'s OOM killer this is logged but the service continues running. If set to
-C<stop> the event is logged but the service is terminated cleanly by the service
-manager. If set to C<kill> and one of the service\'s processes is killed by the OOM
-killer the kernel is instructed to kill all remaining processes of the service too, by setting the
+This setting takes one of C<continue>, C<stop> or
+C<kill>. If set to C<continue> and a process in the unit is
+killed by the OOM killer, this is logged but the unit continues running. If set to
+C<stop> the event is logged but the unit is terminated cleanly by the service
+manager. If set to C<kill> and one of the unit\'s processes is killed by the OOM
+killer the kernel is instructed to kill all remaining processes of the unit too, by setting the
 C<memory.oom.group> attribute to C<1>; also see L<kernel
 documentation|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
 
 Defaults to the setting C<DefaultOOMPolicy> in
 L<systemd-system.conf(5)>
-is set to, except for services where C<Delegate> is turned on, where it defaults to
+is set to, except for units where C<Delegate> is turned on, where it defaults to
 C<continue>.
 
 Use the C<OOMScoreAdjust> setting to configure whether processes of the unit
@@ -953,9 +1041,50 @@ killer logic. See
 L<systemd.exec(5)> for
 details.
 
-This setting also applies to systemd-oomd. Similarly to the kernel OOM
-kills, this setting determines the state of the service after systemd-oomd kills a
-cgroup associated with the service.',
+This setting also applies to
+L<systemd-oomd.service(8)>.
+Similarly to the kernel OOM kills performed by the kernel, this setting determines the state of the
+unit after systemd-oomd kills a cgroup associated with it.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'OpenFile',
+      {
+        'description' => 'Takes an argument of the form C<path:fd-name:options>,
+where:
+C<path> is a path to a file or an C<AF_UNIX> socket in the file system;C<fd-name> is a name that will be associated
+with the file descriptor;
+the name may contain any ASCII character, but must exclude control characters and ":", and must be at most 255
+characters in length;
+it is optional and, if not provided, defaults to the file name;C<options> is a comma-separated list of access options;
+possible values are
+C<read-only>,
+C<append>,
+C<truncate>,
+C<graceful>;
+if not specified, files will be opened in C<rw> mode;
+if C<graceful> is specified, errors during file/socket opening are ignored.
+Specifying the same option several times is treated as an error.
+The file or socket is opened by the service manager and the file descriptor is passed to the service.
+If the path is a socket, we call connect() on it.
+See L<sd_listen_fds(3)>
+for more details on how to retrieve these file descriptors.
+
+This setting is useful to allow services to access files/sockets that they can\'t access themselves
+(due to running in a separate mount namespace, not having privileges, ...).
+
+This setting can be specified multiple times, in which case all the specified paths are opened and the file descriptors
+passed to the service.
+If the empty string is assigned, the entire list of open files defined prior to this is reset.',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'ReloadSignal',
+      {
+        'description' => 'Configures the UNIX process signal to send to the service\'s main process when asked
+to reload the service\'s configuration. Defaults to C<SIGHUP>. This option has no
+effect unless C<Type>C<notify-reload> is used, see
+above.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

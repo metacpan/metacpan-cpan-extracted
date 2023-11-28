@@ -4,9 +4,9 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-06'; # DATE
+our $DATE = '2023-10-20'; # DATE
 our $DIST = 'Acme-CPANModules-LanguageCodes'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => 'List of modules related to language codes',
@@ -15,7 +15,7 @@ our $LIST = {
 ## Basics
 
 <pm:Locale::Language> and <pm:Locale::Codes::Language> (both part of
-<pm:Locale::Codes now) should be your first go-to module. It is a core module
+<pm:Locale::Codes> now) should be your first go-to module. It is a core module
 since perl 5.14 (Locale::Language from 5.8) and supports converting between
 English language names and 2-letter- and 3-letter ISO country codes, and retired
 codes. If you need to squeeze some milliseconds of loading time, you can use
@@ -33,7 +33,12 @@ Moose: <pm:MooseX::Types::Locale::Language>,
 
 ## Other utilities
 
-<pm:Locale::Util::Language>
+
+## CLI utilities
+
+<pm:App::ListLanguages>
+
+<pm:App::LocaleCodesUtils>
 
 MARKDOWN
     'x.app.cpanmodules.show_entries' => 0,
@@ -56,14 +61,14 @@ Acme::CPANModules::LanguageCodes - List of modules related to language codes
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::LanguageCodes (from Perl distribution Acme-CPANModules-LanguageCodes), released on 2023-08-06.
+This document describes version 0.003 of Acme::CPANModules::LanguageCodes (from Perl distribution Acme-CPANModules-LanguageCodes), released on 2023-10-20.
 
 =head1 DESCRIPTION
 
 =head2 Basics
 
 L<Locale::Language> and L<Locale::Codes::Language> (both part of
-<pm:Locale::Codes now) should be your first go-to module. It is a core module
+L<Locale::Codes> now) should be your first go-to module. It is a core module
 since perl 5.14 (Locale::Language from 5.8) and supports converting between
 English language names and 2-letter- and 3-letter ISO country codes, and retired
 codes. If you need to squeeze some milliseconds of loading time, you can use
@@ -79,7 +84,11 @@ L<MooseX::Types::Locale::Language::Fast>.
 
 =head2 Other utilities
 
-L<Locale::Util::Language>
+=head2 CLI utilities
+
+L<App::ListLanguages>
+
+L<App::LocaleCodesUtils>
 
 =head1 ACME::CPANMODULES ENTRIES
 
@@ -90,6 +99,10 @@ L<Locale::Util::Language>
 Author: L<SBECK|https://metacpan.org/author/SBECK>
 
 =item L<Locale::Codes::Language>
+
+Author: L<SBECK|https://metacpan.org/author/SBECK>
+
+=item L<Locale::Codes>
 
 Author: L<SBECK|https://metacpan.org/author/SBECK>
 
@@ -117,7 +130,13 @@ Author: L<MORIYA|https://metacpan.org/author/MORIYA>
 
 Author: L<MORIYA|https://metacpan.org/author/MORIYA>
 
-=item L<Locale::Util::Language>
+=item L<App::ListLanguages>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
+
+=item L<App::LocaleCodesUtils>
+
+Author: L<PERLANCAR|https://metacpan.org/author/PERLANCAR>
 
 =back
 

@@ -9,7 +9,7 @@ use AsposeCellsCloud::Request::PostProtectWorkbook;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **string** | The workbook name. |
-**protection** | **WorkbookProtectionRequest** | The protection settings. |
+**protect_workbook_request** | **ProtectWorkbookRequest** | The protection settings. |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  
 

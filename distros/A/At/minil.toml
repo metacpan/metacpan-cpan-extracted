@@ -1,0 +1,25 @@
+name = "At"
+badges = ["github-actions/linux.yaml", "github-actions/windows.yaml", "github-actions/osx.yaml", "metacpan"]
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+license = "artistic_2"
+markdown_maker = "Pod::Markdown::Github"
+
+[release]
+hooks=[
+    'tidyall -a'
+]
+
+[no_index]
+directory=[
+    "t",
+    "xt",
+    "inc",
+    "share",
+    "eg",
+    "examples",
+    "author"
+]
+
+[Metadata]
+X_No_Archive = 'Yes'

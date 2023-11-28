@@ -50,7 +50,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.29';
+our $VERSION = '0.36';
 
 use App::LXC::Container::Texts;
 
@@ -81,6 +81,7 @@ our @EXPORT = qw(groups_of
 		 content_x11_mounts
 		 content_x11_packages
 		 depends_on
+		 libraries_used
 		 package_of
 		 paths_of
 		 regular_users
@@ -496,6 +497,36 @@ sub depends_on($$)
     my ($package, $include) = @_;
     my $os_object = _singleton();
     return $os_object->depends_on($package, $include);
+}
+
+#########################################################################
+
+=head2 libraries_used - find package of executable
+
+    @libraries = libraries_used($executable);
+
+=head3 parameters:
+
+    $executable         absolute path to program or library to analyse
+
+=head3 description:
+
+This function returns all shared libraries (aka shared objects aka C<.so>
+files) used by the given program or library, unless they do not return an
+absolute path in L<C<ldd>> (e.g. C<linux-vdso.so.1>).
+
+=head3 returns:
+
+    list of absolute paths to the libraries used
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub libraries_used($)
+{
+    my ($executable) = @_;
+    my $os_object = _singleton();
+    return $os_object->libraries_used($executable);
 }
 
 #########################################################################

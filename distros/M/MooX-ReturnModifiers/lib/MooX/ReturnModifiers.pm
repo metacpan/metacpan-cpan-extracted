@@ -4,22 +4,31 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 
-our $VERSION = '1.000000';
+our $VERSION = '1.000001';
 
 use Exporter 'import';
 
 our @EXPORT = qw/return_modifiers/;
-our @EXPORT_OK = qw/return_modifiers return_has return_with return_around return_extends return_before return_after/;
+our @EXPORT_OK = qw/return_modifiers return_has return_with return_around return_extends return_before return_after return_sub/;
 
 sub return_modifiers {
+	my $target = shift;
 	my %modifiers = ();
-	$_[1] ||= [qw/has with around extends before after/];
-	for ( @{ $_[1] } ) {
-		unless ( $modifiers{$_} = $_[0]->can($_) ) {
-			croak "Can't find method <$_> in <$_[0]>";
+	$_[0] ||= [qw/has with around extends before after sub/];
+	for ( @{ $_[0] } ) {
+		if ($_ eq 'sub') {
+			$modifiers{$_} = sub {
+				my ($sub, $cb) = @_;
+				no strict 'refs';
+				*{"${target}::${sub}"} = $cb;
+			};
+			next;
+		}
+		unless ( $modifiers{$_} = $target->can($_) ) {
+			croak "Can't find method <$_> in <$target>";
 		}
 	}
-	return $_[2] ? \%modifiers : %modifiers;
+	return $_[1] ? \%modifiers : %modifiers;
 }
 
 sub return_has {return_modifiers($_[0], [qw/has/], 1)->{has}}
@@ -34,6 +43,8 @@ sub return_around {return_modifiers($_[0], [qw/around/], 1)->{around}}
 
 sub return_extends {return_modifiers($_[0], [qw/extends/], 1)->{extends}}
 
+sub return_sub {return_modifiers($_[0], [qw/sub/], 1)->{sub}}
+
 1;
 
 __END__
@@ -44,7 +55,7 @@ MooX::ReturnModifiers - Returns Moo Modifiers as a Hash
 
 =head1 VERSION
 
-Version 1.000000
+Version 1.000001
 
 =head1 SYNOPSIS
 
@@ -55,12 +66,13 @@ Version 1.000000
 		my %modifiers = return_modifiers($target);
 
 		...
-		$modifers{has}->();
-		$modifers{with}->();
-		$modifers{extends}->();
-		$modifers{around}->();
-		$modifers{before}->();
-		$modifers{after}->();
+		$modifiers{has}->();
+		$modifiers{with}->();
+		$modifiers{extends}->();
+		$modifiers{around}->();
+		$modifiers{before}->();
+		$modifiers{after}->();
+		$modifiers{sub}->();
 	}
 
 	.... OR ......
@@ -114,6 +126,10 @@ Return a list of Moo modifers. You can optionally pass your own ArrayRef of keys
 =head2 return_after
 
 	my $after = return_after($target);
+
+=head2 return_sub
+
+	my $sub = return_sub($target);
 
 =head1 AUTHOR
 

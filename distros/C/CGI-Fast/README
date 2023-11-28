@@ -202,13 +202,11 @@ maintained by Lee Johnson
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
+# BUGS
+
 Address bug reports and comments to:
 
     https://github.com/leejo/cgi-fast
-
-# BUGS
-
-This section intentionally left blank.
 
 # SEE ALSO
 

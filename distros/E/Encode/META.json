@@ -4,7 +4,7 @@
       "Dan Kogai <dankogai@dan.co.jp>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -49,7 +49,7 @@
          "url" : "https://github.com/dankogai/p5-encode"
       }
    },
-   "version" : "3.19",
+   "version" : "3.20",
    "x_contributors" : [
       "Alex Davies <alex.davies@talktalk.net>",
       "Alex Kapranoff <alex@kapranoff.ru>",
@@ -135,5 +135,5 @@
       "Vincent van Dam <vvandam@sandvine.com>",
       "Yitzchak Scott-Thoennes <sthoenna@efn.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

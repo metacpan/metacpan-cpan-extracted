@@ -248,9 +248,9 @@ Hindi Latin locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Mangalwaar, 5 February, 2008
-   1995-12-22T09:05:02 = Shukrawaar, 22 December, 1995
-  -0010-09-15T04:44:23 = Shaniwaar, 15 September, -10
+   2008-02-05T18:30:30 = Mangalwaar 5 February, 2008
+   1995-12-22T09:05:02 = Shukrawaar 22 December, 1995
+  -0010-09-15T04:44:23 = Shaniwaar 15 September, -10
 
 =head3 Long
 
@@ -302,9 +302,9 @@ Hindi Latin locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Mangalwaar, 5 February, 2008, 6:30:30 PM UTC
-   1995-12-22T09:05:02 = Shukrawaar, 22 December, 1995, 9:05:02 AM UTC
-  -0010-09-15T04:44:23 = Shaniwaar, 15 September, -10, 4:44:23 AM UTC
+   2008-02-05T18:30:30 = Mangalwaar 5 February, 2008, 6:30:30 PM UTC
+   1995-12-22T09:05:02 = Shukrawaar 22 December, 1995, 9:05:02 AM UTC
+  -0010-09-15T04:44:23 = Shaniwaar 15 September, -10, 4:44:23 AM UTC
 
 =head3 Long
 
@@ -387,11 +387,23 @@ Hindi Latin locale.
    1995-12-22T09:05:02 = Shukra, 9:05 AM
   -0010-09-15T04:44:23 = Shani, 4:44 AM
 
+=head3 Ehm-alt-ascii (E, h:mm a)
+
+   2008-02-05T18:30:30 = Mangal, 6:30 PM
+   1995-12-22T09:05:02 = Shukra, 9:05 AM
+  -0010-09-15T04:44:23 = Shani, 4:44 AM
+
 =head3 Ehms (E, h:mm:ss a)
 
    2008-02-05T18:30:30 = Mangal, 6:30:30 PM
    1995-12-22T09:05:02 = Shukra, 9:05:02 AM
   -0010-09-15T04:44:23 = Shani, 4:44:23 AM
+
+=head3 Ehms-alt-ascii (E, h:mm:ss a)
+
+   2008-02-05T18:30:30 = Mangal, 6:30:30 PM
+   1995-12-22T09:05:02 = Shukra, 9:05:02 AM
+  -0010-09-15T04:44:23 = Shani, 4:44:23 AM
 
 =head3 Gy (G y)
 
@@ -404,6 +416,12 @@ Hindi Latin locale.
    2008-02-05T18:30:30 = AD 2008 Feb
    1995-12-22T09:05:02 = AD 1995 Dec
   -0010-09-15T04:44:23 = BC -10 Sep
+
+=head3 GyMMMEEEEd (EEEE d MMM, y G)
+
+   2008-02-05T18:30:30 = Mangalwaar 5 Feb, 2008 AD
+   1995-12-22T09:05:02 = Shukrawaar 22 Dec, 1995 AD
+  -0010-09-15T04:44:23 = Shaniwaar 15 Sep, -10 BC
 
 =head3 GyMMMEd (G y, dd MMM, E)
 
@@ -471,11 +489,23 @@ Hindi Latin locale.
    1995-12-22T09:05:02 = Dec
   -0010-09-15T04:44:23 = Sept
 
+=head3 MMMEEEEd (EEEE d MMM)
+
+   2008-02-05T18:30:30 = Mangalwaar 5 Feb
+   1995-12-22T09:05:02 = Shukrawaar 22 Dec
+  -0010-09-15T04:44:23 = Shaniwaar 15 Sep
+
 =head3 MMMEd (E, d MMM)
 
    2008-02-05T18:30:30 = Mangal, 5 Feb
    1995-12-22T09:05:02 = Shukra, 22 Dec
   -0010-09-15T04:44:23 = Shani, 15 Sep
+
+=head3 MMMMEEEEd (EEEE d MMMM)
+
+   2008-02-05T18:30:30 = Mangalwaar 5 February
+   1995-12-22T09:05:02 = Shukrawaar 22 December
+  -0010-09-15T04:44:23 = Shaniwaar 15 September
 
 =head3 MMMMW-count-one (MMMM 'kaa' 'week' W)
 
@@ -525,11 +555,23 @@ Hindi Latin locale.
    1995-12-22T09:05:02 = 9 AM
   -0010-09-15T04:44:23 = 4 AM
 
+=head3 h-alt-ascii (h a)
+
+   2008-02-05T18:30:30 = 6 PM
+   1995-12-22T09:05:02 = 9 AM
+  -0010-09-15T04:44:23 = 4 AM
+
 =head3 hm (h:mm a)
 
    2008-02-05T18:30:30 = 6:30 PM
    1995-12-22T09:05:02 = 9:05 AM
   -0010-09-15T04:44:23 = 4:44 AM
+
+=head3 hm-alt-ascii (h:mm a)
+
+   2008-02-05T18:30:30 = 6:30 PM
+   1995-12-22T09:05:02 = 9:05 AM
+  -0010-09-15T04:44:23 = 4:44 AM
 
 =head3 hms (h:mm:ss a)
 
@@ -537,17 +579,35 @@ Hindi Latin locale.
    1995-12-22T09:05:02 = 9:05:02 AM
   -0010-09-15T04:44:23 = 4:44:23 AM
 
+=head3 hms-alt-ascii (h:mm:ss a)
+
+   2008-02-05T18:30:30 = 6:30:30 PM
+   1995-12-22T09:05:02 = 9:05:02 AM
+  -0010-09-15T04:44:23 = 4:44:23 AM
+
 =head3 hmsv (h:mm:ss a v)
 
    2008-02-05T18:30:30 = 6:30:30 PM UTC
    1995-12-22T09:05:02 = 9:05:02 AM UTC
   -0010-09-15T04:44:23 = 4:44:23 AM UTC
 
+=head3 hmsv-alt-ascii (h:mm:ss a v)
+
+   2008-02-05T18:30:30 = 6:30:30 PM UTC
+   1995-12-22T09:05:02 = 9:05:02 AM UTC
+  -0010-09-15T04:44:23 = 4:44:23 AM UTC
+
 =head3 hmv (h:mm a v)
 
    2008-02-05T18:30:30 = 6:30 PM UTC
    1995-12-22T09:05:02 = 9:05 AM UTC
   -0010-09-15T04:44:23 = 4:44 AM UTC
+
+=head3 hmv-alt-ascii (h:mm a v)
+
+   2008-02-05T18:30:30 = 6:30 PM UTC
+   1995-12-22T09:05:02 = 9:05 AM UTC
+  -0010-09-15T04:44:23 = 4:44 AM UTC
 
 =head3 ms (mm:ss)
 
@@ -579,6 +639,12 @@ Hindi Latin locale.
    1995-12-22T09:05:02 = Dec 1995
   -0010-09-15T04:44:23 = Sep -10
 
+=head3 yMMMEEEEd (EEEE d MMM, y)
+
+   2008-02-05T18:30:30 = Mangalwaar 5 Feb, 2008
+   1995-12-22T09:05:02 = Shukrawaar 22 Dec, 1995
+  -0010-09-15T04:44:23 = Shaniwaar 15 Sep, -10
+
 =head3 yMMMEd (E, d MMM, y)
 
    2008-02-05T18:30:30 = Mangal, 5 Feb, 2008
@@ -590,6 +656,12 @@ Hindi Latin locale.
    2008-02-05T18:30:30 = February 2008
    1995-12-22T09:05:02 = December 1995
   -0010-09-15T04:44:23 = September -10
+
+=head3 yMMMMEEEEd (EEEE d MMMM, y)
+
+   2008-02-05T18:30:30 = Mangalwaar 5 February, 2008
+   1995-12-22T09:05:02 = Shukrawaar 22 December, 1995
+  -0010-09-15T04:44:23 = Shaniwaar 15 September, -10
 
 =head3 yMMMd (d MMM, y)
 

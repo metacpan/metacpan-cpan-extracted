@@ -10,9 +10,9 @@ with 'Org::ElementRole';
 with 'Org::ElementRole::Inline';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-05'; # DATE
+our $DATE = '2023-11-06'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.560'; # VERSION
+our $VERSION = '0.561'; # VERSION
 
 my @attrs = (qw/datetime has_time event_duration recurrence is_active/);
 for (@attrs) {
@@ -213,7 +213,7 @@ Org::Element::Timestamp - Represent Org timestamp
 
 =head1 VERSION
 
-This document describes version 0.560 of Org::Element::Timestamp (from Perl distribution Org-Parser), released on 2023-08-05.
+This document describes version 0.561 of Org::Element::Timestamp (from Perl distribution Org-Parser), released on 2023-11-06.
 
 =head1 DESCRIPTION
 

@@ -1,7 +1,7 @@
 Changes
 Config.pm
 doc/dcmqrcnf.txt
-examples/ex1.pl
+examples/serialize_example_config.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

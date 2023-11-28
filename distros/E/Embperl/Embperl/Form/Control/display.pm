@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -21,6 +22,7 @@ use strict ;
 use base 'Embperl::Form::Control' ;
 
 use Embperl::Inline ;
+use HTML::Escape ;
 
 use vars qw{%fdat} ;
 
@@ -34,32 +36,72 @@ sub init_data
     {
     my ($self, $req, $parentctrl) = @_ ;
 
-    return if (!$self -> {value2text}) ;
-
     
     my $fdat    = $req -> {docdata} || \%fdat ;
     my $name    = $self->{name} ;
     my $value   = $fdat->{$name} ;
 
-    my $val ;
-    my $txt ;
-    if (ref $value eq 'ARRAY')
+    $value = [ split /\t/, $value ] if $self->{split};
+    $value = [ split /\n/, $value ] if $self->{splitlines};
+    
+
+
+    if ($self -> {value2text})
         {
-        foreach (@$value)
+        my $val ;
+        my $txt ;
+        if (ref $value eq 'ARRAY')
             {
-            $val = $self -> {value2text} . $_ ;
+            foreach (@$value)
+                {
+                $val = $self -> {value2text} . $_ ;
+                $txt = $self -> form -> convert_text ($self, $val, undef, $req) ;
+                $_ = $txt if ($txt ne $val) ;
+                }
+            }
+        else
+            {
+            $val = $self -> {value2text} . $value ;
             $txt = $self -> form -> convert_text ($self, $val, undef, $req) ;
-            $_ = $txt if ($txt ne $val) ;
+            $fdat->{$name} = $txt if ($txt ne $val) ;
             }
         }
-    else
+
+
+
+    if (ref $value eq 'ARRAY')
         {
-        $val = $self -> {value2text} . $value ;
-        $txt = $self -> form -> convert_text ($self, $val, undef, $req) ;
-        $fdat->{$name} = $txt if ($txt ne $val) ;
+    #    $fdat->{$name} = join ("<br>\n", @$value) ;
+        $fdat->{$name} = $value ;
         }
     }
 
+# ---------------------------------------------------------------------------
+#
+#   init_markup - add any dynamic markup to the form data
+#
+
+sub init_markup
+
+    {
+    my ($self, $req, $parentctl, $method) = @_ ;
+
+    my $fdat  = $req -> {docdata} || \%fdat ;
+    my $name  = $self->{name} ;
+    my $value = $fdat->{$name} ;
+    $value = [ split /\t/, $value ] if $self->{split};
+    $value = [ split /\n/, $value ] if $self->{splitlines};
+    if (ref $value eq 'ARRAY')
+        {
+        @$value = map { $_ = HTML::Escape::escape_html ($_) } @$value ;
+        $fdat->{$name} = join ("<br>\n", @$value) ;
+        }
+    else
+        {
+        $fdat->{$name} = HTML::Escape::escape_html ($fdat->{$name}) ;
+        }
+    }
+    
 # ------------------------------------------------------------------------------------------
 
 
@@ -158,7 +200,7 @@ so it can be translated.
 
 =head1 Author
 
-G. Richter (richter at embperl dot org), A. Beckert (beckert@ecos.de)
+G. Richter (richter at embperl dot org), A. Beckert
 
 =head1 See Also
 

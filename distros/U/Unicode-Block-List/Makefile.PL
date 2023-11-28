@@ -21,16 +21,15 @@ requires 'Class::Utils' => 0.02;
 requires 'Unicode::Block' => 0.02;
 requires 'Unicode::UCD' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Unicode-Block-List';
-resources 'homepage' => 'https://github.com/tupinek/Unicode-Block-List';
-resources 'repository' => 'git://github.com/tupinek/Unicode-Block-List';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Unicode-Block-List/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Unicode-Block-List';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Unicode-Block-List';
 test_requires 'English' => 0;
 test_requires 'File::Object' => 0.06;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

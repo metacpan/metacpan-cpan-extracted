@@ -3,7 +3,7 @@ use warnings;
 
 package Dist::Zilla::PluginBundle::Author::AJNN;
 # ABSTRACT: Dist::Zilla configuration the way AJNN does it
-$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.05';
+$Dist::Zilla::PluginBundle::Author::AJNN::VERSION = '0.06';
 
 use Dist::Zilla;
 use Moose;
@@ -200,7 +200,7 @@ Dist::Zilla::PluginBundle::Author::AJNN - Dist::Zilla configuration the way AJNN
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -233,7 +233,7 @@ This is the configuration I use for L<Dist::Zilla>.
 
 (Most likely you don't want or need to read this.)
 
-=head1 OVERVIEW
+=head1 EQUIVALENT INI CONFIG
 
 This plugin bundle is nearly equivalent to the following C<dist.ini> config:
 

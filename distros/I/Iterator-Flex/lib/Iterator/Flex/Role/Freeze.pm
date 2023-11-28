@@ -5,7 +5,7 @@ package Iterator::Flex::Role::Freeze;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use List::Util;
 
@@ -74,7 +74,7 @@ Iterator::Flex::Role::Freeze - Role to add serialization capability to an Iterat
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 METHODS
 

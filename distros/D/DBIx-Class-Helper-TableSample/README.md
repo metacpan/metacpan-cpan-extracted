@@ -4,7 +4,7 @@ DBIx::Class::Helper::TableSample - Add support for tablesample clauses
 
 # VERSION
 
-version v0.4.0
+version v0.5.0
 
 # SYNOPSIS
 
@@ -46,8 +46,23 @@ SELECT me.id, me.name FROM table me TABLESAMPLE SYSTEM (0.5)
 This helper adds rudimentary support for tablesample queries
 to [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass) resultsets.
 
-The `tablesample` key supports the following options as a hash
-reference:
+# METHODS
+
+## search\_rs
+
+This adds a `tablesample` key to the search options, for example
+
+```perl
+$rs->search_rs( undef, { tablesample => 10 } );
+```
+
+or
+
+```perl
+$rs->search_rs( undef, { tablesample => { fraction => 10, method => 'system' } } );
+```
+
+Normally the value is a fraction, or a hash reference with the following options:
 
 - `fraction`
 
@@ -162,6 +177,18 @@ reference:
     Scalar references are dereferenced, and expressions or
     database-specific extensions should be specified has scalar
     references.
+
+## tablesample
+
+```perl
+my $rs = $schema->resultset('Wobbles')->tablesample( $fraction, \%options );
+
+my $rs = $schema->resultset('Wobbles')->tablesample( 10, { method => 'system' } );
+```
+
+This is a helper method.
+
+It was added in v0.4.1.
 
 # KNOWN ISSUES
 

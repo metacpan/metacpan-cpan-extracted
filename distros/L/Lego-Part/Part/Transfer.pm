@@ -1,16 +1,13 @@
 package Lego::Part::Transfer;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -66,6 +63,7 @@ Lego::Part::Transfer - Lego part transfer abstract class.
 =head1 SYNOPSIS
 
  use Lego::Part::Transfer;
+
  my $obj = Lego::Part::Transfer->new;
  $obj->element2design($part);
  $obj->design2element($part);
@@ -109,21 +107,22 @@ Install the Lego modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Lego-Part>
+L<https://github.com/michal-josef-spacek/Lego-Part>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2015 Michal Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

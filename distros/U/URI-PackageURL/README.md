@@ -10,20 +10,78 @@ use URI::PackageURL;
 # OO-interface
 
 # Encode components in PackageURL string
-$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.02');
+$purl = URI::PackageURL->new(type => cpan, namespace => 'GDT', name => 'URI-PackageURL', version => '2.04');
 
-say $purl; # pkg:cpan/GDT/URI-PackageURL@2.02
+say $purl; # pkg:cpan/GDT/URI-PackageURL@2.04
 
 # Parse PackageURL string
-$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.02');
+$purl = URI::PackageURL->from_string('pkg:cpan/GDT/URI-PackageURL@2.04');
 
 # exported funtions
 
-$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.02');
+$purl = decode_purl('pkg:cpan/GDT/URI-PackageURL@2.04');
 say $purl->type;  # cpan
 
-$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.02');
+$purl_string = encode_purl(type => cpan, namespace => 'GDT', name => 'URI::PackageURL', version => '2.04');
 ```
+
+
+## purl-tool a CLI for URI::PackageURL module
+
+Inspect and export "purl" string in various formats (JSON, YAML, Data::Dumper, ENV):
+
+```console
+$ purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --json | jq
+{
+  "name": "URI-PackageURL",
+  "namespace": "GDT",
+  "qualifiers": {},
+  "subpath": null,
+  "type": "cpan",
+  "version": "2.04"
+}
+```
+
+
+Download package using "purl" string:
+
+```console
+$ wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --download-url)
+```
+
+
+Use "purl" string in your shell-scripts:
+
+```.bash
+#!bash
+
+set -e 
+
+PURL="pkg:cpan/GDT/URI-PackageURL@2.04"
+
+eval $(purl-tool "$PURL" --env)
+
+echo "Download $PURL_NAME $PURL_VERSION"
+wget $PURL_DOWNLOAD_URL
+
+echo "Build and install module $PURL_NAME $PURL_VERSION"
+tar xvf $PURL_NAME-$PURL_VERSION.tar.gz
+
+cd $PURL_NAME-$PURL_VERSION
+perl Makefile.PL
+make && make install
+```
+
+
+Create on-the-fly a "purl" string:
+
+```console
+$ purl-tool --type cpan \
+            --namespace GDT \
+            --name URI-PackageURL \
+            --version 2.04
+```
+
 
 ## Install
 
@@ -45,6 +103,7 @@ Using App::cpanminus:
 
  - `perldoc URI::PackageURL`
  - https://metacpan.org/release/URI-PackageURL
+ - https://github.com/package-url/purl-spec
 
 
 ## Copyright

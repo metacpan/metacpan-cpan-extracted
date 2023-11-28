@@ -19,4 +19,5 @@ Revision history for MooX-ReturnModifiers
 	:%s/, 1//gc
 	/o\
 	
-
+1.00001 12/11/2023
+	Extend to return a sub routine modifier

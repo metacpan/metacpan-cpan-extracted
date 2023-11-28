@@ -12,7 +12,7 @@ use Mojo::Loader qw(load_class);
 use Mojo::Promise;
 use Mojo::Server;
 use Mojo::Util qw(scope_guard steady_time);
-use YAML::XS qw(Dump);
+use YAML::XS   qw(Dump);
 
 has app => sub { $_[0]{app_ref} = Mojo::Server->new->build_app('Mojo::HelloWorld') }, weak => 1;
 has 'backend';
@@ -21,7 +21,7 @@ has missing_after                  => 1800;
 has [qw(remove_after stuck_after)] => 172800;
 has tasks                          => sub { {} };
 
-our $VERSION = '10.25';
+our $VERSION = '10.27';
 
 sub add_task {
   my ($self, $name, $task) = @_;
@@ -1172,7 +1172,7 @@ Stefan Adams
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2014-2022, Sebastian Riedel and others.
+Copyright (C) 2014-2023, Sebastian Riedel and others.
 
 This program is free software, you can redistribute it and/or modify it under the terms of the Artistic License version
 2.0.

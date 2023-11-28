@@ -27,7 +27,7 @@ Greple의 **-Mtee** 모듈은 지정된 필터 명령에 일치하는 텍스트 
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # OPTIONS
 
@@ -39,19 +39,25 @@ Version 0.9901
 
     필터 명령에 전달하기 전에 빈 줄이 아닌 일련의 줄을 한 줄로 결합합니다. 넓은 문자 사이의 개행 문자는 삭제되고 다른 개행 문자는 공백으로 바뀝니다.
 
-- **--blockmatch**
+- **--blocks**
 
     일반적으로 지정된 검색 패턴과 일치하는 영역이 외부 명령으로 전송됩니다. 이 옵션을 지정하면 일치하는 영역이 아니라 해당 패턴이 포함된 전체 블록이 처리됩니다.
 
     예를 들어 `foo` 패턴이 포함된 줄을 외부 명령으로 보내려면 전체 줄에 일치하는 패턴을 지정해야 합니다:
 
-        greple -Mtee cat -n -- '^.*foo.*\n'
+        greple -Mtee cat -n -- '^.*foo.*\n' --all
 
-    하지만 **--blockmatch** 옵션을 사용하면 다음과 같이 간단하게 수행할 수 있습니다:
+    하지만 **--블록** 옵션을 사용하면 다음과 같이 간단하게 수행할 수 있습니다:
 
-        greple -Mtee cat -n -- foo
+        greple -Mtee cat -n -- foo --blocks
 
-    **--blockmatch** 옵션을 사용하면 이 모듈은 [teip(1)](http://man.he.net/man1/teip)의 **-g** 옵션과 비슷하게 동작합니다.
+    **--블록** 옵션을 사용하면 이 모듈은 [teip(1)](http://man.he.net/man1/teip)의 **-g** 옵션처럼 동작합니다. 그렇지 않으면 **-o** 옵션이 있는 [teip(1)](http://man.he.net/man1/teip)와 동작이 유사합니다.
+
+    블록이 전체 데이터가 되므로 **--블록**을 **--all** 옵션과 함께 사용하지 마십시오.
+
+- **--squeeze**
+
+    두 개 이상의 연속된 개행 문자를 하나로 결합합니다.
 
 # WHY DO NOT USE TEIP
 

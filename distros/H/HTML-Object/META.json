@@ -46,7 +46,6 @@
             "JSON" : "4.05",
             "List::Util" : "1.56",
             "Module::Generic" : "v0.32.4",
-            "Nice::Try" : "v1.3.4",
             "POSIX" : "0",
             "Promise::Me" : "v0.4.7",
             "Scalar::Util" : "1.60",
@@ -86,6 +85,6 @@
          "web" : "https://gitlab.com/jackdeguest/HTML-Object"
       }
    },
-   "version" : "v0.2.9",
+   "version" : "v0.3.1",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

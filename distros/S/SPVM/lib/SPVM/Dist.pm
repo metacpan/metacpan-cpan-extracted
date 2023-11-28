@@ -314,7 +314,7 @@ sub generate_perl_class_file {
   my $description;
   my $main_doc;
   if ($interface) {
-    $description = "$basic_type_name interface of L<SPVM> has interface methods for someting.";
+    $description = "The $basic_type_name interface of L<SPVM> has interface methods to do someting.";
     $main_doc  = <<"EOS";
 =head1 Usage
 
@@ -327,7 +327,7 @@ sub generate_perl_class_file {
 EOS
   }
   elsif ($resource) {
-    $description = "$basic_type_name resource of L<SPVM> is a L<resouce|SPVM::Document::Resource> for someting.";
+    $description = "The $basic_type_name resource of L<SPVM> is a L<resouce|SPVM::Document::Resource> to do someting.";
     
     my $native = $self->native;
     my $new_method;
@@ -446,7 +446,7 @@ MyClass.$native_module_ext:
 EOS
   }
   else {
-    $description = "$basic_type_name class of L<SPVM> has methods for someting.";
+    $description = "The $basic_type_name class of L<SPVM> has methods to do someting.";
     $main_doc  = <<"EOS";
 =head1 Usage
 
@@ -715,7 +715,7 @@ sub generate_changes_file {
   
   # Content
   my $changes_content = <<"EOS";
-0.01 $today
+0.001 $today
   [Changes]
     * First release.
   
@@ -880,13 +880,20 @@ use SPVM '$basic_type_name';
 use SPVM::$basic_type_name;
 use SPVM 'Fn';
 
+my \$api = SPVM::api();
+
+my \$start_memory_blocks_count = \$api->get_memory_blocks_count;
+
 ok(SPVM::TestCase::$basic_type_name->test);
 
-# Version
+# Version check
 {
   my \$version_string = SPVM::Fn->get_version_string("$basic_type_name");
   is(\$SPVM::${basic_type_name}::VERSION, \$version_string);
 }
+
+my \$end_memory_blocks_count = \$api->get_memory_blocks_count;
+is(\$end_memory_blocks_count, \$start_memory_blocks_count);
 
 done_testing;
 EOS

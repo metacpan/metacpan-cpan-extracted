@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::PivotTable
+# AsposeCellsCloud::Object::PivotTable 
 
 ## Load the model package
 ```perl
@@ -8,76 +8,75 @@ use AsposeCellsCloud::Object::PivotTable;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**link** | [**Link**](Link.md) |  | [optional] 
-**show_pivot_style_last_column** | **boolean** |  | [optional] 
-**row_header_caption** | **string** |  | [optional] 
-**column_range** | [**CellArea**](CellArea.md) |  | [optional] 
-**refresh_data_on_opening_file** | **boolean** |  | [optional] 
-**page_fields** | [**ARRAY[PivotField]**](PivotField.md) |  | [optional] 
-**data_fields** | [**ARRAY[PivotField]**](PivotField.md) |  | [optional] 
-**data_body_range** | [**CellArea**](CellArea.md) |  | [optional] 
-**show_drill** | **boolean** |  | [optional] 
-**refresh_data_flag** | **boolean** |  | [optional] 
-**column_grand** | **boolean** |  | [optional] 
-**pivot_table_style_name** | **string** |  | [optional] 
-**pivot_filters** | [**ARRAY[PivotFilter]**](PivotFilter.md) |  | [optional] 
-**null_string** | **string** |  | [optional] 
-**item_print_titles** | **boolean** |  | [optional] 
-**display_null_string** | **boolean** |  | [optional] 
-**enable_field_list** | **boolean** |  | [optional] 
-**table_range2** | [**CellArea**](CellArea.md) |  | [optional] 
-**row_fields** | [**ARRAY[PivotField]**](PivotField.md) |  | [optional] 
-**page_field_order** | **string** |  | [optional] 
-**auto_format_type** | **string** |  | [optional] 
-**enable_data_value_editing** | **boolean** |  | [optional] 
-**show_pivot_style_row_header** | **boolean** |  | [optional] 
-**is_grid_drop_zones** | **boolean** |  | [optional] 
-**enable_wizard** | **boolean** |  | [optional] 
-**show_member_property_tips** | **boolean** |  | [optional] 
-**alt_text_description** | **string** |  | [optional] 
-**show_data_tips** | **boolean** |  | [optional] 
-**print_titles** | **boolean** |  | [optional] 
-**table_range1** | [**CellArea**](CellArea.md) |  | [optional] 
-**show_empty_row** | **boolean** |  | [optional] 
-**is_multiple_field_filters** | **boolean** |  | [optional] 
-**show_empty_col** | **boolean** |  | [optional] 
-**show_row_header_caption** | **boolean** |  | [optional] 
-**has_blank_rows** | **boolean** |  | [optional] 
-**data_source** | **ARRAY[string]** |  | [optional] 
-**tag** | **string** |  | [optional] 
-**enable_drilldown** | **boolean** |  | [optional] 
-**indent** | **int** |  | [optional] 
-**name** | **string** |  | [optional] 
-**row_grand** | **boolean** |  | [optional] 
-**grand_total_name** | **string** |  | [optional] 
-**display_error_string** | **boolean** |  | [optional] 
-**row_range** | [**CellArea**](CellArea.md) |  | [optional] 
-**is_selected** | **boolean** |  | [optional] 
-**column_fields** | [**ARRAY[PivotField]**](PivotField.md) |  | [optional] 
-**column_header_caption** | **string** |  | [optional] 
-**show_values_row** | **boolean** |  | [optional] 
-**enable_field_dialog** | **boolean** |  | [optional] 
-**missing_items_limit** | **string** |  | [optional] 
-**show_pivot_style_row_stripes** | **boolean** |  | [optional] 
-**manual_update** | **boolean** |  | [optional] 
-**is_auto_format** | **boolean** |  | [optional] 
-**display_immediate_items** | **boolean** |  | [optional] 
-**error_string** | **string** |  | [optional] 
-**custom_list_sort** | **boolean** |  | [optional] 
-**merge_labels** | **boolean** |  | [optional] 
-**page_field_wrap_count** | **int** |  | [optional] 
-**show_pivot_style_column_stripes** | **boolean** |  | [optional] 
-**field_list_sort_ascending** | **boolean** |  | [optional] 
-**alt_text_title** | **string** |  | [optional] 
-**preserve_formatting** | **boolean** |  | [optional] 
-**pivot_table_style_type** | **string** |  | [optional] 
-**data_field** | [**PivotField**](PivotField.md) |  | [optional] 
-**save_data** | **boolean** |  | [optional] 
-**subtotal_hidden_page_items** | **boolean** |  | [optional] 
-**print_drill** | **boolean** |  | [optional] 
-**show_pivot_style_column_header** | **boolean** |  | [optional] 
-**base_fields** | [**ARRAY[PivotField]**](PivotField.md) |  | [optional] 
+**AltTextDescription** | **string** |  |
+**AltTextTitle** | **string** |  |
+**AutoFormatType** | **string** |  |
+**BaseFields** | **ARRAY[PivotField]** |  |
+**ColumnFields** | **ARRAY[PivotField]** |  |
+**ColumnGrand** | **boolean** |  |
+**ColumnHeaderCaption** | **string** |  |
+**ColumnRange** | **CellArea** |  |
+**CustomListSort** | **boolean** |  |
+**DataBodyRange** | **CellArea** |  |
+**DataField** | **PivotField** |  |
+**DataFields** | **ARRAY[PivotField]** |  |
+**DataSource** | **ARRAY[string]** |  |
+**DisplayErrorString** | **boolean** |  |
+**DisplayImmediateItems** | **boolean** |  |
+**DisplayNullString** | **boolean** |  |
+**EnableDataValueEditing** | **boolean** |  |
+**EnableDrilldown** | **boolean** |  |
+**EnableFieldDialog** | **boolean** |  |
+**EnableFieldList** | **boolean** |  |
+**EnableWizard** | **boolean** |  |
+**ErrorString** | **string** |  |
+**FieldListSortAscending** | **boolean** |  |
+**GrandTotalName** | **string** |  |
+**HasBlankRows** | **boolean** |  |
+**Indent** | **int** |  |
+**IsAutoFormat** | **boolean** |  |
+**IsGridDropZones** | **boolean** |  |
+**IsMultipleFieldFilters** | **boolean** |  |
+**IsSelected** | **boolean** |  |
+**ItemPrintTitles** | **boolean** |  |
+**ManualUpdate** | **boolean** |  |
+**MergeLabels** | **boolean** |  |
+**MissingItemsLimit** | **string** |  |
+**Name** | **string** |  |
+**NullString** | **string** |  |
+**PageFieldOrder** | **string** |  |
+**PageFields** | **ARRAY[PivotField]** |  |
+**PageFieldWrapCount** | **int** |  |
+**PivotFilters** | **ARRAY[PivotFilter]** |  |
+**PivotTableStyleName** | **string** |  |
+**PivotTableStyleType** | **string** |  |
+**PreserveFormatting** | **boolean** |  |
+**PrintDrill** | **boolean** |  |
+**PrintTitles** | **boolean** |  |
+**RefreshDataFlag** | **boolean** |  |
+**RefreshDataOnOpeningFile** | **boolean** |  |
+**RowFields** | **ARRAY[PivotField]** |  |
+**RowGrand** | **boolean** |  |
+**RowHeaderCaption** | **string** |  |
+**RowRange** | **CellArea** |  |
+**SaveData** | **boolean** |  |
+**ShowDataTips** | **boolean** |  |
+**ShowDrill** | **boolean** |  |
+**ShowEmptyCol** | **boolean** |  |
+**ShowEmptyRow** | **boolean** |  |
+**ShowMemberPropertyTips** | **boolean** |  |
+**ShowPivotStyleColumnHeader** | **boolean** |  |
+**ShowPivotStyleColumnStripes** | **boolean** |  |
+**ShowPivotStyleLastColumn** | **boolean** |  |
+**ShowPivotStyleRowHeader** | **boolean** |  |
+**ShowPivotStyleRowStripes** | **boolean** |  |
+**ShowRowHeaderCaption** | **boolean** |  |
+**ShowValuesRow** | **boolean** |  |
+**SubtotalHiddenPageItems** | **boolean** |  |
+**TableRange1** | **CellArea** |  |
+**TableRange2** | **CellArea** |  |
+**Tag** | **string** |  |
+**link** | **Link** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

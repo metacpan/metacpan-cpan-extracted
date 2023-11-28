@@ -1,7 +1,7 @@
 package OpenTelemetry::Integration::DBI;
 # ABSTRACT: OpenTelemetry integration for DBI
 
-our $VERSION = '0.011';
+our $VERSION = '0.018';
 
 use strict;
 use warnings;
@@ -78,13 +78,22 @@ sub install ( $class, %options ) {
             return $handle->$orig(@args);
         }
         catch ( $error ) {
+            my ($description) = split /\n/, $error =~ s/^\s+|\s+$//gr, 2;
+            $description =~ s/ at \S+ line \d+\.$//a;
+
             $span->record_exception($error);
-            $span->set_status( SPAN_STATUS_ERROR, $error );
+            $span->set_status( SPAN_STATUS_ERROR, $description );
+
             die $error;
         }
         finally {
             if ( $handle->err ) {
-                $span->set_status( SPAN_STATUS_ERROR, $handle->errstr );
+                my $error = $handle->errstr =~ s/^\s+|\s+$//gr;
+
+                my ($description) = split /\n/, $error, 2;
+                $description =~ s/ at \S+ line \d+\.$//a;
+
+                $span->set_status( SPAN_STATUS_ERROR, $description );
             }
             else {
                 $span->set_status( SPAN_STATUS_OK );

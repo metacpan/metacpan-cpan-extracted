@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,45 +12,50 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 6fe097cf8c1fd7a0a2bd358384b68ee410a73709 Changes
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
-SHA1 bf83c38349cfd1ef42ee38ebf0b7d35e67d54369 MANIFEST
-SHA1 d5b50ef49659d0b1212bc21377ac3bcaca92ed5f META.yml
-SHA1 0fba58ac0e9562547714cad4e3c5b2c589cb7948 Makefile.PL
-SHA1 f1f81fcc014933775963500e0122a687580781ac README
-SHA1 5d905a8cad8531bbbef994544374d1cf2726fc11 TGF.pm
-SHA1 43156d71b3768487ee1b0d920cbf65c02384a740 examples/ex1.pl
-SHA1 e1a998750627040ec475fbde14873cb05b175a6c examples/ex2.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 49be701547ff45878fd3e1fce377d1d30262759d t/Graph-Reader-TGF/01-use.t
-SHA1 bd5f5e275bc3144a397b8429ed9111b15ef502cb t/Graph-Reader-TGF/02-version.t
-SHA1 b65f93c03ebbc3feb96caaf7d928de4a2a05abd3 t/Graph-Reader-TGF/03-new.t
-SHA1 44452788c51039c66f7f2f50e1ae9027486fd665 t/Graph-Reader-TGF/04-read_graph.t
-SHA1 eefe1f1dda9b50d91cde57537988387023a005e7 t/data/ex1.tgf
-SHA1 ace4eba9f1e7f61b6e74611b2fdf87018546337d t/data/ex2.tgf
-SHA1 5c63be1cb3de79bbec88a989ad8b13350b1f4b14 t/data/ex3.tgf
-SHA1 3b2af9c10ce9d907bd4e1ca46738ca52fa8271e8 xt/Graph-Reader-TGF/01-pod_coverage.t
-SHA1 66c74ef5d335b8771171fed1d1db754fdeab0696 xt/Graph-Reader-TGF/02-pod.t
+SHA256 8aef8a1334ed13046f9e8d5964e1a9d68c93c04e3ef6f3afa7fb443a05b501cd Changes
+SHA256 bb21e21e0f3e33f0870057aa51c2073bf720004b7848a58e997bbbef4ae5d653 LICENSE
+SHA256 e26a351cce523950d7b3017913de3af9a506b73d235c9b2ca6681d4755b315d1 MANIFEST
+SHA256 2b7c5f3505d71dac27dc3143bab284e1371e5fd8858e8ec91bcd0df9a11498cb META.yml
+SHA256 f17befc61f3c1eb37a3e6cf7351e7740d12d4ddafa5406582f323ea182c59e8c Makefile.PL
+SHA256 1ddbeaa688473a1398ca670413e8ffa698cc89fda3987e50a4362c56678515a4 README
+SHA256 80bacefc5827519f3c06f63801835b09888e5cee3c3e6f24bc6f7eb2b6858a6b TGF.pm
+SHA256 56cd576292117d7d80badfe2fd9c01e5a4964c2842786cea752fcf8f52db22eb examples/read_tgf_advanced_and_print.pl
+SHA256 85f7ab4e278dff482bfedb8130452fe2e08387780198126f771da6850a811438 examples/read_tgf_trivial_and_print.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 b982db2d3acdbb83fcd43d61ae66460b9a2be0ed7e67c1179b98b5044decb03c t/Graph-Reader-TGF/01-use.t
+SHA256 caade339eabb1fa11533f6ed4ac6ef5503c2e231b06fa2345a56e66745fdada2 t/Graph-Reader-TGF/02-version.t
+SHA256 5a8df228318e9fa8fba3924663df064fe110182bb42453cccbe0ab081dad64d7 t/Graph-Reader-TGF/03-new.t
+SHA256 a797b9e2fe44fa6462d7798b6b4f67391cc86e21345d6d6ea24412723975bec4 t/Graph-Reader-TGF/04-read_graph.t
+SHA256 92bbc12d35f55453e38e2ef2479667809ce1c22c70c06129fed43e1254a7007f t/data/ex1.tgf
+SHA256 a6b604902a7b3cfefe55659ccdfec1a5cc385baeb5ae1df392d34f99b2c47a74 t/data/ex2.tgf
+SHA256 9f56ce2a98a03ec46e426e70cd791790b3a1b6107a6baaf6ea8dd3bfaf73d8a2 t/data/ex3.tgf
+SHA256 549459ca335219cf3934318d0f61ee5ee2345c3f0f51e1a94d3d7a71d714e83c xt/Graph-Reader-TGF/01-pod_coverage.t
+SHA256 0097bea0e37476ae8a060fe02b5060bb184b85a175960c3384ab9e32602b42e0 xt/Graph-Reader-TGF/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWMh4kAAoJEJe+XXKaIuTl4iMIAIoXcfYadTgwDP9kt8wC0oi+
-qe9F9Zl3MI6JZQKnCj4sFzPKKyMF3Yn2AJc2bMDZBDT4MDgtRnp+8ahyJNjXD1UY
-qw+oSm5jnzgb79JOPLFxx/ge8KPPFEv8oKM9f2Rk+gytq7UgBfnxeaO5CjES88qa
-Wd6wOFAArPMr1RbTV2IO6lV7J1UaKkKHc6d+XQ9G3TJyFHp1mfHLGglWNzhORY3Y
-ecndYOMyVxkHxzx03I1rzUV+4eaWA7rZQcT+rwbdu7mAmhVzl58D4aFLiLok+BMJ
-hKZpKAXoQ6nPrerqflNQDPrFd71B99aKowQQz2eb2jsRW4s1h7bIHfLsUUuOdsE=
-=XEZe
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVhBk8ACgkQojV9Rpe/
+B8tekw/+O9B7frI6ID9N/nQzT7/ay0JRThXkXwLqoKM6KNfVe0TcTa2DNfLhYH7o
+VUsUw0nDWwXW01V/eKTJ9diB/EgAhN61gRkvjhFvGlBuMkQ4COWK3roi067onj8D
+V5ZZsq8kYdbUBn9j0TiaVCHqPKokIyzJsjHnexvAK4zYtOWVHXnICxDaGCo39poM
+NqeHH/bTaqCo9bgqltG6xdv/uURL4OKRRm3ECm+LwiuPSy5lrZap8BP87LbyXfC8
+MWxyw1n2EYG2A1L2xHusZLKlivhSFiagZNiP4ZBDtg4PVZj/WYlJidIfD84GOfGa
+HJJ3g/IoemFZzt+hPyb63+WdnKKGFbN70wj2JVrPY6Tph8nDj25hSJ677XUfrGFS
+ZHa8w+Xq6tSM2FIED+BZi9P/HiAnPFb8XAOUzmPMgzPfgdkMdEp5ouU+Hm49paOv
+9lnsy1wpBuShBxnzB0AhtMdtQXmtB7NiEzRBtTHO7v3remcmg+NS5ebujTB830ny
+6XC1JUmccZRys7BGXSFKN+Xtt3ny57SyDo/+UKyPvZdKFWOJeBnANvhQnkzWRCQO
+Mh+8KTn4vBR3nx7L66DL7yOzzNDalYadN4TQ4jMKw2mqRFuOjb94gFyYO5G7eMsC
+J3Qr5hNpiyMwcWxsZzS1mod0fkB5JbLB8VJKbRJql/ennK5Ok5Y=
+=DuhX
 -----END PGP SIGNATURE-----

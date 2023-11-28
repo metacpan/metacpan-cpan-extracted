@@ -6,9 +6,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-21'; # DATE
+our $DATE = '2023-08-14'; # DATE
 our $DIST = 'List-Util-Uniq'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our @EXPORT_OK = qw(
                        uniq
@@ -199,7 +199,7 @@ List::Util::Uniq - List utilities related to finding unique items
 
 =head1 VERSION
 
-This document describes version 0.006 of List::Util::Uniq (from Perl distribution List-Util-Uniq), released on 2023-06-21.
+This document describes version 0.007 of List::Util::Uniq (from Perl distribution List-Util-Uniq), released on 2023-08-14.
 
 =head1 SYNOPSIS
 
@@ -244,6 +244,11 @@ This document describes version 0.006 of List::Util::Uniq (from Perl distributio
 
  @res = dupe_ci("a", "b", "B", "c", "a"); #  => ("B", "a")
 
+=head1 DESCRIPTION
+
+This module supplements L<List::Util> with functions related to list item's
+uniqueness.
+
 =for Pod::Coverage ^(uniq|uniqint|uniqnum|uniqstr)+
 
 =head1 FUNCTIONS
@@ -258,7 +263,7 @@ Usage:
 
 Remove I<adjacent> duplicates from list, i.e. behave more like Unix utility's
 B<uniq> instead of L<List::Util>'s C<uniq> function. Uses string equality
-test.
+test (the C<eq> operator).
 
 =head2 uniq_adj_ci
 
@@ -274,9 +279,9 @@ Usage:
 
  my $is_uniq = is_uniq(@list);
 
-Return true when the values in C<@list> is unique (compared string-wise).
-Knowing whether a list has unique values is faster using this function compared
-to doing:
+Return true when the values in C<@list> is unique (compared string-wise). In
+theory, knowing whether a list has unique values is faster using this function
+compared to doing:
 
  my @uniq = uniq(@list);
  @uniq == @list;

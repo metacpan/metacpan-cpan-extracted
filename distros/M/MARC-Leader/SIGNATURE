@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 4f61cccba3123ca60654693d2266739d05619e41351475e9a7dc0769d05cc785 Changes
+SHA256 e9ae42c89b2f406c60c950a2a41695eabc2d324c0a9cd90d165e87c4e8a731bd LICENSE
+SHA256 de2847e104575e31eb2508c1e5ae195f97aa26c0226debc930adb1b57bf89015 Leader.pm
+SHA256 96405c6c58898eb98806efaa12788aa94a545ce6670d6db304670bbe389d281d MANIFEST
+SHA256 1b65c91dba4ff86395a3953d462de92bd153fde4cbbf387cb706e6b8ff283806 META.yml
+SHA256 8ebc3a499e5604dbfc43a848332a7c509d89949784ec12bbe76e4bdb7e0d689d Makefile.PL
+SHA256 7b07bc33a5ac6b459f3bd4b85dbf1c07bb66afb338088506029d7765bcda42ef README
+SHA256 69f679adab7ae95581b7f62f7cd1e2398d46f1023c6d06e3cefc374b83ba72c8 examples/parse_marc_leader_and_dump.pl
+SHA256 6aa96214bc1daa71afa657e67962d5beae0c81791bafa27a8e33eb7e8fd771ff examples/parse_marc_leader_and_print.pl
+SHA256 e62fa09d60758cb3c3158e05859cf5367ca839d3383536b4502e9c59e76d1a00 examples/serialize_marc_leader.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 49469a98c29c133b0129cacd950f375eaecc40be9e257ae5e9995c5e39dfb95a t/MARC-Leader/01-use.t
+SHA256 c48968f89765496bbec1d02ddafe9283f0f91da5b78a84267f441149ce88abde t/MARC-Leader/02-version.t
+SHA256 98721844a6264ec21a326b2e0efb8940feaf7164878fcb96817782ce7881b8b8 t/MARC-Leader/03-new.t
+SHA256 e5977a20e43d0c8beb11827a88f3b4db245716382ccf6f39ec571d2c274830be t/MARC-Leader/04-parse.t
+SHA256 26a3bbc06f3e47fb48594df2a49f93549098b0befbc96a698feb6a0cc49a3ad9 t/MARC-Leader/05-serialize.t
+SHA256 0627e1c7b234d1711c4323ab2b74b1c3b0c2af15f41f67b19cab4e688ceab24a xt/MARC-Leader/01-pod_coverage.t
+SHA256 bd70b77d110b0ab6e526b69a95972c9fcd97745f6a9fd1bc865b8a746c2b4488 xt/MARC-Leader/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVbd9EACgkQojV9Rpe/
+B8t5Xg//cwJKIj2M+iTIfQ48GKOy3x0KT3s/0FyQ8PCsDisimdo1y/+H06eGb4hj
+WltxD8gFxMeAK2b+7Xj0aj8WckyaPzeY7jUCXJgd6AY1jdJw4L+t85piXPLfwzWM
+AUKlKDz2bmIsCzDTiDZNmrtooF0UxI55ivo0WmePjwx5yrlISQnD/6/fz56Pa2i0
+mstUd6/cJtOQ2lXKmym5HHl3vJLbxh+Rm5J6jSYsISVD05MaXRfLG2ZJrhA/cNFZ
+kQ1rrwucISDcviy0Oj9AOETR8qYBHsvM4hyCTPGZBySRbOXTXEimGB9Z48PXVyeH
+GktZzetNP6g0icD1CLqF3lc988mT8Nu1xoLc8phmFyGu3SUt82dp+k4krMNJVMll
+C2l7PKhjRrlgkEQgOM4516HCCIMi0ucRdCxvFe0+ZZ6BoJ9NfprJVgiOsXlJoKwW
+SAjxhumuBeEJkuCwGkaOrlv716Tqz1zpH0H5rM8TmGqL/jt5Z3m04qOvkkcI0rA4
+HvPyFV1EUKMYMEqDUQMwGwRpXjuI1Z5IAcBJNYzgZVMNVkz2J6Kdwkh/okuRIrU7
+hapdZUMiiLuaVaHc6kwbXtxjkiCn5ACfwcSvCc2ziTClDZQh3KNZ5jywsDJy4ApK
+WKc+231UfPvAv0ZoGFkPdiq3tes6EAFhw+vtUwYVA3jTnesLn8A=
+=drf1
+-----END PGP SIGNATURE-----

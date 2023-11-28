@@ -47,8 +47,7 @@ my $build = Module::Build->new
     'Test::Memory::Cycle' => '0',
     'Test::More' => '0',
     'Test::Pod' => '1.00',
-    'XXX' => '0',
-    'YAML::XS' => '0'
+    'XXX' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.34'
@@ -72,7 +71,6 @@ my $build = Module::Build->new
     'Tk::BrowseEntry' => '0',
     'Tk::Dialog' => '0',
     'Tk::DialogBox' => '0',
-    'Tk::DirSelect' => '0',
     'Tk::DoubleClick' => '0',
     'Tk::FontDialog' => '0',
     'Tk::Frame' => '0',
@@ -87,7 +85,7 @@ my $build = Module::Build->new
     'Tk::Toplevel' => '0',
     'Tk::Tree' => '0',
     'Try::Tiny' => '0',
-    'YAML' => '0',
+    'YAML::PP' => '0',
     'perl' => '5.012'
   },
 

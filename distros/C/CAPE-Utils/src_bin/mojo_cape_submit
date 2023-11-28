@@ -78,12 +78,6 @@ use JSON;
 use CAPE::Utils;
 use File::Slurp;
 use Sys::Hostname;
-use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u
-	sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
-use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u
-	md5_file md5_file_hex md5_file_b64 md5_file_b64u );
-use Crypt::Digest::SHA1 qw( sha1 sha1_hex sha1_b64 sha1_b64u
-	sha1_file sha1_file_hex sha1_file_b64 sha1_file_b64u );
 
 # two are needed as /* and / don't overlap... so pass it to the_stuff to actually handle it
 post '/*' => sub ($c) {
@@ -258,11 +252,17 @@ sub the_stuff {
 
 	# copy it into place
 	$file->move_to($name);
-	$json->{cape_submit}{sha256} = lc( sha256_file_hex($name) );
+	$json->{cape_submit}{sha256} = lc( `sha256sum $name` );
+	chomp($json->{cape_submit}{sha256});
+	$json->{cape_submit}{sha256} =~ s/[\ \t].+//;
 	log_drek( 'info', 'SHA256: ' . $json->{cape_submit}{sha256} );
-	$json->{cape_submit}{sha1} = lc( sha1_file_hex($name) );
+	$json->{cape_submit}{sha1} = lc( `sha1sum $name` );
+	chomp($json->{cape_submit}{sha1});
+	$json->{cape_submit}{sha1} =~ s/[\ \t].+//;
 	log_drek( 'info', 'SHA1: ' . $json->{cape_submit}{sha1} );
-	$json->{cape_submit}{md5} = lc( md5_file_hex($name) );
+	$json->{cape_submit}{md5} = lc( `md5sum $name` );
+	chomp($json->{cape_submit}{md5});
+	$json->{cape_submit}{md5} =~ s/[\ \t].+//;
 	log_drek( 'info', 'MD5: ' . $json->{cape_submit}{md5} );
 
 	# finally submit it

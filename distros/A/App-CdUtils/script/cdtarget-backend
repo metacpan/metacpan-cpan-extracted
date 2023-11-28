@@ -3,23 +3,35 @@
 use strict;
 use warnings;
 
+use File::Util::Test;
 use Path::Tiny;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-30'; # DATE
+our $DATE = '2023-11-24'; # DATE
 our $DIST = 'App-CdUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 our $DEBUG = $ENV{DEBUG};
 
-if (@ARGV != 1) { warn "Usage: cdtarget <symlink>\n"; print ".\n"; exit }
+my $symlink;
+GET_SYMLINK: {
+    if (!@ARGV || @ARGV==1 && $ARGV[0] eq '') {
+        # try to find the only symlink in the directory, use that if we find it
+        $symlink = File::Util::Test::get_dir_only_symlink();
+        last if defined $symlink;
+    }
 
-my $target = readlink($ARGV[0]);
-unless (defined $target) { warn "cdtarget: $ARGV[0] not a symlink\n"; print ".\n"; exit }
+    if (@ARGV != 1 || @ARGV==1 && $ARGV[0] eq '') { warn "Usage: cdtarget [symlink]\n"; print ".\n"; exit }
+
+    $symlink = $ARGV[0];
+}
+
+my $target = readlink($symlink);
+unless (defined $target) { warn "cdtarget: $symlink not a symlink\n"; print ".\n"; exit }
 
 my $targetp = path($target);
 unless ($targetp->is_absolute) {
-    $targetp = $targetp->absolute( path($ARGV[0])->parent );
+    $targetp = $targetp->absolute( path($symlink)->parent );
 }
 
 if ($targetp->is_dir) {
@@ -43,7 +55,7 @@ cdtarget-backend - Change directory to symlink target's directory
 
 =head1 VERSION
 
-This document describes version 0.006 of cdtarget-backend (from Perl distribution App-CdUtils), released on 2022-09-30.
+This document describes version 0.007 of cdtarget-backend (from Perl distribution App-CdUtils), released on 2023-11-24.
 
 =head1 SYNOPSIS
 
@@ -73,6 +85,9 @@ To use in shell:
 B<cdtarget> is a command to change directory to a symlink target's directory. If
 the target is already a directory then it will be used directly, otherwise it's
 the target's directory that is used.
+
+If symlink is not specified as argument, and there is a single symlink in the
+current directory and nothing else, that symlink will be used.
 
 =head1 ENVIRONMENT
 
@@ -110,7 +125,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

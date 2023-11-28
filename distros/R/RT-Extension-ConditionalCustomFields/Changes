@@ -1,5 +1,8 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+1.14 2023-11-09
+ - Fix unneeded patches for RT up to 5.0.5.
+
 1.13 2023-10-13
  - Do NOT Limit to Dropdown CF retriggering change on Condition CF after inline form has been made visible
  - No need to play with collapse

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostWatermark;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | File to upload |
+**file** | **string** | e.g. #1032ff |
 **text** | **string** |  |
 **color** | **string** | e.g. #1032ff |
 **password** | **string** |  |

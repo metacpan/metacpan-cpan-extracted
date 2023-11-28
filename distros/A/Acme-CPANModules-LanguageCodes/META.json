@@ -46,10 +46,12 @@
       },
       "x_lists" : {
          "x_lists" : {
+            "App::ListLanguages" : "0",
+            "App::LocaleCodesUtils" : "0",
+            "Locale::Codes" : "0",
             "Locale::Codes::Language" : "0",
             "Locale::Codes::Language_Codes" : "0",
             "Locale::Language" : "0",
-            "Locale::Util::Language" : "0",
             "MooseX::Types::Locale::Language" : "0",
             "MooseX::Types::Locale::Language::Fast" : "0",
             "Sah::Schema::language::code" : "0",
@@ -59,10 +61,12 @@
       },
       "x_mentions" : {
          "x_mentions" : {
+            "App::ListLanguages" : "0",
+            "App::LocaleCodesUtils" : "0",
+            "Locale::Codes" : "0",
             "Locale::Codes::Language" : "0",
             "Locale::Codes::Language_Codes" : "0",
             "Locale::Language" : "0",
-            "Locale::Util::Language" : "0",
             "MooseX::Types::Locale::Language" : "0",
             "MooseX::Types::Locale::Language::Fast" : "0",
             "Sah::Schema::language::code" : "0",
@@ -74,7 +78,7 @@
    "provides" : {
       "Acme::CPANModules::LanguageCodes" : {
          "file" : "lib/Acme/CPANModules/LanguageCodes.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -89,7 +93,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-LanguageCodes"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

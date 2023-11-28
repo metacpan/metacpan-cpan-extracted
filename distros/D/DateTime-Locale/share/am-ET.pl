@@ -52,7 +52,6 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'of' Y",
     "yw-count-other" => "'week' w 'of' Y",
   },
   code => "am-ET",
@@ -138,8 +137,8 @@
   glibc_time_format => "%l:%M:%S %p",
   language => "Amharic",
   month_format_abbreviated => [
-    "\N{U+1303}\N{U+1295}\N{U+12e9}",
-    "\N{U+134c}\N{U+1265}\N{U+1229}",
+    "\N{U+1303}\N{U+1295}",
+    "\N{U+134c}\N{U+1265}",
     "\N{U+121b}\N{U+122d}\N{U+127d}",
     "\N{U+12a4}\N{U+1355}\N{U+122a}",
     "\N{U+121c}\N{U+12ed}",
@@ -166,8 +165,8 @@
     "\N{U+12f2}",
   ],
   month_format_wide => [
-    "\N{U+1303}\N{U+1295}\N{U+12e9}\N{U+12c8}\N{U+122a}",
-    "\N{U+134c}\N{U+1265}\N{U+1229}\N{U+12c8}\N{U+122a}",
+    "\N{U+1303}\N{U+1295}\N{U+12cb}\N{U+122a}",
+    "\N{U+134c}\N{U+1265}\N{U+1229}\N{U+12cb}\N{U+122a}",
     "\N{U+121b}\N{U+122d}\N{U+127d}",
     "\N{U+12a4}\N{U+1355}\N{U+122a}\N{U+120d}",
     "\N{U+121c}\N{U+12ed}",
@@ -180,8 +179,8 @@
     "\N{U+12f2}\N{U+1234}\N{U+121d}\N{U+1260}\N{U+122d}",
   ],
   month_stand_alone_abbreviated => [
-    "\N{U+1303}\N{U+1295}\N{U+12e9}",
-    "\N{U+134c}\N{U+1265}\N{U+1229}",
+    "\N{U+1303}\N{U+1295}",
+    "\N{U+134c}\N{U+1265}",
     "\N{U+121b}\N{U+122d}\N{U+127d}",
     "\N{U+12a4}\N{U+1355}\N{U+122a}",
     "\N{U+121c}\N{U+12ed}",
@@ -208,8 +207,8 @@
     "\N{U+12f2}",
   ],
   month_stand_alone_wide => [
-    "\N{U+1303}\N{U+1295}\N{U+12e9}\N{U+12c8}\N{U+122a}",
-    "\N{U+134c}\N{U+1265}\N{U+1229}\N{U+12c8}\N{U+122a}",
+    "\N{U+1303}\N{U+1295}\N{U+12cb}\N{U+122a}",
+    "\N{U+134c}\N{U+1265}\N{U+1229}\N{U+12cb}\N{U+122a}",
     "\N{U+121b}\N{U+122d}\N{U+127d}",
     "\N{U+12a4}\N{U+1355}\N{U+122a}\N{U+120d}",
     "\N{U+121c}\N{U+12ed}",
@@ -270,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 43,
+  version => 44,
 }

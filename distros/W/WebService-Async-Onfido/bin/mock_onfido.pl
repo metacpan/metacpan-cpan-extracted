@@ -9,6 +9,7 @@ use Data::UUID;
 use File::Basename;
 use Path::Tiny;
 use JSON::MaybeUTF8 qw(:v1);
+use MIME::Base64;
 
 # New HTTP server implementation
 use Net::Async::HTTP::Server;
@@ -24,6 +25,9 @@ my %files;
 my %reports;
 my %checks;
 my @sdk_tokens;
+
+# this is damn small pdf
+use constant DAMN_SMALL_PDF => 'JVBERi0xLg10cmFpbGVyPDwvUm9vdDw8L1BhZ2VzPDwvS2lkc1s8PC9NZWRpYUJveFswIDAgMyAzXT4+XT4+Pj4+Pg==';
 
 # storage utilities
 
@@ -261,6 +265,17 @@ my $router = {
 
             return file_response($req, $photo_id);
         },
+        '/v3.4/checks/:check_id/download' => sub {
+            my $req      = shift;
+            my @stash    = route_params($req);
+            my $check_id = $stash[2];
+
+            unless (exists($checks{$check_id})) {
+                return json_response($req, {status => 'Not Found'});
+            }
+
+            return pdf_response($req, $check_id);
+        },
         '/v3.4/checks/:check_id' => sub {
             my $req      = shift;
             my @stash    = route_params($req);
@@ -413,6 +428,21 @@ sub json_response {
     $response->add_content($json);
     $response->content_type('application/json');
     $response->content_length(length $response->content);
+
+    return $response;
+}
+# dumps a generated on the fly really tiny pdf file
+
+sub pdf_response {
+    my ($req, $id) = @_;
+
+    my $response = HTTP::Response->new(200);
+    my $file     = decode_base64(DAMN_SMALL_PDF);
+
+    $response->add_content($file);
+    $response->content_type('application/pdf');
+    $response->content_length(length $file);
+    $response->header('content-disposition' => 'attachment; filename="' . $id . '.pdf"');
 
     return $response;
 }

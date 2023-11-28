@@ -480,11 +480,13 @@ __
     $const{_NET_WM_STATE_REMOVE} = 'newSViv(0)';
     $const{_NET_WM_STATE_TOGGLE} = 'newSViv(2)';
 
-    # Add LEAVE_NOTIFY and BUTTON_RELEASE manually, as they are missing in xml
+    # Add some constants manually, as they are missing in xml
     $const{XCB_NONE} = 'newSViv(XCB_NONE)';
     $const{LEAVE_NOTIFY} = 'newSViv(XCB_LEAVE_NOTIFY)';
     $const{KEY_RELEASE} = 'newSViv(XCB_KEY_RELEASE)';
     $const{BUTTON_RELEASE} = 'newSViv(XCB_BUTTON_RELEASE)';
+    $const{FOCUS_OUT} = 'newSViv(XCB_FOCUS_OUT)';
+    $const{CIRCULATE_REQUEST} = 'newSViv(XCB_CIRCULATE_REQUEST)';
 
     # ICCCM constants from xcb-util
     for my $const (qw(XCB_ICCCM_WM_STATE_WITHDRAWN XCB_ICCCM_WM_STATE_NORMAL XCB_ICCCM_WM_STATE_ICONIC)) {

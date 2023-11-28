@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.573';
+our $VERSION = '0.575';
 
 use 5.020;
 use strictures 2;
@@ -205,6 +205,7 @@ sub canonical_uri ($state, @extra_path) {
 # - schema_path
 # - _schema_path_suffix
 # - errors
+# - exception
 sub E ($state, $error_string, @args) {
   croak 'E called in void context' if not defined wantarray;
 
@@ -240,6 +241,8 @@ sub E ($state, $error_string, @args) {
 # - _schema_path_suffix
 # - annotations
 # - collect_annotations
+# - spec_version
+# - _unknown
 sub A ($state, $annotation) {
   return 1 if not $state->{collect_annotations} or $state->{spec_version} eq 'draft7';
 
@@ -283,14 +286,8 @@ sub assert_keyword_exists ($state, $schema) {
 
 sub assert_keyword_type ($state, $schema, $type) {
   croak 'assert_keyword_type called in void context' if not defined wantarray;
-  my $value = $schema->{$state->{keyword}};
-  my $thing = 'value';
-  ($value, $thing) = is_plain_hashref($value) ? ($value->{$state->{_schema_path_suffix}}, 'value at "'.$state->{_schema_path_suffix}.'"')
-      : is_plain_arrayref($value) ? ($value->[$state->{_schema_path_suffix}], 'item '.$state->{_schema_path_suffix})
-      : die 'unknown type'
-    if exists $state->{_schema_path_suffix};
-  return 1 if is_type($type, $value);
-  E($state, '%s %s is not a%s %s', $state->{keyword}, $thing, ($type =~ /^[aeiou]/ ? 'n' : ''), $type);
+  return 1 if is_type($type, $schema->{$state->{keyword}});
+  E($state, '%s value is not a%s %s', $state->{keyword}, ($type =~ /^[aeiou]/ ? 'n' : ''), $type);
 }
 
 sub assert_pattern ($state, $pattern) {
@@ -365,7 +362,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.573
+version 0.575
 
 =head1 SYNOPSIS
 

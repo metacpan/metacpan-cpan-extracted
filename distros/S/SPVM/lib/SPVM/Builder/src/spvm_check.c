@@ -768,7 +768,7 @@ void SPVM_CHECK_check_op_types(SPVM_COMPILER* compiler) {
   }
 }
 
-void SPVM_CHECK_check_class_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_class_var_access, const char* current_basic_type_name) {
+void SPVM_CHECK_check_class_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_class_var_access, SPVM_METHOD* current_method) {
   
   if (op_class_var_access->uv.class_var_access->class_var) {
     return;
@@ -797,7 +797,13 @@ void SPVM_CHECK_check_class_var_access(SPVM_COMPILER* compiler, SPVM_OP* op_clas
     memcpy(base_name + 1, colon_ptr + 1, base_name_length);
   }
   else {
-    basic_type_name = (char*)current_basic_type_name;
+    if (current_method->is_anon) {
+      basic_type_name = (char*)current_method->outer_basic_type_name;
+    }
+    else {
+      basic_type_name = (char*)current_method->current_basic_type->name;
+    }
+    
     base_name = (char*)name;
   }
   
@@ -922,7 +928,7 @@ void SPVM_CHECK_check_field_offset(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE* bas
   basic_type->fields_size = offset;
 }
 
-void SPVM_CHECK_check_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_call_method, const char* current_basic_type_name) {
+void SPVM_CHECK_check_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_call_method, SPVM_METHOD* current_method) {
   
   SPVM_CALL_METHOD* call_method = op_call_method->uv.call_method;
   
@@ -938,7 +944,12 @@ void SPVM_CHECK_check_call_method(SPVM_COMPILER* compiler, SPVM_OP* op_call_meth
     // Basic type name + method name
     const char* basic_type_name;
     if (call_method->is_current) {
-      basic_type_name = current_basic_type_name;
+      if (current_method->is_anon) {
+        basic_type_name = current_method->outer_basic_type_name;
+      }
+      else {
+        basic_type_name = current_method->current_basic_type->name;
+      }
     }
     else {
       SPVM_OP* op_type_basic_type = op_call_method->last;
@@ -1219,7 +1230,17 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
           }
           case SPVM_OP_C_ID_CURRENT_CLASS_NAME: {
             SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
-            SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, basic_type->name, strlen(basic_type->name), op_cur->file, op_cur->line);
+            
+            const char* current_class_name = NULL;
+            if (method->is_anon) {
+              SPVM_BASIC_TYPE_add_constant_string(compiler, basic_type, method->outer_basic_type_name, strlen(method->outer_basic_type_name));
+              current_class_name = method->outer_basic_type_name;
+            }
+            else {
+              current_class_name = basic_type->name;
+            }
+            
+            SPVM_OP* op_constant = SPVM_OP_new_op_constant_string(compiler, current_class_name, strlen(current_class_name), op_cur->file, op_cur->line);
             SPVM_OP_replace_op(compiler, op_stab, op_constant);
             op_cur = op_constant;
             
@@ -2597,8 +2618,21 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
           case SPVM_OP_C_ID_DIE: {
             SPVM_TYPE* last_type = SPVM_CHECK_get_type(compiler, op_cur->last);
             
-            if (!SPVM_TYPE_is_class_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
-              SPVM_COMPILER_error(compiler, "The error class of the die statement must be a class type.\n  at %s line %d", op_cur->file, op_cur->line);
+            // Type
+            if (op_cur->last->id == SPVM_OP_C_ID_TYPE) {
+              if (!SPVM_TYPE_is_class_type(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The error class of the die statement must be a class type.\n  at %s line %d", op_cur->file, op_cur->line);
+                return;
+              }
+            }
+            // Basic type ID
+            else {
+              if (!SPVM_TYPE_is_integer_type_within_int(compiler, last_type->basic_type->id, last_type->dimension, last_type->flag)) {
+                SPVM_COMPILER_error(compiler, "The error ID must be an integer type within int.\n  at %s line %d", op_cur->file, op_cur->line);
+                return;
+              }
+              
+              SPVM_CHECK_perform_integer_promotional_conversion(compiler, op_cur->last);
             }
             
             break;
@@ -2785,19 +2819,19 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
               var->var_decl = found_var_decl;
             }
             else {
-              // Search the class variable
+              // Search a class variable
               SPVM_OP* op_name_basic_type_var = SPVM_OP_new_op_name(compiler, op_cur->uv.var->name, op_cur->file, op_cur->line);
               SPVM_OP* op_class_var_access = SPVM_OP_new_op_class_var_access(compiler, op_name_basic_type_var);
               
               op_class_var_access->is_dist = op_cur->is_dist;
               
-              SPVM_CHECK_check_class_var_access(compiler, op_class_var_access, basic_type->name);
+              SPVM_CHECK_check_class_var_access(compiler, op_class_var_access, method);
               if (op_class_var_access->uv.class_var_access->class_var) {
                 
                 SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_cur);
                 
                 // Check field name
-                SPVM_CHECK_check_class_var_access(compiler, op_class_var_access, basic_type->name);
+                SPVM_CHECK_check_class_var_access(compiler, op_class_var_access, method);
                 if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
                   return;
                 }
@@ -2835,7 +2869,7 @@ void SPVM_CHECK_check_ast_check_syntax(SPVM_COMPILER* compiler, SPVM_BASIC_TYPE*
                 
             
             // Check method
-            SPVM_CHECK_check_call_method(compiler, op_cur, basic_type->name);
+            SPVM_CHECK_check_call_method(compiler, op_cur, method);
             if (SPVM_COMPILER_get_error_messages_length(compiler) > 0) {
               return;
             }

@@ -1,10 +1,9 @@
 package WWW::Mechanize::Chrome::URLBlacklist;
 use Moo 2;
-use Filter::signatures;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 =head1 NAME
 

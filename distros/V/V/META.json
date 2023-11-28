@@ -4,7 +4,7 @@
       "Abe Timmerman <abeltje@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -41,13 +41,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/abeltje/V/issues"
+      },
       "homepage" : "https://github.com/abeltje/V",
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/abeltje/V.git"
       }
    },
-   "version" : "0.16",
-   "x_IRC" : "irc://irc.perl.org/#amsterdam.pm",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.18",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

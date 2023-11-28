@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -263,7 +264,7 @@ the hash ref and the text to display as heading. Example:
 email and phone will be display on the first line with headings
 'E-Mail Address' and 'Phone' and foo and bar will be displayed
 on the second line for each entry.
-In case your data is an array of arrays you have to specifiy the
+In case your data is an array of arrays you have to specify the
 array index instead of the hash key name.
 
 It is possible to add additional information. One entry might
@@ -271,34 +272,34 @@ contain the following entries:
 
 =over
 
-=item 0
+=item C<0>
 
 Key for into data hashref
 
-=item 1
+=item C<1>
 
 Text to display
 
-=item 2
+=item C<2>
 
-Colspan (how many colums this cell should span)
+Colspan (how many columns this cell should span)
 
-=item 3
+=item C<3>
 
 If set a control is displayed instead of a text. Must contain:
 
 radio,<name>,<value> or checkbox,<name>,<value>
 
-=item 4
+=item C<4>
 
 Display as link. This item contains the name of the key in the data hashref
 that holds the href.
 
-=item 5
+=item C<5>
 
 target for link
 
-=item 6
+=item C<6>
 
 Name of filter function. The value of the cell is process through this filter.
 Filter functions are passed as hashref of subs in the parameter 'filters' .

@@ -1287,6 +1287,62 @@ ALTER TABLE talks ALTER upstreamid DROP NOT NULL;
 -- 29 down
 UPDATE talks SET upstreamid=slug WHERE upstreamid IS NULL;
 ALTER TABLE talks ALTER upstreamid SET NOT NULL;
+-- 30 up
+CREATE TYPE talkstate_new AS ENUM (
+    'waiting_for_files',
+    'cutting',
+    'generating_previews',
+    'notification',
+    'preview',
+    'transcoding',
+    'fixuping',
+    'uploading',
+    'publishing',
+    'notify_final',
+    'finalreview',
+    'announcing',
+    'done',
+    'injecting',
+    'remove',
+    'removing',
+    'broken',
+    'needs_work',
+    'lost',
+    'ignored',
+    'uninteresting'
+);
+ALTER TABLE talks ALTER state DROP DEFAULT;
+ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstate_new;
+ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
+DROP TYPE talkstate;
+ALTER TYPE talkstate_new RENAME TO talkstate;
+-- 30 down
+CREATE TYPE talkstate_new AS ENUM (
+    'waiting_for_files',
+    'cutting',
+    'generating_previews',
+    'notification',
+    'preview',
+    'transcoding',
+    'uploading',
+    'publishing',
+    'notify_final',
+    'finalreview',
+    'announcing',
+    'done',
+    'injecting',
+    'remove',
+    'removing',
+    'broken',
+    'needs_work',
+    'lost',
+    'ignored'
+);
+ALTER TABLE talks ALTER state DROP DEFAULT;
+ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstate_new;
+ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
+DROP TYPE talkstate;
+ALTER TYPE talkstate_new RENAME TO talkstate;
 @@ code
 -- 1 up
 CREATE VIEW last_room_files AS
@@ -1950,3 +2006,60 @@ BEGIN
 END $_$;
 -- 7 down
 DROP FUNCTION adjusted_raw_talks(integer, interval, interval, interval);
+-- 8 up
+DROP VIEW talk_list;
+CREATE VIEW talk_list AS
+ SELECT talks.id,
+    talks.event AS eventid,
+    events.name AS event,
+    events.outputdir AS event_output,
+    rooms.name AS room,
+    rooms.outputname AS room_output,
+    speakerlist(talks.id) AS speakers,
+    talks.title AS name,
+    talks.nonce,
+    talks.slug,
+    talks.starttime,
+    talks.endtime,
+    talks.state,
+    talks.progress,
+    talks.comments,
+    rooms.id AS roomid,
+    talks.prelen,
+    talks.postlen,
+    talks.subtitle,
+    talks.description,
+    talks.apologynote,
+    tracks.name AS track
+   FROM rooms
+     LEFT JOIN talks ON rooms.id = talks.room
+     LEFT JOIN events ON talks.event = events.id
+     LEFT JOIN tracks ON talks.track = tracks.id;
+-- 8 down
+DROP VIEW talk_list;
+CREATE VIEW talk_list AS
+ SELECT talks.id,
+    talks.event AS eventid,
+    events.name AS event,
+    events.outputdir AS event_output,
+    rooms.name AS room,
+    rooms.outputname AS room_output,
+    speakerlist(talks.id) AS speakers,
+    talks.title AS name,
+    talks.nonce,
+    talks.slug,
+    talks.starttime,
+    talks.endtime,
+    talks.state,
+    talks.progress,
+    talks.comments,
+    rooms.id AS roomid,
+    talks.prelen,
+    talks.postlen,
+    talks.subtitle,
+    talks.apologynote,
+    tracks.name AS track
+   FROM rooms
+     LEFT JOIN talks ON rooms.id = talks.room
+     LEFT JOIN events ON talks.event = events.id
+     LEFT JOIN tracks ON talks.track = tracks.id;

@@ -380,6 +380,7 @@ sub setup {
 
         # Creating a new file
         unless ( $bytes_read ) {
+            $self->{storage}->{byte_size} = $self->{byte_size};
             $self->_write_file_header;
 
             # 1) Create Array/Hash entry
@@ -408,6 +409,7 @@ sub setup {
             }
 
             $obj->{staleness} = $initial_reference->staleness;
+            $self->{storage}->{byte_size} = $self->{byte_size};
         }
     }
 

@@ -42,7 +42,7 @@ my %module = (
         x_static_install => 1, # we are pure Perl and don't do anything fancy
     },
 
-    MIN_PERL_VERSION => '5.010', # I use // in some places
+    MIN_PERL_VERSION => '5.020', # I use // in some places, __SUB__, signatures
 
     'LICENSE'=> 'perl',
 
@@ -57,7 +57,6 @@ my %module = (
         'IPC::Open3'         => 0, # for IPC on Windows
         'File::Spec'         => 0,
 
-        'Filter::signatures' => '0.16',
         'Carp'               => 0,
         'Future'             => '0.35', # Some smokers have 0.25 which lacks many features
         #'Future::IO'         => 0,    # For loop-compatible ->sleep()
@@ -83,6 +82,7 @@ my %module = (
         'Future::HTTP'       => 0.06, # fixes Mojolicious error handling
         'JSON'               => 0,
         'Moo'                => 2, # for some hashes-as-objects
+        'MooX::Role::EventEmitter' => 0, # for callback handling
 
         'HTTP::Response'                   => 0,
         'HTTP::Cookies'                    => 0,

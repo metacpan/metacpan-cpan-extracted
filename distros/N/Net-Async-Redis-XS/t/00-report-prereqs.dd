@@ -25,7 +25,8 @@ do { my $x = {
                       'requires' => {
                                       'Future::AsyncAwait' => '0.61',
                                       'IO::Async::Loop' => '0',
-                                      'Net::Async::Redis' => '4.002',
+                                      'Net::Async::Redis' => '5.000',
+                                      'Object::Pad' => '0',
                                       'perl' => '5.026'
                                     }
                     },
@@ -43,6 +44,7 @@ do { my $x = {
                                    'Test::Fatal' => '0.016',
                                    'Test::HexString' => '0',
                                    'Test::MemoryGrowth' => '0',
+                                   'Test::MockModule' => '0',
                                    'Test::More' => '0.98'
                                  }
                  }

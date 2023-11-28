@@ -2053,3 +2053,12 @@ Entries: [4m424[24m637
 Transport information:
   Protocol: TCP
 
+foo.bar#show platform jericho2 tcam summary 
+              Tcam Allocation (Fap0)              
+   Bank                     Used By    Reserved By
+---------- --------------------------- -----------
+      0                    dbIpPacl              -
+      7       dbIp6CpuTrafficPolicy              -
+     12                   dbSystem6              -
+     15                 dbMacSystem              -
+

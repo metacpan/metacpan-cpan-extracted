@@ -1,5 +1,18 @@
 Revision history for Perl extension Kossy
 
+0.63 2023-11-13T02:24:23Z
+
+        - Stabilize routing #22
+
+0.62 2023-11-09T08:56:51Z
+
+        - Fixed JSON request #21
+
+0.61 2023-11-06T14:26:54Z
+
+        - Enhance Kossy::Request to support array values in JSON body params #19 Thank you kfly8
+        - Support 5.14 and above
+
 0.60 2021-09-16T12:04:10Z
 
         - [IMCOMPATIBLE CHANGE] fix: defense from JSON hijacking (Thank you kfly8)

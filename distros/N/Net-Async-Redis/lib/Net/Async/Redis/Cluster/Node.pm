@@ -1,11 +1,8 @@
 package Net::Async::Redis::Cluster::Node;
+use Object::Pad;
+class Net::Async::Redis::Cluster::Node :isa(IO::Async::Notifier);
 
-use strict;
-use warnings;
-
-our $VERSION = '4.002'; # VERSION
-
-use parent qw(IO::Async::Notifier);
+our $VERSION = '5.001'; # VERSION
 
 use Scalar::Util qw(refaddr);
 use Future::AsyncAwait;
@@ -16,8 +13,7 @@ use overload
     bool => sub { 1 },
     fallback => 1;
 
-sub configure {
-    my ($self, %args) = @_;
+method configure (%args) {
     for my $k (qw(start end primary replicas), @Net::Async::Redis::Cluster::CONFIG_KEYS) {
         $self->{$k} = delete $args{$k} if exists $args{$k};
     }
@@ -51,14 +47,12 @@ sub id { $_[0]->{primary}[2] // $_[0]->host_port }
 sub host_port { join ':', @{$_[0]->{primary}}[0, 1] }
 sub cluster { shift->{cluster} }
 
-sub primary_connection {
-    my ($self) = @_;
+method primary_connection ($conn = undef) {
+    $self->{primary_connection} = $conn if $conn;
     return $self->{primary_connection} ||= $self->establish_primary_connection;
 }
 
-async sub establish_primary_connection {
-    my ($self) = @_;
-
+async method establish_primary_connection {
     $self->add_child(
         my $redis = Net::Async::Redis->new(
             $self->Net::Async::Redis::Cluster::node_config,
@@ -81,5 +75,5 @@ L<Net::Async::Redis/CONTRIBUTORS>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2015-2022. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2015-2023. Licensed under the same terms as Perl itself.
 

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,44 +12,49 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 796590ad25a32c360058ca77e9d3aa5c00c784f4 CSV.pm
-SHA1 e688be1ef17a3e8abb80dbeaf9e0e19bb8fd1922 Changes
-SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
-SHA1 0d69658011d6fdf598e417ce2afb296d7adf31b2 MANIFEST
-SHA1 a56bb9815a224e4dce2183280943d674b9090b2f META.yml
-SHA1 c98e6c04a38c0af429431c7e89602f9df71e12a0 Makefile.PL
-SHA1 fdb41413d008f9bb1b0bac932e1cc72680dd3427 README
-SHA1 13ab6631a9a11d81200eed3e94dcb3b29a7c7ab5 examples/ex1.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 07f9b4542246bad13c4e7e3e7bc5fd036c2f1ce7 t/Graph-Reader-TGF-CSV/01-use.t
-SHA1 6f3e2bd8ab6e317661bcdcf3685d7f9b5e6792b7 t/Graph-Reader-TGF-CSV/02-version.t
-SHA1 20de9d9dfd27dbb0aedbd8a64a9eb8d06764b1d2 t/Graph-Reader-TGF-CSV/03-new.t
-SHA1 e18ad3bd84bf7a0141bc217932fc22de523b64d8 t/Graph-Reader-TGF-CSV/04-read_graph.t
-SHA1 f273a9d11e4abe53489e2d884021701cdd6b8593 t/data/ex1.tgf
-SHA1 f2f695a9f7dfad01fbf588c08da8453b561576d3 t/data/ex2.tgf
-SHA1 f7444f0dfe0d45061ac3f30fcd407f70ff8b8735 t/data/ex3.tgf
-SHA1 ac7888c2117c9056baef482be583dadb9ba68323 xt/Graph-Reader-TGF-CSV/01-pod_coverage.t
-SHA1 21c966667684bac6a350cb3f2e8bde2fbe0e5a86 xt/Graph-Reader-TGF-CSV/02-pod.t
+SHA256 94e9d75eb2117261cf65993ca8c1f9c974872e6c20821c0c506bae05c7144955 CSV.pm
+SHA256 25a2e82a1b0945e432a9f6dec17d2d1819886e3606b0daef3116aaec95d3bca3 Changes
+SHA256 bb21e21e0f3e33f0870057aa51c2073bf720004b7848a58e997bbbef4ae5d653 LICENSE
+SHA256 da04fc1c5e1edbd75bd88e65a1e7d307a420b43f9411e20a9fecd2ef1ce29ba8 MANIFEST
+SHA256 31ce333a0186a522cd864970306da573ee2802ceb84dee462580f88d601bef04 META.yml
+SHA256 0d13a69437f0a639ae3def4bfcbac1f4d13b91e1e45b75091506b057fcd78d47 Makefile.PL
+SHA256 fc8d81d4ec5fa2e3e5b57226a81db3de677951596a6e253a0029b5d85bfda818 README
+SHA256 bb1be3512a8340f2bccbe58bd93a612c017c9dfffccbe5aa61b5d9aeb4db5644 examples/ex1.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 383099023bfbc555aa9cdd544bc35af4afe8c966c67507ae1ceb5d444155c4d0 t/Graph-Reader-TGF-CSV/01-use.t
+SHA256 3303ae5b1a348ccef971bd8ef43b4174e662456f91ab0fc605256c31ce72eb56 t/Graph-Reader-TGF-CSV/02-version.t
+SHA256 a5c33e0ce5a280acc23e2bc5246ceee45a4fb8d62b6ff1a523e7a5123127fd93 t/Graph-Reader-TGF-CSV/03-new.t
+SHA256 4d307d3e5638e1d1c39f5a85fd3d6e576beb7dfda8ba5a04d8f23d0079998cfe t/Graph-Reader-TGF-CSV/04-read_graph.t
+SHA256 ad49d68f420b928c89f4d57d94c91dc8c24651315e1f5d5181e99d1694f411a1 t/data/ex1.tgf
+SHA256 c3c1f49e62de942c52b75e47bf6cf902d973b93ff39d19f04bb5aa340a2a270a t/data/ex2.tgf
+SHA256 bdf4ecb356bf6929a34ab1fcaae9d20a50b59991eceda5cc5c2c174c30d82609 t/data/ex3.tgf
+SHA256 81c120b7a1c31917a30d7f9c6357b57c438325307e088f205c0c6555abe30bba xt/Graph-Reader-TGF-CSV/01-pod_coverage.t
+SHA256 205d1094091a3a48c8c32cf9f5c5b4d8ce862ac061b5e6c5aec01750b0ca3e68 xt/Graph-Reader-TGF-CSV/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWMjwAAAoJEJe+XXKaIuTlJRMIAKi3m0hOMuFueHLEIDT6PufP
-aPvkQkJiPoBlr0qd82/SmHZa/z6pZVl9pYCyhebpon7huQXH88pD1/k31UJ4RlN/
-kF1MoH0pM6ZR8udm1ce3gL7xNEKt6k5ucpjVSLs3viu4vKK3uT1KeU819UMfF4Nc
-6eJtu1MpUiv7KyA2wUxjzmND7gAg62RuUz4ZStpZuvcphaZJg82W++KrsrCWRPpF
-HHAReepEsxb3A1R26WeRAeLp6mnNhP4QhceXysoIJ6AlthdH1BnH1d+U9XnEGyE0
-Bzn9j/VfdPexeRl5KiKy+j7wclD2rZ4T1RZiHlumRORixA2xT7wOtqK9lyT4vko=
-=yGbM
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVhBv4ACgkQojV9Rpe/
+B8vdHBAAjovGf0aakGtzcLaZ1MgI2bU92+pnCe7Ss4hzHYc2PSpbib91kuXhl83f
+KAoCh2tUh7lM64UpG7i+aVpntZCTLXJ47Nlfz+jt8oP51Jr5E7TWtSd49Ji79dIG
+q2aQbRi53FWm0mjrmdSERhW12zwk2RdQqWp9UfdC4lu2l2r29ESYLF3axiNPXyGp
+pE1XrKEb0JKfL1xOEq/LM4DSyUZN0rijD0ImSt0+HjGamkUshk/aXDKpTasG4Rdc
+y2F4bFsElLXvmyjspsbPyqUcKTk7Z1+sD7DaTerYdVkPojgCshdbnqoBzGiZR3xz
+NzFpKZT5dlC2i8zEu2IOQahusUgabEN4bJxh0HoJCICB56pd9QN3HmOkaGbb18u2
+XV94v/yvEXJCs/8Dcp4pIJXAOrnjn3C9C/iIDyEdqP291MwF5qAavl+1h9QfnTOe
+D8PivHmNy/q0+QdlieGcjbD6yRzh45XL0+yqhZAqdAFSkqiiPnujOFV9Q9fbmsGn
+NYHX6Jn2GnTKrUncht2pgYzXaihPcfwlJQ682HCW6Quokh0c6cD79+6WyliPvXbX
+kulh28Egfo+5PMNR/mO+kf86tptO0IslHiSX5dtL30UUTigd2Duxjt/6SzQURSZi
+kFv7fUyGCTFhoFPMhAaWzc389PvHbd0+C48A3IgGQll0qksreT8=
+=p9c3
 -----END PGP SIGNATURE-----

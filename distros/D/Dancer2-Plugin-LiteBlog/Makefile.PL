@@ -30,6 +30,7 @@ my %WriteMakefileArgs = (
         'Moo' => 0,
         'Path::Tiny' => 0,
         'Text::Markdown' => 0,
+        'XML::RSS' => 0,
         'YAML::XS' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -14,61 +14,89 @@ use POSIX ();
 use URI ();
 use YAML::XS ();
 
-our $VERSION = '1.16'; # VERSION
+our $VERSION = '1.17'; # VERSION
 
 $Carp::Internal{ (__PACKAGE__) }++;
 
-sub _locations {
-    return grep { length } $ENV{CONFIGAPPINIT}, qw(
-        config/app.yaml
-        etc/config.yaml
-        etc/conf.yaml
-        etc/app.yaml
-        config.yaml
-        conf.yaml
-        app.yaml
+sub _locate_root_config {
+    my ($config_location) = @_;
+    if ($config_location) {
+        return undef, $config_location if ( URI->new($config_location)->scheme );
+        return ( -f $config_location ) ? ( '/', $config_location ) : ( undef, undef )
+            if ( substr( $config_location, 0, 1 ) eq '/' );
+    }
+
+    my $locate = sub {
+        my ( $abs_paths, $rel_config_locations ) = @_;
+
+        for my $abs_paths (@$abs_paths) {
+            for my $test_location (@$rel_config_locations) {
+                my @search_path = split( '/', $abs_paths );
+                while (@search_path) {
+                    my $test_path = join( '/', @search_path );
+                    return $test_path || '/', $test_location if ( -f $test_path . '/' . $test_location );
+                    pop @search_path;
+                }
+            }
+        }
+    };
+
+    my ( $root_dir, $config_file ) = $locate->(
+        [ $FindBin::Bin, getcwd() ],
+        [ ($config_location) ? $config_location : (
+            ( $ENV{CONFIGAPPINIT} ) ? $ENV{CONFIGAPPINIT} : (),
+            qw(
+                config/app.yaml
+                etc/config.yaml
+                etc/conf.yaml
+                etc/app.yaml
+                config.yaml
+                conf.yaml
+                app.yaml
+            )
+        ) ],
     );
+
+    return ( length $root_dir and length $config_file ) ? ( $root_dir, $config_file ) : undef;
 }
 
 sub _add_to_inc {
     my ( $root_dir, @libs ) = @_;
+
     for my $lib ( map { $root_dir . '/' . $_ } @libs ) {
         unshift( @INC, $lib ) unless ( grep { $_ eq $lib } @INC );
     }
+
+    return;
 }
 
 sub import {
     my $self = shift;
 
-    my ( $root_dir, $config_file, $location, @libs );
-    for (
-        ( @_ > 1 )  ? ( $_[0], $_[-1], _locations() ) :
-        ( @_ == 1 ) ? ( $_[0], _locations() )         : _locations()
-    ) {
-        ( $root_dir, $config_file ) = _find_root_dir($_);
+    my ( $root_dir, $config_file, @libs );
+    for ( @_, undef ) {
+        my @locate_root_config = _locate_root_config($_);
 
-        if ( $root_dir eq '/' ) {
-            $location = $config_file;
+        unless ( $locate_root_config[0] ) {
+            push( @libs, $_ );
         }
-        elsif ( -f $config_file ) {
-            $location = substr( $config_file, length($root_dir) + 1 );
-            @libs     = grep { $location ne $_ } @_;
-            last;
+        elsif ( not $root_dir ) {
+            ( $root_dir, $config_file ) = @locate_root_config;
         }
     }
 
-    _add_to_inc( $root_dir, ( @libs || 'lib' ) );
+    die "Config::App unable to locate configuration file\n" unless ($config_file);
+
+    _add_to_inc( $root_dir, ( @libs || 'lib' ) ) if $root_dir;
 
     my $error = do {
         local $@;
-        eval {
-            $self->new($location);
-        };
+        eval { $self->new($config_file) };
         $@;
     };
-
     chomp($error);
-    die $error . "\n" if ($error);
+    die $error . "\n" if $error;
+
     return;
 }
 
@@ -80,54 +108,49 @@ sub import {
         return $singleton if ( not $no_singleton and $singleton );
 
         ( my $box = ( POSIX::uname )[1] ) =~ s/\..*$//;
-        my $user  = getpwuid($>) || POSIX::cuserid;
-        my $env   = $ENV{CONFIGAPPENV};
         my $conf  = {};
 
-        if ($location) {
-            _location_fetch( $box, $user, $env, $conf, $location );
-        }
-        else {
-            my ( $success, @errors );
+        _process_location({
+            box      => $box,
+            user     => getpwuid($>) || POSIX::cuserid,
+            env      => $ENV{CONFIGAPPENV},
+            conf     => $conf,
+            optional => 0,
+            location => $location,
+        });
 
-            my @locations = _locations();
-            my $cwd       = getcwd();
-
-            for my $this_location ( @locations, map {"$cwd/$_"} @locations ) {
-                my $error = do {
-                    local $@;
-                    eval {
-                        _location_fetch( $box, $user, $env, $conf, $this_location );
-                    };
-                    $@;
-                };
-
-                chomp($error);
-                if ($error) {
-                    die $error . "\n" if ( substr( $error, 0, 15 ) ne 'Failed to find ' );
-                    push( @errors, $error );
-                }
-                else {
-                    $success = 1;
-                    $conf->{config_app}{root_dir} = $cwd if ( index( $this_location, $cwd ) == 0 );
-                    last;
-                }
-            }
-
-            die join( ' ', @errors ) unless ($success);
-        }
-
-        $self = bless( { _conf => $conf }, $self );
-        $singleton = $self unless ($no_singleton);
+        $self      = bless( { _conf => $conf }, $self );
+        $singleton = $self unless $no_singleton;
 
         if ( my $libs = $self->get('libs') ) {
-            _add_to_inc(
-                $self->get( qw( config_app root_dir ) ),
+           _add_to_inc(
+                $self->root_dir,
                 ( ref $libs eq 'ARRAY' ) ? @$libs : $libs,
             );
         }
 
         return $self;
+    }
+
+    sub deimport {
+        my $self = shift;
+
+        delete $self->{_conf} if ( __PACKAGE__ eq ref $self );
+        $singleton = undef;
+
+        {
+            no strict 'refs';
+            @{ __PACKAGE__ . '::ISA' } = ();
+            my $symbol_table = __PACKAGE__ . '::';
+            for my $symbol ( keys %$symbol_table ) {
+                next if ( $symbol =~ /\A[^:]+::\z/ );
+                delete $symbol_table->{$symbol};
+            }
+        }
+
+        delete $INC{ join( '/', split /(?:'|::)/, __PACKAGE__ ) . '.pm' };
+
+        return;
     }
 }
 
@@ -144,6 +167,16 @@ sub find {
     }
 
     return $self;
+}
+
+sub root_dir {
+    my ($self) = @_;
+    return $self->get( qw( config_app root_dir ) );
+}
+
+sub includes {
+    my ($self) = @_;
+    return $self->get( qw( config_app includes ) );
 }
 
 sub get {
@@ -178,48 +211,64 @@ sub conf {
     return _clone( $self->{_conf} );
 }
 
-sub _clone {
-    return YAML::XS::Load( YAML::XS::Dump(@_) );
-}
+sub _process_location {
+    my ($input) = @_;
+    my ( $root_dir, $config_file ) = _locate_root_config( $input->{location} );
 
-sub _location_fetch {
-    my ( $box, $user, $env, $conf, $location, @source_path ) = @_;
+    my $include = join( '/', grep { defined and $_ ne '/' } $root_dir, $config_file );
+    my $sources = [ grep { defined } @{ $input->{sources} || [] }, $input->{location} ];
 
-    my ( $raw_config, $root_dir ) = _get_raw_config( $location, @source_path );
-    return unless ($raw_config);
+    my $raw_config = _get_raw_config({
+        include  => $include,
+        location => $input->{location},
+        optional => $input->{optional},
+        sources  => $sources,
+    });
+    return unless $raw_config;
 
-    $conf->{config_app}{root_dir} ||= $root_dir if ($root_dir);
+    $input->{conf}->{config_app}{root_dir} = $root_dir
+        if ( defined $root_dir and not exists $input->{conf}->{config_app}{root_dir} );
 
-    my $include = $root_dir . '/' . ( ( ref $location ) ? $$location : $location );
-    $include =~ s|/+|/|g;
-
-    unless ( grep { $_ eq $include } @{ $conf->{config_app}{includes} } ) {
-        push( @{ $conf->{config_app}{includes} }, $include );
+    unless ( grep { $_ eq $include } @{ $input->{conf}->{config_app}{includes} } ) {
+        push( @{ $input->{conf}->{config_app}{includes} }, $include );
     }
     else {
-        carp(
-            'Configuration include recursion encountered when trying to include: ' .
-            ( ( ref $location ) ? $$location : $location )
-        );
+        carp "Configuration include recursion encountered when trying to include: $include";
         return;
     }
 
-    my $set = _parse_config( $raw_config, $location, @source_path );
+    my $set = _parse_config({
+        raw_config => $raw_config,
+        include    => $include,
+        sources    => $sources,
+    });
 
-    my $location_fetch = sub { _location_fetch( $box, $user, $env, $conf, $_[0], $location, @source_path ) };
-    my $fetch_block    = sub {
-        my $include  = ( ( $_[0] ) ? 'pre' : '' ) . 'include';
-        my $optional = 'optional_' . $include;
+    my $sub_process_location = sub { _process_location({
+        box      => $input->{box},
+        user     => $input->{user},
+        env      => $input->{env},
+        conf     => $input->{conf},
+        location => $_[0],
+        optional => $_[1],
+        sources  => $sources,
+    }) };
 
-        $location_fetch->( $set->{$include}               ) if ( $set->{$include}   );
-        $location_fetch->( delete( $conf->{$include} )    ) if ( $conf->{$include}  );
-        $location_fetch->( \$set->{$optional}             ) if ( $set->{$optional}  );
-        $location_fetch->( \ delete( $conf->{$optional} ) ) if ( $conf->{$optional} );
+    my $fetch_block = sub {
+        my ($include_type) = @_;
+        my $optional = 'optional_' . $include_type;
+
+        $sub_process_location->( $set->{$include_type}, 0 ) if ( $set->{$include_type} );
+        $sub_process_location->( delete( $input->{conf}->{$include_type} ), 0 )
+            if ( $input->{conf}->{$include_type} );
+        $sub_process_location->( $set->{$optional}, 1 ) if ( $set->{$optional} );
+        $sub_process_location->( delete( $input->{conf}->{$optional} ), 1 )
+            if ( $input->{conf}->{$optional} );
     };
 
-    $fetch_block->(1);
+    $fetch_block->('preinclude');
 
-    _merge_settings( $conf, $_ ) for (
+    my ( $box, $user, $env ) = @$input{ qw( box user env ) };
+    _merge_settings( $input->{conf}, $_ ) for (
         grep { defined } (
             map {
                 $set->{ join( '|', ( grep { defined } @$_ ) ) }
@@ -237,90 +286,65 @@ sub _location_fetch {
         )
     );
 
-    $fetch_block->();
+    $fetch_block->('include');
 
     return;
 }
 
-sub _get_raw_config {
-    my ( $location, @source_path ) = @_;
+{
+    my $ua;
 
-    my $optional = 0;
-    if ( ref $location ) {
-        $location = $$location;
-        $optional = 1;
-    }
+    sub _get_raw_config {
+        my ($input) = @_;
 
-    if ( URI->new($location)->scheme ) {
-        my $ua = LWP::UserAgent->new(
-            agent      => 'Config-App',
-            cookie_jar => {},
-            env_proxy  => 1,
-        );
+        if ( URI->new( $input->{include} )->scheme ) {
+            $ua ||= LWP::UserAgent->new(
+                agent      => 'Config-App',
+                cookie_jar => {},
+                env_proxy  => 1,
+            );
 
-        my $res = $ua->get($location);
+            my $res = $ua->get( $input->{include} );
 
-        if ( $res->is_success ) {
-            return $res->decoded_content;
-        }
-        else {
-            unless ($optional) {
+            if ( $res->is_success ) {
+                return $res->decoded_content;
+            }
+            else {
                 croak 'Failed to get '
-                    . join( ' -> ', map { "\"$_\"" } @source_path, $location )
+                    . join( ' -> ', map { "\"$_\"" } @{ $input->{sources} } )
                     . '; '
-                    . $res->status_line;
-            }
-            else {
-                return '', '';
-            }
-        }
-    }
-    else {
-        my ( $root_dir, $config_file ) = _find_root_dir($location);
-
-        unless ( -f $config_file ) {
-            unless ($optional) {
-                croak 'Failed to find ' . join( ' -> ', map { "\"$_\"" } @source_path, $location );
-            }
-            else {
-                return '', '';
+                    . $res->status_line
+                    unless $input->{optional};
+                return;
             }
         }
         else {
-            open( my $config_fh, '<', $config_file ) or croak "Failed to read $config_file; $!";
-            return join( '', <$config_fh> ), $root_dir;
+            unless ( $input->{include} ) {
+                croak 'Failed to find ' .
+                    join( ' -> ', map { "\"$_\"" } @{ $input->{sources} } )
+                    unless $input->{optional};
+                return;
+            }
+            else {
+                open( my $include_fh, '<', $input->{include} )
+                    or croak "Failed to read $input->{include}; $!";
+                return join( '', <$include_fh> );
+            }
         }
     }
-}
-
-sub _find_root_dir {
-    my ($location) = @_;
-    $location ||= location();
-    return '/', $location if ( URI->new($location)->scheme or substr( $location, 0, 1 ) eq '/' );
-
-    my ( $root_dir, $config_file );
-    my @search_path = split( '/', $FindBin::Bin );
-    while ( @search_path > 1 ) {
-        $root_dir = join( '/', @search_path );
-        $config_file = $root_dir . '/' . $location;
-        last if ( -f $config_file );
-        pop @search_path;
-    }
-
-    return $root_dir, $config_file;
 }
 
 {
     my $json_xs;
 
     sub _parse_config {
-        my ( $raw_config, $location, @source_path ) = @_;
+        my ($input) = @_;
 
         my @types = qw( yaml json );
-        if ( $location =~ /\.yaml$/ or $location =~ /\.yml$/ ) {
+        if ( $input->{include} =~ /\.yaml$/i or $input->{include} =~ /\.yml$/i ) {
             @types = ( 'yaml', grep { $_ ne 'yaml' } @types );
         }
-        elsif ( $location =~ /\.json$/ or $location =~ /\.js$/ ) {
+        elsif ( $input->{include} =~ /\.json$/i or $input->{include} =~ /\.js$/i ) {
             @types = ( 'json', grep { $_ ne 'json' } @types );
         }
 
@@ -338,10 +362,10 @@ sub _find_root_dir {
                             ->allow_blessed
                             ->allow_tags;
 
-                        $config = $json_xs->decode($raw_config);
+                        $config = $json_xs->decode( $input->{raw_config} );
                     }
                     else {
-                        $config = YAML::XS::Load($raw_config);
+                        $config = YAML::XS::Load( $input->{raw_config} );
                     }
                 };
                 $@;
@@ -350,13 +374,13 @@ sub _find_root_dir {
             if ($error) {
                 my $message =
                     'Failed to parse ' .
-                    join( ' -> ', map { "\"$_\"" } @source_path, $location ) . '; ' .
+                    join( ' -> ', map { "\"$_\"" } @{ $input->{sources} } ) . '; ' .
                     $error;
                 croak($message) if ( not $config );
                 carp($message);
             }
 
-            last if ($config);
+            last if $config;
         }
 
         return $config;
@@ -400,6 +424,10 @@ sub _merge_settings {
     return;
 }
 
+sub _clone {
+    return YAML::XS::Load( YAML::XS::Dump(@_) );
+}
+
 1;
 
 __END__
@@ -414,7 +442,7 @@ Config::App - Cascading merged application configuration
 
 =head1 VERSION
 
-version 1.16
+version 1.17
 
 =for markdown [![test](https://github.com/gryphonshafer/Config-App/workflows/test/badge.svg)](https://github.com/gryphonshafer/Config-App/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Config-App/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Config-App)
@@ -455,15 +483,14 @@ version 1.16
 
 =head1 DESCRIPTION
 
-The intent of this module is to provide an all-purpose enviornment setup helper
-and configuration fetcher that allows configuration files to include other files
-and "cascade" or merge bits of these files into the "active" configuration
-based on server name, user account name the process is running under, and/or
-enviornment variable flag. The goal being that a single unified configuration
-can be built from a set of files (real files or URLs) and slices of that
-configuration can be automatically used as the active configuration in any
-enviornment. Thus, you can write configuration files once and never need to
-change them based on the location to which the application is being deployed.
+The intent of this module is to provide for projects (within a directory tree)
+configuration fetcher and merger functionality that supports configuration files
+that may include other files and "cascade" or merge bits of these files into an
+"active" configuration based on server name, user account name the process is
+running under, and/or enviornment variable flag. The goal being that a single
+unified configuration can be built from a set of files (real files or URLs) and
+slices of that configuration can be used as the active configuration in any
+enviornment.
 
 You can write configuration files in YAML or JSON. These files can be local
 or served through some sort of URL.
@@ -549,12 +576,13 @@ source configuration file  overwriting data in any included files, use
 =head2 Configuration File Finding
 
 When a file is included, it's searched for starting at the current directory
-of the program or application, as determined by L<FindBin>. If the file is not
-found, it will be looked for one directory level above, and so on and so on,
-until it's either found or we get to the top directory level. This means that
-in a given application with several nested directories of varying depth and
-programs within each, you can use a single configuration file and not have to
-hard-code paths into each program.
+of the program or application, as determined by L<FindBin> initially; and if
+that failes, the current working directory. If the file is not found, it will be
+looked for one directory level above, and so on and so on, until it's either
+found or we get to the top directory level. This means that in a given
+application with several nested directories of varying depth and programs within
+each, you can use a single configuration file and not have to hard-code paths
+into each program.
 
 At any point, either in the C<new()> constructor or as values to "include"
 keys, you can stipulate URLs. If any of the configuration returned from
@@ -727,6 +755,24 @@ configuration.
     my $new_full_conf_as_data_structure = $conf->conf({
         change => { some => { conf => 1138 } }
     });
+
+=head2 root_dir
+
+This is a shortcut to:
+
+    $conf->get( qw( config_app root_dir ) );
+
+=head2 includes
+
+This is a shortcut to:
+
+    $conf->get( qw( config_app includes ) );
+
+=head2 deimport
+
+If for whatever reason you need to completely remove Config::App and its data,
+perhaps for a use case where you need to C<use> it a second time as if it was
+the first time, this method attempts to set that option up.
 
 =head1 LIBRARY DIRECTORY INJECTION
 

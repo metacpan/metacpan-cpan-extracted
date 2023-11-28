@@ -1,8 +1,32 @@
 #!perl
 
+use File::Find::Rule;
+use warnings;
+use strict;
+use Config::Tiny;
+use Time::Piece;
+use File::Slurp qw(read_file);
+use JSON;
+use Getopt::Long;
+use Statistics::Lite qw(:all);
+use Gzip::Faster;
+use MIME::Base64;
+use Pod::Usage;
+
 =head1 NAME
 
 mojo_cape_submit_extend - Compute stats for mojo_cape_submit based on incoming JSONs
+
+=head1 VERSION
+
+0.1.0
+
+=cut
+
+sub version {
+	print "mojo_cape_submit_extend v. 0.1.0\n";
+	exit 255;
+}
 
 =head1 SYNOPSIS
 
@@ -67,18 +91,6 @@ Slugs hash...
 
 =cut
 
-use File::Find::Rule;
-use warnings;
-use strict;
-use Config::Tiny;
-use Time::Piece;
-use File::Slurp qw(read_file);
-use JSON;
-use Getopt::Long;
-use Statistics::Lite qw(:all);
-use Gzip::Faster;
-use MIME::Base64;
-
 my $extend_version = 1;
 
 my $version;
@@ -95,27 +107,12 @@ GetOptions(
 	'm=s'     => \$incoming_json_dir,
 );
 
-sub version {
-	print "mojo_cape_submit_extend v. 0.0.1\n";
+if ($version) {
+	version;
 }
 
 if ($help) {
-	version;
-
-	print '
-
--m <dir>   Incoming JSON dir.
-           Default :: /malware/incoming-json/
-
--Z         Do not gzip+base64 compress the results.
-
--h         Print help.
---help     Print help.
--v         Print version info.
---version  Print version info.
-';
-
-	exit;
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
 } ## end if ($help)
 
 my $t           = localtime;
@@ -203,7 +200,7 @@ foreach my $file (@files) {
 				$data->{slugs}{$slug}{app_protos}++;
 				$data->{slugs}{$slug}{app_proto}{$app_proto} = 0;
 			}
-			$data->{slugs}{app_proto}{$app_proto}++;
+			$data->{slugs}{$slug}{app_proto}{$app_proto}++;
 		} ## end if ( defined( $json->{app_proto} ) )
 	};
 	if ($@) {

@@ -3,7 +3,7 @@ use v5.10.1;
 use warnings;
 use strict;
 
-our $VERSION = '1.06';
+our $VERSION = "1.09";
 
 use parent 'Test::Builder::Module';
 
@@ -33,6 +33,9 @@ sub import_extra {
     lib->import('t/lib');
 
     if ($Devel::Cover::VERSION) { # don't run_end_test when Devel::Cover
+        Test::Warnings->import(':no_end_test');
+    }
+    if (! $ENV{AUTHOR_TESTING}) {
         Test::Warnings->import(':no_end_test');
     }
 }

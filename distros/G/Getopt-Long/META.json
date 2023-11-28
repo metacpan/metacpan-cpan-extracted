@@ -4,7 +4,7 @@
       "Johan Vromans (jvromans@squirrel.nl)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -17,6 +17,9 @@
       "directory" : [
          "t",
          "inc"
+      ],
+      "package" : [
+         "Getopt::Long::CallBack"
       ]
    },
    "prereqs" : {
@@ -38,12 +41,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sciurius/perl-Getopt-Long/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/sciurius/perl-Getopt-Long.git",
          "web" : "https://github.com/sciurius/perl-Getopt-Long"
       }
    },
-   "version" : "2.54",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : 2.57,
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

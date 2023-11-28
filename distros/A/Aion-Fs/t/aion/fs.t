@@ -4,7 +4,7 @@ use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { 
 # 
 # # VERSION
 # 
-# 0.0.3
+# 0.0.6
 # 
 # # SYNOPSIS
 # 
@@ -78,6 +78,12 @@ lay "unicode.txt", "↯";
 ::like scalar do {eval { cat "A" }; $@}, qr!cat A: No such file or directory!, 'eval { cat "A" }; $@  # ~> cat A: No such file or directory';
 
 # 
+# **See also:**
+# 
+# * <File::Slurp> — `read_file('file.txt')`.
+# * <File::Slurper> — `read_text('file.txt')`, `read_binary('file.txt')`.
+# * <IO::All> — `io('file.txt') > $contents`.
+# 
 # ## lay ($file, $content)
 # 
 # Write `$content` in `$file`.
@@ -91,6 +97,12 @@ done_testing; }; subtest 'lay ($file, $content)' => sub {
 
 ::like scalar do {eval { lay "/", "↯" }; $@}, qr!lay /: Is a directory!, 'eval { lay "/", "↯" }; $@ # ~> lay /: Is a directory';
 
+# 
+# **See also:**
+# 
+# * <File::Slurp> — `write_file('file.txt', $contents)`.
+# * <File::Slurper> — `write_text('file.txt', $contents)`, `write_binary('file.txt', $contents)`.
+# * <IO::All> — `io('file.txt') < $contents`.
 # 
 # ## find ($path, @filters)
 # 
@@ -122,6 +134,10 @@ mkpath ["example/", 0];
 ::like scalar do {eval { find "example", errorenter { die "find $_: $!" } }; $@}, qr!find example: Permission denied!, 'eval { find "example", errorenter { die "find $_: $!" } }; $@   # ~> find example: Permission denied';
 
 # 
+# **See also:**
+# 
+# * <File::Find> — `find(sub { push @paths, $File::Find::name }, $dir)`.
+# 
 # ## noenter (@filters)
 # 
 # No enter to catalogs. Using in `find`. `@filters` same as in `find`.
@@ -139,6 +155,11 @@ done_testing; }; subtest 'erase (@paths)' => sub {
 ::like scalar do {eval { erase "/dev/null" }; $@}, qr!erase file /dev/null: Permission denied!, 'eval { erase "/dev/null" }; $@  # ~> erase file /dev/null: Permission denied';
 
 # 
+# **See also:**
+# 
+# * <unlink>.
+# * <File::Path> — `remove_tree("dir")`.
+# 
 # ## mkpath ($path)
 # 
 # As **mkdir -p**, but consider last path-part (after last slash) as filename, and not create this catalog.
@@ -147,13 +168,20 @@ done_testing; }; subtest 'erase (@paths)' => sub {
 # * If `$path` is array ref, then use path as first and permission as second element.
 # * Default permission is `0755`.
 # * Returns `$path`.
-# cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+# 
 done_testing; }; subtest 'mkpath ($path)' => sub { 
 local $_ = ["A", 0755];
 ::is scalar do {mkpath}, "A", 'mkpath   # => A';
 
-::like scalar do {eval { mkpath "/A/" }; $@}, qr!mkpath : No such file or directory!, 'eval { mkpath "/A/" }; $@   # ~> mkpath : No such file or directory';
+::like scalar do {eval { mkpath "/A/" }; $@}, qr!mkpath /A: Permission denied!, 'eval { mkpath "/A/" }; $@   # ~> mkpath /A: Permission denied';
 
+mkpath "A///./file";
+::is scalar do {-d "A"}, scalar do{1}, '-d "A"  # -> 1';
+
+# 
+# **See also:**
+# 
+# * <File::Path> — `mkpath("dir1/dir2")`.
 # 
 # ## mtime ($file)
 # 
@@ -168,6 +196,12 @@ local $_ = "nofile";
 ::like scalar do {mtime ["/"]}, qr!^\d+(\.\d+)?$!, 'mtime ["/"]   # ~> ^\d+(\.\d+)?$';
 
 # 
+# **See also:**
+# 
+# * <-M> — `-M "file.txt"`, `-M _` in days.
+# * <stat> — `(stat "file.txt")[9]` in seconds.
+# * <Time::HiRes> — `(Time::HiRes::stat "file.txt")[9]` in seconds with fractional part.
+# 
 # ## replace (&sub, @files)
 # 
 # Replacing each the file if `&sub` replace `$_`. Returns files in which there were no replacements.
@@ -180,6 +214,11 @@ lay "abc";
 replace { $b = ":utf8"; y/a/¡/ } [$_, ":raw"];
 ::is scalar do {cat}, "¡bc", 'cat  # => ¡bc';
 
+# 
+# **See also:**
+# 
+# * <File::Edit>.
+# * <File::Edit::Portable>.
 # 
 # ## include ($pkg)
 # 
@@ -239,6 +278,11 @@ done_testing; }; subtest 'wildcard ($wildcard)' => sub {
 # 
 # Using in filters the function `find`.
 # 
+# **See also:**
+# 
+# * <File::Wildcard>.
+# * <String::Wildcard::Bash>.
+# 
 # ## goto_editor ($path, $line)
 # 
 # Open the file in editor from config on the line.
@@ -263,9 +307,27 @@ goto_editor "mypath", 10;
 # 
 # Default the editor is `vscodium`.
 # 
+# ## from_pkg (;$pkg)
+# 
+# From package to file path.
+# 
+done_testing; }; subtest 'from_pkg (;$pkg)' => sub { 
+::is scalar do {from_pkg "Aion::Fs"}, "Aion/Fs.pm", 'from_pkg "Aion::Fs"  # => Aion/Fs.pm';
+::is_deeply scalar do {[map from_pkg, "Aion::Fs", "A::B::C"]}, scalar do {["Aion/Fs.pm", "A/B/C.pm"]}, '[map from_pkg, "Aion::Fs", "A::B::C"]  # --> ["Aion/Fs.pm", "A/B/C.pm"]';
+
+# 
+# ## to_pkg (;$path)
+# 
+# From file path to package.
+# 
+done_testing; }; subtest 'to_pkg (;$path)' => sub { 
+::is scalar do {to_pkg "Aion/Fs.pm"}, "Aion::Fs", 'to_pkg "Aion/Fs.pm"  # => Aion::Fs';
+::is_deeply scalar do {[map to_pkg, "Aion/Fs.md", "A/B/C.md"]}, scalar do {["Aion::Fs", "A::B::C"]}, '[map to_pkg, "Aion/Fs.md", "A/B/C.md"]  # --> ["Aion::Fs", "A::B::C"]';
+
+# 
 # # AUTHOR
 # 
-# Yaroslav O. Kosmina [dart@cpan.org](dart@cpan.org)
+# Yaroslav O. Kosmina <dart@cpan.org>
 # 
 # # LICENSE
 # 

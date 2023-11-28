@@ -1,49 +1,74 @@
 {
    "abstract" : "Basic framework to provide DTD catalogs",
    "author" : [
-      "Eric Brine, C<< <ikegami@adaelis.com> >>"
+      "Eric Brine <ikegami@adaelis.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "unrestricted"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XML-Catalogs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Test::More" : 0
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : 0
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage" : "0.18",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "runtime" : {
          "requires" : {
-            "Carp" : 0,
-            "File::ShareDir" : 0,
-            "URI::file" : 0,
-            "version" : 0
+            "Carp" : "0",
+            "File::ShareDir" : "0",
+            "URI::file" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "XML::Catalogs" : {
-         "file" : "lib/XML/Catalogs.pm",
-         "version" : "v1.0.3"
+      },
+      "test" : {
+         "recommends" : {
+            "Test::Pod" : "1.22"
+         },
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ikegami/perl-XML-Catalogs/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/XML-Catalogs/",
       "license" : [
          "http://creativecommons.org/publicdomain/zero/1.0/"
-      ]
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ikegami/perl-XML-Catalogs.git",
+         "web" : "https://github.com/ikegami/perl-XML-Catalogs"
+      }
    },
-   "version" : "v1.0.3"
+   "version" : "v1.6.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

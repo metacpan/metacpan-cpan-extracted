@@ -2,7 +2,7 @@ package Net::DNS::RR::PX;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: PX.pm 1898 2023-02-15 14:27:22Z willem $)[2];
+our $VERSION = (qw$Id: PX.pm 1945 2023-11-22 08:02:31Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -19,11 +19,11 @@ use Net::DNS::DomainName;
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset ) = @_;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
 	$self->{preference} = unpack( "\@$offset n", $$data );
-	( $self->{map822},  $offset ) = Net::DNS::DomainName2535->decode( $data, $offset + 2 );
-	( $self->{mapx400}, $offset ) = Net::DNS::DomainName2535->decode( $data, $offset );
+	( $self->{map822},  $offset ) = Net::DNS::DomainName2535->decode( $data, $offset + 2, @opaque );
+	( $self->{mapx400}, $offset ) = Net::DNS::DomainName2535->decode( $data, $offset,     @opaque );
 	return;
 }
 

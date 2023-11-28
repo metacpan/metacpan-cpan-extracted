@@ -6,9 +6,9 @@ use Moo;
 extends 'Org::Element';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-05'; # DATE
+our $DATE = '2023-11-06'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.560'; # VERSION
+our $VERSION = '0.561'; # VERSION
 
 has bullet => (is => 'rw');
 has check_state => (is => 'rw');
@@ -44,7 +44,7 @@ Org::Element::ListItem - Represent Org list item
 
 =head1 VERSION
 
-This document describes version 0.560 of Org::Element::ListItem (from Perl distribution Org-Parser), released on 2023-08-05.
+This document describes version 0.561 of Org::Element::ListItem (from Perl distribution Org-Parser), released on 2023-11-06.
 
 =head1 DESCRIPTION
 

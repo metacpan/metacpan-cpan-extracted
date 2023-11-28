@@ -1,16 +1,13 @@
 package MooX::Keyword::Chain;
 use 5.006; use strict; use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 use Moo; our %CHAINS;
 use MooX::Keyword {
 	chain => {
 		builder => sub {
 			my ($moo, $name, $chain, $cb) = @_;
-			do {
-				$cb = $chain;
-				$chain = "";
-			} if ! $cb;
 			$moo->has($name, is => 'rw') if ! $CHAINS{$name}++;
+			$moo->sub($chain, $cb);
 			$moo->around($name, sub {
 				my ($orig, $self, @args) = @_;
 				@args = $self->$orig(@args);
@@ -34,7 +31,7 @@ MooX::Keyword::Chain - Subroutine chains
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
@@ -74,6 +71,32 @@ Perhaps a little code snippet.
 
 	$chains->add(); # [ 'leadership', 'propaganda', 'finance' ];
 
+=head1 DESCRIPTION
+
+create a sub routine which chains from multiple other sub routines.
+
+=head1 KEYWORDS
+
+=head2 chain
+
+Configure a chained sub routine.
+
+	chain two => 'demo' => sub {
+		...
+	}
+
+	chain two => 'show' => sub {
+		...
+	}
+
+...
+
+	$chains->two(); # will call demo and then show
+
+You can also still call each sub routine independently.
+
+	$chains->demo();
+	$chains->show();
 
 =head1 AUTHOR
 

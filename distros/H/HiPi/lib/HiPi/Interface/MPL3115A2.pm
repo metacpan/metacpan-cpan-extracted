@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::MPL3115A2
 # Description  : Interface to MPL3115A2 precision Altimeter
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -17,7 +17,7 @@ use HiPi qw( :i2c :mpl3115a2 :rpi );
 use HiPi::RaspberryPi;
 use Carp;
 
-our $VERSION ='0.81';
+our $VERSION ='0.89';
 
 __PACKAGE__->create_accessors( qw( osdelay backend ) );
 
@@ -80,27 +80,26 @@ sub new {
 }
 
 sub unpack_altitude {
-    my( $self, $msb, $csb, $lsb ) =@_;
-    my $alt = $msb << 8;
-    $alt += $csb;
-    if( $msb > 127 ) {
-        $alt = 0xFFFF &~$alt;
-        $alt ++;
-        $alt *= -1;
+    my( $self, $msb, $csb, $lsb ) = @_;
+    my $alt = unpack('s>', pack('C*', $msb, $csb ));
+    my $fraction = 0;
+    $fraction += 0.5    if( $lsb & 0b10000000 );
+    $fraction += 0.25   if( $lsb & 0b01000000 );
+    $fraction += 0.125  if( $lsb & 0b00100000 );
+    $fraction += 0.0625 if( $lsb & 0b00010000 );
+    if( $alt < 0 ) {
+        $alt = - ( abs($alt) + $fraction );
+    } else {
+        $alt += $fraction;
     }
-    $alt += 0.5    if( $lsb & 0b10000000 );
-    $alt += 0.25   if( $lsb & 0b01000000 );
-    $alt += 0.125  if( $lsb & 0b00100000 );
-    $alt += 0.0625 if( $lsb & 0b00010000 );
     return $alt;
 }
 
 sub pack_altitude {
     my($self, $alt) = @_;
     my $mint = int( $alt );
-    my $lsb =  0b1111 & int(0.5 + ( 15.0 * (abs($alt) - abs($mint))));
+    my $lsb =  0b1111 & int(1 + ( 15.0 * (abs($alt) - abs($mint))));
     $lsb <<= 4;
-    
     if( $alt < 0 ) {
         $mint *= -1;
         $mint --;
@@ -113,23 +112,25 @@ sub pack_altitude {
 }
 
 sub unpack_temperature {
-    my( $self, $msb, $lsb ) =@_;
-    if( $msb > 127 ) {
-        $msb = 0xFFFF &~$msb;
-        $msb ++;
-        $msb *= -1;
+    my( $self, $msb, $lsb ) =@_;    
+    my $temp = unpack('c', pack('C',$msb));
+    my $fraction = 0;
+    $fraction += 0.5    if( $lsb & 0b10000000 );
+    $fraction += 0.25   if( $lsb & 0b01000000 );
+    $fraction += 0.125  if( $lsb & 0b00100000 );
+    $fraction += 0.0625 if( $lsb & 0b00010000 );
+    if( $temp < 0 ) {
+        $temp = - ( abs($temp) + $fraction );
+    } else {
+        $temp += $fraction;
     }
-    $msb += 0.5    if( $lsb & 0b10000000 );
-    $msb += 0.25   if( $lsb & 0b01000000 );
-    $msb += 0.125  if( $lsb & 0b00100000 );
-    $msb += 0.0625 if( $lsb & 0b00010000 );
-    return $msb;
+    return $temp;
 }
 
 sub pack_temperature {
     my($self, $temp) = @_;
     my $mint = int( $temp );
-    my $lsb =  0b1111 & int(0.495 + ( 15.0 * (abs($temp) - abs($mint))));
+    my $lsb =  0b1111 & int(1 + ( 15.0 * (abs($temp) - abs($mint))));
     $lsb <<= 4;
     if( $temp < 0 ) {
         $mint *= -1;
@@ -142,18 +143,18 @@ sub pack_temperature {
 
 sub unpack_pressure {
     my( $self, $msb, $csb, $lsb ) =@_;
-    my $alt = $msb << 10;
-    $alt += $csb << 2;
-    $alt += 0b11 & ( $lsb >> 6 );
-    $alt += 0.5  if( $lsb & 0b00100000 );
-    $alt += 0.25 if( $lsb & 0b00010000 );
-    return $alt;
+    my $pre = ( $msb & 0xFF ) << 10;
+    $pre |= ( $csb & 0xFF ) << 2;
+    $pre |= 0b11 & ( $lsb >> 6 );
+    $pre += 0.5  if( $lsb & 0b00100000 );
+    $pre += 0.25 if( $lsb & 0b00010000 );
+    return $pre;
 }
 
 sub pack_pressure {
-    my($self, $alt) = @_;
-    my $mint = int( $alt );
-    my $lsb =  0b1111 & int(0.495 + ( 3.0 * (abs($alt) - abs($mint))));
+    my($self, $pre) = @_;
+    my $mint = int( $pre );
+    my $lsb =  0b11 & int(1 + ( 3.0 * (abs($pre) - abs($mint))));
     $lsb <<= 4;
     my $msb = $mint & 0x3FC00;
     $msb >>= 10;

@@ -78,7 +78,7 @@ find-secret-leakage-in-git-diff.pl - find secrets leaking in a Git repository
 
 =head1 VERSION
 
-version 3.5.0
+version 3.6.0
 
 =head1 SYNOPSIS
 

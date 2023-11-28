@@ -1,6 +1,6 @@
 #############################################################################
 #################         Easy Debugging Module        ######################
-################# Copyright 2013 - 2021 Richard Kelsch ######################
+################# Copyright 2013 - 2023 Richard Kelsch ######################
 #################          All Rights Reserved         ######################
 #############################################################################
 ####### Licensing information available near the end of this file. ##########
@@ -19,16 +19,20 @@ use Term::ANSIColor;
 use Time::HiRes qw(time);
 use File::Basename;
 
-use Data::Dumper; $Data::Dumper::Sortkeys = TRUE; $Data::Dumper::Purity = TRUE; $Data::Dumper::Deparse = TRUE;
+use Data::Dumper;
+eval {use Data::Dumper::Simple;};
+$Data::Dumper::Sortkeys = TRUE;
+$Data::Dumper::Purity   = TRUE;
+$Data::Dumper::Deparse  = TRUE;
 
 use Config;
-use threads;
+eval {use threads;};
 
 BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.08';
+    our $VERSION = '2.10';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);
@@ -38,18 +42,18 @@ BEGIN {
 
     # Functions and variables which can be optionally exported
     our @EXPORT_OK = qw(@Levels);
-}
+} ## end BEGIN
 
 # This can be optionally exported for whatever
 our @Levels = qw( ERR WARN NOTICE INFO VERBOSE DEBUG DEBUGMAX );
 
 # For quick level checks to speed up execution
 our %LevelLogic;
-for (my $count = 0 ; $count < scalar(@Levels) ; $count++) {
-    $LevelLogic{$Levels[$count]} = $count;
+for (my $count = 0; $count < scalar(@Levels); $count++) {
+    $LevelLogic{ $Levels[$count] } = $count;
 }
 
-our $PARENT = $$; # This needs to be defined at the very beginning before new
+our $PARENT = $$;    # This needs to be defined at the very beginning before new
 my ($SCRIPTNAME, $SCRIPTPATH, $suffix) = fileparse($0);
 
 =head1 NAME
@@ -126,8 +130,8 @@ sub DESTROY {    # We spit out one last message before we die, the total execute
     my $bench = colored(['bright_cyan'], sprintf('%06s', sprintf('%.02f', (time - $self->{'MASTERSTART'}))));
     my $name  = $SCRIPTNAME;
     $name .= ' [child]' if ($PARENT ne $$);
-    $self->DEBUG([$bench . ' ' . colored(['black on_white'],"---- $name complete ----")]);
-}
+    $self->DEBUG([$bench . ' ' . colored(['black on_white'], "---- $name complete ----")]);
+} ## end sub DESTROY
 
 =head1 B<METHODS>
 
@@ -315,23 +319,23 @@ sub new {
     my $class = shift;
     my ($filename, $dir, $suffix) = fileparse($0);
     my $self = {
-        'LogLevel'           => 'ERR',                                   # Default is errors only
-        'Type'               => 'fh',                                    # Default is a filehandle
-        'Path'               => '/var/log',                              # Default path should type be unix
-        'FileHandle'         => \*STDERR,                                # Default filehandle is STDERR
+        'LogLevel'           => 'ERR',                                                               # Default is errors only
+        'Type'               => 'fh',                                                                # Default is a filehandle
+        'Path'               => '/var/log',                                                          # Default path should type be unix
+        'FileHandle'         => \*STDERR,                                                            # Default filehandle is STDERR
         'MasterStart'        => time,
-        'ANY_LastStamp'      => time,                                    # Initialize main benchmark
-        'ERR_LastStamp'      => time,                                    # Initialize the ERR benchmark
-        'WARN_LastStamp'     => time,                                    # Initialize the WARN benchmark
-        'INFO_LastStamp'     => time,                                    # Initialize the INFO benchmark
-        'NOTICE_LastStamp'   => time,                                    # Initialize the NOTICE benchmark
-        'DEBUG_LastStamp'    => time,                                    # Initialize the DEBUG benchmark
-        'DEBUGMAX_LastStamp' => time,                                    # Initialize the DEBUGMAX benchmark
-        'Color'              => TRUE,                                    # Default to colorized output
+        'ANY_LastStamp'      => time,                                                                # Initialize main benchmark
+        'ERR_LastStamp'      => time,                                                                # Initialize the ERR benchmark
+        'WARN_LastStamp'     => time,                                                                # Initialize the WARN benchmark
+        'INFO_LastStamp'     => time,                                                                # Initialize the INFO benchmark
+        'NOTICE_LastStamp'   => time,                                                                # Initialize the NOTICE benchmark
+        'DEBUG_LastStamp'    => time,                                                                # Initialize the DEBUG benchmark
+        'DEBUGMAX_LastStamp' => time,                                                                # Initialize the DEBUGMAX benchmark
+        'Color'              => TRUE,                                                                # Default to colorized output
         'DateStamp'          => colored(['yellow'], '%date%'),
         'TimeStamp'          => colored(['yellow'], '%time%'),
         'Epoch'              => colored(['cyan'],   '%epoch%'),
-        'Padding'            => -20,                                     # Default padding is 20 spaces
+        'Padding'            => -20,                                                                 # Default padding is 20 spaces
         'Lines-Padding'      => -2,
         'Subroutine-Padding' => 0,
         'Line-Padding'       => 0,
@@ -351,7 +355,7 @@ sub new {
     };
 
     # This pretty much makes all hash keys uppercase
-    my @Keys = (keys %{$self}); # Hash is redefined on the fly, so get the list before
+    my @Keys = (keys %{$self});    # Hash is redefined on the fly, so get the list before
     foreach my $Key (@Keys) {
         my $upper = uc($Key);
         if ($Key ne $upper) {
@@ -360,17 +364,17 @@ sub new {
             # This fixes a documentation error for past versions
             if ($upper eq 'LOGLEVEL') {
                 $self->{$upper} = 'ERR' if ($self->{$upper} =~ /^ERROR$/i);
-                $self->{$upper} = uc($self->{$upper});    # Make loglevels case insensitive
+                $self->{$upper} = uc($self->{$upper});                        # Make loglevels case insensitive
             }
             delete($self->{$Key});
         } elsif ($Key eq 'LOGLEVEL') {    # Make loglevels case insensitive
             $self->{$upper} = uc($self->{$upper});
         }
-    }
-    { # This makes sure the user overrides actually override
+    } ## end foreach my $Key (@Keys)
+    {                                     # This makes sure the user overrides actually override
         my %params = (@_);
         foreach my $Key (keys %params) {
-            $self->{uc($Key)} = $params{$Key};
+            $self->{ uc($Key) } = $params{$Key};
         }
     }
 
@@ -378,6 +382,7 @@ sub new {
     # if the Color attribute is set to zero.
     if ($self->{'COLOR'} =~ /0|FALSE|OFF|NO/i) {
         $ENV{'ANSI_COLORS_DISABLED'} = TRUE;
+
         # If COLOR is FALSE, then clear color data from ANSILEVEL, as these were
         # defined before color was turned off.
         $self->{'ANSILEVEL'} = {
@@ -391,21 +396,22 @@ sub new {
         $self->{'DATESTAMP'} = '%date%';
         $self->{'TIMESTAMP'} = '%time%';
         $self->{'EPOCH'}     = '%epoch%';
-    }
+    } ## end if ($self->{'COLOR'} =~...)
 
     foreach my $lvl (@Levels) {
         $self->{"$lvl-PREFIX"} = $self->{'PREFIX'} unless (exists($self->{"$lvl-PREFIX"}) && defined($self->{"$lvl-PREFIX"}));
     }
 
     my $fh = $self->{'FILEHANDLE'};
+
     # Signal the script has started (and logger initialized)
     my $name = $SCRIPTNAME;
     $name .= ' [child]' if ($PARENT ne $$);
-    print $fh sprintf('   %.02f%s %s', 0, $self->{'ANSILEVEL'}->{'DEBUG'}, colored(['black on_white'], "----- $name begin -----") . " (To View in 'less', use it's '-r' switch)" ),"\n";
+    print $fh sprintf('   %.02f%s %s', 0, $self->{'ANSILEVEL'}->{'DEBUG'}, colored(['black on_white'], "----- $name begin -----") . " (To View in 'less', use it's '-r' switch)"), "\n" if ($self->{'LOGLEVEL'} !~ /ERR/);
 
     bless($self, $class);
     return ($self);
-}
+} ## end sub new
 
 =head2 debug
 
@@ -436,10 +442,10 @@ sub debug {
         $level = uc($msgs);                                 # It tosses the legacy __LINE__ argument
         $msgs  = shift;
     }
-    $level =~ s/(OR|ING|RMATION)$//; # Strip off the excess
+    $level =~ s/(OR|ING|RMATION)$//;                        # Strip off the excess
 
     # A much quicker bypass when the log level is below what is needed
-    return if ($LevelLogic{$self->{'LOGLEVEL'}} < $LevelLogic{$level});
+    return if ($LevelLogic{ $self->{'LOGLEVEL'} } < $LevelLogic{$level});
 
     my @messages;
     if (ref($msgs) eq 'SCALAR' || ref($msgs) eq '') {
@@ -447,7 +453,7 @@ sub debug {
     } elsif (ref($msgs) eq 'ARRAY') {
         @messages = @{$msgs};
     } else {
-        push(@messages,Dumper($msgs));
+        push(@messages, Dumper($msgs));
     }
     my ($sname, $cline, $nested, $subroutine, $thisBench, $thisBench2, $sline, $short) = ('', '', '', '', '', '', '', '');
 
@@ -462,7 +468,7 @@ sub debug {
                 $package = $array[0];
                 my $subroutine = $array[3];
                 $subroutine =~ s/^$package\:\://;
-                $sname =~ s/$subroutine//;
+                $sname      =~ s/$subroutine//;
                 if ($sname eq '') {
                     $sname = ($subroutine ne '') ? $subroutine : $package;
                     $cline = $array[2];
@@ -475,11 +481,11 @@ sub debug {
                     $sline = $array[2];
                 }
                 $nest++;
-            }
+            } ## end if ($array[3] !~ /Debug::Easy/)
             $count++;
-        }
+        } ## end while (my @array = caller...)
         if ($package ne '') {
-            $sname = $package . '::' . $sname;
+            $sname  = $package . '::' . $sname;
             $nested = ' ' x $nest if ($nest);
         } else {
             my @array = caller(1);
@@ -491,26 +497,27 @@ sub debug {
             $sname = 'main';
             $sline = $cline;
             $short = $sname;
-        }
-        $subroutine = ($sname ne '') ? $sname : 'main';
+        } ## end else [ if ($package ne '') ]
+        $subroutine                   = ($sname ne '') ? $sname : 'main';
         $self->{'PADDING'}            = 0 - length($subroutine) if (length($subroutine) > abs($self->{'PADDING'}));
         $self->{'LINES-PADDING'}      = 0 - length($cline)      if (length($cline) > abs($self->{'LINES-PADDING'}));
         $self->{'SUBROUTINE-PADDING'} = 0 - length($short)      if (length($short) > abs($self->{'SUBROUTINE-PADDING'}));
         $self->{'LINE-PADDING'}       = 0 - length($sline)      if (length($sline) > abs($self->{'LINE-PADDING'}));
-        $cline = sprintf('%' . $self->{'LINES-PADDING'} . 's', $cline);
-        $subroutine = colored(['bold cyan'], sprintf('%' . $self->{'PADDING'} . 's', $subroutine));
-        $sline = sprintf('%' . $self->{'LINE-PADDING'} . 's', $sline);
-        $short = colored(['bold cyan'], sprintf('%' . $self->{'SUBROUTINE-PADDING'} . 's', $short));
-    }
+        $cline                        = sprintf('%' . $self->{'LINES-PADDING'} . 's', $cline);
+        $subroutine                   = colored(['bold cyan'], sprintf('%' . $self->{'PADDING'} . 's', $subroutine));
+        $sline                        = sprintf('%' . $self->{'LINE-PADDING'} . 's', $sline);
+        $short                        = colored(['bold cyan'], sprintf('%' . $self->{'SUBROUTINE-PADDING'} . 's', $short));
+    } ## end if ($self->{'PREFIX'} ...)
 
     # Figure out the benchmarks, but only if it is in the prefix
     if ($self->{'PREFIX'} =~ /\%Benchmark\%/) {
+
         # For multiline output, only output the bench data on the first line.  Use padded spaces for the rest.
         #        $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{$level . '_LASTSTAMP'}));
-        $thisBench = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
+        $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
         $thisBench2 = ' ' x length($thisBench);
-    }
-    my $first = TRUE;    # Set the first line flag.
+    } ## end if ($self->{'PREFIX'} ...)
+    my $first = TRUE;                # Set the first line flag.
     foreach my $msg (@messages) {    # Loop through each line of output and format accordingly.
         if (ref($msg) ne '') {
             $msg = Dumper($msg);
@@ -525,12 +532,12 @@ sub debug {
             $self->_send_to_logger($level, $nested, $msg, $first, $thisBench, $thisBench2, $subroutine, $cline, $sline, $short);
         }
         $first = FALSE;    # Clear the first line flag.
-    }
+    } ## end foreach my $msg (@messages)
     $self->{'ANY_LASTSTAMP'} = time;
-    $self->{$level . '_LASTSTAMP'} = time;
-}
+    $self->{ $level . '_LASTSTAMP' } = time;
+} ## end sub debug
 
-sub _send_to_logger {      # This actually simplifies the previous method ... seriously
+sub _send_to_logger {    # This actually simplifies the previous method ... seriously
     my $self       = shift;
     my $level      = shift;
     my $padding    = shift;
@@ -547,16 +554,19 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     my $dt       = DateTime->now('time_zone' => $timezone);
     my $Date     = $dt->ymd();
     my $Time     = $dt->hms();
-    my $prefix   = $self->{$level . '-PREFIX'} . '';    # A copy not a pointer
+    my $prefix   = $self->{ $level . '-PREFIX' } . '';                                # A copy not a pointer
     my $forked   = ($PARENT ne $$) ? 'C' : 'P';
     my $threaded = 'PT-';
     my $epoch    = time;
-    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) { # Do eval so non-threaded perl's don't whine
-        eval(q(
-            my $tid   = threads->tid();
-            $threaded = ($tid > 0) ? sprintf('T%02d',$tid) : 'PT-';
-        ));
-    }
+
+    if (exists($Config{'useithreads'}) && $Config{'useithreads'}) {                   # Do eval so non-threaded perl's don't whine
+        eval(
+            q(
+				my $tid   = threads->tid();
+				$threaded = ($tid > 0) ? sprintf('T%02d',$tid) : 'PT-';
+			)
+        );
+    } ## end if (exists($Config{'useithreads'...}))
 
     $prefix =~ s/\%PID\%/$$/g;
     $prefix =~ s/\%Loglevel\%/$self->{'ANSILEVEL'}->{$level}/g;
@@ -589,7 +599,7 @@ sub _send_to_logger {      # This actually simplifies the previous method ... se
     } else {
         print $fh "$prefix$padding$msg\n";
     }
-}
+} ## end sub _send_to_logger
 
 =head2 B<ERR> or B<ERROR>
 
@@ -657,7 +667,7 @@ sub NOTICE {
 
 sub ATTENTION {
     my $self = shift;
-    $self->debug('NOTICE'. @_);
+    $self->debug('NOTICE' . @_);
 }
 
 =head2 B<INFO> or B<INFORMATION>
@@ -736,7 +746,7 @@ To install this module, run the following commands:
  perl Makefile.PL
  make
  make test
- make install
+ [sudo] make install
 
 =head1 AUTHOR
 
@@ -746,7 +756,7 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 B<VERSION>
 
-Version 2.07    (June 24, 2021)
+Version 2.08    (June 24, 2021)
 
 =head1 B<SUPPORT>
 
@@ -768,7 +778,7 @@ If you have any features you wish added, or functionality improved or changed, t
 
 =head1 B<LICENSE AND COPYRIGHT>
 
-Copyright 2013-2021 Richard Kelsch.
+Copyright 2013-2023 Richard Kelsch.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (2.0). You may obtain a copy of the full license at:
 

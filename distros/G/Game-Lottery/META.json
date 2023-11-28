@@ -47,6 +47,7 @@
             "Getopt::Long::Descriptive" : "0",
             "Math::Random::Secure" : "0",
             "Path::Tiny" : "0",
+            "Pod::Usage" : "0",
             "experimental" : "0",
             "perl" : "5.038"
          }
@@ -73,7 +74,7 @@
    "provides" : {
       "Game::Lottery" : {
          "file" : "lib/Game/Lottery.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -86,7 +87,7 @@
          "web" : "https://bitbucket.org/brainbuz/lottery"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_generated_by_perl" : "v5.38.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

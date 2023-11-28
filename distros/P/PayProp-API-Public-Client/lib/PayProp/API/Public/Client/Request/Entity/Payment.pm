@@ -104,7 +104,7 @@ __END__
 
 =head1 NAME
 
-	PayProp::API::Public::Client::Request::Entity::Payment - Payment entity module.
+PayProp::API::Public::Client::Request::Entity::Payment - Payment entity module.
 
 =head1 SYNOPSIS
 
@@ -122,174 +122,167 @@ This module is intended to be accessed via instance of C<PayProp::API::Public::C
 
 =head2 list_p(\%params)
 
-	Issues a C<HTTP GET> request to PayProp API C</entity/payment> endpoint. It takes an optional C<HASHREF> of parameters.
+Issues a C<HTTP GET> request to PayProp API C</entity/payment> endpoint. It takes an optional C<HASHREF> of parameters.
 
-	See L</"QUERY PARAMETERS"> for a list of expected parameters.
+See L</"QUERY PARAMETERS"> for a list of expected parameters.
 
 	$Payment
 		->list_p({ ... })
 		->then( sub {
 			my ( $ResponsePayment ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Entity::Payment>.
 		} )
 		->catch( sub {
 			my ( $Exception ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Exception::Response>.
 		} )
 		->wait
 	;
 
+Returns L<PayProp::API::Public::Client::Response::Entity::Payment> on success or L<PayProp::API::Public::Client::Exception::Response> on error.
 
 =head2 create_p(\%content)
 
-	Issues a C<HTTP POST> request to PayProp API C</entity/payment> endpoint.
+Issues a C<HTTP POST> request to PayProp API C</entity/payment> endpoint.
 
-	See L</"REQUEST BODY FIELDS"> for a list of expected request body fields.
+See L</"REQUEST BODY FIELDS"> for a list of expected request body fields.
 
 	$Payment
 		->create_p({ ... })
 		->then( sub {
 			my ( $ResponsePayment ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Entity::Payment>.
 		} )
 		->catch( sub {
 			my ( $Exception ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Exception::Response>.
 		} )
 		->wait
 	;
 
+Returns L<PayProp::API::Public::Client::Response::Entity::Payment> on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 
 =head2 update_p(\%params, \%content)
 
-	Issues a C<HTTP PUT> request to PayProp API C</entity/payment> endpoint.
+Issues a C<HTTP PUT> request to PayProp API C</entity/payment> endpoint.
 
-	See L</"REQUEST BODY FIELDS"> for a list of expected request body fields, L</"QUERY PARAMETERS"> and L</"PATH PARAMETERS"> for a list of expected parameters.
+See L</"REQUEST BODY FIELDS"> for a list of expected request body fields, L</"QUERY PARAMETERS"> and L</"PATH PARAMETERS"> for a list of expected parameters.
 
 	$Payment
 		->update_p({ ... })
 		->then( sub {
 			my ( $ResponsePayment ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Entity::Payment>.
 		} )
 		->catch( sub {
 			my ( $Exception ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Exception::Response>.
 		} )
 		->wait
 	;
+
+Returns L<PayProp::API::Public::Client::Response::Entity::Payment> on success or L<PayProp::API::Public::Client::Exception::Response> on error.
 
 
 =head1 REQUEST BODY FIELDS
 
 =head2 amount
 
-	B<number>
-	Payment amount. C<required>
+B<number>
+Payment amount. C<required>
 
 =head2 category_id
 
-	B<string> C<[10..32] characters /^[a-zA-Z0-9]+$/>
-	Payment category external ID. C<required>
+B<string> C<[10..32] characters /^[a-zA-Z0-9]+$/>
+Payment category external ID. C<required>
 
 =head2 customer_id
 
-	B<string> C<[1..50] characters /^[a-zA-Z0-9]+$/>
-	The customer ID is a unique, case-sensitive value per API consumer. The value can be used to retrieve and update the entity. Providing C<null> on update will remove the customer ID associated with the entity. Please note that currently, this functionality is marked as experimental; we strongly recommend keeping track of PayProp entity C<external_id> along with your C<customer_id>.
+B<string> C<[1..50] characters /^[a-zA-Z0-9]+$/>
+The customer ID is a unique, case-sensitive value per API consumer. The value can be used to retrieve and update the entity. Providing C<null> on update will remove the customer ID associated with the entity. Please note that currently, this functionality is marked as experimental; we strongly recommend keeping track of PayProp entity C<external_id> along with your C<customer_id>.
 
 =head2 description
 
-	B<string> C<<= 255 characters>
-	Payment description.
+B<string> C<E<lt>= 255 characters>
+Payment description.
 
 =head2 end_date
 
-	B<date>
-	Payment end date.
+B<date>
+Payment end date.
 
 =head2 frequency
 
-	B<string>
-	Enum: "O" "W" "2W" "4W" "M" "2M" "Q" "6M" "A"
-	Payment frequency. C<required>
+B<string>
+Enum: C<"O"> C<"W"> C<"2W"> C<"4W"> C<"M"> C<"2M"> C<"Q"> C<"6M"> C<"A">
+Payment frequency. C<required>
 
 =head2 has_payment_period
 
-	B<boolean>
-	Available for reoccurring payments
+B<boolean>
+Available for reoccurring payments
 
 =head2 has_tax
 
-	B<boolean>
+B<boolean>
 
 =head2 is_direct_debit
 
-	B<boolean>
+B<boolean>
 
 =head2 payment_day
 
-	B<number>
-	C<[1..31]> C<required>
+B<number>
+C<[1..31]> C<required>
 
 =head2 property_id
 
-	B<string> C<[1..32] characters /^[a-zA-Z0-9]+$/>
-	External ID of payment property. C<required>
+B<string> C<[1..32] characters /^[a-zA-Z0-9]+$/>
+External ID of payment property. C<required>
 
 =head2 start_date
 
-	B<date>
-	Payment start date.
+B<date>
+Payment start date.
 
 =head2 tenant_id
 
-	B<string> C<[1..32] characters /^[a-zA-Z0-9]+$/>
-	External ID of payment tenant. C<required>
+B<string> C<[1..32] characters /^[a-zA-Z0-9]+$/>
+External ID of payment tenant. C<required>
 
 =head1 QUERY PARAMETERS
 
 =head2 is_customer_id
 
-	B<boolean>
-	Lookup entity based on given customer ID by overriding route C<external_id>.
+B<boolean>
+Lookup entity based on given customer ID by overriding route C<external_id>.
 
 =head1 PATH PARAMETERS
 
 =head2 external_id
 
-	B<string> C<[1..32] characters /^[a-zA-Z0-9]+$/>
-	External ID of payment. C<required> for L</"list_p(\%params)"> and L</"update_p(\%params, \%content)">.
+B<string> C<[1..32] characters /^[a-zA-Z0-9]+$/>
+External ID of payment. C<required> for L</"list_p(\%params)"> and L</"update_p(\%params, \%content)">.
 
 =head1 AUTHOR
 
-	Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
 
-	Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-	Copyright 2023- PayProp
+Copyright 2023- PayProp
 
 =head1 LICENSE
 
-	This library is free software; you can redistribute it and/or modify
-	it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
-	If you would like to contribute documentation
-	or file a bug report then please raise an issue / pull request:
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
 
-	L<https://github.com/Humanstate/api-client-public-module>
+L<https://github.com/Humanstate/api-client-public-module>
 
 =cut

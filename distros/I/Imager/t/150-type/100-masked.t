@@ -1,8 +1,8 @@
 #!perl -w
 use strict;
-use Test::More tests => 244;
+use Test::More;
 use Imager qw(:all :handy);
-use Imager::Test qw(is_color3 is_fcolor3);
+use Imager::Test qw(is_color3 is_fcolor3 test_image is_image);
 
 -d "testout" or mkdir "testout";
 
@@ -688,6 +688,29 @@ for my $masked (0, 1) { # psampf
 }
 
 {
+  my $im = test_image;
+  my $m = $im->masked(left => 10, right => 10);
+  ok(!$m, "cannot make masked image with no width");
+  $m = $im->masked(top => 10, bottom => 10);
+  ok(!$m, "cannot make masked image with no height");
+
+  $m = $im->masked(left => 10, right => 9);
+  ok(!$m, "cannot make masked image with neg width");
+  $m = $im->masked(top => 10, bottom => 9);
+  ok(!$m, "cannot make masked image with neg height");
+
+  $m = $im->masked(left => -151);
+  ok(!$m, "disallow negative left (after scaling)");
+  $m = $im->masked(top => -151);
+  ok(!$m, "disallow negative top (after scaling)");
+
+  $m = $im->masked(left => -20, top => -70, right => -10, bottom => -15);
+  ok($m, "make masked image based on negative offsets");
+  my $cmp = $im->crop(left => 130, top => 80, right => 140, bottom => 135);
+  is_image($m, $cmp, "check masked image matches expecteed cropped image");
+}
+
+{
   my $empty = Imager->new;
   ok(!$empty->masked, "fail to make a masked image from an empty");
   is($empty->errstr, "masked: empty input image",
@@ -699,6 +722,8 @@ Imager->close_log();
 unless ($ENV{IMAGER_KEEP_FILES}) {
   unlink "testout/t020masked.log";
 }
+
+done_testing();
 
 sub _get_error {
   my @errors = Imager::i_errors();

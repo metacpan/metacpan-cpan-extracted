@@ -231,6 +231,20 @@ service account
 
 Returns a L<Future> which will resolve with the result.
 
+=head2 download_check
+
+Gets the PDF report for a given L<WebService::Async::Onfido::Check>.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<check_id> - the L<WebService::Async::Onfido::Check/id> for the check to query
+
+=back
+
+Returns a PDF file blob
+
 =head2 download_photo
 
 Gets a live_photo in a form of binary data for a given L<WebService::Async::Onfido::Photo>.

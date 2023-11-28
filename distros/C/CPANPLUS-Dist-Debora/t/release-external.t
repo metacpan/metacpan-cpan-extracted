@@ -41,6 +41,7 @@ $config->set_conf(allow_build_interactivity => 0);
 $config->set_conf(base                      => $tempdir);
 $config->set_conf(dist_type                 => 'CPANPLUS::Dist::Debora');
 $config->set_conf(flush                     => 0);
+$config->set_conf(signature                 => 0);
 $config->set_conf(verbose                   => 0);
 
 my $mirror = $ENV{CPAN_MIRROR};

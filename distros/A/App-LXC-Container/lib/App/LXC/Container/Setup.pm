@@ -37,7 +37,7 @@ use warnings 'once';
 use File::Path 'make_path';
 use Text::Diff;
 
-our $VERSION = "0.29";
+our $VERSION = "0.36";
 
 use App::LXC::Container::Texts;
 use App::LXC::Container::Data;
@@ -265,6 +265,66 @@ sub _add_file($$$@)
 
 #########################################################################
 
+=head2 _add_library_packages - add library item(s) to package listbox via FSD
+
+    $self->_add_library_packages($listbox);
+
+=head3 parameters:
+
+    $listbox            reference to UI element of the listbox
+
+=head3 description:
+
+This method opens a file-selection dialog and add all package(s) containing
+a library used by the selected executable(s) to the package listbox.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+# extracted for testing purposes:
+sub __add_library_packages_internal_code($@)
+{
+    my $ui_listbox = shift;
+    my @files = @_;
+    my %libraries = ();
+    local $_;
+    foreach my $file (@files)
+    {
+	if (-f $file)
+	{
+	    foreach (libraries_used($file))
+	    {   $libraries{$_} = 1;   }
+	}
+    }
+    my %packages = ();
+    foreach (sort keys %libraries)
+    {
+	$_ = package_of($_);
+	if ($_  and  not defined $packages{$_})
+	{
+	    $ui_listbox->add($_);
+	    $packages{$_} = 1;
+	}
+    }
+}
+sub _add_library_packages($@)
+{
+    my ($self, $ui_listbox) = @_;
+    debug(3, __PACKAGE__, '::_add_library_packages($self, $ui_listbox)');
+
+    $self->_add_dialog(txt('select_files4library_package'),
+		       $_initial_file_dir,
+		       sub{
+			   my $widget = shift;
+			   __add_library_packages_internal_code($ui_listbox,
+								@_);
+			   $widget->destroy;
+		       });
+}
+
+#########################################################################
+
 =head2 _add_package - add item(s) to package listbox via file-selection dialog
 
     $self->_add_package($listbox);
@@ -395,7 +455,9 @@ sub _create_main_window($)
 				  $self->{packages},
 				  $height,
 				  $width,
-				  sub{   $self->_add_package(@_);   });
+				  sub{   $self->_add_package(@_);   },
+				  sub{   $self->_modify_value($_[0]);   },
+				  sub{   $self->_add_library_packages(@_);   });
 
     ####################################
     # create listbox for files/directories:
@@ -502,7 +564,8 @@ sub _create_main_window($)
 
 =head2 _create_mw_listbox - create listbox area for main window
 
-    my $box = _create_mw_listbox($title, $ra_list, $h, $w, $add [, $modify]);
+    my $box =
+        _create_mw_listbox($title, $ra_list, $h, $w, $add, $modify [, $indirect]);
 
 =head3 parameters:
 
@@ -512,6 +575,7 @@ sub _create_main_window($)
     $w                  width of listbox
     $add                reference to function called to add entry
     $modify             optional reference to function called to modify entry
+    $indirect           optional reference to function called to add dependencies
 
 =head3 description:
 
@@ -528,10 +592,13 @@ C<L<UI::Various::Box>> object containing listbox, title and controls
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 sub _create_mw_listbox($@)
 {
-    my ($self, $title, $ra_list, $h, $w, $add, $modify) = @_;
+    my ($self, $title, $ra_list, $h, $w, $add, $modify, $indirect) = @_;
     debug(2, __PACKAGE__, '::_create_mw_listbox($self, "', $title,
 	  '", $ra_list, ', $h, ', ', $w, ', CODE)');
-    my $wb = int( ($w - 15) / (defined $modify ? 3 : 2) );
+    my $bc = 2;
+    $bc++ if defined $indirect;
+    $bc++ if defined $modify;
+    my $wb = int( ($w - 15) / $bc );
     my $ui_title = UI::Various::Text->new(text => $title,
 					  width => $w,
 					  align => 5);
@@ -556,6 +623,11 @@ sub _create_mw_listbox($@)
 	UI::Various::Button->new
 	    (text => '+', align => 5, width => $wb,
 	     code => sub{   &$add($ui_listbox);   });
+    push @ui_buttons,
+	UI::Various::Button->new
+	    (text => '++', align => 5, width => $wb,
+	     code => sub{   &$indirect($ui_listbox);   })
+	    if  defined $indirect;
     my $ui_buttons = UI::Various::Box->new(columns => scalar(@ui_buttons));
     $ui_buttons->add(@ui_buttons);
     my $ui_area = UI::Various::Box->new(border => 1, rows => 3);
@@ -894,6 +966,57 @@ sub _modify_entry($$$@)
 		      }));
     my $main = $self->{MAIN_UI};
     $main->dialog({title => $title}, $ui_title, $ui_radio, $ui_buttons);
+}
+
+#########################################################################
+
+=head2 _modify_value - modify a (text) value of an entry of a listbox
+
+    $self->_modify_value($listbox);
+
+=head3 parameters:
+
+    $listbox            reference to UI element of the listbox
+
+=head3 description:
+
+This method opens a minimal dialog to allow changing an entry of the given
+listbox.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub _modify_value($$$)
+{
+    my ($self, $ui_listbox) = @_;
+    my $entry = $ui_listbox->selected();
+    defined $entry  or  return;
+    my $value = $ui_listbox->texts->[$entry];
+    debug(3, __PACKAGE__, '::($self, "', $value, '")');
+
+    my $title = message('modify__1', $value);
+    my $ui_title = UI::Various::Text->new(text => $title,
+					  height => 3,
+					  width => 40,
+					  align => 5);
+    my $ui_value = UI::Various::Input->new(textvar => \$value,
+					   width => 40,
+					   align => 5);
+    my $ui_buttons = UI::Various::Box->new(columns => 2);
+    $ui_buttons->add(UI::Various::Button->new(text => txt('cancel'),
+					      code => sub{
+						  my $widget = shift;
+						  $widget->destroy;
+					      }),
+		     UI::Various::Button->new
+		     (text => txt('ok'),
+		      code => sub{
+			  my $widget = shift;
+			  $ui_listbox->modify($entry, $value);
+			  $widget->destroy;
+		      }));
+    my $main = $self->{MAIN_UI};
+    $main->dialog({title => $title}, $ui_title, $ui_value, $ui_buttons);
 }
 
 #########################################################################

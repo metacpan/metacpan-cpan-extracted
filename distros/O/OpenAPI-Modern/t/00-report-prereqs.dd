@@ -29,7 +29,9 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Portability::Files' => '0',
                                       'Test::Spelling' => '0.12',
-                                      'Test::Warnings' => '0'
+                                      'Test::Warnings' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
@@ -38,7 +40,7 @@ do { my $x = {
                                       'Encode' => '2.89',
                                       'Feature::Compat::Try' => '0',
                                       'File::ShareDir' => '0',
-                                      'JSON::Schema::Modern' => '0.571',
+                                      'JSON::Schema::Modern' => '0.574',
                                       'JSON::Schema::Modern::Document' => '0',
                                       'JSON::Schema::Modern::Utilities' => '0.531',
                                       'JSON::Schema::Modern::Vocabulary' => '0',
@@ -47,7 +49,6 @@ do { my $x = {
                                       'Mojo::Message::Request' => '0',
                                       'Mojo::Message::Response' => '0',
                                       'Moo' => '0',
-                                      'MooX::HandlesVia' => '0',
                                       'MooX::TypeTiny' => '0.002002',
                                       'Path::Tiny' => '0',
                                       'Ref::Util' => '0',
@@ -62,14 +63,15 @@ do { my $x = {
                                       'namespace::clean' => '0',
                                       'perl' => 'v5.20.0',
                                       'stable' => '0.031',
-                                      'strict' => '0',
                                       'strictures' => '2',
-                                      'utf8' => '0',
-                                      'warnings' => '0'
+                                      'utf8' => '0'
                                     },
                       'suggests' => {
                                       'Class::XSAccessor' => '0',
                                       'Cpanel::JSON::XS' => '0',
+                                      'HTTP::Message::PSGI' => '0',
+                                      'Plack::Request' => '0',
+                                      'Plack::Response' => '0',
                                       'Ref::Util::XS' => '0',
                                       'Type::Tiny::XS' => '0'
                                     }
@@ -91,11 +93,14 @@ do { my $x = {
                                    'Test::JSON::Schema::Acceptance' => '1.014',
                                    'Test::Memory::Cycle' => '0',
                                    'Test::More' => '0.96',
+                                   'Test::Needs' => '0',
                                    'URI' => '0',
                                    'YAML::PP' => '0.005',
                                    'lib' => '0',
                                    'open' => '0',
-                                   'perl' => 'v5.20.0'
+                                   'perl' => 'v5.20.0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
                                  }
                  },
        'x_Dist_Zilla' => {

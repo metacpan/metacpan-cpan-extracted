@@ -22,22 +22,22 @@ name: Locale-CLDR-Locales-Yue
 provides:
   Locale::CLDR::Locales::Yue:
     file: lib/Locale/CLDR/Locales/Yue.pm
-    version: v0.34.2
+    version: v0.34.3
   Locale::CLDR::Locales::Yue::Hans:
     file: lib/Locale/CLDR/Locales/Yue/Hans.pm
-    version: v0.34.2
+    version: v0.34.3
   Locale::CLDR::Locales::Yue::Hans::Cn:
     file: lib/Locale/CLDR/Locales/Yue/Hans/Cn.pm
-    version: v0.34.2
+    version: v0.34.3
   Locale::CLDR::Locales::Yue::Hant:
     file: lib/Locale/CLDR/Locales/Yue/Hant.pm
-    version: v0.34.2
+    version: v0.34.3
   Locale::CLDR::Locales::Yue::Hant::Hk:
     file: lib/Locale/CLDR/Locales/Yue/Hant/Hk.pm
-    version: v0.34.2
+    version: v0.34.3
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.34.2
+  Locale::CLDR: v0.34.3
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -47,5 +47,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.2
+version: v0.34.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

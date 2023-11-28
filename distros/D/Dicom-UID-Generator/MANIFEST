@@ -1,5 +1,5 @@
 Changes
-examples/ex1.pl
+examples/gen_uid_numbers.pl
 Generator.pm
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -20,5 +20,6 @@ README
 SIGNATURE
 t/Dicom-UID-Generator/01-use.t
 t/Dicom-UID-Generator/02-version.t
+t/Dicom-UID-Generator/03-new.t
 xt/Dicom-UID-Generator/01-pod_coverage.t
 xt/Dicom-UID-Generator/02-pod.t

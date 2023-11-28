@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.39';
+our $VERSION = '1.40';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.39
+version 1.40
 
 =head1 DESCRIPTION
 
@@ -129,6 +129,8 @@ The available locales are:
  be-tarask        Belarusian Taraskievica orthography               беларуская
  bem              Bemba                                             Ichibemba
  bem-ZM           Bemba Zambia                                      Ichibemba Zambia
+ bew              Betawi
+ bew-ID           Betawi Indonesia
  bez              Bena                                              Hibena
  bez-TZ           Bena Tanzania                                     Hibena Hutanzania
  bg               Bulgarian                                         български
@@ -143,6 +145,8 @@ The available locales are:
  bgn-PK           Western Balochi Pakistan                          بلوچی (رخشانی)
  bho              Bhojpuri                                          भोजपुरी
  bho-IN           Bhojpuri India                                    भोजपुरी भारत
+ blo              Anii                                              anii kagɩja
+ blo-BJ           Anii Benin                                        anii kagɩja Benɛɛ
  blt              Tai Dam                                           ꪼꪕꪒꪾ
  blt-VN           Tai Dam Vietnam                                   ꪼꪕꪒꪾ
  bm               Bambara                                           bamanakan
@@ -200,6 +204,8 @@ The available locales are:
  co-FR            Corsican France                                   corsu
  cs               Czech                                             čeština
  cs-CZ            Czech Czechia                                     čeština Česko
+ csw              Swampy Cree                                       ᓀᐦᐃᓇᐍᐏᐣ
+ csw-CA           Swampy Cree Canada                                ᓀᐦᐃᓇᐍᐏᐣ ᑲᓇᑕ
  cu               Church Slavic
  cu-RU            Church Slavic Russia
  cv               Chuvash                                           чӑваш
@@ -285,6 +291,7 @@ The available locales are:
  en-GU            English Guam                                      English Guam
  en-GY            English Guyana                                    English Guyana
  en-HK            English Hong Kong SAR China                       English Hong Kong SAR China
+ en-ID            English Indonesia                                 English Indonesia
  en-IE            English Ireland                                   English Ireland
  en-IL            English Israel                                    English Israel
  en-IM            English Isle of Man                               English Isle of Man
@@ -353,8 +360,8 @@ The available locales are:
  en-ZA            English South Africa                              English South Africa
  en-ZM            English Zambia                                    English Zambia
  en-ZW            English Zimbabwe                                  English Zimbabwe
- eo               Esperanto                                         esperanto
- eo-001           Esperanto world                                   esperanto Mondo
+ eo               Esperanto                                         Esperanto
+ eo-001           Esperanto world                                   Esperanto mondo
  es               Spanish                                           español
  es-419           Spanish Latin America                             español Latinoamérica
  es-AR            Spanish Argentina                                 español Argentina
@@ -535,6 +542,8 @@ The available locales are:
  ia-001           Interlingua world                                 interlingua Mundo
  id               Indonesian                                        Indonesia
  id-ID            Indonesian Indonesia                              Indonesia Indonesia
+ ie               Interlingue                                       Interlingue
+ ie-EE            Interlingue Estonia                               Interlingue Estonia
  ig               Igbo                                              Igbo
  ig-NG            Igbo Nigeria                                      Igbo Naịjịrịa
  ii               Sichuan Yi                                        ꆈꌠꉙ
@@ -597,6 +606,7 @@ The available locales are:
  kn               Kannada                                           ಕನ್ನಡ
  kn-IN            Kannada India                                     ಕನ್ನಡ ಭಾರತ
  ko               Korean                                            한국어
+ ko-CN            Korean China                                      한국어 중국
  ko-KP            Korean North Korea                                한국어 조선민주주의인민공화국
  ko-KR            Korean South Korea                                한국어 대한민국
  kok              Konkani                                           कोंकणी
@@ -615,10 +625,19 @@ The available locales are:
  ksf-CM           Bafia Cameroon                                    rikpa kamɛrún
  ksh              Colognian                                         Kölsch
  ksh-DE           Colognian Germany                                 Kölsch Doütschland
- ku               Kurdish                                           kurdî
- ku-TR            Kurdish Türkiye                                   kurdî Tirkiye
+ ku               Kurdish                                           kurdî (kurmancî)
+ ku-TR            Kurdish Türkiye                                   kurdî (kurmancî) Tirkiye
  kw               Cornish                                           kernewek
  kw-GB            Cornish United Kingdom                            kernewek Rywvaneth Unys
+ kxv              Kuvi                                              kuvi
+ kxv-Deva         Kuvi Devanagari                                   कुवि देवनागरी
+ kxv-Deva-IN      Kuvi India Devanagari                             कुवि बारत देवनागरी
+ kxv-Latn         Kuvi Latin                                        kuvi laṭin
+ kxv-Latn-IN      Kuvi India Latin                                  kuvi inḍiā laṭin
+ kxv-Orya         Kuvi Odia                                         କୁୱି ଅଡ଼ିଆ
+ kxv-Orya-IN      Kuvi India Odia                                   କୁୱି ବାରତ ଅଡ଼ିଆ
+ kxv-Telu         Kuvi Telugu                                       కువి తెలుగు
+ kxv-Telu-IN      Kuvi India Telugu                                 కువి బారతదెసాం తెలుగు
  ky               Kyrgyz                                            кыргызча
  ky-KG            Kyrgyz Kyrgyzstan                                 кыргызча Кыргызстан
  la               Latin
@@ -633,8 +652,8 @@ The available locales are:
  lij-IT           Ligurian Italy                                    ligure Italia
  lkt              Lakota                                            Lakȟólʼiyapi
  lkt-US           Lakota United States                              Lakȟólʼiyapi Mílahaŋska Tȟamákȟočhe
- lmo              Lombard
- lmo-IT           Lombard Italy
+ lmo              Lombard                                           Lombard
+ lmo-IT           Lombard Italy                                     Lombard Italia
  ln               Lingala                                           lingála
  ln-AO            Lingala Angola                                    lingála Angóla
  ln-CD            Lingala Congo - Kinshasa                          lingála Republíki ya Kongó Demokratíki
@@ -674,6 +693,8 @@ The available locales are:
  mgo-CM           Metaʼ Cameroon                                    metaʼ Kamalun
  mi               Māori                                             Māori
  mi-NZ            Māori New Zealand                                 Māori Aotearoa
+ mic              Mi'kmaw                                           Lʼnuiʼsuti
+ mic-CA           Mi'kmaw Canada                                    Lʼnuiʼsuti
  mk               Macedonian                                        македонски
  mk-MK            Macedonian North Macedonia                        македонски Северна Македонија
  ml               Malayalam                                         മലയാളം
@@ -719,9 +740,9 @@ The available locales are:
  nb-SJ            Norwegian Bokmål Svalbard & Jan Mayen             norsk bokmål Svalbard og Jan Mayen
  nd               North Ndebele                                     isiNdebele
  nd-ZW            North Ndebele Zimbabwe                            isiNdebele Zimbabwe
- nds              Low German
- nds-DE           Low German Germany
- nds-NL           Low German Netherlands
+ nds              Low German                                        Neddersass’sch
+ nds-DE           Low German Germany                                Neddersass’sch Düütschland
+ nds-NL           Low German Netherlands                            Neddersass’sch Nedderlannen
  ne               Nepali                                            नेपाली
  ne-IN            Nepali India                                      नेपाली भारत
  ne-NP            Nepali Nepal                                      नेपाली नेपाल
@@ -754,9 +775,9 @@ The available locales are:
  ny-MW            Nyanja Malawi                                     Nyanja
  nyn              Nyankole                                          Runyankore
  nyn-UG           Nyankole Uganda                                   Runyankore Uganda
- oc               Occitan
- oc-ES            Occitan Spain
- oc-FR            Occitan France
+ oc               Occitan                                           occitan
+ oc-ES            Occitan Spain                                     occitan Espanha
+ oc-FR            Occitan France                                    occitan França
  om               Oromo                                             Oromoo
  om-ET            Oromo Ethiopia                                    Oromoo Itoophiyaa
  om-KE            Oromo Kenya                                       Oromoo Keeniyaa
@@ -782,7 +803,7 @@ The available locales are:
  pl               Polish                                            polski
  pl-PL            Polish Poland                                     polski Polska
  prg              Prussian                                          prūsiskan
- prg-001          Prussian world                                    prūsiskan
+ prg-PL           Prussian Poland                                   prūsiskan Pōli
  ps               Pashto                                            پښتو
  ps-AF            Pashto Afghanistan                                پښتو افغانستان
  ps-PK            Pashto Pakistan                                   پښتو پاکستان
@@ -882,6 +903,8 @@ The available locales are:
  sid-ET           Sidamo Ethiopia
  sk               Slovak                                            slovenčina
  sk-SK            Slovak Slovakia                                   slovenčina Slovensko
+ skr                                                                سرائیکی
+ skr-PK           Pakistan                                          سرائیکی
  sl               Slovenian                                         slovenščina
  sl-SI            Slovenian Slovenia                                slovenščina Slovenija
  sma              Southern Sami                                     Åarjelsaemien gïele
@@ -940,7 +963,7 @@ The available locales are:
  syr-IQ           Syriac Iraq                                       ܣܘܪܝܝܐ ܥܝܪܩ
  syr-SY           Syriac Syria                                      ܣܘܪܝܝܐ ܣܘܪܝܐ
  szl              Silesian                                          ślōnski
- szl-PL           Silesian Poland                                   ślōnski
+ szl-PL           Silesian Poland                                   ślōnski Polska
  ta               Tamil                                             தமிழ்
  ta-IN            Tamil India                                       தமிழ் இந்தியா
  ta-LK            Tamil Sri Lanka                                   தமிழ் இலங்கை
@@ -967,8 +990,8 @@ The available locales are:
  tn-ZA            Tswana South Africa                               Aforika Borwa
  to               Tongan                                            lea fakatonga
  to-TO            Tongan Tonga                                      lea fakatonga Tonga
- tok              Toki Pona                                         Toki Pona
- tok-001          Toki Pona world                                   Toki Pona
+ tok              Toki Pona                                         toki pona
+ tok-001          Toki Pona world                                   toki pona ma ale
  tpi              Tok Pisin                                         Tok Pisin
  tpi-PG           Tok Pisin Papua New Guinea                        Tok Pisin Papua Niugini
  tr               Turkish                                           Türkçe
@@ -984,6 +1007,8 @@ The available locales are:
  tt-RU            Tatar Russia                                      татар Россия
  twq              Tasawaq                                           Tasawaq senni
  twq-NE           Tasawaq Niger                                     Tasawaq senni Nižer
+ tyv              Tuvinian
+ tyv-RU           Tuvinian Russia
  tzm              Central Atlas Tamazight                           Tamaziɣt n laṭlaṣ
  tzm-MA           Central Atlas Tamazight Morocco                   Tamaziɣt n laṭlaṣ Meṛṛuk
  ug               Uyghur                                            ئۇيغۇرچە
@@ -1008,10 +1033,12 @@ The available locales are:
  vai-Vaii-LR      Vai Liberia Vai                                   ꕙꔤ ꕞꔤꔫꕩ
  ve               Venda
  ve-ZA            Venda South Africa
- vec              Venetian                                          Veneto
- vec-IT           Venetian Italy                                    Veneto
+ vec              Venetian                                          veneto
+ vec-IT           Venetian Italy                                    veneto Italia
  vi               Vietnamese                                        Tiếng Việt
  vi-VN            Vietnamese Vietnam                                Tiếng Việt Việt Nam
+ vmw              Makhuwa                                           emakhuwa
+ vmw-MZ           Makhuwa Mozambique                                emakhuwa oMosambikhi
  vo               Volapük
  vo-001           Volapük world
  vun              Vunjo                                             Kyivunjo
@@ -1028,12 +1055,14 @@ The available locales are:
  wo-SN            Wolof Senegal                                     Wolof Senegaal
  xh               Xhosa                                             IsiXhosa
  xh-ZA            Xhosa South Africa                                IsiXhosa EMzantsi Afrika
+ xnr              Kangri                                            कांगड़ी
+ xnr-IN           Kangri India                                      कांगड़ी भारत
  xog              Soga                                              Olusoga
  xog-UG           Soga Uganda                                       Olusoga Yuganda
  yav              Yangben                                           nuasue
  yav-CM           Yangben Cameroon                                  nuasue Kemelún
  yi               Yiddish                                           ייִדיש
- yi-001           Yiddish world                                     ייִדיש וועלט
+ yi-UA            Yiddish Ukraine                                   ייִדיש אוקראַינע
  yo               Yoruba                                            Èdè Yorùbá
  yo-BJ            Yoruba Benin                                      Èdè Yorùbá Bɛ̀nɛ̀
  yo-NG            Yoruba Nigeria                                    Èdè Yorùbá Nàìjíríà
@@ -1046,6 +1075,8 @@ The available locales are:
  yue-Hans-CN      Cantonese China Simplified                        粤语 中华人民共和国 简体
  yue-Hant         Cantonese Traditional                             粵語 繁體
  yue-Hant-HK      Cantonese Hong Kong SAR China Traditional         粵語 中華人民共和國香港特別行政區 繁體
+ za               Zhuang                                            Vahcuengh
+ za-CN            Zhuang China                                      Vahcuengh Cunghgoz
  zgh              Standard Moroccan Tamazight                       ⵜⴰⵎⴰⵣⵉⵖⵜ
  zgh-MA           Standard Moroccan Tamazight Morocco               ⵜⴰⵎⴰⵣⵉⵖⵜ ⵍⵎⵖⵔⵉⴱ
  zh               Chinese                                           中文

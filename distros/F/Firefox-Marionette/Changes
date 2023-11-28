@@ -1,5 +1,16 @@
 Revision history for Firefox-Marionette
 
+1.49  Sat Nov 18 12:10 2023
+       Fixing a hang for Windows 7 in G#26.  Thanks to twata1.
+
+1.48  Mon Nov 13 20:51 2023
+       Adding extra Cache constants
+       Fixing github actions for OS X
+
+1.47  Sun Nov 12 22:25 2023
+       Adding WebFrame and WebWindow support
+       Now using parent instead of base for inheritance
+
 1.46  Sat Oct 14 18:56 2023
        Documentation and test suite fixes
 

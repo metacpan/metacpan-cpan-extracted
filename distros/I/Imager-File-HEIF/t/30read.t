@@ -37,4 +37,45 @@ SKIP:
   is_image_similar($im, $cmp, 1_000_000, "check if vaguely similar");
 }
 
+{
+  my $im = Imager->new;
+  ok($im->read(file => "testimg/exif.heic"),
+     "read image with EXIF metadata");
+  # this metadata was copied from an old, old file with exiftool
+  my %expect =
+    (
+      exif_aperture => "2.97085",
+      exif_artist => "Tony Cook",
+      exif_color_space => "1",
+      exif_color_space_name => "sRGB",
+      exif_date_time => "2005:12:06 15:25:39",
+      exif_date_time_digitized => "2005:12:06 15:25:39",
+      exif_date_time_original => "2005:11:25 00:00:00",
+      exif_exposure_mode => "0",
+      exif_exposure_mode_name => "Auto exposure",
+      exif_exposure_time => "0.0166667",
+      exif_f_number => "2.8",
+      exif_flashpix_version => "0100",
+      exif_image_description => "Imager Development Notes",
+      exif_iso_speed_ratings => "100",
+      exif_make => "Canon",
+      exif_model => "CanoScan LiDE 35",
+      exif_resolution_unit => "2",
+      exif_resolution_unit_name => "inches",
+      exif_scene_capture_type => "0",
+      exif_scene_capture_type_name => "Standard",
+      exif_shutter_speed => "5.90689",
+      exif_software => "CanoScan Toolbox 4.5",
+      exif_user_comment => "ASCII   Part of notes from reworking i_arc() and friends.",
+      exif_version => "0221",
+      exif_white_balance => "0",
+      exif_white_balance_name => "Auto white balance",
+      exif_x_resolution => "75",
+      exif_y_resolution => "75",
+     );
+  for my $tag (keys %expect) {
+    is($im->tags(name => $tag), $expect{$tag}, $tag);
+  }
+}
+
 done_testing();

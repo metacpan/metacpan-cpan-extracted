@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **LinkedSource** | **string** |  |
 **RotationAngle** | **int** |  |
-**Text** | **string** |  |
+**Text** | **string** | Gets or sets the text of display unit label. |
 **TextDirection** | **string** |  |
 **TextHorizontalAlignment** | **string** |  |
 **TextVerticalAlignment** | **string** |  |

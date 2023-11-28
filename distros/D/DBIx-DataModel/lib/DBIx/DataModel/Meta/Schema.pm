@@ -62,6 +62,12 @@ $spec->{statement_class}        = {type    => SCALAR,
                                    isa     => $statement_class,
                                    default => $statement_class};
 
+my $sqla_abstract_class = 'SQL::Abstract::More';
+$spec->{sql_abstract_class}     = {type    => SCALAR, 
+                                   isa     => $sqla_abstract_class,
+                                   default => $sqla_abstract_class};
+$spec->{sql_abstract_args}      = {type    => ARRAYREF, 
+                                   default => []};
 
 #----------------------------------------------------------------------
 # PUBLIC METHODS : CONSTRUCTOR AND ACCESSORS

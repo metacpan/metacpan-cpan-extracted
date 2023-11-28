@@ -230,6 +230,7 @@ _new_event_object(xcb_generic_event_t *event)
         {
             objname = "X11::XCB::Event::Focus";
             xcb_focus_in_event_t *e = (xcb_focus_in_event_t*)event;
+            hv_store(hash, "detail", strlen("detail"), newSViv(e->detail), 0);
             hv_store(hash, "event", strlen("event"), newSViv(e->event), 0);
             hv_store(hash, "mode", strlen("mode"), newSViv(e->mode), 0);
         }

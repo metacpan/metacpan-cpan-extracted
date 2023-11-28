@@ -19,6 +19,7 @@ if($ENV{AUTHOR_TESTING} ) {
 }
 
 __DATA__
+CGI
 Dreamhost
 inet
 misconfigures

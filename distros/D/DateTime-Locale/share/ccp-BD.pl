@@ -30,7 +30,6 @@
     MMM => "LLL",
     MMMEd => "E d MMM",
     MMMMEd => "E d MMMM",
-    "MMMMW-count-one" => "MMMM \N{U+11103}\N{U+1112c}\N{U+11122}\N{U+11134} \N{U+11120}\N{U+11134} \N{U+11125}\N{U+1111b}\N{U+11134}\N{U+11116} W",
     "MMMMW-count-other" => "MMMM \N{U+11103}\N{U+1112c}\N{U+11122}\N{U+11134} \N{U+11120}\N{U+11134} \N{U+11125}\N{U+1111b}\N{U+11134}\N{U+11116} W",
     MMMMd => "d MMMM",
     MMMd => "d MMM",
@@ -54,7 +53,6 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "Y \N{U+11103}\N{U+1112c}\N{U+11122}\N{U+11134} \N{U+11116}\N{U+11127}\N{U+1111f}\N{U+11134} \N{U+11125}\N{U+1111b}\N{U+11134}\N{U+11116} w",
     "yw-count-other" => "Y \N{U+11103}\N{U+1112c}\N{U+11122}\N{U+11134} \N{U+11116}\N{U+11127}\N{U+1111f}\N{U+11134} \N{U+11125}\N{U+1111b}\N{U+11134}\N{U+11116} w",
   },
   code => "ccp-BD",
@@ -272,5 +270,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 43,
+  version => 44,
 }

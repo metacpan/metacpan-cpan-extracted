@@ -39,7 +39,7 @@
             "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" : "0",
             "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" : "0",
-            "File::Trash::FreeDesktop" : "0.204",
+            "File::Trash::FreeDesktop" : "0.205",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
@@ -64,7 +64,7 @@
    "provides" : {
       "App::TrashUtils" : {
          "file" : "lib/App/TrashUtils.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -79,7 +79,7 @@
          "web" : "https://github.com/perlancar/perl-App-TrashUtils"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

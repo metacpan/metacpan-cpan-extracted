@@ -1,0 +1,31 @@
+---
+abstract: 'A Mojolicious plugin that adds a helper to test if a request is a bot.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '1.302195'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojolicious-Plugin-IsBot
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+    - t
+requires:
+  Mojolicious: '9.00'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/rawleyfowler/mojolicious-plugin-IsBot/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/rawleyfowler/mojolicious-plugin-IsBot
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

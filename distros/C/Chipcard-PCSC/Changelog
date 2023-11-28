@@ -1,0 +1,639 @@
+2015-11-19  author  <author@debian>
+
+	* README: Release 1.4.14
+
+	* PCSC.xs: Update copyright date
+
+	* PCSC.xs: _StringifyError(): cast Error in a (DWORD)
+
+	On Mac OS X El Capitan (at least) the value is extended to 64 bits and
+	is then wrong.
+
+	We get 0xFFFFFFFF80100068 instead of 0x80100068 and all the error codes
+	are all converted to the default error: "Unknown (reader specific ?) error..."
+
+2014-12-05  author  <author@debian>
+
+	* LICENCE: Update GNU GPL v2 license text
+
+	The FSF postal adress has changed.
+
+	Thanks to Martin Hauke for the bug report.
+
+	* README: Release 1.4.13
+
+2013-04-01  author  <author@debian>
+
+	* create_distrib.sh:
+	rcs2log has been moved in /usr/share/cvs/contrib/rcs2log
+
+	* PCSC.pm: Support Perl 5.16
+
+	Remove the warning:
+	defined(@array) is deprecated at /usr/lib/perl/5.16.3/Chipcard/PCSC.pm line 69.
+		(Maybe you should just omit the defined()?)
+
+	Thanks to Viliam Pucik for the bug report
+
+2011-03-06  author  <author@debian>
+
+	* README: release 1.4.12
+
+	* PCSC.xs: Also check for SVt_PVIV and not just SVt_IV.
+
+	Fixes Debian bug #613722 "libpcsc-perl: GetStatusChange error after print"
+
+	* PCSC.xs, PCSC.pm, test.pl: Use lines of less than 80 columns
+
+2010-10-27  author  <author@debian>
+
+	* create_distrib.sh: compress using bzip2 instead of gzip
+
+	* README: release 1.4.11
+
+	* PCSCperl.h: SCardCancelTransaction() is no more present in pcsc-lite
+
+	* PCSC.pm, PCSC.pod, PCSC.xs, PCSCperl.h:
+	SCardSetTimout is no more present in pcsc-lite > 1.6.4
+	It was a pcsc-lite specific and deprecated function
+
+2010-08-18  author  <author@debian>
+
+	* PCSCperl.h:
+	use SCARD_READERSTATE * instead of LPSCARD_READERSTATE since is not
+	define in pcsc-lite < 1.6.3
+
+	* README: release 1.4.10
+
+	* PCSC.pm, PCSC.xs, PCSCperl.h, README: Update copyright date
+
+	* create_distrib.sh: Allow more than one digit in the version numbers
+
+	* PCSC.xs, PCSCperl.h:
+	Use LPSCARD_READERSTATE instead of LPSCARD_READERSTATE_A since it is no
+	more defined in pcsc-lite >= 1.6.2
+
+2010-06-30  author  <author@debian>
+
+	* README: release 1.4.9
+
+	* PCSC.pm, PCSC.pod, PCSC.xs: sort constants in alphabetical order
+
+	* PCSC.pod, PCSC.xs:
+	SCARD_E_UNSUPPORTED_FEATURE is not specific to pcsc-lite but is also
+	available on Windows
+
+	* PCSC.pm, PCSC.pod, PCSC.xs:
+	SCARD_W_INSERTED_CARD is no more defined in pcsc-lite 1.6.0 and then
+	pcsc-perl failed to build. It was an error code specific to pcsc-lite.
+
+2010-01-03  author  <author@debian>
+
+	* Card/Card.pod: fix spelling error
+
+2009-09-23  author  <author@debian>
+
+	* README: release 1.4.8
+
+	* Card/Card.pod: Correct 3 bugs signaled by podchecker
+
+2009-09-06  author  <author@debian>
+
+	* PCSC.xs:
+	PCSC.xs:853: warning: format ‘%d’ expects type ‘int’, but argument 2 has type ‘long unsigned int’
+
+2008-09-28  author  <author@debian>
+
+	* PCSC.pod: example code for GetStatusChange()
+
+2008-03-26  author  <author@debian>
+
+	* Card/Card.pm: type: prefered -> preferred
+
+	* Card/Card.pm: update copyright date
+
+	* Card/Card.pm: typo: prefered -> preferred
+
+	* Card/Card.pod: typos
+
+	* README: release 1.4.7
+
+2008-03-12  author  <author@debian>
+
+	* MANIFEST: remove removed files (merged)
+
+	* Makefile_OSX.PL, Makefile_win.PL: merged in Makefile.PL
+
+	* README, README.OSX, README.Unix, README.Windows:
+	merge all README.* in README
+
+	* Makefile.PL: merge Makefile_win.PL and Makefile_OSX.PL
+
+	* PCSC.pod: typos
+
+	* PCSC.pod: typo
+
+	* PCSC.pm: version 0.05
+
+	* PCSC.pod, PCSCperl.h: update copyright date
+
+	* PCSCperl.h:
+	reorder the .h inclusion to have a default for Unix system
+
+2007-03-07  author  <author@debian>
+
+	* README: release 1.4.6
+
+	* PCSCperl.h: add support of GNU/FreeBSD
+
+	Thanks to Cyril Brulebois for the patch (Debian bug #413618)
+
+2007-03-02  author  <author@debian>
+
+	* README: release 1.4.5
+
+	* MANIFEST: add Card/t/test.t
+
+	* PCSC.xs:
+	remove a const on the return type to avoid: PCSC.xs:244: warning: type
+	qualifiers ignored on function return type
+
+	* PCSCperl.h: For Linux
+	#define LPCTSTR LPCSTR
+	#define LPTSTR LPSTR
+	to avoid using deprecated types
+
+2007-02-05  author  <author@debian>
+
+	* PCSC.xs: remove some pcsc-lite specific constants
+
+2006-12-09  author  <author@debian>
+
+	* t/test.t:
+	remove Chipcard::PCSC::Card tests since they are now done by Card/t/test.t
+
+	* Card/t/test.t: new file. Copy from ../t/test.t
+
+	* t/test.t, test.pl: use Test::More instead of ExtUtils::testlib
+
+2006-10-10  author  <author@debian>
+
+	* PCSC.pm: remove a debug print command
+
+2006-10-08  author  <author@debian>
+
+	* PCSC.pm: version 0.04
+
+	* PCSC.pm:
+	ascii_to_array(): check that an hex number is exactly two characters
+
+2006-08-12  author  <author@debian>
+
+	* README: release 1.4.4
+
+	* Card/Card.pm, examples/gsm_directory.pl, examples/test_iso_error.pl, test/multiple_readers.pl, test/single_reader.pl, PCSC.pm, README.Unix, README.Windows, create_distrib.sh, test.pl:
+	new $Id$ format
+
+2006-05-30  author  <author@debian>
+
+	* PCSC.xs, PCSCperl.h: add support of extended APDU
+
+2006-05-16  author  <author@debian>
+
+	* README: release 1.4.3
+
+2006-05-04  author  <author@debian>
+
+	* PCSC.xs: use unsigned char for pbAtr[] to have "3B FA ..." instead of
+	"3B FFFFFFFA ..."
+
+	* t/test.t: update $Id$
+
+	* Makefile_OSX.PL: update for Mac OS X Tiger
+
+	* PCSC.xs:
+	change some types and use some cast to make the code compile under Mac
+	OS X
+
+	* PCSCperl.h: add some #include <> for Mac OS X
+
+2004-08-06  author  <author@debian>
+
+	* README: release 1.4.2
+
+	* PCSC.xs:
+	allow to use SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1 as the protocol
+
+	* Card/Card.pm: typo: informatin -> information
+
+2004-07-04  author  <author@debian>
+
+	* README: release 1.4.1
+
+	* README:
+	use http://pcsclite.alioth.debian.org/ as the pcsc-lite homepage
+
+	* Makefile.PL, PCSCperl.h:
+	back to use pcsclite.h instead of PCSC/pcsclite.h for __linux__ but now
+	use `pkg-config --cflags libpcsclite` at compilation
+
+2004-06-29  author  <author@debian>
+
+	* Card/Card.pm:
+	ISO7816Error(): return an error if given $sw if not 5 chars long "xx xx"
+
+	* Card/Card.pm:
+	return (undef) if the protocol is not defined in Transmit. This happens
+	if you change a T=0 card with a T=1 (or vice versa) and try to exchange
+	an APDU without disconnecting first.
+
+2004-06-25  author  <author@debian>
+
+	* Card/Card.pod: add en empty line
+
+	* PCSCperl.h: - use PCSC/pcsclite.h
+	- replace LPCSTR by LPCTSTR
+
+2004-05-30  author  <author@debian>
+
+	* README: release 1.4.0
+
+	* PCSC.pm: ABI changed so change VERSION number
+
+	* PCSCperl.h: - add support of new SCardControl() API through Control()
+	- now loads libpcsclite.so.1 instead of libpcsclite.so.0
+
+	* Card/Card.pm, Card/Card.pod, PCSC.xs, test.pl, test/single_reader.pl:
+	add support of new SCardControl() API
+
+2004-04-02  author  <author@debian>
+
+	* README: release 1.3.1
+
+	* PCSC.pod: document GetStatusChange()
+
+	* test.pl: add demo code for GetStatusChange()
+
+	* PCSC.xs, PCSCperl.h:
+	use dynamic table and avoid using the deprecated PCSCLITE_MAX_CHANNELS
+
+2004-01-18  author  <author@debian>
+
+	* Card/Card.pm, Card/Card.pod:
+	Use regular expression "90 [10]0" instead of "90 [1,0]0"
+
+	* Card/Card.pm:
+	allow commands to be in the form "00A40100020100" instead of "00 A4 01 00 02 01 00"
+
+2003-12-13  author  <author@debian>
+
+	* README: release 1.3.0
+
+	* Card/Card.pod: add documentation for Control()
+
+	* test.pl:
+	simplify the sample code for Control() since array_to_ascii() now
+	returns an empty string for an empty list
+
+	* PCSC.pm: array_to_ascii() return an empty string for an empty list
+
+	* test.pl, test/single_reader.pl:
+	Comment out the tests for Control since the result is any thing
+	depending on the reader and driver.
+
+2003-12-11  author  <author@debian>
+
+	* PCSC.xs:
+	Windows PCSC has a different behavior and ATR and ReaderName buffers
+	must not be set to NULL. Thanks to Andrew Kay for the patch.
+
+	* MANIFEST: add Makefile_win.PL
+
+	* Card/Card.pm, PCSC.xs, PCSCperl.h, test.pl, test/single_reader.pl:
+	Add support for SCardControl with $out = $hContext->Control (\@in);
+
+2003-12-10  author  <author@debian>
+
+	* Card/Card.pod: some repaging.
+
+	* Card/Card.pod: correct a typo
+
+2003-12-09  author  <author@debian>
+
+	* Card/Card.pm, Card/Card.pod:
+	by default use T=0 | T=1 protocols instead of just T=0
+
+	* PCSC.xs:
+	Initalise ioRecvPci structure in Transmit(). Patch from Troy Curtiss.
+
+	* PCSCperl.h: add #define PCSCLITE_MAX_CHANNELS for Windows plateforms
+
+	* Makefile_win.PL: new file to support Windows platforms
+
+2003-05-27  author  <author@debian>
+
+	* README: release 1.2.2
+
+	* MANIFEST:
+	Makefile_OSX.pl is renamed Makefile_OSX.PL since it was not a correct
+	solution to avoid automatic use by Perl. We use PL_FILES instead.
+
+	* Makefile_OSX.PL:
+	use the new naming scheme and add PL_FILES line to avoid problems with
+	the other Makefile.PL
+
+	* Makefile.PL: add PL_FILES line to avoid problem with Makefile_OSX.PL
+
+2003-05-25  author  <author@debian>
+
+	* README.OSX: addapted comment to the updated Makefile_OSX.PL
+
+	* Makefile_OSX.PL: remove #!/usr/bin/perl -w
+
+	* Card/Card.pm, PCSC.pm:
+	removed #!/usr/bin/perl as suggested by Ville Skytt�
+
+	* PCSC.pm:
+	add constant definition (thanks to Ville Skytt� for report and patch)
+
+2003-05-24  author  <author@debian>
+
+	* README: release 1.2.1
+
+	* MANIFEST: Card/test.pl removed
+
+	* MANIFEST: test_iso_error.pl moved into examples
+
+	* MANIFEST: files have moved
+
+	* Card/Makefile.PL: new file to install Card/Card.*
+
+	* Makefile.PL: moved files from Chipcard/ to .
+
+	* test.pl:
+	wait for ".. .." in TransmitWithCheck test since the SW will depend on
+	the inserted card
+
+	* Card/Card.pm: add a version number
+
+	* Card/Card.pm: Chipcard::PCSC::Utils.pm no longer exists
+
+2003-05-10  author  <author@debian>
+
+	* MANIFEST, Card/Card.pm, Card/Utils.pm: Utils.pm merged into Card.pm
+
+2003-05-09  author  <author@debian>
+
+	* Card/Card.pod: example are now in typewriter text
+
+	* Card/Card.pod: typos
+
+	* MANIFEST: PCSC.pod moved from . to Chipcard/
+
+	* README: release 1.2.0
+
+	* MANIFEST: add Chipcard/PCSC/Utils.pm and test_iso_error.pl
+
+	* create_distrib.sh: use 'mkdir -p' instead of just 'mkdir'
+
+	* create_distrib.sh: make distclean only if Makefile exists
+
+	* create_distrib.sh: make distclean before anything else
+
+	* test.pl: add test support of TransmitWithCheck and
+	Chipcard::PCSC::Card::ISO7816Error
+
+	* examples/test_iso_error.pl:
+	small script to test output of Chipcard::PCSC::Card::ISO7816Error()
+
+	* Card/Card.pod:
+	add documentation for TransmitWithCheck() and ISO7816Error()
+
+	* Card/Utils.pm:
+	two new functions: TransmitWithCheck() and ISO7816Error()
+
+	* test/multiple_readers.pl:
+	cleanly exit if a second reader is not found
+
+	* t/test.t: remove Log list
+
+	* Card/Card.pm: some reformating
+
+2003-05-06  author  <author@debian>
+
+	* examples/gsm_directory.pl, t/test.t, test/multiple_readers.pl, test/single_reader.pl, Card/Card.pm, Card/Card.pod, MANIFEST, Makefile.PL, PCSC.pm, PCSC.pod, PCSC.xs, PCSCperl.h, test.pl:
+	naming scheme migration from PCSC to Chipcard::PCSC
+
+2002-11-07  author  <author@debian>
+
+	* README: release 1.1.3
+
+2002-08-29  author  <author@debian>
+
+	* PCSC.xs: add a pTHX_ cast to make it work with Perl 5.8
+
+	* PCSC.pm: add prototypes and contants definitions
+
+2002-08-28  author  <author@debian>
+
+	* README: release 1.1.2
+
+	* PCSCperl.h: link against libpcsclite.so.0 instead of libpcsclite.so
+
+2002-05-16  author  <author@debian>
+
+	* PCSC.xs:
+	 Modified error handling to use warn() instead of the more destructive
+	croak()... croak() only remains for blocking problems such as a missing
+	libraryetc...
+
+	 Implemented GetStatusChange and Cancel
+
+	* PCSC.pm: Added support for GetStatusChange and Cancel
+
+2002-03-07  author  <author@debian>
+
+	* README: release 1.1.1
+
+	* Card/Card.pm, Card/Card.pod, PCSC.pod, PCSC.xs: use bold for commands
+	changed -> into -E<gt> (reverse patch :-)
+
+2002-03-06  author  <author@debian>
+
+	* PCSCperl.h: comment unused variable declarations
+
+	* Makefile.PL: add "-O2 -Wall" arguments
+
+	* MANIFEST: add README file
+
+	* README: release 1.1.0
+
+	* README.Unix: removed release reference. See README instead
+
+	* Card/Card.pod, PCSC.pod: complete reindentation
+
+	* PCSC.xs: correct line wrap in licence text
+
+2002-03-05  author  <author@debian>
+
+	* README.Unix: Release 1.0.9
+
+	* PCSC.pm, README.Unix: correctly test if a digit is hexa or not
+
+	* Card/Card.pm: the minium APDU length is 4 bytes and not 5
+
+2001-10-18  author  <author@debian>
+
+	* MANIFEST: added LICENCE
+
+	* LICENCE: Added GPL LICENCE
+
+	* README.Unix: Release 1.0.8
+
+	* create_distrib.sh: format is foo-bar-x.y.z not foo-bar.x.y.z
+
+	* create_distrib.sh: removed debian/ from the official archive
+
+	* MANIFEST, README.Windows, remarks.txt:
+	remarks.txt renamed README.Windows
+
+	* MANIFEST, create_distrib.sh:
+	added some comments, remove exit used for debug
+
+	* MANIFEST, create_distrib.sh:
+	compare the files in the directory with MANIFEST to check all the files
+	will be included in the archive
+
+2001-10-17  author  <author@debian>
+
+	* create_distrib.sh:
+	Added checks: directory name format, directory existance
+
+2001-10-16  author  <author@debian>
+
+	* MANIFEST:
+	removed scriptor and gscriptor scripts (moved to pcsc-tools)
+
+	* examples/readfile.script: removed
+
+	* MANIFEST: removed create_distrib.sh from exported files
+
+	* create_distrib.sh:
+	added automatic creation of Changelog using rcs2log
+
+	* README.Unix: quick install notes
+
+	* MANIFEST, create_distrib.sh: *** empty log message ***
+
+	* create_distrib.sh:
+	create a nice package without Debian specific stuff and CVS directories
+
+2001-10-10  author  <author@debian>
+
+	* t/test.t: Initial check in
+
+	* PCSC.pm:
+	Added fake variable declarations/initialization to work with make test
+
+2001-09-07  author  <author@debian>
+
+	* examples/gsm_directory.pl: cosmetic chage in the header comment
+
+2001-09-06  author  <author@debian>
+
+	* examples/gsm_directory.pl: added CVS Id and Log fields
+
+	* examples/gsm_directory.pl: typos in comments
+
+	* examples/gsm_directory.pl: Added a license
+
+2001-09-05  author  <author@debian>
+
+	* examples/gsm.script, examples/gsm_directory.pl:
+	Added some GSM11.11 demo scripts to gscriptor/scriptor as well as a
+	small example of how to use PCSC-perl to read the directory from your
+	GSM card...
+
+	* Card/Card.pm:
+	Do not warn anymore when P3(len) is not related to the number of bytes
+	to be transmitted after the APDU
+
+	* test/single_reader.pl:
+	Added -w flag to #!/usr/bin/perl and corrected some warnings
+
+	* test/multiple_readers.pl:
+	Added title and author name in the GPL licence
+
+	* test/single_reader.pl: Added CVS Id and Log fields
+	Added GPL licence
+
+	* test/multiple_readers.pl:
+	Added -w flag to /usr/bin/perl and corrected some warnings
+
+	* test/multiple_readers.pl: Added CVS Id and Log fields
+	Added GPL licence
+
+	* test.pl: Added CVS Log and Id fields
+	Added GPL licence
+
+2001-09-04  author  <author@debian>
+
+	* test/multiple_readers.pl, test/single_reader.pl:
+	Now using the real double typed magical scalar $PCSC::errno to report
+	errors instead of the old $! which was buggy.
+
+	* test/multiple_readers.pl, test/single_reader.pl:
+	updated the files so that they now use the 'new' package architecture
+	i.e.: PCSC + PCSC::Card insteead of PCSC + PCSCCard...
+
+	* PCSC.pm:
+	tried to make the @EXPORT @ISA $VERSION variable use more standard (At
+	least I hope so)
+
+	* PCSC.pm:
+	Fixed a bug in PCSC::ascii_to_array(). The returned array was global
+	therefore, each call to the function was returning all the arrays since
+	the object initialization.
+	I now use 'use strict' to avoid such problems in the future but I do not
+	know if I do it the proper way... I had to modify EXPORT and such to make
+	it run
+
+	* test/multiple_readers.pl, test/single_reader.pl:
+	More cosmetic changes
+
+	* Card/Card.pm, Card/Card.pod, PCSC.pm, PCSC.pod, PCSC.xs, test.pl:
+	Applied a patch from somebody who apparently wants to stay anonymous.
+	This patch includes mostly cosmetic changes and extra documentation about
+	array_to_ascii() and ascii_to_array(). Thanks to this contributor for his
+	help and time
+
+2001-07-02  author  <author@debian>
+
+	* PCSC.pod, test.pl:
+	Made minor modifications (corrected some misspelled words in the doc and
+	removed unnecessary commented code)
+
+	* examples/readfile.script: Initial checkin
+
+2001-06-12  author  <author@debian>
+
+	* README.OSX: Small README about the OS X install.
+
+	* Makefile_OSX.PL:
+	Changed name tp .pl instead of .PL otherwise MakeMaker tries to run Makefile_OSX.PL
+
+	* PCSC.pod, PCSC.xs:
+	Modification for Mac OS X support (LOAD_LIB replaced by LOAD_LIB())
+
+	* PCSCperl.h: Added support for MacOS X
+
+2001-05-31  author  <author@debian>
+
+	* Card/Card.pm, PCSC.pm: added hash-bang
+
+	* Card/Card.pm, Card/Card.pod, Makefile.PL, PCSC.pm, PCSC.pod, PCSC.xs, PCSCperl.h, remarks.txt, test.pl, test/multiple_readers.pl, test/single_reader.pl, typemap:
+	Initial import
+
+	* Card/Card.pm, Card/Card.pod, Makefile.PL, PCSC.pm, PCSC.pod, PCSC.xs, PCSCperl.h, remarks.txt, test.pl, test/multiple_readers.pl, test/single_reader.pl, typemap:
+	New file.
+

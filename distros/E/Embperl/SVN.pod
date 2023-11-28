@@ -27,37 +27,30 @@ helpful.
 
 To access the Subversion repositories anonymously, you will need a Subversion client. 
 You can also browse the ASF projects that are using Subversion with a Webbroswer via
-http://svn.apache.org/repos/asf/.
+https://svn.apache.org/repos/asf/.
 
-Embperl can be found at the URL http://svn.apache.org/repos/asf/perl/embperl/
+Embperl can be found at the URL https://svn.apache.org/repos/asf/perl/embperl/
 
 To check it out use
 
-  svn checkout http://svn.apache.org/repos/asf/perl/embperl/trunk embperl
+  svn checkout https://svn.apache.org/repos/asf/perl/embperl/trunk embperl
 
 To keep it up to date go into the embperl directory and run
 
   svn up
 
-For more help on using Subversion, consult the Subversion website (http://subversion.tigris.org/)
-or Subversion book (http://svnbook.red-bean.com/). 
-The web site provides a list of clients and useful links (http://subversion.tigris.org/project_links.html).
+For more help on using Subversion, consult the Subversion website (https://subversion.tigris.org/)
+or Subversion book (https://svnbook.red-bean.com/). 
+The web site provides a list of clients and useful links (https://subversion.tigris.org/project_links.html).
 
 
 =head2 web-access
 
 As mentioned above you can browser the svn repository directly with a webbrowser at
-http://svn.apache.org/repos/asf/perl/embperl
+https://svn.apache.org/repos/asf/perl/embperl
 
-A more confortable way is to use http://svn.apache.org/viewcvs.cgi/perl/embperl/
+A more confortable way is to use https://svn.apache.org/viewcvs.cgi/perl/embperl/
 
-
-=head2 Snapshot
-
-A snapshot is rolled off the Embperl tree every 6 hours and placed
-here:
-
-http://svn.apache.org/snapshots/embperl/
 
 
 =head2 Embperl 1.x
@@ -67,7 +60,7 @@ will become necessary you can access the Embperl 1.x code via the branch
 B<ep1>, so when you checkout just run
 
 
-    svn checkout http://svn.apache.org/repos/asf/perl/embperl/branches/ep1/
+    svn checkout https://svn.apache.org/repos/asf/perl/embperl/branches/ep1/
 
 
 =head2 MAILING LIST

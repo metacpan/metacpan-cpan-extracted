@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Software::License::Artistic_1_0;
-$Software::License::Artistic_1_0::VERSION = '0.104004';
+package Software::License::Artistic_1_0 0.104005;
+
 use parent 'Software::License';
 # ABSTRACT: The Artistic License
 
@@ -61,7 +61,7 @@ Software::License::Artistic_1_0 - The Artistic License
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 PERL VERSION
 
@@ -100,7 +100,7 @@ By default this method returns true on instances and dies on the class.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

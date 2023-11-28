@@ -1,6 +1,13 @@
 Revision history for Perl extension UI-Various
 
-0.43 2023-09-16T12:46:13Z
+0.44 2023-11-11T13:20:34Z
+
+0.44 2023-11-11T13:20:10Z
+
+    - improved builder/dod-check.pl
+    - added another KNWON ERROR comment (for smokers)
+    - added missing German translations
+    - descriminate identical error messages in builder/update-language.pl
 
 0.43 2023-09-16T12:45:31Z
 

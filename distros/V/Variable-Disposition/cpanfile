@@ -1,4 +1,4 @@
-requires 'Future', '>= 0.30';
+requires 'Future', '>= 0.36';
 
 on 'test' => sub {
 	requires 'Test::More', '>= 0.98';

@@ -3,7 +3,7 @@ package Net::DNS::SEC::RSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: RSA.pm 1863 2022-03-14 14:59:21Z willem $)[2];
+our $VERSION = (qw$Id: RSA.pm 1940 2023-10-30 15:59:20Z willem $)[2];
 
 
 =head1 NAME
@@ -66,10 +66,9 @@ sub sign {
 	my $evpmd = $parameters{$private->algorithm};
 	die 'private key not RSA' unless $evpmd;
 
-	my ( $n, $e, $d, $p, $q ) =
-			map { decode_base64( $private->$_ ) } qw(Modulus PublicExponent PrivateExponent Prime1 Prime2);
-
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_RSA( $n, $e, $d, $p, $q );
+	my @key = qw(Modulus PublicExponent PrivateExponent Prime1 Prime2 Exponent1 Exponent2 Coefficient);
+	my ( $n, $e, $d, $p1, $p2, $e1, $e2, $c ) = map { decode_base64( $private->$_ ) } @key;
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_RSA( $n, $e, $d, $p1, $p2, $e1, $e2, $c );
 
 	return Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
 }
@@ -88,7 +87,7 @@ sub verify {
 	my $keyfmt = $short ? "x a$short a*" : "x3 a$long a*";
 	my ( $exponent, $modulus ) = unpack( $keyfmt, $keybin );
 
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_RSA( $modulus, $exponent, '', '', '' );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_RSA( $modulus, $exponent );
 
 	return Net::DNS::SEC::libcrypto::EVP_verify( $sigdata, $sigbin, $evpkey, $evpmd );
 }

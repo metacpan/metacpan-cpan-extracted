@@ -10,17 +10,19 @@ use vars qw($VERSION $DYNAMIC $FILTER_NAME);
 
 use WWW::PlantUML;
 
+=for html <a href="https://travis-ci.com/ranwitter/perl5-Template-Plugin-Filter-PlantUML"><img src="https://travis-ci.com/ranwitter/perl5-Template-Plugin-Filter-PlantUML.svg?branch=master"></a>&nbsp;</a><a title="Artistic-2.0" href="https://opensource.org/licenses/Artistic-2.0"><img src="https://img.shields.io/badge/License-Perl-0298c3.svg"></a>
+
 =head1 NAME
 
 Template::Plugin::Filter::PlantUML - A template toolkit plugin filter for encoding and processing PlantUML Diagrams using a PlantUML Server.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION     = 0.01;
+our $VERSION     = 0.02;
 our $DYNAMIC     = 1;
 our $FILTER_NAME = 'plantuml';
 
@@ -29,18 +31,42 @@ our $FILTER_NAME = 'plantuml';
 To use this plugin, you have to make sure that the Template Toolkit knows about its namespace.
 
     my $tt2 = Template->new({
-        PLUGIN_BASE => 'Template::Plugin::Filter::PlantUML',
+        PLUGIN_BASE => 'Template::Plugin::Filter',
     });
 
-Then you C<USE> your plugin like below.
+    # or
 
-    [% USE Filter.PlantUML 'http://www.plantuml.com/plantuml' 'svg' -%]
+    my $tt2 = Template->new({
+        PLUGINS => {
+           PlantUML => 'Template::Plugin::Filter::PlantUML',
+        },
+    });
+
+Then you C<USE> your plugin in a template file as follows.
+
+    [% USE 'http://www.plantuml.com/plantuml' 'svg' -%]
     
     [% url = FILTER plantuml %]
       Bob -> Alice : hello
     [% END %]
     
-    <img src="[% url %]" alt="[% url %]" />
+    <img src="[% url %]"/>
+
+Finally process your template.
+
+    $tt2->process('foo.tt2') || die $tt2->error();
+
+Result would be:
+
+    <img src="http://www.plantuml.com/plantuml/svg/~169NZKb1moazIqBLJSCp9J4vLi5B8ICt9oUS204a_1dy0"/>
+
+=head1 EXAMPLE
+
+=begin HTML
+
+<p><img src="http://www.plantuml.com/plantuml/svg/~169NZKb1moazIqBLJSCp9J4vLi5B8ICt9oUS204a_1dy0" alt="Live Example from PlantUML.com" /></p>
+
+=end HTML
 
 =head1 DESCRIPTION
 
@@ -104,9 +130,9 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Template-Plugin-Filter-PlantUML>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * GitHub Repository
 
-L<http://annocpan.org/dist/Template-Plugin-Filter-PlantUML>
+L<https://github.com/ranwitter/perl5-Template-Plugin-Filter-PlantUML>
 
 =item * CPAN Ratings
 
@@ -121,6 +147,7 @@ L<https://metacpan.org/release/Template-Plugin-Filter-PlantUML>
 
 =head1 ACKNOWLEDGEMENTS
 
+Many thanks to Andy Wardley L<http://wardley.org> for his awesome L<Template::Plugin::Filter>
 
 =head1 LICENSE AND COPYRIGHT
 

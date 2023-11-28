@@ -1,16 +1,13 @@
 package Graph::Reader::TGF;
 
-# Pragmas.
 use base qw(Graph::Reader);
 use strict;
 use warnings;
 
-# Modules.
 use Encode qw(decode_utf8);
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Edge callback.
 sub _edge_callback {
@@ -107,26 +104,30 @@ Graph::Reader::TGF - Perl class for reading a graph from TGF format.
 =head1 SYNOPSIS
 
  use Graph::Reader::TGF;
+
  my $obj = Graph::Reader::TGF->new;
  my $graph = $obj->read_graph($tgf_file);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $obj = Graph::Reader::TGF->new;
 
- Constructor.
- This doesn't take any arguments.
- Returns Graph::Reader::TGF object.
+Constructor.
 
-=item C<read_graph($tgf_file)>
+This doesn't take any arguments.
 
- Read a graph from the specified file.
- The argument can either be a filename, or a filehandle for a previously opened file.
- Returns Graph object.
+Returns Graph::Reader::TGF object.
 
-=back
+=head2 C<read_graph>
+
+ my $graph = $obj->read_graph($tgf_file);
+
+Read a graph from the specified file.
+The argument can either be a filename, or a filehandle for a previously opened file.
+
+Returns Graph object.
 
 =head1 TGF FILE FORMAT
 
@@ -146,14 +147,14 @@ Graph::Reader::TGF - Perl class for reading a graph from TGF format.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=read_tgf_trivial_and_print.pl
+
  use strict;
  use warnings;
 
- # Modules.
+ use File::Temp qw(tempfile);
  use Graph::Reader::TGF;
  use IO::Barf qw(barf);
- use File::Temp qw(tempfile);
 
  # Example data.
  my $data = <<'END';
@@ -186,14 +187,14 @@ Graph::Reader::TGF - Perl class for reading a graph from TGF format.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=read_tgf_advanced_and_print.pl
+
  use strict;
  use warnings;
 
- # Modules.
+ use File::Temp qw(tempfile);
  use Graph::Reader::TGF;
  use IO::Barf qw(barf);
- use File::Temp qw(tempfile);
 
  # Example data.
  my $data = <<'END';
@@ -262,21 +263,22 @@ Install the Graph::Reader modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Graph-Reader-TGF>
+L<https://github.com/michal-josef-spacek/Graph-Reader-TGF>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2014-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2014-2023
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

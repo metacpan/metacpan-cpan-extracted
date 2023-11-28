@@ -4,7 +4,7 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
   - 'Inspired by L<Ryu::Buffer> by Tom Molesworth <TEAM@cpan.org>'
 build_requires:
-  Test2::V0: '0'
+  Test2::V0: '0.000149'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -18,11 +18,11 @@ name: Future-Buffer
 provides:
   Future::Buffer:
     file: lib/Future/Buffer.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Future: '0'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

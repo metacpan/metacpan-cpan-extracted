@@ -7,9 +7,9 @@ use Org::Document;
 use Scalar::Util qw(blessed);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-05'; # DATE
+our $DATE = '2023-11-06'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.560'; # VERSION
+our $VERSION = '0.561'; # VERSION
 
 sub parse {
     my ($self, $arg, $opts) = @_;
@@ -119,7 +119,7 @@ Org::Parser - Parse Org documents
 
 =head1 VERSION
 
-This document describes version 0.560 of Org::Parser (from Perl distribution Org-Parser), released on 2023-08-05.
+This document describes version 0.561 of Org::Parser (from Perl distribution Org-Parser), released on 2023-11-06.
 
 =head1 SYNOPSIS
 
@@ -284,7 +284,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex White Karl Williamson Steven Haryanto Tekki Trent Fisher Wong Meng Weng
+=for stopwords Alex White Karl Williamson Steven Haryanto Tekki Trent Fisher William Lindley Wong Meng Weng
 
 =over 4
 
@@ -307,6 +307,10 @@ Tekki <tekki@tekki.ch>
 =item *
 
 Trent Fisher <trent@cs.pdx.edu>
+
+=item *
+
+William Lindley <wlindley@wlindley.com>
 
 =item *
 

@@ -1,4 +1,5 @@
 use v5;
+use strict;
 use warnings;
 
 use Module::Build;

@@ -1,5 +1,10 @@
 Revision history for Dist-Zilla-PluginBundle-RJBS
 
+5.025     2023-11-20 19:58:30-05:00 America/New_York
+        - There is no longer any reason for "toolchain" perl-window to forbid
+          the use of "package NAME VERSION", so it doesn't.  We have reached
+          the year 2010!
+
 5.024     2023-05-03 19:56:39-04:00 America/New_York
         - "toolchain" in "perl-window" now follows the Lyon Amendment, meaning
           that it's tied to "ten years ago", not 5.8.1.  (There is a one year

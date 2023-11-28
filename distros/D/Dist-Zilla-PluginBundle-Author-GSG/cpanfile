@@ -48,15 +48,19 @@ on test => sub {
     requires 'File::Spec';
     requires 'File::Temp';
     requires 'File::pushd';
+    requires 'IPC::Cmd';
     requires 'Test::DZil';
     requires 'Test::Deep';
     requires 'Test::Fatal';
     requires 'Test::More';
     requires 'Test::Pod', '1.14';
-    requires 'Test::Strict';
     requires 'Time::Piece';
+    requires 'lib';
+    requires 'strict';
+    requires 'warnings';
 };
 
 on develop => sub {
     requires 'Dist::Zilla::Plugin::Bootstrap::lib';
+    requires 'Test::Strict';
 };

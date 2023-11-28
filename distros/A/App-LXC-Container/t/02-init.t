@@ -161,6 +161,10 @@ like($@,
 # on smokers (no STDIN from TTY) we only use mockup (except for 'ls' and 'ldd'):
 -t STDIN  and  $ENV{PATH} = T_PATH . '/mockup:' . $ENV{PATH};
 
+# We must find the real ldd, not the one in mockup for setup/data tests:
+chmod 0644, T_PATH . '/mockup/ldd'
+    or  die "can't chmod 0644 ", T_PATH . '/mockup/ldd';
+
 my $re_dialog = join('',
 		     $re_dialog_main,
 		     $re_dialog_fs,

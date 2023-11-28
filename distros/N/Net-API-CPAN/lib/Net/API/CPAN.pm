@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Meta CPAN API - ~/lib/Net/API/CPAN.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/25
-## Modified 2023/10/11
+## Modified 2023/11/24
 ## All rights reserved
 ## 
 ## 
@@ -28,7 +28,7 @@ BEGIN
         METACPAN_CLIENTINFO_URI => 'https://clientinfo.metacpan.org',
     };
     our $MODULE_RE = qr/[a-zA-Z_][a-zA-Z0-9_]+(?:\:{2}[a-zA-Z0-9_]+)*/;
-    our $VERSION = 'v0.1.3';
+    our $VERSION = 'v0.1.4';
 };
 
 use strict;
@@ -2299,7 +2299,7 @@ Net::API::CPAN - Meta CPAN API
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 
@@ -2381,7 +2381,7 @@ The C<POST> payload to send to the remote MetaCPAN API. It must be already encod
 
 =item * C<postprocess>
 
-A subroutine reference or an anonymous subroutine that will be call backed, taking the data received as the sole argument and returning the modified data.
+A subroutine reference or an anonymous subroutine that will be called back, taking the data received as the sole argument and returning the modified data.
 
 =item * C<query>
 

@@ -16,9 +16,8 @@ use 5.14.0;
 use warnings;
 use File::Spec::Functions 'tmpdir';
 use File::Temp ();
-use Getopt::Long 'GetOptions';
+use Getopt::Long qw(GetOptions :config no_ignore_case);
 use POSIX 'setsid';
-use IPC::Run3 'run3';
 use Text::ParseWords 'shellwords';
 
 my @Lilypond_Cmd = qw/lilypond -dno-point-and-click/;
@@ -40,9 +39,11 @@ my $tempo      = 130;
 #
 # MAIN
 
-@Lilypond_Cmd = shellwords( $ENV{LILYPOND} )     if exists $ENV{LILYPOND};
-@MIDI_Player  = shellwords( $ENV{MIDI_EDITOR} )  if exists $ENV{MIDI_EDITOR};
-@Score_Reader = shellwords( $ENV{SCORE_VIEWER} ) if exists $ENV{SCORE_VIEWER};
+@Lilypond_Cmd = shellwords( $ENV{LILYPOND} ) if exists $ENV{LILYPOND};
+@MIDI_Player  = shellwords( $ENV{MIDI_EDITOR} )
+  if exists $ENV{MIDI_EDITOR};
+@Score_Reader = shellwords( $ENV{SCORE_VIEWER} )
+  if exists $ENV{SCORE_VIEWER};
 
 GetOptions(
     'absolute|abs|a'   => \my $is_absolute,
@@ -176,27 +177,7 @@ close $tmp_ly;
 
 say $ly_filename if $Flag_Generate_Score;
 
-my ( $stdout, $stderr );
-
-eval {
-    my $stdin;
-    push @Lilypond_Cmd, $ly_filename;
-    run3 \@Lilypond_Cmd, \$stdin, \$stdout, \$stderr;
-    1;
-} or do {
-    chomp $@;
-    die "ly-fu: run3() of '@Lilypond_Cmd' failed: $@\n";
-};
-if ($?) {
-    warn "ly-fu: non-zero exit from '@Lilypond_Cmd'\n";
-    warn $stderr;
-    print $stdout;
-    exit $?;
-}
-print $stdout if $Flag_Verbose;
-
-# the files might be shared, so open up the permissions
-chmod 0644, $ly_filename, $midi_filename, $score_filename;
+system @Lilypond_Cmd == 0 or die "lilypond failed: $?\n";
 
 if ($Flag_Show_Score) {
     local $SIG{CHLD} = 'IGNORE';
@@ -224,11 +205,15 @@ unless ($Flag_No_MIDI) {
           "ly-fu: could not exec MIDI player '@MIDI_Player $midi_filename': $!\n";
     } else {
         system( @MIDI_Player, $midi_filename ) == 0
-          or die "ly-fu: could not run MIDI player '@MIDI_Player $midi_filename': $!\n";
+          or die
+          "ly-fu: could not run MIDI player '@MIDI_Player $midi_filename': $!\n";
     }
 }
 
-unless ($Flag_Generate_Score) {
+if ($Flag_Generate_Score) {
+    # the files might be shared, so open up the permissions
+    chmod 0644, $ly_filename, $midi_filename, $score_filename;
+} else {
     # Preview.app got increasingly slower to actually start over time,
     # hence this kluge. Eventually I switched to mupdf, and eventually
     # the 2009 macbook died in late 2022.

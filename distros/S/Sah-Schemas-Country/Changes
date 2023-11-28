@@ -1,3 +1,9 @@
+0.009   2023-08-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add summary of country name for country code completion
+          answer.
+
+
 0.008   2020-03-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

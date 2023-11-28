@@ -83,6 +83,7 @@ $test->for('abstract');
 =includes
 
 method: args
+method: auto
 method: cmds
 method: description
 method: execute
@@ -225,6 +226,65 @@ $test->for('example', 2, 'data', sub {
   $result
 });
 
+=attribute tryer
+
+The tryer attribute is read-write, accepts C<(Venus::Try)> values, and is
+optional.
+
+=signature tryer
+
+  tryer(Venus::Try $data) (Venus::Try)
+
+=metadata tryer
+
+{
+  since => '4.11',
+}
+
+=cut
+
+=example-1 tryer
+
+  # given: synopsis
+
+  package main;
+
+  my $set_tryer = $task->tryer($task->try('execute'));
+
+  # bless(..., "Venus::Try")
+
+=cut
+
+$test->for('example', 1, 'tryer', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Try');
+
+  $result
+});
+
+=example-2 tryer
+
+  # given: synopsis
+
+  # given: example-1 tryer
+
+  package main;
+
+  my $get_tryer = $task->tryer;
+
+  # bless(..., "Venus::Try")
+
+=cut
+
+$test->for('example', 2, 'tryer', sub {
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  ok $result->isa('Venus::Try');
+
+  $result
+});
+
 =method args
 
 The args method can be overridden and returns a hashref suitable to be passed
@@ -301,6 +361,104 @@ $test->for('example', 2, 'args', sub {
       help => 'Name of user',
     },
   };
+
+  Venus::Space->new('Example')->unload;
+  $result
+});
+
+=method auto
+
+The auto class method is similar to the L</run> method but accepts a callback
+which will be invoked with the instansiated class before calling the
+L</execute> method. This method is meant to be used directly in package scope
+outside of any routine, and will only auto-execute under the conditions that
+the caller is the "main" package space and the C<VENUS_TASK_AUTO> environment
+variable is truthy.
+
+=signature auto
+
+  auto(coderef $code) (Venus::Task)
+
+=metadata auto
+
+{
+  since => '4.11',
+}
+
+=cut
+
+=example-1 auto
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  package main;
+
+  my $task = Example->new(['--help']);
+
+  my $auto = $task->auto(sub{});
+
+  # bless({...}, 'Venus::Task')
+
+=cut
+
+$test->for('example', 1, 'auto', sub {
+  local $TEST_VENUS_TASK_PRINT = [];
+  local $ENV{VENUS_TASK_AUTO} = 1;
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Task';
+  # will not run in eval context
+  is_deeply $TEST_VENUS_TASK_PRINT, [];
+
+  Venus::Space->new('Example')->unload;
+  $result
+});
+
+=example-2 auto
+
+  package Example;
+
+  use base 'Venus::Task';
+
+  sub opts {
+
+    return {
+      help => {
+        help => 'Display help',
+        alias => ['h'],
+      },
+    }
+  }
+
+  auto Example sub {
+    my ($self) = @_;
+    $self->tryer->no_default;
+  };
+
+  # bless({...}, 'Venus::Task')
+
+=cut
+
+$test->for('example', 2, 'auto', sub {
+  local $TEST_VENUS_TASK_PRINT = [];
+  local $ENV{VENUS_TASK_AUTO} = 1;
+  my ($tryable) = @_;
+  my $result = $tryable->result;
+  isa_ok $result, 'Venus::Task';
+  # will not run in eval context
+  is_deeply $TEST_VENUS_TASK_PRINT, [];
 
   Venus::Space->new('Example')->unload;
   $result
@@ -502,7 +660,8 @@ $test->for('example', 1, 'description', sub {
 The execute method can be overridden and returns the invocant. This method
 prepares the L<Venus::Cli> via L</prepare>, and runs the L</startup>,
 L</handler>, and L</shutdown> sequences, passing L<Venus::Cli/parsed> to each
-method.
+method. This method is not typically invoked directly, but instead by the
+L</tryer> attribute via the L</run> or L</auto> class methods.
 
 =signature execute
 

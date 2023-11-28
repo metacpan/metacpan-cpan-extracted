@@ -1,5 +1,5 @@
 package Parse::SAMGov;
-$Parse::SAMGov::VERSION = '0.106';
+$Parse::SAMGov::VERSION = '0.202';
 use strict;
 use warnings;
 use 5.010;
@@ -28,17 +28,32 @@ sub parse_file {
         $line =~ s/\s+$//g;
         next unless length $line;
         my $obj = Parse::SAMGov::Entity->new;
-        if ($line =~ /BOF PUBLIC\s+(\d{8})\s+(\d{8})\s+(\d+)\s+(\d+)/) {
+        if ($line =~ /BOF\s+PUBLIC\s+(V2)?\s*(\d{8})\s+(\d{8})\s+(\d+)\s+(\d+)/) {
             $is_entity            = 1;
-            $entity_info->{date}  = $1;
-            $entity_info->{rows}  = $3;
-            $entity_info->{seqno} = $4;
+            $entity_info->{version} = $1 // 'V1';
+            if ($entity_info->{version} eq 'V2') {
+                $entity_info->{date}  = $3;
+                $entity_info->{rows}  = $4;
+                $entity_info->{seqno} = $5;
+            } else {
+                $entity_info->{date}  = $2;
+                $entity_info->{rows}  = $4;
+                $entity_info->{seqno} = $5;
+            }
             next;
-        } elsif ($line =~ /EOF\s+PUBLIC\s+(\d{8})\s+(\d{8})\s+(\d+)\s+(\d+)/) {
-            croak "Invalid footer q{$line} in file"
-              if (   $entity_info->{date} ne $1
-                  or $entity_info->{rows}  ne $3
-                  or $entity_info->{seqno} ne $4);
+        } elsif ($line =~ /EOF\s+PUBLIC\s+(V2)?\s*(\d{8})\s+(\d{8})\s+(\d+)\s+(\d+)/) {
+            $entity_info->{version} = $1 // 'V1';
+            if ($entity_info->{version} eq 'V2') {
+                croak "Invalid footer q{$line} in file"
+                  if (   $entity_info->{date} ne $3
+                      or $entity_info->{rows}  ne $4
+                      or $entity_info->{seqno} ne $5);
+            } else {
+                croak "Invalid footer q{$line} in file"
+                  if (   $entity_info->{date} ne $2
+                      or $entity_info->{rows}  ne $4
+                      or $entity_info->{seqno} ne $5);
+            }
             last;
         } else {
             last unless $is_entity;    # skip this loop and do something else
@@ -84,7 +99,7 @@ Parse::SAMGov - Parses SAM Entity Management Public Extract Layout from SAM.gov
 
 =head1 VERSION
 
-version 0.106
+version 0.202
 
 =head1 SYNOPSIS
 
@@ -143,7 +158,7 @@ Vikas N Kumar <vikas@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Selective Intellect LLC.
+This software is copyright (c) 2023 by Selective Intellect LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

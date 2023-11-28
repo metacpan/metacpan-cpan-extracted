@@ -4,10 +4,10 @@ use strict;
 use warnings;
 use Carp;
 
-require Exporter;
+use Exporter "import";
 use AutoLoader;
 
-our @ISA = qw(Exporter);
+#our @ISA = qw(Exporter);
 
 # Items to export into callers namespace by default. Note: do not export
 # names by default without a very good reason. Use EXPORT_OK instead.
@@ -19,6 +19,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [ qw(
 	accept
 	accept_multiple
+  accept4
 	listen
 	socket
 	bind
@@ -70,10 +71,11 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.3';
 
-use constant();
-use Socket qw<SOCK_NONBLOCK SOCK_CLOEXEC>;
+use constant::more();
+#use constant();
+#use Socket qw<SOCK_NONBLOCK SOCK_CLOEXEC>;
 my $non_block;
 my $cloexec;
 #Define constants for non linux systems (looked up from a ubuntu machine...)
@@ -82,8 +84,8 @@ BEGIN {
     #Make belive values
     $cloexec=0x10000000;
     $non_block=0x20000000;
-    constant->import(SOCK_NONBLOCK=> $non_block);
-    constant->import(SOCK_CLOEXEC=>  $cloexec);
+    constant::more->import(SOCK_NONBLOCK=> $non_block);
+    constant::more->import(SOCK_CLOEXEC=>  $cloexec);
 	}
 	else {
 		$cloexec=0;

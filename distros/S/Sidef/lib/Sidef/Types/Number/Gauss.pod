@@ -271,6 +271,14 @@ Returns the
 
 =cut
 
+=head2 divisors
+
+    n.divisors
+
+Returns the
+
+=cut
+
 =head2 dump
 
     x.dump
@@ -282,6 +290,24 @@ Returns the
 =head2 eval
 
     x.eval(v)
+
+Returns the
+
+=cut
+
+=head2 factor
+
+    z.factor
+
+Returns the
+
+Aliases: I<factors>
+
+=cut
+
+=head2 factor_exp
+
+    z.factor_exp
 
 Returns the
 
@@ -356,6 +382,16 @@ Returns the
     n.is_coprime(k)
 
 Returns the
+
+=cut
+
+=head2 is_div
+
+    x.is_div(y)
+
+Returns the
+
+Aliases: I<is_divisible>
 
 =cut
 

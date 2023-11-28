@@ -10,7 +10,7 @@ my $verbose = 0;
 use Data::Dump qw/pp/;
 use utf8;
 
-our $VERSION='0.24';
+our $VERSION='0.25';
 
 use Test::More;
 use Test2::Plugin::UTF8;

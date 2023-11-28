@@ -125,7 +125,10 @@ documentation.  This is intended and not a bug!
 
 Some CPAN smoke testers fail some of the test scripts (notably #11, #14, #20
 and #41) when the size of their virtual terminal is too small (height less
-than 12 lines)
+than 12 lines).  This seems to be especially for script #41 some FreeBSD
+systems, where C<stty -a> reports 0 rows/columns.  (Outside of
+C<L<Curses::UI>> the module now uses a default size of 24 x 80 in those
+cases.)
 
 =cut
 
@@ -139,7 +142,7 @@ use warnings 'once';
 
 use Carp;			# may only be used in import!
 
-our $VERSION = "0.43";
+our $VERSION = "0.44";
 
 BEGIN  {  require UI::Various::core;  }
 

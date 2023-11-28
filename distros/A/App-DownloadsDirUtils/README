@@ -1,0 +1,1050 @@
+NAME
+    App::DownloadsDirUtils - Utilities related to downloads directories
+
+VERSION
+    This document describes version 0.003 of App::DownloadsDirUtils (from
+    Perl distribution App-DownloadsDirUtils), released on 2023-11-16.
+
+DESCRIPTION
+    This distribution provides the following command-line utilities:
+
+    1. foremost-download
+    2. hindmost-download
+    3. largest-download
+    4. list-downloads-dirs
+    5. mv-foremost-download-here
+    6. mv-hindmost-download-here
+    7. mv-largest-download-here
+    8. mv-newest-download-here
+    9. mv-oldest-download-here
+    10. mv-smallest-download-here
+    11. newest-download
+    12. oldest-download
+    13. smallest-download
+
+FUNCTIONS
+  foremost_download
+    Usage:
+
+     foremost_download(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the foremost file(s) in the downloads directories.
+
+    This is a thin wrapper for the foremost utility; the wrapper sets the
+    default for the directories to the downloads directories, as well as by
+    default excluding partial downloads ("*.part" files).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   ignore_case => *bool*
+
+        (No description)
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  hindmost_download
+    Usage:
+
+     hindmost_download(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the hindmost file(s) in the downloads directories.
+
+    This is a thin wrapper for the hindmost utility; the wrapper sets the
+    default for the directories to the downloads directories, as well as by
+    default excluding partial downloads ("*.part" files).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   ignore_case => *bool*
+
+        (No description)
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  largest_download
+    Usage:
+
+     largest_download(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the largest file(s) in the downloads directories.
+
+    This is a thin wrapper for the largest utility; the wrapper sets the
+    default for the directories to the downloads directories, as well as by
+    default excluding partial downloads ("*.part" files).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  list_downloads_dirs
+    Usage:
+
+     list_downloads_dirs() -> any
+
+    List downloads directories.
+
+    This function is not exported.
+
+    No arguments.
+
+    Return value: (any)
+
+  mv_foremost_download_here
+    Usage:
+
+     mv_foremost_download_here(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Move the foremost file(s) from the downloads directories to current
+    directory.
+
+    This is a thin wrapper for the foremost_download utility; the wrapper
+    moves the files to current directory. It hopes to be a convenient helper
+    to organize your downloads.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   ignore_case => *bool*
+
+        (No description)
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   to_dir => *dirname* (default: ".")
+
+        (No description)
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  mv_hindmost_download_here
+    Usage:
+
+     mv_hindmost_download_here(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Move the hindmost file(s) from the downloads directories to current
+    directory.
+
+    This is a thin wrapper for the hindmost_download utility; the wrapper
+    moves the files to current directory. It hopes to be a convenient helper
+    to organize your downloads.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   ignore_case => *bool*
+
+        (No description)
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   to_dir => *dirname* (default: ".")
+
+        (No description)
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  mv_largest_download_here
+    Usage:
+
+     mv_largest_download_here(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Move the largest file(s) from the downloads directories to current
+    directory.
+
+    This is a thin wrapper for the largest_download utility; the wrapper
+    moves the files to current directory. It hopes to be a convenient helper
+    to organize your downloads.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   to_dir => *dirname* (default: ".")
+
+        (No description)
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  mv_newest_download_here
+    Usage:
+
+     mv_newest_download_here(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Move the newest file(s) from the downloads directories to current
+    directory.
+
+    This is a thin wrapper for the newest_download utility; the wrapper
+    moves the files to current directory. It hopes to be a convenient helper
+    to organize your downloads.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   to_dir => *dirname* (default: ".")
+
+        (No description)
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  mv_oldest_download_here
+    Usage:
+
+     mv_oldest_download_here(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Move the oldest file(s) from the downloads directories to current
+    directory.
+
+    This is a thin wrapper for the oldest_download utility; the wrapper
+    moves the files to current directory. It hopes to be a convenient helper
+    to organize your downloads.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   to_dir => *dirname* (default: ".")
+
+        (No description)
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  mv_smallest_download_here
+    Usage:
+
+     mv_smallest_download_here(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Move the smallest file(s) from the downloads directories to current
+    directory.
+
+    This is a thin wrapper for the smallest_download utility; the wrapper
+    moves the files to current directory. It hopes to be a convenient helper
+    to organize your downloads.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   to_dir => *dirname* (default: ".")
+
+        (No description)
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  newest_download
+    Usage:
+
+     newest_download(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the newest file(s) in the downloads directories.
+
+    This is a thin wrapper for the newest utility; the wrapper sets the
+    default for the directories to the downloads directories, as well as by
+    default excluding partial downloads ("*.part" files).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  oldest_download
+    Usage:
+
+     oldest_download(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the oldest file(s) in the downloads directories.
+
+    This is a thin wrapper for the oldest utility; the wrapper sets the
+    default for the directories to the downloads directories, as well as by
+    default excluding partial downloads ("*.part" files).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  smallest_download
+    Usage:
+
+     smallest_download(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Return the smallest file(s) in the downloads directories.
+
+    This is a thin wrapper for the smallest utility; the wrapper sets the
+    default for the directories to the downloads directories, as well as by
+    default excluding partial downloads ("*.part" files).
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   all => *true*
+
+        Do not ignore entries starting with .
+
+    *   detail => *true*
+
+        (No description)
+
+    *   dirs => *array[dirname]* (default: ["/home/u1/Downloads"])
+
+        Directory to sort files of, defaults to current directory.
+
+    *   exclude_filename_pattern => *re_from_str* (default: "/\\.part\\z/")
+
+        Exclude filenames that match a regex pattern.
+
+    *   include_filename_pattern => *re_from_str*
+
+        Only include filenames that match a regex pattern.
+
+    *   num_ranks => *uint*
+
+        Number of ranks to return.
+
+        Difference between "num_results" and "num_ranks": "num_results"
+        ("-n" option) specifies number of results regardless of ranks while
+        "num_ranks" ("-N" option) returns number of ranks. For example, if
+        sorting is by reverse size and if "num_results" is set to 1 and
+        there are 2 files with the same largest size then only 1 of those
+        files will be returned. With "num_ranks" set to 1, both files will
+        be returned because are they both rank #1.
+
+    *   num_results => *uint*
+
+        Number of results to return.
+
+    *   recursive => *true*
+
+        Recurse into subdirectories.
+
+    *   type => *str*
+
+        Only include files of certain type.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-DownloadsDirUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-DownloadsDirUtils>.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-DownloadsDirUtils
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

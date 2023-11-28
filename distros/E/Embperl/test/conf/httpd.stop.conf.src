@@ -1,6 +1,4 @@
 
-# $Id: httpd.stop.conf.src 1382640 2012-09-10 05:01:48Z richter $
-
 print OFH <<EOD ;
 #
 # Testconfig for Embperl make stop

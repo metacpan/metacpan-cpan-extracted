@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -59,11 +60,13 @@ sub prepare_fdat
     my $join  = $self -> {join} ;
     my $num   = $self -> {numinputs} || 1 ;
     my @vals ;
+    my $ok = 0 ;
     for (my $i = 0; $i < $num; $i++)
 	{
+        $ok = 1 if (exists $fdat->{$name}) ;
 	push @vals, $fdat->{"$name-_-$i"} ;
 	}
-    $fdat->{$name} = join ($join, @vals) ;
+    $fdat->{$name} = join ($join, @vals) if ($ok) ;
     }
 
 

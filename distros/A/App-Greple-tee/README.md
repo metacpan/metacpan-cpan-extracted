@@ -41,7 +41,7 @@ with **--discrete** option.
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # OPTIONS
 
@@ -56,25 +56,32 @@ Version 0.9901
     characters are deleted, and other newline characters are replaced with
     spaces.
 
-- **--blockmatch**
+- **--blocks**
 
-    Normally, the area matching the specified search pattern is sent to the 
-    external command. If this option is specified, not the matched area but 
-    the entire block containing it will be processed.
+    Normally, the area matching the specified search pattern is sent to
+    the external command. If this option is specified, not the matched
+    area but the entire block containing it will be processed.
 
     For example, to send lines containing the pattern `foo` to the
     external command, you need to specify the pattern which matches to
     entire line:
 
-        greple -Mtee cat -n -- '^.*foo.*\n'
+        greple -Mtee cat -n -- '^.*foo.*\n' --all
 
-    But with the **--blockmatch** option, it can be done as simply as
-    follows:
+    But with the **--blocks** option, it can be done as simply as follows:
 
-        greple -Mtee cat -n -- foo
+        greple -Mtee cat -n -- foo --blocks
 
-    With **--blockmatch** option, this module behave more like [teip(1)](http://man.he.net/man1/teip)'s
-    **-g** option.
+    With **--blocks** option, this module behave more like [teip(1)](http://man.he.net/man1/teip)'s
+    **-g** option.  Otherwise, the behavior is similar to [teip(1)](http://man.he.net/man1/teip) with
+    the **-o** option.
+
+    Do not use the **--blocks** with the **--all** option, since the block
+    will be the entire data.
+
+- **--squeeze**
+
+    Combines two or more consecutive newline characters into one.
 
 # WHY DO NOT USE TEIP
 

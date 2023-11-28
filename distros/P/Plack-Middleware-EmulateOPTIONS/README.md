@@ -4,7 +4,7 @@ Plack::Middleware::EmulateOPTIONS - handle OPTIONS requests as HEAD
 
 # VERSION
 
-version v0.3.1
+version v0.3.2
 
 # SYNOPSIS
 
@@ -81,12 +81,6 @@ Since v0.3.0, the this module requires Perl v5.14 or later.
 If you need this module on Perl v5.10, please use one of the v0.2.x
 versions of this module.  Significant bug or security fixes may be
 backported to those versions.
-
-# SEE ALSO
-
-[Plack](https://metacpan.org/pod/Plack)
-
-[PSGI](https://metacpan.org/pod/PSGI)
 
 # SOURCE
 

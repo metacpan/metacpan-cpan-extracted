@@ -1,5 +1,24 @@
 Revision history for Perl extension URI::PackageURL.
 
+2.04 2023-11-16
+    - Added "docker", "bitbuket", "golang" support to
+      "URI::PackageURL::Util::purl_to_urls"
+    - Added new options for create canonical purl string using "purl-tool(1)"
+      (giterlizzi/perl-URI-PackageURL#9)
+    - Added sample scripts
+    - Removed empty "qualifier" keys in "URI::PackageURL->from_string"
+
+2.03 2023-11-09
+    - Improved validation during encode and decode "purl" string
+    - Fixed CPAN repository URL
+    - FIX Qualifiers are case sensitive
+      (giterlizzi/perl-URI-PackageURL#4)
+    - FIX PURLs containing multiple namespaces segments parse incorrectly
+      (giterlizzi/perl-URI-PackageURL#5)
+    - FIX Incorrect parsing of PURLs that begin with "pkg:/"
+      (giterlizzi/perl-URI-PackageURL#6)
+    - Improved "t/99-official-purl-test-suite.t" test
+
 2.02 2023-09-22
     - Added core "JSON" module prerequisite in Makefile.PL (#4)
 

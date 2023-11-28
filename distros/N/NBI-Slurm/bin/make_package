@@ -11,7 +11,7 @@ use File::Spec;
 use Pod::Usage;
 use NBI::Slurm;
 
-my $config    = NBI::Slurm::load_config("$USER/.nbislurm.config");
+my $config    = NBI::Slurm::load_config("$ENV{USER}/.nbislurm.config");
 my $image     = undef;
 my $package   = undef;
 my $force     = 0;
@@ -80,9 +80,8 @@ if (chmod($permissions, $source_file)) {
 # Create symbolic links for the provided commands
 my @COMMANDS = `singularity exec \"$image\" cat /etc/binaries.txt`;
 if ($? != 0) {
-    say STDERR "ERROR: Failed to read /etc/binaries.txt from image.";
-    say STDERR "  -> Are you sure this is a valid Singularity image?";
-    exit 1;
+    say STDERR "WARNING: Failed to read /etc/binaries.txt from image.";
+    say STDERR "  -> We will consider this a 'custom' Singularity image?";
 } elsif (scalar @COMMANDS == 0) {
     say STDERR "ERROR: No commands supplied (or no /etc/binaries.txt found).";
 } else {
@@ -178,7 +177,7 @@ make_package - Install a "package" in the NBI HPC using a singularity image
 
 =head1 VERSION
 
-version 0.8.1
+version 0.8.2
 
 =head1 SYNOPSIS
 

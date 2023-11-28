@@ -3,33 +3,35 @@ abstract: 'Parses SAM Entity Management Public Extract Layout from SAM.gov'
 author:
   - 'Vikas N Kumar <vikas@cpan.org>'
 build_requires:
-  File::Temp: 0
-  IO::All: 0
-  Test::More: 0.88
+  File::Temp: '0'
+  IO::All: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Parse-SAMGov
 requires:
-  Carp: 0
-  Data::Dumper: 0
-  DateTime: 0
-  DateTime::Format::Strptime: 0
-  Email::Valid: 0
-  IO::All: 0
-  Text::CSV_XS: 0
-  URI: 0
-  overload: 0
-  perl: 5.010
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  Data::Dumper: '0'
+  DateTime: '0'
+  DateTime::Format::Strptime: '0'
+  Email::Valid: '0'
+  IO::All: '0'
+  Text::CSV_XS: '0'
+  URI: '0'
+  overload: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/selectiveintellect/p5-parse-samgov/issues
   repository: git://github.com/selectiveintellect/p5-parse-samgov.git
-version: 0.106
-x_serialization_backend: 'YAML::Tiny version 1.51'
+version: '0.202'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

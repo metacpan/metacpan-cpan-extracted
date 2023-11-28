@@ -44,9 +44,7 @@ my $main = redis(
             map $main->get('key::' . $_), 1..100
         );
         ok(!$f->is_ready, 'initial GET requests start out pending');
-        ok(@{$main->{awaiting_pipeline}}, 'have some requests queued for pipelining');
         await $f;
-        ok(!@{$main->{awaiting_pipeline}}, 'no more requests queued for pipelining');
         await Future->needs_all(
             map { $main->set('key::' . $_, 'xx' . $_) } 1..100
         );

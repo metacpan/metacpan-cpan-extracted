@@ -1,5 +1,24 @@
-Version 0.88  - TBR
-
+Version 0.90  - 10 November 2023
+                HiPi::Device::GPIO ( sysfs gpio interface )
+                enabled for Raspberry Pi 5
+                
+Version 0.89  - 01 November 2023
+                Supports Raspberry Pi 5
+                Supports Debian 12 - Bookworm
+                Refactored OpenThings / Energenie implementation
+                - now using pack / unpack for encoding / decoding
+                  OpenThings message data
+                - OpenThings implementation now supports communication
+                  with custom devices. 
+                - Added 'Float' OpenThings value type
+                Refactored HopeRFM69 maximum power settings
+                Refactored negative temperature calculation
+                in HiPi::Interface::MPL3115A2
+                
+Version 0.88  - 19 February 2023
+                arm64 updates
+                Updated for optional module HiPi::BCM2835 release
+                
 Version 0.87  - 12 February 2023
                 Updated for multiple package builds
                 Bullseye, Buster, armhf, arm64

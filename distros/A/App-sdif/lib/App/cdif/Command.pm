@@ -21,9 +21,14 @@ sub debug {
     }
 }
 
+my %default_option = (
+    read_error => 0,
+);
+
 sub new {
     my $class = shift;
     my $obj = $class->SUPER::new;
+    $obj->{OPTION} = { %default_option };
     $obj->command(@_) if @_;
     $obj;
 }
@@ -35,6 +40,18 @@ sub command {
 	$obj;
     } else {
 	@{$obj->{COMMAND}};
+    }
+}
+
+sub option {
+    my $obj = shift;
+    if (@_ == 1) {
+	return $obj->{OPTION}->{+shift};
+    } else {
+	while (my($k, $v) = splice @_, 0, 2) {
+	    $obj->{$k} = $v;
+	}
+	return $obj;
     }
 }
 
@@ -57,7 +74,7 @@ sub execute {
 	    open STDIN, "<&=", $stdin->fileno or die "open: $!\n";
 	    binmode STDIN, ':encoding(utf8)';
 	}
-	open STDERR, ">&STDOUT";
+	open STDERR, ">&STDOUT" if $obj->option('read_error');
 	exec @command;
 	die "exec: $@\n";
     }

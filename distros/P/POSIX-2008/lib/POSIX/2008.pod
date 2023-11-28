@@ -872,9 +872,8 @@ Returns undef on error.
 
 ret = openat2(dirfd, path, how);
 
-The C<openat2()> system call is an extension of L<C<openat()>|"openat"> and
-provides a superset of its functionality. It is Linux-specific and thus not
-part of POSIX, but I include it anyway.
+The C<openat2()> system call is a Linux-specific extension of
+L<C<openat()>|"openat"> and provides a superset of its functionality.
 
 The I<how> parameter is a hash reference corresponding to the I<struct
 open_how>. It currently supports the keys I<flags>, I<mode> and
@@ -940,7 +939,7 @@ This syscall is present in Linux and BSD.
 
 bytes_read = preadv2(fd, buffers, sizes, offset=0, flags=0);
 
-C<preadv()> is similar to L<C<preadv()>|"preadv"> but adds an optional I<flags>
+C<preadv2()> is similar to L<C<preadv()>|"preadv"> but adds an optional I<flags>
 argument, which is a bitwise OR of zero or more of the C<RWF_*> flags (see the
 manpage for details). I<flags> is set to 0 if omitted or undef.
 
@@ -994,9 +993,9 @@ This syscall is present in Linux and BSD.
 
 bytes_written = pwritev2(fd, buffers, offset=0, flags=0);
 
-C<pwritev()> is similar to L<C<writev()>|"writev"> but adds an optional I<flags>
-argument, which is a bitwise OR of zero or more of the C<RWF_*> flags (see the
-manpage for details). I<flags> is set to 0 if omitted or undef.
+C<pwritev2()> is similar to L<C<pwritev()>|"pwritev"> but adds an optional
+I<flags> argument, which is a bitwise OR of zero or more of the C<RWF_*>
+flags (see the manpage for details). I<flags> is set to 0 if omitted or undef.
 
 This syscall is Linux-specific.
 
@@ -1084,9 +1083,9 @@ because someone "couldn't read the plans right and did a piss-poor job of
 putting it together" as C<(-d $_[0]) ? CORE::rmdir($_[0]) :
 CORE::unlink($_[0])>. Quote from Armageddon.
 
-This could be fixed like this: C<unlink $_[0] or ($!{EISDIR} || $!{EPERM} ?
-rmdir $_[0] : undef)> (correct errno check depends on OS), or by using the
-library call right away.
+This could be fixed like this: C<unlink $_[0] or ($!{EISDIR} or $!{EPERM}) and
+rmdir $_[0]> (correct errno check depends on OS), or by using the library call
+right away.
 
 =item C<remquo>
 
@@ -1101,6 +1100,16 @@ ret = rename(old, new);
 =item C<renameat>
 
 ret = renameat(olddirfd, oldpath, newdirfd, newpath);
+
+=item C<renameat2>
+
+ret = renameat(olddirfd, oldpath, newdirfd, newpath, flags=0);
+
+The C<renameat2()> system call is a Linux-specific extension of
+L<C<renameat()>|"renameat"> and provides a superset of its functionality.
+
+I<flags> is the bitwise OR of zero or more of C<RENAME_EXCHANGE>,
+C<RENAME_NOREPLACE>, C<RENAME_WHITEOUT>.
 
 =item C<round>
 
@@ -1389,12 +1398,12 @@ C<yn()> is the Bessel function of the second kind of order n.
 This module does not export anything by default. The following export tags are
 available:
 
- :at     All *at() functions like openat() and all AT_/RESOLVE_ constants
+ :at     All *at() functions like openat() and all AT_/RENAME_/RESOLVE_ constants
  :id     All get/set*id() functions like getuid() etc.
  :is     All is* functions like isdigit() etc.
  :rw     read(), readv(), write(), writev()
  :prw    pread(), preadv(), preadv2(), pwrite(), pwritev(), pwritev2()
- :clock  All clock* functions and all CLOCK* constants
+ :clock  All clock* functions and CLOCK_ constants
  :fcntl  All F_, FD_, O_, POSIX_FADV_, SEEK_ and _OK constants (for AT_ use :at)
  :fenv_h All FE_ constants and fe* functions
  :fnm    fnmatch() and all FNM_ constants
@@ -1405,9 +1414,10 @@ available:
 =head1 CONSTANTS
 
 C<AT_EACCESS> C<AT_EMPTY_PATH> C<AT_FDCWD> C<AT_NO_AUTOMOUNT> C<AT_REMOVEDIR>
-C<AT_SYMLINK_FOLLOW> C<AT_SYMLINK_NOFOLLOW> C<RESOLVE_BENEATH>
-C<RESOLVE_CACHED> C<RESOLVE_IN_ROOT> C<RESOLVE_NO_MAGICLINKS>
-C<RESOLVE_NO_SYMLINKS> C<RESOLVE_NO_XDEV>
+C<AT_SYMLINK_FOLLOW> C<AT_SYMLINK_NOFOLLOW> C<RENAME_EXCHANGE>
+C<RENAME_NOREPLACE> C<RENAME_WHITEOUT> C<RESOLVE_BENEATH> C<RESOLVE_CACHED>
+C<RESOLVE_IN_ROOT> C<RESOLVE_NO_MAGICLINKS> C<RESOLVE_NO_SYMLINKS>
+C<RESOLVE_NO_XDEV>
 
 C<BOOT_TIME> C<NEW_TIME> C<OLD_TIME> C<DEAD_PROCESS> C<INIT_PROCESS>
 C<LOGIN_PROCESS> C<USER_PROCESS> C<RUN_LVL>
@@ -1466,8 +1476,8 @@ C<UTIME_NOW> C<UTIME_OMIT>
 C<preadv()> and C<pwritev()> are nonstandard extensions present in Linux and
 BSD.
 
-C<openat2()>, C<preadv2()> and C<pwritev2()> are nonstandard extensions
-present in Linux.
+C<openat2()>, C<preadv2()>, C<pwritev2()> and C<renameat2()> are nonstandard
+extensions present in Linux.
 
 C<fstatat()>, C<lstat()> and C<stat()> do not set the special underscore
 filehandle C<_> (mostly because I have no clue how that works).

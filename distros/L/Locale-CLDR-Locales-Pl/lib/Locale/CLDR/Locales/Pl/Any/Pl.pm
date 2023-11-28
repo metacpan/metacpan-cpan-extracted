@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Pl::Any::Pl - Package for language Polish
 
 package Locale::CLDR::Locales::Pl::Any::Pl;
 # This file auto generated from Data\common\main\pl_PL.xml
-#	on Fri 13 Oct  9:33:34 am GMT
+#	on Sat  4 Nov  6:19:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

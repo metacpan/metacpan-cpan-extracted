@@ -66,7 +66,8 @@ and L<DBIx::DataModel::Doc::Delta_v1>.
 Automatic schema generation from external sources is described directly 
 in the L<generator module|DBIx::DataModel::Schema::Generator>.
 Subclasses of C<Statement> for specific architectures are
-in L<DBIx::DataModel::Statement::JDBC> and L<DBIx::DataModel::Statement::Oracle>.
+in L<DBIx::DataModel::Statement::JDBC> and
+L<DBIx::DataModel::Statement::Oracle> (for Oracle versions prior to 12c).
 
 The syntax for producing SQL requests is documented in
 L<SQL::Abstract::More> and its parent class L<SQL::Abstract>.
@@ -246,8 +247,6 @@ This option can be overridden at the statement level.
 The advantages of joins with USING is discussed in 
 L<SQL::Abstract::More/"joins with USING clause instead of ON">.
 
-
-
 =item table_parent, join_parent
 
 Optional application-specific classes, to be used instead of the
@@ -257,14 +256,26 @@ this schema.
 =item table_metaclass, join_metaclass, association_metaclass, path_metaclass, type_metaclass
 
 Optional application-specific classes, to be used instead of the
-builtin metaclasses, for instantiating meta-objects declared in this schema, .
+builtin metaclasses, for instantiating meta-objects declared in this schema.
 
 =item statement_class
 
 Optional application-specific class to be used instead of the
 builtin class L<DBIx::DataModel::Statement> for instantiating
 statements. For example you may want to set this option to
-L<DBIx::DataModel::Statement::Oracle> if you work with an Oracle database.
+L<DBIx::DataModel::Statement::Oracle> if you work with an
+Oracle database, version prior to 12c.
+
+=item sql_abstract_class
+
+Optional subclass of L<SQL::Abstract::More> to be used when
+populating the C<sql_abstract> attribute of a schema.
+
+=item sql_abstract_args
+
+Optional arrayref of arguments to be passed to the C<< ->new() >> method
+of C<sql_abstract_class>.
+
 
 =back
 
@@ -1011,7 +1022,7 @@ containing a database connection, a debugging status, etc.
 
 A schema subclass can have several instances; in that case, the application
 runs in 
-L<multi-schema|DBIx::DataModel::Doc::Glossary/"multi-schema">.
+L<multi-schema|DBIx::DataModel::Doc::Glossary/"multi-schema"> mode.
 However, multi-schema mode is only useful
 in some special situations, like for example when transferring data between
 several databases; in most common cases, a 
@@ -1159,10 +1170,8 @@ There is also another way to see the SQL code for one particular statement :
 
 Sets or retrieves the instance of L<SQL::Abstract::More> used 
 by this C<$schema>. If the client code does not set it explicitly,
-an instance will be implicitly created. The reason for using
-something else than this default might be either 
-to control some specific parameters of C<SQL::Abstract::More>,
-or to subclass it.
+an instance will be implicitly created, using meta-schema attributes
+C<sql_abstract_class> and C<sql_abstract_args>.
 
 
 =head3 dbi_prepare_method()
@@ -1508,9 +1517,9 @@ for application-specific purposes : for instance the
 L<DBIx::DataModel::Statement::Oracle|DBIx::DataModel::Statement::Oracle>
 subclass in this distribution adds some methods specific to
 L<DBD::Oracle|DBD::Oracle> data sources, for implementing pagination
-through Oracle cursors.
-
-
+through Oracle cursors. This was needed in Oracle versions prior to 12c;
+for more recent versions, the regular Statement class will do,
+but the L<SQL::Abstract::More> dialect must be set to C<Oracle12c>.
 
 
 

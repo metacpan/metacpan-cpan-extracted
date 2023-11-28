@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use File::Find::Rule;
 use Filesys::Df;
+use Net::Server::Daemonize qw(create_pid_file unlink_pid_file check_pid_file);
 
 =head1 NAME
 
@@ -12,11 +13,11 @@ App::FileCleanerByDiskUage - Removes files based on disk space usage till it dro
 
 =head1 VERSION
 
-Version 0.2.1
+Version 0.3.0
 
 =cut
 
-our $VERSION = '0.2.1';
+our $VERSION = '0.3.0';
 
 =head1 SYNOPSIS
 
@@ -87,6 +88,16 @@ The following hash values are taken by it.
     - dry_run :: Do not actually remove anything. Just check to see if the file writable by the
                  current user.
 
+    -use_pid :: Create a PID to make sure multiple instances can't run at once.
+        Default :: undef
+
+    -pid_dir :: Create a PID to make sure multiple instances can't run at once.
+        Default :: /var/run
+
+    - pid_name :: Append this to the the name of the pid file created. If specified with a
+            value of 'foo' then the file would be 'file_cleaner_by_du-foo.pid'.
+        Default :: undef
+
 The returned value is a hash ref.
 
     - dry_run :: Boolean for fir it was a dry run or not.
@@ -138,6 +149,29 @@ The files hash is composed as below.
 sub clean {
 	my ( $empty, %opts ) = @_;
 
+	my $pid_file;
+	if ( $opts{use_pid} ) {
+		if ( !defined( $opts{pid_dir} ) ) {
+			$opts{pid_dir} = '/var/run';
+		} else {
+			if ( !-d $opts{pid_dir} ) {
+				die( $opts{pid_dir} . ' does not exist or is not a dir' );
+			}
+		}
+
+		if ( !defined( $opts{pid_name} ) ) {
+			$pid_file = $opts{pid_dir} . '/file_cleaner_by_du.pid';
+		} else {
+			if ( $opts{pid_name} =~ /\// || $opts{pid_name} =~ /\\/ ) {
+				die( 'PID name of "' . $opts{pid_name} . '" can not contain either / or \\' );
+			}
+			$pid_file = $opts{pid_dir} . '/file_cleaner_by_du-' . $opts{pid_name} . '.pid';
+		}
+
+		check_pid_file($pid_file);
+		create_pid_file($pid_file);
+	} ## end if ( $opts{use_pid} )
+
 	my @missing_paths;
 	my @paths;
 
@@ -145,11 +179,17 @@ sub clean {
 	# file paths should end with / or other wise if it is a symlink File::Find::Rule will skip it
 	# so fix that up while we are doing the path check
 	if ( !defined( $opts{path} ) ) {
+		if ( $opts{use_pid} ) {
+			unlink_pid_file($pid_file);
+		}
 		die('$opts{path} is not defined');
 	} elsif ( ref( $opts{path} ) ne 'ARRAY' && !-d $opts{path} ) {
 		push( @missing_paths, $opts{path} );
 	} elsif ( ref( $opts{path} ) eq 'ARRAY' ) {
 		if ( !defined( $opts{path}[0] ) ) {
+			if ( $opts{use_pid} ) {
+				unlink_pid_file($pid_file);
+			}
 			die('$opts{path}[0] is not defined');
 		}
 		my $int = 0;
@@ -172,13 +212,22 @@ sub clean {
 	}
 
 	if ( !defined( $opts{du} ) ) {
+		if ( $opts{use_pid} ) {
+			unlink_pid_file($pid_file);
+		}
 		die('$opts{du} is not defined');
 	} elsif ( $opts{du} !~ /^\d+$/ ) {
+		if ( $opts{use_pid} ) {
+			unlink_pid_file($pid_file);
+		}
 		die( '$opts{du} is set to "' . $opts{du} . '" whish is not numeric' );
 	}
 
 	# if we have a min_files specified, make sure the value is numeric
 	if ( defined( $opts{min_files} ) && $opts{min_files} !~ /^\d+$/ ) {
+		if ( $opts{use_pid} ) {
+			unlink_pid_file($pid_file);
+		}
 		die( '$opts{min_files} is set to "' . $opts{min_files} . '" whish is not numeric matching /^\d+$/' );
 	}
 
@@ -209,10 +258,16 @@ sub clean {
 	};
 
 	if ( !defined( $paths[0] ) ) {
+		if ( $opts{use_pid} ) {
+			unlink_pid_file($pid_file);
+		}
 		return $results;
 	}
 
 	if ( $df->{per} < $opts{du} ) {
+		if ( $opts{use_pid} ) {
+			unlink_pid_file($pid_file);
+		}
 		return $results;
 	}
 
@@ -229,6 +284,9 @@ sub clean {
 	# if we have a min number of files specified, make sure have that many defined
 	if ( $opts{min_files} && !defined( $files[ $opts{min_files} ] ) ) {
 		$results->{min_files} = $opts{min_files};
+		if ( $opts{use_pid} ) {
+			unlink_pid_file($pid_file);
+		}
 		return $results;
 	}
 
@@ -293,6 +351,9 @@ sub clean {
 		$results->{unlink_failed_count} = $#{ $results->{unlink_failed} } + 1;
 	}
 
+	if ( $opts{use_pid} ) {
+		unlink_pid_file($pid_file);
+	}
 	return $results;
 } ## end sub clean
 

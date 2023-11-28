@@ -20,7 +20,7 @@ VVS Stuttgart Schwabstraße"
 
 echo $checks | while read service name place; do
 	echo -n "${service} ... "
-	if bin/efa-m -s $service $name $place > /dev/null; then
+	if perl -Ilib bin/efa-m -s $service $name $place > /dev/null; then
 		echo OK
 	fi
 done

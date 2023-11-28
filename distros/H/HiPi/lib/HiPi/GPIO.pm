@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::GPIO
 # Description  : Wrapper for GPIO
-# Copyright    : Copyright (c) 2017 Mark Dootson
+# Copyright    : Copyright (c) 2017-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -19,24 +19,20 @@ use HiPi 0.80;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.81';
+our $VERSION ='0.90';
 
 __PACKAGE__->create_accessors( );
 
-XSLoader::load('HiPi::GPIO', $VERSION) if HiPi::is_raspberry_pi();
+if ( HiPi::is_raspberry_pi() ) {
+    if ( HiPi::RaspberryPi::has_rp1() ) {
+        XSLoader::load('HiPi::GPIO::RP1', $VERSION);
+    } else {
+        XSLoader::load('HiPi::GPIO', $VERSION);
+    }
+}
 
 my $xsok = ( HiPi::is_raspberry_pi() ) ? xs_initialise_gpio_block() : 0;
 END { xs_release_gpio_block() if HiPi::is_raspberry_pi(); };
-
-use constant {
-    GPEDS0   => 16,
-    GPREN0   => 19,
-    GPFEN0   => 22,
-    GPHEN0   => 25,
-    GPLEN0   => 28,
-    GPAREN0  => 31,
-    GPAFEN0  => 34,
-};
 
 sub error_report {
     my ( $error ) = @_;
@@ -95,6 +91,46 @@ sub get_pin_pud {
     return xs_gpio_get_pud( $gpio );
 }
 
+sub set_pin_schmitt {
+    my($class, $gpio, $schmitt ) = @_;
+    if ( HiPi::RaspberryPi::has_rp1() ) {
+        return xs_gpio_set_schmitt( $gpio, $schmitt);
+    } else {
+        error_report('This Raspberry Pi does not support schmitt operations');
+        return -1;
+    }
+}
+
+sub get_pin_schmitt {
+    my($class, $gpio ) = @_;
+    if ( HiPi::RaspberryPi::has_rp1() ) {
+        return xs_gpio_get_schmitt( $gpio );
+    } else {
+        error_report('This Raspberry Pi does not support schmitt operations');
+        return -1;
+    }
+}
+
+sub set_pin_slew {
+    my($class, $gpio, $slew ) = @_;
+    if ( HiPi::RaspberryPi::has_rp1() ) {
+        return xs_gpio_set_slew( $gpio, $slew);
+    } else {
+        error_report('This Raspberry Pi does not support slew operations');
+        return -1;
+    }
+}
+
+sub get_pin_slew{
+    my($class, $gpio ) = @_;
+    if ( HiPi::RaspberryPi::has_rp1() ) {
+        return xs_gpio_get_slew( $gpio );
+    } else {
+        error_report('This Raspberry Pi does not support slew operations');
+        return -1;
+    }
+}
+
 sub set_pin_activelow {
     my($class, $gpio, $alow ) = @_;
     warn q(HiPi::GPIO does not support active_low);
@@ -126,8 +162,20 @@ sub get_pin_interrupt {
 }
 
 sub get_pin_function {
+    my($class, $gpio) = @_; 
+    if ( HiPi::RaspberryPi::has_rp1() ) {
+        my ( $funcname, $altnum ) = $class->_get_pin_function_rp1( $gpio );
+        return ( wantarray ) ? ( $funcname, $altnum ) : $funcname;
+    } else {
+        my ( $funcname, $altnum ) = $class->_get_pin_function_bcm2835( $gpio );
+        return ( wantarray ) ? ( $funcname, $altnum ) : $funcname;
+    }
+}
+
+sub _get_pin_function_bcm2835 {
     my($class, $gpio) = @_;
     my $mode = $class->get_pin_mode( $gpio );
+    
     my $funcname = 'UNKNOWN';
     my $altnum = undef;
     
@@ -161,90 +209,21 @@ sub get_pin_function {
         $funcname = 'ERROR';
     }
     
-    return ( wantarray ) ? ( $funcname, $altnum ) : $funcname;
+    return ( $funcname, $altnum );
+}
+
+sub _get_pin_function_rp1 {
+    my($class, $gpio) = @_;
+    
+    my $funcname = xs_gpio_get_current_mode_name($gpio);
+    
+    return( $funcname, 0);
+    
 }
 
 sub get_peripheral_base_address {
     return xs_gpio_get_peripheral_base_address();
 }
-
-## edge detect functions conflict with system
-
-#sub get_pin_edge_detect {
-#    my( $self, $gpio ) = @_;
-#    return xs_gpio_read_edge_detect( $gpio );
-#}
-#
-#sub clear_pin_edge_detect {
-#    my( $self, $gpio ) = @_;
-#    return xs_gpio_clear_edge_detect( $gpio );
-#}
-#
-#sub set_rising_edge_detect {
-#    my($class, $gpio, $val) = @_;
-#    $val //= 0;
-#    return xs_gpio_set_edge_detect( $gpio, GPREN0(), $val);
-#}
-#
-#sub get_rising_edge_detect {
-#    my($class, $gpio) = @_;
-#    return xs_gpio_get_edge_detect( $gpio, GPREN0());
-#}
-#
-#sub set_falling_edge_detect {
-#    my($class, $gpio, $val) = @_;
-#    $val //= 0;
-#    return xs_gpio_set_edge_detect( $gpio, GPFEN0(), $val);
-#}
-#
-#sub get_falling_edge_detect {
-#    my($class, $gpio) = @_;
-#    return xs_gpio_get_edge_detect( $gpio, GPFEN0());
-#}
-#
-#sub set_high_edge_detect {
-#    my($class, $gpio, $val) = @_;
-#    $val //= 0;
-#    return xs_gpio_set_edge_detect( $gpio, GPHEN0(), $val);
-#}
-#
-#sub get_high_edge_detect {
-#    my($class, $gpio) = @_;
-#    return xs_gpio_get_edge_detect( $gpio, GPHEN0());
-#}
-#
-#sub set_low_edge_detect {
-#    my($class, $gpio, $val) = @_;
-#    $val //= 0;
-#    return xs_gpio_set_edge_detect( $gpio, GPLEN0(), $val);
-#}
-#
-#sub get_low_edge_detect {
-#    my($class, $gpio) = @_;
-#    return xs_gpio_get_edge_detect( $gpio, GPLEN0());
-#}
-#
-#sub set_async_rising_edge_detect {
-#    my($class, $gpio, $val) = @_;
-#    $val //= 0;
-#    return xs_gpio_set_edge_detect( $gpio, GPAREN0(), $val);
-#}
-#
-#sub get_async_rising_edge_detect {
-#    my($class, $gpio) = @_;
-#    return xs_gpio_get_edge_detect( $gpio, GPAREN0());
-#}
-#
-#sub set_async_falling_edge_detect {
-#    my($class, $gpio, $val) = @_;
-#    $val //= 0;
-#    return xs_gpio_set_edge_detect( $gpio, GPAFEN0(), $val);
-#}
-#
-#sub get_async_falling_edge_detect {
-#    my($class, $gpio) = @_;
-#    return xs_gpio_get_edge_detect( $gpio, GPAFEN0());
-#}
 
 # Aliases
 

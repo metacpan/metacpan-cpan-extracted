@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::RF::OpenThings::Message
 # Description  : Handle OpenThings protocol message
-# Copyright    : Copyright (c) 2013-2017 Mark Dootson
+# Copyright    : Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -12,18 +12,16 @@ package HiPi::RF::OpenThings::Message;
 
 use strict;
 use warnings;
-use parent qw( HiPi::Class );
+use parent qw( HiPi::RF::Message );
 use HiPi qw( :openthings :energenie );
 use HiPi::RF::OpenThings;
 use Try::Tiny;
 use JSON;
 
-our $VERSION ='0.81';
+our $VERSION ='0.89';
 
 __PACKAGE__->create_accessors( qw(
     cryptseed
-    errorbuffer
-    databuffer
     epoch
     length
     ok
@@ -33,13 +31,12 @@ __PACKAGE__->create_accessors( qw(
     _pid
     _sid
     _pip
-    is_decoded
-    is_encoded
     has_join_cmd
     has_join_ack
     switch_state
     switch_command
     has_command
+    max_buffer_length
 ));
 
 sub new {
@@ -53,15 +50,16 @@ sub new {
             $_ = hex($_);
         }
     }
-    
+    $params{max_buffer_length} ||= OPENTHINGS_MAXIMUM_BUFFER_LEN;
     $params{epoch} = time();
-    $params{errorbuffer}  = [];
-    $params{databuffer} //= [];
     $params{cryptseed} //= 1;
     $params{records} = [];
     $params{_mid} = $sk_mid || $params{mid} || $params{manufacturer_id} || 0;
     $params{_pid} = $sk_pid || $params{pid} || $params{product_id} || 0;
     $params{_sid} = $sk_sid || $params{sid} || $params{sensor_id} || 0;
+    ## since version 0.89 we'll ignore anything set here
+    ## and properly create a randomised pip when encoding a message
+    ## by calling _create_message_pip
     $params{_pip} = $params{pip} || $params{encrypt_pip} || 0;
     my $self = $class->SUPER::new( %params );
     return $self;
@@ -69,11 +67,26 @@ sub new {
 
 sub manufacturer_id { return $_[0]->_mid; }
 
+sub mid { return $_[0]->_mid; }
+
 sub product_id { return $_[0]->_pid; }
+
+sub pid { return $_[0]->_pid; }
 
 sub sensor_id { return $_[0]->_sid; }
 
+sub sid { return $_[0]->_sid; }
+
 sub encrypt_pip { return $_[0]->_pip; }
+
+sub _create_message_pip {
+    my $self = shift;
+    return unless $self->cryptseed;
+    my $encryption_id = $self->cryptseed;
+    my $mask = 1 + int(rand(65535));
+    my $pip = ( $mask ^ (  $encryption_id << 8 ) ) & 0xFFFF;
+    $self->_pip( $pip );
+}
 
 sub has_switch_state {
     my $self = shift;
@@ -158,6 +171,7 @@ sub json {
 sub encode_buffer {
     my $self = shift;
     my $result = try {
+        $self->_create_message_pip;
         my $payload = [ 0 ]; # len we will assign later
         push @$payload, $self->manufacturer_id;
         push @$payload, $self->product_id;
@@ -189,21 +203,82 @@ sub encode_buffer {
             my $writemask = ( $record->command ) ? OPENTHINGS_WRITE_MASK : 0x0;
             # ID and R/W
             push @$payload, $record->id | $writemask;
-            # Type (will or/| length later)
-            push @$payload, $record->typeid & 0xF0;
             
-            # record position of type/length byte
-            my $lenpos = ( scalar @$payload ) -1;
-            
-            my $val = $record->value;
-            if(defined($val) && $val ne '') {
-                my @valbytes = $self->encode_value( $record->typeid, $val );
+            if ( $record->id == OPENTHINGS_PARAM_SOURCE_SELECTOR ) {
+                # size of bitfield
+                my @selectorbytes = $self->encode_value( OPENTHINGS_UINT, $record->selector, undef );
+                my $selectorlen = scalar( @selectorbytes );
+                # max record length is 15 bytes;
+                if ( $selectorlen > 15 ) {
+                    $self->push_error(sprintf(q(selector value bytes %s exceeds maximum 15 : type %s ), $selectorlen, $record->typeid ));
+                    return 0;
+                }
+                my $selector_type_len_byte = OPENTHINGS_UINT | ( $selectorlen & 0xF );
+                push @$payload, $selector_type_len_byte;
+                # bitfield
+                for (my $bindex = 0; $bindex < $selectorlen; $bindex ++ ) {
+                    push @$payload, $selectorbytes[$bindex];
+                }
+                
+                # standard command record
+                push @$payload, $record->source | $writemask;
+                
+                my @valbytes = $self->encode_value( $record->typeid, $record->value || 0, undef );
                 my $vallen = scalar( @valbytes );
                 # max record length is 15 bytes;
-                $vallen = 15 if $vallen > 15;
-                $payload->[$lenpos] = ( $record->typeid & 0xF0 ) | ( $vallen & 0xF );
+                if ( $vallen > 15 ) {
+                    $self->push_error(sprintf(q(value bytes %s exceeds maximum 15 : type %s ), $vallen, $record->typeid ));
+                    return 0;
+                }
+                # type and size of value
+                my $type_len_byte = ( $record->typeid & 0xF0 ) | ( $vallen & 0xF );
+                push @$payload, $type_len_byte;
+                # value
                 for (my $vindex = 0; $vindex < $vallen; $vindex ++ ) {
                     push @$payload, $valbytes[$vindex];
+                }
+            } else {
+                if ( ( $record->typeid & 0xF0 ) == OPENTHINGS_ENUMERATION ) {
+                    for my $enum ( $record->enumerated_values ) {
+                        push @$payload, ( OPENTHINGS_ENUMERATION & 0xF0 ) | ( $enum->enumeration_id & 0xF);
+                        my $val = $enum->value;
+                        if(defined($val) && $val ne '') {
+                            my @valbytes = $self->encode_value( $enum->typeid, $val, undef );
+                            my $vallen = scalar( @valbytes );
+                            # max record length is 15 bytes;
+                            if ( $vallen > 15 ) {
+                                $self->push_error(sprintf(q(value bytes %s exceeds maximum 15 : type %s ), $vallen, $record->typeid_));
+                                return 0;
+                            }
+                            my $type_len_byte = ( $enum->typeid & 0xF0 ) | ( $vallen & 0xF );
+                            push @$payload, $type_len_byte;
+                            for (my $vindex = 0; $vindex < $vallen; $vindex ++ ) {
+                                push @$payload, $valbytes[$vindex];
+                            }
+                        }
+                    }
+                } else {
+                
+                    # Type (will or/| length later)
+                    push @$payload, $record->typeid & 0xF0;
+                    
+                    # record position of type/length byte
+                    my $lenpos = ( scalar @$payload ) -1;
+                    
+                    my $val = $record->value;
+                    if(defined($val) && $val ne '') {
+                        my @valbytes = $self->encode_value( $record->typeid, $val, $record->length );
+                        my $vallen = scalar( @valbytes );
+                        # max record length is 15 bytes;
+                        if ( $vallen > 15 ) {
+                            $self->push_error(sprintf(q(value bytes %s exceeds maximum 15 : type %s ), $vallen, $record->typeid_));
+                            return 0;
+                        }
+                        $payload->[$lenpos] = ( $record->typeid & 0xF0 ) | ( $vallen & 0xF );
+                        for (my $vindex = 0; $vindex < $vallen; $vindex ++ ) {
+                            push @$payload, $valbytes[$vindex];
+                        }
+                    }
                 }
             }
         }
@@ -218,6 +293,16 @@ sub encode_buffer {
         push @$payload, $crc & 0xFF;
         
         $payload->[0] = ( scalar @$payload ) -1;
+        
+        # check buffer length
+        my $bytelength = $self->buffer_length;
+        
+        if ( $bytelength > $self->max_buffer_length ) {
+            $self->push_error(sprintf(qq(invalid message byte length %s exceeds configured maximum %s), $bytelength, $self->max_buffer_length));
+            return 0;
+        } elsif( $bytelength > OPENTHINGS_MAXIMUM_BUFFER_LEN ) {
+            warn sprintf(qq(Message length %s bytes exceeds OpenThings maximum of %s), $bytelength, OPENTHINGS_MAXIMUM_BUFFER_LEN );
+        };
         
         $self->crypt_buffer;
         
@@ -245,6 +330,14 @@ sub inspect_buffer {
                 $self->push_error(q(invalid message length ) . $bytelength);
                 return 0;
             }
+            
+            if ( $bytelength > $self->max_buffer_length ) {
+                $self->push_error(sprintf(qq(invalid message byte length %s exceeds configured maximum %s), $bytelength, $self->max_buffer_length));
+                return 0;
+            } elsif( $bytelength > OPENTHINGS_MAXIMUM_BUFFER_LEN ) {
+                warn sprintf(qq(Message length %s bytes exceeds OpenThings maximum of %s), $bytelength, OPENTHINGS_MAXIMUM_BUFFER_LEN );
+            };
+            
         }
         
         $self->_mid( $self->databuffer->[1] );
@@ -276,6 +369,13 @@ sub decode_buffer {
                 $self->push_error(q(invalid message length ) . $bytelength);
                 return 0;
             }
+            
+            if ( $bytelength > $self->max_buffer_length ) {
+                $self->push_error(sprintf(qq(invalid message byte length %s exceeds configured maximum %s), $bytelength, $self->max_buffer_length));
+                return 0;
+            } elsif( $bytelength > OPENTHINGS_MAXIMUM_BUFFER_LEN ) {
+                warn sprintf(qq(Message length %s bytes exceeds OpenThings maximum of %s), $bytelength, OPENTHINGS_MAXIMUM_BUFFER_LEN );
+            };
         }
         
         my $payload = $self->databuffer;
@@ -290,6 +390,12 @@ sub decode_buffer {
         $self->crypt_buffer;
         
         $self->_sid( ( $payload->[5] << 16 ) + ( $payload->[6] << 8 ) + $payload->[7] );
+        
+        # basic check for message format - is the NULL byte where it should be?
+        if ( $payload->[-3]) {
+            $self->push_error(qq(received buffer does not contain a valid message));
+            return 0;
+        }
         
         # check CRC to see if this is good message
         my $crc_sent  = ( $payload->[-2] << 8 ) + $payload->[-1];
@@ -307,40 +413,24 @@ sub decode_buffer {
             my $param = $payload->[$index];
             my $command = (( $param & OPENTHINGS_WRITE_MASK ) == OPENTHINGS_WRITE_MASK ) ? 1 : 0;
 		    my $paramid = $param & 0x7F;
-            my ( $paramname, $paramunit ) = HiPi::RF::OpenThings->parameter_map( $paramid );
-            $index ++;
-            my $typeid = $payload->[$index] & 0xF0;
-            my $paramlen = $payload->[$index] & 0x0F;
             $index ++;
             
-            my $record = {
-                command => $command,
-                id      => $paramid,
-                name    => $paramname,
-                units   => $paramunit,
-                typeid  => $typeid,
-                length  => $paramlen,
-                value   => '',
-                bytes   => [],
-            };
+            my $record;
             
-            if ( $paramlen != 0 ) {
-                my @valuebytes = ();
-                for (my $i = 0; $i < $paramlen; $i++ ) {
-                    push @valuebytes, $payload->[$index];
-                    $index ++;
+            if ( $paramid == OPENTHINGS_PARAM_SOURCE_SELECTOR ) {
+                ( $record, $index ) = $self->decode_record_source_selector( $paramid, $command, $payload, $index );
+            } else {
+                my $typeid = $payload->[$index] & 0xF0;
+                my $paramlen = $payload->[$index] & 0x0F;
+                $index ++;
+                if ( $typeid == OPENTHINGS_ENUMERATION ) {
+                    ( $record, $index ) = $self->decode_record_enumeration( $paramid, $command, $payload, $index, $paramlen );
+                } else {
+                    ( $record, $index ) = $self->decode_record_any( $paramid, $command, $payload, $index, $paramlen, $typeid );
                 }
-                
-                if ( $paramlen != @valuebytes ) {
-                    $self->push_error('length of bytes for param incorrect');
-                    return 0;
-                }
-                
-                
-                my $value = $self->decode_value($typeid, \@valuebytes );
-                $record->{value} = $value;
-                $record->{bytes} = \@valuebytes;
             }
+            
+            return 0 if (!$record);
             
             # get some convenience values
             
@@ -379,6 +469,186 @@ sub decode_buffer {
     $self->ok( $result );
 }
 
+sub decode_record_source_selector {
+    my ($self, $paramid, $command, $payload, $index ) = @_;
+    
+    my ( $outputrecord, $outputindex ) = try {
+        my $bitfield_typeid   = $payload->[$index] & 0xF0;
+        my $bitfield_paramlen = $payload->[$index] & 0x0F;
+        $index ++;
+        
+        my @bitfieldbytes = ();
+        
+        for (my $i = 0; $i < $bitfield_paramlen; $i++ ) {
+            push @bitfieldbytes, $payload->[$index];
+            $index ++;
+        }
+        
+        my $bitfield = $self->decode_value($bitfield_typeid, \@bitfieldbytes );
+        
+        my $sourceparamid = $payload->[$index] & 0x7F;
+        $index ++;
+        
+        my ( $sourcename, $sourceunit ) = HiPi::RF::OpenThings->parameter_map( $sourceparamid );
+        
+        my $typeid   = $payload->[$index] & 0xF0;
+        my $paramlen = $payload->[$index] & 0x0F;
+        $index ++;
+        
+        my $record = {
+            command  => $command,
+            id       => $paramid,
+            name     => $sourcename,
+            units    => $sourceunit,
+            typeid   => $typeid,
+            length   => $paramlen,
+            selector => $bitfield,
+            source   => $sourceparamid,
+            value    => '',
+            bytes    => [],
+        };
+
+        if ( $paramlen != 0 ) {
+            my @valuebytes = ();
+            for (my $i = 0; $i < $paramlen; $i++ ) {
+                push @valuebytes, $payload->[$index];
+                $index ++;
+            }
+                      
+            if ( $paramlen != @valuebytes ) {
+                $self->push_error(qq(length of bytes for param $sourcename in source selector is incorrect));
+                return ( undef, undef );
+            }
+            
+            my $value = $self->decode_value($typeid, \@valuebytes );
+            $record->{value} = $value;
+            $record->{bytes} = \@valuebytes;
+        }
+        return ( $record, $index );        
+        
+    } catch {
+        $self->push_error(q(unexpected error in record decode for source selector : ) . $_);
+        return ( undef, undef );
+    };
+}
+
+sub decode_record_enumeration {
+    my ($self, $paramid, $command, $payload, $index, $enumid ) = @_;
+    
+    my ( $paramname, $paramunit ) = HiPi::RF::OpenThings->parameter_map( $paramid );
+    
+    my ( $outputrecord, $outputindex ) = try {
+        
+        my $record = {
+            command             => $command,
+            id                  => $paramid,
+            name                => $paramname,
+            units               => $paramunit,
+            typeid              => OPENTHINGS_ENUMERATION,
+            length              => 0,
+            value               => undef,
+            bytes               => [],
+            enumerated_values   => [],
+        };
+        
+        while ( $enumid ) {
+            my $typeid = $payload->[$index] & 0xF0;
+            my $paramlen = $payload->[$index] & 0x0F;
+            $index ++;
+            
+            if ( $paramlen != 0 ) {
+                my @valuebytes = ();
+                for (my $i = 0; $i < $paramlen; $i++ ) {
+                    push @valuebytes, $payload->[$index];
+                    $index ++;
+                }
+                          
+                if ( $paramlen != @valuebytes ) {
+                    $self->push_error(qq(length of bytes for enumerated param $paramname incorrect));
+                    return ( undef, undef );
+                }
+                
+                my $enumvalue = $self->decode_value($typeid, \@valuebytes );
+                push @{ $record->{enumerated_values} },
+                {
+                    enumeration_id  => $enumid,
+                    value           => $enumvalue,
+                    bytes           => \@valuebytes,
+                    typeid          => $typeid,
+                    length          => $paramlen,
+                    
+                };
+                
+                ## check if the next byte is another enum value marker
+                my $nexttypeid = $payload->[$index] & 0xF0;
+                if ( $nexttypeid && $nexttypeid == OPENTHINGS_ENUMERATION ) {
+                    $enumid = $payload->[$index] & 0x0F;
+                    if( !$enumid ) {
+                        $self->push_error(qq(missing enumeration number for $paramname ));
+                        return ( undef, undef );
+                    }
+                    # skip the OPENTHINGS_ENUMERATION marker byte
+                    $index ++;
+                } else {
+                    $enumid = 0
+                }
+            }
+        }
+        
+        return ( $record, $index );        
+        
+    } catch {
+        $self->push_error(qq(unexpected error in record decode for $paramname : ) . $_);
+        return ( undef, undef );
+    };
+    
+    return ( $outputrecord, $outputindex );
+}
+
+sub decode_record_any {
+    my ($self, $paramid, $command, $payload, $index, $paramlen, $typeid ) = @_;
+    
+    my ( $paramname, $paramunit ) = HiPi::RF::OpenThings->parameter_map( $paramid );
+    
+    my ( $outputrecord, $outputindex ) = try {
+        
+        my $record = {
+            command => $command,
+            id      => $paramid,
+            name    => $paramname,
+            units   => $paramunit,
+            typeid  => $typeid,
+            length  => $paramlen,
+            value   => '',
+            bytes   => [],
+        };
+
+        if ( $paramlen != 0 ) {
+            my @valuebytes = ();
+            for (my $i = 0; $i < $paramlen; $i++ ) {
+                push @valuebytes, $payload->[$index];
+                $index ++;
+            }
+                      
+            if ( $paramlen != @valuebytes ) {
+                $self->push_error(qq(length of bytes for param $paramname incorrect));
+                return ( undef, undef );
+            }
+            
+            my $value = $self->decode_value($typeid, \@valuebytes );
+            $record->{value} = $value;
+            $record->{bytes} = \@valuebytes;
+        }
+        return ( $record, $index );        
+        
+    } catch {
+        $self->push_error(qq(unexpected error in record decode for $paramname : ) . $_);
+        return ( undef, undef );
+    };
+    
+    return ( $outputrecord, $outputindex );
+}
+
 sub get_value_type_bits {
     my($self, $typeid) = @_;
     
@@ -406,32 +676,6 @@ sub get_value_type_bits {
     return $rval;    
 }
 
-sub get_value_bits {
-    my($self, $value) = @_;
-    return 2 if $value == -1;
-	# Turn into  2's
-	my $maxbytes = 15;
-	my $maxbits = 1 << ( $maxbytes * 8 );
-	$value = $value & $maxbits -1;
-	
-    my $bits = 2 + $self->get_highest_clear_bit($value, $maxbytes * 8 );
-    
-    return $bits;
-}
-
-sub get_highest_clear_bit {
-    my($self, $value, $maxbits) = @_;
-    
-    my $mask = 1 << ( $maxbits -1 );
-	my $bitno = $maxbits - 1;
-	while( $mask != 0 ) {
-        last if( ($value & $mask) == 0);
-        $mask >>= 1;
-		$bitno -= 1;
-    }
-	return $bitno;
-}
-
 sub decode_value {
     my($self, $typeid, $bytes) = @_;
     
@@ -439,38 +683,24 @@ sub decode_value {
     return undef unless $numbytes;
     
     if ( $typeid <= OPENTHINGS_UINT_BP24 ) {
-		my $result = 0;
-		# decode unsigned integer first
-		for (my $i = 0; $i < @$bytes; $i++) {
-			$result <<= 8;
-			$result += $bytes->[$i];
-        }
+                
+        my $result = HiPi->bytes_to_integer($bytes);
         
-		# process any fixed binary points
+        # adjust for binary point
 		if( $typeid == OPENTHINGS_UINT ) {
-            return $result; # no BP adjustment
+			return $result; # no BP, return as int
         } else {
             return $result / ( 2 ** $self->get_value_type_bits( $typeid ) );
         }
+        
     } elsif( $typeid == OPENTHINGS_CHAR ) {
         my $format = 'C*';
         my $result = pack($format, @$bytes);
         return $result;
     } elsif( $typeid >= OPENTHINGS_SINT && $typeid <= OPENTHINGS_SINT_BP24 ) {     
-        # decode unsigned int first
-		
-        my $result = 0;
+                        
+        my $result = HiPi->bytes_to_integer($bytes, 1);
         
-		for (my $i = 0; $i < @$bytes; $i++) {
-			$result <<= 8;
-			$result += $bytes->[$i];
-        }
-        
-		# turn to signed int based on high bit of MSB
-		# 2's comp is 1's comp plus 1
-		if(($bytes->[0] & 0x80) == 0x80) {
-            $result = - HiPi->twos_compliment( $result, $numbytes );
-        }
 		# adjust for binary point
 		if( $typeid == OPENTHINGS_SINT ) {
 			return $result; # no BP, return as int
@@ -478,16 +708,22 @@ sub decode_value {
             return $result / ( 2 ** $self->get_value_type_bits( $typeid ) );
         }
         
+        return $result;
         
     } elsif( $typeid == OPENTHINGS_FLOAT ) {
-        return "TODO_FLOAT_IEEE_754-2008";
+        my $unpackformat = ( $numbytes == 8 )
+            ? 'd>'
+            : 'f>';
+        my $result = unpack( $unpackformat, pack('C*', @$bytes ) );
+        
+        return $result;
     }
        
     return 0;
 }
 
 sub encode_value {
-    my($self, $typeid, $value ) = @_;
+    my($self, $typeid, $value, $rec_len ) = @_;
     
     my @result = ();
     my @emptyresult = ();
@@ -499,25 +735,33 @@ sub encode_value {
         @result = unpack('C*', $value );
 
     } elsif( $typeid == OPENTHINGS_FLOAT ) {
-        warn "TODO_FLOAT_IEEE_754-2008";
-        return @emptyresult;
+        unless(defined($value) && $value ne '' ) {
+            return @emptyresult;
+        }
         
-    } elsif ( $typeid <= OPENTHINGS_SINT_BP24 ) {
-        # signed and unsigned integers can be packed the same
-        if ( ( $typeid != OPENTHINGS_UINT ) && ( $typeid != OPENTHINGS_SINT ) ) {
+        my $float_len = $rec_len || 4;
+        ## we only accept 8 or 4
+        $float_len = 4 if( $float_len ne '8');
+        
+        my $packformat = ( $float_len == 8 )
+            ? 'd>'
+            : 'f>';
+        
+        @result = unpack('C*', pack( $packformat, $value ) );
+        
+    } elsif ( $typeid >= OPENTHINGS_UINT && $typeid <= OPENTHINGS_SINT_BP24 ) {
+        
+        if ( $typeid != OPENTHINGS_UINT && $typeid != OPENTHINGS_SINT ) {
 			# pre-adjust for BP
             $value *= ( 2 ** $self->get_value_type_bits( $typeid ) ); # shifts float into int range using BP
-            $value = int($value);   
         }
         
-        my $v = $value;
-        unshift(@result, $v & 0xFF );
-        $v >>= 8;
-        
-        while( $v != 0.0 ) {
-            unshift(@result, $v & 0xFF );
-            $v >>= 8;
-        }
+        $value = $self->round_value($value);
+                
+        my $is_signed = ( $typeid >= OPENTHINGS_SINT && $typeid <= OPENTHINGS_SINT_BP24 )
+            ? 1 : 0;
+                
+        @result = HiPi->integer_to_bytes_calc_length( $value,  $is_signed );
     }
     
     return @result;
@@ -572,30 +816,16 @@ sub buffer_length {
     return $val;
 }
 
-sub push_error {
-    my( $self, $error) = @_;
-    
-    if ( $error ) {
-       push( @{ $self->errorbuffer }, $error );
-    }
-    return;
-}
-
-sub error {
-    my $self = shift;
-    return scalar @{ $self->errorbuffer };
-}
-
-sub shift_error {
-    my $self = shift;
-    my $rval = shift @{ $self->errorbuffer };
-    return $rval;
-}
-
 sub add_record {
-    my($self, %params) = @_;
-    my $record = HiPi::RF::OpenThings::Message::Record->new( %params );
-    push @{ $self->records }, $record;
+    my($self, @params ) = @_;
+    
+    if ( $params[0] && $params[0]->isa('HiPi::RF::OpenThings::Message::Record') ) {
+        push @{ $self->records }, $params[0];
+    } else {
+        my $record = HiPi::RF::OpenThings::Message::Record->new( @params );
+        push @{ $self->records }, $record;
+    }
+    
     return;
 }
 
@@ -612,10 +842,8 @@ sub round_value {
     my( $self, $value ) = @_;
     if($value == 0) {
         return 0;
-    } elsif( $value == int($value) ) {
-        return $value;
     } else {
-        return sprintf(qq(%.0f), $value );
+        return sprintf(q(%.0f), $value );
     }   
 }
 
@@ -628,25 +856,83 @@ use strict;
 use warnings;
 use parent qw( HiPi::Class );
 
-__PACKAGE__->create_accessors( qw( command id name units typeid length value bytes ) );
+__PACKAGE__->create_accessors( qw(
+    command
+    id
+    name
+    units
+    typeid
+    length
+    value
+    bytes
+    _enumerated_values
+    selector
+    source
+) );
+
+sub new {
+    my ( $class, %params ) = @_;
+    
+    if (defined($params{source})) {
+        my ( $name, $units ) = HiPi::RF::OpenThings->parameter_map( $params{source} );
+        $params{name}  ||= $name;
+        $params{units} ||= $units;
+    } else {
+        my ( $name, $units ) = HiPi::RF::OpenThings->parameter_map( $params{id} );
+        $params{name}  ||= $name;
+        $params{units} ||= $units;
+    }
+    
+    if ( $params{enumerated_values} && ref($params{enumerated_values}) eq 'ARRAY' ) {
+        my @enums = ();
+        for my $enum ( @{ $params{enumerated_values} } ) {
+            push @enums, HiPi::RF::OpenThings::Message::EnumeratedValue->new( %$enum );
+        }
+        $params{_enumerated_values} = \@enums;
+        delete($params{enumerated_values});
+    } else {
+        $params{_enumerated_values} = [];
+    }
+        
+    my $self = $class->SUPER::new( %params );
+    
+    return $self;
+}
+
+sub enumerated_values {
+    my $self = shift;
+    return ( wantarray )
+        ?  @{ $self->_enumerated_values }
+        : scalar @{ $self->_enumerated_values };
+}
+
+sub typename {
+    return HiPi::RF::OpenThings->record_type_name( shift->typeid );
+}
+
+#########################################################################################
+
+package HiPi::RF::OpenThings::Message::EnumeratedValue;
+
+#########################################################################################
+use strict;
+use warnings;
+use parent qw( HiPi::Class );
+
+__PACKAGE__->create_accessors( qw( enumeration_id typeid value length name units bytes ) );
 
 sub new {
     my ( $class, %params ) = @_;
     
     my $self = $class->SUPER::new( %params );
     
-    unless($self->name && $self->units) {
-        my ( $name, $units ) = HiPi::RF::OpenThings->parameter_map( $self->id );
-        unless( $self->name ) {
-            $self->name( $name );
-        }
-        unless( $self->units ) {
-            $self->units( $units );
-        }
-    }
-    
-    return $self;
+    return $self;   
 }
+
+sub typename {
+    return HiPi::RF::OpenThings->record_type_name( shift->typeid );
+}
+
 
 1;
 

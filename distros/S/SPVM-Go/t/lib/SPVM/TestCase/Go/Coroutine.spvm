@@ -1,0 +1,149 @@
+class TestCase::Go::Coroutine {
+  use Go::Coroutine;
+  use Callback;
+  use Point;
+  use IntList;
+  use Array;
+  
+  our $RESULT : IntList;
+  
+  static method transfer_minimal : int () {
+    
+    $RESULT = IntList->new;
+    
+    my $coroutine_return_back = Go::Coroutine->new;
+    
+    my $coroutine = Go::Coroutine->new(method : void () {
+      $RESULT->push(2);
+    }, $coroutine_return_back);
+    
+    $RESULT->push(1);
+    
+    Go::Coroutine->transfer($coroutine_return_back, $coroutine);
+    
+    $RESULT->push(3);
+    
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method transfer_create_many_objects : int () {
+    
+    my $coroutine_return_back = Go::Coroutine->new;
+    
+    my $coroutine = Go::Coroutine->new(method : void () {
+      
+      for (my $i = 0; $i < 100; $i++) {
+        my $point = Point->new;
+      }
+      
+    }, $coroutine_return_back);
+    
+    Go::Coroutine->transfer($coroutine_return_back, $coroutine);
+    
+    return 1;
+  }
+  
+  static method transfer : int () {
+    
+    $RESULT = IntList->new;
+    
+    my $coroutines = new Go::Coroutine[2];
+    
+    my $coroutine_return_back = Go::Coroutine->new;
+    
+    my $coroutine0 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
+      
+      $RESULT->push(2);
+      
+      my $coroutines = $self->{coroutines};
+      
+      my $coroutine1 = Go::Coroutine->new([has coroutines : Go::Coroutine[] = $coroutines] method : void () {
+        
+        $RESULT->push(4);
+        
+        &foo;
+        
+        $RESULT->push(6);
+        
+        Go::Coroutine->transfer($self->{coroutines}[1], $self->{coroutines}[0]);
+        
+        $RESULT->push(8);
+        
+      }, $coroutines->[0]);
+      
+      $coroutines->[1] = $coroutine1;
+      
+      $RESULT->push(3);
+      
+      Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
+      
+      $RESULT->push(7);
+      
+      Go::Coroutine->transfer($coroutines->[0], $coroutines->[1]);
+      
+      $RESULT->push(9);
+      
+    }, $coroutine_return_back);
+    
+    $coroutines->[0] = $coroutine0;
+    
+    $RESULT->push(1);
+    
+    Go::Coroutine->transfer($coroutine_return_back, $coroutines->[0]);
+    
+    $RESULT->push(10);
+    
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    $coroutines->[0] = undef;
+    
+    $coroutines->[1] = undef;
+    
+    return 1;
+  }
+  
+  static method foo : void () {
+    $RESULT->push(5);
+  }
+
+  static method die : int () {
+    
+    $RESULT = IntList->new;
+    
+    my $coroutine_return_back = Go::Coroutine->new;
+    
+    my $coroutine = Go::Coroutine->new(method : void () {
+      
+      $RESULT->push(2);
+      
+      die "Coroutine Error.";
+      
+      $RESULT->push(4);
+    }, $coroutine_return_back);
+    
+    $RESULT->push(1);
+    
+    Go::Coroutine->transfer($coroutine_return_back, $coroutine);
+    
+    $RESULT->push(3);
+    
+    unless (Array->equals_int($RESULT->to_array, [1, 2, 3])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+}

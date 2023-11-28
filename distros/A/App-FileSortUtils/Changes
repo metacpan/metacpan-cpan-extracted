@@ -1,3 +1,32 @@
+0.009   2023-11-26  Released-By: PERLANCAR; Urgency: medium
+
+        - Split backend routines to File-Util-Sort to minimize dependencies,
+          because the backend routines will be used by other distributions.
+
+
+0.008   2023-11-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option: --recursive (-R).
+
+
+0.007   2023-11-14  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [enhancement] Allow sorting files in multiple directories.
+
+        - [incompatible changes] Rename 'dir' argument to 'dirs'.
+
+        - [doc] Mention App::DownloadsDirUtils.
+
+
+0.006   2023-11-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [Incompatible change] By default ignore dotfiles. Specify --all (-a)
+          to include them.
+
+        - Add options: --include-filename-pattern (-I),
+          --exclude-filename-pattern (-X), --all (-a).
+
+
 0.005   2023-10-31  Released-By: PERLANCAR; Urgency: medium
 
         - [ux] Add log statement so e.g. in commands like "mv `newest

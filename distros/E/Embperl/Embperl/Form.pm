@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -10,8 +11,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id$
 #
 ###################################################################################
 
@@ -32,6 +31,7 @@ use Embperl::Inline ;
 use Data::Dumper ;
 use Storable ;
 use MIME::Base64 ;
+use Scalar::Util qw{weaken} ;
 
 our %forms ;
 our $form_cnt = 1 ;
@@ -77,7 +77,8 @@ sub sub_new
     # The following lines needs to there twice!
     # some weired bug in Perl?
     $Embperl::FormData::forms{$self -> {formptr}} = $self ;
-    $Embperl::FormData::forms{$self -> {formptr}} = $self ;
+    weaken($Embperl::FormData::forms{$self -> {formptr}});
+    #$Embperl::FormData::forms{$self -> {formptr}} = $self ;
 
     if ($toplevel)
         {
@@ -88,6 +89,7 @@ sub sub_new
         $self -> {code_refs}    = [] ;
         $self -> {constrain_attrs} = [] ;
         $self -> {do_validate}  = [] ;
+        $self -> {all_controls}  = {} ;
         }
     else
         {
@@ -98,9 +100,13 @@ sub sub_new
         $self -> {constrain_attrs}    = $self -> parent_form -> {constrain_attrs} ;
         $self -> {code_refs}    = $self -> parent_form -> {code_refs} ;
         $self -> {do_validate}  = $self -> parent_form -> {do_validate} ;
+        $self -> {all_controls} = $self -> parent_form -> {all_controls} ;
         }
-    push @{$self -> {code_refs}}, $self if ($self -> has_code_refs) ;
-
+    if ($self -> has_code_refs)
+        {
+        push @{$self -> {code_refs}}, $self  ;
+        weaken ($self -> {code_refs}[-1]) ;
+        }
     $self -> new_controls ($controls, $options, undef, $id, $options -> {masks}, $options -> {defaults}) ;
 
     $self -> {noframe} = 1 if ($controls && @$controls > 0 &&
@@ -119,6 +125,17 @@ sub new
     {
     my $class = shift ;
     return $class -> sub_new (@_) ;
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   clone - clone an existing form. trivial new here, maybe more complex for kids
+#       This will always return a Embperl::Form, no matter what $self is
+
+sub cloned_form
+    {
+    my $self  = shift ;
+    return Embperl::Form -> sub_new (@_) ;
     }
 
 # ---------------------------------------------------------------------------
@@ -275,13 +292,13 @@ sub new_controls
             $ctlid = $control->{name} . '_' . $q ;
             $q++ ;
             }
-        
+
         my $name = $control -> {name} ;
         $control -> {type}      =~ s/sf_select.+/select/ ;
         $control -> {type}      ||= ($control -> {name}?'input':'blank') ;
         $control -> {parentid}  = $id if ($id) ;
         $control -> {id}      ||= $ctlid ;
-        $control -> {basename}  = $control->{name} ;
+        $control -> {basename}||= $control->{name} ;
         $control -> {formid}    = $formid ;
         $control -> {formptr}   = $self -> {formptr}  ;
 
@@ -310,16 +327,38 @@ sub new_controls
             $control = $self -> new_object ($packages, $type, $control) ;
             if (!$no_init)
                 {
-                push @{$self -> {init_data}}, $control if ($control -> can ('init_data')) ;
-                push @{$self -> {init_markup}}, $control if ($control -> can ('init_markup')) ;
-                push @{$self -> {prepare_fdat}}, $control if ($control -> can ('prepare_fdat')) ;
-                push @{$self -> {code_refs}}, $control if ($control -> has_code_refs) ;
-                push @{$self -> {do_validate}}, $control if ($control -> has_validate_rules) ;
+                if ($control -> can ('init_data'))
+                    {
+                    push @{$self -> {init_data}}, $control ;
+                    weaken ($self -> {init_data}[-1]) ;
+                    }
+                if ($control -> can ('init_markup'))
+                    {
+                    push @{$self -> {init_markup}}, $control ;
+                    weaken ($self -> {init_markup}[-1]) ;
+                    }
+                if ($control -> can ('prepare_fdat'))
+                    {
+                    push @{$self -> {prepare_fdat}}, $control ;
+                    weaken ($self -> {prepare_fdat}[-1]) ;
+                    }
+                if ($control -> has_code_refs)
+                    {
+                    push @{$self -> {code_refs}}, $control ;
+                    weaken ($self -> {code_refs}[-1]) ;
+                    }
+                if ($control -> has_validate_rules)
+                    {
+                    push @{$self -> {do_validate}}, $control ;
+                    weaken ($self -> {do_validate}[-1]) ;
+                    }
                 push @{$self -> {constrain_attrs}}, $control -> constrain_attrs ;
+                $self -> {all_controls}{$name} = $control ;
+                weaken ($self -> {all_controls}{$name}) ;
                 }
             }
         $self -> {controlids}{$control->{id}} = $control ;
-        
+
         next if ($control -> is_disabled ()) ;
         if ($control -> {sublines})
             {
@@ -353,6 +392,7 @@ sub new_controls
                 my $subform = $class -> sub_new ($subcontrols, $options, $ctlid, 0, $self -> {formptr}) ;
                 $subform -> {text} ||= $control -> {options}[$i] if (exists ($control -> {options}) && $control -> {options}[$i]) ;
                 $subform -> {parent_control} = $control ;
+                weaken ($subform -> {parent_control}) ;
                 push @ids, $ctlid ;
                 push @obj, $subform ;
                 $i++ ;
@@ -417,11 +457,11 @@ sub layout
     foreach my $control (@$controls)
         {
         next if ($control -> is_disabled ()) ;
-	if ($control -> is_hidden)
-	    {
-	    $control -> {width_percent} = 0 ;
-            push @$hidden, $control  ;
-	    next ;
+    if ($control -> is_hidden)
+        {
+        $control -> {width_percent} = 0 ;
+        push @$hidden, $control  ;
+        next ;
             }
         my $width = ($control -> {width} eq 'expand')?100:$control -> {width_percent} || int($max_x / ($control -> {width} || 2)) ;
         #$width = 21 if ($x == 0 && $width < 21) ;
@@ -441,7 +481,7 @@ sub layout
         $last_state = $control -> {state} ;
         $control -> {width_percent} = $control -> {width} eq 'expand'?'expand':int($width) ;
         $control -> {x_percent}     = int($x) ;
-	$control -> {level}         = $level ;
+        $control -> {level}         = $level ;
         $x += $width ;
         $num++ ;
         $max_num = $num if ($num > $max_num) ;
@@ -476,8 +516,8 @@ sub layout
                 {
                 next if (!$subobj) ;
                 $subobj -> layout ;
-		push @$hidden, @{$subobj -> {hidden}} ;
-	        delete $subobj -> {hidden} ;
+                push @$hidden, @{$subobj -> {hidden}} ;
+                delete $subobj -> {hidden} ;
                 }
             }
         }
@@ -582,12 +622,13 @@ sub init_validate
                 }
             else
                 {
-                $self -> {validate}  = 0 ;    
+                $self -> add_code_at_bottom (" function epform_validate_$self->{formname} () { return false } ") ;
+                $self -> {validate}  = 0 ;
                 }
             }
         }
-    
-    return $self -> {validate}?1:0 ;    
+
+    return $self -> {validate}?1:0 ;
     }
 
 # ---------------------------------------------------------------------------
@@ -606,7 +647,7 @@ sub show
         $self -> init_data ($req) ;
         $self -> show_form_begin ($req) ;
         }
-    
+
     #$self -> validate ($req) if ($self -> {toplevel});
     $self -> show_controls ($req, $activeid, $options) ;
     $self -> show_form_end  ($req) if ($self -> {toplevel});
@@ -629,7 +670,8 @@ sub init_data
         }
     foreach my $control (@{$self -> {init_data}})
         {
-        $control -> init_data ($req) if (!$control -> is_disabled ($req)) ;
+        next if (!$control) ;
+        $control -> init_data ($req) if ($control -> should_init_data ($req)) ;
         }
     }
 
@@ -672,7 +714,7 @@ sub prepare_fdat
         $control -> prepare_fdat ($req)  if (!$control -> is_disabled ($req)) ;
         }
     }
-    
+
 # ---------------------------------------------------------------------------
 #
 #   is_disabled - do not display this control at all
@@ -736,7 +778,7 @@ sub all_code_ref_fingerprints
         {
         $fp .= $control -> code_ref_fingerprint ($req) ;
         }
-    return $fp ;    
+    return $fp ;
     }
 
 # ---------------------------------------------------------------------------
@@ -763,17 +805,17 @@ sub validate
 
     {
     my ($self, $fdat, $pref, $epreq) = @_ ;
-    
+
     my $validate = $self -> {validate} ;
     my $result = $validate -> validate ($fdat, $pref, $epreq) ;
     my @msgs ;
     foreach my $err (@$result)
         {
         my $msg = $validate -> error_message ($err, $pref, $epreq) ;
-        push @msgs, $msg ;    
+        push @msgs, $msg ;
         }
 
-    return ($result, \@msgs) ;    
+    return ($result, \@msgs) ;
     }
 
 
@@ -820,9 +862,9 @@ sub add_tabs
         }
 
     if (@forms == 1)
-	{
-	return @{$forms[0]} ;
-	}
+        {
+        return @{$forms[0]} ;
+        }
 
     return {
             section => 'cSectionText',
@@ -895,17 +937,18 @@ sub add_sublines
         $subfields ||= [] ;
         foreach (@$subfields)
             {
-            $_ -> {state} = $object_data -> {name} . '-show-' .  ($file->{value} || $file->{name}) ;   
+            $_ -> {state} = $object_data -> {name} . '-show-' .  ($file->{value} || $file->{name}) ;
             }
         push @forms, $subfields  ;
         push @values,  $file->{value} || $file->{name};
         push @options, $file -> {text} || $file->{value} || $file->{name};
         }
     $object_data -> {trigger} = 1 ;
-    return { %$object_data, type => $type || 'select',
-             values => \@values, options => \@options, sublines => \@forms,
-	     };
-
+    return 
+        { 
+        %$object_data, type => $type || 'select',
+        values => \@values, options => \@options, sublines => \@forms,
+        };
     }
 
 #------------------------------------------------------------------------------------------
@@ -954,18 +997,18 @@ sub add_checkbox_subform
         my $obj = Execute ({object => "./$fn"} ) ;
         #$subfield = [eval {$obj -> fields ($r, { %$file, %$args} ) || undef}];
         }
-    
+
     my $subfields = $subfield -> [0] ;
     foreach (@$subfields)
         {
-        $_ -> {state} = $subform -> {name} . '-show' ;   
+        $_ -> {state} = $subform -> {name} . '-show' ;
         }
     $subfields = $subfield -> [1] ;
     foreach (@$subfields)
         {
-        $_ -> {state} = $subform -> {name} . '-hide';   
+        $_ -> {state} = $subform -> {name} . '-hide';
         }
-        
+
     return  {type => 'checkbox' , trigger => 1, section => $section, width => $width, name => $name, text => $text, value => $value, sublines => $subfield}
 
     }
@@ -985,7 +1028,7 @@ sub add_checkbox_subform
 sub convert_label
     {
     my ($self, $ctrl, $name, $text, $req) = @_ ;
-    
+
     return $text || $ctrl->{text} || $name || $ctrl->{name} ;
     }
 
@@ -1005,7 +1048,7 @@ sub convert_label
 sub convert_options
     {
     my ($self, $ctrl, $values, $options, $req) = @_ ;
-    
+
     return $options ;
     }
 
@@ -1024,7 +1067,7 @@ sub convert_options
 sub convert_text
     {
     my ($self, $ctrl, $value, $text, $req) = @_ ;
-    
+
     return $value || $ctrl->{text} || $ctrl->{name} ;
     }
 
@@ -1043,7 +1086,7 @@ sub convert_text
 sub diff_checkitems
     {
     my ($self, $check) = @_ ;
-    
+
     my %diff ;
     my $checkitems = eval { Storable::thaw(MIME::Base64::decode ($Embperl::fdat{-checkitems})) } ;
 
@@ -1053,7 +1096,7 @@ sub diff_checkitems
         $diff{$_} = 1 if ($checkitems -> {$_} ne $Embperl::fdat{$_}) ;
         }
 
-    return \%diff ;    
+    return \%diff ;
     }
 
 
@@ -1158,8 +1201,8 @@ $]
 #]
 
 [$sub show_checkitems ($self, $req)
- 
-my $checkitems = MIME::Base64::encode (Storable::freeze (\%idat)) ; 
+
+my $checkitems = MIME::Base64::encode (Storable::freeze (\%idat)) ;
 $]
 <input type="hidden" name="-checkitems" value="[+ $checkitems +]">
 
@@ -1194,7 +1237,7 @@ $]<!-- line begin -->
     [$if $id $] id="[+ $id +]" [$endif$]
     [$if ($activeid eq '-' || ($baseid eq $baseaid && $baseidn != $baseaidn)) $] style="display: none" [$endif$]
     >
-    #][* return !($activeid eq '-' || ($baseid eq $baseaid && $baseidn != $baseaidn)) 
+    #][* return !($activeid eq '-' || ($baseid eq $baseaid && $baseidn != $baseaidn))
 *][$endsub$]
 
 [# ---------------------------------------------------------------------------
@@ -1314,21 +1357,21 @@ Example:
 
 =item * classdiv
 
-Gives the CSS class of the DIV arround the form. Default cTableDiv.
+Gives the CSS class of the DIV around the form. Default cTableDiv.
 
 =item * checkitems
 
-If set to true, allow to call the function diff_checkitems after the data is
+If set to true, allows one to call the function diff_checkitems after the data is
 posted and see which form fields are changed.
 
 =item * control_packages
 
-Arrayref with package names to search for form controls. Alternativly you can
+Arrayref with package names to search for form controls. Alternatively you can
 overwrite the method get_control_packages.
 
 =item * datasrc_packages
 
-Arrayref with package names to search for form data source modules. Alternativly you can
+Arrayref with package names to search for form data source modules. Alternatively you can
 overwrite the method get_datasrc_packages.
 
 

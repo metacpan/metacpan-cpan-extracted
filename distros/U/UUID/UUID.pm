@@ -1,14 +1,15 @@
 package UUID;
-
 require 5.005;
 use strict;
-#use warnings;
+use warnings;
 
 require Exporter;
 require DynaLoader;
 
 use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 @ISA = qw(Exporter DynaLoader);
+
+$VERSION = '0.31';
 
 # This allows declaration       use UUID ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
@@ -22,8 +23,6 @@ use vars qw(@ISA %EXPORT_TAGS @EXPORT_OK $VERSION);
 );
 
 @EXPORT_OK = ( @{$EXPORT_TAGS{'all'}} );
-
-$VERSION = '0.30';
 
 bootstrap UUID $VERSION;
 
@@ -210,7 +209,7 @@ This is free software, licensed under:
 
   The Artistic License 2.0 (GPL Compatible)
 
-Details of this license can be found within the 'License' text file.
+Details of this license can be found within the 'LICENSE' text file.
 
 =head1 AUTHOR
 

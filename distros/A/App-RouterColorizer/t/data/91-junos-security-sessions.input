@@ -1,0 +1,7 @@
+Session ID: 323818, Policy name: P1/14, Timeout: 56, Valid
+  In: 192.0.2.2/15851 --> 192.0.2.1/678;udp, Conn Tag: 0x0, If: st0.1, Pkts: 18275, Bytes: 1681208,
+  Out: 192.0.2.1/678 --> 192.0.2.2/15851;udp, Conn Tag: 0x0, If: irb.1, Pkts: 18275, Bytes: 1736774,
+
+Session ID: 326455, Policy name: P1/14, Timeout: 58, Valid
+  In: 192.0.2.2/52454 --> 192.0.2.3/678;udp, Conn Tag: 0x0, If: st0.1, Pkts: 3500, Bytes: 321908,
+  Out: 192.0.2.3/678 --> 192.0.2.2/52454;udp, Conn Tag: 0x0, If: irb.1, Pkts: 3500, Bytes: 344754,

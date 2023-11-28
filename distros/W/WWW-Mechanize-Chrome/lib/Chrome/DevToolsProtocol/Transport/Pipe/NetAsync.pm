@@ -1,6 +1,5 @@
 package Chrome::DevToolsProtocol::Transport::Pipe::NetAsync;
 use strict;
-use Filter::signatures;
 use Moo 2;
 no warnings 'experimental::signatures';
 use feature 'signatures';
@@ -9,7 +8,7 @@ use Scalar::Util 'weaken';
 use IO::Async::Loop;
 use IO::Async::Stream;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 =head1 NAME
 

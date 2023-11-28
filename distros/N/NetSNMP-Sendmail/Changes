@@ -1,3 +1,7 @@
+0.97 2023-11-15
+
+* Don't bail out if mailq or mailstats fails.
+
 0.96 2021-02-13
 
 * Change bugtracker address.

@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Bs::Latn - Package for language Bosnian
 
 package Locale::CLDR::Locales::Bs::Latn;
 # This file auto generated from Data\common\main\bs_Latn.xml
-#	on Fri 13 Oct  9:09:00 am GMT
+#	on Sat  4 Nov  5:55:42 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

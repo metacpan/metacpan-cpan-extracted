@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+#-*- mode: sh; -*-
+# Script to create or run a Modulino
+#
+# To create a modulino link from a well formed module name
+#   modulino Foo::Bar::Baz ...  will create foo_bar_baz
+#
+# To create a modulino link and force the name
+#   modulino Foo/Bar/Baz.pm ... will create Foo_Bar_Baz
+#
+# To run a modulino...
+#   foo_bar_baz
+
+pgm=$(basename $0)
+
+if [ "$pgm" = "modulino" ]; then
+    extension="${1##*.}"
+    
+    if [ "$extension" = "$(basename $1)" ]; then
+        echo ln -s $(which modulino) $(echo "$1" | tr [A-Z] [a-z] | sed 's/::/_/g;')
+    else
+        filename="${1%.*}"
+        echo ln -s $(which modulino) $(echo $filename | sed 's/\//_/g')
+    fi
+else  
+    MODULINO_PATH=$(basename $0 | perl -ne 'chomp; printf "%s.pm", join "/", map { ucfirst $_ } split /_/;')
+    MODULINO=$(basename $0 | perl -ne 'chomp; print join "::", map { ucfirst $_ } split /_/;')
+    
+    MODULINO_RUN=$(perl -M$MODULINO -e 'print $INC{"'$MODULINO_PATH'"}';)
+    
+    if test -z "$MODULINO_RUN"; then
+        echo "$MODULINO is not installed"
+        exit 1;
+    fi
+    
+    perl $MODULINO_RUN "$@"
+fi

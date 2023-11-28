@@ -8,6 +8,29 @@ SEE ALSO
     Error::Pure
         Perl module for structured errors.
 
+    Error::Pure::ANSIColor
+        Error::Pure modules with Term::ANSIColor support.
+
+    Error::Pure::ANSIColor::AllError
+        Error::Pure module with full backtrace.
+
+    Error::Pure::ANSIColor::Die
+        Error::Pure module with classic die.
+
+    Error::Pure::ANSIColor::Error
+        Error::Pure module with error on one line with informations.
+
+    Error::Pure::ANSIColor::ErrorList
+        Error::Pure module with list of errors in one line with
+        informations.
+
+    Error::Pure::ANSIColor::Print
+        Error::Pure module for simple error print.
+
+    Error::Pure::ANSIColor::PrintVar
+        Error::Pure module for simple error print with all variables with
+        ANSIColor support.
+
     Error::Pure::AllError
         Error::Pure module with full backtrace.
 
@@ -53,6 +76,9 @@ SEE ALSO
     Error::Pure::NoDie
         Error::Pure module for simple print instead die.
 
+    Error::Pure::Output::ANSIColor
+        ANSIColor Output subroutines for Error::Pure.
+
     Error::Pure::Output::JSON
         Output JSON subroutines for Error::Pure.
 
@@ -69,7 +95,7 @@ SEE ALSO
         Error::Pure module for simple error print with all variables.
 
 REPOSITORY
-    <https://github.com/tupinek/Task-Error-Pure>
+    <https://github.com/michal-josef-spacek/Task-Error-Pure>
 
 AUTHOR
     Michal Špaček <mailto:skim@cpan.org>
@@ -77,10 +103,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2015-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

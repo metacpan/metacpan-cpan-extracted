@@ -3,6 +3,7 @@ package Test::TableSample::Role;
 use Test::Roo::Role;
 
 use Class::Load qw/ load_class /;
+use Ref::Util qw/ is_plain_hashref /;
 use SQL::Abstract::Test import => [qw/ is_same_sql_bind /];
 
 has dsn => (
@@ -79,6 +80,27 @@ test 'build query' => sub {
         $self->bind,
         'expected sql and bind'
     );
+
+};
+
+test 'tablesample method' => sub {
+    my ($self) = @_;
+
+    my %attr = %{ $self->attr };
+    ok my $opts = delete $attr{tablesample}, 'tablesample options';
+
+    unless ( is_plain_hashref($opts) ) {
+        $opts = { fraction => $opts };
+    }
+
+    my $frac = delete $opts->{fraction};
+
+    my $rs = $self->schema->resultset( $self->table_class )->search_rs( $self->where, \%attr )->tablesample( $frac, $opts );
+
+    my $alias = $self->current_source_alias;
+    my $sql   = $self->sql =~ s/\bme\b/$alias/gr;
+
+    is_same_sql_bind( $rs->as_query, "(${sql})", $self->bind, 'expected sql and bind' );
 
 };
 

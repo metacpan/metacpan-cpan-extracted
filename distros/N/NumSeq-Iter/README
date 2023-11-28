@@ -3,8 +3,8 @@ NAME
     specification (e.g. '1,3,5,...,101')
 
 VERSION
-    This document describes version 0.005 of NumSeq::Iter (from Perl
-    distribution NumSeq-Iter), released on 2022-01-21.
+    This document describes version 0.008 of NumSeq::Iter (from Perl
+    distribution NumSeq-Iter), released on 2023-11-21.
 
 SYNOPSIS
       use NumSeq::Iter qw(numseq_parse numseq_iter);
@@ -21,7 +21,8 @@ SYNOPSIS
       my $res = numseq_parse('1,2,3,...');    # [200, "OK", {numbers=>[1,2,3], has_ellipsis=>1, type=>'arithmetic', inc=>1, last_number=>undef}]
       my $res = numseq_parse('1,3,9,...');    # [200, "OK", {numbers=>[1,3,9], has_ellipsis=>1, type=>'geometric',  inc=>3, last_number=>undef}]
       my $res = numseq_parse('1,3,5,...,13'); # [200, "OK", {numbers=>[1,3,5], has_ellipsis=>1, type=>'arithmetic', inc=>2, last_number=>13}]
-      my $res = numseq_parse('2,3,5,...');    # [400, "Parse fail: Can't determine the pattern from number sequence: 2, 3, 5"]
+      my $res = numseq_parse('2,3,5,...');    # [200, "OK", {numbers=>[1,3,5], has_ellipsis=>1, type=>'fibonacci'}]
+      my $res = numseq_parse('2,3,7,...');    # [400, "Parse fail: Can't determine the pattern from number sequence: 2, 3, 7"]
 
 DESCRIPTION
     This module provides a simple (coderef) iterator which you can call
@@ -37,8 +38,15 @@ DESCRIPTION
     When the sequence has an ellipsis, there must be at least three numbers
     before the ellipsis. There can optionally be another number after the
     ellipsis to make the sequence finite; but the last number can also be
-    Inf, +Inf, or -Inf. Currently only simple arithmetic sequence ('1,3,5')
-    or simple geometric sequence ('2,6,18') is recognized.
+    Inf, +Inf, or -Inf.
+
+    Currently these sequences are recognized:
+
+    *   simple arithmetic sequence ('1,3,5')
+
+    *   simple geometric sequence ('2,6,18')
+
+    *   fibonacci ('2,3,5')
 
 FUNCTIONS
   numseq_iter
@@ -85,14 +93,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021 by perlancar
-    <perlancar@cpan.org>.
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

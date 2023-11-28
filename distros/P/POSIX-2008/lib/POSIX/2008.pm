@@ -6,7 +6,7 @@ use Carp;
 
 require Exporter;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION; # so "use Module 0.002" won't warn on underscore
 
@@ -29,8 +29,8 @@ link linkat log log1p log2 logb lrand48 lround lstat mkdir mkdirat mkdtemp
 mkfifo mkfifoat mknod mknodat mkstemp mrand48 nanosleep nearbyint nextafter
 nice nrand48 open openat openat2 pread preadv preadv2 ptsname pwrite pwritev
 pwritev2 random read readlink readlinkat readv realpath remainder remove
-remquo rename renameat rmdir round scalbn seed48 setegid seteuid setgid
-setitimer setpriority setregid setreuid setsid setuid setutxent sighold
+remquo rename renameat renameat2 rmdir round scalbn seed48 setegid seteuid
+setgid setitimer setpriority setregid setreuid setsid setuid setutxent sighold
 sigignore signbit sigpause sigrelse sin sinh srand48 srandom stat strptime
 symlink symlinkat sync tan tanh tgamma timer_create timer_delete
 timer_getoverrun timer_gettime timer_settime trunc truncate ttyname unlink
@@ -58,13 +58,14 @@ O_NOATIME O_NOCTTY O_NOFOLLOW O_NONBLOCK O_PATH O_RDONLY O_RDWR O_RSYNC
 O_SEARCH O_SYNC O_TMPFILE O_TRUNC O_TTY_INIT O_WRONLY OLD_TIME
 POSIX_FADV_NORMAL POSIX_FADV_SEQUENTIAL POSIX_FADV_RANDOM POSIX_FADV_NOREUSE
 POSIX_FADV_WILLNEED POSIX_FADV_DONTNEED PRIO_PROCESS PRIO_PGRP PRIO_USER
-RESOLVE_BENEATH RESOLVE_IN_ROOT RESOLVE_NO_MAGICLINKS RESOLVE_NO_SYMLINKS
-RESOLVE_NO_XDEV RESOLVE_CACHED RTLD_GLOBAL RTLD_LAZY RTLD_LOCAL RTLD_NOW
-RUN_LVL RWF_DSYNC RWF_HIPRI RWF_SYNC RWF_NOWAIT RWF_APPEND S_IFMT S_IFBLK
-S_IFCHR S_IFIFO S_IFREG S_IFDIR S_IFLNK S_IFSOCK S_ISUID S_ISGID S_IRWXU
-S_IRUSR S_IWUSR S_IXUSR S_IRWXG S_IRGRP S_IWGRP S_IXGRP S_IRWXO S_IROTH
-S_IWOTH S_IXOTH S_ISVTX SEEK_SET SEEK_CUR SEEK_END SEEK_DATA SEEK_HOLE
-TIMER_ABSTIME USER_PROCESS UTIME_NOW UTIME_OMIT F_OK R_OK W_OK X_OK
+RENAME_EXCHANGE RENAME_NOREPLACE RENAME_WHITEOUT RESOLVE_BENEATH
+RESOLVE_IN_ROOT RESOLVE_NO_MAGICLINKS RESOLVE_NO_SYMLINKS RESOLVE_NO_XDEV
+RESOLVE_CACHED RTLD_GLOBAL RTLD_LAZY RTLD_LOCAL RTLD_NOW RUN_LVL RWF_DSYNC
+RWF_HIPRI RWF_SYNC RWF_NOWAIT RWF_APPEND S_IFMT S_IFBLK S_IFCHR S_IFIFO
+S_IFREG S_IFDIR S_IFLNK S_IFSOCK S_ISUID S_ISGID S_IRWXU S_IRUSR S_IWUSR
+S_IXUSR S_IRWXG S_IRGRP S_IWGRP S_IXGRP S_IRWXO S_IROTH S_IWOTH S_IXOTH
+S_ISVTX SEEK_SET SEEK_CUR SEEK_END SEEK_DATA SEEK_HOLE TIMER_ABSTIME
+USER_PROCESS UTIME_NOW UTIME_OMIT F_OK R_OK W_OK X_OK
 );
 
 our @ISA = qw(Exporter);
@@ -75,8 +76,8 @@ our @EXPORT_OK = (@_functions, @_constants);
 our %EXPORT_TAGS = (
   # at: Older Perls don't have variable length lookbehind, hence two regexen
   # for functions.
-  'at'     => [grep(/^(?:AT|RESOLVE)_/, @_constants),
-              grep(/at$/ && !/^l?stat$/, @_functions), 'openat2'],
+  'at'     => [grep(/^(?:AT|RENAME|RESOLVE)_/, @_constants),
+               grep(/at2?$/ && !/^l?stat$/, @_functions)],
   'id'     => [grep /^[gs]et.+id$/, @_functions],
   'is'     => [grep /^is/, @_functions],
   'rw'     => [qw(read write readv writev)],

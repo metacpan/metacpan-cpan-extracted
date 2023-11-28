@@ -14,6 +14,7 @@ local %ENV = (
 
 class Local::Test :does(OpenTelemetry::Exporter) {
     use File::Temp 'tempfile';
+    use Future::AsyncAwait;
     use JSON::PP;
 
     use feature 'say';
@@ -43,9 +44,10 @@ class Local::Test :does(OpenTelemetry::Exporter) {
         print $handle '';
     }
 
-    method export      { $self->$log( export      => @_ ); 0 }
-    method shutdown    { $self->$log( shutdown    => @_ ); 0 }
-    method force_flush { $self->$log( force_flush => @_ ); 0 }
+    method export { $self->$log( export => @_ ); 0 }
+
+    async method shutdown    { $self->$log( shutdown    => @_ ); 0 }
+    async method force_flush { $self->$log( force_flush => @_ ); 0 }
 }
 
 tests 'Constructor' => sub {

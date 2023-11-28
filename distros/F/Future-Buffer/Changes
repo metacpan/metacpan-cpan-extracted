@@ -1,5 +1,11 @@
 Revision history for Future-Buffer
 
+0.05    2023-11-10
+        [BUGFIXES]
+         * Fix logic for fill futures that complete immediately
+         * Ensure that fill future's `on_done` closure doesn't strongly
+           capture `$self`
+
 0.04    2023-10-17
         [CHANGES]
          * Support end-of-file condition

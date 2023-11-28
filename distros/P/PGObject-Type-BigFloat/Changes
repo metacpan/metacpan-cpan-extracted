@@ -1,5 +1,10 @@
 Revision history for PGObject-Type-BigFloat
 
+2.1.1   2023-11-11
+    Set minimum version for Math::BigFloat to 1.999842; earlier
+    versions have varying levels of problems handling inheritance
+    from Math::BigFloat -- which is what this module depends on
+
 2.1.0   2018-06-04
     Add accuracy, precision, round_mode, div_scale globals,
     so they have defaults and can be set properly.

@@ -8,12 +8,12 @@ use AsposeCellsCloud::Object::LineShape;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**BeginArrowheadLength** | **string** |  |
-**BeginArrowheadStyle** | **string** |  |
-**BeginArrowheadWidth** | **string** |  |
-**EndArrowheadLength** | **string** |  |
-**EndArrowheadStyle** | **string** |  |
-**EndArrowheadWidth** | **string** |  |
+**BeginArrowheadLength** | **string** | Gets and sets the begin arrow head length of the line. |
+**BeginArrowheadStyle** | **string** | Gets and sets the begin arrow head style of the line. |
+**BeginArrowheadWidth** | **string** | Gets and sets the begin arrow head width of the line. |
+**EndArrowheadLength** | **string** | Gets and sets the end arrow head length of the line. |
+**EndArrowheadStyle** | **string** | Gets and sets the end arrow head style of the line. |
+**EndArrowheadWidth** | **string** | Gets and sets the end arrow head width of the line. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

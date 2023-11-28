@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::dirname::unix;
 
-our $DATE = '2023-10-29'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2023-11-23'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis is like the `dirname` schema but with extra checks relevant to the Unix,\n(e.g. a path element cannot be longer than 255 characters) and prefilters (e.g.\nmultipile consecutive slashes `//` will be normalized into a single one `/`).\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"/"},{valid=>1,value=>"foo/bar"},{valid=>1,validated_value=>"foo/bar",value=>"foo//bar"},{summary=>"Path element too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{summary=>"Contains null character",valid=>0,value=>"foo\0"}],match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem directory name on a Unix system","x.completion"=>["dirname"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::dirname::unix - Filesystem directory name on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::SchemaR::dirname::unix (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::SchemaR::dirname::unix (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 DESCRIPTION
 

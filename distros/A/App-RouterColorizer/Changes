@@ -1,6 +1,15 @@
-1.231650  2023-06-14 17:40:19+00:00 UTC
+1.233180  2023-11-14 11:28:34-07:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] Do not colorize too much of the output from "show security
+   flow session" on Junos.
+
+1.231650  2023-06-14 17:42:45+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>
  * [bugfix] Add additional IP address colorizations
+
+1.231460  2023-05-25 20:38:08-06:00 America/Denver
+ Joelle Maslak <jmaslak@antelope.net>
+ * [bugfix] Do not colorize "show platform jericho tcam summary" on Arista
 
 1.231100  2023-04-20 03:11:30+00:00 UTC
  Joelle Maslak <jmaslak@antelope.net>

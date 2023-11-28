@@ -1,3 +1,4 @@
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 use strictures 2;
 use stable 0.031 'postderef';
 use experimental 'signatures';
@@ -7,19 +8,40 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
+use Test::Fatal;
 use URI;
 
 use lib 't/lib';
 use Helper;
 
 my $openapi = OpenAPI::Modern->new(
-  openapi_uri => 'openapi.yaml',
+  openapi_uri => '',
   openapi_schema => {
     openapi => '3.1.0',
     info => { title => 'Test API', version => '1.2.3' },
+    components => {
+      schemas => {
+        nothing => {},
+        string => { type => 'string' },
+        array => { type => 'array' },
+        object => { type => 'object' },
+        deep_string => { '$defs' => { foo => { type => 'string' } } },
+        ref_to_deep_string => { '$ref' => '#/components/schemas/string' },
+      },
+    },
     paths => {},
   },
 );
+
+$openapi->evaluator->add_schema({
+  '$id' => 'http://localhost:1234/extras',
+  '$defs' => {
+    array => { type => 'array' },
+    object => { type => 'object' },
+    deep_string => { '$defs' => { foo => { type => 'string' } } },
+    ref_to_deep_string => { '$ref' => '#/components/schemas/string' },
+  },
+});
 
 my $parameter_content;
 no warnings 'redefine';
@@ -429,7 +451,7 @@ subtest 'header parameters' => sub {
       ],
     },
     {
-      name => 'EncodedNumber',
+      name => 'Encoded-Number',
       header_obj => { content => { 'application/json' => { schema => { type => 'integer' } } } },
       values => [ '3' ],
       content => 3, # number, not string!
@@ -451,6 +473,19 @@ subtest 'header parameters' => sub {
       header_obj => { schema => { type => 'string' } },
       values => [ 'foo' ],
       content => 'foo',
+    },
+    {
+      name => 'Single-Header-Deep-Ref-String',
+      header_obj => { schema => { '$ref' => '#/components/schemas/ref_to_deep_string' } },
+      values => [ 'foo' ],
+      content => 'foo',
+    },
+    {
+      name => 'Single-Header-Deep-Ref-Elsewhere-String',
+      header_obj => { schema => { '$ref' => 'http://localhost:1234/extras#/$defs/ref_to_deep_string' } },
+      values => [ 'foo' ],
+      content => 'foo',
+      todo => '_resolve_ref does not know how to verify entities in JSDO objects',
     },
     {
       # a single header is passed as an array iff when array is requested
@@ -479,11 +514,11 @@ subtest 'header parameters' => sub {
       content => [ 'foo', 'bar' ],
     },
     {
-      # comma-separated values are always normalized
+      # internal comma-separated values are not altered
       name => 'Comma-Headers-String',
       header_obj => { schema => { type => 'string' } },
       values => [ ' foo,  bar ' ],
-      content => 'foo, bar',
+      content => 'foo,  bar',
     },
     {
       # split individual values on comma when type=array
@@ -532,10 +567,14 @@ subtest 'header parameters' => sub {
     my $headers = Mojo::Headers->new;
     $headers->add($name, $test->{values}->@*) if defined $test->{values};
 
-    ()= $openapi->_validate_header_parameter({ %$state, data_path => '/request/header/'.$name },
-      $name, $test->{header_obj}, $headers->header($name));
+    my $exception = exception {
+      ()= $openapi->_validate_header_parameter({ %$state, data_path => '/request/header/'.$name },
+        $name, $test->{header_obj}, $headers);
+    };
 
     local $TODO = $test->{todo} if $test->{todo};
+
+    is($exception, undef, 'no exceptions');
 
     is_equal(
       [ map $_->TO_JSON, $state->{errors}->@* ],

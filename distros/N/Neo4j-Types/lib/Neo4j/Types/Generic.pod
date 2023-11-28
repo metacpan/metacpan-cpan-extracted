@@ -1,0 +1,183 @@
+# PODNAME: Neo4j::Types::Generic
+# ABSTRACT: Generic Neo4j type implementations
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Types::Generic - Generic Neo4j type implementations
+
+=head1 VERSION
+
+version 2.00
+
+=head1 OVERVIEW
+
+The L<Neo4j::Types> distribution includes generic
+implementations of some Neo4j property types.
+This enables users to easily create values of these types
+locally, for example to pass these back to Neo4j in a query
+parameter.
+
+Neo4j drivers may provide similar packages, which might
+be better optimised for use with the respective driver.
+As long as each of them conforms to the appropriate interface
+from L<Neo4j::Types>, they should all be interchangeable.
+
+=head1 ByteArray
+
+Neo4j::Types::Generic::ByteArray offers the following method
+in addition to the one defined in L<Neo4j::Types::ByteArray>.
+
+=head2 new
+
+ $bytearray = Neo4j::Types::Generic::ByteArray->new( $bytes );
+
+Create a new generic Neo4j byte array value.
+The parameter C<$bytes> is expected to be a scalar string.
+
+=head1 DateTime
+
+Neo4j::Types::Generic::DateTime offers the following methods
+in addition to those defined in L<Neo4j::Types::DateTime>.
+
+=head2 new
+
+ $dt = Neo4j::Types::Generic::DateTime->new({
+   days        => $days,
+   seconds     => $seconds,
+   nanoseconds => $nanoseconds,
+   tz_offset   => $offset_seconds,
+   tz_name     => $iana_tz_name,
+ });
+ $dt = Neo4j::Types::Generic::DateTime->new( $epoch );
+ $dt = Neo4j::Types::Generic::DateTime->new( $epoch, $tz );
+
+Create a new generic temporal instant value.
+For the description of the parameters, see
+L<Neo4j::Types::DateTime/"METHODS">.
+The type of the value will be intrinsically defined by the
+parameters you provide.
+
+Instead of giving the parameters hash ref, you can alternatively
+give the Unix epoch with or without time zone identification.
+This will always create a C<LOCAL DATETIME> or C<ZONED DATETIME>
+value, as appropriate.
+If C<$tz> begins with a letter, it will be treated as an IANA
+Olson time zone database entry name; if it begins with a digit
+or a sign, it will be treated as an offset in seconds.
+
+=head1 Duration
+
+Neo4j::Types::Generic::Duration offers the following methods
+in addition to those defined in L<Neo4j::Types::Duration>.
+
+=head2 new
+
+ $dt = Neo4j::Types::Generic::Duration->new({
+   months      => $months,
+   days        => $days,
+   seconds     => $seconds,
+   nanoseconds => $nanoseconds,
+ });
+
+Create a new generic temporal duration value.
+For the description of the parameters, see
+L<Neo4j::Types::Duration/"METHODS">.
+Missing parameters will be assumed to have the value C<0>.
+
+=head1 Point
+
+Neo4j::Types::Generic::Point offers the following methods
+in addition to those defined in L<Neo4j::Types::Point>.
+
+=head2 height
+
+ $value = $point->height;
+
+Alias for L<C<Z()>|/"Z">.
+
+=head2 latitude
+
+ $value = $point->latitude;
+
+Alias for L<C<Y()>|/"Y">.
+
+=head2 longitude
+
+ $value = $point->longitude;
+
+Alias for L<C<X()>|/"X">.
+
+=head2 new
+
+ $point = Neo4j::Types::Generic::Point->new($neo4j_srid, @coordinates);
+
+Creates a new generic Point instance with the specified value.
+
+This method will fail if the SRID provided is not supported by Neo4j
+or if it requires a greater number of coordinates than provided.
+See L<Neo4j::Types::Point/"srid">.
+
+=head2 X
+
+ $value = $point->X;  # uppercase X
+
+Retrieve the point's first ordinate, also known as the abscissa.
+Commonly used for the horizontal axis in an Euclidean plane or for
+the geographical longitude.
+
+=head2 Y
+
+ $value = $point->Y;  # uppercase Y
+
+Retrieve the point's second ordinate. Commonly used for the vertical
+axis in an Euclidean plane or for the geographical latitude.
+
+=head2 Z
+
+ $value = $point->Z;  # uppercase Z
+
+Retrieve the point's third ordinate. Commonly used for height.
+
+For points in coordinate systems that have no more than two
+dimensions, this method returns C<undef>.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Neo4j::Types>
+
+=item * L<Neo4j::Types::ByteArray>
+
+=item * L<Neo4j::Types::DateTime>
+
+=item * L<Neo4j::Types::Duration>
+
+=item * L<Neo4j::Types::Point>
+
+=item * L<Neo4j::Types::ImplementorNotes>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

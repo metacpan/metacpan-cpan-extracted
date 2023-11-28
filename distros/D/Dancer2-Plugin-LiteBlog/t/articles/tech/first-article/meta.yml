@@ -5,4 +5,5 @@ tags:
   - dancer
   - blog
 image: "featured.jpg"
+background: "featured.jpg"
 excerpt: "An example of an article for you to see easily how to write content for your Liteblog site."

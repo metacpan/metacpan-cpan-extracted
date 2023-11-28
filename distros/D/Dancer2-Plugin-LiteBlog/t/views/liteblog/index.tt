@@ -10,23 +10,37 @@
 
         <pre>
 liteblog:
+  # Global settings for your Liteblog site
   title: "My Liteblog Site"
+  base_url: "http://localhost:5000"
+  description: "Some description of your site"
   logo: "/images/liteblog.jpg"
+  favicon: "/images/liteblog.jpg"
+
   feature:
+    # Enable HighlightJS lib
     highlight: 1
+
+  # The navigation bar of the site
   navigation:
     - label: "Home"
       link: "/"
     - label: "Tech"
       link: "/blog/tech"
+
+  # Widgets you want to enable
   widgets:
+    # Activities cards, to be displayed on the home
     - name: activities
       params: 
         source: "activities.yml"
+
+    # Blog engine, with articles, pages, and a RSS feed
     - name: blog
       params:
         title: "Read my Stories"
         root: "articles"
+        mount: "/blog" # The base path of all Blog permalinks (can be set to /).
         </pre>
     </div>
 </section>

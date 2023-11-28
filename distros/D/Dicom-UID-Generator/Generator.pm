@@ -1,17 +1,14 @@
 package Dicom::UID::Generator;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use DateTime::HiRes;
 use English;
 use Readonly;
 
-# Version.
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constants.
 Readonly::Scalar our $EMPTY_STR => q{};
@@ -111,6 +108,7 @@ Dicom::UID::Generator - DICOM UID generator.
 =head1 SYNOPSIS
 
  use Dicom::UID::Generator;
+
  my $obj = Dicom::UID::Generator->new(%params);
  my $uid = $obj->create_series_instance_uid;
  my $uid = $obj->create_sop_instance_uid;
@@ -184,11 +182,11 @@ Dicom::UID::Generator - DICOM UID generator.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=gen_uid_numbers.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Dicom::UID::Generator;
 
  # Object.
@@ -245,21 +243,22 @@ Install the Dicom modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Dicom-UID-Generator>
+L<https://github.com/michal-josef-spacek/Dicom-UID-Generator>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2016
- BSD 2-Clause License
+© Michal Josef Špaček 2016
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

@@ -1,0 +1,90 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Bin::Search;
+
+our $VERSION = 0.02;
+
+# Run.
+exit App::Bin::Search->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+bin-search - Tool to bitwise search of data in hexadecimal stream.
+
+=head1 SYNOPSIS
+
+ bin-search [-b] [-h] [-v] [--version] hex_stream search
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-b>
+
+Print in binary (default hexadecimal).
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-v>
+
+Verbose mode.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<hex_stream>
+
+Hexadecimal stream.
+
+=item * C<search>
+
+Search string (in hexadecimal).
+
+=back
+
+=head1 EXAMPLE
+
+ bin-search FFABCD D5
+
+ # Output:
+ # Found D5E68 at 8 bit
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Bin-Search>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2023 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

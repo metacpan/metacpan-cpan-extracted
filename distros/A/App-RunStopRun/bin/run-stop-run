@@ -74,8 +74,13 @@ if ($verbose) {
     warn "Controller is in the foreground\n" if $isfg;
 }
 
-# Ensure END block is run.
-$SIG{INT} = $SIG{TERM} = sub { exit };
+my $sigint;
+$SIG{INT} = $SIG{TERM} = sub {
+    $sigint = shift;
+    warn "Received SIG$sigint\n" if $verbose;
+    # Ensure END block is run.
+    exit;
+};
 $SIG{USR1} = sub {
     my $pids = join ',', sort { $a <=> $b } @pid;
     my $info = sprintf "Invoked on PID%s: %s\n", 1 < @pid ? 's' : '', $pids;
@@ -164,10 +169,11 @@ $group = ! $nogroup;
 
 $SIG{CHLD} = sub {
     local ($!, $?);
-    while (0 < waitpid $pid[0], WNOHANG) {
+    warn "Received SIGCHLD\n" if $verbose;
+    while (0 < (my $pid = waitpid -1, WNOHANG)) {
         $status = WIFEXITED($?) ? WEXITSTATUS($?)
             : WIFSIGNALED($?) ? WTERMSIG($?) : $? >> 8;
-        warn "Received SIGCHLD for $pid[0]; exit($status)\n" if $verbose;
+        warn "Reaped $pid; exit($status)\n" if $verbose;
     }
 };
 $SIG{TSTP} = sub {
@@ -210,6 +216,12 @@ END {
 
     # Restore terminal settings.
     $termios->setattr(fileno $ttyfh, &POSIX::TCSANOW) if $termios;
+
+    if ($sigint) {
+        warn "Sending SIG$sigint to self\n" if $verbose;
+        local @SIG{qw(INT TERM)};
+        kill $sigint => $$;
+    }
 }
 
 
@@ -305,7 +317,7 @@ Options:
   -H, --man           Display the complete documentation
     END_OF_OPTIONS
 
-    exit @_ ? 2 : 0;
+    exit(@_ ? 2 : 0);
 }
 
 
@@ -418,9 +430,9 @@ Display this documentation.
 =head1 KNOWN PROBLEMS
 
 Operating on a PID of a foreground process will likely result in job control
-message from the shell indicating the job was stopped when it receives the
+messages from the shell indicating the job was stopped when it receives the
 SIGSTOP signal. Note that the job will be continued in the background after
-receiving the SIGCONT signal, but no shell message will be displayed.
+receiving the SIGCONT signal, but no shell messages will be displayed.
 
 It is not always possible to determine if a process is a child process. In
 that case, you can run the command separately and then run this program

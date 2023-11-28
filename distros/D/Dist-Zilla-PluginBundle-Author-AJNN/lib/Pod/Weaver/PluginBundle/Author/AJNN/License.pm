@@ -3,7 +3,7 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::Author::AJNN::License;
 # ABSTRACT: Pod section for copyright and license statement
-$Pod::Weaver::PluginBundle::Author::AJNN::License::VERSION = '0.05';
+$Pod::Weaver::PluginBundle::Author::AJNN::License::VERSION = '0.06';
 
 use Carp qw(croak);
 use Moose;
@@ -79,7 +79,7 @@ Pod::Weaver::PluginBundle::Author::AJNN::License - Pod section for copyright and
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

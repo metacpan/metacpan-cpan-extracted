@@ -1,3 +1,9 @@
+0.009   2023-03-10  Released-By: PERLANCAR; Urgency: medium
+
+        - Set header row when outputting as texttable, ansitabale,
+          asciitable.
+
+
 0.008   2022-02-18  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Revert back 0.007's decision to set escape_char to '\'

@@ -8,13 +8,13 @@ use AsposeCellsCloud::Object::ScrollBar;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CurrentValue** | **int** |  |
-**IncrementalChange** | **int** |  |
-**IsHorizontal** | **boolean** |  |
-**Max** | **int** |  |
-**Min** | **int** |  |
-**PageChange** | **int** |  |
-**Shadow** | **boolean** |  |
+**CurrentValue** | **int** | Gets or sets the current value. |
+**IncrementalChange** | **int** | Gets or sets the amount that the scroll bar or spinner is incremented a line scroll. |
+**IsHorizontal** | **boolean** | Indicates whether this is a horizontal scroll bar. |
+**Max** | **int** | Gets or sets the maximum value of a scroll bar or spinner range. |
+**Min** | **int** | Gets or sets the minimum value of a scroll bar or spinner range. |
+**PageChange** | **int** | Gets or sets page change |
+**Shadow** | **boolean** | Indicates whether the shape has 3-D shading. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

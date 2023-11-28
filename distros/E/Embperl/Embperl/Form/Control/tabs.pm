@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -112,7 +113,9 @@ $]
 >
 
 [$if (!$form -> {noframe}) $]
-    <div class="ef-tabs-separator ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-corner-top"><span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s ef-icon" title="Verstecken/Anzeigen"></span><span class="ef-tabs-separator-header-text">[+ $form -> {text} +]</span></div>
+    [$if !$self -> is_disabled ($req) $]
+    <div class="ef-tabs-separator ui-accordion-header ui-helper-reset ui-state-default ui-accordion-icons ui-corner-top"><span class="ui-accordion-header-icon ui-icon ui-icon-triangle-1-s ef-icon" title="[+ $form -> convert_text ({}, 'ctl:show_hide', 'Verstecken/Anzeigen', $req) +]"></span><span class="ef-tabs-separator-header-text">[+ $form -> convert_text ({}, 'tab:' . $form->{id}, $from -> {text}, $req) +]</span></div>
+    [$endif$]
                              [#<table class="ef-tabs-border-cell [+ $class +]"><tr><td class="ef-tabs-content-cell"> #]
     <div class="ef-tabs-border-cell [+ $class +]"><div class="ef-tabs-content-cell">
                               
@@ -179,6 +182,16 @@ $]
         my $id        = $self -> {subids}[$j] ;
         my $cellclass = $id eq $activeid?'ef-tabs-cell-on':'ef-tabs-cell-off' ;
         my $divclass  = $id eq $activeid?'ef-tabs-div-on':'ef-tabs-div-off' ;
+        if ($i - $start_i == 0)
+            {
+            $cellclass .= ' ef-tabs-cell-left' ;
+            $divclass  .= ' ef-tabs-div-left' ;
+            }
+        elsif ($i - $start_i == -1 || $j == @$values - 1)
+            {
+            $cellclass .= ' ef-tabs-cell-right' ;
+            $divclass  .= ' ef-tabs-div-right' ;
+            }
 
         my @switch_code ;
 
@@ -190,7 +203,7 @@ $]
         my $js = join (';', @switch_code) ;
         *]
         <td class="[+ $cellclass +]"><div class="ef-tabs-div [+ $divclass +]" 
-              [$ if $i - $start_i == 0 $]style="border-left: black 1px solid" [$endif$]
+[#              [$ if $i - $start_i == 0 $]style="border-left: black 1px solid" [$endif$] #]
               >[+ $options ->[$j] || $val +]
         </div></td>
         [* $i++ ;

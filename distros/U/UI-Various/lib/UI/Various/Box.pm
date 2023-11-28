@@ -53,7 +53,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.43';
+our $VERSION = '0.44';
 
 use UI::Various::core;
 use UI::Various::toplevel;

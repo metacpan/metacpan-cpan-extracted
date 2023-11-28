@@ -70,6 +70,14 @@ METHODS
 
             It's required.
 
+    *       "verbose"
+
+            Verbose mode.
+
+            Could be 1 or 0.
+
+            Default value is 0.
+
     Returns instance of object.
 
   "object"
@@ -302,7 +310,7 @@ DEPENDENCIES
     Class::Utils, Error::Pure, MARC::Convert::Wikidata::Item::AudioBook,
     MARC::Convert::Wikidata::Item::BookEdition,
     MARC::Convert::Wikidata::Item::Periodical,
-    MARC::Convert::Wikidata::Transform, Scalar::Util.
+    MARC::Convert::Wikidata::Transform, MARC::Leader, Scalar::Util.
 
 SEE ALSO
     MARC::Record
@@ -325,5 +333,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.06
 

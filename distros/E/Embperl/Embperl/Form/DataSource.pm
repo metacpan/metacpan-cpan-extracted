@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -10,8 +11,6 @@
 #   THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-#
-#   $Id$
 #
 ###################################################################################
 
@@ -75,6 +74,62 @@ sub constrain_attrs
 
 # ---------------------------------------------------------------------------
 #
+#   get_constrain_value - returns the constrain value that is need for a
+#                         search or undef if there is no constrain
+#
+#   in  $req        request data
+#       $ctrl       control that will display the value
+#   ret $constrain          contrain value if any
+#       $without_contrain   true if also values that have no contrain value
+#                           are part of the resultset
+#
+
+sub get_constrain_value
+
+    {
+    my ($self, $req, $ctrl) = @_ ;
+
+    return ;
+    }
+    
+
+# ---------------------------------------------------------------------------
+#
+#   get_url_modifier - returns modifier for url for requesting datasrc values (selectdyn)
+#
+#   in  $req        request data
+#       $ctrl       control that will display the value
+#   ret $search
+#       $replace
+#
+
+sub get_url_modifier
+
+    {
+    my ($self, $req, $ctrl) = @_ ;
+
+    return ;
+    }
+    
+# ---------------------------------------------------------------------------
+#
+#   get_dbname - returns dbname to pass to control (selectdyn)
+#
+#   in  $req        request data
+#       $ctrl       control that will display the value
+#   ret $dbname     if any
+#
+
+sub get_dbname
+
+    {
+    my ($self, $req, $ctrl) = @_ ;
+
+    return  ;
+    }
+    
+# ---------------------------------------------------------------------------
+#
 #   sorttype - returns information how to sort this datasource values for displaying
 #
 
@@ -122,6 +177,51 @@ sub get_option_from_value
     return ;
     }
 
+# ---------------------------------------------------------------------------
+#
+#   get_value_from_option - returns the value for a given option
+#
+#   in  $option option
+#   ret         value
+#
+
+sub get_value_from_option
+
+    {
+    my ($self, $option, $req, $ctrl) = @_ ;
+    
+    
+    my ($values, $options) = $self -> get_values ($req, $ctrl) ;
+
+    my $i = 0 ;
+    foreach (@$options)
+        {
+        if ($_ eq $option)
+            {
+            return $values -> [$i] ;
+            }
+        $i++ ;
+        }
+
+    return ;
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   get_value_from_id - returns the value for a given id
+#
+#   in  $id     id
+#   ret         value
+#
+
+sub get_value_from_id
+
+    {
+    my ($self, $option, $req, $ctrl) = @_ ;
+    
+    return ;
+    }
+
 
 # ---------------------------------------------------------------------------
 #
@@ -131,7 +231,7 @@ sub get_option_from_value
 sub get_id_from_value
 
     {
-    my ($self, $value) = @_ ;
+    my ($self, $value, $req) = @_ ;
 
     return $value ;
     }
@@ -182,8 +282,8 @@ returns the values and options. Must be overwritten.
 
 =head3 get_id_from_value
 
-returns an id for a given value. This allow to have an id form an value/option
-pair which is not excat the same as the value. This is used in json requests
+returns an id for a given value. This allows one to have an id form a value/option
+pair which is not exactly the same as the value. This is used in json requests
 for example for selectdyn control.
 
 =head3 get_datasource_controls 

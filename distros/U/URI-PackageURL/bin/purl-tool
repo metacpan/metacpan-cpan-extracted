@@ -15,49 +15,78 @@ __END__
 
 =head1 NAME
 
-purl-tool - PackageURL tool
+purl-tool - Package URL tool
 
 =head1 SYNOPSIS
 
     purl-tool [OPTIONS]...STRING
-    purl-tool [--help|--man|--version]
+    purl-tool --type STRING [--namespace STRING] --name STRING [--version STRING] [--subpath STRING] [--qualifier KEY=VALUE [...]]
+    purl-tool [--help|--man|-v]
 
     Options:
-          --help                Brief help message
-          --man                 Full documentation
-          --version             Print version
+          --help                    Brief help message
+          --man                     Full documentation
+          -v                        Print version
 
-          --download-url        Download URL
-          --repository-url      Repository URL
+    "purl" string encode options:
 
-      -0, --null                Return NULL char instead of new line
+          --type=STRING             Type
+          --namespace=STRING        Namespace (optional)
+          --name=STRING             Name
+          --version=STRING          Version (optional)
+          --qualifier KEY=VALUE     Qualifier key-value (optional)
 
-          --format=FORMAT       Output format
-          --dumper              Data::Dumper format (--format=dumper)
-          --json                JSON output format (--format=json)
-          --yaml                YAML output format (--format=yaml)
-          --env                 ENV output format (--format=env)
+    "purl" string decode options:
+
+          --download-url            Download URL
+          --repository-url          Repository URL
+
+      -0, --null                    Return NULL char instead of new line
+
+          --format=FORMAT           Output format
+          --dumper                  Data::Dumper format (--format=dumper)
+          --json                    JSON output format (--format=json)
+          --yaml                    YAML output format (--format=yaml)
+          --env                     ENV output format (--format=env)
 
     Examples:
 
-        purl-tool pkg:cpan/GDT/URI-PackageURL@2.02 --json | jq
+    Parse the given Package URL string and return JSON and send the STDOUT to jq:
 
-        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.02 --download-url)
+        purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --json | jq
+
+    Download the package from the repository using Package URL string:
+
+        wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --download-url)
+
+    Create a canonical Package URL string
+
+        purl-tool --type cpan \
+                  --namespace GDT \
+                  --name URI-PackageURL \
+                  --version 2.04
 
 
 =head1 DESCRIPTION
 
-C<purl-tool> PackageURL tool
+C<purl-tool> Package URL tool
 
 =head1 EXAMPLES
 
-Parse the given PackageURL string and return JSON and send the STDOUT to L<jq>:
+Parse the given Package URL string and return JSON and send the STDOUT to L<jq>:
 
-B<purl-tool pkg:cpan/GDT/URI-PackageURL@2.02 --json | jq>
+    purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --json | jq
 
-Download the package from the repository using PackageURL string:
+Download the package from the repository using Package URL string:
 
-B<wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.02 --download-url)>
+    wget $(purl-tool pkg:cpan/GDT/URI-PackageURL@2.04 --download-url)
+
+Create a canonical Package URL string:
+
+    purl-tool --type cpan \
+              --namespace GDT \
+              --name URI-PackageURL \
+              --version 2.04
 
 =head1 AUTHOR
 

@@ -11,9 +11,9 @@ use IPC::System::Options;
 use Nodejs::Util qw(get_nodejs_path);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-21'; # DATE
+our $DATE = '2023-08-16'; # DATE
 our $DIST = 'Data-Sah-Filter'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 our @EXPORT_OK = qw(gen_filter);
 
@@ -126,7 +126,7 @@ Data::Sah::FilterJS - Generate filter code
 
 =head1 VERSION
 
-This document describes version 0.021 of Data::Sah::FilterJS (from Perl distribution Data-Sah-Filter), released on 2023-06-21.
+This document describes version 0.022 of Data::Sah::FilterJS (from Perl distribution Data-Sah-Filter), released on 2023-08-16.
 
 =head1 SYNOPSIS
 
@@ -137,7 +137,7 @@ This document describes version 0.021 of Data::Sah::FilterJS (from Perl distribu
 =head1 DESCRIPTION
 
 This module is just like L<Data::Sah::Filter> except that it uses JavaScript
-filter rule modules.
+filter rule modules and generates JavaScript code.
 
 =head1 VARIABLES
 

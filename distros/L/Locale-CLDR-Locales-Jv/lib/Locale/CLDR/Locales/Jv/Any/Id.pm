@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Jv::Any::Id - Package for language Javanese
 
 package Locale::CLDR::Locales::Jv::Any::Id;
 # This file auto generated from Data\common\main\jv_ID.xml
-#	on Fri 13 Oct  9:22:36 am GMT
+#	on Sat  4 Nov  6:08:49 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

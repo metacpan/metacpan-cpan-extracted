@@ -1,3 +1,9 @@
+0.005   2023-08-07  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add summaries of language names for completion answer of
+          language codes.
+
+
 0.004   2020-05-27  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

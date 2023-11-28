@@ -10,14 +10,20 @@ LIBDIR = $(PREFIX)/scripts/bibtexperllibs
 
 DOCDIR = $(PREFIX)/doc/bibtex/bibtexperllibs
 
+DOCS = latex-tounicode.pdf ltx2unitxt.pdf ltx2unitxt.1
+
 all:  
+
+docs: $(DOCS)
 
 latex-tounicode.pdf: latex-tounicode.tex ltx2unitxt.pdf
 	texfot pdflatex $< || { rm -f $@; exit 1; }
 
 ToUnicode = lib/LaTeX/ToUnicode
+
 latex-tounicode.tex: $(ToUnicode).pm $(ToUnicode)/Tables.pm
 	pod2latex -modify -full -prefile head.ltx -out $@ $^
+
 latex-tounicode.tex: head.ltx 
 # unfortunately pod2latex doesn't recognize =encoding, so there
 # are two warnings of "Command encoding not recognised ...". Oh well.
@@ -33,12 +39,15 @@ ltx2unitxt.pdf: ltx2unitxt.1
 
 force:
 
-install:  
+install:  all docs
 	mkdir -p $(LIBDIR)
 	cp -r lib/* $(LIBDIR)
 	mkdir -p $(DOCDIR)
 	cp -r man/man3/* $(DOCDIR)
+	cp -r latex-tounicode.pdf ltx2unitxt.pdf ltx2unitxt.1 $(DOCDIR)
 
 clean:
+	$(RM) *.log *.aux *.out *.toc latex-tounicode.tex
 
 distclean: clean
+	$(RM) $(DOCS)

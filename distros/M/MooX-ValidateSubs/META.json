@@ -35,7 +35,7 @@
             "B" : "0",
             "Carp" : "0",
             "Moo" : "0",
-            "MooX::ReturnModifiers" : "0.09",
+            "MooX::ReturnModifiers" : "1.000001",
             "Type::Tiny" : "1.002000",
             "perl" : "5.006"
          }
@@ -44,7 +44,7 @@
    "provides" : {
       "MooX::ValidateSubs" : {
          "file" : "lib/MooX/ValidateSubs.pm",
-         "version" : "1.012006"
+         "version" : "1.012008"
       },
       "MooX::ValidateSubs::Role" : {
          "file" : "lib/MooX/ValidateSubs/Role.pm"
@@ -58,7 +58,7 @@
          "web" : "https://github.com/ThisUsedToBeAnEmail/MooX-ValidateSubs"
       }
    },
-   "version" : "1.012006",
+   "version" : "1.012008",
    "x_contributors" : [
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],

@@ -75,9 +75,9 @@ and second line of title</title>
 <sect2><title>restart 2 Head 2</title>
 </sect2><sect2><title>restart 3 Head 2</title>
 <para>end</para>
-<para><xlink>test</xlink> <xlink uri='yyy'>xxx</xlink> <xlink>http://www.ecos.de</xlink> <xlink>ftp://ftp.dev.ecos.de</xlink>
+<para><xlink>test</xlink> <xlink uri='yyy'>xxx</xlink> <xlink>https://www.actevy.io</xlink> <xlink>ftp://ftp.example.org</xlink>
 
-<xlink>test</xlink> <xlink uri='yyy 2'>xxx 2</xlink> <xlink>http://www.ecos.de</xlink> <xlink>ftp://ftp.dev.ecos.de</xlink></para>
+<xlink>test</xlink> <xlink uri='yyy 2'>xxx 2</xlink> <xlink>https://www.actevy.io</xlink> <xlink>ftp://ftp.example.org</xlink></para>
 </sect2></sect1><sect1><title id="idhead1">ID Test head1</title>
 <sect2><title id="idhead2">ID Test head2</title>
 <para id="idpara">ID Test para</para>

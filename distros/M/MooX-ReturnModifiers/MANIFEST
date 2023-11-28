@@ -2,6 +2,8 @@ Changes
 lib/MooX/ReturnModifiers.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/01-basic.t
@@ -11,9 +13,8 @@ t/04-extends.t
 t/05-around.t
 t/06-before.t
 t/07-after.t
+t/08-sub.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

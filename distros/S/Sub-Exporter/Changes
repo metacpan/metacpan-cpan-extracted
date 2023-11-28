@@ -1,5 +1,9 @@
 Revision history for Sub-Exporter
 
+0.991     2023-11-23 20:32:17-05:00 America/New_York
+        - make the requirement for perl v5.12.0 explicit; previously, it was
+          only implicit because of prerequisites
+
 0.990     2023-07-22 14:09:26+10:00 Australia/Melbourne
         - fixes to keep working in v5.39 (thanks, Yves Orton!)
 

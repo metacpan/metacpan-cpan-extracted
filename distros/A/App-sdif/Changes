@@ -1,5 +1,18 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.29 2023-11-15T10:16:22Z
+
+    - fix bug in lib/cdif/Command.pm
+    - make sdif --colortable option takes optional parameter 6,12,24
+
+4.2802 2023-11-12T09:27:04Z
+
+    - make cdif/Command.pm does not read stderr by default
+
+4.2801 2023-11-07T07:47:24Z
+
+    - diff3 -m produces 2-segment output when MY and YOUR are same
+
 4.28 2023-07-27T08:53:39Z
 
     - introduce -V option to watchdiff command

@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -39,6 +40,7 @@ sub init
         {
         my $name = $self -> {datasrc} ;
         $name =~ s/[#\/].+$// ;
+        $name =~ s/^.+?\.// ;
         my $form = $self -> form ;
         my $packages = $form -> get_datasrc_packages ;
         $self -> {datasrcobj} = $form -> new_object ($packages, $name, $self, { datarsc => $self -> {datasrc}}) ;
@@ -61,7 +63,7 @@ sub constrain_attrs
     my ($self, $req) = @_ ;
 
     return if (!$self -> {datasrcobj}) ;
-        
+
     return $self -> {datasrcobj} -> constrain_attrs ($req) ;
     }
 
@@ -85,7 +87,7 @@ sub get_all_values
     my $values ;
     my $options ;
     my $nocache = 0 ;
-    
+
     if ($self -> {datasrcobj})
         {
         my $key = "all_values_datasrc:$self->{datasrcobj}" ;
@@ -103,25 +105,25 @@ sub get_all_values
         }
     else
         {
-        $values  = $self -> {values} ;    
+        $values  = $self -> {values} ;
         $options = $self -> {options} || $values ;
         $options = $self -> form -> convert_options ($self, $self -> {values}, $options, $req)
-            if (!$self -> {showoptions}) ;
+            if (!$self -> {showoptions} && $self -> form) ;
         }
- 
+
     if (!$addtop && !$addbottom)
         {
         $req -> {$key} = [$values, $options] ;
-        return ($values, $options) 
+        return ($values, $options)
         }
     my @values ;
-    my @options ;    
+    my @options ;
     if ($addtop)
         {
         push @values,  map { ref $_?$_ -> [0]:$_ } @$addtop ;
         push @options, map { ref $_?$_ -> [1]:$_ } @$addtop ;
         }
-        
+
     if ($values)
         {
         if ($addtop && $values -> [0] eq '' && $options -> [0] eq '---')
@@ -135,7 +137,7 @@ sub get_all_values
             push @options, @$options  ;
             }
         }
-        
+
     if ($addbottom)
         {
         push @values, map { $_ -> [0] } @$addbottom ;
@@ -156,7 +158,7 @@ sub get_values
     {
     my ($self, $req) = @_ ;
 
-    
+
     my ($values, $options) = $self -> get_all_values ($req) ;
     my $filter = $self -> {filter} ;
     return ($values, $options) if (!$filter) ;
@@ -175,7 +177,7 @@ sub get_values
         }
     return (\@values, \@options) ;
     }
-        
+
 
 # ---------------------------------------------------------------------------
 #
@@ -200,11 +202,43 @@ sub get_datasource_controls
 sub get_id_from_value
 
     {
-    my ($self, $value) = @_ ;
+    my ($self, $value, $req) = @_ ;
 
     return if (!$self -> {datasrcobj}) ;
-    return $self -> {datasrcobj} -> get_id_from_value ($value) ;
+
+    if (wantarray)
+        {
+        $value = [$value] if (!ref $value) ;
+        my @result ;
+        foreach my $val (@$value)
+            {
+            push @result, $self -> {datasrcobj} -> get_id_from_value ($val, $req) ;
+            }
+        return @result ;
+        }
+
+    $value = $value -> [0] if (ref $value) ;
+    return $self -> {datasrcobj} -> get_id_from_value ($value, $req) ;
     }
+
+# ---------------------------------------------------------------------------
+#
+#   get_dbname - returns dbname to pass to control (selectdyn)
+#
+#   in  $req        request data
+#   ret $dbname     if any
+#
+
+sub get_dbname
+
+    {
+    my ($self, $req, $ctrl) = @_ ;
+
+    return if (!$self -> {datasrcobj}) ;
+
+    return $self -> {datasrcobj} -> get_dbname ($req, $self) ;
+    }
+
 
 # ---------------------------------------------------------------------------
 #
@@ -218,7 +252,7 @@ sub get_option_from_value
 
     {
     my ($self, $value, $req) = @_ ;
-    
+
     my $addtop = $self -> {addtop} ;
     if ($addtop)
         {
@@ -229,12 +263,12 @@ sub get_option_from_value
                 return $_ -> [1] ;
                 }
             }
-        }    
+        }
 
     if ($self->{datasrc})
         {
         my $option = $self -> {datasrcobj} -> get_option_from_value ($value, $req, $self) ;
-    
+
         return $option if (defined ($option)) ;
         }
     elsif (ref $self -> {values})
@@ -263,7 +297,92 @@ sub get_option_from_value
                 return $_ -> [1] ;
                 }
             }
-        }    
+        }
+
+    return ;
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   get_value_from_option - returns the value for a given option
+#
+#   in  $option option
+#   ret         value
+#
+
+sub get_value_from_option
+
+    {
+    my ($self, $option, $req) = @_ ;
+
+    my $addtop = $self -> {addtop} ;
+    if ($addtop)
+        {
+        foreach (@$addtop)
+            {
+            if ($_ -> [1] eq $option)
+                {
+                return $_ -> [0] ;
+                }
+            }
+        }
+
+    if ($self->{datasrc})
+        {
+        my $value = $self -> {datasrcobj} -> get_value_from_option ($option, $req, $self) ;
+
+        return $value if (defined ($value)) ;
+        }
+    elsif (ref $self -> {options})
+        {
+        my $i = 0 ;
+        my $options = $self -> {options} ;
+        $options = $self -> form -> convert_options ($self, $self -> {options}, $options, $req)
+                    if (!$self -> {showoptions}) ;
+        foreach (@$options)
+            {
+            if ($_ eq $option)
+                {
+                return $self -> {values}[$i] ;
+                }
+            $i++ ;
+            }
+        }
+
+    my $addbottom = $self -> {addbottom} ;
+    if ($addbottom)
+        {
+        foreach (@$addbottom)
+            {
+            if ($_ -> [1] eq $option)
+                {
+                return $_ -> [0] ;
+                }
+            }
+        }
+
+    return ;
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   get_value_from_id - returns the value for a given id
+#
+#   in  $id     id
+#   ret         value
+#
+
+sub get_value_from_id
+
+    {
+    my ($self, $id, $req) = @_ ;
+
+    if ($self->{datasrc})
+        {
+        my $value = $self -> {datasrcobj} -> get_value_from_id ($id, $req, $self) ;
+
+        return $value if (defined ($value)) ;
+        }
 
     return ;
     }
@@ -313,7 +432,7 @@ sub is_with_id
 
     return 1 ;
     }
-    
+
 # ------------------------------------------------------------------------------------------
 #
 #   get_display_text - returns the text that should be displayed
@@ -324,11 +443,38 @@ sub get_display_text
     my ($self, $req, $value) = @_ ;
 
     $value = $self -> get_value ($req) if (!defined ($value)) ;
-    $value = $self -> get_option_from_value ($value, $req) ;
+    if (!ref $value)
+        {
+        my @value = split (/\t/, $value) ;
+        $value = \@value ;
+        }
+    my @result ;
+    foreach my $val (@$value)
+        {
+        push @result, $self -> get_option_from_value ($val, $req) ;
+        }
 
-    return $value ;
+    return join (', ', @result) ;
     }
-    
+
+# ------------------------------------------------------------------------------------------
+#
+#   get_sort_value - returns the value that should be used to sort
+#
+
+sub get_sort_value
+    {
+    my ($self, $req, $value) = @_ ;
+
+    if ($self -> {datasrcobj} && $self -> {datasrcobj} -> can('get_sort_value'))
+        {
+        $value = $self -> get_value ($req) if (!defined ($value)) ;
+        return $self -> {datasrcobj} -> get_sort_value ($req, $value) ;
+        }
+
+    return $self -> SUPER::get_sort_value ($req, $value) ;
+    }
+
 # ---------------------------------------------------------------------------
 #
 #   init_markup - add any dynamic markup to the form data
@@ -340,17 +486,54 @@ sub init_markup
     my ($self, $req, $parentctl, $method) = @_ ;
 
     return if (!$self -> is_readonly($req) && (! $parentctl || ! $parentctl -> is_readonly($req))) ;
-    
+
     my $val = $self -> get_value ($req) ;
     if ($val ne '')
         {
         my $name = $self -> {name} ;
         my $fdat = $req -> {docdata} || \%Embperl::fdat ;
-        $fdat -> {'_opt_' . $name} = $self -> get_option_from_value ($val, $req) ;
-        $fdat -> {'_id_' .  $name} = $self -> get_id_from_value ($val, $req) ;
+        my $opt  = $self -> get_display_text ($req, $val) ;
+        my $id   = $self -> get_id_from_value ($val, $req) ;
+        $fdat -> {'_opt_' . $name} = $opt if ($opt ne '') ;
+        $fdat -> {'_id_' .  $name} = $id  if ($id ne '') ;
         }
     }
-    
+
+# ------------------------------------------------------------------------------------------
+#
+#   prepare_fdat - daten zusammenfuehren
+#
+
+sub prepare_fdat
+    {
+    my ($self, $req) = @_ ;
+
+    return if ($self -> is_readonly ($req)) ;
+
+    my $fdat  = $req -> {form} || \%fdat ;
+    my $name    = $self->{name} ;
+    if (exists ($fdat -> {"_opt_$name"}))
+        {
+        if ($fdat -> {"_opt_$name"} eq '')
+            {
+            $fdat -> {$name} = '' ;
+            }
+        elsif ($fdat -> {$name} eq '')
+            {
+            $fdat -> {$name} = $self ->  get_value_from_option ($fdat -> {"_opt_$name"}, $req) ;
+            }
+        }
+    elsif (exists ($fdat -> {"_id_$name"}))
+        {
+        if ($fdat -> {$name} eq '' && $fdat -> {"_id_$name"} ne '')
+            {
+            $fdat -> {$name} = $self ->  get_value_from_id ($fdat -> {"_id_$name"}, $req) ;
+            }
+        }
+    delete $fdat -> {"_opt_$name"} ;
+    delete $fdat -> {"_id_$name"} ;
+    }
+
 1 ;
 
 # damit %fdat etc definiert ist
@@ -362,14 +545,16 @@ __EMBPERL__
 #   show_control_readonly - output the control as readonly
 #]
 
-[$ sub show_control_readonly ($self, $req, $value) 
+[$ sub show_control_readonly ($self, $req, $value)
 
 my $text  = $self -> get_display_text ($req, $value)  ;
-my $id    = $self -> get_id_from_value ($val, $req) ; 
+my $id    = $self -> get_id_from_value ($val, $req) ;
 my $name  = $self -> {force_name} || $self -> {name} ;
 $]
 <div [+ do { local $escmode = 0 ; $self -> get_std_control_attr($req, '', 'readonly', 'ef-control-with-id') } +] _ef_divname="_opt_[+ $name +]">[+ $text +]</div>
-[$ if $self->{hidden} $]
+[$ if $self->{trigger} $]
+<span style='display: none'>[- $self -> show_control ($req) -]</span>
+[$ elsif $self->{hidden} $]
 <input type="hidden" name="[+ $name +]" value="[+ $value +]">
 [$endif$]
 <input type="hidden" name="_id_[+ $name +]" value="[+ $id +]">
@@ -381,7 +566,7 @@ $]
 #]
 
 [$ sub show_control_addons ($self, $req)
- 
+
 my $datasrc_ctrls  ;
 $datasrc_ctrls = $self -> get_datasource_controls ($req)
     unless ($self -> {no_datasource_controls}) ;
@@ -462,4 +647,3 @@ G. Richter (richter at embperl dot org)
 =head1 SEE ALSO
 
 perl(1), Embperl, Embperl::Form, Embperl::From::Control, Embperl::Form::DataSource
-

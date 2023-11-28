@@ -59,27 +59,48 @@ contained in the same slice and for all its parent slices
 and the units contained therein. The system default for this
 setting may be controlled with
 C<DefaultCPUAccounting> in
-L<systemd-system.conf(5)>. I< Optional. Type boolean.  > 
+L<systemd-system.conf(5)>.
+
+Under the unified cgroup hierarchy, CPU accounting is available for all units and this
+setting has no effect. I< Optional. Type boolean.  > 
 
 =head2 CPUWeight
 
+These settings control the C<cpu> controller in the unified hierarchy.
+
 These options accept an integer value or a the special string "idle":
 
 While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
 the startup and shutdown phases. Using C<StartupCPUWeight> allows prioritizing specific services at
-boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+boot-up and shutdown differently than during normal runtime.
+
+In addition to the resource allocation performed by the C<cpu> controller, the
+kernel may automatically divide resources based on session-id grouping, see "The autogroup feature"
+in L<sched(7)>.
+The effect of this feature is similar to the C<cpu> controller with no explicit
+configuration, so users should be careful to not mistake one for the other. I< Optional. Type uniline.  > 
 
 =head2 StartupCPUWeight
 
+These settings control the C<cpu> controller in the unified hierarchy.
+
 These options accept an integer value or a the special string "idle":
 
 While C<StartupCPUWeight> applies to the startup and shutdown phases of the system,
 C<CPUWeight> applies to normal runtime of the system, and if the former is not set also to
 the startup and shutdown phases. Using C<StartupCPUWeight> allows prioritizing specific services at
-boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+boot-up and shutdown differently than during normal runtime.
+
+In addition to the resource allocation performed by the C<cpu> controller, the
+kernel may automatically divide resources based on session-id grouping, see "The autogroup feature"
+in L<sched(7)>.
+The effect of this feature is similar to the C<cpu> controller with no explicit
+configuration, so users should be careful to not mistake one for the other. I< Optional. Type uniline.  > 
 
 =head2 CPUQuota
+
+This setting controls the C<cpu> controller in the unified hierarchy.
 
 Assign the specified CPU time quota to the processes executed. Takes a percentage value, suffixed with
 "%". The percentage specifies how much CPU time the unit shall get at maximum, relative to the total CPU time
@@ -95,6 +116,8 @@ Example: C<CPUQuota=20%> ensures that the executed processes will never get more
 
 =head2 CPUQuotaPeriodSec
 
+This setting controls the C<cpu> controller in the unified hierarchy.
+
 Assign the duration over which the CPU time quota specified by C<CPUQuota> is measured.
 Takes a time duration value in seconds, with an optional suffix such as "ms" for milliseconds (or "s" for seconds.)
 The default setting is 100ms. The period is clamped to the range supported by the kernel, which is [1ms, 1000ms].
@@ -109,6 +132,8 @@ L<CFS Scheduler|https://docs.kernel.org/scheduler/sched-design-CFS.html>.
 Example: C<CPUQuotaPeriodSec=10ms> to request that the CPU quota is measured in periods of 10ms. I< Optional. Type uniline.  > 
 
 =head2 AllowedCPUs
+
+This setting controls the C<cpuset> controller in the unified hierarchy.
 
 Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
 whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
@@ -126,6 +151,8 @@ This setting is supported only with the unified control group hierarchy. I< Opti
 
 =head2 StartupAllowedCPUs
 
+This setting controls the C<cpuset> controller in the unified hierarchy.
+
 Restrict processes to be executed on specific CPUs. Takes a list of CPU indices or ranges separated by either
 whitespace or commas. CPU ranges are specified by the lower and upper CPU indices separated by a dash.
 
@@ -140,41 +167,9 @@ boot-up and shutdown differently than during normal runtime.
 
 This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
 
-=head2 AllowedMemoryNodes
-
-Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
-or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
-NUMA nodes indices separated by a dash.
-
-Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn't
-guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
-The effective configuration is reported as C<EffectiveMemoryNodes>.
-
-While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
-C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
-the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
-boot-up and shutdown differently than during normal runtime.
-
-This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
-
-=head2 StartupAllowedMemoryNodes
-
-Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
-or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
-NUMA nodes indices separated by a dash.
-
-Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn't
-guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
-The effective configuration is reported as C<EffectiveMemoryNodes>.
-
-While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
-C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
-the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
-boot-up and shutdown differently than during normal runtime.
-
-This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
-
 =head2 MemoryAccounting
+
+This setting controls the C<memory> controller in the unified hierarchy.
 
 Turn on process and kernel memory accounting for this
 unit. Takes a boolean argument. Note that turning on memory
@@ -186,6 +181,8 @@ C<DefaultMemoryAccounting> in
 L<systemd-system.conf(5)>. I< Optional. Type boolean.  > 
 
 =head2 MemoryMin
+
+These settings control the C<memory> controller in the unified hierarchy.
 
 Specify the memory usage protection of the executed processes in this unit.
 When reclaiming memory, the unit is treated as if it was using less memory resulting in memory
@@ -212,13 +209,62 @@ Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>
 Units may have their children use a default C<memory.min> or
 C<memory.low> value by specifying C<DefaultMemoryMin> or
 C<DefaultMemoryLow>, which has the same semantics as
-C<MemoryMin> and C<MemoryLow>.
+C<MemoryMin> and C<MemoryLow>, or C<DefaultStartupMemoryLow>
+which has the same semantics as C<StartupMemoryLow>.
 This setting does not affect C<memory.min> or C<memory.low>
 in the unit itself.
 Using it to set a default child allocation is only useful on kernels older than 5.7,
-which do not support the C<memory_recursiveprot> cgroup2 mount option. I< Optional. Type uniline.  > 
+which do not support the C<memory_recursiveprot> cgroup2 mount option.
+
+While C<StartupMemoryLow> applies to the startup and shutdown phases of the system,
+C<MemoryMin> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryLow> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+
+=head2 StartupMemoryLow
+
+These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the memory usage protection of the executed processes in this unit.
+When reclaiming memory, the unit is treated as if it was using less memory resulting in memory
+to be preferentially reclaimed from unprotected units.
+Using C<MemoryLow> results in a weaker protection where memory may still
+be reclaimed to avoid invoking the OOM killer in case there is no other reclaimable memory.
+
+For a protection to be effective, it is generally required to set a corresponding
+allocation on all ancestors, which is then distributed between children
+(with the exception of the root slice).
+Any C<MemoryMin> or C<MemoryLow> allocation that is not
+explicitly distributed to specific children is used to create a shared protection for all children.
+As this is a shared protection, the children will freely compete for the memory.
+
+Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the installed physical memory on the
+system. If assigned the special value C<infinity>, all available memory is protected, which may be
+useful in order to always inherit all of the protection afforded by ancestors.
+This controls the C<memory.min> or C<memory.low> control group attribute.
+For details about this control group attribute, see L<Memory Interface
+Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+Units may have their children use a default C<memory.min> or
+C<memory.low> value by specifying C<DefaultMemoryMin> or
+C<DefaultMemoryLow>, which has the same semantics as
+C<MemoryMin> and C<MemoryLow>, or C<DefaultStartupMemoryLow>
+which has the same semantics as C<StartupMemoryLow>.
+This setting does not affect C<memory.min> or C<memory.low>
+in the unit itself.
+Using it to set a default child allocation is only useful on kernels older than 5.7,
+which do not support the C<memory_recursiveprot> cgroup2 mount option.
+
+While C<StartupMemoryLow> applies to the startup and shutdown phases of the system,
+C<MemoryMin> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryLow> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
 
 =head2 MemoryHigh
+
+These settings control the C<memory> controller in the unified hierarchy.
 
 Specify the throttling limit on memory usage of the executed processes in this unit. Memory usage may go
 above the limit if unavoidable, but the processes are heavily slowed down and memory is taken away
@@ -230,9 +276,37 @@ percentage value may be specified, which is taken relative to the installed phys
 system. If assigned the
 special value C<infinity>, no memory throttling is applied. This controls the
 C<memory.high> control group attribute. For details about this control group attribute, see
-L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>. I< Optional. Type uniline.  > 
+L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryHigh> applies to the startup and shutdown phases of the system,
+C<MemoryHigh> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryHigh> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+
+=head2 StartupMemoryHigh
+
+These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the throttling limit on memory usage of the executed processes in this unit. Memory usage may go
+above the limit if unavoidable, but the processes are heavily slowed down and memory is taken away
+aggressively in such cases. This is the main mechanism to control memory usage of a unit.
+
+Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the installed physical memory on the
+system. If assigned the
+special value C<infinity>, no memory throttling is applied. This controls the
+C<memory.high> control group attribute. For details about this control group attribute, see
+L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryHigh> applies to the startup and shutdown phases of the system,
+C<MemoryHigh> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryHigh> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
 
 =head2 MemoryMax
+
+These settings control the C<memory> controller in the unified hierarchy.
 
 Specify the absolute limit on memory usage of the executed processes in this unit. If memory usage
 cannot be contained under the limit, out-of-memory killer is invoked inside the unit. It is recommended to
@@ -244,34 +318,163 @@ parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), re
 percentage value may be specified, which is taken relative to the installed physical memory on the system. If
 assigned the special value C<infinity>, no memory limit is applied. This controls the
 C<memory.max> control group attribute. For details about this control group attribute, see
-L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>. I< Optional. Type uniline.  > 
+L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryMax> applies to the startup and shutdown phases of the system,
+C<MemoryMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+
+=head2 StartupMemoryMax
+
+These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on memory usage of the executed processes in this unit. If memory usage
+cannot be contained under the limit, out-of-memory killer is invoked inside the unit. It is recommended to
+use C<MemoryHigh> as the main control mechanism and use C<MemoryMax> as the
+last line of defense.
+
+Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
+percentage value may be specified, which is taken relative to the installed physical memory on the system. If
+assigned the special value C<infinity>, no memory limit is applied. This controls the
+C<memory.max> control group attribute. For details about this control group attribute, see
+L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryMax> applies to the startup and shutdown phases of the system,
+C<MemoryMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
 
 =head2 MemorySwapMax
+
+These settings control the C<memory> controller in the unified hierarchy.
 
 Specify the absolute limit on swap usage of the executed processes in this unit.
 
 Takes a swap size in bytes. If the value is suffixed with K, M, G or T, the specified swap size is
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
-special value C<infinity>, no swap limit is applied. This controls the
+special value C<infinity>, no swap limit is applied. These settings control the
 C<memory.swap.max> control group attribute. For details about this control group attribute,
-see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>. I< Optional. Type uniline.  > 
+see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemorySwapMax> applies to the startup and shutdown phases of the system,
+C<MemorySwapMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemorySwapMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+
+=head2 StartupMemorySwapMax
+
+These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on swap usage of the executed processes in this unit.
+
+Takes a swap size in bytes. If the value is suffixed with K, M, G or T, the specified swap size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
+special value C<infinity>, no swap limit is applied. These settings control the
+C<memory.swap.max> control group attribute. For details about this control group attribute,
+see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemorySwapMax> applies to the startup and shutdown phases of the system,
+C<MemorySwapMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemorySwapMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+
+=head2 MemoryZSwapMax
+
+These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on zswap usage of the processes in this unit. Zswap is a lightweight compressed
+cache for swap pages. It takes pages that are in the process of being swapped out and attempts to compress them into a
+dynamically allocated RAM-based memory pool. If the limit specified is hit, no entries from this unit will be
+stored in the pool until existing entries are faulted back or written out to disk. See the kernel's
+L<Zswap|https://www.kernel.org/doc/html/latest/admin-guide/mm/zswap.html> documentation for more details.
+
+Takes a size in bytes. If the value is suffixed with K, M, G or T, the specified size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
+special value C<infinity>, no limit is applied. These settings control the
+C<memory.zswap.max> control group attribute. For details about this control group attribute,
+see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryZSwapMax> applies to the startup and shutdown phases of the system,
+C<MemoryZSwapMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryZSwapMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+
+=head2 StartupMemoryZSwapMax
+
+These settings control the C<memory> controller in the unified hierarchy.
+
+Specify the absolute limit on zswap usage of the processes in this unit. Zswap is a lightweight compressed
+cache for swap pages. It takes pages that are in the process of being swapped out and attempts to compress them into a
+dynamically allocated RAM-based memory pool. If the limit specified is hit, no entries from this unit will be
+stored in the pool until existing entries are faulted back or written out to disk. See the kernel's
+L<Zswap|https://www.kernel.org/doc/html/latest/admin-guide/mm/zswap.html> documentation for more details.
+
+Takes a size in bytes. If the value is suffixed with K, M, G or T, the specified size is
+parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. If assigned the
+special value C<infinity>, no limit is applied. These settings control the
+C<memory.zswap.max> control group attribute. For details about this control group attribute,
+see L<Memory Interface Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files>.
+
+While C<StartupMemoryZSwapMax> applies to the startup and shutdown phases of the system,
+C<MemoryZSwapMax> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupMemoryZSwapMax> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime. I< Optional. Type uniline.  > 
+
+=head2 AllowedMemoryNodes
+
+These settings control the C<cpuset> controller in the unified hierarchy.
+
+Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
+or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
+NUMA nodes indices separated by a dash.
+
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn't
+guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
+The effective configuration is reported as C<EffectiveMemoryNodes>.
+
+While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
+C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
+
+This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
+
+=head2 StartupAllowedMemoryNodes
+
+These settings control the C<cpuset> controller in the unified hierarchy.
+
+Restrict processes to be executed on specific memory NUMA nodes. Takes a list of memory NUMA nodes indices
+or ranges separated by either whitespace or commas. Memory NUMA nodes ranges are specified by the lower and upper
+NUMA nodes indices separated by a dash.
+
+Setting C<AllowedMemoryNodes> or C<StartupAllowedMemoryNodes> doesn't
+guarantee that all of the memory NUMA nodes will be used by the processes as it may be limited by parent units.
+The effective configuration is reported as C<EffectiveMemoryNodes>.
+
+While C<StartupAllowedMemoryNodes> applies to the startup and shutdown phases of the system,
+C<AllowedMemoryNodes> applies to normal runtime of the system, and if the former is not set also to
+the startup and shutdown phases. Using C<StartupAllowedMemoryNodes> allows prioritizing specific services at
+boot-up and shutdown differently than during normal runtime.
+
+This setting is supported only with the unified control group hierarchy. I< Optional. Type uniline.  > 
 
 =head2 TasksAccounting
 
-Turn on task accounting for this unit. Takes a
-boolean argument. If enabled, the system manager will keep
-track of the number of tasks in the unit. The number of
-tasks accounted this way includes both kernel threads and
-userspace processes, with each thread counting
-individually. Note that turning on tasks accounting for one
-unit will also implicitly turn it on for all units contained
-in the same slice and for all its parent slices and the
-units contained therein. The system default for this setting
-may be controlled with
-C<DefaultTasksAccounting> in
+This setting controls the C<pids> controller in the unified hierarchy.
+
+Turn on task accounting for this unit. Takes a boolean argument. If enabled, the kernel will
+keep track of the total number of tasks in the unit and its children. This number includes both
+kernel threads and userspace processes, with each thread counted individually. Note that turning on
+tasks accounting for one unit will also implicitly turn it on for all units contained in the same
+slice and for all its parent slices and the units contained therein. The system default for this
+setting may be controlled with C<DefaultTasksAccounting> in
 L<systemd-system.conf(5)>. I< Optional. Type boolean.  > 
 
 =head2 TasksMax
+
+This setting controls the C<pids> controller in the unified hierarchy.
 
 Specify the maximum number of tasks that may be created in the unit. This ensures that the
 number of tasks accounted for the unit (see above) stays below a specific limit. This either takes
@@ -288,6 +491,8 @@ L<systemd-system.conf(5)>. I< Optional. Type uniline.  >
 
 =head2 IOAccounting
 
+This setting controls the C<io> controller in the unified hierarchy.
+
 Turn on Block I/O accounting for this unit, if the unified control group hierarchy is used on the
 system. Takes a boolean argument. Note that turning on block I/O accounting for one unit will also implicitly
 turn it on for all units contained in the same slice and all for its parent slices and the units contained
@@ -296,6 +501,8 @@ in
 L<systemd-system.conf(5)>. I< Optional. Type boolean.  > 
 
 =head2 IOWeight
+
+These settings control the C<io> controller in the unified hierarchy.
 
 Set the default overall block I/O weight for the executed processes, if the unified control
 group hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the
@@ -315,6 +522,8 @@ and shutdown differently than during runtime. I< Optional. Type uniline.  >
 
 =head2 StartupIOWeight
 
+These settings control the C<io> controller in the unified hierarchy.
+
 Set the default overall block I/O weight for the executed processes, if the unified control
 group hierarchy is used on the system. Takes a single weight value (between 1 and 10000) to set the
 default block I/O weight. This controls the C<io.weight> control group attribute,
@@ -332,6 +541,8 @@ and shutdown phases. This allows prioritizing specific services at boot-up
 and shutdown differently than during runtime. I< Optional. Type uniline.  > 
 
 =head2 IODeviceWeight
+
+This setting controls the C<io> controller in the unified hierarchy.
 
 Set the per-device overall block I/O weight for the executed processes, if the unified control group
 hierarchy is used on the system. Takes a space-separated pair of a file path and a weight value to specify
@@ -352,6 +563,8 @@ does not cover complex storage and in particular RAID and volume management stor
 
 =head2 IOReadBandwidthMax
 
+These settings control the C<io> controller in the unified hierarchy.
+
 Set the per-device overall block I/O bandwidth maximum limit for the executed processes, if the unified
 control group hierarchy is used on the system. This limit is not work-conserving and the executed processes
 are not allowed to use more even if the device has idle capacity.  Takes a space-separated pair of a file
@@ -367,6 +580,8 @@ Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
 Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above. I< Optional. Type uniline.  > 
 
 =head2 IOWriteBandwidthMax
+
+These settings control the C<io> controller in the unified hierarchy.
 
 Set the per-device overall block I/O bandwidth maximum limit for the executed processes, if the unified
 control group hierarchy is used on the system. This limit is not work-conserving and the executed processes
@@ -384,6 +599,8 @@ Similar restrictions on block device discovery as for C<IODeviceWeight> apply, s
 
 =head2 IOReadIOPSMax
 
+These settings control the C<io> controller in the unified hierarchy.
+
 Set the per-device overall block I/O IOs-Per-Second maximum limit for the executed processes, if the
 unified control group hierarchy is used on the system. This limit is not work-conserving and the executed
 processes are not allowed to use more even if the device has idle capacity.  Takes a space-separated pair of
@@ -400,6 +617,8 @@ Similar restrictions on block device discovery as for C<IODeviceWeight> apply, s
 
 =head2 IOWriteIOPSMax
 
+These settings control the C<io> controller in the unified hierarchy.
+
 Set the per-device overall block I/O IOs-Per-Second maximum limit for the executed processes, if the
 unified control group hierarchy is used on the system. This limit is not work-conserving and the executed
 processes are not allowed to use more even if the device has idle capacity.  Takes a space-separated pair of
@@ -415,6 +634,8 @@ Files|https://docs.kernel.org/admin-guide/cgroup-v2.html#io-interface-files>.
 Similar restrictions on block device discovery as for C<IODeviceWeight> apply, see above. I< Optional. Type uniline.  > 
 
 =head2 IODeviceLatencyTargetSec
+
+This setting controls the C<io> controller in the unified hierarchy.
 
 Set the per-device average target I/O latency for the executed processes, if the unified control group
 hierarchy is used on the system. Takes a file path and a timespan separated by a space to specify
@@ -479,7 +700,7 @@ ultimately activated services for it. Conversely, the IP access list configured 
 not applied to any sockets passed into the service via socket activation. Thus, it is usually a
 good idea to replicate the IP access lists on both the socket and the service unit. Nevertheless,
 it may make sense to maintain one list more open and the other one more restricted, depending on
-the usecase.
+the use case.
 
 If these settings are used multiple times in the same unit the specified lists are combined. If an
 empty string is assigned to these settings the specific access list is reset and all previous settings undone.
@@ -523,7 +744,7 @@ ultimately activated services for it. Conversely, the IP access list configured 
 not applied to any sockets passed into the service via socket activation. Thus, it is usually a
 good idea to replicate the IP access lists on both the socket and the service unit. Nevertheless,
 it may make sense to maintain one list more open and the other one more restricted, depending on
-the usecase.
+the use case.
 
 If these settings are used multiple times in the same unit the specified lists are combined. If an
 empty string is assigned to these settings the specific access list is reset and all previous settings undone.
@@ -535,72 +756,6 @@ Note that these settings might not be supported on some systems (for example if 
 support is not enabled in the underlying kernel or container manager). These settings will have no effect in
 that case. If compatibility with such systems is desired it is hence recommended to not exclusively rely on
 them for IP security. I< Optional. Type uniline.  > 
-
-=head2 IPIngressFilterPath
-
-Add custom network traffic filters implemented as BPF programs, applying to all IP packets
-sent and received over C<AF_INET> and C<AF_INET6> sockets.
-Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
-
-The filters configured with this option are applied to all sockets created by processes
-of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
-to filters any of the parent slice units this unit might be a member of as well as any
-C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
-By default there are no filters specified.
-
-If these settings are used multiple times in the same unit all the specified programs are attached. If an
-empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
-
-If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
-is already being handled by C<BPFProgram> ingress hook, e.g.
-C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
-the assignment will be still considered valid and the program will be attached to a cgroup. Same for
-C<IPEgressFilterPath> path and C<egress> hook.
-
-Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
-all sockets associated with it directly, but not to any sockets created by the ultimately activated services
-for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
-the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
-the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
-one more restricted, depending on the usecase.
-
-Note that these settings might not be supported on some systems (for example if eBPF control group
-support is not enabled in the underlying kernel or container manager). These settings will fail the service in
-that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
-(requires C<Delegate>C<yes>) instead of using this setting. I< Optional. Type uniline.  > 
-
-=head2 IPEgressFilterPath
-
-Add custom network traffic filters implemented as BPF programs, applying to all IP packets
-sent and received over C<AF_INET> and C<AF_INET6> sockets.
-Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
-
-The filters configured with this option are applied to all sockets created by processes
-of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
-to filters any of the parent slice units this unit might be a member of as well as any
-C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
-By default there are no filters specified.
-
-If these settings are used multiple times in the same unit all the specified programs are attached. If an
-empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
-
-If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
-is already being handled by C<BPFProgram> ingress hook, e.g.
-C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
-the assignment will be still considered valid and the program will be attached to a cgroup. Same for
-C<IPEgressFilterPath> path and C<egress> hook.
-
-Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
-all sockets associated with it directly, but not to any sockets created by the ultimately activated services
-for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
-the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
-the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
-one more restricted, depending on the usecase.
-
-Note that these settings might not be supported on some systems (for example if eBPF control group
-support is not enabled in the underlying kernel or container manager). These settings will fail the service in
-that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
-(requires C<Delegate>C<yes>) instead of using this setting. I< Optional. Type uniline.  > 
 
 =head2 SocketBindAllow
 
@@ -807,6 +962,121 @@ Example 3: mixed
 Programs in the unit will be only able to use the eth2 network interface.
 I< Optional. Type uniline.  > 
 
+=head2 IPIngressFilterPath
+
+Add custom network traffic filters implemented as BPF programs, applying to all IP packets
+sent and received over C<AF_INET> and C<AF_INET6> sockets.
+Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
+
+The filters configured with this option are applied to all sockets created by processes
+of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
+to filters any of the parent slice units this unit might be a member of as well as any
+C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
+By default there are no filters specified.
+
+If these settings are used multiple times in the same unit all the specified programs are attached. If an
+empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
+
+If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
+is already being handled by C<BPFProgram> ingress hook, e.g.
+C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
+the assignment will be still considered valid and the program will be attached to a cgroup. Same for
+C<IPEgressFilterPath> path and C<egress> hook.
+
+Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
+all sockets associated with it directly, but not to any sockets created by the ultimately activated services
+for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
+the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
+the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
+one more restricted, depending on the use case.
+
+Note that these settings might not be supported on some systems (for example if eBPF control group
+support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
+(requires C<Delegate>C<yes>) instead of using this setting. I< Optional. Type uniline.  > 
+
+=head2 IPEgressFilterPath
+
+Add custom network traffic filters implemented as BPF programs, applying to all IP packets
+sent and received over C<AF_INET> and C<AF_INET6> sockets.
+Takes an absolute path to a pinned BPF program in the BPF virtual filesystem (C</sys/fs/bpf/>).
+
+The filters configured with this option are applied to all sockets created by processes
+of this unit (or in the case of socket units, associated with it). The filters are loaded in addition
+to filters any of the parent slice units this unit might be a member of as well as any
+C<IPAddressAllow> and C<IPAddressDeny> filters in any of these units.
+By default there are no filters specified.
+
+If these settings are used multiple times in the same unit all the specified programs are attached. If an
+empty string is assigned to these settings the program list is reset and all previous specified programs ignored.
+
+If the path BPF_FS_PROGRAM_PATH in C<IPIngressFilterPath> assignment
+is already being handled by C<BPFProgram> ingress hook, e.g.
+C<BPFProgram>C<ingress>:BPF_FS_PROGRAM_PATH,
+the assignment will be still considered valid and the program will be attached to a cgroup. Same for
+C<IPEgressFilterPath> path and C<egress> hook.
+
+Note that for socket-activated services, the IP filter programs configured on the socket unit apply to
+all sockets associated with it directly, but not to any sockets created by the ultimately activated services
+for it. Conversely, the IP filter programs configured for the service are not applied to any sockets passed into
+the service via socket activation. Thus, it is usually a good idea, to replicate the IP filter programs on both
+the socket and the service unit, however it often makes sense to maintain one configuration more open and the other
+one more restricted, depending on the use case.
+
+Note that these settings might not be supported on some systems (for example if eBPF control group
+support is not enabled in the underlying kernel or container manager). These settings will fail the service in
+that case. If compatibility with such systems is desired it is hence recommended to attach your filter manually
+(requires C<Delegate>C<yes>) instead of using this setting. I< Optional. Type uniline.  > 
+
+=head2 BPFProgram
+
+C<BPFProgram> allows attaching custom BPF programs to the cgroup of a
+unit. (This generalizes the functionality exposed via C<IPEgressFilterPath> and
+and C<IPIngressFilterPath> for other hooks.)  Cgroup-bpf hooks in the form of BPF
+programs loaded to the BPF filesystem are attached with cgroup-bpf attach flags determined by the
+unit. For details about attachment types and flags see
+L<C<bpf.h>|https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/plain/include/uapi/linux/bpf.h>. Also
+refer to the general L<BPF documentation|https://docs.kernel.org/bpf/>.
+
+The specification of BPF program consists of a pair of BPF program type and program path in
+the file system, with C<:> as the separator:
+type:program-path.
+
+The BPF program type is equivalent to the BPF attach type used in
+bpftool. It may be one of C<egress>,
+C<ingress>, C<sock_create>, C<sock_ops>,
+C<device>, C<bind4>, C<bind6>,
+C<connect4>, C<connect6>, C<post_bind4>,
+C<post_bind6>, C<sendmsg4>, C<sendmsg6>,
+C<sysctl>, C<recvmsg4>, C<recvmsg6>,
+C<getsockopt>, C<setsockopt>.
+
+The specified program path must be an absolute path referencing a BPF program inode in the
+bpffs file system (which generally means it must begin with C</sys/fs/bpf/>). If
+a specified program does not exist (i.e. has not been uploaded to the BPF subsystem of the kernel
+yet), it will not be installed but unit activation will continue (a warning will be printed to the
+logs).
+
+Setting C<BPFProgram> to an empty value makes previous assignments
+ineffective.
+
+Multiple assignments of the same program type/path pair have the same effect as a single
+assignment: the program will be attached just once.
+
+If BPF C<egress> pinned to program-path path is already being
+handled by C<IPEgressFilterPath>, C<BPFProgram>
+assignment will be considered valid and C<BPFProgram> will be attached to a cgroup.
+Similarly for C<ingress> hook and C<IPIngressFilterPath> assignment.
+
+BPF programs passed with C<BPFProgram> are attached to the cgroup of a unit
+with BPF attach flag C<multi>, that allows further attachments of the same
+type within cgroup hierarchy topped by the unit cgroup.
+
+Examples:
+    BPFProgram=egress:/sys/fs/bpf/egress-hook
+    BPFProgram=bind6:/sys/fs/bpf/sock-addr-hook
+. I< Optional. Type uniline.  > 
+
 =head2 DeviceAllow
 
 Control access to specific device nodes by the executed processes. Takes two space-separated
@@ -885,48 +1155,77 @@ L<systemd.service(5)>, section
 
 =head2 Delegate
 
-Turns on delegation of further resource control partitioning to processes of the unit. Units where this
-is enabled may create and manage their own private subhierarchy of control groups below the control group of
-the unit itself. For unprivileged services (i.e. those using the C<User> setting) the unit's
-control group will be made accessible to the relevant user. When enabled the service manager will refrain
-from manipulating control groups or moving processes below the unit's control group, so that a clear concept
-of ownership is established: the control group tree above the unit's control group (i.e. towards the root
-control group) is owned and managed by the service manager of the host, while the control group tree below
-the unit's control group is owned and managed by the unit itself. Takes either a boolean argument or a list
-of control group controller names. If true, delegation is turned on, and all supported controllers are
-enabled for the unit, making them available to the unit's processes for management. If false, delegation is
-turned off entirely (and no additional controllers are enabled). If set to a list of controllers, delegation
-is turned on, and the specified controllers are enabled for the unit. Note that additional controllers than
-the ones specified might be made available as well, depending on configuration of the containing slice unit
-or other units contained in it. Note that assigning the empty string will enable delegation, but reset the
-list of controllers, all assignments prior to this will have no effect.  Defaults to false.
+Turns on delegation of further resource control partitioning to processes of the unit. Units
+where this is enabled may create and manage their own private subhierarchy of control groups below
+the control group of the unit itself. For unprivileged services (i.e. those using the
+C<User> setting) the unit's control group will be made accessible to the relevant
+user.
 
-Note that controller delegation to less privileged code is only safe on the unified control group
-hierarchy. Accordingly, access to the specified controllers will not be granted to unprivileged services on
-the legacy hierarchy, even when requested.
+When enabled the service manager will refrain from manipulating control groups or moving
+processes below the unit's control group, so that a clear concept of ownership is established: the
+control group tree at the level of the unit's control group and above (i.e. towards the root
+control group) is owned and managed by the service manager of the host, while the control group
+tree below the unit's control group is owned and managed by the unit itself.
 
-Not all of these controllers are available on all kernels however, and some are
-specific to the unified hierarchy while others are specific to the legacy hierarchy. Also note that the
-kernel might support further controllers, which aren't covered here yet as delegation is either not supported
-at all for them or not defined cleanly.
+Takes either a boolean argument or a (possibly empty) list of control group controller names.
+If true, delegation is turned on, and all supported controllers are enabled for the unit, making
+them available to the unit's processes for management. If false, delegation is turned off entirely
+(and no additional controllers are enabled). If set to a list of controllers, delegation is turned
+on, and the specified controllers are enabled for the unit. Assigning the empty string will enable
+delegation, but reset the list of controllers, and all assignments prior to this will have no
+effect. Note that additional controllers other than the ones specified might be made available as
+well, depending on configuration of the containing slice unit or other units contained in it.
+Defaults to false.
+
+Note that controller delegation to less privileged code is only safe on the unified control
+group hierarchy. Accordingly, access to the specified controllers will not be granted to
+unprivileged services on the legacy hierarchy, even when requested.
+
+Not all of these controllers are available on all kernels however, and some are specific to
+the unified hierarchy while others are specific to the legacy hierarchy. Also note that the kernel
+might support further controllers, which aren't covered here yet as delegation is either not
+supported at all for them or not defined cleanly.
+
+Note that because of the hierarchical nature of cgroup hierarchy, any controllers that are
+delegated will be enabled for the parent and sibling units of the unit with delegation.
 
 For further details on the delegation model consult L<Control Group APIs and
 Delegation|https://systemd.io/CGROUP_DELEGATION>. I< Optional. Type uniline.  > 
 
+=head2 DelegateSubgroup
+
+Place unit processes in the specified subgroup of the unit's control group. Takes a valid
+control group name (not a path!) as parameter, or an empty string to turn this feature
+off. Defaults to off. The control group name must be usable as filename and avoid conflicts with
+the kernel's control group attribute files (i.e. C<cgroup.procs> is not an
+acceptable name, since the kernel exposes a native control group attribute file by that name). This
+option has no effect unless control group delegation is turned on via C<Delegate>,
+see above. Note that this setting only applies to "main" processes of a unit, i.e. for services to
+C<ExecStart>, but not for C<ExecReload> and similar. If
+delegation is enabled, the latter are always placed inside a subgroup named
+C<.control>. The specified subgroup is automatically created (and potentially
+ownership is passed to the unit's configured user/group) when a process is started in it.
+
+This option is useful to avoid manually moving the invoked process into a subgroup after it
+has been started. Since no processes should live in inner nodes of the control group tree it's
+almost always necessary to run the main ("supervising") process of a unit that has delegation
+turned on in a subgroup. I< Optional. Type uniline.  > 
+
 =head2 DisableControllers
 
-Disables controllers from being enabled for a unit's children. If a controller listed is already in use
-in its subtree, the controller will be removed from the subtree. This can be used to avoid child units being
-able to implicitly or explicitly enable a controller. Defaults to not disabling any controllers.
-
-It may not be possible to successfully disable a controller if the unit or any child of the unit in
-question delegates controllers to its children, as any delegated subtree of the cgroup hierarchy is unmanaged
-by systemd.
+Disables controllers from being enabled for a unit's children. If a controller listed is
+already in use in its subtree, the controller will be removed from the subtree. This can be used to
+avoid configuration in child units from being able to implicitly or explicitly enable a controller.
+Defaults to empty.
 
 Multiple controllers may be specified, separated by spaces. You may also pass
 C<DisableControllers> multiple times, in which case each new instance adds another controller
 to disable. Passing C<DisableControllers> by itself with no controller name present resets
-the disabled controller list. I< Optional. Type uniline.  > 
+the disabled controller list.
+
+It may not be possible to disable a controller after units have been started, if the unit or
+any child of the unit in question delegates controllers to its children, as any delegated subtree
+of the cgroup hierarchy is unmanaged by systemd. I< Optional. Type uniline.  > 
 
 =head2 ManagedOOMSwap
 
@@ -999,10 +1298,10 @@ When calculating candidates to relieve swap usage, systemd-oomd will
 only respect these extended attributes if the unit's cgroup is owned by root.
 
 When calculating candidates to relieve memory pressure, systemd-oomd
-will only respect these extended attributes if the unit's cgroup owner, and the
-owner of the monitored ancestor cgroup are the same. For example, if systemd-oomd
-is calculating candidates for C<-.slice>, then extended attributes set
-on descendants of C</user.slice/user-1000.slice/user@1000.service/>
+will only respect these extended attributes if the unit's cgroup is owned by root, or if the
+unit's cgroup owner, and the owner of the monitored ancestor cgroup are the same. For example,
+if systemd-oomd is calculating candidates for C<-.slice>,
+then extended attributes set on descendants of C</user.slice/user-1000.slice/user@1000.service/>
 will be ignored because the descendants are owned by UID 1000, and C<-.slice>
 is owned by UID 0. But, if calculating candidates for
 C</user.slice/user-1000.slice/user@1000.service/>, then extended attributes set
@@ -1024,7 +1323,50 @@ Defaults to C<none> which means systemd-oomd will rank this
 unit's cgroup as defined in
 L<systemd-oomd.service(8)>
 and L<oomd.conf(5)>.
-I< Optional. Type enum. choice: 'none', 'avoid', 'omit'.  > 
+I< Optional. Type enum. choice: 'avoid', 'none', 'omit'.  > 
+
+=head2 MemoryPressureWatch
+
+Controls memory pressure monitoring for invoked processes. Takes one of
+C<off>, C<on>, C<auto> or C<skip>. If
+C<off> tells the service not to watch for memory pressure events, by setting the
+C<$MEMORY_PRESSURE_WATCH> environment variable to the literal string
+C</dev/null>. If C<on> tells the service to watch for memory
+pressure events. This enables memory accounting for the service, and ensures the
+C<memory.pressure> cgroup attribute files is accessible for read and write to the
+service's user. It then sets the C<$MEMORY_PRESSURE_WATCH> environment variable for
+processes invoked by the unit to the file system path to this file. The threshold information
+configured with C<MemoryPressureThresholdSec> is encoded in the
+C<$MEMORY_PRESSURE_WRITE> environment variable. If the C<auto> value
+is set the protocol is enabled if memory accounting is anyway enabled for the unit, and disabled
+otherwise. If set to C<skip> the logic is neither enabled, nor disabled and the two
+environment variables are not set.
+
+Note that services are free to use the two environment variables, but it's unproblematic if
+they ignore them. Memory pressure handling must be implemented individually in each service, and
+usually means different things for different software. For further details on memory pressure
+handling see L<Memory Pressure Handling in
+systemd|https://systemd.io/MEMORY_PRESSURE>.
+
+Services implemented using
+L<sd-event(3)> may use
+L<sd_event_add_memory_pressure(3)>
+to watch for and handle memory pressure events.
+
+If not explicit set, defaults to the C<DefaultMemoryPressureWatch> setting in
+L<systemd-system.conf(5)>. I< Optional. Type enum. choice: 'auto', 'off', 'on', 'skip'.  > 
+
+=head2 MemoryPressureThresholdSec
+
+Sets the memory pressure threshold time for memory pressure monitor as configured via
+C<MemoryPressureWatch>. Specifies the maximum allocation latency before a memory
+pressure event is signalled to the service, per 2s window. If not specified defaults to the
+C<DefaultMemoryPressureThresholdSec> setting in
+L<systemd-system.conf(5)>
+(which in turn defaults to 200ms). The specified value expects a time unit such as
+C<ms> or C<μs>, see
+L<systemd.time(7)> for
+details on the permitted syntax. I< Optional. Type uniline.  > 
 
 =head2 ExecSearchPath
 
@@ -1068,7 +1410,15 @@ the root environment, to ensure the notification interface can work correctly.
 
 Note that services using C<RootDirectory>/C<RootImage> will
 not be able to log via the syslog or journal protocols to the host logging infrastructure, unless the
-relevant sockets are mounted from the host, specifically: I< Optional. Type uniline.  > 
+relevant sockets are mounted from the host, specifically:
+
+The host's
+L<os-release(5)>
+file will be made available for the service (read-only) as
+C</run/host/os-release>.
+It will be updated automatically on soft reboot (see:
+L<systemd-soft-reboot.service(8)>),
+in case the service is configured to survive it. I< Optional. Type uniline.  > 
 
 =head2 RootImage
 
@@ -1078,7 +1428,7 @@ or loopback file instead of a directory. The device node or file system image fi
 file system without a partition table, or a file system within an MBR/MS-DOS or GPT partition table
 with only a single Linux-compatible partition, or a set of file systems within a GPT partition table
 that follows the L<Discoverable Partitions
-Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>.
+Specification|https://uapi-group.org/specifications/specs/discoverable_partitions_specification>.
 
 When C<DevicePolicy> is set to C<closed> or
 C<strict>, or set to C<auto> and C<DeviceAllow> is
@@ -1091,7 +1441,15 @@ C<PrivateDevices> below, as it may change the setting of
 C<DevicePolicy>.
 
 Units making use of C<RootImage> automatically gain an
-C<After> dependency on C<systemd-udevd.service>. I< Optional. Type uniline.  > 
+C<After> dependency on C<systemd-udevd.service>.
+
+The host's
+L<os-release(5)>
+file will be made available for the service (read-only) as
+C</run/host/os-release>.
+It will be updated automatically on soft reboot (see:
+L<systemd-soft-reboot.service(8)>),
+in case the service is configured to survive it. I< Optional. Type uniline.  > 
 
 =head2 RootImageOptions
 
@@ -1103,10 +1461,26 @@ string removes previous assignments. Duplicated options are ignored. For a list 
 refer to
 L<mount(8)>.
 
-Valid partition names follow the L<Discoverable Partitions Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>:
+Valid partition names follow the L<Discoverable Partitions
+Specification|https://uapi-group.org/specifications/specs/discoverable_partitions_specification>:
 C<root>, C<usr>, C<home>, C<srv>,
 C<esp>, C<xbootldr>, C<tmp>,
 C<var>. I< Optional. Type uniline.  > 
+
+=head2 RootEphemeral
+
+Takes a boolean argument. If enabled, executed processes will run in an ephemeral
+copy of the root directory or root image. The ephemeral copy is placed in
+C</var/lib/systemd/ephemeral-trees/> while the service is active and is cleaned up
+when the service is stopped or restarted. If C<RootDirectory> is used and the root
+directory is a subvolume, the ephemeral copy will be created by making a snapshot of the subvolume.
+
+To make sure making ephemeral copies can be made efficiently, the root directory or root image
+should be located on the same filesystem as C</var/lib/systemd/ephemeral-trees/>.
+When using C<RootEphemeral> with root directories, btrfs should be used as the
+filesystem and the root directory should ideally be a subvolume which systemd can
+snapshot to make the ephemeral copy. For root images, a filesystem with support for reflinks should
+be used to ensure an efficient ephemeral copy. I< Optional. Type boolean.  > 
 
 =head2 RootHash
 
@@ -1149,7 +1523,7 @@ directly. I< Optional. Type uniline.  >
 
 Takes the path to a data integrity (dm-verity) file. This option enables data integrity checks
 using dm-verity, if C<RootImage> is used and a root-hash is passed and if the used image itself
-does not contains the integrity data. The integrity data must be matched by the root hash. If this option is not
+does not contain the integrity data. The integrity data must be matched by the root hash. If this option is not
 specified, but a file with the C<.verity> suffix is found next to the image file, bearing otherwise
 the same name (except if the image has the C<.raw> suffix, in which case the verity data file must
 not have it in its name), the verity data is read from it and automatically used.
@@ -1157,7 +1531,70 @@ not have it in its name), the verity data is read from it and automatically used
 This option is supported only for disk images that contain a single file system, without an
 enveloping partition table. Images that contain a GPT partition table should instead include both
 root file system and matching Verity data in the same image, implementing the L<Discoverable Partitions
-Specification|https://systemd.io/DISCOVERABLE_PARTITIONS>. I< Optional. Type uniline.  > 
+Specification|https://uapi-group.org/specifications/specs/discoverable_partitions_specification>. I< Optional. Type uniline.  > 
+
+=head2 RootImagePolicy
+
+Takes an image policy string as per
+L<systemd.image-policy(7)>
+to use when mounting the disk images (DDI) specified in C<RootImage>,
+C<MountImage>, C<ExtensionImage>, respectively. If not specified
+the following policy string is the default for C<RootImagePolicy> and C<MountImagePolicy>:
+
+    root=verity+signed+encrypted+unprotected+absent: \
+    usr=verity+signed+encrypted+unprotected+absent: \
+    home=encrypted+unprotected+absent: \
+    srv=encrypted+unprotected+absent: \
+    tmp=encrypted+unprotected+absent: \
+    var=encrypted+unprotected+absent
+
+The default policy for C<ExtensionImagePolicy> is:
+
+    root=verity+signed+encrypted+unprotected+absent: \
+    usr=verity+signed+encrypted+unprotected+absent
+. I< Optional. Type uniline.  > 
+
+=head2 MountImagePolicy
+
+Takes an image policy string as per
+L<systemd.image-policy(7)>
+to use when mounting the disk images (DDI) specified in C<RootImage>,
+C<MountImage>, C<ExtensionImage>, respectively. If not specified
+the following policy string is the default for C<RootImagePolicy> and C<MountImagePolicy>:
+
+    root=verity+signed+encrypted+unprotected+absent: \
+    usr=verity+signed+encrypted+unprotected+absent: \
+    home=encrypted+unprotected+absent: \
+    srv=encrypted+unprotected+absent: \
+    tmp=encrypted+unprotected+absent: \
+    var=encrypted+unprotected+absent
+
+The default policy for C<ExtensionImagePolicy> is:
+
+    root=verity+signed+encrypted+unprotected+absent: \
+    usr=verity+signed+encrypted+unprotected+absent
+. I< Optional. Type uniline.  > 
+
+=head2 ExtensionImagePolicy
+
+Takes an image policy string as per
+L<systemd.image-policy(7)>
+to use when mounting the disk images (DDI) specified in C<RootImage>,
+C<MountImage>, C<ExtensionImage>, respectively. If not specified
+the following policy string is the default for C<RootImagePolicy> and C<MountImagePolicy>:
+
+    root=verity+signed+encrypted+unprotected+absent: \
+    usr=verity+signed+encrypted+unprotected+absent: \
+    home=encrypted+unprotected+absent: \
+    srv=encrypted+unprotected+absent: \
+    tmp=encrypted+unprotected+absent: \
+    var=encrypted+unprotected+absent
+
+The default policy for C<ExtensionImagePolicy> is:
+
+    root=verity+signed+encrypted+unprotected+absent: \
+    usr=verity+signed+encrypted+unprotected+absent
+. I< Optional. Type uniline.  > 
 
 =head2 MountAPIVFS
 
@@ -1202,7 +1639,7 @@ option implies C<MountAPIVFS>.
 
 If the kernel doesn't support per-mount point C<hidepid=> mount options this
 setting remains without effect, and the unit's processes will be able to access and see other process
-as if the option was not used. I< Optional. Type enum. choice: 'noaccess', 'invisible', 'ptraceable', 'default'.  > 
+as if the option was not used. I< Optional. Type enum. choice: 'default', 'invisible', 'noaccess', 'ptraceable'.  > 
 
 =head2 ProcSubset
 
@@ -1514,7 +1951,9 @@ to directories outside of these explicitly configured and managed ones. Specific
 C<BindPaths> and be careful with C<AF_UNIX> file descriptor
 passing for directory file descriptors, as this would permit processes to create files or directories
 owned by the dynamic user/group that are not subject to the lifecycle and access guarantees of the
-service. Defaults to off. I< Optional. Type boolean.  > 
+service. Note that this option is currently incompatible with D-Bus policies, thus a service using
+this option may currently not allocate a D-Bus service name (note that this does not affect calling
+into other D-Bus services). Defaults to off. I< Optional. Type boolean.  > 
 
 =head2 SupplementaryGroups
 
@@ -1627,8 +2066,8 @@ Flag|https://docs.kernel.org/userspace-api/no_new_privs.html>.
 
 Note that this setting only has an effect on the unit's processes themselves (or any processes
 directly or indirectly forked off them). It has no effect on processes potentially invoked on request
-of them through tools such as L<at(1p)>,
-L<crontab(1p)>,
+of them through tools such as L<at(1)>,
+L<crontab(1)>,
 L<systemd-run(1)>, or
 arbitrary IPC services. I< Optional. Type boolean.  > 
 
@@ -2594,7 +3033,7 @@ system services, as this ensures that multiple services running under the same s
 the root user) do not share their key material among each other. If C<shared> is used a new
 session keyring is allocated as for C<private>, but the user keyring of the user configured with
 C<User> is linked into it, so that keys assigned to the user may be requested by the unit's
-processes. In this modes multiple units running processes under the same user ID may share key material. Unless
+processes. In this mode multiple units running processes under the same user ID may share key material. Unless
 C<inherit> is selected the unique invocation ID for the unit (see below) is added as a protected
 key by the name C<invocation_id> to the newly created session keyring. Defaults to
 C<private> for services of the system service manager and to C<inherit> for
@@ -2624,16 +3063,20 @@ nano-seconds if no unit is specified. The usual time units are understood too. I
 
 =head2 Personality
 
-Controls which kernel architecture L<uname(2)> shall report,
-when invoked by unit processes. Takes one of the architecture identifiers C<x86>,
-C<x86-64>, C<ppc>, C<ppc-le>, C<ppc64>,
-C<ppc64-le>, C<s390> or C<s390x>. Which personality
-architectures are supported depends on the system architecture. Usually the 64bit versions of the various
-system architectures support their immediate 32bit personality architecture counterpart, but no others. For
-example, C<x86-64> systems support the C<x86-64> and
-C<x86> personalities but no others. The personality feature is useful when running 32-bit
-services on a 64-bit host system. If not specified, the personality is left unmodified and thus reflects the
-personality of the host system's kernel. I< Optional. Type enum. choice: 'x86', 'x86-64', 'ppc', 'ppc-le', 'ppc64', 'ppc64-le', 's390', 's390x'.  > 
+Controls which kernel architecture L<uname(2)> shall
+report, when invoked by unit processes. Takes one of the architecture identifiers
+C<arm64>, C<arm64-be>, C<arm>,
+C<arm-be>, C<x86>, C<x86-64>,
+C<ppc>, C<ppc-le>, C<ppc64>,
+C<ppc64-le>, C<s390> or C<s390x>. Which
+personality architectures are supported depends on the kernel's native architecture. Usually the
+64-bit versions of the various system architectures support their immediate 32-bit personality
+architecture counterpart, but no others. For example, C<x86-64> systems support the
+C<x86-64> and C<x86> personalities but no others. The personality
+feature is useful when running 32-bit services on a 64-bit host system. If not specified, the
+personality is left unmodified and thus reflects the personality of the host system's kernel. This
+option is not useful on architectures for which only one native word width was ever available, such
+as C<m68k> (32-bit only) or C<alpha> (64-bit only). I< Optional. Type enum. choice: 'arm', 'arm-be', 'arm64', 'arm64-be', 'ppc', 'ppc-le', 'ppc64', 'ppc64-le', 's390', 's390x', 'x86', 'x86-64'.  > 
 
 =head2 IgnoreSIGPIPE
 
@@ -2655,7 +3098,7 @@ details. I< Optional. Type integer.  >
 Sets the CPU scheduling policy for executed processes. Takes one of C<other>,
 C<batch>, C<idle>, C<fifo> or C<rr>. See
 L<sched_setscheduler(2)> for
-details. I< Optional. Type enum. choice: 'other', 'batch', 'idle', 'fifo', 'rr'.  > 
+details. I< Optional. Type enum. choice: 'batch', 'fifo', 'idle', 'other', 'rr'.  > 
 
 =head2 CPUSchedulingPriority
 
@@ -2754,7 +3197,7 @@ or need to modify the operating system in other ways. If this option is used,
 C<ReadWritePaths> may be used to exclude specific directories from being made read-only. This
 setting is implied if C<DynamicUser> is set. This setting cannot ensure protection in all
 cases. In general it has the same limitations as C<ReadOnlyPaths>, see below. Defaults to
-off. I< Optional. Type enum. choice: 'no', 'yes', 'full', 'strict'.  > 
+off. I< Optional. Type enum. choice: 'full', 'no', 'strict', 'yes'.  > 
 
 =head2 ProtectHome
 
@@ -2777,7 +3220,7 @@ It is recommended to enable this setting for all long-running services (in parti
 network-facing ones), to ensure they cannot get access to private user data, unless the services
 actually require access to the user's private data. This setting is implied if
 C<DynamicUser> is set. This setting cannot ensure protection in all cases. In
-general it has the same limitations as C<ReadOnlyPaths>, see below. I< Optional. Type enum. choice: 'no', 'yes', 'read-only', 'tmpfs'.  > 
+general it has the same limitations as C<ReadOnlyPaths>, see below. I< Optional. Type enum. choice: 'no', 'read-only', 'tmpfs', 'yes'.  > 
 
 =head2 RuntimeDirectory
 
@@ -2832,7 +3275,48 @@ and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
 The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
 The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
 options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
+using the same first parameter, but a different second parameter.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var/>, C</run/>, C</etc/>, …). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+… command on the relevant units, see
+L<systemctl(1)> for
+details.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
+owned by the user and group specified in C<User> and C<Group>, and removed
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo:bar foo:baz
+
+the service manager creates C</run/foo> (if it does not exist), and
+C</run/bar> plus C</run/baz> as symlinks to
+C</run/foo>. I< Optional. Type uniline.  > 
 
 =head2 StateDirectory
 
@@ -2887,7 +3371,48 @@ and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
 The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
 The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
 options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
+using the same first parameter, but a different second parameter.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var/>, C</run/>, C</etc/>, …). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+… command on the relevant units, see
+L<systemctl(1)> for
+details.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
+owned by the user and group specified in C<User> and C<Group>, and removed
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo:bar foo:baz
+
+the service manager creates C</run/foo> (if it does not exist), and
+C</run/bar> plus C</run/baz> as symlinks to
+C</run/foo>. I< Optional. Type uniline.  > 
 
 =head2 CacheDirectory
 
@@ -2942,7 +3467,48 @@ and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
 The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
 The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
 options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
+using the same first parameter, but a different second parameter.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var/>, C</run/>, C</etc/>, …). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+… command on the relevant units, see
+L<systemctl(1)> for
+details.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
+owned by the user and group specified in C<User> and C<Group>, and removed
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo:bar foo:baz
+
+the service manager creates C</run/foo> (if it does not exist), and
+C</run/bar> plus C</run/baz> as symlinks to
+C</run/foo>. I< Optional. Type uniline.  > 
 
 =head2 LogsDirectory
 
@@ -2997,7 +3563,48 @@ and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
 The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
 The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
 options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
+using the same first parameter, but a different second parameter.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var/>, C</run/>, C</etc/>, …). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+… command on the relevant units, see
+L<systemctl(1)> for
+details.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
+owned by the user and group specified in C<User> and C<Group>, and removed
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo:bar foo:baz
+
+the service manager creates C</run/foo> (if it does not exist), and
+C</run/bar> plus C</run/baz> as symlinks to
+C</run/foo>. I< Optional. Type uniline.  > 
 
 =head2 ConfigurationDirectory
 
@@ -3052,7 +3659,48 @@ and C<LogsDirectory>  optionally support a second parameter, separated by C<:>.
 The second parameter will be interpreted as a destination path that will be created as a symlink to the directory.
 The symlinks will be created after any C<BindPaths> or C<TemporaryFileSystem>
 options have been set up, to make ephemeral symlinking possible. The same source can have multiple symlinks, by
-using the same first parameter, but a different second parameter. I< Optional. Type uniline.  > 
+using the same first parameter, but a different second parameter.
+
+The directories defined by these options are always created under the standard paths used by systemd
+(C</var/>, C</run/>, C</etc/>, …). If the service needs
+directories in a different location, a different mechanism has to be used to create them.
+
+L<tmpfiles.d(5)> provides
+functionality that overlaps with these options. Using these options is recommended, because the lifetime of
+the directories is tied directly to the lifetime of the unit, and it is not necessary to ensure that the
+C<tmpfiles.d> configuration is executed before the unit is started.
+
+To remove any of the directories created by these settings, use the systemctl clean
+… command on the relevant units, see
+L<systemctl(1)> for
+details.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar baz
+
+the service manager creates C</run/foo> (if it does not exist),
+C</run/foo/bar>, and C</run/baz>. The
+directories C</run/foo/bar> and
+C</run/baz> except C</run/foo> are
+owned by the user and group specified in C<User> and C<Group>, and removed
+when the service is stopped.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo/bar
+    StateDirectory=aaa/bbb ccc
+
+then the environment variable C<RUNTIME_DIRECTORY> is set with C</run/foo/bar>, and
+C<STATE_DIRECTORY> is set with C</var/lib/aaa/bbb:/var/lib/ccc>.
+
+Example: if a system service unit has the following,
+
+    RuntimeDirectory=foo:bar foo:baz
+
+the service manager creates C</run/foo> (if it does not exist), and
+C</run/bar> plus C</run/baz> as symlinks to
+C</run/foo>. I< Optional. Type uniline.  > 
 
 =head2 RuntimeDirectoryMode
 
@@ -3104,7 +3752,7 @@ C<Restart>, and manual restart means the one triggered by systemctl restart
 foo.service. If set to C<yes>, then the directories are not removed when the service is
 stopped. Note that since the runtime directory C</run/> is a mount point of
 C<tmpfs>, then for system services the directories specified in
-C<RuntimeDirectory> are removed when the system is rebooted. I< Optional. Type enum. choice: 'no', 'yes', 'restart'.  > 
+C<RuntimeDirectory> are removed when the system is rebooted. I< Optional. Type enum. choice: 'no', 'restart', 'yes'.  > 
 
 =head2 TimeoutCleanSec
 
@@ -3547,6 +4195,10 @@ Note that the implementation of this setting might be impossible (for example if
 not available), and the unit should be written in a way that does not solely rely on this setting for
 security.
 
+When this option is enabled, C<PrivateMounts> is implied unless it is
+explicitly disabled, and C</sys> will be remounted to associate it with the new
+network namespace.
+
 When this option is used on a socket unit any sockets bound on behalf of this unit will be
 bound within a private network namespace. This may be combined with
 C<JoinsNamespaceOf> to listen on sockets inside of network namespaces of other
@@ -3554,7 +4206,7 @@ services. I< Optional. Type boolean.  >
 
 =head2 NetworkNamespacePath
 
-Takes an absolute file system path refererring to a Linux network namespace
+Takes an absolute file system path referring to a Linux network namespace
 pseudo-file (i.e. a file like C</proc/$PID/ns/net> or a bind mount or symlink to
 one). When set the invoked processes are added to the network namespace referenced by that path. The
 path has to point to a valid namespace file at the moment the processes are forked off. If this
@@ -3563,6 +4215,10 @@ C<JoinsNamespaceOf> then it only has an effect if this unit is started before an
 the listed units that have C<PrivateNetwork> or
 C<NetworkNamespacePath> configured, as otherwise the network namespace of those
 units is reused.
+
+When this option is enabled, C<PrivateMounts> is implied unless it is
+explicitly disabled, and C</sys> will be remounted to associate it with the new
+network namespace.
 
 When this option is used on a socket unit any sockets bound on behalf of this unit will be
 bound within the specified network namespace. I< Optional. Type uniline.  > 
@@ -3596,7 +4252,7 @@ security. I< Optional. Type boolean.  >
 
 =head2 IPCNamespacePath
 
-Takes an absolute file system path refererring to a Linux IPC namespace
+Takes an absolute file system path referring to a Linux IPC namespace
 pseudo-file (i.e. a file like C</proc/$PID/ns/ipc> or a bind mount or symlink to
 one). When set the invoked processes are added to the network namespace referenced by that path. The
 path has to point to a valid namespace file at the moment the processes are forked off. If this
@@ -3605,6 +4261,19 @@ C<JoinsNamespaceOf> then it only has an effect if this unit is started before an
 the listed units that have C<PrivateIPC> or
 C<IPCNamespacePath> configured, as otherwise the network namespace of those
 units is reused. I< Optional. Type uniline.  > 
+
+=head2 MemoryKSM
+
+Takes a boolean argument. When set, it enables KSM (kernel samepage merging) for
+the processes. KSM is a memory-saving de-duplication feature. Anonymous memory pages with identical
+content can be replaced by a single write-protected page. This feature should only be enabled for
+jobs that share the same security domain. For details, see
+L<Kernel Samepage Merging|https://docs.kernel.org/admin-guide/mm/ksm.html> in the
+kernel documentation.
+
+Note that this functionality might not be available, for example if KSM is disabled in the
+kernel, or the kernel doesn't support controlling KSM at the process level through
+prctl(). I< Optional. Type boolean.  > 
 
 =head2 PrivateUsers
 
@@ -3656,16 +4325,21 @@ C<NoNewPrivileges=yes> is implied. I< Optional. Type boolean.  >
 
 =head2 ProtectClock
 
-Takes a boolean argument. If set, writes to the hardware clock or system clock will be denied.
-It is recommended to turn this on for most services that do not need modify the clock. Defaults to off. Enabling
-this option removes C<CAP_SYS_TIME> and C<CAP_WAKE_ALARM> from the
-capability bounding set for this unit, installs a system call filter to block calls that can set the
-clock, and C<DeviceAllow=char-rtc r> is implied. This ensures C</dev/rtc0>,
-C</dev/rtc1>, etc. are made read-only to the service. See
+Takes a boolean argument. If set, writes to the hardware clock or system clock will
+be denied. Defaults to off. Enabling this option removes C<CAP_SYS_TIME> and
+C<CAP_WAKE_ALARM> from the capability bounding set for this unit, installs a system
+call filter to block calls that can set the clock, and C<DeviceAllow=char-rtc r> is
+implied. Note that the system calls are blocked altogether, the filter does not take into account
+that some of the calls can be used to read the clock state with some parameter combinations.
+Effectively, C</dev/rtc0>, C</dev/rtc1>, etc. are made read-only
+to the service. See
 L<systemd.resource-control(5)>
-for the details about C<DeviceAllow>. If this setting is on, but the unit
-doesn't have the C<CAP_SYS_ADMIN> capability (e.g. services for which
-C<User> is set), C<NoNewPrivileges=yes> is implied. I< Optional. Type boolean.  > 
+for the details about C<DeviceAllow>. If this setting is on, but the unit doesn't
+have the C<CAP_SYS_ADMIN> capability (e.g. services for which
+C<User> is set), C<NoNewPrivileges=yes> is implied.
+
+It is recommended to turn this on for most services that do not need modify the clock or check
+its state. I< Optional. Type boolean.  > 
 
 =head2 ProtectKernelTunables
 
@@ -3862,9 +4536,11 @@ C<NoNewPrivileges=yes> is implied. I< Optional. Type boolean.  >
 
 Takes a boolean argument. If set, attempts to create memory mappings that are writable and
 executable at the same time, or to change existing memory mappings to become executable, or mapping shared
-memory segments as executable, are prohibited. Specifically, a system call filter is added that rejects
-L<mmap(2)> system calls with both
-C<PROT_EXEC> and C<PROT_WRITE> set,
+memory segments as executable, are prohibited. Specifically, a system call filter is added (or
+preferably, an equivalent kernel check is enabled with
+L<prctl(2)>) that
+rejects L<mmap(2)>
+system calls with both C<PROT_EXEC> and C<PROT_WRITE> set,
 L<mprotect(2)> or
 L<pkey_mprotect(2)> system calls
 with C<PROT_EXEC> set and
@@ -4041,21 +4717,23 @@ other IPC (L<mq_overview(7)>, L<svipc(7)>)@keyringKernel keyring access (L<keyct
 of memory in RAM (L<mlock(2)>, L<mlockall(2)> and related calls)@moduleLoading and unloading of kernel modules
 (L<init_module(2)>, L<delete_module(2)> and related calls)@mountMounting and unmounting of file systems (L<mount(2)>,
 L<chroot(2)>, and related calls)@network-ioSocket I/O (including local AF_UNIX): L<socket(7)>,
-L<unix(7)>@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, …)@privilegedAll system calls
-which need super-user capabilities (L<capabilities(7)>)@processProcess control, execution, namespacing operations
-(L<clone(2)>, L<kill(2)>, L<namespaces(7)>, …)@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(),
-…)@rebootSystem calls for rebooting and reboot preparation (L<reboot(2)>, kexec(), …)@resourcesSystem calls for
-changing resource limits, memory and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, …)@setuidSystem calls
-for changing user ID and group ID credentials, (L<setuid(2)>, L<setgid(2)>, L<setresuid(2)>, …)@signalSystem calls for
-manipulating and handling process signals (L<signal(2)>, L<sigprocmask(2)>, …)@swapSystem calls for enabling/disabling
-swap devices (L<swapon(2)>, L<swapoff(2)>)@syncSynchronizing files and memory to disk (L<fsync(2)>, L<msync(2)>, and
-related calls)@system-serviceA reasonable set of system calls used by common system services, excluding any special
-purpose calls. This is the recommended starting point for allow-listing system calls for system services, as it
-contains what is typically needed by system services, but excludes overly specific interfaces. For example, the
-following APIs are excluded: C<@clock>, C<@mount>, C<@swap>, C<@reboot>.@timerSystem calls for scheduling operations by
-time (L<alarm(2)>, L<timer_create(2)>, …)@knownAll system calls defined by the kernel. This list is defined statically
-in systemd based on a kernel version that was available when this systemd version was released. It will become
-progressively more out-of-date as the kernel is updated.
+L<unix(7)>@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, …)@pkeySystem calls that deal
+with memory protection keys (L<pkeys(7)>)@privilegedAll system calls which need super-user capabilities
+(L<capabilities(7)>)@processProcess control, execution, namespacing operations (L<clone(2)>, L<kill(2)>,
+L<namespaces(7)>, …)@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(), …)@rebootSystem calls for
+rebooting and reboot preparation (L<reboot(2)>, kexec(), …)@resourcesSystem calls for changing resource limits, memory
+and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, …)@sandboxSystem calls for sandboxing programs
+(L<seccomp(2)>, Landlock system calls, …)@setuidSystem calls for changing user ID and group ID credentials,
+(L<setuid(2)>, L<setgid(2)>, L<setresuid(2)>, …)@signalSystem calls for manipulating and handling process signals
+(L<signal(2)>, L<sigprocmask(2)>, …)@swapSystem calls for enabling/disabling swap devices (L<swapon(2)>,
+L<swapoff(2)>)@syncSynchronizing files and memory to disk (L<fsync(2)>, L<msync(2)>, and related calls)@system-serviceA
+reasonable set of system calls used by common system services, excluding any special purpose calls. This is the
+recommended starting point for allow-listing system calls for system services, as it contains what is typically needed
+by system services, but excludes overly specific interfaces. For example, the following APIs are excluded: C<@clock>,
+C<@mount>, C<@swap>, C<@reboot>.@timerSystem calls for scheduling operations by time (L<alarm(2)>, L<timer_create(2)>,
+…)@knownAll system calls defined by the kernel. This list is defined statically in systemd based on a kernel version
+that was available when this systemd version was released. It will become progressively more out-of-date as the kernel
+is updated.
 Note, that as new system calls are added to the kernel, additional system calls might be added to the groups
 above. Contents of the sets may also change between systemd versions. In addition, the list of system calls
 depends on the kernel version and architecture for which systemd was compiled. Use
@@ -4066,6 +4744,10 @@ Generally, allow-listing system calls (rather than deny-listing) is the safer mo
 operation. It is recommended to enforce system call allow lists for all long-running system
 services. Specifically, the following lines are a relatively safe basic choice for the majority of
 system services:
+
+    [Service]
+    SystemCallFilter=@system-service
+    SystemCallErrorNumber=EPERM
 
 Note that various kernel system calls are defined redundantly: there are multiple system calls
 for executing the same operation. For example, the pidfd_send_signal() system
@@ -4338,7 +5020,7 @@ details about named file descriptors and their ordering.
 
 This setting defaults to C<null>, unless
 C<StandardInputText>/C<StandardInputData> are set, in which case it
-defaults to C<data>. I< Optional. Type enum. choice: 'null', 'tty', 'tty-force', 'tty-fail', 'data', 'socket'.  > 
+defaults to C<data>. I< Optional. Type enum. choice: 'data', 'null', 'socket', 'tty', 'tty-fail', 'tty-force'.  > 
 
 =head2 StandardOutput
 
@@ -4432,7 +5114,7 @@ setting defaults to C<inherit>.
 In other cases, this setting defaults to the value set with C<DefaultStandardOutput> in
 L<systemd-system.conf(5)>, which
 defaults to C<journal>. Note that setting this parameter might result in additional dependencies
-to be added to the unit (see above). I< Optional. Type enum. choice: 'inherit', 'null', 'tty', 'journal', 'kmsg', 'journal+console', 'kmsg+console', 'socket'.  > 
+to be added to the unit (see above). I< Optional. Type enum. choice: 'inherit', 'journal', 'journal+console', 'kmsg', 'kmsg+console', 'null', 'socket', 'tty'.  > 
 
 =head2 StandardError
 
@@ -4474,7 +5156,19 @@ file. Assigning an empty string to either will reset the data buffer.
 Please keep in mind that in order to maintain readability long unit file settings may be split into
 multiple lines, by suffixing each line (except for the last) with a C<\> character (see
 L<systemd.unit(5)> for
-details). This is particularly useful for large data configured with these two options. Example: I< Optional. Type uniline.  > 
+details). This is particularly useful for large data configured with these two options. Example:
+
+    …
+    StandardInput=data
+    StandardInputData=V2XigLJyZSBubyBzdHJhbmdlcnMgdG8gbG92ZQpZb3Uga25vdyB0aGUgcnVsZXMgYW5kIHNvIGRv \
+    IEkKQSBmdWxsIGNvbW1pdG1lbnQncyB3aGF0IEnigLJtIHRoaW5raW5nIG9mCllvdSB3b3VsZG4n \
+    dCBnZXQgdGhpcyBmcm9tIGFueSBvdGhlciBndXkKSSBqdXN0IHdhbm5hIHRlbGwgeW91IGhvdyBJ \
+    J20gZmVlbGluZwpHb3R0YSBtYWtlIHlvdSB1bmRlcnN0YW5kCgpOZXZlciBnb25uYSBnaXZlIHlv \
+    dSB1cApOZXZlciBnb25uYSBsZXQgeW91IGRvd24KTmV2ZXIgZ29ubmEgcnVuIGFyb3VuZCBhbmQg \
+    ZGVzZXJ0IHlvdQpOZXZlciBnb25uYSBtYWtlIHlvdSBjcnkKTmV2ZXIgZ29ubmEgc2F5IGdvb2Ri \
+    eWUKTmV2ZXIgZ29ubmEgdGVsbCBhIGxpZSBhbmQgaHVydCB5b3UK
+    …
+I< Optional. Type uniline.  > 
 
 =head2 StandardInputData
 
@@ -4503,7 +5197,19 @@ file. Assigning an empty string to either will reset the data buffer.
 Please keep in mind that in order to maintain readability long unit file settings may be split into
 multiple lines, by suffixing each line (except for the last) with a C<\> character (see
 L<systemd.unit(5)> for
-details). This is particularly useful for large data configured with these two options. Example: I< Optional. Type uniline.  > 
+details). This is particularly useful for large data configured with these two options. Example:
+
+    …
+    StandardInput=data
+    StandardInputData=V2XigLJyZSBubyBzdHJhbmdlcnMgdG8gbG92ZQpZb3Uga25vdyB0aGUgcnVsZXMgYW5kIHNvIGRv \
+    IEkKQSBmdWxsIGNvbW1pdG1lbnQncyB3aGF0IEnigLJtIHRoaW5raW5nIG9mCllvdSB3b3VsZG4n \
+    dCBnZXQgdGhpcyBmcm9tIGFueSBvdGhlciBndXkKSSBqdXN0IHdhbm5hIHRlbGwgeW91IGhvdyBJ \
+    J20gZmVlbGluZwpHb3R0YSBtYWtlIHlvdSB1bmRlcnN0YW5kCgpOZXZlciBnb25uYSBnaXZlIHlv \
+    dSB1cApOZXZlciBnb25uYSBsZXQgeW91IGRvd24KTmV2ZXIgZ29ubmEgcnVuIGFyb3VuZCBhbmQg \
+    ZGVzZXJ0IHlvdQpOZXZlciBnb25uYSBtYWtlIHlvdSBjcnkKTmV2ZXIgZ29ubmEgc2F5IGdvb2Ri \
+    eWUKTmV2ZXIgZ29ubmEgdGVsbCBhIGxpZSBhbmQgaHVydCB5b3UK
+    …
+I< Optional. Type uniline.  > 
 
 =head2 LogLevelMax
 
@@ -4528,8 +5234,8 @@ C<LogLevelMax> permitted it to be processed. I< Optional. Type uniline.  >
 =head2 LogExtraFields
 
 Configures additional log metadata fields to include in all log records generated by
-processes associated with this unit. This setting takes one or more journal field assignments in the
-format C<FIELD=VALUE> separated by whitespace. See
+processes associated with this unit, including systemd. This setting takes one or more journal field
+assignments in the format C<FIELD=VALUE> separated by whitespace. See
 L<systemd.journal-fields(7)>
 for details on the journal field concept. Even though the underlying journal implementation permits
 binary field values, this setting accepts only valid UTF-8 values. To include space characters in a
@@ -4541,29 +5247,69 @@ string to reset the list. I< Optional. Type uniline.  >
 
 =head2 LogRateLimitIntervalSec
 
-Configures the rate limiting that is applied to messages generated by this unit. If, in the
-time interval defined by C<LogRateLimitIntervalSec>, more messages than specified in
-C<LogRateLimitBurst> are logged by a service, all further messages within the interval are
-dropped until the interval is over. A message about the number of dropped messages is generated. The time
-specification for C<LogRateLimitIntervalSec> may be specified in the following units: "s",
-"min", "h", "ms", "us" (see
-L<systemd.time(7)> for details).
-The default settings are set by C<RateLimitIntervalSec> and C<RateLimitBurst>
-configured in L<journald.conf(5)>.
-I< Optional. Type uniline.  > 
+Configures the rate limiting that is applied to log messages generated by this unit.
+If, in the time interval defined by C<LogRateLimitIntervalSec>, more messages than
+specified in C<LogRateLimitBurst> are logged by a service, all further messages
+within the interval are dropped until the interval is over. A message about the number of dropped
+messages is generated. The time specification for C<LogRateLimitIntervalSec> may be
+specified in the following units: "s", "min", "h", "ms", "us". See
+L<systemd.time(7)> for
+details. The default settings are set by C<RateLimitIntervalSec> and
+C<RateLimitBurst> configured in
+L<journald.conf(5)>.
+Note that this only applies to log messages that are processed by the logging subsystem, i.e. by
+L<systemd-journald.service(8)>
+This means that if you connect a service's stderr directly to a file via
+C<StandardOutput=file:…> or a similar setting, the rate limiting will not be applied
+to messages written that way (but it will be enforced for messages generated via
+L<syslog(3)>
+and similar functions). I< Optional. Type uniline.  > 
 
 =head2 LogRateLimitBurst
 
-Configures the rate limiting that is applied to messages generated by this unit. If, in the
-time interval defined by C<LogRateLimitIntervalSec>, more messages than specified in
-C<LogRateLimitBurst> are logged by a service, all further messages within the interval are
-dropped until the interval is over. A message about the number of dropped messages is generated. The time
-specification for C<LogRateLimitIntervalSec> may be specified in the following units: "s",
-"min", "h", "ms", "us" (see
-L<systemd.time(7)> for details).
-The default settings are set by C<RateLimitIntervalSec> and C<RateLimitBurst>
-configured in L<journald.conf(5)>.
-I< Optional. Type uniline.  > 
+Configures the rate limiting that is applied to log messages generated by this unit.
+If, in the time interval defined by C<LogRateLimitIntervalSec>, more messages than
+specified in C<LogRateLimitBurst> are logged by a service, all further messages
+within the interval are dropped until the interval is over. A message about the number of dropped
+messages is generated. The time specification for C<LogRateLimitIntervalSec> may be
+specified in the following units: "s", "min", "h", "ms", "us". See
+L<systemd.time(7)> for
+details. The default settings are set by C<RateLimitIntervalSec> and
+C<RateLimitBurst> configured in
+L<journald.conf(5)>.
+Note that this only applies to log messages that are processed by the logging subsystem, i.e. by
+L<systemd-journald.service(8)>
+This means that if you connect a service's stderr directly to a file via
+C<StandardOutput=file:…> or a similar setting, the rate limiting will not be applied
+to messages written that way (but it will be enforced for messages generated via
+L<syslog(3)>
+and similar functions). I< Optional. Type uniline.  > 
+
+=head2 LogFilterPatterns
+
+Define an extended regular expression to filter log messages based on the
+C<MESSAGE> field of the structured message. If the first character of the pattern is
+C<~>, log entries matching the pattern should be discarded. This option takes a single
+pattern as an argument but can be used multiple times to create a list of allowed and denied patterns.
+If the empty string is assigned, the filter is reset, and all prior assignments will have no effect.
+
+Because the C<~> character is used to define denied patterns, it must be replaced
+with C<\x7e> to allow a message starting with C<~>. For example,
+C<~foobar> would add a pattern matching C<foobar> to the deny list, while
+C<\x7efoobar> would add a pattern matching C<~foobar> to the allow list.
+
+Log messages are tested against denied patterns (if any), then against allowed patterns
+(if any). If a log message matches any of the denied patterns, it will be discarded, whatever the
+allowed patterns. Then, remaining log messages are tested against allowed patterns. Messages matching
+against none of the allowed pattern are discarded. If no allowed patterns are defined, then all
+messages are processed directly after going through denied filters.
+
+Filtering is based on the unit for which C<LogFilterPatterns> is defined, meaning log
+messages coming from
+L<systemd(1)> about the
+unit are not taken into account. Filtered log messages won't be forwarded to traditional syslog daemons,
+the kernel log buffer (kmsg), the systemd console, or sent as wall messages to all logged-in
+users. I< Optional. Type uniline.  > 
 
 =head2 LogNamespace
 
@@ -4730,7 +5476,13 @@ C</var/lib/systemd/credentials.secret>, or with both. Using encrypted and
 authenticated credentials improves security as credentials are not stored in plaintext and only
 authenticated and decrypted into plaintext the moment a service requiring them is started. Moreover,
 credentials may be bound to the local hardware and installations, so that they cannot easily be
-analyzed offline, or be generated externally.
+analyzed offline, or be generated externally. When C<DevicePolicy> is set to
+C<closed> or C<strict>, or set to C<auto> and
+C<DeviceAllow> is set, or C<PrivateDevices> is set, then this
+setting adds C</dev/tpmrm0> with C<rw> mode to
+C<DeviceAllow>. See
+L<systemd.resource-control(5)>
+for the details about C<DevicePolicy> or C<DeviceAllow>.
 
 The credential files/IPC sockets must be accessible to the service manager, but don't have to
 be directly accessible to the unit's processes: the credential data is read and copied into separate,
@@ -4755,16 +5507,21 @@ about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standar
 11) with a prefix of C<io.systemd.credential:> or
 C<io.systemd.credential.binary:>. In both cases a key/value pair separated by
 C<=> is expected, in the latter case the right-hand side is Base64 decoded when
-parsed (thus permitting binary data to be passed in). Example qemu switch: C<-smbios
+parsed (thus permitting binary data to be passed in). Example
+L<qemu|https://www.qemu.org/docs/master/system/index.html> switch: C<-smbios
 type=11,value=io.systemd.credential:xx=yy>, or C<-smbios
 type=11,value=io.systemd.credential.binary:rick=TmV2ZXIgR29ubmEgR2l2ZSBZb3UgVXA=>. Alternatively,
 use the qemu C<fw_cfg> node
-C<opt/io.systemd.credentials/>. Example qemu switch: C<-fw_cfg
-name=opt/io.systemd.credentials/mycred,string=supersecret>. They may also be specified on
-the kernel command line using the C<systemd.set_credential=> switch (see
-L<systemd(1)>) and from
-the UEFI firmware environment via
-L<systemd-stub(7)>.
+C<opt/io.systemd.credentials/>. Example qemu switch:
+C<-fw_cfg name=opt/io.systemd.credentials/mycred,string=supersecret>. They may also
+be passed from the UEFI firmware environment via
+L<systemd-stub(7)>,
+from the initrd (see
+L<systemd(1)>), or be
+specified on the kernel command line using the C<systemd.set_credential=> and
+C<systemd.set_credential_binary=> switches (see
+L<systemd(1)> – this is
+not recommended since unprivileged userspace can read the kernel command line).
 
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
 originate from an abstract namespace socket, that includes information about the unit and the
@@ -4838,7 +5595,13 @@ C</var/lib/systemd/credentials.secret>, or with both. Using encrypted and
 authenticated credentials improves security as credentials are not stored in plaintext and only
 authenticated and decrypted into plaintext the moment a service requiring them is started. Moreover,
 credentials may be bound to the local hardware and installations, so that they cannot easily be
-analyzed offline, or be generated externally.
+analyzed offline, or be generated externally. When C<DevicePolicy> is set to
+C<closed> or C<strict>, or set to C<auto> and
+C<DeviceAllow> is set, or C<PrivateDevices> is set, then this
+setting adds C</dev/tpmrm0> with C<rw> mode to
+C<DeviceAllow>. See
+L<systemd.resource-control(5)>
+for the details about C<DevicePolicy> or C<DeviceAllow>.
 
 The credential files/IPC sockets must be accessible to the service manager, but don't have to
 be directly accessible to the unit's processes: the credential data is read and copied into separate,
@@ -4863,16 +5626,21 @@ about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standar
 11) with a prefix of C<io.systemd.credential:> or
 C<io.systemd.credential.binary:>. In both cases a key/value pair separated by
 C<=> is expected, in the latter case the right-hand side is Base64 decoded when
-parsed (thus permitting binary data to be passed in). Example qemu switch: C<-smbios
+parsed (thus permitting binary data to be passed in). Example
+L<qemu|https://www.qemu.org/docs/master/system/index.html> switch: C<-smbios
 type=11,value=io.systemd.credential:xx=yy>, or C<-smbios
 type=11,value=io.systemd.credential.binary:rick=TmV2ZXIgR29ubmEgR2l2ZSBZb3UgVXA=>. Alternatively,
 use the qemu C<fw_cfg> node
-C<opt/io.systemd.credentials/>. Example qemu switch: C<-fw_cfg
-name=opt/io.systemd.credentials/mycred,string=supersecret>. They may also be specified on
-the kernel command line using the C<systemd.set_credential=> switch (see
-L<systemd(1)>) and from
-the UEFI firmware environment via
-L<systemd-stub(7)>.
+C<opt/io.systemd.credentials/>. Example qemu switch:
+C<-fw_cfg name=opt/io.systemd.credentials/mycred,string=supersecret>. They may also
+be passed from the UEFI firmware environment via
+L<systemd-stub(7)>,
+from the initrd (see
+L<systemd(1)>), or be
+specified on the kernel command line using the C<systemd.set_credential=> and
+C<systemd.set_credential_binary=> switches (see
+L<systemd(1)> – this is
+not recommended since unprivileged userspace can read the kernel command line).
 
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
 originate from an abstract namespace socket, that includes information about the unit and the
@@ -4889,6 +5657,28 @@ consumers.
 
 For further information see L<System and Service
 Credentials|https://systemd.io/CREDENTIALS> documentation. I< Optional. Type uniline.  > 
+
+=head2 ImportCredential
+
+Pass one or more credentials to the unit. Takes a credential name for which we'll
+attempt to find a credential that the service manager itself received under the specified name —
+which may be used to propagate credentials from an invoking environment (e.g. a container manager
+that invoked the service manager) into a service. If the credential name is a glob, all credentials
+matching the glob are passed to the unit. Matching credentials are searched for in the system
+credentials, the encrypted system credentials, and under C</etc/credstore/>,
+C</run/credstore/>, C</usr/lib/credstore/>,
+C</run/credstore.encrypted/>, C</etc/credstore.encrypted/>, and
+C</usr/lib/credstore.encrypted/> in that order. When multiple credentials of the
+same name are found, the first one found is used.
+
+The globbing expression implements a restrictive subset of L<glob(7)>: only
+a single trailing C<*> wildcard may be specified. Both C<?> and
+C<[]> wildcards are not permitted, nor are C<*> wildcards anywhere
+except at the end of the glob expression.
+
+When multiple credentials of the same name are found, credentials found by
+C<LoadCredential> and C<LoadCredentialEncrypted> take priority over
+credentials found by C<ImportCredential>. I< Optional. Type uniline.  > 
 
 =head2 SetCredential
 
@@ -4909,10 +5699,13 @@ C<-p> switch to generate suitable C<SetCredentialEncrypted> lines
 directly from plaintext credentials. For further details see
 C<LoadCredentialEncrypted> above.
 
-If a credential of the same ID is listed in both C<LoadCredential> and
-C<SetCredential>, the latter will act as default if the former cannot be
-retrieved. In this case not being able to retrieve the credential from the path specified in
-C<LoadCredential> is not considered fatal. I< Optional. Type uniline.  > 
+When multiple credentials of the same name are found, credentials found by
+C<LoadCredential>, C<LoadCredentialEncrypted> and
+C<ImportCredential> take priority over credentials found by
+C<SetCredential>. As such, C<SetCredential> will act as default if
+no credentials are found by any of the former. In this case not being able to retrieve the credential
+from the path specified in C<LoadCredential> or
+C<LoadCredentialEncrypted> is not considered fatal. I< Optional. Type uniline.  > 
 
 =head2 SetCredentialEncrypted
 
@@ -4933,10 +5726,13 @@ C<-p> switch to generate suitable C<SetCredentialEncrypted> lines
 directly from plaintext credentials. For further details see
 C<LoadCredentialEncrypted> above.
 
-If a credential of the same ID is listed in both C<LoadCredential> and
-C<SetCredential>, the latter will act as default if the former cannot be
-retrieved. In this case not being able to retrieve the credential from the path specified in
-C<LoadCredential> is not considered fatal. I< Optional. Type uniline.  > 
+When multiple credentials of the same name are found, credentials found by
+C<LoadCredential>, C<LoadCredentialEncrypted> and
+C<ImportCredential> take priority over credentials found by
+C<SetCredential>. As such, C<SetCredential> will act as default if
+no credentials are found by any of the former. In this case not being able to retrieve the credential
+from the path specified in C<LoadCredential> or
+C<LoadCredentialEncrypted> is not considered fatal. I< Optional. Type uniline.  > 
 
 =head2 UtmpIdentifier
 
@@ -5065,29 +5861,38 @@ I< Optional. Type uniline.  >
 
 =head2 Type
 
-Configures the process start-up type for this service unit. One of C<simple>,
-C<exec>, C<forking>, C<oneshot>, C<dbus>,
-C<notify> or C<idle>:
+Configures the mechanism via which the service notifies the manager that the service start-up
+has finished. One of C<simple>, C<exec>, C<forking>,
+C<oneshot>, C<dbus>, C<notify>,
+C<notify-reload>, or C<idle>:
 
-It is generally recommended to use C<Type>C<simple> for long-running
-services whenever possible, as it is the simplest and fastest option. However, as this service type won't
-propagate service start-up failures and doesn't allow ordering of other units against completion of
-initialization of the service (which for example is useful if clients need to connect to the service through
-some form of IPC, and the IPC channel is only established by the service itself — in contrast to doing this
-ahead of time through socket or bus activation or similar), it might not be sufficient for many cases. If so,
-C<notify> or C<dbus> (the latter only in case the service provides a D-Bus
-interface) are the preferred options as they allow service program code to precisely schedule when to
-consider the service started up successfully and when to proceed with follow-up units. The
-C<notify> service type requires explicit support in the service codebase (as
-sd_notify() or an equivalent API needs to be invoked by the service at the appropriate
-time) — if it's not supported, then C<forking> is an alternative: it supports the traditional
-UNIX service start-up protocol. Finally, C<exec> might be an option for cases where it is
-enough to ensure the service binary is invoked, and where the service binary itself executes no or little
-initialization on its own (and its initialization is unlikely to fail). Note that using any type other than
-C<simple> possibly delays the boot process, as the service manager needs to wait for service
-initialization to complete. It is hence recommended not to needlessly use any types other than
-C<simple>. (Also note it is generally not recommended to use C<idle> or
-C<oneshot> for long-running services.) I< Optional. Type uniline.  > 
+It is recommended to use C<Type>C<exec> for long-running
+services, as it ensures that process setup errors (e.g. errors such as a missing service
+executable, or missing user) are properly tracked. However, as this service type won't propagate
+the failures in the service's own startup code (as opposed to failures in the preparatory steps the
+service manager executes before execve()) and doesn't allow ordering of other
+units against completion of initialization of the service code itself (which for example is useful
+if clients need to connect to the service through some form of IPC, and the IPC channel is only
+established by the service itself — in contrast to doing this ahead of time through socket or bus
+activation or similar), it might not be sufficient for many cases. If so, C<notify>,
+C<notify-reload>, or C<dbus> (the latter only in case the service
+provides a D-Bus interface) are the preferred options as they allow service program code to
+precisely schedule when to consider the service started up successfully and when to proceed with
+follow-up units. The C<notify>/C<notify-reload> service types require
+explicit support in the service codebase (as sd_notify() or an equivalent API
+needs to be invoked by the service at the appropriate time) — if it's not supported, then
+C<forking> is an alternative: it supports the traditional heavy-weight UNIX service
+start-up protocol. Note that using any type other than C<simple> possibly delays the
+boot process, as the service manager needs to wait for at least some service initialization to
+complete. (Also note it is generally not recommended to use C<idle> or
+C<oneshot> for long-running services.)
+
+Note that various service settings (e.g. C<User>, C<Group>
+through libc NSS) might result in "hidden" blocking IPC calls to other services when
+used. Sometimes it might be advisable to use the C<simple> service type to ensure
+that the service manager's transaction logic is not affected by such potentially slow operations
+and hidden dependencies, as this is the only service type where the service manager will not wait
+for such service execution setup operations to complete before proceeding. I< Optional. Type uniline.  > 
 
 =head2 ExitType
 
@@ -5132,9 +5937,10 @@ by a privileged user, but if it is owned by an unprivileged user additional safe
 the file may not be a symlink to a file owned by a different user (neither directly nor indirectly), and the
 PID file must refer to a process already belonging to the service.
 
-Note that PID files should be avoided in modern projects. Use C<Type=notify> or
-C<Type=simple> where possible, which does not require use of PID files to determine the
-main process of a service and avoids needless forking. I< Optional. Type uniline.  > 
+Note that PID files should be avoided in modern projects. Use C<Type=notify>,
+C<Type=notify-reload> or C<Type=simple> where possible, which does not
+require use of PID files to determine the main process of a service and avoids needless
+forking. I< Optional. Type uniline.  > 
 
 =head2 BusName
 
@@ -5146,10 +5952,8 @@ this. I< Optional. Type uniline.  >
 
 =head2 ExecStart
 
-Commands with their arguments that are
-executed when this service is started. The value is split into
-zero or more command lines according to the rules described
-below (see section "Command Lines" below).
+Commands that are executed when this service is started. The value is split into zero
+or more command lines according to the rules described in the section "Command Lines" below.
 
 Unless C<Type> is C<oneshot>, exactly one command must be given. When
 C<Type=oneshot> is used, zero or more commands may be specified. Commands may be specified by
@@ -5159,17 +5963,6 @@ is reset, prior assignments of this option will have no effect. If no C<ExecStar
 specified, then the service must have C<RemainAfterExit=yes> and at least one
 C<ExecStop> line set. (Services lacking both C<ExecStart> and
 C<ExecStop> are not valid.)
-
-For each of the specified commands, the first argument must be either an absolute path to an executable
-or a simple file name without any slashes. Optionally, this filename may be prefixed with a number of special
-characters:
-
-C<@>, C<->, C<:>, and one of
-C<+>/C<!>/C<!!> may be used together and they can appear in any
-order. However, only one of C<+>, C<!>, C<!!> may be used at a
-time. Note that these prefixes are also supported for the other command line settings,
-i.e. C<ExecStartPre>, C<ExecStartPost>, C<ExecReload>,
-C<ExecStop> and C<ExecStopPost>.
 
 If more than one command is specified, the commands are
 invoked sequentially in the order they appear in the unit
@@ -5199,12 +5992,13 @@ all C<ExecStartPre> commands that were not prefixed
 with a C<-> exit successfully.
 
 C<ExecStartPost> commands are only run after the commands specified in
-C<ExecStart> have been invoked successfully, as determined by C<Type>
-(i.e. the process has been started for C<Type=simple> or C<Type=idle>, the last
-C<ExecStart> process exited successfully for C<Type=oneshot>, the initial
-process exited successfully for C<Type=forking>, C<READY=1> is sent for
-C<Type=notify>, or the C<BusName> has been taken for
-C<Type=dbus>).
+C<ExecStart> have been invoked successfully, as determined by
+C<Type> (i.e. the process has been started for C<Type=simple> or
+C<Type=idle>, the last C<ExecStart> process exited successfully for
+C<Type=oneshot>, the initial process exited successfully for
+C<Type=forking>, C<READY=1> is sent for
+C<Type=notify>/C<Type=notify-reload>, or the
+C<BusName> has been taken for C<Type=dbus>).
 
 Note that C<ExecStartPre> may not be
 used to start long-running processes. All processes forked
@@ -5237,12 +6031,13 @@ all C<ExecStartPre> commands that were not prefixed
 with a C<-> exit successfully.
 
 C<ExecStartPost> commands are only run after the commands specified in
-C<ExecStart> have been invoked successfully, as determined by C<Type>
-(i.e. the process has been started for C<Type=simple> or C<Type=idle>, the last
-C<ExecStart> process exited successfully for C<Type=oneshot>, the initial
-process exited successfully for C<Type=forking>, C<READY=1> is sent for
-C<Type=notify>, or the C<BusName> has been taken for
-C<Type=dbus>).
+C<ExecStart> have been invoked successfully, as determined by
+C<Type> (i.e. the process has been started for C<Type=simple> or
+C<Type=idle>, the last C<ExecStart> process exited successfully for
+C<Type=oneshot>, the initial process exited successfully for
+C<Type=forking>, C<READY=1> is sent for
+C<Type=notify>/C<Type=notify-reload>, or the
+C<BusName> has been taken for C<Type=dbus>).
 
 Note that C<ExecStartPre> may not be
 used to start long-running processes. All processes forked
@@ -5277,29 +6072,30 @@ exits, like the ones described above. I< Optional. Type list of uniline.  >
 
 =head2 ExecReload
 
-Commands to execute to trigger a configuration
-reload in the service. This argument takes multiple command
-lines, following the same scheme as described for
-C<ExecStart> above. Use of this setting is
-optional. Specifier and environment variable substitution is
-supported here following the same scheme as for
+Commands to execute to trigger a configuration reload in the service. This argument
+takes multiple command lines, following the same scheme as described for
+C<ExecStart> above. Use of this setting is optional. Specifier and environment
+variable substitution is supported here following the same scheme as for
 C<ExecStart>.
 
-One additional, special environment variable is set: if
-known, C<$MAINPID> is set to the main process
-of the daemon, and may be used for command lines like the
-following:
+One additional, special environment variable is set: if known, C<$MAINPID> is
+set to the main process of the daemon, and may be used for command lines like the following:
 
-Note however that reloading a daemon by sending a signal
-(as with the example line above) is usually not a good choice,
-because this is an asynchronous operation and hence not
-suitable to order reloads of multiple services against each
-other. It is strongly recommended to set
-C<ExecReload> to a command that not only
-triggers a configuration reload of the daemon, but also
-synchronously waits for it to complete. For example,
-L<dbus-broker(1)>
-uses the following: I< Optional. Type list of uniline.  > 
+    ExecReload=kill -HUP $MAINPID
+
+Note however that reloading a daemon by enqueuing a signal (as with the example line above) is
+usually not a good choice, because this is an asynchronous operation and hence not suitable when
+ordering reloads of multiple services against each other. It is thus strongly recommended to either
+use C<Type>C<notify-reload> in place of
+C<ExecReload>, or to set C<ExecReload> to a command that not only
+triggers a configuration reload of the daemon, but also synchronously waits for it to complete. For
+example, L<dbus-broker(1)>
+uses the following:
+
+    ExecReload=busctl call org.freedesktop.DBus \
+    /org/freedesktop/DBus org.freedesktop.DBus \
+    ReloadConfig
+. I< Optional. Type list of uniline.  > 
 
 =head2 ExecStop
 
@@ -5372,22 +6168,41 @@ a service (as configured with C<Restart>).
 Takes a unit-less value in seconds, or a time span value such
 as "5min 20s". Defaults to 100ms. I< Optional. Type uniline.  > 
 
+=head2 RestartSteps
+
+Configures the number of steps to take to increase the interval
+of auto-restarts from C<RestartSec> to C<RestartMaxDelaySec>.
+Takes a positive integer or 0 to disable it. Defaults to 0.
+
+This setting is effective only if C<RestartMaxDelaySec> is also set. I< Optional. Type uniline.  > 
+
+=head2 RestartMaxDelaySec
+
+Configures the longest time to sleep before restarting a service
+as the interval goes up with C<RestartSteps>. Takes a value
+in the same format as C<RestartSec>, or C<infinity>
+to disable the setting. Defaults to C<infinity>.
+
+This setting is effective only if C<RestartSteps> is also set. I< Optional. Type uniline.  > 
+
 =head2 TimeoutStartSec
 
-Configures the time to wait for start-up. If a daemon service does not signal start-up
-completion within the configured time, the service will be considered failed and will be shut down again. The
-precise action depends on the C<TimeoutStartFailureMode> option. Takes a unit-less value in
-seconds, or a time span value such as "5min 20s". Pass C<infinity> to disable the timeout logic.
-Defaults to C<DefaultTimeoutStartSec> from the manager configuration file, except when
+Configures the time to wait for start-up. If a daemon service does not signal
+start-up completion within the configured time, the service will be considered failed and will be
+shut down again. The precise action depends on the C<TimeoutStartFailureMode>
+option. Takes a unit-less value in seconds, or a time span value such as "5min 20s". Pass
+C<infinity> to disable the timeout logic. Defaults to
+C<DefaultTimeoutStartSec> set in the manager, except when
 C<Type=oneshot> is used, in which case the timeout is disabled by default (see
 L<systemd-system.conf(5)>).
 
-If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=…>, this may cause
-the start time to be extended beyond C<TimeoutStartSec>. The first receipt of this message
-must occur before C<TimeoutStartSec> is exceeded, and once the start time has extended beyond
-C<TimeoutStartSec>, the service manager will allow the service to continue to start, provided
-the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified until the service
-startup status is finished by C<READY=1>. (see
+If a service of C<Type=notify>/C<Type=notify-reload> sends
+C<EXTEND_TIMEOUT_USEC=…>, this may cause the start time to be extended beyond
+C<TimeoutStartSec>. The first receipt of this message must occur before
+C<TimeoutStartSec> is exceeded, and once the start time has extended beyond
+C<TimeoutStartSec>, the service manager will allow the service to continue to start,
+provided the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified
+until the service startup status is finished by C<READY=1>. (see
 L<sd_notify(3)>).
 I< Optional. Type uniline.  > 
 
@@ -5408,12 +6223,14 @@ C<DefaultTimeoutStopSec> from the manager
 configuration file (see
 L<systemd-system.conf(5)>).
 
-If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=…>, this may cause
-the stop time to be extended beyond C<TimeoutStopSec>. The first receipt of this message
-must occur before C<TimeoutStopSec> is exceeded, and once the stop time has extended beyond
-C<TimeoutStopSec>, the service manager will allow the service to continue to stop, provided
-the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified, or terminates itself
-(see L<sd_notify(3)>).
+If a service of C<Type=notify>/C<Type=notify-reload> sends
+C<EXTEND_TIMEOUT_USEC=…>, this may cause the stop time to be extended beyond
+C<TimeoutStopSec>. The first receipt of this message must occur before
+C<TimeoutStopSec> is exceeded, and once the stop time has extended beyond
+C<TimeoutStopSec>, the service manager will allow the service to continue to stop,
+provided the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified,
+or terminates itself (see
+L<sd_notify(3)>).
 I< Optional. Type uniline.  > 
 
 =head2 TimeoutAbortSec
@@ -5433,13 +6250,15 @@ C<infinity> to disable the timeout logic. Defaults to C<DefaultTimeoutAbortSec> 
 the manager configuration file (see
 L<systemd-system.conf(5)>).
 
-If a service of C<Type=notify> handles C<SIGABRT> itself (instead of relying
-on the kernel to write a core dump) it can send C<EXTEND_TIMEOUT_USEC=…> to
-extended the abort time beyond C<TimeoutAbortSec>. The first receipt of this message
-must occur before C<TimeoutAbortSec> is exceeded, and once the abort time has extended beyond
-C<TimeoutAbortSec>, the service manager will allow the service to continue to abort, provided
-the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified, or terminates itself
-(see L<sd_notify(3)>).
+If a service of C<Type=notify>/C<Type=notify-reload> handles
+C<SIGABRT> itself (instead of relying on the kernel to write a core dump) it can
+send C<EXTEND_TIMEOUT_USEC=…> to extended the abort time beyond
+C<TimeoutAbortSec>. The first receipt of this message must occur before
+C<TimeoutAbortSec> is exceeded, and once the abort time has extended beyond
+C<TimeoutAbortSec>, the service manager will allow the service to continue to abort,
+provided the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified,
+or terminates itself (see
+L<sd_notify(3)>).
 I< Optional. Type uniline.  > 
 
 =head2 TimeoutSec
@@ -5466,7 +6285,7 @@ This setting may be used to analyze services that fail to start-up or shut-down 
 By using C<kill> the service is immediately terminated by sending
 C<FinalKillSignal> without any further timeout. This setting can be used to expedite the
 shutdown of failing services.
-I< Optional. Type enum. choice: 'terminate', 'abort', 'kill'.  > 
+I< Optional. Type enum. choice: 'abort', 'kill', 'terminate'.  > 
 
 =head2 TimeoutStopFailureMode
 
@@ -5485,7 +6304,7 @@ This setting may be used to analyze services that fail to start-up or shut-down 
 By using C<kill> the service is immediately terminated by sending
 C<FinalKillSignal> without any further timeout. This setting can be used to expedite the
 shutdown of failing services.
-I< Optional. Type enum. choice: 'terminate', 'abort', 'kill'.  > 
+I< Optional. Type enum. choice: 'abort', 'kill', 'terminate'.  > 
 
 =head2 RuntimeMaxSec
 
@@ -5495,12 +6314,13 @@ does not have any effect on C<Type=oneshot> services, as they terminate immediat
 activation completed. Pass C<infinity> (the default) to configure no runtime
 limit.
 
-If a service of C<Type=notify> sends C<EXTEND_TIMEOUT_USEC=…>, this may cause
-the runtime to be extended beyond C<RuntimeMaxSec>. The first receipt of this message
-must occur before C<RuntimeMaxSec> is exceeded, and once the runtime has extended beyond
-C<RuntimeMaxSec>, the service manager will allow the service to continue to run, provided
-the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified until the service
-shutdown is achieved by C<STOPPING=1> (or termination). (see
+If a service of C<Type=notify>/C<Type=notify-reload> sends
+C<EXTEND_TIMEOUT_USEC=…>, this may cause the runtime to be extended beyond
+C<RuntimeMaxSec>. The first receipt of this message must occur before
+C<RuntimeMaxSec> is exceeded, and once the runtime has extended beyond
+C<RuntimeMaxSec>, the service manager will allow the service to continue to run,
+provided the service repeats C<EXTEND_TIMEOUT_USEC=…> within the interval specified
+until the service shutdown is achieved by C<STOPPING=1> (or termination). (see
 L<sd_notify(3)>).
 I< Optional. Type uniline.  > 
 
@@ -5611,15 +6431,27 @@ Note that service restart is subject to unit start rate
 limiting configured with C<StartLimitIntervalSec>
 and C<StartLimitBurst>, see
 L<systemd.unit(5)>
-for details.  A restarted service enters the failed state only
-after the start limits are reached.
+for details.
 
 Setting this to C<on-failure> is the
 recommended choice for long-running services, in order to
 increase reliability by attempting automatic recovery from
 errors. For services that shall be able to terminate on their
 own choice (and avoid immediate restarting),
-C<on-abnormal> is an alternative choice. I< Optional. Type enum. choice: 'no', 'on-success', 'on-failure', 'on-abnormal', 'on-watchdog', 'on-abort', 'always'.  > 
+C<on-abnormal> is an alternative choice. I< Optional. Type enum. choice: 'always', 'no', 'on-abnormal', 'on-abort', 'on-failure', 'on-success', 'on-watchdog'.  > 
+
+=head2 RestartMode
+
+Takes a string value that specifies how a service should restart:
+If set to C<normal> (the default), the service restarts by
+going through a failed/inactive state.If set to C<direct>, the service transitions to the activating
+state directly during auto-restart, skipping failed/inactive state.
+C<ExecStopPost> is invoked.
+C<OnSuccess> and C<OnFailure> are skipped.
+
+This option is useful in cases where a dependency can fail temporarily
+but we don't want these temporary failures to make the dependent units fail.
+When this option is set to C<direct>, dependent units are not notified of these temporary failures. I< Optional. Type uniline.  > 
 
 =head2 SuccessExitStatus
 
@@ -5708,16 +6540,19 @@ false. I< Optional. Type uniline.  >
 =head2 NotifyAccess
 
 Controls access to the service status notification socket, as accessible via the
-L<sd_notify(3)> call. Takes one
-of C<none> (the default), C<main>, C<exec> or
-C<all>. If C<none>, no daemon status updates are accepted from the service
-processes, all status update messages are ignored. If C<main>, only service updates sent from the
-main process of the service are accepted. If C<exec>, only service updates sent from any of the
-main or control processes originating from one of the C<Exec*=> commands are accepted. If
-C<all>, all services updates from all members of the service's control group are accepted. This
-option should be set to open access to the notification socket when using C<Type=notify> or
-C<WatchdogSec> (see above). If those options are used but C<NotifyAccess> is
-not configured, it will be implicitly set to C<main>.
+L<sd_notify(3)>
+call. Takes one of C<none> (the default), C<main>, C<exec>
+or C<all>. If C<none>, no daemon status updates are accepted from the
+service processes, all status update messages are ignored. If C<main>, only service
+updates sent from the main process of the service are accepted. If C<exec>, only
+service updates sent from any of the main or control processes originating from one of the
+C<Exec*=> commands are accepted. If C<all>, all services updates from
+all members of the service's control group are accepted. This option should be set to open access to
+the notification socket when using
+C<Type=notify>/C<Type=notify-reload> or
+C<WatchdogSec> (see above). If those options are used but
+C<NotifyAccess> is not configured, it will be implicitly set to
+C<main>.
 
 Note that sd_notify() notifications may be attributed to units correctly only if
 either the sending process is still around at the time PID 1 processes the message, or if the sending process
@@ -5733,7 +6568,7 @@ to units correctly, sd_notify_barrier() may be used. This call acts as a synchro
 and ensures all notifications sent before this call have been picked up by the service manager when it returns
 successfully. Use of sd_notify_barrier() is needed for clients which are not invoked by the
 service manager, otherwise this synchronization mechanism is unnecessary for attribution of notifications to the
-unit. I< Optional. Type enum. choice: 'none', 'main', 'exec', 'all'.  > 
+unit. I< Optional. Type enum. choice: 'all', 'exec', 'main', 'none'.  > 
 
 =head2 Sockets
 
@@ -5767,7 +6602,7 @@ L<sd_pid_notify_with_fds(3)>'s
 C<FDSTORE=1> messages. This is useful for implementing services that can restart
 after an explicit request or a crash without losing state. Any open sockets and other file
 descriptors which should not be closed during the restart may be stored this way. Application state
-can either be serialized to a file in C</run/>, or better, stored in a
+can either be serialized to a file in C<RuntimeDirectory>, or stored in a
 L<memfd_create(2)>
 memory file descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service
 manager. All file descriptors passed to the service manager from a specific service are passed back
@@ -5776,10 +6611,45 @@ L<sd_listen_fds(3)> for
 details about the precise protocol used and the order in which the file descriptors are passed). Any
 file descriptors passed to the service manager are automatically closed when
 C<POLLHUP> or C<POLLERR> is seen on them, or when the service is
-fully stopped and no job is queued or being executed for it. If this option is used,
+fully stopped and no job is queued or being executed for it (the latter can be tweaked with
+C<FileDescriptorStorePreserve>, see below). If this option is used,
 C<NotifyAccess> (see above) should be set to open access to the notification socket
 provided by systemd. If C<NotifyAccess> is not set, it will be implicitly set to
-C<main>. I< Optional. Type uniline.  > 
+C<main>.
+
+The fdstore command of
+L<systemd-analyze(1)>
+may be used to list the current contents of a service's file descriptor store.
+
+Note that the service manager will only pass file descriptors contained in the file descriptor
+store to the service's own processes, never to other clients via IPC or similar. However, it does
+allow unprivileged clients to query the list of currently open file descriptors of a
+service. Sensitive data may hence be safely placed inside the referenced files, but should not be
+attached to the metadata (e.g. included in filenames) of the stored file
+descriptors.
+
+If this option is set to a non-zero value the C<$FDSTORE> environment variable
+will be set for processes invoked for this service. See
+L<systemd.exec(5)> for
+details.
+
+For further information on the file descriptor store see the L<File Descriptor
+Store|https://systemd.io/FILE_DESCRIPTOR_STORE> overview. I< Optional. Type uniline.  > 
+
+=head2 FileDescriptorStorePreserve
+
+Takes one of C<no>, C<yes>,
+C<restart> and controls when to release the service's file descriptor store
+(i.e. when to close the contained file descriptors, if any). If set to C<no> the
+file descriptor store is automatically released when the service is stopped; if
+C<restart> (the default) it is kept around as long as the unit is neither inactive
+nor failed, or a job is queued for the service, or the service is expected to be restarted. If
+C<yes> the file descriptor store is kept around until the unit is removed from
+memory (i.e. is not referenced anymore and inactive). The latter is useful to keep entries in the
+file descriptor store pinned until the service manager exits.
+
+Use systemctl clean --what=fdstore … to release the file descriptor store
+explicitly. I< Optional. Type enum. choice: 'no', 'restart', 'yes'.  > 
 
 =head2 USBFunctionDescriptors
 
@@ -5801,26 +6671,27 @@ above. I< Optional. Type uniline.  >
 
 =head2 OOMPolicy
 
-Configure the out-of-memory (OOM) kernel killer policy. Note that the userspace OOM
+Configure the out-of-memory (OOM) killing policy for the kernel and the userspace OOM
 killer
-L<systemd-oomd.service(8)>
-is a more flexible solution that aims to prevent out-of-memory situations for the userspace, not just
-the kernel.
+L<systemd-oomd.service(8)>.
+On Linux, when memory becomes scarce to the point that the kernel has trouble allocating memory for
+itself, it might decide to kill a running process in order to free up memory and reduce memory
+pressure. Note that C<systemd-oomd.service> is a more flexible solution that aims
+to prevent out-of-memory situations for the userspace too, not just the kernel, by attempting to
+terminate services earlier, before the kernel would have to act.
 
-On Linux, when memory becomes scarce to the point that the kernel has trouble allocating memory
-for itself, it might decide to kill a running process in order to free up memory and reduce memory
-pressure. This setting takes one of C<continue>, C<stop> or
-C<kill>. If set to C<continue> and a process of the service is
-killed by the kernel's OOM killer this is logged but the service continues running. If set to
-C<stop> the event is logged but the service is terminated cleanly by the service
-manager. If set to C<kill> and one of the service's processes is killed by the OOM
-killer the kernel is instructed to kill all remaining processes of the service too, by setting the
+This setting takes one of C<continue>, C<stop> or
+C<kill>. If set to C<continue> and a process in the unit is
+killed by the OOM killer, this is logged but the unit continues running. If set to
+C<stop> the event is logged but the unit is terminated cleanly by the service
+manager. If set to C<kill> and one of the unit's processes is killed by the OOM
+killer the kernel is instructed to kill all remaining processes of the unit too, by setting the
 C<memory.oom.group> attribute to C<1>; also see L<kernel
 documentation|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
 
 Defaults to the setting C<DefaultOOMPolicy> in
 L<systemd-system.conf(5)>
-is set to, except for services where C<Delegate> is turned on, where it defaults to
+is set to, except for units where C<Delegate> is turned on, where it defaults to
 C<continue>.
 
 Use the C<OOMScoreAdjust> setting to configure whether processes of the unit
@@ -5829,9 +6700,46 @@ killer logic. See
 L<systemd.exec(5)> for
 details.
 
-This setting also applies to systemd-oomd. Similarly to the kernel OOM
-kills, this setting determines the state of the service after systemd-oomd kills a
-cgroup associated with the service. I< Optional. Type uniline.  > 
+This setting also applies to
+L<systemd-oomd.service(8)>.
+Similarly to the kernel OOM kills performed by the kernel, this setting determines the state of the
+unit after systemd-oomd kills a cgroup associated with it. I< Optional. Type uniline.  > 
+
+=head2 OpenFile
+
+Takes an argument of the form C<path:fd-name:options>,
+where:
+C<path> is a path to a file or an C<AF_UNIX> socket in the file system;C<fd-name> is a name that will be associated
+with the file descriptor;
+the name may contain any ASCII character, but must exclude control characters and ":", and must be at most 255
+characters in length;
+it is optional and, if not provided, defaults to the file name;C<options> is a comma-separated list of access options;
+possible values are
+C<read-only>,
+C<append>,
+C<truncate>,
+C<graceful>;
+if not specified, files will be opened in C<rw> mode;
+if C<graceful> is specified, errors during file/socket opening are ignored.
+Specifying the same option several times is treated as an error.
+The file or socket is opened by the service manager and the file descriptor is passed to the service.
+If the path is a socket, we call connect() on it.
+See L<sd_listen_fds(3)>
+for more details on how to retrieve these file descriptors.
+
+This setting is useful to allow services to access files/sockets that they can't access themselves
+(due to running in a separate mount namespace, not having privileges, ...).
+
+This setting can be specified multiple times, in which case all the specified paths are opened and the file descriptors
+passed to the service.
+If the empty string is assigned, the entire list of open files defined prior to this is reset. I< Optional. Type uniline.  > 
+
+=head2 ReloadSignal
+
+Configures the UNIX process signal to send to the service's main process when asked
+to reload the service's configuration. Defaults to C<SIGHUP>. This option has no
+effect unless C<Type>C<notify-reload> is used, see
+above. I< Optional. Type uniline.  > 
 
 =head2 FailureAction
 

@@ -1,12 +1,14 @@
 MANIFEST              List of files in this kit
-README                Introductionary text
-INSTALL               Installation information
+README.md             Introductionary text
 Changes               List of changes
 lib/Getopt/Long.pm    Getopt::Long
+lib/Getopt/Long/Parser.pm    Getopt::Long OO Parser
 lib/newgetopt.pl      newgetopt.pl (subroutine NGetOpt)
 Makefile.PL           Makefile for installation
 t/gol-basic.t         Test basic functionality
 t/gol-compat.t        Test compatibility
+t/gol-load1.t	      Loading Getopt::Long and parser
+t/gol-load2.t	      Loading Getopt::Long::Parser and Getopt::Long
 t/gol-linkage.t       Test user linkage
 t/gol-oo.t            Test OO interface
 t/gol-xargv.t         Test parsing from array

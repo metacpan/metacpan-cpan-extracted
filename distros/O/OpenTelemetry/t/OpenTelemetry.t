@@ -4,6 +4,7 @@ use Test2::V0 -target => 'OpenTelemetry';
 use Test2::Tools::OpenTelemetry;
 
 use OpenTelemetry -all;
+use OpenTelemetry::Trace;
 
 use Object::Pad;
 use Syntax::Keyword::Dynamically;
@@ -75,6 +76,15 @@ subtest 'Error handling' => sub {
 
     is messages { otel_handle_error message => 'an error', exception => 'boom' }, [
         [ error => OpenTelemetry => 'OpenTelemetry error: an error - boom' ],
+    ], 'Default error handler prints message and exception';
+
+    is messages {
+        otel_handle_error
+            message   => 'an error',
+            exception => 'boom',
+            details   => { some => 'data' };
+    }, [
+        [ error => OpenTelemetry => 'OpenTelemetry error: an error - boom {some => "data"}' ],
     ], 'Default error handler prints message and exception';
 };
 
@@ -173,6 +183,27 @@ subtest Helpers => sub {
 
         ref_is otel_span_from_context, $span,
             'Reads span from current context';
+    };
+
+    subtest 'Untraced context' => sub {
+        is my $context = otel_untraced_context, object {
+            prop isa => 'OpenTelemetry::Context';
+        }, 'Returns a context';
+
+        is +OpenTelemetry::Trace->is_untraced_context($context), T,
+            'Context does not trace';
+    };
+
+    subtest Config => sub {
+        local %ENV = (
+            OTEL_PERL_FOO => 'perl',
+            OTEL_FOO      => 'xxx',
+            OTEL_BAR      => 'otel',
+        );
+
+        is otel_config('FOO'), 'perl', 'Prefers Perl vars';
+        is otel_config('BAR'), 'otel', 'Reads OTel vars';
+        is otel_config('XXX'), U,      'Returns undef if missing';
     };
 };
 

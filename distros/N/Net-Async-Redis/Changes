@@ -1,5 +1,32 @@
 Revision history for Net-Async-Redis
 
+5.001     2023-11-15 13:42:42+08:00 Asia/Singapore
+    [New features]
+
+    - helper methods for some standard cluster commands with no keys - these previously failed and
+    generated warnings, now they accumulate results from all primary nodes and return the aggregated
+    results
+    - fall back to a random node when no keys are found for other commands
+    - we now use the same primary connection across multiple slots, reduces the connection count when
+    the shards are highly fragmented
+
+5.000     2023-11-05 21:22:40+08:00 Asia/Singapore
+    [Refactoring]
+
+    - migrated to Object::Pad, for better OO handling (still uses a hashref-based object
+    implementation, for backwards compatibility). Since this has the potential to be a big
+    change, and may affect backward compatibility, the major version has been increased,
+    and the Object::Pad migration will be released in steps during this version series
+    (e.g. conversion to `field` instead of `$self->{accessor}`, move Net::Async::Redis::Commands
+    to a rôle)
+    - MULTI handling rewritten to handle cluster mode and mixed regular/transactional commands
+    better
+
+    [Bugs fixed]
+
+    - previous versions exhibited excessive memory usage and poor performance when attempting
+    to call MULTI within MULTI, the refactoring now includes tests to cover this scenario
+
 4.002     2023-10-26 11:39:40+08:00 Asia/Singapore
     [Bugs fixed]
 

@@ -1,3 +1,16 @@
+0.06 2023-11-24T18:13:39+01:00
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite from List::MoreUtils to List::Util.
+ - Rewrite to use of =head2 in doc.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.05 2015-09-17T23:41:44+02:00
  [Common]
  - Improve LICENSE AND COPYRIGHT section in doc.

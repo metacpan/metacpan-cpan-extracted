@@ -4,7 +4,7 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.78";
+our $VERSION = "1.79";
 
 use Clone qw();
 use Encode qw();
@@ -1957,7 +1957,9 @@ sub Table {
 
 =head2 QueryHint [Hint]
 
-If called with an argument, sets a query hint for this collection.
+If called with an argument, sets a query hint for this collection. Call
+this method before performing additional operations on a collection,
+such as C<Count()>, C<Next()>, etc.
 
 Always returns the query hint.
 
@@ -1983,7 +1985,10 @@ Returns the query hint formatted appropriately for inclusion in SQL queries.
 sub QueryHintFormatted {
     my $self = shift;
     my $QueryHint = $self->QueryHint;
-    return $QueryHint ? " /* $QueryHint */ " : " ";
+
+    # As it turns out, we can't have a space between the opening /*
+    # and the query hint, otherwise Oracle treats this as a comment.
+    return $QueryHint ? " /*$QueryHint */ " : " ";
 }
 
 

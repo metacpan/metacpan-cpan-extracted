@@ -1,5 +1,5 @@
 package JSON::Schema::Generate;
-use 5.006; use strict; use warnings; our $VERSION = '0.08';
+use 5.006; use strict; use warnings; our $VERSION = '0.09';
 use Tie::IxHash; use Types::Standard qw/Str HashRef Bool/;
 use Compiled::Params::OO qw/cpo/; use JSON; use Blessed::Merge;
 
@@ -154,9 +154,9 @@ sub _build_props {
 	} elsif ($data =~ m/^\d+\.\d+$/) {
 		$self->_add_type($props, 'number');
 		$self->_unique_examples($props, $data);
-#	} elsif ($data =~ m/\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}\+\d{2}\:\d{2}/) {
-#		$self->_add_type($props, 'date-time');
-#		$self->_unique_examples($props, $data);
+	} elsif ($data =~ m/\d{4}\-\d{2}\-\d{2}T\d{2}\:\d{2}\:\d{2}\+\d{2}\:\d{2}/) {
+		$self->_add_type($props, 'date-time');
+		$self->_unique_examples($props, $data);
 	} else {
 		$self->_add_type($props, 'string');
 		$self->_unique_examples($props, $data);
@@ -204,7 +204,7 @@ JSON::Schema::Generate - Generate JSON Schemas from data!
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =cut
 

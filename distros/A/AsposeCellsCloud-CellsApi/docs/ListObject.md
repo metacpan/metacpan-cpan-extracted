@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::ListObject
+# AsposeCellsCloud::Object::ListObject 
 
 ## Load the model package
 ```perl
@@ -8,23 +8,28 @@ use AsposeCellsCloud::Object::ListObject;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**link** | [**Link**](Link.md) |  | [optional] 
-**show_totals** | **boolean** | Gets and sets whether this ListObject show total row. | [optional] 
-**table_style_type** | **string** | Gets and the built-in table style. | [optional] 
-**display_name** | **string** | Gets and sets the display name.Gets the data range of the ListObject. | [optional] 
-**show_header_row** | **boolean** | Gets and sets whether this ListObject show header row.              | [optional] 
-**start_column** | **int** | Gets the start column of the range. | [optional] 
-**show_table_style_last_column** | **boolean** | Indicates whether the last column in the table should have the style applied. | [optional] 
-**show_table_style_column_stripes** | **boolean** | Indicates whether column stripe formatting is applied. | [optional] 
-**show_table_style_first_column** | **boolean** | Inidicates whether the first column in the table should have the style applied. | [optional] 
-**start_row** | **int** | Gets the start row of the range. | [optional] 
-**auto_filter** | [**AutoFilter**](AutoFilter.md) | Gets auto filter.              | [optional] 
-**show_table_style_row_stripes** | **boolean** | Indicates whether row stripe formatting is applied. | [optional] 
-**end_column** | **int** | Gets the end column of the range. | [optional] 
-**table_style_name** | **string** | Gets and sets the table style name. | [optional] 
-**list_columns** | [**ARRAY[ListColumn]**](ListColumn.md) | Gets ListColumns of the ListObject. | [optional] 
-**end_row** | **int** | Gets the end row of the range. | [optional] 
+**AutoFilter** | **AutoFilter** | Gets auto filter. |
+**DisplayName** | **string** | Gets and sets the display name. |
+**StartColumn** | **int** | Gets the start column of the range. |
+**StartRow** | **int** | Gets the start row of the range. |
+**EndColumn** | **int** | Gets the end column of the range. |
+**EndRow** | **int** | Gets the end  row of the range. |
+**ListColumns** | **ARRAY[ListColumn]** | Gets ListColumns of the ListObject. |
+**ShowHeaderRow** | **boolean** | Gets and sets whether this ListObject show header row. |
+**ShowTableStyleColumnStripes** | **boolean** | Indicates whether column stripe formatting is applied. |
+**ShowTableStyleFirstColumn** | **boolean** | Indicates whether the first column in the table should have the style applied. |
+**ShowTableStyleLastColumn** | **boolean** | Indicates whether the last column in the table should have the style applied. |
+**ShowTableStyleRowStripes** | **boolean** | Indicates whether row stripe formatting is applied. |
+**ShowTotals** | **boolean** | Gets and sets whether this ListObject show total row. |
+**TableStyleName** | **string** | Gets and sets the table style name. |
+**TableStyleType** | **string** | Gets and the built-in table style. |
+**DataRange** | **Range** | Gets the data range of the ListObject. |
+**DataSourceType** | **string** | Gets the data source type of the table. |
+**Comment** | **string** | Gets and sets the comment of the table. |
+**XmlMap** | **XmlMap** | Gets an  used for this list. |
+**AlternativeText** | **string** | Gets and sets the alternative text. |
+**AlternativeDescription** | **string** | Gets and sets the alternative description. |
+**link** | **Link** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::Workbook
+# AsposeCellsCloud::Object::Workbook 
 
 ## Load the model package
 ```perl
@@ -8,18 +8,17 @@ use AsposeCellsCloud::Object::Workbook;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**links** | [**ARRAY[Link]**](Link.md) |  | [optional] 
-**settings** | [**LinkElement**](LinkElement.md) |  | [optional] 
-**is_protected** | **string** |  | [optional] 
-**is_write_protected** | **string** |  | [optional] 
-**file_name** | **string** |  | [optional] 
-**document_properties** | [**LinkElement**](LinkElement.md) |  | [optional] 
-**names** | [**LinkElement**](LinkElement.md) |  | [optional] 
-**default_style** | [**LinkElement**](LinkElement.md) |  | [optional] 
-**is_encryption** | **string** |  | [optional] 
-**worksheets** | [**LinkElement**](LinkElement.md) |  | [optional] 
-**password** | **string** |  | [optional] 
+**FileName** | **string** | Gets and sets the current file name.  |
+**Links** | **ARRAY[Link]** |  |
+**Worksheets** | **LinkElement** | Gets the  collection in the spreadsheet.  |
+**DefaultStyle** | **LinkElement** | Gets or sets the default  object of the workbook.  |
+**DocumentProperties** | **LinkElement** |  |
+**Names** | **LinkElement** |  |
+**Settings** | **LinkElement** | Represents the workbook settings.  |
+**IsWriteProtected** | **string** |  |
+**IsProtected** | **string** |  |
+**IsEncryption** | **string** |  |
+**Password** | **string** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

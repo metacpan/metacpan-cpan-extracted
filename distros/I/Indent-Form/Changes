@@ -1,3 +1,10 @@
+0.08 2023-11-20T14:12:39+01:00
+ - Fix Makefile.PL which fails with no '.' in @INC.
+ - Fix indent in doc.
+ - Rename example files to better names.
+ - Update Module::Install to 1.21.
+ - Update copyright years.
+
 0.07 2021-06-28T16:49:11+02:00
  - Add doc about NO_COLOR env variable.
  - Improve LICENSE AND COPYRIGHT section in doc.

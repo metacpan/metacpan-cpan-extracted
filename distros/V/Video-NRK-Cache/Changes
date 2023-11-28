@@ -1,4 +1,10 @@
-Revision history for nrkcache.pl
+Revision history for Video::NRK::Cache / nrkcache
+
+3.01  2023-11-15
+
+ - Fix for NRK changes: They recently started to separate video and audio
+   into a stream each of their own, which format selection didn't expect.
+ - Fix declared prerequisites.
 
 3.00  2023-03-06
 

@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Dicom::UID::Generator;
+
      my $obj = Dicom::UID::Generator->new(%params);
      my $uid = $obj->create_series_instance_uid;
      my $uid = $obj->create_sop_instance_uid;
@@ -60,11 +61,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Dicom::UID::Generator;
 
      # Object.
@@ -110,17 +109,18 @@ SEE ALSO
         Install the Dicom modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Dicom-UID-Generator>
+    <https://github.com/michal-josef-spacek/Dicom-UID-Generator>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2016
-     BSD 2-Clause License
+    © Michal Josef Špaček 2016
+
+    BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

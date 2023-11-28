@@ -1,7 +1,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use HTTP::Request::Common 6.21;
 use HTTP::Status qw/ :constants status_message /;

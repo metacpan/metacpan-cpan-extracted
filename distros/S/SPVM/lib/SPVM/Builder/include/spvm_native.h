@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#define SPVM_NATIVE_VERSION_NUMBER 0.989058
+#define SPVM_NATIVE_VERSION_NUMBER 0.989063
 
 #define SPVM_NATIVE_CREATE_VERSION_STRING_STRINGIFY(x) #x
 
@@ -22,6 +22,8 @@
 #define SPVM_NATIVE_SET_POINTER(object, pointer) (*(void**)object = pointer)
 
 #define spvm_warn(format, ...) fprintf(stderr, format "\n", ##__VA_ARGS__)
+
+#define spvm_warnf(stream, format, ...) fprintf(stream, format "\n", ##__VA_ARGS__)
 
 typedef union spvm_value SPVM_VALUE;
 
@@ -94,10 +96,7 @@ union spvm_value {
 
 
 
-
-
 struct spvm_env {
-  void* reserved0;
   void* runtime;
   SPVM_ENV_API* api;
   SPVM_ENV* (*new_env)(void);
@@ -285,7 +284,6 @@ struct spvm_env {
   int32_t (*enter_scope)(SPVM_ENV* env, SPVM_VALUE* stack);
   void (*leave_scope)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t scope_id);
   int32_t (*push_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, void* object);
-  void* *reserved188;
   int32_t (*weaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_address);
   int32_t (*isweak)(SPVM_ENV* env, SPVM_VALUE* stack, void** object);
   void (*unweaken)(SPVM_ENV* env, SPVM_VALUE* stack, void** object_address);
@@ -293,24 +291,14 @@ struct spvm_env {
   void* (*strerror_string_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
   const char* (*strerror)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value, int32_t length);
   const char* (*strerror_nolen)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_value);
-  void* reserved196;
-  void* reserved197;
-  void* reserved198;
-  void* reserved199;
   void* (*new_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
   void (*free_memory_stack)(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
-  void* reserved202;
   SPVM_VALUE* (*new_stack)(SPVM_ENV* env);
   void (*free_stack)(SPVM_ENV* env, SPVM_VALUE* stack);
-  void* reserved205;
-  void* reserved206;
-  void* reserved207;
   void* (*get_field_object_defined_and_has_pointer_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file_name, int32_t line);
   void** (*get_field_object_ref)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, void* field);
   void** (*get_field_object_ref_by_name)(SPVM_ENV* env, SPVM_VALUE* stack, void* object, const char* field_name, int32_t* error_id, const char* func_name, const char* file, int32_t line);
   int32_t (*check_stack_env)(SPVM_ENV* env, SPVM_VALUE* stack);
-  void* reserved212;
-  void* reserved213;
   void (*assign_object)(SPVM_ENV* env, SPVM_VALUE* stack, void** dist_ref, void* object);
   void* (*new_string_array_no_mortal)(SPVM_ENV* env, SPVM_VALUE* stack, int32_t length);
   void* (*new_memory_block)(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
@@ -318,12 +306,9 @@ struct spvm_env {
   int32_t (*get_memory_blocks_count)(SPVM_ENV* env, SPVM_VALUE* stack);
   void (*say)(SPVM_ENV* env, SPVM_VALUE* stack, void* string);
   void (*warn)(SPVM_ENV* env, SPVM_VALUE* stack, void* string, const char* class_dir, const char* class_rel_file, int32_t line);
-  void* (*new_mutex)(SPVM_ENV* env, SPVM_VALUE* stack);
-  void (*free_mutex)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
-  int32_t (*lock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
-  int32_t (*unlock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
-  int32_t (*reader_lock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
-  int32_t (*reader_unlock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+  FILE* (*spvm_stdin)(SPVM_ENV* env, SPVM_VALUE* stack);
+  FILE* (*spvm_stdout)(SPVM_ENV* env, SPVM_VALUE* stack);
+  FILE* (*spvm_stderr)(SPVM_ENV* env, SPVM_VALUE* stack);
 };
 
 struct spvm_env_api {
@@ -347,61 +332,13 @@ struct spvm_api_allocator {
   void (*free_instance)(void* allocator);
 };
 
-struct spvm_api_string_buffer {
-  void* (*new_instance)(void* allocator, int32_t capacity);
-  void (*free_instance)(void* string_buffer);
-  const char* (*get_string)(void* string_buffer);
-  int32_t (*get_length)(void* string_buffer);
-};
-
-struct spvm_api_compiler {
-  void* (*new_instance)(void);
-  void (*free_instance)(void* compiler);
-  int32_t (*get_start_line)(void* compiler);
-  void (*set_start_line)(void* compiler, int32_t start_line);
-  const char* (*get_start_file)(void* compiler);
-  void (*set_start_file)(void* compiler, const char* start_file);
-  int32_t (*get_include_dirs_length )(void* compiler);
-  const char* (*get_include_dir )(void* compiler, int32_t index);
-  void (*add_include_dir)(void* compiler, const char* include_dir);
-  void (*clear_include_dirs)(void* compiler);
-  void (*add_class_file)(void* compiler, const char* class_name);
-  void (*delete_class_file)(void* compiler, const char* class_name);
-  void* (*get_class_file)(void* compiler, const char* class_name);
-  int32_t (*compile)(void* compiler, const char* basic_type_name);
-  const char* (*get_error_message)(void* compiler, int32_t index);
-  int32_t (*get_error_messages_length)(void* compiler);
-  void* (*get_runtime)(void* compiler);
-};
-
-struct spvm_api_class_file {
-  const char* (*get_class_name)(void* compiler, void* class_file);
-  const char* (*get_file)(void* compiler, void* class_file);
-  void (*set_file)(void* compiler, void* class_file, const char* file);
-  const char* (*get_dir)(void* compiler, void* class_file);
-  void (*set_dir)(void* compiler, void* class_file, const char* dir);
-  const char* (*get_rel_file)(void* compiler, void* class_file);
-  void (*set_rel_file)(void* compiler, void* class_file, const char* rel_file);
-  const char* (*get_content)(void* compiler, void* class_file);
-  void (*set_content)(void* compiler, void* class_file, const char* content);
-  int32_t (*get_content_length)(void* compiler, void* class_file);
-  void (*set_content_length)(void* compiler, void* class_file, int32_t content_length);
-};
-
-struct spvm_api_runtime {
-  int32_t (*get_object_data_offset)(void* runtime);
-  int32_t (*get_object_ref_count_offset)(void* runtime);
-  int32_t (*get_object_length_offset)(void* runtime);
-  void* (*get_basic_type_by_id)(void* runtime, int32_t basic_type_id);
-  void* (*get_basic_type_by_name)(void* runtime, const char* basic_type_name);
-  int32_t (*get_basic_types_length)(void* runtime);
-  void (*build_precompile_module_source)(void* runtime, void* string_buffer, void* module_basic_type);
-  void (*build_precompile_method_source)(void* runtime, void* string_buffer, void* method);
-  void* (*get_compiler)(void* runtime);
-  void (*set_compiler)(void* runtime, void* compiler);
-  FILE* (*get_spvm_stdin)(void* runtime);
-  FILE* (*get_spvm_stdout)(void* runtime);
-  FILE* (*get_spvm_stderr)(void* runtime);
+struct spvm_api_arg {
+  const void* (*get_name)(void* runtime, void* arg);
+  int32_t (*get_index)(void* runtime, void* arg);
+  void* (*get_basic_type)(void* runtime, void* arg);
+  int32_t (*get_type_dimension)(void* runtime, void* arg);
+  int32_t (*get_type_flag)(void* runtime, void* arg);
+  int32_t (*get_stack_index)(void* runtime, void* arg);
 };
 
 struct spvm_api_basic_type {
@@ -429,6 +366,20 @@ struct spvm_api_basic_type {
   int32_t (*is_super_class)(void* runtime, void* super_basic_type, void* child_basic_type);
 };
 
+struct spvm_api_class_file {
+  const char* (*get_class_name)(void* compiler, void* class_file);
+  const char* (*get_file)(void* compiler, void* class_file);
+  void (*set_file)(void* compiler, void* class_file, const char* file);
+  const char* (*get_dir)(void* compiler, void* class_file);
+  void (*set_dir)(void* compiler, void* class_file, const char* dir);
+  const char* (*get_rel_file)(void* compiler, void* class_file);
+  void (*set_rel_file)(void* compiler, void* class_file, const char* rel_file);
+  const char* (*get_content)(void* compiler, void* class_file);
+  void (*set_content)(void* compiler, void* class_file, const char* content);
+  int32_t (*get_content_length)(void* compiler, void* class_file);
+  void (*set_content_length)(void* compiler, void* class_file, int32_t content_length);
+};
+
 struct spvm_api_class_var {
   const char* (*get_name)(void* runtime, void* class_var);
   int32_t (*get_index)(void* runtime, void* class_var);
@@ -436,6 +387,27 @@ struct spvm_api_class_var {
   int32_t (*get_type_dimension)(void* runtime, void* class_var);
   int32_t (*get_type_flag)(void* runtime, void* class_var);
   void* (*get_current_basic_type)(void* runtime, void* class_var);
+};
+
+struct spvm_api_compiler {
+  void* (*new_instance)(void);
+  void (*free_instance)(void* compiler);
+  int32_t (*get_start_line)(void* compiler);
+  void (*set_start_line)(void* compiler, int32_t start_line);
+  const char* (*get_start_file)(void* compiler);
+  void (*set_start_file)(void* compiler, const char* start_file);
+  int32_t (*get_include_dirs_length )(void* compiler);
+  const char* (*get_include_dir )(void* compiler, int32_t index);
+  void (*add_include_dir)(void* compiler, const char* include_dir);
+  void (*clear_include_dirs)(void* compiler);
+  void (*add_class_file)(void* compiler, const char* class_name);
+  void (*delete_class_file)(void* compiler, const char* class_name);
+  void* (*get_class_file)(void* compiler, const char* class_name);
+  int32_t (*compile)(void* compiler, const char* basic_type_name);
+  const char* (*get_error_message)(void* compiler, int32_t index);
+  int32_t (*get_error_messages_length)(void* compiler);
+  void* (*get_runtime)(void* compiler);
+  void (*prepend_include_dir)(void* compiler, const char* include_dir);
 };
 
 struct spvm_api_field {
@@ -446,15 +418,6 @@ struct spvm_api_field {
   int32_t (*get_type_dimension)(void* runtime, void* field);
   int32_t (*get_type_flag)(void* runtime, void* field);
   void* (*get_current_basic_type)(void* runtime, void* field);
-};
-
-struct spvm_api_type {
-  int32_t (*can_assign)(void* runtime, void* dist_basic_type, int32_t dist_type_dimension, int32_t dist_type_flag, void* src_basic_type, int32_t src_type_dimension, int32_t src_type_flag);
-  int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
-  int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
-  int32_t (*is_any_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
-  int32_t (*is_object_array_type)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
-  int32_t (*is_any_object_array_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
 };
 
 struct spvm_api_method {
@@ -489,13 +452,20 @@ struct spvm_api_method {
   void (*set_precompile_address)(void* runtime, void* method, void* address);
 };
 
-struct spvm_api_arg {
-  const void* (*get_name)(void* runtime, void* arg);
-  int32_t (*get_index)(void* runtime, void* arg);
-  void* (*get_basic_type)(void* runtime, void* arg);
-  int32_t (*get_type_dimension)(void* runtime, void* arg);
-  int32_t (*get_type_flag)(void* runtime, void* arg);
-  int32_t (*get_stack_index)(void* runtime, void* arg);
+struct spvm_api_runtime {
+  int32_t (*get_object_data_offset)(void* runtime);
+  int32_t (*get_object_ref_count_offset)(void* runtime);
+  int32_t (*get_object_length_offset)(void* runtime);
+  void* (*get_basic_type_by_id)(void* runtime, int32_t basic_type_id);
+  void* (*get_basic_type_by_name)(void* runtime, const char* basic_type_name);
+  int32_t (*get_basic_types_length)(void* runtime);
+  void (*build_precompile_class_source)(void* runtime, void* string_buffer, void* module_basic_type);
+  void (*build_precompile_method_source)(void* runtime, void* string_buffer, void* method);
+  void* (*get_compiler)(void* runtime);
+  void (*set_compiler)(void* runtime, void* compiler);
+  FILE* (*get_spvm_stdin)(void* runtime);
+  FILE* (*get_spvm_stdout)(void* runtime);
+  FILE* (*get_spvm_stderr)(void* runtime);
 };
 
 struct spvm_api_internal {
@@ -512,6 +482,22 @@ struct spvm_api_mutex {
   void (*unlock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
   void (*reader_lock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
   void (*reader_unlock)(SPVM_ENV* env, SPVM_VALUE* stack, void* mutex);
+};
+
+struct spvm_api_string_buffer {
+  void* (*new_instance)(void* allocator, int32_t capacity);
+  void (*free_instance)(void* string_buffer);
+  const char* (*get_string)(void* string_buffer);
+  int32_t (*get_length)(void* string_buffer);
+};
+
+struct spvm_api_type {
+  int32_t (*can_assign)(void* runtime, void* dist_basic_type, int32_t dist_type_dimension, int32_t dist_type_flag, void* src_basic_type, int32_t src_type_dimension, int32_t src_type_flag);
+  int32_t (*get_type_width)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
+  int32_t (*is_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
+  int32_t (*is_any_object_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
+  int32_t (*is_object_array_type)(void* runtime, void* basic_type, int32_t dimension, int32_t flag);
+  int32_t (*is_any_object_array_type)(void* runtime, void* basic_type, int32_t type_dimension, int32_t flag);
 };
 
 enum {
@@ -538,6 +524,7 @@ enum {
   SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS,
   SPVM_NATIVE_C_BASIC_TYPE_ID_COMMAND_INFO_CLASS,
   SPVM_NATIVE_C_BASIC_TYPE_ID_ADDRESS_CLASS,
+  SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_COMPILE_CLASS,
 };
 
 enum {

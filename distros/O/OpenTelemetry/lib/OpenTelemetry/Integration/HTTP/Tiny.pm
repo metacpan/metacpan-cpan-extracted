@@ -1,7 +1,7 @@
 package OpenTelemetry::Integration::HTTP::Tiny;
 # ABSTRACT: OpenTelemetry integration for HTTP::Tiny
 
-our $VERSION = '0.011';
+our $VERSION = '0.018';
 
 use strict;
 use warnings;
@@ -127,12 +127,15 @@ sub install ( $class, %config ) {
         if ( $res->{success} ) {
             $span->set_status( SPAN_STATUS_OK );
         }
-        else {
-            my $description = $res->{status} == 599
-                ? ( $res->{content} // '' )
-                : $res->{status};
+        elsif ( $res->{status} == 599 ) {
+            my $error = ( $res->{content} // '' ) =~ s/^\s+|\s+$//r;
+            my ($description) = split /\n/, $error, 2;
+            $description =~ s/ at \S+ line \d+\.$//a;
 
             $span->set_status( SPAN_STATUS_ERROR, $description );
+        }
+        else {
+            $span->set_status( SPAN_STATUS_ERROR, $res->{status} );
         }
 
         $span->set_attribute(

@@ -1,10 +1,10 @@
-requires 'perl'                              => '5.008004';
+requires 'perl'                              => '5.014004';
 requires 'parent';
 requires 'Scalar::Util';
 requires 'Plack'                             => '1.0029';
 requires 'Plack::Middleware::Static';
 requires 'Plack::Middleware::ReverseProxy';
-requires 'Router::Boom'                      => '1.01';
+requires 'Router::Boom'                      => '1.03';
 requires 'Cwd';
 requires 'File::Basename';
 requires 'Text::Xslate'                      => '3.2.4';

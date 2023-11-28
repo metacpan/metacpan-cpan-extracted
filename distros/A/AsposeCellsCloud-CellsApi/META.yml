@@ -20,11 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 23.10
-  AsposeCellsCloud::LiteCellsApi:
-    file: lib/AsposeCellsCloud/LiteCellsApi.pm
-  AsposeCellsCloud::LightCellsApi:
-    file: lib/AsposeCellsCloud/LightCellsApi.pm    
+    version: 23.11
   AsposeCellsCloud::Configuration:
     file: lib/AsposeCellsCloud/Configuration.pm
   AsposeCellsCloud::Role:
@@ -583,6 +579,8 @@ provides:
     file: lib/AsposeCellsCloud/Object/ConvertParameter.pm
   AsposeCellsCloud::Object::CreatePivotTableRequest:
     file: lib/AsposeCellsCloud/Object/CreatePivotTableRequest.pm
+  AsposeCellsCloud::Object::ImportJsonRequest:
+    file: lib/AsposeCellsCloud/Object/ImportJsonRequest.pm
   AsposeCellsCloud::Object::ImportXMLRequest:
     file: lib/AsposeCellsCloud/Object/ImportXMLRequest.pm
   AsposeCellsCloud::Object::MatchConditionRequest:
@@ -1017,6 +1015,16 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostConvertWorkbookToSQLRequest.pm
   AsposeCellsCloud::Request::PostConvertWorkbookToCSVRequest:
     file: lib/AsposeCellsCloud/Request/PostConvertWorkbookToCSVRequest.pm
+  AsposeCellsCloud::Request::PostExportRequest:
+    file: lib/AsposeCellsCloud/Request/PostExportRequest.pm
+  AsposeCellsCloud::Request::PostWorkbookExportXMLRequest:
+    file: lib/AsposeCellsCloud/Request/PostWorkbookExportXMLRequest.pm
+  AsposeCellsCloud::Request::PostWorkbookImportJsonRequest:
+    file: lib/AsposeCellsCloud/Request/PostWorkbookImportJsonRequest.pm
+  AsposeCellsCloud::Request::PostWorkbookImportXMLRequest:
+    file: lib/AsposeCellsCloud/Request/PostWorkbookImportXMLRequest.pm
+  AsposeCellsCloud::Request::PostImportDataRequest:
+    file: lib/AsposeCellsCloud/Request/PostImportDataRequest.pm
   AsposeCellsCloud::Request::GetWorksheetHyperlinksRequest:
     file: lib/AsposeCellsCloud/Request/GetWorksheetHyperlinksRequest.pm
   AsposeCellsCloud::Request::GetWorksheetHyperlinkRequest:
@@ -1033,8 +1041,6 @@ provides:
     file: lib/AsposeCellsCloud/Request/PostAssembleRequest.pm
   AsposeCellsCloud::Request::PostCompressRequest:
     file: lib/AsposeCellsCloud/Request/PostCompressRequest.pm
-  AsposeCellsCloud::Request::PostExportRequest:
-    file: lib/AsposeCellsCloud/Request/PostExportRequest.pm
   AsposeCellsCloud::Request::PostMergeRequest:
     file: lib/AsposeCellsCloud/Request/PostMergeRequest.pm
   AsposeCellsCloud::Request::PostSplitRequest:
@@ -1303,8 +1309,6 @@ provides:
     file: lib/AsposeCellsCloud/Request/PutWorkbookCreateRequest.pm
   AsposeCellsCloud::Request::PostWorkbookSplitRequest:
     file: lib/AsposeCellsCloud/Request/PostWorkbookSplitRequest.pm
-  AsposeCellsCloud::Request::PostImportDataRequest:
-    file: lib/AsposeCellsCloud/Request/PostImportDataRequest.pm
   AsposeCellsCloud::Request::PostWorkbookCalculateFormulaRequest:
     file: lib/AsposeCellsCloud/Request/PostWorkbookCalculateFormulaRequest.pm
   AsposeCellsCloud::Request::PostAutofitWorkbookRowsRequest:
@@ -1413,10 +1417,6 @@ provides:
     file: lib/AsposeCellsCloud/Request/DeleteWorksheetValidationRequest.pm
   AsposeCellsCloud::Request::DeleteWorksheetValidationsRequest:
     file: lib/AsposeCellsCloud/Request/DeleteWorksheetValidationsRequest.pm
-  AsposeCellsCloud::Request::PostWorkbookExportXMLRequest:
-    file: lib/AsposeCellsCloud/Request/PostWorkbookExportXMLRequest.pm
-  AsposeCellsCloud::Request::PostWorkbookImportXMLRequest:
-    file: lib/AsposeCellsCloud/Request/PostWorkbookImportXMLRequest.pm
   AsposeCellsCloud::Request::DownloadFileRequest:
     file: lib/AsposeCellsCloud/Request/DownloadFileRequest.pm
   AsposeCellsCloud::Request::UploadFileRequest:
@@ -1470,5 +1470,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 23.10
+version: 23.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

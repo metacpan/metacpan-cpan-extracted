@@ -14,7 +14,9 @@ License: perl
 
 # Perl Power Tool - ls(1)
 
+use Config qw(%Config);
 use File::Basename qw(basename);
+use File::Spec::Functions;
 use File::stat;
 use Getopt::Std;
 use File::Spec;
@@ -40,6 +42,44 @@ my $Program = basename($0);
 my @perms = qw(--- --x -w- -wx r-- r-x rw- rwx);
 my @ftype = qw(. p c ? d ? b ? - ? l ? s ? ? ?);
 $ftype[0] = '';
+
+sub get_columns {
+	my @methods = qw(windows unix default);
+	foreach my $m ( @methods ) {
+		my $cols = __PACKAGE__->can($m)->();
+		next unless defined $cols;
+		return $cols;
+		}
+}
+
+sub windows {
+	return unless $^O eq 'MSWin32';
+	my @lines = `powershell -command "&{(get-host).ui.rawui.WindowSize;}"`;
+
+	while( my $l = shift @lines ) { last if $l =~ /\A-----/ }
+	return $lines[0] =~ m/\A\s*(\d+)/ ? $1 : ();
+	}
+
+sub unix {
+	return if $^O eq 'MSWin32';
+	my $c = do {
+		if( has('tput') ) { `tput cols` }
+		elsif( has('ssty') ) { `stty size  | cut -d' ' -f 2` }
+		else { undef };
+		};
+	chomp $c;
+	return $c;
+	}
+
+sub default { 80 }
+
+sub has ( $program ) {
+	foreach my $dir ( split /\Q$Config{path_sep}/, $ENV{PATH} ) {
+		next unless -x catfile( $dir, $program );
+		return 1;
+		}
+	return;
+	}
 
 sub format_mode {
   my $mode = shift;
@@ -81,14 +121,7 @@ my %Options = ();	# option/flag arguments
 my $SixMonths =		# long listing time if < 6 months, else year
  60*60*24*(365/2);
 my $VERSION = '0.70';	# because we're V7-compatible :)
-my $WinSize = "\0" x 8;	# window size buffer
-my $TIOCGWINSZ =	# get window size via ioctl()
- 0x40087468;		# should be require sys/ioctl.pl,
-			# but that won't exist on all platforms
-my $WinCols = 0;	# window columns of output
-my $WinRows = 0;	# window rows of output
-my $Xpixel = 0;		# window start X
-my $Ypixel = 0;		# window start Y
+my $WinCols;		# window columns of output
 
 # ------ compensate for lack of getpwuid/getgrgid on some platforms
 eval { my $dummy = ""; $dummy = (getpwuid(0))[0] };
@@ -457,12 +490,7 @@ if ($Options{'f'}) {
 	$Options{'a'} = 1;
 }
 
-# ------ get (or guess) window size
-if (ioctl(STDOUT, $TIOCGWINSZ, $WinSize)) {
-	($WinRows, $WinCols, $Xpixel, $Ypixel) = unpack('S4', $WinSize);
-} else {
-	$WinCols = 80;
-}
+$WinCols = get_columns();
 $Attributes = stat(STDOUT);
 if ($Attributes->mode & 0140000) {
 	$Options{'1'} = '1';

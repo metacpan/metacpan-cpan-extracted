@@ -1,26 +1,23 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More;
-use List::Util                qw/max/;
-use List::MoreUtils           qw/all/;
-use Scalar::Util              qw/looks_like_number/;
-use Clone                     qw/clone/;
-use Module::Load::Conditional qw/check_install/;
+use Test::More 1.302195;
+use List::Util                     qw/max/;
+use List::MoreUtils                qw/all/;
+use Scalar::Util                   qw/looks_like_number/;
+use Clone                          qw/clone/;
+use Module::Load::Conditional 0.66 qw/check_install/;
 
 use Excel::ValueReader::XLSX;
-
 note "testing Excel::ValueReader::XLSX version $Excel::ValueReader::XLSX::VERSION";
 
-
 (my $tst_dir = $0) =~ s/valuereader\.t$//;
-$tst_dir       ||= ".";
-my $xl_file      = "$tst_dir/valuereader.xlsx";
-my $xl_1904      = "$tst_dir/valuereader1904.xlsx";
-my $xl_ulibuck   = "$tst_dir/ulibuck.xlsx";
-my $xl_mappe     = "$tst_dir/Mappe1.xlsx";
-my $xl_without_r = "$tst_dir/cells_without_r_attr.xlsx";
-
+$tst_dir       ||= "./";
+my $xl_file      = $tst_dir . "valuereader.xlsx";
+my $xl_1904      = $tst_dir . "valuereader1904.xlsx";
+my $xl_ulibuck   = $tst_dir . "ulibuck.xlsx";
+my $xl_mappe     = $tst_dir . "Mappe1.xlsx";
+my $xl_without_r = $tst_dir . "cells_without_r_attr.xlsx";
 
 my @expected_sheet_names = qw/Test Empty Entities Tab_entities Dates Tables/;
 my @expected_values      = (  ["Hello", undef, undef, 22, 33, 55],
@@ -33,6 +30,7 @@ my @expected_values      = (  ["Hello", undef, undef, 22, 33, 55],
                                "Hello after an empty row and col"],
                               ["cell\r\nwith\r\nembedded newlines"],
                              );
+my $expected_active_sheet = 6;
 
 my @expected_tab_entities  = (
   [],
@@ -194,56 +192,76 @@ push @backends, 'LibXML' if check_install(module => 'XML::LibXML::Reader');
 
 foreach my $backend (@backends) {
 
+  # directly supply pathname
+  run_tests(file => $xl_file, $backend);
+
+  # open file and pass a filehandle
+  open my $fh, "<:raw", $xl_file or die "could not open $xl_file: $!";
+  run_tests(handle => $fh, $backend);
+}
+
+
+
+
+
+sub run_tests {
+  my ($source_kind, $xl_source, $backend) = @_;
+
+  my $context = "$backend (source: $source_kind)";
+
   # dirty hack when testing with LibXML, because \r\n are silently transformed into \n
   local $expected_values[-1][0] = "cell\nwith\nembedded newlines"
     if $backend eq 'LibXML';
 
   # instantiate the reader
-  my $reader = Excel::ValueReader::XLSX->new(xlsx => $xl_file, using => $backend);
+  my $reader = Excel::ValueReader::XLSX->new(xlsx => $xl_source, using => $backend);
 
   # check sheet names
   my @sheet_names = $reader->sheet_names;
-  is_deeply(\@sheet_names, \@expected_sheet_names, "sheet names using $backend");
+  is_deeply(\@sheet_names, \@expected_sheet_names, "sheet names using $context");
+
+  # check active_sheet
+  is($reader->active_sheet, $expected_active_sheet, "active_sheet using $context");
 
   # check a regular sheet
   my $values = $reader->values('Test');
-  is_deeply($values, \@expected_values, "values using $backend");
+  is_deeply($values, \@expected_values, "values using $context");
   my $nb_cols = max map {scalar @$_} @$values;
-  is ($nb_cols, 6, "nb_cols using $backend");
+  is ($nb_cols, 6, "nb_cols using $context");
 
   # check an empty sheet
   my $empty  = $reader->values('Empty');
-  is_deeply($empty, [], "empty values using $backend");
+  is_deeply($empty, [], "empty values using $context");
 
   # tables
   my ($entity_columns, $entities) = $reader->table('Entities');
   is_deeply($entity_columns, [qw(Num Name Char Cap/small Letter Variant)],
-                                           "column names, using $backend");
-  is $entities->[0]{Name},   'amp'       , "1st table row, name, using $backend";
-  is $entities->[0]{Letter}, 'ampersand' , "1st table row, letter, using $backend";
-  is $entities->[-1]{Name},  'yuml' ,      "last table row, name, using $backend";
+                                           "column names, using $context");
+  is $entities->[0]{Name},   'amp'       , "1st table row, name, using $context";
+  is $entities->[0]{Letter}, 'ampersand' , "1st table row, letter, using $context";
+  is $entities->[-1]{Name},  'yuml' ,      "last table row, name, using $context";
 
-  is_deeply([$reader->table_names], \@expected_tab_names, "table names, using $backend");
+  is_deeply([$reader->table_names], \@expected_tab_names, "table names, using $context");
 
   my $tab_foobar = $reader->table('tab_foobar');
-  is_deeply($tab_foobar, \@expected_tab_foobar, "tab_foobar, using $backend");
+  is_deeply($tab_foobar, \@expected_tab_foobar, "tab_foobar, using $context");
 
   my $tab_badambum = $reader->table('tab_in_middle_of_sheet');
-  is_deeply($tab_badambum, \@expected_tab_badambum, "tab_badambum, using $backend");
+  is_deeply($tab_badambum, \@expected_tab_badambum, "tab_badambum, using $context");
 
   my ($col_headers, $tab_no_headers) = $reader->table('tab_without_headers');
-  is_deeply($tab_no_headers, \@expected_tab_no_headers, "tab_no_headers, using $backend");
+  is_deeply($tab_no_headers, \@expected_tab_no_headers, "tab_no_headers, using $context");
 
   my $tab_cols_with_entities = $reader->table('Cols_with_entities');
-  is_deeply($tab_cols_with_entities, \@expected_tab_cols_with_entities, "tab_cols_with_entities, using $backend");
+  is_deeply($tab_cols_with_entities, \@expected_tab_cols_with_entities, "tab_cols_with_entities, using $context");
 
   # check a pivot table
   my $tab_entities = $reader->values('Tab_entities');
-  is_deeply($tab_entities, \@expected_tab_entities, "tab_entities using $backend");
+  is_deeply($tab_entities, \@expected_tab_entities, "tab_entities using $context");
 
   # check date conversions
   my $dates = $reader->values('Dates');
-  is_deeply($dates, \@expected_dates_and_times, "dates using $backend");
+  is_deeply($dates, \@expected_dates_and_times, "dates using $context");
 
   # check time conversions with rounding hack
   my $t1 = $reader->formatted_date("44022.123599537037", "[h]:mm:ss");
@@ -256,42 +274,45 @@ foreach my $backend (@backends) {
   foreach my $row (@$expected_other_format) {
     $_ and s/^(\d\d)\.(\d\d)\.\d\d(\d\d)/$2-$1-$3/ foreach @$row;
   }
-  my $other_reader = Excel::ValueReader::XLSX->new(xlsx => $xl_file, using => $backend,
+  my $other_reader = Excel::ValueReader::XLSX->new(xlsx => $xl_source, using => $backend,
                                                    date_format => "%m-%d-%y");
   my $other_dates = $other_reader->values('Dates');
-  is_deeply($other_dates, $expected_other_format, "dates with other format, using $backend");
+  is_deeply($other_dates, $expected_other_format, "dates with other format, using $context");
 
 
   # no date format
-  my $reader_no_date = Excel::ValueReader::XLSX->new(xlsx => $xl_file, using => $backend,
+  my $reader_no_date = Excel::ValueReader::XLSX->new(xlsx => $xl_source, using => $backend,
                                                      date_formatter => undef);
   my $dates_raw_nums  = $reader_no_date->values('Dates');
   my @all_vals_flat   = grep {$_} map {@$_} @$dates_raw_nums;
   my $are_all_numbers = all {looks_like_number($_)} @all_vals_flat;
-  ok($are_all_numbers, "dates with no format, using $backend");
+  ok($are_all_numbers, "dates with no format, using $context");
 
 
   # Excel file in 1904 date format
   my $reader_1904 = Excel::ValueReader::XLSX->new(xlsx => $xl_1904, using => $backend);
   my $dates_1904  = $reader_1904->values('Dates');
-  is_deeply($dates_1904, \@expected_dates_1904, "dates in 1904 format, using $backend");
+  is_deeply($dates_1904, \@expected_dates_1904, "dates in 1904 format, using $context");
 
   # some edge cases provided by https://github.com/ulibuck
   my $reader_ulibuck = Excel::ValueReader::XLSX->new(xlsx => $xl_ulibuck, using => $backend);
   my $example1       = $reader_ulibuck->values('Example');
-  is($example1->[3][2], '30.12.2021', "date1904=\"false\", using $backend");
+  is($example1->[3][2], '30.12.2021', "date1904=\"false\", using $context");
   my $example2       = $reader_ulibuck->values('Example two');
-  is($example2->[12][2], '# Dummy', "# Dummy, using $backend");
+  is($example2->[12][2], '# Dummy', "# Dummy, using $context");
+
+  # in this workbook the active_sheet is deliberately empty
+  ok(! defined $reader_ulibuck->active_sheet, "empty active_sheet, using $context");
 
   # https://github.com/damil/Excel-ValueReader-XLSX/issues/2 : empty string (ulibuck++)
   my $reader_mappe = Excel::ValueReader::XLSX->new(xlsx => $xl_mappe, using => $backend);
   my $strings      = $reader_mappe->values('Tabelle2');
-  is_deeply $strings, \@expected_mappe, "empty string nodes, using $backend";
+  is_deeply $strings, \@expected_mappe, "empty string nodes, using $context";
 
   # cells do not always have a 'r' attribute
   my $reader_without_r = Excel::ValueReader::XLSX->new(xlsx => $xl_without_r, using => $backend);
   my $vals = $reader_without_r->values(1);
-  is_deeply $vals, \@expected_without_r, "cells without 'r' attribute";
+  is_deeply $vals, \@expected_without_r, "cells without 'r' attribute, using $context";
 }
 
 

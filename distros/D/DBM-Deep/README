@@ -353,8 +353,8 @@ TIE INTERFACE
     and direct them to the right place -- the DB file. This has nothing to
     do with the "Tie Construction" section above. This simply tells you how
     to use DBM::Deep using regular hashes and arrays, rather than calling
-    functions like get() and put() (although those work too). It is entirely
-    up to you how to want to access your databases.
+    functions like "get()" and "put()" (although those work too). It is
+    entirely up to you how to want to access your databases.
 
   Hashes
     You can treat any DBM::Deep object like a normal Perl hash reference.
@@ -368,25 +368,25 @@ TIE INTERFACE
 
       print $db->{myhash}->{subkey} . "\n";
 
-    You can even step through hash keys using the normal Perl keys()
+    You can even step through hash keys using the normal Perl "keys()"
     function:
 
       foreach my $key (keys %$db) {
           print "$key: " . $db->{$key} . "\n";
       }
 
-    Remember that Perl's keys() function extracts *every* key from the hash
-    and pushes them onto an array, all before the loop even begins. If you
-    have an extremely large hash, this may exhaust Perl's memory. Instead,
-    consider using Perl's each() function, which pulls keys/values one at a
-    time, using very little memory:
+    Remember that Perl's "keys()" function extracts *every* key from the
+    hash and pushes them onto an array, all before the loop even begins. If
+    you have an extremely large hash, this may exhaust Perl's memory.
+    Instead, consider using Perl's "each()" function, which pulls
+    keys/values one at a time, using very little memory:
 
       while (my ($key, $value) = each %$db) {
           print "$key: $value\n";
       }
 
-    Please note that when using each(), you should always pass a direct hash
-    reference, not a lookup. Meaning, you should never do this:
+    Please note that when using "each()", you should always pass a direct
+    hash reference, not a lookup. Meaning, you should never do this:
 
       # NEVER DO THIS
       while (my ($key, $value) = each %{$db->{foo}}) { # BAD
@@ -400,8 +400,8 @@ TIE INTERFACE
   Arrays
     As with hashes, you can treat any DBM::Deep object like a normal Perl
     array reference. This includes inserting, removing and manipulating
-    elements, and the push(), pop(), shift(), unshift() and splice()
-    functions. The object must have first been created using type
+    elements, and the "push()", "pop()", "shift()", "unshift()" and
+    "splice()" functions. The object must have first been created using type
     "DBM::Deep->TYPE_ARRAY", or simply be a nested array reference inside a
     hash. Example:
 
@@ -424,8 +424,9 @@ OO INTERFACE
     In addition to the *tie()* interface, you can also use a standard OO
     interface to manipulate all aspects of DBM::Deep databases. Each type of
     object (hash or array) has its own methods, but both types share the
-    following common methods: put(), get(), exists(), delete() and clear().
-    fetch() and store() are aliases to put() and get(), respectively.
+    following common methods: "put()", "get()", "exists()", "delete()" and
+    "clear()". "fetch()" and "store()" are aliases to "put()" and "get()",
+    respectively.
 
     *   new() / clone()
 
@@ -487,7 +488,7 @@ OO INTERFACE
         This will compress the datafile so that it takes up as little space
         as possible. There is a freespace manager so that when space is
         freed up, it is used before extending the size of the datafile. But,
-        that freespace just sits in the datafile unless optimize() is
+        that freespace just sits in the datafile unless "optimize()" is
         called.
 
         "optimize" basically copies everything into a new database, so, if
@@ -495,10 +496,11 @@ OO INTERFACE
 
     *   import()
 
-        Unlike simple assignment, import() does not tie the right-hand side.
-        Instead, a copy of your data is put into the DB. import() takes
-        either an arrayref (if your DB is an array) or a hashref (if your DB
-        is a hash). import() will die if anything else is passed in.
+        Unlike simple assignment, "import()" does not tie the right-hand
+        side. Instead, a copy of your data is put into the DB. "import()"
+        takes either an arrayref (if your DB is an array) or a hashref (if
+        your DB is a hash). "import()" will die if anything else is passed
+        in.
 
     *   export()
 
@@ -531,7 +533,7 @@ OO INTERFACE
 
   Hashes
     For hashes, DBM::Deep supports all the common methods described above,
-    and the following additional methods: first_key() and next_key().
+    and the following additional methods: "first_key()" and "next_key()".
 
     *   first_key()
 
@@ -570,8 +572,8 @@ OO INTERFACE
 
   Arrays
     For arrays, DBM::Deep supports all the common methods described above,
-    and the following additional methods: length(), push(), pop(), shift(),
-    unshift() and splice().
+    and the following additional methods: "length()", "push()", "pop()",
+    "shift()", "unshift()" and "splice()".
 
     *   length()
 
@@ -654,16 +656,16 @@ LOCKING
           locking => 1
       );
 
-    This causes DBM::Deep to flock() the underlying filehandle with
+    This causes DBM::Deep to "flock()" the underlying filehandle with
     exclusive mode for writes, and shared mode for reads. This is required
     if you have multiple processes accessing the same database file, to
-    avoid file corruption. Please note that flock() does NOT work for files
-    over NFS. See "DB over NFS" below for more.
+    avoid file corruption. Please note that "flock()" does NOT work for
+    files over NFS. See "DB over NFS" below for more.
 
   Explicit Locking
     You can explicitly lock a database, so it remains locked for multiple
-    actions. This is done by calling the lock_exclusive() method (for when
-    you want to write) or the lock_shared() method (for when you want to
+    actions. This is done by calling the "lock_exclusive()" method (for when
+    you want to write) or the "lock_shared()" method (for when you want to
     read). This is particularly useful for things like counters, where the
     current value needs to be fetched, then incremented, then stored again.
 
@@ -686,16 +688,16 @@ LOCKING
     future release.
 
 IMPORTING/EXPORTING
-    You can import existing complex structures by calling the import()
+    You can import existing complex structures by calling the "import()"
     method, and export an entire database into an in-memory structure using
-    the export() method. Both are examined here.
+    the "export()" method. Both are examined here.
 
   Importing
     Say you have an existing hash with nested hashes/arrays inside it.
     Instead of walking the structure and adding keys/elements to the
-    database as you go, simply pass a reference to the import() method. This
-    recursively adds everything to an existing DBM::Deep object for you.
-    Here is an example:
+    database as you go, simply pass a reference to the "import()" method.
+    This recursively adds everything to an existing DBM::Deep object for
+    you. Here is an example:
 
       my $struct = {
           key1 => "value1",
@@ -715,18 +717,18 @@ IMPORTING/EXPORTING
     This recursively imports the entire $struct object into $db, including
     all nested hashes and arrays. If the DBM::Deep object contains existing
     data, keys are merged with the existing ones, replacing if they already
-    exist. The import() method can be called on any database level (not just
-    the base level), and works with both hash and array DB types.
+    exist. The "import()" method can be called on any database level (not
+    just the base level), and works with both hash and array DB types.
 
     Note: Make sure your existing structure has no circular references in
     it. These will cause an infinite loop when importing. There are plans to
     fix this in a later release.
 
   Exporting
-    Calling the export() method on an existing DBM::Deep object will return
-    a reference to a new in-memory copy of the database. The export is done
-    recursively, so all nested hashes/arrays are all exported to standard
-    Perl objects. Here is an example:
+    Calling the "export()" method on an existing DBM::Deep object will
+    return a reference to a new in-memory copy of the database. The export
+    is done recursively, so all nested hashes/arrays are all exported to
+    standard Perl objects. Here is an example:
 
       my $db = DBM::Deep->new( "foo.db" );
 
@@ -741,10 +743,10 @@ IMPORTING/EXPORTING
       print $struct->{key1} . "\n"; # prints "value1"
 
     This makes a complete copy of the database in memory, and returns a
-    reference to it. The export() method can be called on any database level
-    (not just the base level), and works with both hash and array DB types.
-    Be careful of large databases -- you can store a lot more data in a
-    DBM::Deep object than an in-memory Perl structure.
+    reference to it. The "export()" method can be called on any database
+    level (not just the base level), and works with both hash and array DB
+    types. Be careful of large databases -- you can store a lot more data in
+    a DBM::Deep object than an in-memory Perl structure.
 
     Note: Make sure your database has no circular references in it. These
     will cause an infinite loop when exporting. There are plans to fix this
@@ -756,7 +758,7 @@ FILTERS
     perfect way to extend the engine, and implement things like real-time
     compression or encryption. Filtering applies to the base DB level, and
     all child hashes / arrays. Filter hooks can be specified when your
-    DBM::Deep object is first constructed, or by calling the set_filter()
+    DBM::Deep object is first constructed, or by calling the "set_filter()"
     method at any time. There are four available filter hooks.
 
   set_filter()
@@ -777,8 +779,8 @@ FILTERS
     *   filter_fetch_key
 
         This filter is called whenever a hash key is fetched (i.e. via
-        first_key() or next_key()). It is passed the transformed key, and
-        expected to return the plain key.
+        "first_key()" or "next_key()"). It is passed the transformed key,
+        and expected to return the plain key.
 
     *   filter_fetch_value
 
@@ -850,7 +852,8 @@ LARGEFILE SUPPORT
 
 LOW-LEVEL ACCESS
     If you require low-level access to the underlying filehandle that
-    DBM::Deep uses, you can call the _fh() method, which returns the handle:
+    DBM::Deep uses, you can call the "_fh()" method, which returns the
+    handle:
 
       my $fh = $db->_fh();
 
@@ -858,7 +861,7 @@ LOW-LEVEL ACCESS
     child hashes or arrays. All levels share a *root* structure, which
     contains things like the filehandle, a reference counter, and all the
     options specified when you created the object. You can get access to
-    this file object by calling the _storage() method.
+    this file object by calling the "_storage()" method.
 
       my $file_obj = $db->_storage();
 
@@ -900,9 +903,9 @@ CIRCULAR REFERENCES
       $db2->{foo} = $db1->{foo}; # dies
 
     Note: Passing the object to a function that recursively walks the object
-    tree (such as *Data::Dumper* or even the built-in optimize() or export()
-    methods) will result in an infinite loop. This will be fixed in a future
-    release by adding singleton support.
+    tree (such as *Data::Dumper* or even the built-in "optimize()" or
+    "export()" methods) will result in an infinite loop. This will be fixed
+    in a future release by adding singleton support.
 
 TRANSACTIONS
     As of 1.0000, DBM::Deep has ACID transactions. Every DBM::Deep object is
@@ -1030,10 +1033,10 @@ CAVEATS, ISSUES & BUGS
         Data::Dump::Streamer provides a mechanism for serializing coderefs,
         including saving off all closure state. This would allow for
         DBM::Deep to store the code for a subroutine. Then, whenever the
-        subroutine is read, the code could be eval()'ed into being. However,
-        just as for SCALAR and REF, that closure state may change without
-        notifying the DBM::Deep object storing the reference. Again, this
-        would generally be considered a feature.
+        subroutine is read, the code could be "eval()"'ed into being.
+        However, just as for SCALAR and REF, that closure state may change
+        without notifying the DBM::Deep object storing the reference. Again,
+        this would generally be considered a feature.
 
   External references and transactions
     If you do "my $x = $db->{foo};", then start a transaction, $x will be
@@ -1046,7 +1049,7 @@ CAVEATS, ISSUES & BUGS
     The current level of error handling in DBM::Deep is minimal. Files *are*
     checked for a 32-bit signature when opened, but any other form of
     corruption in the datafile can cause segmentation faults. DBM::Deep may
-    try to seek() past the end of a file, or get stuck in an infinite loop
+    try to "seek()" past the end of a file, or get stuck in an infinite loop
     depending on the level and type of corruption. File write operations are
     not checked for failure (for speed), so if you happen to run out of disk
     space, DBM::Deep will probably fail in a bad way. These things will be
@@ -1056,15 +1059,15 @@ CAVEATS, ISSUES & BUGS
     Beware of using DBM::Deep files over NFS. DBM::Deep uses flock(), which
     works well on local filesystems, but will NOT protect you from file
     corruption over NFS. I've heard about setting up your NFS server with a
-    locking daemon, then using lockf() to lock your files, but your mileage
-    may vary there as well. From what I understand, there is no real way to
-    do it. However, if you need access to the underlying filehandle in
-    DBM::Deep for using some other kind of locking scheme like lockf(), see
-    the "LOW-LEVEL ACCESS" section above.
+    locking daemon, then using "lockf()" to lock your files, but your
+    mileage may vary there as well. From what I understand, there is no real
+    way to do it. However, if you need access to the underlying filehandle
+    in DBM::Deep for using some other kind of locking scheme like "lockf()",
+    see the "LOW-LEVEL ACCESS" section above.
 
   Copying Objects
     Beware of copying tied objects in Perl. Very strange things can happen.
-    Instead, use DBM::Deep's clone() method which safely copies the object
+    Instead, use DBM::Deep's "clone()" method which safely copies the object
     and returns a new, blessed and tied hash or array to the same level in
     the DB.
 
@@ -1100,10 +1103,10 @@ CAVEATS, ISSUES & BUGS
     stale reference as an array or hash reference will cause an error.
 
   Large Arrays
-    Beware of using shift(), unshift() or splice() with large arrays. These
-    functions cause every element in the array to move, which can be murder
-    on DBM::Deep, as every element has to be fetched from disk, then stored
-    again in a different location. This will be addressed in a future
+    Beware of using "shift()", "unshift()" or "splice()" with large arrays.
+    These functions cause every element in the array to move, which can be
+    murder on DBM::Deep, as every element has to be fetched from disk, then
+    stored again in a different location. This will be addressed in a future
     version.
 
     This has been somewhat addressed so that the cost is constant,
@@ -1134,7 +1137,7 @@ CAVEATS, ISSUES & BUGS
     future changes to $x can be tracked within the DBM::Deep file and is
     considered to be a feature. By the time the rollback occurs, there is no
     knowledge that there had been an $x or what memory location to assign an
-    export() to.
+    "export()" to.
 
     NOTE: This does not affect importing because imports do a walk over the
     reference to be imported in order to explicitly leave it untied.

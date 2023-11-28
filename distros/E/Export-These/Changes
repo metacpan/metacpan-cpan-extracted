@@ -1,4 +1,18 @@
 Revision history for Perl extension Export::These.
+v0.2.0 2023-10-29
+  [features]
+    - add $EXPORT_PASS variable for user control over what symbols are
+      reexportable.
+    - refs (array, hash, code) now can be used inplace of simple symbol names
+      to pass in configuration to module instead of exporting symbols
+    - _preexport routine attempted to be called to allow filtering of
+      import arguments
+
+  [fixes]
+    - stricter (exact) name matching on exported symbols
+    - fixed error message with mangled name of CODE symbols not found during
+      export
+
 
 v0.1.2 2023-09-07
   [fixes]

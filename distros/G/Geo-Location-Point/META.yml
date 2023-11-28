@@ -25,10 +25,9 @@ no_index:
 requires:
   Carp: '0'
   GIS::Distance: '0'
-  TimeZone::TimeZoneDB: '0'
   perl: '5.010000'
 resources:
   bugtracker: https://github.com/nigelhorne/Geo-Location-Point/issues
   repository: git://github.com/nigelhorne/Geo-Location-Point.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

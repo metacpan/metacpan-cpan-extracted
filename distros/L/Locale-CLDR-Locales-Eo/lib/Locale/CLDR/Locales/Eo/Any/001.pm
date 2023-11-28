@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Eo::Any::001 - Package for language Esperanto
 
 package Locale::CLDR::Locales::Eo::Any::001;
 # This file auto generated from Data\common\main\eo_001.xml
-#	on Fri 13 Oct  9:13:36 am GMT
+#	on Sat  4 Nov  6:00:09 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

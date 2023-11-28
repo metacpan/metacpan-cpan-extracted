@@ -9,9 +9,10 @@ use MARC::Convert::Wikidata::Item::AudioBook;
 use MARC::Convert::Wikidata::Item::BookEdition;
 use MARC::Convert::Wikidata::Item::Periodical;
 use MARC::Convert::Wikidata::Transform;
+use MARC::Leader;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -44,6 +45,9 @@ sub new {
 	# MARC::Record object.
 	$self->{'marc_record'} = undef;
 
+	# Verbose mode.
+	$self->{'verbose'} = 0;
+
 	# Process parameters.
 	set_params($self, @params);
 
@@ -72,27 +76,26 @@ sub object {
 sub type {
 	my $self = shift;
 
-	my $leader = $self->{'marc_record'}->leader;
-	# XXX Use MARC::Leader if exist.
-	my $leader_hr = $self->_leader($leader);
+	my $leader_str = $self->{'marc_record'}->leader;
+	my $leader_obj = MARC::Leader->new->parse($leader_str);
 
 	# Language material
-	if ($leader_hr->{'type_of_record'} eq 'a' && $leader_hr->{'bibliographic_level'} eq 'm') {
+	if ($leader_obj->type eq 'a' && $leader_obj->bibliographic_level eq 'm') {
 		return 'monograph';
 
 	# XXX Notated music
-	} elsif ($leader_hr->{'type_of_record'} eq 'c' && $leader_hr->{'bibliographic_level'} eq 'm') {
+	} elsif ($leader_obj->type eq 'c' && $leader_obj->bibliographic_level eq 'm') {
 		return 'monograph';
 
 	# Nonmusical sound recording
-	} elsif ($leader_hr->{'type_of_record'} eq 'i' && $leader_hr->{'bibliographic_level'} eq 'm') {
+	} elsif ($leader_obj->type eq 'i' && $leader_obj->bibliographic_level eq 'm') {
 		return 'audiobook';
 
 	# Serial
-	} elsif ($leader_hr->{'bibliographic_level'} eq 's') {
+	} elsif ($leader_obj->bibliographic_level eq 's') {
 		return 'periodical';
 	} else {
-		err "Unsupported item with leader '$leader'.";
+		err "Unsupported item with leader '$leader_str'.";
 	}
 }
 
@@ -130,23 +133,6 @@ sub wikidata {
 	}
 
 	return $wikidata;
-}
-
-sub _leader {
-	my ($self, $leader) = @_;
-
-	# Example '03691nam a2200685 aa4500'
-	my $length = substr $leader, 0, 5;
-	my $record_status = substr $leader, 5, 1;
-	my $type_of_record = substr $leader, 6, 1;
-	my $bibliographic_level = substr $leader, 7, 1;
-
-	return {
-		'length' => $length,
-		'record_status' => $record_status,
-		'type_of_record' => $type_of_record,
-		'bibliographic_level' => $bibliographic_level,
-	}
 }
 
 1;
@@ -233,6 +219,14 @@ Default value is undef.
 MARC::Record object.
 
 It's required.
+
+=item * C<verbose>
+
+Verbose mode.
+
+Could be 1 or 0.
+
+Default value is 0.
 
 =back
 
@@ -479,6 +473,7 @@ L<MARC::Convert::Wikidata::Item::AudioBook>,
 L<MARC::Convert::Wikidata::Item::BookEdition>,
 L<MARC::Convert::Wikidata::Item::Periodical>,
 L<MARC::Convert::Wikidata::Transform>,
+L<MARC::Leader>,
 L<Scalar::Util>.
 
 =head1 SEE ALSO
@@ -513,6 +508,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

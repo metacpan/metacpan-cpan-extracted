@@ -12,6 +12,7 @@ base 'Venus::Task';
 use Venus;
 
 our $NAME = __PACKAGE__;
+our $FILE = '.vns.pl';
 
 # HOOKS
 
@@ -38,12 +39,20 @@ sub args {
 }
 
 state $cmds = {
+  'func' => {
+    help => 'Register function',
+    arg => 'command',
+  },
   'help' => {
     help => 'Display help and usages',
     arg => 'command',
   },
   'init' => {
     help => 'Initialize the configuration file',
+    arg => 'command',
+  },
+  'with' => {
+    help => 'Register subcommand',
     arg => 'command',
   },
 };
@@ -62,8 +71,9 @@ sub conf {
 }
 
 sub file {
+  my $base = $FILE =~ s/\.\w+$//r;
 
-  return $ENV{VENUS_FILE} || (grep -f, map ".vns.$_", qw(yaml yml json js perl pl))[0]
+  return $ENV{VENUS_FILE} || (grep -f, map "$base.$_", qw(yaml yml json js perl pl))[0]
 }
 
 state $footer = <<"EOF";
@@ -143,6 +153,10 @@ sub handler {
 
   return $self->handler_for_help($data) if (!$next && $help) || (lc($next) eq 'help');
 
+  return $self->handler_for_func($data) if lc($next) eq 'func';
+
+  return $self->handler_for_with($data) if lc($next) eq 'with';
+
   return $self->handler_for_init($data) if lc($next) eq 'init';
 
   return $self->handler_for_exec($data);
@@ -166,6 +180,50 @@ sub handler_for_exec {
   return $self->exit(undef, sub{_exec($code, $self->conf, @{$self->data})});
 }
 
+sub handler_for_func {
+  my ($self, $data) = @_;
+
+  my ($func, $name, $path) = @{$self->cli->data};
+
+  require Venus::Path;
+
+  $path = Venus::Path->new($path)->absolute;
+
+  return $self->fail if !$func;
+
+  if (!$name) {
+    return $self->fail(sub{$self->log_error("No function name provided")});
+  }
+
+  if (!$path) {
+    return $self->fail(sub{$self->log_error("No function path provided")});
+  }
+
+  if (!$path->is_file) {
+    return $self->fail(sub{$self->log_error("Function path provided doesn't exist")});
+  }
+
+  my $command = _vars(join ' ', $func, $name, $path);
+
+  $self->log_info('Using:', $command) if $ENV{ECHO};
+
+  my $conf = $self->conf;
+
+  if (exists $conf->{func}->{$name}) {
+    return $self->fail(sub{$self->log_error("Function $name already exists")});
+  }
+
+  $conf->{func}->{$name} = "$path";
+
+  my $file = $self->file;
+
+  require Venus::Config;
+
+  Venus::Config->new($conf)->write_file($file);
+
+  return $self->okay('log_info', "Function $name registered in file $file");
+}
+
 sub handler_for_help {
   my ($self, $data) = @_;
 
@@ -187,7 +245,7 @@ sub handler_for_init {
 
   return $self->fail('log_error', "Already using $file") if $file && -f $file;
 
-  $file ||= '.vns.pl';
+  $file ||= $FILE;
 
   require Venus::Config;
 
@@ -196,6 +254,50 @@ sub handler_for_init {
   Venus::Config->new($self->init)->write_file($file);
 
   return $self->okay('log_info', "Initialized with generated file $file");
+}
+
+sub handler_for_with {
+  my ($self, $data) = @_;
+
+  my ($with, $name, $path) = @{$self->cli->data};
+
+  require Venus::Path;
+
+  $path = Venus::Path->new($path)->absolute;
+
+  return $self->fail if !$with;
+
+  if (!$name) {
+    return $self->fail(sub{$self->log_error("No subcommand name provided")});
+  }
+
+  if (!$path) {
+    return $self->fail(sub{$self->log_error("No subcommand path provided")});
+  }
+
+  if (!$path->is_file) {
+    return $self->fail(sub{$self->log_error("Subcommand path provided doesn't exist")});
+  }
+
+  my $command = _vars(join ' ', $with, $name, $path);
+
+  $self->log_info('Using:', $command) if $ENV{ECHO};
+
+  my $conf = $self->conf;
+
+  if (exists $conf->{with}->{$name}) {
+    return $self->fail(sub{$self->log_error("Subcommand $name already exists")});
+  }
+
+  $conf->{with}->{$name} = "$path";
+
+  my $file = $self->file;
+
+  require Venus::Config;
+
+  Venus::Config->new($conf)->write_file($file);
+
+  return $self->okay('log_info', "Subcommand $name registered in file $file");
 }
 
 state $init = {
@@ -673,7 +775,25 @@ sub _vars {
 
 # AUTORUN
 
-run Venus::Run;
+auto Venus::Run sub {
+  my ($self) = @_;
+
+  my $tryer = $self->tryer;
+
+  $tryer->catch('Venus::Json::Error', sub {
+    $self->log_error($_->render);
+  });
+
+  $tryer->catch('Venus::Path::Error', sub {
+    $self->log_error($_->render);
+  });
+
+  $tryer->catch('Venus::Yaml::Error', sub {
+    $self->log_error($_->render);
+  });
+
+  return $self;
+};
 
 1;
 
@@ -1789,6 +1909,38 @@ I<Since C<2.91>>
 
 =back
 
+=over 4
+
+=item handler example 23
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new(['func', 'dump', 't/path/etc/dump.pl']);
+
+  $run->execute;
+
+  # ()
+
+=back
+
+=over 4
+
+=item handler example 24
+
+  package main;
+
+  use Venus::Run;
+
+  my $run = Venus::Run->new(['with', 'asks', 't/conf/asks.perl']);
+
+  $run->execute;
+
+  # ()
+
+=back
+
 =cut
 
 =head2 init
@@ -2280,7 +2432,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+Copyright (C) 2022, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

@@ -2,7 +2,7 @@ package Net::DNS::RR::SVCB;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: SVCB.pm 1930 2023-08-21 14:10:10Z willem $)[2];
+our $VERSION = (qw$Id: SVCB.pm 1945 2023-11-22 08:02:31Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -35,22 +35,19 @@ my %keybyname = (
 
 
 sub _decode_rdata {			## decode rdata from wire-format octet string
-	my ( $self, $data, $offset ) = @_;
+	my ( $self, $data, $offset, @opaque ) = @_;
 
-	my $rdata = substr $$data, $offset, $self->{rdlength};
-	$self->{SvcPriority} = unpack( 'n', $rdata );
-
-	my $index;
-	( $self->{TargetName}, $index ) = Net::DNS::DomainName->decode( \$rdata, 2 );
+	my $limit = $offset + $self->{rdlength};
+	$self->{SvcPriority} = unpack( "\@$offset n", $$data );
+	( $self->{TargetName}, $offset ) = Net::DNS::DomainName->decode( $data, $offset + 2, @opaque );
 
 	my $params = $self->{SvcParams} = [];
-	my $limit  = length($rdata) - 3;
-	while ( $index < $limit ) {
-		my ( $key, $size ) = unpack( "\@$index n2", $rdata );
-		push @$params, ( $key, substr $rdata, $index + 4, $size );
-		$index += ( $size + 4 );
+	while ( $offset < $limit ) {
+		my ( $key, $size ) = unpack( "\@$offset n2", $$data );
+		push @$params, ( $key, substr $$data, $offset + 4, $size );
+		$offset += ( $size + 4 );
 	}
-	die $self->type . ': corrupt RDATA' unless $index == length($rdata);
+	die $self->type . ': corrupt RDATA' unless $offset == $limit;
 	return;
 }
 
@@ -255,7 +252,7 @@ sub _string {
 	s/\\,/\\044/g;						# disguise (RFC1035) escaped comma
 	die <<"QQ" if /\\092,|\\092\\092/;
 SVCB:	Please use standard RFC1035 escapes
-	draft-ietf-dnsop-svcb-https double-escape nonsense not implemented
+	RFC9460 double-escape nonsense not implemented
 QQ
 	return _presentation( map { Net::DNS::Text->new($_)->encode() } split /,/ );
 }
@@ -350,7 +347,7 @@ owner name of this record must be used as the effective TargetName.
     $string = $rr->port();	# \004\210
     $rr->key3($string);
 
-Constructor methods for mnemonic SvcParams defined in draft-ietf-dnsop-svcb-https.
+Constructor methods for mnemonic SvcParams prescribed by RFC9460.
 When invoked without arguments, the methods return the presentation format
 value for the underlying key.
 The behaviour with undefined arguments is not specified.
@@ -399,8 +396,7 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-draft-ietf-dnsop-svcb-https,
-L<RFC1035|https://tools.ietf.org/html/rfc1035>
+L<RFC9460|https://tools.ietf.org/html/rfc9460>
 
 L<Service Parameter Keys|https://www.iana.org/assignments/dns-svcb>
 

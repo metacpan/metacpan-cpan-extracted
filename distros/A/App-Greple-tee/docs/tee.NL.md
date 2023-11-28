@@ -27,7 +27,7 @@ Bij gebruik van de optie **--discreet** hoeven de regels invoer- en uitvoergegev
 
 # VERSION
 
-Version 0.9901
+Version 0.9902
 
 # OPTIONS
 
@@ -39,19 +39,25 @@ Version 0.9901
 
     Combineer een reeks niet lege regels tot één regel voordat je ze doorgeeft aan de filteropdracht. Newline-tekens tussen brede tekens worden verwijderd en andere newline-tekens worden vervangen door spaties.
 
-- **--blockmatch**
+- **--blocks**
 
     Normaal gesproken wordt het gebied dat overeenkomt met het opgegeven zoekpatroon naar de externe opdracht gestuurd. Als deze optie is opgegeven, wordt niet het gebied dat overeenkomt, maar het hele blok dat het bevat, verwerkt.
 
     Om bijvoorbeeld regels met het patroon `foo` naar de externe opdracht te sturen, moet je het patroon opgeven dat overeenkomt met de hele regel:
 
-        greple -Mtee cat -n -- '^.*foo.*\n'
+        greple -Mtee cat -n -- '^.*foo.*\n' --all
 
-    Maar met de optie **--blockmatch** kan het als volgt eenvoudig:
+    Maar met de optie **-blokken** kan het als volgt:
 
-        greple -Mtee cat -n -- foo
+        greple -Mtee cat -n -- foo --blocks
 
-    Met de **--blockmatch** optie gedraagt deze module zich meer als de **-g** optie van [teip(1)](http://man.he.net/man1/teip).
+    Met de **-blokken** optie gedraagt deze module zich meer als de **-g** optie van [teip(1)](http://man.he.net/man1/teip). Anders is het gedrag gelijkaardig aan [teip(1)](http://man.he.net/man1/teip) met de **-o** optie.
+
+    Gebruik de **-blokken** niet met de **--all** optie, aangezien het blok dan de volledige gegevens zijn.
+
+- **--squeeze**
+
+    Combineert twee of meer opeenvolgende newline-tekens tot één.
 
 # WHY DO NOT USE TEIP
 

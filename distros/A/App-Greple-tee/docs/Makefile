@@ -1,5 +1,6 @@
 LANGS    := DE EL ET FR ID JA KO NL RO RU TR UK ZH
 RM_LANGS := JA KO ZH
+IGNORE   := VERSION AUTHOR LICENSE
 
 LIB    := ../lib/App/Greple
 SRCDIR := src
@@ -21,16 +22,37 @@ ifdef SRCDIR
 endif
 SRCPATH := $(if $(SRCDIR),$(SRCDIR)/,)
 
-$(foreach mod,$(MODS),$(eval $(SRCPATH)$(notdir $(mod)): $(mod); cp $$< $(if $(SRCPATH),$(SRCPATH),.) ))
+PODIFY := greple -Mperl --nocolor --le :pod
+$(foreach mod,$(MODS),$(eval $(SRCPATH)$(notdir $(mod)): $(mod) Makefile; $(PODIFY) $$< > $$@ ))
+
+ifdef IGNORE
+$(foreach ignore,$(IGNORE),$(eval \
+  EXCLUDE += --exclude '^=head\d[ ]+(?i:$(ignore))\b(?s:.*?)(?=^=|\z)'\
+))
+endif
 
 XLATE := xlate $(if $(USEAPI),-a)
 
+DESUMASU := GPTY
+ifeq ($(DESUMASU),GREPLE)
 JA_FORM   ?= dearu
 JA_DICT   := $(wildcard *.dict)
 JA_FILTER := greple -Mperl -Msubst::desumasu \
 	$(if $(findstring $(JA_FORM).dict,$(JA_DICT)), --dict $(JA_FORM).dict) \
 	--pod --subst --all --no-color --need=0 \
-	--$(JA_FORM) 
+	--$(JA_FORM)
+endif
+ifeq ($(DESUMASU),GPTY)
+JA_FILTER := perl -I../lib -S greple \
+	-Mtee gpty -d -q -t 0 \
+		-s '以下の項目に挙げる指示にしたがって、続く日本語の文章を変換してください' \
+		-s '語尾がない文については付け加えずにそのままにする' \
+		-s '語尾の部分だけを「である調」から「ですます調」に換える' \
+		- -- \
+	-Mperl --pod -E '^(\w.*\n)+' \
+	--debug $(EXCLUDE) \
+	--all --no-color
+endif
 
 define LANG_PM
   $(SRCPATH)%.$1.pm: $(SRCPATH)%.pm Makefile

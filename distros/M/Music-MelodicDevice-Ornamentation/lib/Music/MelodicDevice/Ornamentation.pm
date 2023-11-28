@@ -3,14 +3,14 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Chromatic and diatonic melodic ornamentation
 
-our $VERSION = '0.0703';
+our $VERSION = '0.0706';
 
+use Moo;
 use strictures 2;
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
 use MIDI::Simple ();
-use Moo;
 use Music::Duration ();
 use Music::Scales qw(get_scale_MIDI is_scale);
 use namespace::clean;
@@ -250,7 +250,7 @@ Music::MelodicDevice::Ornamentation - Chromatic and diatonic melodic ornamentati
 
 =head1 VERSION
 
-version 0.0703
+version 0.0706
 
 =head1 SYNOPSIS
 
@@ -279,6 +279,9 @@ version 0.0703
   $spec = $md->slide('qn', 74, 77);
 
 =head1 DESCRIPTION
+
+=for html <img src="https://raw.githubusercontent.com/ology/Music-MelodicDevice-Ornamentation/main/eg/Bach-Ornaments.png">
+<p></p>
 
 C<Music::MelodicDevice::Ornamentation> provides chromatic and diatonic
 musical melodic ornamentation methods.
@@ -423,7 +426,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2020-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::FileVersions
+# AsposeCellsCloud::Object::FileVersions 
 
 ## Load the model package
 ```perl
@@ -8,8 +8,7 @@ use AsposeCellsCloud::Object::FileVersions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**value** | [**ARRAY[FileVersion]**](FileVersion.md) | File versions FileVersion. | [optional] 
+**Value** | **ARRAY[FileVersion]** | File versions FileVersion. |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

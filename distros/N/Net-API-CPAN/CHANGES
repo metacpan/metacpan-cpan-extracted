@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::CPAN
 
+v0.1.4 2023-11-24T12:23:28+0900
+    - Addition of field maturity in Net::API::CPAN::Release::Recent. See <https://github.com/metacpan/metacpan-api/issues/1146>
+
 v0.1.3 2023-10-11T20:33:35+0900
     - Corrected malformed signature for distribution release
 

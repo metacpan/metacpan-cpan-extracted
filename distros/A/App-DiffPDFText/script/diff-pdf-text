@@ -14,9 +14,9 @@ use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-07'; # DATE
+our $DATE = '2023-08-09'; # DATE
 our $DIST = 'App-DiffPDFText'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my @files;
 Getopt::Long::Configure("gnu_getopt", "no_ignore_case", "pass_through");
@@ -24,12 +24,14 @@ Getopt::Long::Configure("gnu_getopt", "no_ignore_case", "pass_through");
 my $fail;
 my $opt_pages;
 my $opt_fmt = 1;
+my $opt_pager;
 
 GetOptionsCLIWrapper(
     cli => 'diff',
     add_opts => {
         'pdf-pages=s' => \$opt_pages,
         'pdf-fmt!' => \$opt_fmt,
+        'pager' => \$opt_pager,
         '<>' => sub {
             my $filename = $_[0];
             unless (-f $filename) {
@@ -67,10 +69,11 @@ my $diff_cmd =
     (File::Which::which("diffwc") ? "diffwc" : undef) // "diff";
 
 require IPC::System::Options;
-IPC::System::Options::system(
-    {log=>1},
-    $diff_cmd, "-ruN", @ARGV,
-);
+if ($opt_pager) {
+    IPC::System::Options::system({log=>1, shell=>1, env=>{COLOR=>1}}, $diff_cmd, "-ruN", @ARGV, \"|", 'less', '-R');
+} else {
+    IPC::System::Options::system({log=>1}, $diff_cmd, "-ruN", @ARGV);
+}
 
 # ABSTRACT: Diff the text of two PDF documents
 # PODNAME: diff-pdf-text
@@ -87,7 +90,7 @@ diff-pdf-text - Diff the text of two PDF documents
 
 =head1 VERSION
 
-This document describes version 0.005 of diff-pdf-text (from Perl distribution App-DiffPDFText), released on 2022-10-07.
+This document describes version 0.006 of diff-pdf-text (from Perl distribution App-DiffPDFText), released on 2023-08-09.
 
 =head1 SYNOPSIS
 
@@ -120,6 +123,11 @@ Requires B<pdftk> to extract the page range.
 
 Whether to apply `fmt` formatting to the `pdftotext` output. The default is yes;
 use C<--no-pdf-fmt> to disable it.
+
+=item * --pager
+
+Run the output through pager. Currently this option uses C<less> and also forces
+color output. The main use is to see colored diff with a pager.
 
 =back
 
@@ -175,7 +183,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Interface::ZeroSeg
 # Description  : Interface to Pi Hut ZeroSeg pHAT
-# Copyright    : Copyright (c) 2018 Mark Dootson
+# Copyright    : Copyright (c) 2018-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -16,7 +16,7 @@ use parent qw( HiPi::Interface );
 use HiPi qw( :max7219 );
 use HiPi::Interface::MAX7219;
 
-our $VERSION ='0.81';
+our $VERSION ='0.89';
 
 __PACKAGE__->create_accessors( qw( buffer writeflags flipped _decimals _shutdown_on_exit segmentfont ) );
 
@@ -98,7 +98,7 @@ sub new {
     
     my %params = (
         devicename   => '/dev/spidev0.0',
-        speed        => 9600000,  # 9.6 mhz
+        speed        => 8000000,  # 8 mhz
         delay        => 0,
         _shutdown_on_exit => 1,
         segmentfont  => $defaultsegmentfont,

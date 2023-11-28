@@ -1,6 +1,6 @@
 package School::Code::Compare::Charset::Signes;
 # ABSTRACT: remove word characters completely
-$School::Code::Compare::Charset::Signes::VERSION = '0.104';
+$School::Code::Compare::Charset::Signes::VERSION = '0.201';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ School::Code::Compare::Charset::Signes - remove word characters completely
 
 =head1 VERSION
 
-version 0.104
+version 0.201
 
 =head1 AUTHOR
 
@@ -53,7 +53,7 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Boris Däppen.
+This software is copyright (c) 2023 by Boris Däppen.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

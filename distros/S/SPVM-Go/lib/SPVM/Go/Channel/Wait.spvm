@@ -1,0 +1,27 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Channel::Wait {
+  allow Go::Schedule;
+  allow Go::Channel;
+  
+  use Go::Coroutine;
+  
+  has coroutine : Go::Coroutine;
+  
+  has value : object;
+  
+  has finish : byte;
+  
+  has in_buffer : byte;
+  
+  has ok : byte;
+  
+  # Class Methods
+  static method new : Go::Channel::Wait () {
+    
+    my $self = new Go::Channel::Wait;
+    
+    return $self;
+  }
+}

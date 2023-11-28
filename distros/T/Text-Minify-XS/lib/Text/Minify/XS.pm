@@ -10,7 +10,7 @@ use XSLoader;
 
 our @EXPORT_OK = qw(minify minify_utf8 minify_ascii);
 
-our $VERSION = 'v0.7.1';
+our $VERSION = 'v0.7.2';
 
 XSLoader::load( __PACKAGE__, $VERSION );
 
@@ -33,7 +33,7 @@ Text::Minify::XS - Remove indentation and trailing whitespace from multi-line te
 
 =head1 VERSION
 
-version v0.7.1
+version v0.7.2
 
 =head1 SYNOPSIS
 

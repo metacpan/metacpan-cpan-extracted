@@ -1,5 +1,9 @@
 Revision history for SQL-Abstract-More
 
+1.40 19.11.2023
+  - new dialect "Oracle12c" for using query_limiting clauses in Oracle version 12c or greater
+  - internals : replaced Module::Install by Module::Build
+
 1.39 22.07.2022
   - back to SQL::Abstract::Classic as default parent class, because of
     compatibility issues with special_operators

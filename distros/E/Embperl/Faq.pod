@@ -52,9 +52,10 @@ No.
 
 =head2 Is there a binary distribution of Embperl for Win32?
 
+Former versions of Embperl could be found here.
 Win NT/95/98 binarys for Apache/perl/mod_perl/Embperl are
 available from ftp://theoryx5.uwinnipeg.ca/pub/other/ . A
-european mirror is at http://www.robert.cz/misc/ .
+european mirror is at https://www.robert.cz/misc/ .
 
 
 =head2 I want to run Embperl with mod_perl under Apache. In what order should I
@@ -78,7 +79,7 @@ cc: Internal compiler error: program cc1 got fatal signal 11
 make: *** [epmain.o] Error 1
 
 GCC croaking with signal 11 frequently indicates hardware problems.
-See http://www.bitwizard.nl/sig11/
+See https://www.bitwizard.nl/sig11/
 
 
 =head2 I have a lot of errors in 'make test' from mod_perl when using Embperl
@@ -254,7 +255,7 @@ The eaiest way is
         bt                      -> show the backtrace
 
 To get some more information it would be a good idea to compile Embperl with
-debugging infomation enabled. Therefor do
+debugging information enabled. Therefore do
 
 =head2 How do I build Embperl with debugging information
 
@@ -270,7 +271,7 @@ debugging infomation enabled. Therefor do
 
 =back
 
-now start the gdb as decribed before.
+now start the gdb as described before.
 
 
 
@@ -352,8 +353,8 @@ change the name on the logfile, the logfile will stay open.
 The problem (in this case) is, that Embperl init function ,(Init in epmain.c)
 calls OpenLog will an second argument of zero. Which will only save the
 filename. The log will actually opened on the first write to it (or at the
-start of the first request). At this time your Apache has alreay switch to
-user www. This is done to allow to change the logfile name before an
+start of the first request). At this time your Apache has already switch to
+user www. This is done to allow one to change the logfile name before a
 request, but after the init is already called (which is done when you or
 Apache "use" the module)
 
@@ -492,7 +493,7 @@ Unescaping.  They are so common, that an entire section on
 L<"Escaping & Unescaping"> is devoted to them.
 
 
-=head2 When I use a module inside a Embperl page, it behaves weired
+=head2 When I use a module inside an Embperl page, it behaves weird
 when the source changes.
 
 
@@ -528,7 +529,7 @@ when Apache is terminated. Out of these two things follows, that a module
 that is loaded via C<use> or C<require> is only loaded once and will never
 be reloaded, regardless if the source changes or not.
 
-So far this is just standard Perl. Things get's a little bit more difficult
+So far this is just standard Perl. Things get a little bit more difficult
 when running under mod_perl (only Unix), because Apache forks a set of child
 processes as necessary and from the moment they are forked, they run on their
 own and don't know of each other. So if a module is loaded at server startup
@@ -564,7 +565,7 @@ works most times (but not all modules can be cleanly reloaded) and as the number
 of loaded modules increase, your sever will slow down, because of the stat it
 has to do for every module.
 
-=item * Use C<do> instead of C<require>. C<do> will execute your file everytime
+=item * Use C<do> instead of C<require>. C<do> will execute your file every time
 it is used. This also adds overhead, but this may be accpetable for small files
 or in a debugging environment. (B<NOTE:> Be sure to check C<$@> after a C<do>,
 because do works like C<eval>)
@@ -813,7 +814,7 @@ handle sessions for you inside the %udat and %mdat hashes.
 
 The following way works with mod_perl and as cgi:
 
-  [- $http_headers_out{'Location'} = "http://www.ecos.de/embperl/" -]
+  [- $http_headers_out{'Location'} = "https://www.actevy.io/embperl/" -]
 
 the status of the request will automatically set to 301.
 
@@ -1078,7 +1079,7 @@ the middle of your Perl code). This Embperl feature keeps things like
     [- $var  = 1; <br>
         $foo = 2 -]
 
-permissable, so that you can enter Perl code while you mark up pages in an
+permissible, so that you can enter Perl code while you mark up pages in an
 editor, all at once.  In this example, Embperl would remove the
 unnecessary <br> tag and, therefore, make Perl happy. And if Perl is
 happy, we are all happy. 
@@ -1451,11 +1452,9 @@ of file-uploads.
 
 =head2 Where can I get more help?
 
-You can get free support on the mod_perl mailing list. If you need
-commercial support (with a guarantee for response time or a solution) for
-Embperl, or if you want a web site where you can run your Embperl/mod_perl 
-scripts without setting up your own web server, please send email to 
-info@ecos.de.
+You can get free support on the embperl mailing list. If you need
+commercial support for Embperl, please send email to 
+richter at embperl dot org.
 
 Please also see the section L<Embperl/"Support"> in the Embperl documentation.
 

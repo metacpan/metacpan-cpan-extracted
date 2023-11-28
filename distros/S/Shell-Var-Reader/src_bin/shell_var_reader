@@ -15,11 +15,12 @@ use JSON::Path;
 use Rex::CMDB;
 use Rex -feature => [qw/1.4/];
 use Hash::Flatten;
+use Pod::Usage;
 
 # prevents Rex from printing out rex is exiting after the script ends
 $::QUIET = 2;
 
-my $version = '0.5.0';
+my $version = '0.6.0';
 
 my $to_read;
 my $format = 'json';
@@ -34,9 +35,11 @@ my $host_vars = "HOSTNAME,REX_NAME,REX_HOSTNAME,ANSIBLE_HOSTNAME,ANSIBLE_NAME,NA
 my $use_roles = 1;
 my $munger_file;
 my $cmdb_env;
-my $env_vars = 'SYSTEM_ENV';
+my $env_vars   = 'SYSTEM_ENV';
+my $output_dir = '.';
 GetOptions(
 	'r=s'         => \$to_read,
+	'd=s'         => \$output_dir,
 	'o=s'         => \$format,
 	'p'           => \$pretty,
 	's'           => \$sort,
@@ -60,53 +63,36 @@ if ($version_flag) {
 }
 
 if ($help) {
-	print 'shell_var_reader v. ' . $version . '
+	print 'shell_var_reader v. ' . $version . "\n\n";
 
--r <file>     File to read/run
--o <format>   Output formats
-              Default: json
-              Formats: json,yaml,toml,dumper(Data::Dumper),shell
--p            Pretty print
--s            Sort
--i <include>  Include file info. May be used multiple times.
--m <munger>   File containing code to use for munging data prior to output.
-
---tcmdb <dir>       Optionally include data from a Rex TOML CMDB.
---cmdb_env <env>    Environment name to use with the CMDB.
-                    Default :: undef
---env_var <vars>    If --cmdb_env is undef, check this comma seperated
-                    list JSON Paths in the currently found/included vars
-                    for the first possible hit.
-                    Default :: SYSTEM_ENV
---cmdb_host <host>  Hostname to use when querying the CMDB.
-                    Default :: undef
---host_vars <vars>  If --cmdb_host is undef, check this comma seperated
-                    list JSON Paths in the currently found/included vars
-                    for the first possible hit.
-                    Default :: HOSTNAME,REX_NAME,REX_HOSTNAME,ANSIBLE_HOSTNAME,ANSIBLE_NAME,NAME
---use_roles [01]    If roles should be used or not with the Rex TOML CMDB.
-                    Default :: 1
-
--h/--help     Help
--v/--version  Version
-
-
-Include Examples...
--i foo,bar.json       Read in bar.json and include it as the variable foo.
--i foo.toml           Read in foo.toml and merge it with what it is being merged into taking presidence.
--i a.jsom -i b.toml   Read in a.json and merge it, then read in in b.json and merge it.
-
-';
-	exit 255;
-} ## end if ($help)
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT );
+}
 
 if ( !defined($to_read) ) {
 	die('No file specified to read via -r');
 }
 
-if ( $format ne 'json' && $format ne 'yaml' && $format ne 'toml' && $format ne 'dumper' && $format ne 'shell' ) {
+if (   $format ne 'json'
+	&& $format ne 'yaml'
+	&& $format ne 'toml'
+	&& $format ne 'dumper'
+	&& $format ne 'shell'
+	&& $format ne 'multi' )
+{
 	die( "'" . $format . "' is not a recognized format" );
 }
+
+if ( $format eq 'multi' ) {
+	my @types = ( 'yaml', 'json', 'toml', 'shell' );
+	foreach my $type (@types) {
+		my $dir_to_create = $output_dir . '/' . $type . '_confs';
+		if ( -e $dir_to_create && !-d $dir_to_create ) {
+			die( '"' . $dir_to_create . '" already exists and is not a directory' );
+		} elsif ( !-e $dir_to_create ) {
+			mkdir($dir_to_create) || die( '"' . $dir_to_create . '" could not be createad...' . $@ );
+		}
+	}
+} ## end if ( $format eq 'multi' )
 
 my $found_vars = Shell::Var::Reader->read_in($to_read);
 
@@ -237,10 +223,17 @@ if ( defined($tcmdb) ) {
 	my %tmp_hash = %{ $merger->merge( $found_vars, $cmdb_vars ) };
 	$found_vars = \%tmp_hash;
 
-	if ( defined($cmdb_host) && !defined( $found_vars->{SYSTEM_NAME} ) ) {
-		$found_vars->{SYSTEM_NAME} = $cmdb_host;
-	}
 } ## end if ( defined($tcmdb) )
+
+if ( defined($cmdb_host) && !defined( $found_vars->{SYSTEM_NAME} ) ) {
+	$found_vars->{SYSTEM_NAME} = $cmdb_host;
+}
+
+if ( !defined($cmdb_host) && $format eq 'multi' ) {
+	die(
+		'Was not able to figure out what CMDB host to use and multi output is specified --cmdb_host <host> may be required'
+	);
+}
 
 ##
 ##
@@ -320,7 +313,47 @@ if ( $format eq 'toml' ) {
 		$munged_key =~ s/$escape//g;
 		print $munged_key . '=' . shell_quote( $found_vars->{$key} ) . "\n";
 	}
-} ## end elsif ( $format eq 'shell' )
+} elsif ( $format eq 'multi' ) {
+	my $output_file = $output_dir . '/json_confs/' . $cmdb_host . '.json';
+	eval {
+		write_file(
+			$output_file, JSON->new->canonical(1)->pretty(1)->encode($found_vars)
+
+		);
+
+		$output_file = $output_dir . '/toml_confs/' . $cmdb_host . '.toml';
+		write_file( $output_file, to_toml($found_vars) );
+
+		$output_file = $output_dir . '/yaml_confs/' . $cmdb_host . '.yaml';
+		write_file( $output_file, Dump($found_vars) );
+
+		$output_file = $output_dir . '/shell_confs/' . $cmdb_host . '.sh';
+		my $to_write = '';
+		my $escape   = rand . rand . rand . rand;
+		$escape =~ s/\.//g;
+		my $make_flat = Hash::Flatten->new(
+			{
+				HashDelimiter  => '_',
+				ArrayDelimiter => '_',
+				EscapeSequence => $escape,
+			}
+		);
+		$found_vars = $make_flat->flatten($found_vars);
+		my @keys = keys( %{$found_vars} );
+
+		if ($sort) {
+			@keys = sort(@keys);
+		}
+		foreach my $key (@keys) {
+			my $munged_key = $key;
+			$munged_key =~ s/$escape//g;
+			$to_write = $to_write . $munged_key . '=' . shell_quote( $found_vars->{$key} ) . "\n";
+		}
+	};
+	if ($@) {
+		die( 'Failed to write out "' . $output_file . '"... ' . $@ );
+	}
+} ## end elsif ( $format eq 'multi' )
 
 exit 0;
 
@@ -330,7 +363,7 @@ shell_var_reader - Read/run a shell script and return set variable in it.
 
 =head1 SYNOPSIS
 
-shell_var_reader B<-r> <file> [B<-o> <format>] [B<-p>] [B<-s>] [B<--tcmdb> <dir>] [B<--cmdb_host> <host>] [B<--host_vars> <vars>] [B<--use_roles> [01]] [B<-m> <munger>]
+shell_var_reader B<-r> <file> [B<-o> <format>] [B<-p>] [B<-s>] [B<--tcmdb> <dir>] [B<--cmdb_host> <host>] [B<--host_vars> <vars>] [B<--use_roles> [01]] [B<-m> <munger>] [B<-m> <multi output base dir>]
 
 =head1 FLAGS
 
@@ -344,7 +377,23 @@ The output format.
 
 Default: json
 
-Formats: json,yaml,toml,dumper(Data::Dumper),shell
+Formats: json,yaml,toml,dumper(Data::Dumper),shell,multi
+
+'multi' will write out JSON, YAML, TOML, to respectively named dirs. The -d
+can be used to specify the base dir, otherwise './' is used like below.
+
+    ./json_confs
+    ./shell_confs
+    ./toml_confs
+    ./yaml_confs
+
+Multi also requires --cmdb_host to be defined or to be findable via --tcmdb.
+
+=head2 -d <multi output base dir>
+
+When using multi, this is the base directory used.
+
+Default: .
 
 =head2 -p
 

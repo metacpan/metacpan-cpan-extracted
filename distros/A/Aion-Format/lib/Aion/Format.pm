@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.0.2";
+our $VERSION = "0.0.3";
 
 require POSIX;
 require Term::ANSIColor;
@@ -135,7 +135,23 @@ sub trans($) {
 	lc $s
 }
 
-#@category Транслитерация
+#@category Строки
+
+# Преобразует в строку perl
+sub to_str(;$) {
+	my ($s) = @_ == 0? $_: @_;
+	$s =~ s/[\\']/\\$&/g;
+	$s =~ s/^(.*)\z/'$1'/s;
+	$s
+}
+
+# Преобразует из строки perl
+sub from_str(;$) {
+	my ($s) = @_ == 0? $_: @_;
+	$s =~ s/^'(.*)'\z/$1/s;
+	$s =~ s/\\([\\'])/$1/g;
+	$s
+}
 
 # Упрощённый язык регулярок
 sub nous($) {
@@ -373,7 +389,7 @@ Aion::Format - Perl extension for formatting numbers, colorizing output and so o
 
 =head1 VERSION
 
-0.0.2
+0.0.3
 
 =head1 SYNOPSIS
 
@@ -642,11 +658,15 @@ Trap for STDERR.
 
 	trapperr { print STDERR 123 }  # => 123
 
+See also C<IO::Capture::Stderr>.
+
 =head2 trappout (&block)
 
 Trap for STDOUT.
 
 	trappout { print 123 }  # => 123
+
+See also C<IO::Capture::Stdout>.
 
 =head2 TiB ()
 
@@ -700,11 +720,25 @@ S - small.
 
 	xxS  # -> 255
 
+=head2 to_str (;$scalar)
+
+Converts to string perl without interpolation.
+
+	to_str "a'\n" # => 'a\\'\n'
+	[map to_str, "a'\n"] # --> ["'a\\'\n'"]
+
+=head2 from_str (;$one_quote_str)
+
+Converts from string perl without interpolation.
+
+	from_str "'a\\'\n'"  # => a'\n
+	[map from_str, "'a\\'\n'"]  # --> ["a'\n"]
+
 =head1 SUBROUTINES/METHODS
 
 =head1 AUTHOR
 
-Yaroslav O. Kosmina LL<mailto:dart@cpan.org>
+Yaroslav O. Kosmina L<mailto:dart@cpan.org>
 
 =head1 LICENSE
 

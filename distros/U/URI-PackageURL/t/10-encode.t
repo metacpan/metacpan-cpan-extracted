@@ -7,10 +7,10 @@ use Test::More;
 
 use URI::PackageURL qw(encode_purl);
 
-is(
-    encode_purl(type => 'cpan', namespace => 'GDT', name => 'URI-PackageURL', version => $URI::PackageURL::VERSION),
-    'pkg:cpan/GDT/URI-PackageURL@' . $URI::PackageURL::VERSION,
-    'encode_purl()'
-);
+my $expected_purl = 'pkg:cpan/GDT/URI-PackageURL@' . $URI::PackageURL::VERSION;
+my $encoded_purl
+    = encode_purl(type => 'cpan', namespace => 'GDT', name => 'URI-PackageURL', version => $URI::PackageURL::VERSION);
+
+is($encoded_purl, $expected_purl, 'encode_purl()');
 
 done_testing();

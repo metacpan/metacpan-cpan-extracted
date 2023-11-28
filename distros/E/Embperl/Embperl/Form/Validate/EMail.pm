@@ -1,8 +1,9 @@
 
 ###################################################################################
 #
-#   Embperl  - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl  - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -11,28 +12,31 @@
 #   IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 #   WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #
-#   $Id: EMail.pm 1578075 2014-03-16 14:01:14Z richter $
-#
 ###################################################################################
 
 
 package Embperl::Form::Validate::EMail ;
 
 use base qw(Embperl::Form::Validate::Default);
+use utf8 ;
+
+my %errutf8 =
+    (
+	validate_email => 'Die eingegebene E-Mail-Adresse "%0" in Feld "%1" ist ungÃ¼ltig, sie muÃŸ genau ein "@" enthalten und darf keine Leerzeichen, Klammern oder Umlaute enthalten.',
+	validate_email_nomailto => 'Die eingegebene E-Mail-Adresse "%0" in Feld "%1" scheint mit einem "mailto:" zu beginnen. Bitte geben Sie nur eine E-Mail-Adresse ein und keine mit "mailto:" beginnende URL.',
+    ) ;
+
+no utf8 ;
 
 my %error_messages = 
 (
     de => 
     {
-	validate_email => 'Die eingegebene E-Mail-Adresse "%0" in Feld "%1" ist ungültig, sie muß genau ein "@" enthalten und darf keine Leerzeichen, Klammern oder Umlaute enthalten.',
+	validate_email => 'Die eingegebene E-Mail-Adresse "%0" in Feld "%1" ist ungï¿½ltig, sie muï¿½ genau ein "@" enthalten und darf keine Leerzeichen, Klammern oder Umlaute enthalten.',
 	validate_email_nomailto => 'Die eingegebene E-Mail-Adresse "%0" in Feld "%1" scheint mit einem "mailto:" zu beginnen. Bitte geben Sie nur eine E-Mail-Adresse ein und keine mit "mailto:" beginnende URL.',
     },
 
-    'de.utf-8' => 
-    {
-	validate_email => 'Die eingegebene E-Mail-Adresse "%0" in Feld "%1" ist ungÃ¼ltig, sie muÃŸ genau ein "@" enthalten und darf keine Leerzeichen, Klammern oder Umlaute enthalten.',
-	validate_email_nomailto => 'Die eingegebene E-Mail-Adresse "%0" in Feld "%1" scheint mit einem "mailto:" zu beginnen. Bitte geben Sie nur eine E-Mail-Adresse ein und keine mit "mailto:" beginnende URL.',
-    },
+    'de.utf-8' => \%errutf8,
 
     en =>
     {
@@ -60,7 +64,7 @@ sub validate
     my ($self, $key, $value, $fdat, $pref) = @_ ;
     
     # The valid address "user@tld" or local addresses are not valid in this more general ruleset
-    if ($value !~ /^[^ <>()@¡-ÿ]+@[^ <>()@¡-ÿ]+\.[a-zA-Z]{2,4}$/ or
+    if ($value !~ /^[^ <>()@ï¿½-ï¿½]+@[^ <>()@ï¿½-ï¿½]+\.[a-zA-Z]{2,4}$/ or
 	$value =~ /@(\.|.*(\.\.|@))/)
 	{
 	return ['validate_email', $value, $key] ;

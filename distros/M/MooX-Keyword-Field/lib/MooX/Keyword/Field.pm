@@ -1,6 +1,6 @@
 package MooX::Keyword::Field;
 
-use 5.006; use strict; use warnings; our $VERSION = '0.02';
+use 5.006; use strict; use warnings; our $VERSION = '0.03';
 use Moo;
 
 our %FIELDS;
@@ -35,7 +35,7 @@ MooX::Keyword::Field - field attributes that cannot be set via the constructor
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
@@ -72,6 +72,31 @@ Perhaps a little code snippet.
 	});
 
 	$persona->created;
+
+=head1 DESCRIPTION
+
+This module simply adds a field keyword which effectively only creates a read only attribute.
+
+=head1 KEYWORDS
+
+=head2 field
+
+Creates a read only attribute.
+
+	field created => (
+		builder => sub {
+			time;
+		}
+	);
+
+The behaviour is identical to the following Moo code.
+
+	has created => (
+		is => 'ro',
+		builder => sub {
+			time;
+		}
+	);
 
 =head1 AUTHOR
 

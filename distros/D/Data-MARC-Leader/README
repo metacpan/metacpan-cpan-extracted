@@ -1,0 +1,260 @@
+NAME
+    Data::MARC::Leader - Data object for MARC leader.
+
+SYNOPSIS
+     use Data::MARC::Leader;
+
+     my $obj = Data::MARC::Leader->new(%params);
+     my $bibliographic_level = $obj->bibliographic_level;
+     my $char_coding_scheme = $obj->char_coding_scheme;
+     my $data_base_addr = $obj->data_base_addr;
+     my $descriptive_cataloging_form = $obj->descriptive_cataloging_form;
+     my $encoding_level = $obj->encoding_level;
+     my $impl_def_portion_len = $obj->impl_def_portion_len;
+     my $indicator_count = $obj->indicator_count;
+     my $length = $obj->length;
+     my $length_of_field_portion_len = $obj->length_of_field_portion_len;
+     my $multipart_resource_record_level = $obj->multipart_resource_record_level;
+     my $starting_char_pos_portion_len = $obj->starting_char_pos_portion_len;
+     my $status = $obj->status;
+     my $subfield_code_count = $obj->subfield_code_count;
+     my $type = $obj->type;
+     my $type_of_control = $obj->type_of_control;
+     my $undefined = $obj->undefined;
+
+METHODS
+  "new"
+     my $obj = Data::MARC::Leader->new(%params);
+
+    Constructor.
+
+    *       "bibliographic_level"
+
+            TODO
+
+    *       "char_coding_scheme"
+
+            TODO
+
+    *       "data_base_addr"
+
+            TODO
+
+    *       "descriptive_cataloging_form"
+
+            TODO
+
+    *       "encoding_level"
+
+            TODO
+
+    *       "impl_def_portion_len"
+
+            TODO
+
+    *       "indicator_count"
+
+            TODO
+
+    *       "length"
+
+            TODO
+
+    *       "length_of_field_portion_len"
+
+            TODO
+
+    *       "multipart_resource_record_level"
+
+            TODO
+
+    *       "starting_char_pos_portion_len"
+
+            TODO
+
+    *       "status"
+
+            TODO
+
+    *       "subfield_code_count"
+
+            TODO
+
+    *       "type"
+
+            TODO
+
+    *       "type_of_control"
+
+            TODO
+
+    *       "undefined"
+
+            TODO
+
+    Returns instance of object.
+
+  "bibliographic_level"
+     my $bibliographic_level = $obj->bibliographic_level;
+
+    Get bibliographic level flag.
+
+    Returns character.
+
+  "char_coding_scheme"
+     my $char_coding_scheme = $obj->char_coding_scheme;
+
+    TODO
+
+  "data_base_addr"
+     my $data_base_addr = $obj->data_base_addr;
+
+    TODO
+
+  "descriptive_cataloging_form"
+     my $descriptive_cataloging_form = $obj->descriptive_cataloging_form;
+
+    TODO
+
+  "encoding_level"
+     my $encoding_level = $obj->encoding_level;
+
+    TODO
+
+  "impl_def_portion_len"
+     my $impl_def_portion_len = $obj->impl_def_portion_len;
+
+    TODO
+
+  "indicator_count"
+     my $indicator_count = $obj->indicator_count;
+
+    TODO
+
+  "length"
+     my $length = $obj->length;
+
+    TODO
+
+  "length_of_field_portion_len"
+     my $length_of_field_portion_len = $obj->length_of_field_portion_len;
+
+    TODO
+
+  "multipart_resource_record_level"
+     my $multipart_resource_record_level = $obj->multipart_resource_record_level;
+
+    TODO
+
+  "starting_char_pos_portion_len"
+     my $starting_char_pos_portion_len = $obj->starting_char_pos_portion_len;
+
+    TODO
+
+  "status"
+     my $status = $obj->status;
+
+    TODO
+
+  "subfield_code_count"
+     my $subfield_code_count = $obj->subfield_code_count;
+
+    TODO
+
+  "type"
+     my $type = $obj->type;
+
+    TODO
+
+  "type_of_control"
+     my $type_of_control = $obj->type_of_control;
+
+    TODO
+
+  "undefined"
+     my $undefined = $obj->undefined;
+
+    TODO
+
+ERRORS
+     new():
+             TODO
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::Printer;
+     use Data::MARC::Leader;
+
+     my $obj = Data::MARC::Leader->new(
+             'bibliographic_level' => 'm',
+             'char_coding_scheme' => 'a',
+             'data_base_addr' => 541,
+             'descriptive_cataloging_form' => 'i',
+             'encoding_level' => ' ',
+             'impl_def_portion_len' => '0',
+             'indicator_count' => '2',
+             'length' => 2200,
+             'length_of_field_portion_len' => '4',
+             'multipart_resource_record_level' => ' ',
+             'starting_char_pos_portion_len' => '5',
+             'status' => 'c',
+             'subfield_code_count' => '2',
+             'type' => 'e',
+             'type_of_control' => ' ',
+             'undefined' => '0',
+     );
+
+     # Print out.
+     p $obj;
+
+     # Output:
+     # Data::MARC::Leader  {
+     #     parents: Mo::Object
+     #     public methods (3):
+     #         BUILD
+     #         Mo::utils:
+     #             check_strings
+     #         Readonly:
+     #             Readonly
+     #     private methods (0)
+     #     internals: {
+     #         bibliographic_level               "m",
+     #         char_coding_scheme                "a",
+     #         data_base_addr                    541,
+     #         descriptive_cataloging_form       "i",
+     #         encoding_level                    " ",
+     #         impl_def_portion_len              0,
+     #         indicator_count                   2,
+     #         length                            2200,
+     #         length_of_field_portion_len       4,
+     #         multipart_resource_record_level   " ",
+     #         starting_char_pos_portion_len     5,
+     #         status                            "c",
+     #         subfield_code_count               2,
+     #         type                              "e",
+     #         type_of_control                   " ",
+     #         undefined                         0
+     #     }
+     # }
+
+DEPENDENCIES
+    Mo, Mo::utils, Readonly.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Data-MARC-Leader>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

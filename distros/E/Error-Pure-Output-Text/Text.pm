@@ -1,11 +1,9 @@
 package Error::Pure::Output::Text;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use warnings;
 
-# Modules.
 use Readonly;
 
 # Constants.
@@ -15,66 +13,78 @@ Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Scalar our $SPACE => q{ };
 
 # Version.
-our $VERSION = 0.23;
+our $VERSION = 0.24;
 
 # Pretty print of backtrace.
 sub err_bt_pretty {
 	my @errors = @_;
+
 	my @ret;
 	my $l_ar = _lenghts(@errors);
 	foreach my $error_hr (@errors) {
 		push @ret, _bt_pretty_one($error_hr, $l_ar);
 	}
+
 	return wantarray ? @ret : (join "\n", @ret)."\n";
 }
 
 # Reverse pretty print of backtrace.
 sub err_bt_pretty_rev {
 	my @errors = @_;
+
 	my @ret;
 	my $l_ar = _lenghts(@errors);
 	foreach my $error_hr (reverse @errors) {
 		push @ret, _bt_pretty_one($error_hr, $l_ar);
 	}
+
 	return wantarray ? @ret : (join "\n", @ret)."\n";
 }
 
 # Pretty print line error.
 sub err_line {
 	my @errors = @_;
+
 	return _err_line($errors[-1]);
 }
 
 # Pretty print with errors each on one line.
 sub err_line_all {
 	my @errors = @_;
+
 	my $ret;
 	foreach my $error_hr (@errors) {
 		$ret .= _err_line($error_hr);
 	}
+
 	return $ret;
 }
 
 # Print error.
 sub err_print {
 	my @errors = @_;
+
 	my $class = _err_class($errors[-1]);
+
 	return $class.$errors[-1]->{'msg'}->[0];
 }
 
 # Print error with all variables.
 sub err_print_var {
 	my @errors = @_;
+
 	my @msg = @{$errors[-1]->{'msg'}};
 	my $class = _err_class($errors[-1]);
 	my @ret = ($class.(shift @msg));
 	push @ret, _err_variables(@msg);
+
 	return wantarray ? @ret : (join "\n", @ret)."\n";
 }
 
 # Pretty print one error backtrace helper.
 sub _bt_pretty_one {
 	my ($error_hr, $l_ar) = @_;
+
 	my @msg = @{$error_hr->{'msg'}};
 	my @ret = ('ERROR: '.(shift @msg));
 	push @ret, _err_variables(@msg);
@@ -89,12 +99,14 @@ sub _bt_pretty_one {
 		$ret .=  $st->{'line'};
 		push @ret, $ret;
 	}
+
 	return @ret;
 }
 
 # Print class if class isn't main.
 sub _err_class {
 	my $error_hr = shift;
+
 	my $class = $error_hr->{'stack'}->[0]->{'class'};
 	if ($class eq 'main') {
 		$class = $EMPTY_STR;
@@ -102,24 +114,28 @@ sub _err_class {
 	if ($class) {
 		$class .= ': ';
 	}
+
 	return $class;
 }
 
 # Pretty print line error.
 sub _err_line {
 	my $error_hr = shift;
+
 	my $stack_ar = $error_hr->{'stack'};
 	my $msg = $error_hr->{'msg'};
 	my $prog = $stack_ar->[0]->{'prog'};
 	$prog =~ s/^\.\///gms;
 	my $e = $msg->[0];
 	chomp $e;
+
 	return "#Error [$prog:$stack_ar->[0]->{'line'}] $e\n";
 }
 
 # Process variables.
 sub _err_variables {
 	my @msg = @_;
+
 	my @ret;
 	while (@msg) {
 		my $f = shift @msg;
@@ -135,12 +151,14 @@ sub _err_variables {
 		}
 		push @ret, $ret;
 	}
+
 	return @ret;
 }
 
 # Gets length for errors.
 sub _lenghts {
 	my @errors = @_;
+
 	my $l_ar = [0, 0, 0];
 	foreach my $error_hr (@errors) {
 		foreach my $st (@{$error_hr->{'stack'}}) {
@@ -158,6 +176,7 @@ sub _lenghts {
 	$l_ar->[0] += 2;
 	$l_ar->[1] += 2;
 	$l_ar->[2] += 2;
+
 	return $l_ar;
 }
 
@@ -177,6 +196,7 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
  use Error::Pure::Output::Text qw(err_bt_pretty err_bt_pretty_rev err_line
          err_line_all err_print err_print_var);
+
  my $ret = err_bt_pretty(@errors);
  my @ret = err_bt_pretty(@errors);
  my $ret = err_bt_pretty_rev(@errors);
@@ -189,76 +209,99 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<err_bt_pretty>
 
-=item C<err_bt_pretty(@errors)>
+ my $ret = err_bt_pretty(@errors);
+ my @ret = err_bt_pretty(@errors);
 
- Returns string with full backtrace in scalar context.
- Returns array of full backtrace lines in array context.
- Format of error is:
-         ERROR: %s
-         %s: %s
-         ...
-         %s %s %s %s
-         ...
- Values of error are:
-         message
-         message as key, $message as value
-         ...
-         sub, caller, program, line
+Get string or array with full backtrace.
+Format of error is:
 
-=item C<err_bt_pretty_rev(@errors)>
+ ERROR: %s
+ %s: %s
+ ...
+ %s %s %s %s
+ ...
 
- Reverse version of print for err_bt_pretty().
- Returns string with full backtrace in scalar context.
- Returns array of full backtrace lines in array context.
- Format of error is:
-         ERROR: %s
-         %s: %s
-         ...
-         %s %s %s %s
-         ...
- Values of error are:
-         message
-         message as key, $message as value
-         ...
-         sub, caller, program, line
+Values of error are:
 
-=item C<err_line(@errors)>
+ message
+ message as key, $message as value
+ ...
+ sub, caller, program, line
 
- Returns string with error on one line.
- Use last error in @errors structure..
- Format of error is: "#Error [%s:%s] %s\n"
- Values of error are: $program, $line, $message
+Returns string with full backtrace in scalar context.
+Returns array of full backtrace lines in array context.
 
-=item C<err_line_all(@errors)>
+=head2 C<err_bt_pretty_rev>
 
- Returns string with errors each on one line.
- Use all errors in @errors structure.
- Format of error line is: "#Error [%s:%s] %s\n"
- Values of error line are: $program, $line, $message
+ my $ret = err_bt_pretty_rev(@errors);
+ my @ret = err_bt_pretty_rev(@errors);
 
-=item C<err_print(@errors)>
+Reverse version of print for C<err_bt_pretty()>.
+Format of error is:
 
- Print first error.
- If error comes from class, print class name before error.
- Returns string with error.
+ ERROR: %s
+ %s: %s
+ ...
+ %s %s %s %s
+ ...
 
-=item C<err_print_var(@errors)>
+Values of error are:
 
- Print first error with all variables.
- Returns error string in scalar mode.
- Returns lines of error in array mode.
+ message
+ message as key, $message as value
+ ...
+ sub, caller, program, line
 
-=back
+Returns string with full backtrace in scalar context.
+Returns array of full backtrace lines in array context.
+
+=head2 C<err_line>
+
+ my $ret = err_line(@errors);
+
+Get string with error on one line.
+Use last error in @errors structure..
+Format of error is: C<"#Error [%s:%s] %s\n">
+Values of error are: C<$program, $line, $message>
+
+Returns string.
+
+=head2 C<err_line_all>
+
+ my $ret = err_line_all(@errors);
+
+Get string with errors each on one line.
+Use all errors in C<@errors> structure.
+Format of error line is: C<"#Error [%s:%s] %s\n">
+Values of error line are: C<$program, $line, $message>
+
+Returns string.
+
+=head2 C<err_print>
+
+ my $ret = err_print(@errors);
+
+Print first error.
+If error comes from class, print class name before error.
+
+Returns string with error.
+
+=head2 C<err_print_var>
+
+Print first error with all variables.
+
+Returns error string in scalar mode.
+Returns lines of error in array mode.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=err_bt_pretty.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Text qw(err_bt_pretty);
 
  # Fictional error structure.
@@ -296,11 +339,11 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=err_line_all.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Text qw(err_line_all);
 
  # Fictional error structure.
@@ -348,11 +391,11 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=err_line.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Text qw(err_line);
 
  # Fictional error structure.
@@ -386,11 +429,11 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
 =head1 EXAMPLE4
 
- # Pragmas.
+=for comment filename=err_bt_pretty_more.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Text qw(err_bt_pretty);
 
  # Fictional error structure.
@@ -442,11 +485,11 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
 =head1 EXAMPLE5
 
- # Pragmas.
+=for comment filename=err_bt_pretty_rev.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Text qw(err_bt_pretty_rev);
 
  # Fictional error structure.
@@ -498,11 +541,11 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
 =head1 EXAMPLE6
 
- # Pragmas.
+=for comment filename=err_print_main.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Text qw(err_print);
 
  # Fictional error structure.
@@ -536,11 +579,11 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
 =head1 EXAMPLE7
 
- # Pragmas.
+=for comment filename=err_print_class.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Text qw(err_print);
 
  # Fictional error structure.
@@ -574,11 +617,11 @@ Error::Pure::Output::Text - Output subroutines for Error::Pure.
 
 =head1 EXAMPLE8
 
- # Pragmas.
+=for comment filename=err_print_var.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Error::Pure::Output::Text qw(err_print_var);
 
  # Fictional error structure.
@@ -632,7 +675,7 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-Output-Text>
+L<https://github.com/michal-josef-spacek/Error-Pure-Output-Text>
 
 =head1 AUTHOR
 
@@ -642,11 +685,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2008-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2008-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.23
+0.24
 
 =cut

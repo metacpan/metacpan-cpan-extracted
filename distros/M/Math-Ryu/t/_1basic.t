@@ -112,8 +112,8 @@ my $v_check = $];
 $v_check =~ s/\.//;
 
 cmp_ok($v, 'eq', $v_check);
-cmp_ok($Math::Ryu::VERSION, 'eq', '0.04', "\$VERSION stringifies as expected");
-cmp_ok($Math::Ryu::VERSION, '==',  0.04,  "\$VERSION numifies as expected");
+cmp_ok($Math::Ryu::VERSION, 'eq', '0.05', "\$VERSION stringifies as expected");
+cmp_ok($Math::Ryu::VERSION, '==',  0.05,  "\$VERSION numifies as expected");
 
 require Math::Ryu::Debug;
 cmp_ok($Math::Ryu::VERSION, 'eq', $Math::Ryu::Debug::VERSION, "Debug and non-Debug version numbers match");

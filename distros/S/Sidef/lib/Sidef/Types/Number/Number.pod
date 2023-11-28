@@ -529,7 +529,7 @@ Aliases: I<tau>
     Num.phi
 
     φ(n)
-    phi(n)
+    phi(n,k=1)
 
 Returns the golden ratio constant C<PHI>, or the Euler totient of C<n>.
 
@@ -1222,6 +1222,14 @@ Scan C<n>, starting from bit index C<k>, towards more significant bits, until a 
 When C<k> is omitted, C<k=0> is assumed.
 
 Returns C<nil> if C<n> cannot be truncated to an integer or if C<k> is negative.
+
+=cut
+
+=head2 bphi
+
+    bphi(n)
+
+The bi-unitary analog of Euler's totient function of C<n>. (OEIS: A116550)
 
 =cut
 
@@ -3976,6 +3984,14 @@ Returns the modular inverse of C<n> modulo C<m>.
 
 =cut
 
+=head2 iphi
+
+    iphi(n, k=1)
+
+Infinitary analog of Euler's phi function. (OEIS: A091732)
+
+=cut
+
 =head2 ipolygonal_root
 
     ipolygonal_root(n,k)
@@ -4094,7 +4110,9 @@ Aliases: I<is_absolute_euler_psp>
 
     n.is_abundant
 
-Returns true when sigma(n) > 2*n.
+Returns true if C<n> is an abundant number, else false.
+
+An abundant number is smaller than the sum of its positive proper divisors.
 
 =cut
 
@@ -4118,6 +4136,24 @@ Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == k>.
     say 20.by { .is_almost_prime(2) }   # semiprimes
     say 20.by { .is_almost_prime(3) }   # 3-almost primes
 
+In order for C<n> to have at least C<k> prime factors, without having any prime factors less than or equal to C<B>, it implies that C<n> must be greater than C<B^k>, since all the prime factors of C<n> are greater than C<B>.
+
+By setting C<Num!USE_CONJECTURES = true>, the function uses a conjectured approach based on Pollard's rho method to find a larger bound for C<B>, which requires C<O(sqrt(B))> steps to find a prime factor less than C<B>. Therefore, if we take C<B = 10^12>, after C<c*10^6> iterations (we use C<c=2>) of the Pollard rho method without success in finding a prime factor of C<n>, it's very probable that C<n> has no prime factor less than C<10^12>.
+
+By enabling the conjectured approach, the function becomes about 5x faster than the rigorous method, for large enough inputs.
+
+=cut
+
+=head2 is_amicable
+
+    is_amicable(n,m)
+
+Returns true if the numbers C<n> and C<m> are "amicable", else false.
+
+Amicable numbers are two different numbers so related that the sum of the proper divisors of each is equal to that of the other.
+
+    say is_amicable(220, 284)   #=> true
+
 =cut
 
 =head2 is_between
@@ -4125,6 +4161,21 @@ Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == k>.
     n.is_between(min, max)
 
 Returns a true value when `n >= min` and `n <= max`.
+
+=cut
+
+=head2 is_bfsw_psp
+
+    n.is_bfsw_psp
+
+Returns true if C<n> passes a slightly stronger and faster variant of the BFW primality test, based on the Lucas-V function, checking the following congruences:
+
+    V_{n+1} == 2*Q (mod n)
+    Q^(n+1) == Q^2 (mod n)
+
+where C<Q = -2> and C<P> is the first integer >= 2 such that C<D = P^2 - 4*Q> gives C<kronecker(D, n) == -1>.
+
+There are no known composites that pass this test.
 
 =cut
 
@@ -4239,6 +4290,16 @@ Returns true if C<n> is divisible by the cubes of all its prime factors.
 Returns true when C<gcd(phi(n), n) = 1>, where C<phi(n)> is the Euler totient function.
 
     say 30.by { .is_cyclic }    # OEIS: A003277
+
+=cut
+
+=head2 is_deficient
+
+    n.is_deficient
+
+Returns true if C<n> is a deficient number, else false.
+
+A deficient number is greater than the sum of its positive proper divisors.
 
 =cut
 
@@ -4593,6 +4654,12 @@ Equivalently, k-omega primes are numbers C<n> such that C<omega(n) == k>.
 
     say 20.by { .is_omega_prime(1) }   # prime powers
     say 20.by { .is_omega_prime(2) }   # numbers n such that omega(n) == 2
+
+In order for C<n> to have at least C<k> prime factors, without having any prime factors less than or equal to C<B>, it implies that C<n> must be greater than C<B^k>, since all the prime factors of C<n> are greater than C<B>.
+
+By setting C<Num!USE_CONJECTURES = true>, the function uses a conjectured approach based on Pollard's rho method to find a larger bound for C<B>, which requires C<O(sqrt(B))> steps to find a prime factor less than C<B>. Therefore, if we take C<B = 10^12>, after C<c*10^6> iterations (we use C<c=2>) of the Pollard rho method without success in finding a prime factor of C<n>, it's very probable that C<n> has no prime factor less than C<10^12>.
+
+By enabling the conjectured approach, the function becomes about 5x faster than the rigorous method, for large enough inputs.
 
 =cut
 
@@ -5133,7 +5200,7 @@ Aliases: I<is_underwood_pseudoprime>, I<is_frobenius_underwood_psp>, I<is_froben
 
 Returns true if C<n> passes the Lucas-V BFW test: C<V_{n+1} == 2*Q (mod n)> for carefully chosen values of C<P> and C<Q>.
 
-The composite numbers that pass this test are extremely rare (see OEIS A365514).
+The composite numbers that pass this test are extremely rare (OEIS A365514).
 
 When combined with a strong Fermat pseudoprime test to base 2, there are no known composites that pass both tests.
 
@@ -5318,6 +5385,20 @@ Dilogarithm function, defined as the integral of C<-log(1-t)/t> from C<0> to C<x
     n.lift
 
 Returns the self object.
+
+=cut
+
+=head2 linear_congruence
+
+    linear_congruence(n, r, m)
+
+Return an array with the values of C<x> satisfying the following linear congruence:
+
+    n*x == r (mod m)
+
+Example:
+
+    say linear_congruence(3, 12, 15)    #=> [4, 9, 14]
 
 =cut
 
@@ -5696,19 +5777,15 @@ Aliases: I<vecmin>
 
 =cut
 
-=head2 modular_quadratic_formula
+=head2 mobius_range
 
-    modular_quadratic_formula(a,b,c,m)
+    mobius_range(a, b)
 
-Returns an array with all the positive solutions for C<x> to the following modular quadratic equation:
+Returns an array with the Möbius values for the range C<a..b>.
 
-    a*x^2 + b*x + c == 0 (mod m)
+    say moebius_range(7, 17) => [-1, 0, 0, 1, -1, 0, -1, 1, 1, 0, -1]
 
-where C<a,b,c> are rational values and C<m> is a positive integer.
-
-Example:
-
-    say modular_quadratic_formula(3,4,5,124)  #=> [47, 55, 109, 117]
+Aliases: I<moebius_range>
 
 =cut
 
@@ -6440,6 +6517,14 @@ Although this may or may not be actually faster.
 
 =cut
 
+=head2 nuphi
+
+    nuphi(n)
+
+The nonunitary totient function. (OEIS: A254503)
+
+=cut
+
 =head2 nusigma
 
     nusigma(n, k=1)
@@ -6555,10 +6640,10 @@ Returns an array with the real and imaginary parts of C<x>.
 
 =cut
 
-=head2 pbrent_factor
+=head2 rho_brent_factor
 
-    n.pbrent_factor
-    n.pbrent_factor(tries)
+    n.rho_brent_factor
+    n.rho_brent_factor(tries)
 
 Pollard-Brent rho factorization method.
 
@@ -7260,17 +7345,6 @@ Returns the previous squarefull (or 2-full) number smaller than C<n>.
 
 =cut
 
-=head2 prho_factor
-
-    n.prho_factor
-    n.prho_factor(tries)
-
-Pollard rho factorization method.
-
-The product of the factors will give back C<n>. However, some factors may be composite.
-
-=cut
-
 =head2 primality_pretest
 
     n.primality_pretest
@@ -7662,6 +7736,28 @@ The method also accepts C<n> to be a fraction, which is computed as:
 
 =cut
 
+=head2 proper_divisors
+
+    n.proper_divisors
+
+Return an array with the divisors of C<n> less than C<n>.
+
+    say proper_divisors(6)  #=> [1, 2, 3]
+
+=cut
+
+=head2 proper_sigma0
+
+    n.proper_sigma0
+
+Returns the number of proper divisors of C<n>.
+
+    say proper_sigma0(6)    #=> 3
+
+Aliases: I<proper_divisor_count>
+
+=cut
+
 =head2 psi
 
     n.psi(k=1)
@@ -7717,6 +7813,24 @@ Aliases: I<quadratic_nonresidue>
 Pomerance's Quadratic Sieve factorization method (SIMPQS).
 
 The product of the factors will give back C<n>. However, some factors may be composite.
+
+=cut
+
+=head2 quadratic_congruence
+
+    quadratic_congruence(a,b,c,m)
+
+Returns an array with all the positive solutions for C<x> to the following quadratic congruence:
+
+    a*x^2 + b*x + c == 0 (mod m)
+
+where C<a,b,c> are rational values and C<m> is a positive integer.
+
+Example:
+
+    say quadratic_congruence(3,4,5,124)  #=> [47, 55, 109, 117]
+
+Aliases: I<modular_quadratic_formula>
 
 =cut
 
@@ -7963,6 +8077,17 @@ Equivalent with:
     n / k**valuation(n,k)
 
 Aliases: I<remove>
+
+=cut
+
+=head2 rho_factor
+
+    n.rho_factor
+    n.rho_factor(tries)
+
+Pollard rho factorization method.
+
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -8917,12 +9042,24 @@ Aliases: I<to_str>
 
 =head2 totient
 
-    phi(n)
-    totient(n)
+    phi(n,k=1)
+    totient(n,k=1)
 
 Euler's totient function.
 
+For k>1, it returns the generalized Jordan's totient C<J_k(n)>.
+
 Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
+
+=cut
+
+=head2 totient_range
+
+    totient_range(a, b)
+
+Returns an array with the totient values for the range C<a..b>.
+
+    say totient_range(7, 17)  #=> [6, 4, 6, 4, 10, 4, 12, 6, 8, 8, 16]
 
 =cut
 
@@ -8994,7 +9131,7 @@ Aliases: I<unitary_divisors>
 
 =head2 uphi
 
-    uphi(n)
+    uphi(n,k=1)
 
 The unitary totient function. (OEIS: A047994)
 

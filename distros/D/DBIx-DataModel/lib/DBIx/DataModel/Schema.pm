@@ -18,7 +18,7 @@ use Params::Validate               qw/validate_with SCALAR ARRAYREF CODEREF UNDE
 
 use Carp::Clan                     qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-use SQL::Abstract::More 1.39;
+use SQL::Abstract::More 1.40;
 use Try::Tiny;
 use mro                            qw/c3/;
 
@@ -44,7 +44,9 @@ my $spec = {
 sub new {
   my $class = shift;
 
-  not $class->metadm->{singleton}
+  my $metadm = $class->metadm;
+
+  not $metadm->{singleton}
     or croak "$class is already used in single-schema mode, can't call new()";
 
   # validate params
@@ -61,13 +63,13 @@ sub new {
   }
 
   # default SQLA
-  $self->{sql_abstract} ||= SQL::Abstract::More->new;
+  $self->{sql_abstract} ||= $metadm->sql_abstract_class->new($metadm->sql_abstract_args);
 
   # default resultAs_classes
   $self->{resultAs_classes} ||= mro::get_linear_isa($class);
 
   # from now on, singleton mode will be forbidden
-  $class->metadm->{singleton} = undef;
+  $metadm->{singleton} = undef;
 
   return $self;
 }
@@ -527,7 +529,7 @@ Laurent Dami, E<lt>laurent.dami AT etat  ge  chE<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2006-2012 Laurent Dami.
+Copyright 2006-2023 Laurent Dami.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

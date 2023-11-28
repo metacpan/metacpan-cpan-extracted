@@ -14,7 +14,7 @@ App::LXC::Container - configure, create and run LXC application containers
 
 =head1 ABSTRACT
 
-B<Currently this module is an alpha release.  It currently only supports
+B<Currently this module is a beta release.  It currently only supports
 Debian (and maybe Ubuntu and some other derivates) using Pipewire or
 Pulseaudio as audio system and X11 as windowing system.  Also see KNOWN BUGS
 below!>
@@ -176,7 +176,11 @@ directory without selecting anything in it.)
 In the main window you now add the needed programs: Select C<+> in the
 C<packages> box followed by the programs C<chromium> and C<evince> in the
 file-selection dialogue.  C<OK> in the later should now present you with
-your Linux distribution's packages for those programs.
+your Linux distribution's packages for those programs.  (Note that if you're
+configuring a container for a 3rd party application missing correct
+dependencies, e.g. something installed outside of the package management,
+you can use C<++> to determine the packages of the shared libraries needed
+for it.)
 
 Next select full network access, X11 and audio support using the radio- and
 check-boxes near the bottom.  Finally select C<+> in the C<users> box to add
@@ -377,7 +381,7 @@ use warnings 'once';
 
 use File::Path 'make_path';
 
-our $VERSION = "0.29";
+our $VERSION = "0.36";
 
 # TODO: Caller dependent module usage to only include UI::Various for setup
 # and corresponding tests.  Is there a better approach?

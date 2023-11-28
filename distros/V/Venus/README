@@ -1,14 +1,14 @@
 NAME
 
-    Venus - OO Library
+    Venus - Standard Library
 
 ABSTRACT
 
-    OO Standard Library for Perl 5
+    Standard Library for Perl 5
 
 VERSION
 
-    4.11
+    4.15
 
 SYNOPSIS
 
@@ -2484,6 +2484,24 @@ FUNCTIONS
       
         # 1
 
+ set
+
+      set(arrayref $value) (Venus::Set)
+
+    The set function returns a Venus::Set object for the arrayref provided.
+
+    Since 4.11
+
+    set example 1
+
+        package main;
+      
+        use Venus 'set';
+      
+        my $set = set [1..9];
+      
+        # bless(..., 'Venus::Set')
+
  space
 
       space(any $name) (Venus::Space)
@@ -3408,7 +3426,7 @@ AUTHORS
 
 LICENSE
 
-    Copyright (C) 2000, Awncorp, awncorp@cpan.org.
+    Copyright (C) 2022, Awncorp, awncorp@cpan.org.
 
     This program is free software, you can redistribute it and/or modify it
     under the terms of the Apache license version 2.0.

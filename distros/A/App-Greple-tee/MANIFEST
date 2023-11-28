@@ -40,5 +40,11 @@ docs/tee.ZH.md
 lib/App/Greple/tee.pm
 minil.toml
 t/00_compile.t
+t/02_run.sh
+t/02_run.t
+t/SAMPLE.txt
+t/Util.pm
+t/runner/README.md
+t/runner/Runner.pm
 META.yml
 MANIFEST

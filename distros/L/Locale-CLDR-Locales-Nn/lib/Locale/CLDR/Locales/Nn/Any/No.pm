@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nn::Any::No - Package for language Norwegian Nynorsk
 
 package Locale::CLDR::Locales::Nn::Any::No;
 # This file auto generated from Data\common\main\nn_NO.xml
-#	on Fri 13 Oct  9:32:26 am GMT
+#	on Sat  4 Nov  6:18:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

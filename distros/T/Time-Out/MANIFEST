@@ -1,11 +1,24 @@
+.perlcriticrc
 Changes
+cpanfile
+lib/Time/Out.pm
+lib/Time/Out.pod
+lib/Time/Out/Exception.pm
+lib/Time/Out/ParamConstraints.pm
+LICENSE
+maint/AuthorExtensions.pl
 Makefile.PL
-MANIFEST
-Out.pm
-Out.pod
+MANIFEST			This list of files
 README
-t/01_init.t
-t/02_usage.t
-t/03_exceptions.t
-t/pod.t
-META.yml                                 Module meta-data (added by MakeMaker)
+t/01-load.t
+t/02-basic.t
+t/03-no-timeout-exceptions.t
+t/04-nested.t
+t/05-RT-100886.t
+t/06-RT-84141.t
+t/07-RT-115809.t
+t/08-RT-128908.t
+t/09-pod.t
+t/10-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

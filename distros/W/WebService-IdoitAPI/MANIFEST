@@ -1,6 +1,9 @@
+bin/idoit-object
 bin/idoit-reports
 Changes
 lib/WebService/IdoitAPI.pm
+lib/WebService/IdoitAPI/Layer3Net.pm
+lib/WebService/IdoitAPI/Object.pm
 Makefile.PL
 MANIFEST
 README

@@ -1,11 +1,10 @@
-use strict;
-use warnings;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.004-3-g762cc66
+use strictures 2;
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.005-7-ge8a94ef
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 use 5.020;
 use if "$]" >= 5.022, experimental => 're_strict';
@@ -65,6 +64,10 @@ sub register ($self, $app, $config) {
 
   $app->helper(validate_request => \&_validate_request);
   $app->helper(validate_response => \&_validate_response);
+
+  $app->hook(after_dispatch => sub ($c) {
+    $c->res->on(finish => sub ($res) { $config->{after_response}->($c) });
+  }) if $config->{after_response};
 }
 
 sub _validate_request ($c) {
@@ -92,13 +95,14 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
   $app->config({
     openapi => {
       document_filename => 'data/openapi.yaml',
+      after_response => sub ($c) { ... },
     },
     ...
   });
@@ -114,6 +118,8 @@ This L<Mojolicious> plugin makes an L<OpenAPI::Modern> object available to the a
 
 There are many features to come.
 
+=for stopwords openapi operationId subref
+
 =head1 CONFIGURATION OPTIONS
 
 =head2 schema
@@ -124,6 +130,24 @@ L<OpenAPI::Modern/openapi_schema>.
 =head2 document_filename
 
 A filename indicating from where to load the OpenAPI document. Supports YAML and json file formats.
+Only used if L</schema> is not provided.
+
+=head2 after_response
+
+A subref which runs after the response has been finalized, to allow you to perform validation on it.
+You B<must not> mutate the response here, nor swap it out for a different response, so use this only
+for telemetry and logging.
+
+  my $after_response = sub ($c) {
+    my $result = $c->validate_response;
+    if ($result) {
+      $c->log->debug('response is valid');
+    }
+    else {
+      # see JSON::Schema::Modern::Result for different output formats
+      $c->log->error("response is invalid:\n", $result);
+    }
+  };
 
 =head1 METHODS
 
@@ -136,36 +160,43 @@ Instantiates an L<OpenAPI::Modern> object and provides an accessor to it.
 These methods are made available on the C<$c> object (the invocant of all controller methods,
 and therefore other helpers).
 
-=for stopwords openapi operationId
-
 =head2 openapi
 
-The L<OpenAPI::Modern> object.
+The L<OpenAPI::Modern> object; it holds your OpenAPI specification and is reused between requests.
 
 =head2 validate_request
 
   my $result = $c->openapi->validate_request;
 
-Passes C<< $c->req >> to L<OpenAPI::Modern/validate_request> and returns the
-L<JSON::Schema::Modern::Result>.
+Passes C<< $c->req >> to L<OpenAPI::Modern/validate_request> and returns a
+L<JSON::Schema::Modern::Result> object.
 
 Note that the matching L<Mojo::Routes::Route> object for this request is I<not> used to find the
 OpenAPI path-item that corresponds to this request: only information in the request URI itself is
-used (although some information in the route may be used in a future feature).
+used (although some information in the route may be used in future features).
+
+You might want to define an C<under> route action that calls C<validate_request> and short-circuits
+with an HTTP 400 response on validation failure.
 
 =head2 validate_response
 
   my $result = $c->openapi->validate_response;
 
-Passes C<< $c->res >> and C<< $c->req >> to L<OpenAPI::Modern/validate_response> and returns the
-L<JSON::Schema::Modern::Result>.
+Passes C<< $c->res >> and C<< $c->req >> to L<OpenAPI::Modern/validate_response> and returns a
+L<JSON::Schema::Modern::Result> object.
 
-Can only be called in the areas of the dispatch flow where the response has already been rendered; a
-good place to call this would be in an L<after_dispatch|Mojolicious/after_dispatch> hook.
+As this can only be called in the parts of the dispatch flow where the response has already been
+rendered and finalized, a hook has been set up for you; you can access it by providing a subref to the
+L</after_response> configuration value:
+
+  $app->config->{openapi}{after_response} //= sub ($c) {
+    my $result = $c->validate_response;
+    # ... do something with the validation result
+  };
 
 Note that the matching L<Mojo::Routes::Route> object for this request is I<not> used to find the
 OpenAPI path-item that corresponds to this request and response: only information in the request URI
-itself is used (although some information in the route may be used in a future feature).
+itself is used (although some information in the route may be used in future features).
 
 =head1 STASH VALUES
 
@@ -236,8 +267,8 @@ Bugs may be submitted through L<https://github.com/karenetheridge/Mojolicious-Pl
 
 I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
-You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and L<OpenAPI Slack
-server|https://open-api.slack.com>, which are also great resources for finding help.
+You can also find me on the L<JSON Schema Slack server|https://json-schema.slack.com> and
+L<OpenAPI Slack server|https://open-api.slack.com>, which are also great resources for finding help.
 
 =head1 AUTHOR
 

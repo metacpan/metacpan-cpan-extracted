@@ -1,0 +1,45 @@
+Revision history for OpenTelemetry-Exporter-OTLP
+
+0.015     2023-11-26 16:19:58+00:00 Europe/London
+
+    * Fix key name of parent span ID in JSON encoding
+    * Switch Metrics::Any client to strict mode, to allow for automatic
+      metric name generation. This means the metrics can be exported
+      with adapters that don't allow periods (eg. Prometheus). This
+      means some metrics had to be renamed:
+      - otel.otlp_exporter.failure -> otel.exporter.otlp.failure
+      - otel.otlp_exporter.message.compressed_size -> otel.exporter.otlp.message.compressed.size
+      - otel.otlp_exporter.message.uncompressed_size -> otel.exporter.otlp.message.uncompressed.size
+      - otel.otlp_exporter.request_duration -> otel.exporter.otlp.request.duration
+      Also: the `otel.exporter.otlp.success` metric was added for
+      consistency.
+
+0.014     2023-11-23 19:32:20+00:00 Europe/London
+
+    * Bump Object::Pad dependency to 0.74 to ensure
+      support for field initialisers
+    * Make all shutdown and force_flush methods async.
+      This adds a new dependency on Future::AsyncAwait
+    * Fix issues with JSON encoding of timestamps,
+      span and trace IDs, and string values
+
+0.013     2023-11-21 23:19:28+00:00 Europe/London
+
+    * Bump OpenTelemetry dependency to 0.010, for
+      a the working implementation of the API
+    * Allow OTLP encoders to encode arbitrary data
+      structures, in preparation for the eventual
+      support of logs and metrics
+
+0.012     2023-11-17 00:07:07+00:00 Europe/London
+
+    * Add missing dependency on OpenTelemetry API
+    * Fixed link to issues in meta
+
+0.011     2023-11-09 23:45:26+00:00 Europe/London
+
+    * Minor documentation fixes
+
+0.010     2023-11-07 20:53:46+00:00 Europe/London
+
+        First version.

@@ -8,31 +8,110 @@ use 5.014;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '4.18';
+our $VERSION = '5.01';
 
 Travel::Status::DE::HAFAS::Stop->mk_ro_accessors(
-	qw(eva name lat lon distance_m weight));
+	qw(loc
+	  rt_arr sched_arr arr arr_delay arr_cancelled
+	  rt_dep sched_dep dep dep_delay dep_cancelled
+	  delay direction
+	  rt_platform sched_platform platform is_changed_platform
+	  load
+	)
+);
 
 # {{{ Constructor
 
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my $loc = $opt{loc};
-	my $ref = {
-		eva        => $loc->{extId} + 0,
-		name       => $loc->{name},
-		lat        => $loc->{crd}{y} * 1e-6,
-		lon        => $loc->{crd}{x} * 1e-6,
-		weight     => $loc->{wt},
-		distance_m => $loc->{dist},
-	};
+	my $stop         = $opt{stop};
+	my $common       = $opt{common};
+	my $date         = $opt{date};
+	my $datetime_ref = $opt{datetime_ref};
+	my $hafas        = $opt{hafas};
+	my $strp_obj     = $opt{hafas}{strptime_obj};
 
-	if ( $opt{extra} ) {
-		while ( my ( $k, $v ) = each %{ $opt{extra} } ) {
-			$ref->{$k} = $v;
+	my $sched_arr = $stop->{aTimeS};
+	my $rt_arr    = $stop->{aTimeR};
+	my $sched_dep = $stop->{dTimeS};
+	my $rt_dep    = $stop->{dTimeR};
+
+	# dIn. / aOut. -> may passengers enter / exit the train?
+
+	my $sched_platform   = $stop->{aPlatfS}  // $stop->{dPlatfS};
+	my $rt_platform      = $stop->{aPlatfR}  // $stop->{dPlatfR};
+	my $changed_platform = $stop->{aPlatfCh} // $stop->{dPlatfCh};
+
+	for my $timestr ( $sched_arr, $rt_arr, $sched_dep, $rt_dep ) {
+		if ( not defined $timestr ) {
+			next;
+		}
+
+		$timestr = handle_day_change(
+			input    => $timestr,
+			date     => $date,
+			strp_obj => $strp_obj,
+			ref      => $datetime_ref
+		);
+
+	}
+
+	my $arr_delay
+	  = ( $sched_arr and $rt_arr )
+	  ? ( $rt_arr->epoch - $sched_arr->epoch ) / 60
+	  : undef;
+
+	my $dep_delay
+	  = ( $sched_dep and $rt_dep )
+	  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
+	  : undef;
+
+	my $arr_cancelled = $stop->{aCncl};
+	my $dep_cancelled = $stop->{dCncl};
+
+	my @messages;
+	for my $msg ( @{ $stop->{msgL} // [] } ) {
+		if ( $msg->{type} eq 'REM' and defined $msg->{remX} ) {
+			push( @messages,
+				$hafas->add_message( $opt{common}{remL}[ $msg->{remX} ] ) );
+		}
+		elsif ( $msg->{type} eq 'HIM' and defined $msg->{himX} ) {
+			push( @messages,
+				$hafas->add_message( $opt{common}{himL}[ $msg->{himX} ], 1 ) );
+		}
+		else {
+			say "Unknown message type $msg->{type}";
 		}
 	}
+
+	my $tco = {};
+	for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
+		my $tco_kv = $common->{tcocL}[$tco_id];
+		$tco->{ $tco_kv->{c} } = $tco_kv->{r};
+	}
+
+	my $ref = {
+		loc                 => $opt{loc},
+		sched_arr           => $sched_arr,
+		rt_arr              => $rt_arr,
+		arr                 => $rt_arr // $sched_arr,
+		arr_delay           => $arr_delay,
+		arr_cancelled       => $arr_cancelled,
+		sched_dep           => $sched_dep,
+		rt_dep              => $rt_dep,
+		dep                 => $rt_dep // $sched_dep,
+		dep_delay           => $dep_delay,
+		dep_cancelled       => $dep_cancelled,
+		delay               => $dep_delay // $arr_delay,
+		direction           => $stop->{dDirTxt},
+		sched_platform      => $sched_platform,
+		rt_platform         => $rt_platform,
+		is_changed_platform => $changed_platform,
+		platform            => $rt_platform // $sched_platform,
+		load                => $tco,
+		messages            => \@messages,
+	};
 
 	bless( $ref, $obj );
 
@@ -40,6 +119,33 @@ sub new {
 }
 
 # }}}
+
+sub handle_day_change {
+	my (%opt)   = @_;
+	my $date    = $opt{date};
+	my $timestr = $opt{input};
+	if ( length($timestr) == 8 ) {
+
+		# arrival time includes a day offset
+		my $offset_date = $opt{ref}->clone;
+		$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
+		$offset_date = $offset_date->strftime('%Y%m%d');
+		$timestr = $opt{strp_obj}->parse_datetime("${offset_date}T${timestr}");
+	}
+	else {
+		$timestr = $opt{strp_obj}->parse_datetime("${date}T${timestr}");
+	}
+	return $timestr;
+}
+
+sub messages {
+	my ($self) = @_;
+
+	if ( $self->{messages} ) {
+		return @{ $self->{messages} };
+	}
+	return;
+}
 
 sub TO_JSON {
 	my ($self) = @_;
@@ -65,26 +171,26 @@ Travel::Status::DE::HAFAS::Stop - Information about a HAFAS stop.
 
 =head1 SYNOPSIS
 
-	# in geoSearch mode
-	for my $stop ($status->results) {
+	# in journey mode
+	for my $stop ($journey->route) {
 		printf(
-			"%5.1f km  %8d  %s\n",
-			$result->distance_m * 1e-3,
-			$result->eva, $result->name
+			%5s -> %5s %s\n",
+			$stop->arr ? $stop->arr->strftime('%H:%M') : '--:--',
+			$stop->dep ? $stop->dep->strftime('%H:%M') : '--:--',
+			$stop->loc->name
 		);
 	}
 
 =head1 VERSION
 
-version 4.18
+version 5.01
 
 =head1 DESCRIPTION
 
-Travel::Status::DE::HAFAS::Stop describes a HAFAS stop. It may be part of a
-journey or part of a geoSearch / locationSearch request.
-
-Journey-, geoSearch- and locationSearch-specific accessors are annotated
-accordingly and return undef in other contexts.
+Travel::Status::DE::HAFAS::Stop describes a
+Travel::Status::DE::HAFAS::Journey(3pm)'s stop at a given
+Travel::Status::DE::HAFAS::Location(3pm) with arrival/departure time,
+platform, etc.
 
 =head1 METHODS
 
@@ -92,96 +198,82 @@ accordingly and return undef in other contexts.
 
 =over
 
-=item $stop->name
+=item $stop->loc
 
-Stop name, e.g. "Essen Hbf" or "Unter den Linden/B75, Tostedt".
+Travel::Status::DE::HAFAS::Location(3pm) instance describing stop name, EVA
+ID, et cetera.
 
-=item $stop->eva
-
-EVA ID, e.g. 8000080.
-
-=item $stop->lat
-
-Stop latitude (WGS-84)
-
-=item $stop->lon
-
-Stop longitude (WGS-84)
-
-=item $stop->distance_m (geoSearch)
-
-Distance in meters between the requested coordinates and this stop.
-
-=item $stop->weight
-
-Weight / Relevance / Importance of this stop using an unknown metric.
-Higher values indicate more relevant stops.
-
-=item $stop->rt_arr (journey)
+=item $stop->rt_arr
 
 DateTime object for actual arrival.
 
-=item $stop->sched_arr (journey)
+=item $stop->sched_arr
 
 DateTime object for scheduled arrival.
 
-=item $stop->arr (journey)
+=item $stop->arr
 
 DateTime object for actual or scheduled arrival.
 
-=item $stop->arr_delay (journey)
+=item $stop->arr_delay
 
 Arrival delay in minutes.
 
-=item $stop->arr_cancelled (journey)
+=item $stop->arr_cancelled
 
 Arrival is cancelled.
 
-=item $stop->rt_dep (journey)
+=item $stop->rt_dep
 
 DateTime object for actual departure.
 
-=item $stop->sched_dep (journey)
+=item $stop->sched_dep
 
 DateTime object for scheduled departure.
 
-=item $stop->dep (journey)
+=item $stop->dep
 
 DateTIme object for actual or scheduled departure.
 
-=item $stop->dep_delay (journey)
+=item $stop->dep_delay
 
 Departure delay in minutes.
 
-=item $stop->dep_cancelled (journey)
+=item $stop->dep_cancelled
 
 Departure is cancelled.
 
-=item $stop->delay (journey)
+=item $stop->delay
 
 Departure or arrival delay in minutes.
 
-=item $stop->direction (journey)
+=item $stop->direction
 
 Direction signage from this stop on, undef if unchanged.
 
-=item $stop->rt_platform (journey)
+=item $journey->messages
+
+List of Travel::Status::DE::HAFAS::Message(3pm) instances related to this stop.
+These typically refer to delay reasons, platform changes, or changes in the
+line number / direction heading.
+
+=item $stop->rt_platform
 
 Actual platform.
 
-=item $stop->sched_platform (journey)
+=item $stop->sched_platform
 
 Scheduled platform.
 
-=item $stop->platform (journey)
+=item $stop->platform
 
 Actual or scheduled platform.
 
-=item $stop->is_changed_platform (journey)
+=item $stop->is_changed_platform
 
 True if real-time and scheduled platform disagree.
 
-=item $stop->load (journey)
+=item $stop->load
 
 Expected utilization / passenger load from this stop on.
 
@@ -209,7 +301,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2023 by Birthe Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

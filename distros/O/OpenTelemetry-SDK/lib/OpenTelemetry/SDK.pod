@@ -19,7 +19,7 @@ OpenTelemetry::SDK - An implementation of the OpenTelemetry SDK for Perl
     # You can also configure some parts of the SDK manually
     OpenTelemetry->tracer_provider->add_span_processor(
         OpenTelemetry::SDK::Trace::Span::Processor::Simple->new(
-            OpenTelemetry::SDK::Exporter::Console->new,
+            exporter => OpenTelemetry::SDK::Exporter::Console->new,
         ),
     );
 
@@ -75,22 +75,237 @@ set.
 
 =over
 
-=item OTEL_SDK_DISABLED
+=item OTEL_ATTRIBUTE_COUNT_LIMIT
 
-Disable the SDK for all signals. Default: C<false>
+Maximum allowed attribute count. Default: 128.
+
+This is used as the default value for L</OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT>,
+L</OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT>, and L</OTEL_LINK_ATTRIBUTE_COUNT_LIMIT>.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT
+
+Maximum allowed attribute value size. Default is to have no limit.
+If set, this will apply to span, event, and link attributes, unless
+a more specific limit is set for these with the
+L</OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT>,
+L</OTEL_EVENT_ATTRIBUTE_VALUE_LENGTH_LIMIT>, or
+L</OTEL_LINK_ATTRIBUTE_VALUE_LENGTH_LIMIT> variables described below.
+Note that, of these, only the one for spans is defined by the
+OpenTelemetry standard specification.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_BSP_EXPORT_TIMEOUT
+
+Maximum allowed time (in milliseconds) for the batch exporter to export data.
+Default: 30000.
+
+See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
+
+=item OTEL_BSP_MAX_EXPORT_BATCH_SIZE
+
+Maximum batch size for the batch exporter. Default: 512. Must be less than or
+equal to L</OTEL_BSP_MAX_QUEUE_SIZE>.
+
+See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
+
+=item OTEL_BSP_MAX_QUEUE_SIZE
+
+Maximum queue size for the batch exporter. Default: 2048.
+
+See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
+
+=item OTEL_BSP_SCHEDULE_DELAY
+
+Delay interval (in milliseconds) between two consecutive exports of the
+batch exporter. Default: 5000.
+
+See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
+
+=item OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT
+
+Maximum allowed attribute per span event count. Default: the value of
+L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_EVENT_ATTRIBUTE_VALUE_LENGTH_LIMIT
+
+Maximum allowed size for event attribute values. Default is to have no
+limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
+latter will apply to event attributes as well.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+This variable is non-standard.
+
+=item OTEL_EXPORTER_OTLP_CERTIFICATE
+
+Set to the path to a PEM file with the certificate used to verify
+a server's TLS credentials. Default: empty.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE
+
+Set to the path to a PEM file with the client certificate/chain trust
+for the client's private key to use in mTLS communication. Default:
+empty.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_CLIENT_KEY
+
+Set to the path to a PEM file with the client's private key to use in
+mTLS communication. Default: empty.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_COMPRESSION
+
+Controls the compression used by the OTLP exporter. Default: depends
+on availability.
+
+Possible values are:
+
+=over
+
+=item C<none>
+
+No compression will be used.
+
+=item C<gzip>
+
+Compressed using zlib.
+
+=back
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_ENDPOINT
+
+The base URL to be used when sending exported data. Default:
+C<http://localhost> with port 4318 for HTTP traffic, and port 4317 for
+gRPC traffic.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_HEADERS
+
+Set to a string with key/value pairs to be sent along with requests
+exporting trace data. Default: empty.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_PROTOCOL
+
+Controls the protocol used by the OTLP exporter. Default: depends on
+availability.
+
+Possible values are:
+
+=over
+
+=item C<http/json>
+
+Sends data as JSON over HTTP.
+
+=item C<http/protobuf>
+
+Sends data as a Protobuf-encoded blob over HTTP.
+
+=item C<grpc> (NYI)
+
+Sends data using gRPC.
+
+=back
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_TIMEOUT
+
+The maximum amount of time the OTLP exporter will wait for a response
+when exporting data. Default: 10.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE
+
+Set to the path to a PEM file with the certificate used to verify
+a server's TLS credentials when exporting trace data. Default: the
+value of L</OTEL_EXPORTER_OTLP_CERTIFICATE>.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE
+
+Set to the path to a PEM file with the client certificate/chain trust
+for the client's private key to use in mTLS communication when exporting
+trace data. Default: the value of L</OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE>.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY
+
+Set to the path to a PEM file with the client's private key to use in
+mTLS communication when exporting trace data. Default: the value of
+L</OTEL_EXPORTER_OTLP_CLIENT_KEY>.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_TRACES_COMPRESSION
+
+Controls the compression used by the OTLP exporter for trace data.
+Default: the value of L</OTEL_EXPORTER_OTLP_COMPRESSION>,
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+
+The URL to send exported trace data. Default: the value of
+L</OTEL_EXPORTER_OTLP_ENDPOINT> with C</v1/traces> appended to it.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_TRACES_HEADERS
+
+Set to a string with key/value pairs to be sent along with requests
+exporting trace data. Default: the value of
+L</OTEL_EXPORTER_OTLP_HEADERS>.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_EXPORTER_OTLP_TRACES_TIMEOUT
+
+The maximum amount of time the OTLP exporter will wait for a response
+when exporting trace data. Default: the value of
+L</OTEL_EXPORTER_OTLP_TIMEOUT>.
+
+See L<OpenTelemetry::Exporter::OTLP> for more details.
+
+=item OTEL_LINK_ATTRIBUTE_COUNT_LIMIT
+
+Maximum allowed attribute per span link count. Default: the value of
+L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_LINK_ATTRIBUTE_VALUE_LENGTH_LIMIT
+
+Maximum allowed size for link attribute values. Default is to have no
+limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
+latter will apply to link attributes as well.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+This variable is non-standard.
 
 =item OTEL_RESOURCE_ATTRIBUTES
 
 Key-value pairs to be used as resource attributes. Default: empty, for no
 attributes.
-
-See L<OpenTelemetry::SDK::Resource> for more details.
-
-=item OTEL_SERVICE_NAME
-
-Sets the value of the C<service.name> resource attribute. If C<service.name>
-is also provided in L</OTEL_RESOURCE_ATTRIBUTES>, that value will be overridden
-by the one provided in this variable. Default: empty.
 
 See L<OpenTelemetry::SDK::Resource> for more details.
 
@@ -134,6 +349,74 @@ L<OpenTelemetry::Propagator::TraceContext>
 =item C<xray>
 
 L<OpenTelemetry::Propagator::XRay> (NYI)
+
+=back
+
+=item OTEL_SDK_DISABLED
+
+Disable the SDK for all signals. Default: C<false>
+
+=item OTEL_SERVICE_NAME
+
+Sets the value of the C<service.name> resource attribute. If C<service.name>
+is also provided in L</OTEL_RESOURCE_ATTRIBUTES>, that value will be overridden
+by the one provided in this variable. Default: empty.
+
+See L<OpenTelemetry::SDK::Resource> for more details.
+
+=item OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT
+
+Maximum allowed span attribute count. Default: the value of
+L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT
+
+Maximum allowed size for span attribute values. Default is to have no
+limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
+latter will apply to span attributes as well.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_SPAN_EVENT_COUNT_LIMIT
+
+Maximum allowed span event count. Default: 128.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_SPAN_LINK_COUNT_LIMIT
+
+Maximum allowed span link count. Default: 128.
+
+See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
+
+=item OTEL_TRACES_EXPORTER
+
+Trace exporter to be used. Default: C<otlp>.
+
+This can be set to a comma-separated list of values, to set multiple
+exporters. They will be deduplicated before configuration takes place.
+
+Possible values (and the classes that represent them) are listed below:
+
+=over
+
+=item C<otlp>
+
+L<OpenTelemetry::Exporter::OTLP>
+
+=item C<zipkin>
+
+L<OpenTelemetry::Exporter::Zipkin> (NYI)
+
+=item C<console>
+
+L<OpenTelemetry::SDK::Exporter::Console>
+
+This value is non-standard.
+
+=item none
 
 =back
 
@@ -194,136 +477,6 @@ argument is. Defaults to empty.
 
 This will only be used if L</OTEL_TRACES_SAMPLER> is set, and if the sampler
 requires it. Invalid or unrecognised input will be logged and will be ignored.
-
-=item OTEL_BSP_SCHEDULE_DELAY
-
-Delay interval (in milliseconds) between two consecutive exports of the
-batch exporter. Default: 5000.
-
-See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
-
-=item OTEL_BSP_EXPORT_TIMEOUT
-
-Maximum allowed time (in milliseconds) for the batch exporter to export data.
-Default: 30000.
-
-See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
-
-=item OTEL_BSP_MAX_QUEUE_SIZE
-
-Maximum queue size for the batch exporter. Default: 2048.
-
-See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
-
-=item OTEL_BSP_MAX_EXPORT_BATCH_SIZE
-
-Maximum batch size for the batch exporter. Default: 512. Must be less than or
-equal to L</OTEL_BSP_MAX_QUEUE_SIZE>.
-
-See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
-
-=item OTEL_ATTRIBUTE_COUNT_LIMIT
-
-Maximum allowed attribute count. Default: 128.
-
-This is used as the default value for L</OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT>,
-L</OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT>, and L</OTEL_LINK_ATTRIBUTE_COUNT_LIMIT>.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-=item OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT
-
-Maximum allowed attribute value size. Default is to have no limit.
-If set, this will apply to span, event, and link attributes, unless
-a more specific limit is set for these with the
-L</OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT>,
-L</OTEL_EVENT_ATTRIBUTE_VALUE_LENGTH_LIMIT>, or
-L</OTEL_LINK_ATTRIBUTE_VALUE_LENGTH_LIMIT> variables described below.
-Note that, of these, only the one for spans is defined by the
-OpenTelemetry standard specification.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-=item OTEL_EVENT_ATTRIBUTE_COUNT_LIMIT
-
-Maximum allowed attribute per span event count. Default: the value of
-L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-=item OTEL_EVENT_ATTRIBUTE_VALUE_LENGTH_LIMIT
-
-Maximum allowed size for event attribute values. Default is to have no
-limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
-latter will apply to event attributes as well.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-This variable is non-standard.
-
-=item OTEL_LINK_ATTRIBUTE_COUNT_LIMIT
-
-Maximum allowed attribute per span link count. Default: the value of
-L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-=item OTEL_LINK_ATTRIBUTE_VALUE_LENGTH_LIMIT
-
-Maximum allowed size for link attribute values. Default is to have no
-limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
-latter will apply to link attributes as well.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-This variable is non-standard.
-
-=item OTEL_SPAN_ATTRIBUTE_COUNT_LIMIT
-
-Maximum allowed span attribute count. Default: the value of
-L</OTEL_ATTRIBUTE_COUNT_LIMIT>.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-=item OTEL_SPAN_ATTRIBUTE_VALUE_LENGTH_LIMIT
-
-Maximum allowed size for span attribute values. Default is to have no
-limit. If not set, but L</OTEL_ATTRIBUTE_VALUE_LENGTH_LIMIT> is, the
-latter will apply to span attributes as well.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-=item OTEL_SPAN_EVENT_COUNT_LIMIT
-
-Maximum allowed span event count. Default: 128.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-=item OTEL_SPAN_LINK_COUNT_LIMIT
-
-Maximum allowed span link count. Default: 128.
-
-See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
-
-=item OTEL_TRACES_EXPORTER
-
-Trace exporter to be used. Default: C<otlp>.
-
-Possible values (and the classes that represent them) are listed below:
-
-=over
-
-=item C<otlp>
-
-L<OpenTelemetry::Exporter::OTLP>
-
-=item C<zipkin>
-
-L<OpenTelemetry::Exporter::Zipkin> (NYI)
-
-=item none
-
-=back
 
 =back
 

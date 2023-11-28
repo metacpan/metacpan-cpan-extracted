@@ -1,5 +1,6 @@
 Changes
 lib/Template/Plugin/Filter/PlantUML.pm
+LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MYMETA.json

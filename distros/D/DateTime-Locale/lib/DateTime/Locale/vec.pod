@@ -30,173 +30,173 @@ Venetian locale.
 
 =head3 Wide (format)
 
-  Mon
-  Tue
-  Wed
-  Thu
-  Fri
-  Sat
-  Sun
+  luni
+  marti
+  mèrcore
+  zoba
+  vènare
+  sabo
+  doménega
 
 =head3 Abbreviated (format)
 
-  Mon
-  Tue
-  Wed
-  Thu
-  Fri
-  Sat
-  Sun
+  lun
+  mar
+  mer
+  zob
+  vèn
+  sab
+  dom
 
 =head3 Narrow (format)
 
+  L
   M
-  T
-  W
-  T
-  F
+  M
+  Z
+  V
   S
-  S
+  D
 
 
 =head3 Wide (stand-alone)
 
-  Mon
-  Tue
-  Wed
-  Thu
-  Fri
-  Sat
-  Sun
+  luni
+  marti
+  mèrcore
+  zoba
+  vènare
+  sabo
+  doménega
 
 =head3 Abbreviated (stand-alone)
 
-  Mon
-  Tue
-  Wed
-  Thu
-  Fri
-  Sat
-  Sun
+  lun
+  mar
+  mer
+  zob
+  vèn
+  sab
+  dom
 
 =head3 Narrow (stand-alone)
 
+  L
   M
-  T
-  W
-  T
-  F
+  M
+  Z
+  V
   S
-  S
+  D
 
 =head2 Months
 
 =head3 Wide (format)
 
-  M01
-  M02
-  M03
-  M04
-  M05
-  M06
-  M07
-  M08
-  M09
-  M10
-  M11
-  M12
+  jenaro
+  febraro
+  marso
+  aprile
+  majo
+  jugno
+  lujo
+  agosto
+  setenbre
+  otobre
+  novenbre
+  desenbre
 
 =head3 Abbreviated (format)
 
-  M01
-  M02
-  M03
-  M04
-  M05
-  M06
-  M07
-  M08
-  M09
-  M10
-  M11
-  M12
+  jen
+  feb
+  mar
+  apr
+  maj
+  jug
+  luj
+  ago
+  set
+  oto
+  nov
+  des
 
 =head3 Narrow (format)
 
-  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
-  10
-  11
-  12
+  J
+  F
+  M
+  A
+  M
+  J
+  L
+  A
+  S
+  O
+  N
+  D
 
 
 =head3 Wide (stand-alone)
 
-  M01
-  M02
-  M03
-  M04
-  M05
-  M06
-  M07
-  M08
-  M09
-  M10
-  M11
-  M12
+  jenaro
+  febraro
+  marso
+  aprile
+  majo
+  jugno
+  lujo
+  agosto
+  setenbre
+  otobre
+  novenbre
+  desenbre
 
 =head3 Abbreviated (stand-alone)
 
-  M01
-  M02
-  M03
-  M04
-  M05
-  M06
-  M07
-  M08
-  M09
-  M10
-  M11
-  M12
+  jen
+  feb
+  mar
+  apr
+  maj
+  jug
+  luj
+  ago
+  set
+  oto
+  nov
+  des
 
 =head3 Narrow (stand-alone)
 
-  1
-  2
-  3
-  4
-  5
-  6
-  7
-  8
-  9
-  10
-  11
-  12
+  J
+  F
+  M
+  A
+  M
+  J
+  L
+  A
+  S
+  O
+  N
+  D
 
 =head2 Quarters
 
 =head3 Wide (format)
 
-  Q1
-  Q2
-  Q3
-  Q4
+  1º trimestre
+  2º trimestre
+  3º trimestre
+  4º trimestre
 
 =head3 Abbreviated (format)
 
-  Q1
-  Q2
-  Q3
-  Q4
+  T1
+  T2
+  T3
+  T4
 
 =head3 Narrow (format)
 
@@ -208,17 +208,17 @@ Venetian locale.
 
 =head3 Wide (stand-alone)
 
-  Q1
-  Q2
-  Q3
-  Q4
+  1º trimestre
+  2º trimestre
+  3º trimestre
+  4º trimestre
 
 =head3 Abbreviated (stand-alone)
 
-  Q1
-  Q2
-  Q3
-  Q4
+  T1
+  T2
+  T3
+  T4
 
 =head3 Narrow (stand-alone)
 
@@ -231,44 +231,44 @@ Venetian locale.
 
 =head3 Wide (format)
 
-  BCE
-  CE
+  vanti Cristo
+  daspò Cristo
 
 =head3 Abbreviated (format)
 
-  BCE
-  CE
+  v.C.
+  d.C.
 
 =head3 Narrow (format)
 
-  BCE
-  CE
+  v.C.
+  d.C.
 
 =head2 Date Formats
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008 M02 5, Tue
-   1995-12-22T09:05:02 = 1995 M12 22, Fri
-  -0010-09-15T04:44:23 = -10 M09 15, Sat
+   2008-02-05T18:30:30 = marti 5 febraro 2008
+   1995-12-22T09:05:02 = vènare 22 desenbre 1995
+  -0010-09-15T04:44:23 = sabo 15 setenbre -10
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 M02 5
-   1995-12-22T09:05:02 = 1995 M12 22
-  -0010-09-15T04:44:23 = -10 M09 15
+   2008-02-05T18:30:30 = 5 febraro 2008
+   1995-12-22T09:05:02 = 22 desenbre 1995
+  -0010-09-15T04:44:23 = 15 setenbre -10
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 M02 5
-   1995-12-22T09:05:02 = 1995 M12 22
-  -0010-09-15T04:44:23 = -10 M09 15
+   2008-02-05T18:30:30 = 5 feb 2008
+   1995-12-22T09:05:02 = 22 des 1995
+  -0010-09-15T04:44:23 = 15 set -10
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2008-02-05
-   1995-12-22T09:05:02 = 1995-12-22
-  -0010-09-15T04:44:23 = -10-09-15
+   2008-02-05T18:30:30 = 05/02/08
+   1995-12-22T09:05:02 = 22/12/95
+  -0010-09-15T04:44:23 = 15/09/-10
 
 
 =head2 Time Formats
@@ -302,27 +302,27 @@ Venetian locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 2008 M02 5, Tue 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995 M12 22, Fri 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 M09 15, Sat 04:44:23 UTC
+   2008-02-05T18:30:30 = marti 5 febraro 2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = vènare 22 desenbre 1995, 09:05:02 UTC
+  -0010-09-15T04:44:23 = sabo 15 setenbre -10, 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 2008 M02 5 18:30:30 UTC
-   1995-12-22T09:05:02 = 1995 M12 22 09:05:02 UTC
-  -0010-09-15T04:44:23 = -10 M09 15 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 febraro 2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 desenbre 1995, 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 setenbre -10, 04:44:23 UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 2008 M02 5 18:30:30
-   1995-12-22T09:05:02 = 1995 M12 22 09:05:02
-  -0010-09-15T04:44:23 = -10 M09 15 04:44:23
+   2008-02-05T18:30:30 = 5 feb 2008, 18:30:30
+   1995-12-22T09:05:02 = 22 des 1995, 09:05:02
+  -0010-09-15T04:44:23 = 15 set -10, 04:44:23
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 2008-02-05 18:30
-   1995-12-22T09:05:02 = 1995-12-22 09:05
-  -0010-09-15T04:44:23 = -10-09-15 04:44
+   2008-02-05T18:30:30 = 05/02/08, 18:30
+   1995-12-22T09:05:02 = 22/12/95, 09:05
+  -0010-09-15T04:44:23 = 15/09/-10, 04:44
 
 
 =head2 Available Formats
@@ -347,81 +347,81 @@ Venetian locale.
 
 =head3 E (ccc)
 
-   2008-02-05T18:30:30 = Tue
-   1995-12-22T09:05:02 = Fri
-  -0010-09-15T04:44:23 = Sat
+   2008-02-05T18:30:30 = mar
+   1995-12-22T09:05:02 = vèn
+  -0010-09-15T04:44:23 = sab
 
 =head3 EBhm (E h:mm B)
 
-   2008-02-05T18:30:30 = Tue 6:30 B
-   1995-12-22T09:05:02 = Fri 9:05 B
-  -0010-09-15T04:44:23 = Sat 4:44 B
+   2008-02-05T18:30:30 = mar 6:30 B
+   1995-12-22T09:05:02 = vèn 9:05 B
+  -0010-09-15T04:44:23 = sab 4:44 B
 
 =head3 EBhms (E h:mm:ss B)
 
-   2008-02-05T18:30:30 = Tue 6:30:30 B
-   1995-12-22T09:05:02 = Fri 9:05:02 B
-  -0010-09-15T04:44:23 = Sat 4:44:23 B
+   2008-02-05T18:30:30 = mar 6:30:30 B
+   1995-12-22T09:05:02 = vèn 9:05:02 B
+  -0010-09-15T04:44:23 = sab 4:44:23 B
 
 =head3 EHm (E HH:mm)
 
-   2008-02-05T18:30:30 = Tue 18:30
-   1995-12-22T09:05:02 = Fri 09:05
-  -0010-09-15T04:44:23 = Sat 04:44
+   2008-02-05T18:30:30 = mar 18:30
+   1995-12-22T09:05:02 = vèn 09:05
+  -0010-09-15T04:44:23 = sab 04:44
 
 =head3 EHms (E HH:mm:ss)
 
-   2008-02-05T18:30:30 = Tue 18:30:30
-   1995-12-22T09:05:02 = Fri 09:05:02
-  -0010-09-15T04:44:23 = Sat 04:44:23
+   2008-02-05T18:30:30 = mar 18:30:30
+   1995-12-22T09:05:02 = vèn 09:05:02
+  -0010-09-15T04:44:23 = sab 04:44:23
 
-=head3 Ed (d, E)
+=head3 Ed (E d)
 
-   2008-02-05T18:30:30 = 5, Tue
-   1995-12-22T09:05:02 = 22, Fri
-  -0010-09-15T04:44:23 = 15, Sat
+   2008-02-05T18:30:30 = mar 5
+   1995-12-22T09:05:02 = vèn 22
+  -0010-09-15T04:44:23 = sab 15
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = Tue 6:30 PM
-   1995-12-22T09:05:02 = Fri 9:05 AM
-  -0010-09-15T04:44:23 = Sat 4:44 AM
+   2008-02-05T18:30:30 = mar 6:30 PM
+   1995-12-22T09:05:02 = vèn 9:05 AM
+  -0010-09-15T04:44:23 = sab 4:44 AM
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = Tue 6:30:30 PM
-   1995-12-22T09:05:02 = Fri 9:05:02 AM
-  -0010-09-15T04:44:23 = Sat 4:44:23 AM
+   2008-02-05T18:30:30 = mar 6:30:30 PM
+   1995-12-22T09:05:02 = vèn 9:05:02 AM
+  -0010-09-15T04:44:23 = sab 4:44:23 AM
 
-=head3 Gy (G y)
+=head3 Gy (y G)
 
-   2008-02-05T18:30:30 = CE 2008
-   1995-12-22T09:05:02 = CE 1995
-  -0010-09-15T04:44:23 = BCE -10
+   2008-02-05T18:30:30 = 2008 d.C.
+   1995-12-22T09:05:02 = 1995 d.C.
+  -0010-09-15T04:44:23 = -10 v.C.
 
-=head3 GyMMM (G y MMM)
+=head3 GyMMM (MMM y G)
 
-   2008-02-05T18:30:30 = CE 2008 M02
-   1995-12-22T09:05:02 = CE 1995 M12
-  -0010-09-15T04:44:23 = BCE -10 M09
+   2008-02-05T18:30:30 = feb 2008 d.C.
+   1995-12-22T09:05:02 = des 1995 d.C.
+  -0010-09-15T04:44:23 = set -10 v.C.
 
-=head3 GyMMMEd (G y MMM d, E)
+=head3 GyMMMEd (E d MMM y G)
 
-   2008-02-05T18:30:30 = CE 2008 M02 5, Tue
-   1995-12-22T09:05:02 = CE 1995 M12 22, Fri
-  -0010-09-15T04:44:23 = BCE -10 M09 15, Sat
+   2008-02-05T18:30:30 = mar 5 feb 2008 d.C.
+   1995-12-22T09:05:02 = vèn 22 des 1995 d.C.
+  -0010-09-15T04:44:23 = sab 15 set -10 v.C.
 
-=head3 GyMMMd (G y MMM d)
+=head3 GyMMMd (d MMM y G)
 
-   2008-02-05T18:30:30 = CE 2008 M02 5
-   1995-12-22T09:05:02 = CE 1995 M12 22
-  -0010-09-15T04:44:23 = BCE -10 M09 15
+   2008-02-05T18:30:30 = 5 feb 2008 d.C.
+   1995-12-22T09:05:02 = 22 des 1995 d.C.
+  -0010-09-15T04:44:23 = 15 set -10 v.C.
 
-=head3 GyMd (GGGGG y-MM-dd)
+=head3 GyMd (dd/MM/y G)
 
-   2008-02-05T18:30:30 = CE 2008-02-05
-   1995-12-22T09:05:02 = CE 1995-12-22
-  -0010-09-15T04:44:23 = BCE -10-09-15
+   2008-02-05T18:30:30 = 05/02/2008 d.C.
+   1995-12-22T09:05:02 = 22/12/1995 d.C.
+  -0010-09-15T04:44:23 = 15/09/-10 v.C.
 
 =head3 H (HH)
 
@@ -441,17 +441,17 @@ Venetian locale.
    1995-12-22T09:05:02 = 09:05:02
   -0010-09-15T04:44:23 = 04:44:23
 
-=head3 Hmsv (HH:mm:ss v)
+=head3 Hmsv (HH:mm:ss (v))
 
-   2008-02-05T18:30:30 = 18:30:30 UTC
-   1995-12-22T09:05:02 = 09:05:02 UTC
-  -0010-09-15T04:44:23 = 04:44:23 UTC
+   2008-02-05T18:30:30 = 18:30:30 (UTC)
+   1995-12-22T09:05:02 = 09:05:02 (UTC)
+  -0010-09-15T04:44:23 = 04:44:23 (UTC)
 
-=head3 Hmv (HH:mm v)
+=head3 Hmv (HH:mm (v))
 
-   2008-02-05T18:30:30 = 18:30 UTC
-   1995-12-22T09:05:02 = 09:05 UTC
-  -0010-09-15T04:44:23 = 04:44 UTC
+   2008-02-05T18:30:30 = 18:30 (UTC)
+   1995-12-22T09:05:02 = 09:05 (UTC)
+  -0010-09-15T04:44:23 = 04:44 (UTC)
 
 =head3 M (L)
 
@@ -459,47 +459,53 @@ Venetian locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (MM-dd, E)
+=head3 MEd (E dd/MM)
 
-   2008-02-05T18:30:30 = 02-05, Tue
-   1995-12-22T09:05:02 = 12-22, Fri
-  -0010-09-15T04:44:23 = 09-15, Sat
+   2008-02-05T18:30:30 = mar 05/02
+   1995-12-22T09:05:02 = vèn 22/12
+  -0010-09-15T04:44:23 = sab 15/09
 
 =head3 MMM (LLL)
 
-   2008-02-05T18:30:30 = M02
-   1995-12-22T09:05:02 = M12
-  -0010-09-15T04:44:23 = M09
+   2008-02-05T18:30:30 = feb
+   1995-12-22T09:05:02 = des
+  -0010-09-15T04:44:23 = set
 
-=head3 MMMEd (MMM d, E)
+=head3 MMMEd (E d MMM)
 
-   2008-02-05T18:30:30 = M02 5, Tue
-   1995-12-22T09:05:02 = M12 22, Fri
-  -0010-09-15T04:44:23 = M09 15, Sat
+   2008-02-05T18:30:30 = mar 5 feb
+   1995-12-22T09:05:02 = vèn 22 des
+  -0010-09-15T04:44:23 = sab 15 set
 
-=head3 MMMMW-count-other ('week' W 'of' MMMM)
+=head3 MMMMW-count-one (W'ª' 'setemana' 'de' MMMM)
 
-   2008-02-05T18:30:30 = week 1 of M02
-   1995-12-22T09:05:02 = week 3 of M12
-  -0010-09-15T04:44:23 = week 2 of M09
+   2008-02-05T18:30:30 = 1ª setemana de febraro
+   1995-12-22T09:05:02 = 3ª setemana de desenbre
+  -0010-09-15T04:44:23 = 2ª setemana de setenbre
 
-=head3 MMMMd (MMMM d)
+=head3 MMMMW-count-other (W'ª' 'setemana' 'de' MMMM)
 
-   2008-02-05T18:30:30 = M02 5
-   1995-12-22T09:05:02 = M12 22
-  -0010-09-15T04:44:23 = M09 15
+   2008-02-05T18:30:30 = 1ª setemana de febraro
+   1995-12-22T09:05:02 = 3ª setemana de desenbre
+  -0010-09-15T04:44:23 = 2ª setemana de setenbre
 
-=head3 MMMd (MMM d)
+=head3 MMMMd (d MMMM)
 
-   2008-02-05T18:30:30 = M02 5
-   1995-12-22T09:05:02 = M12 22
-  -0010-09-15T04:44:23 = M09 15
+   2008-02-05T18:30:30 = 5 febraro
+   1995-12-22T09:05:02 = 22 desenbre
+  -0010-09-15T04:44:23 = 15 setenbre
 
-=head3 Md (MM-dd)
+=head3 MMMd (d MMM)
 
-   2008-02-05T18:30:30 = 02-05
-   1995-12-22T09:05:02 = 12-22
-  -0010-09-15T04:44:23 = 09-15
+   2008-02-05T18:30:30 = 5 feb
+   1995-12-22T09:05:02 = 22 des
+  -0010-09-15T04:44:23 = 15 set
+
+=head3 Md (dd/MM)
+
+   2008-02-05T18:30:30 = 05/02
+   1995-12-22T09:05:02 = 22/12
+  -0010-09-15T04:44:23 = 15/09
 
 =head3 d (d)
 
@@ -525,17 +531,17 @@ Venetian locale.
    1995-12-22T09:05:02 = 9:05:02 AM
   -0010-09-15T04:44:23 = 4:44:23 AM
 
-=head3 hmsv (h:mm:ss a v)
+=head3 hmsv (h:mm:ss a (v))
 
-   2008-02-05T18:30:30 = 6:30:30 PM UTC
-   1995-12-22T09:05:02 = 9:05:02 AM UTC
-  -0010-09-15T04:44:23 = 4:44:23 AM UTC
+   2008-02-05T18:30:30 = 6:30:30 PM (UTC)
+   1995-12-22T09:05:02 = 9:05:02 AM (UTC)
+  -0010-09-15T04:44:23 = 4:44:23 AM (UTC)
 
-=head3 hmv (h:mm a v)
+=head3 hmv (h:mm a (v))
 
-   2008-02-05T18:30:30 = 6:30 PM UTC
-   1995-12-22T09:05:02 = 9:05 AM UTC
-  -0010-09-15T04:44:23 = 4:44 AM UTC
+   2008-02-05T18:30:30 = 6:30 PM (UTC)
+   1995-12-22T09:05:02 = 9:05 AM (UTC)
+  -0010-09-15T04:44:23 = 4:44 AM (UTC)
 
 =head3 ms (mm:ss)
 
@@ -549,65 +555,71 @@ Venetian locale.
    1995-12-22T09:05:02 = 1995
   -0010-09-15T04:44:23 = -10
 
-=head3 yM (y-MM)
+=head3 yM (MM/y)
 
-   2008-02-05T18:30:30 = 2008-02
-   1995-12-22T09:05:02 = 1995-12
-  -0010-09-15T04:44:23 = -10-09
+   2008-02-05T18:30:30 = 02/2008
+   1995-12-22T09:05:02 = 12/1995
+  -0010-09-15T04:44:23 = 09/-10
 
-=head3 yMEd (y-MM-dd, E)
+=head3 yMEd (E dd/MM/y)
 
-   2008-02-05T18:30:30 = 2008-02-05, Tue
-   1995-12-22T09:05:02 = 1995-12-22, Fri
-  -0010-09-15T04:44:23 = -10-09-15, Sat
+   2008-02-05T18:30:30 = mar 05/02/2008
+   1995-12-22T09:05:02 = vèn 22/12/1995
+  -0010-09-15T04:44:23 = sab 15/09/-10
 
-=head3 yMMM (y MMM)
+=head3 yMMM (MMM y)
 
-   2008-02-05T18:30:30 = 2008 M02
-   1995-12-22T09:05:02 = 1995 M12
-  -0010-09-15T04:44:23 = -10 M09
+   2008-02-05T18:30:30 = feb 2008
+   1995-12-22T09:05:02 = des 1995
+  -0010-09-15T04:44:23 = set -10
 
-=head3 yMMMEd (y MMM d, E)
+=head3 yMMMEd (E d MMM y)
 
-   2008-02-05T18:30:30 = 2008 M02 5, Tue
-   1995-12-22T09:05:02 = 1995 M12 22, Fri
-  -0010-09-15T04:44:23 = -10 M09 15, Sat
+   2008-02-05T18:30:30 = mar 5 feb 2008
+   1995-12-22T09:05:02 = vèn 22 des 1995
+  -0010-09-15T04:44:23 = sab 15 set -10
 
-=head3 yMMMM (y MMMM)
+=head3 yMMMM (MMMM y)
 
-   2008-02-05T18:30:30 = 2008 M02
-   1995-12-22T09:05:02 = 1995 M12
-  -0010-09-15T04:44:23 = -10 M09
+   2008-02-05T18:30:30 = febraro 2008
+   1995-12-22T09:05:02 = desenbre 1995
+  -0010-09-15T04:44:23 = setenbre -10
 
-=head3 yMMMd (y MMM d)
+=head3 yMMMd (d MMM y)
 
-   2008-02-05T18:30:30 = 2008 M02 5
-   1995-12-22T09:05:02 = 1995 M12 22
-  -0010-09-15T04:44:23 = -10 M09 15
+   2008-02-05T18:30:30 = 5 feb 2008
+   1995-12-22T09:05:02 = 22 des 1995
+  -0010-09-15T04:44:23 = 15 set -10
 
-=head3 yMd (y-MM-dd)
+=head3 yMd (dd/MM/y)
 
-   2008-02-05T18:30:30 = 2008-02-05
-   1995-12-22T09:05:02 = 1995-12-22
-  -0010-09-15T04:44:23 = -10-09-15
+   2008-02-05T18:30:30 = 05/02/2008
+   1995-12-22T09:05:02 = 22/12/1995
+  -0010-09-15T04:44:23 = 15/09/-10
 
-=head3 yQQQ (y QQQ)
+=head3 yQQQ (QQQ y)
 
-   2008-02-05T18:30:30 = 2008 Q1
-   1995-12-22T09:05:02 = 1995 Q4
-  -0010-09-15T04:44:23 = -10 Q3
+   2008-02-05T18:30:30 = T1 2008
+   1995-12-22T09:05:02 = T4 1995
+  -0010-09-15T04:44:23 = T3 -10
 
-=head3 yQQQQ (y QQQQ)
+=head3 yQQQQ (QQQQ y)
 
-   2008-02-05T18:30:30 = 2008 Q1
-   1995-12-22T09:05:02 = 1995 Q4
-  -0010-09-15T04:44:23 = -10 Q3
+   2008-02-05T18:30:30 = 1º trimestre 2008
+   1995-12-22T09:05:02 = 4º trimestre 1995
+  -0010-09-15T04:44:23 = 3º trimestre -10
 
-=head3 yw-count-other ('week' w 'of' Y)
+=head3 yw-count-one (w'ª' 'setemana' 'de''l' Y)
 
-   2008-02-05T18:30:30 = week 6 of 2008
-   1995-12-22T09:05:02 = week 51 of 1995
-  -0010-09-15T04:44:23 = week 37 of -10
+   2008-02-05T18:30:30 = 6ª setemana de'l 2008
+   1995-12-22T09:05:02 = 51ª setemana de'l 1995
+  -0010-09-15T04:44:23 = 37ª setemana de'l -10
+
+=head3 yw-count-other (w'ª' 'setemana' 'de''l' Y)
+
+   2008-02-05T18:30:30 = 6ª setemana de'l 2008
+   1995-12-22T09:05:02 = 51ª setemana de'l 1995
+  -0010-09-15T04:44:23 = 37ª setemana de'l -10
 
 
 =head2 Miscellaneous
@@ -618,15 +630,15 @@ Yes
 
 =head3 Local first day of the week
 
-1 (Mon)
+1 (luni)
 
 =head2 Strftime Patterns
 
 =head3 %c (%a %b %e %H:%M:%S %Y) - date time format
 
-   2008-02-05T18:30:30 = Tue M02  5 18:30:30 2008
-   1995-12-22T09:05:02 = Fri M12 22 09:05:02 1995
-  -0010-09-15T04:44:23 = Sat M09 15 04:44:23 -10
+   2008-02-05T18:30:30 = mar feb  5 18:30:30 2008
+   1995-12-22T09:05:02 = vèn des 22 09:05:02 1995
+  -0010-09-15T04:44:23 = sab set 15 04:44:23 -10
 
 =head3 %x (%m/%d/%y) - date format
 

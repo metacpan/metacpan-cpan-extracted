@@ -1,0 +1,5 @@
+Travel::Routing::DE::HAFAS 0.01 - Thu Nov 16 2023
+
+    * Initial release
+    * Supports itinerary queries using Deutschen Bahn's mgate.exe interface
+    * No stable API yet

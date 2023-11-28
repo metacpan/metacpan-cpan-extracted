@@ -33,7 +33,6 @@ my $caller2 = Dead::Die::Death->new();
 eval { &MooX::ReturnModifiers::return_modifiers($caller2, ['has']) };
 like($@, qr/^Can\'t find method <has> in/);
 
-
 done_testing();
 
 1;

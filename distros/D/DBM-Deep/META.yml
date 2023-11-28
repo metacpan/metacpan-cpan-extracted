@@ -25,7 +25,7 @@ no_index:
 provides:
   DBM::Deep:
     file: lib/DBM/Deep.pm
-    version: '2.0017'
+    version: '2.0019'
   DBM::Deep::Array:
     file: lib/DBM/Deep/Array.pm
   DBM::Deep::Engine:
@@ -82,8 +82,8 @@ requires:
   Scalar::Util: '1.14'
   perl: 5.008_004
 resources:
-  bugtracker: https://github.com/DrHyde/perl-modules-DBM-Deep/issues
+  bugtracker: https://github.com/DBM-Deep/DBM-Deep/issues
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/DrHyde/perl-modules-DBM-Deep
-version: '2.0017'
+  repository: https://github.com/DBM-Deep/DBM-Deep
+version: '2.0019'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

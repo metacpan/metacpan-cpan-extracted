@@ -1,10 +1,10 @@
 {
-   "abstract" : "Queries Rundeck's REST API",
+   "abstract" : "Queries Rundeck REST API",
    "author" : [
       "Xavier Humbert <xavier.humbert@ac-nancy-metz.fr>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -47,6 +47,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.3.5.0",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v1.3.7.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

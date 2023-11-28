@@ -1,7 +1,10 @@
 # Version/Revision history
 
+1.03 Sun 26 Nov 2023 17:19:10 MSK
+    * Added the 'color' utility function
+
 1.02 Mon 30 Oct 2023 10:33:09 MSK
-    * Added the dformat utility function
+    * Added the 'dformat' utility function
 
 1.01 Fri 27 Oct 2023 21:34:21 MSK
     * Added :DIR constants to Const module

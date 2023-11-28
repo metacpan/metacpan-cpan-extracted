@@ -1,0 +1,141 @@
+# PODNAME: Neo4j::Types::Node
+# ABSTRACT: Represents a Neo4j node / graph vertex
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Types::Node - Represents a Neo4j node / graph vertex
+
+=head1 VERSION
+
+version 2.00
+
+=head1 SYNOPSIS
+
+ @labels  = $node->labels;
+ 
+ $node_id = $node->element_id;  # Neo4j 5 and newer
+ $node_id = $node->id;          # Neo4j 4 and older
+ 
+ $property1  = $node->get('property1');
+ $property2  = $node->get('property2');
+ %properties = %{ $node->properties };
+
+=head1 DESCRIPTION
+
+Describes a node from a Neo4j graph. A node may be created
+by executing a Cypher statement against a Neo4j database
+server. Its description contains the node's properties as
+well as certain meta data, all accessible by methods that
+this class provides.
+
+L<Neo4j::Types::Node> objects are typically not in a
+one-to-one relation with nodes in a Neo4j graph. If the
+same Neo4j node is fetched multiple times, then multiple
+distinct L<Neo4j::Types::Node> objects may be created.
+Refer to the documentation of the Perl module you use to
+fetch nodes from the Neo4j database for information about
+how that particular module handles this aspect.
+
+Neo4j node IDs are not designed to be persistent.
+As such, if you want a public identity to use for your
+nodes, attaching an explicit "id" property is a
+better choice than using the Neo4j node ID or
+S<element ID>.
+
+=head1 METHODS
+
+L<Neo4j::Types::Node> implements the following methods.
+
+=head2 element_id
+
+ $string = $node->element_id;
+
+Return an ID string for this node that is unique within
+a particular context, for example the current transaction.
+
+The element ID string was introduced with Neo4j 5. When it is
+unavailable, for example because this module is used with Neo4j
+server S<version 4> or earlier, this method will issue a
+warning in the C<Neo4j::Types> category and return the legacy
+S<numeric ID> instead; see L<C<id()>|/"id">.
+
+=head2 get
+
+ $value = $node->get('property_key');
+
+Retrieve the value of this node's property with the given
+key. If no such key exists, return C<undef>.
+
+=head2 id
+
+ $number = $node->id;
+
+Return a legacy numeric ID for this node that is
+unique within a particular context, for example the
+current transaction.
+
+On Neo4j 5 and above, numeric IDs are B<deprecated.>
+They may become unavailable in future.
+Use L<C<element_id()>|/"element_id"> instead.
+
+Legacy IDs are always integer numbers.
+A node with the ID C<0> may exist.
+Nodes and relationships do not share the same ID space.
+
+=head2 labels
+
+ @labels = $node->labels;
+
+Return all labels of this node.
+
+In scalar context, return the number of labels on this node.
+
+ $count = scalar $node->labels;
+
+=head2 properties
+
+ $hashref = $node->properties;
+ $value   = $node->properties->{property_key};
+
+Return all properties of this node as a hash reference.
+
+This hash reference should be used for read access only.
+The result of attempts to change this hash is not defined
+by L<Neo4j::Types>.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Neo4j::Types>
+
+=item * L<Neo4j::Types::ImplementorNotes/"Node">
+
+=item * L<Neo4j::Bolt::Node>
+
+=item * L<Neo4j::Driver::Types>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

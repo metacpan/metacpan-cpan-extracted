@@ -35,6 +35,23 @@ if (defined $app) {
 			$doctree->entryAdd($name);
 		}
 	}
+	$app->Frame->pack;
+	$app->Button(
+		-text => 'Modified',
+		-command => sub {
+			my ($sel) = $doctree->selectionGet;
+			print "$sel\n";
+			$doctree->entryModified($sel);
+		}
+	)->pack(-side => 'left');
+	$app->Button(
+		-text => 'Saved',
+		-command => sub {
+			my ($sel) = $doctree->selectionGet;
+			print "$sel\n";
+			$doctree->entrySaved($sel);
+		}
+	)->pack(-side => 'left');
 }
 
 @tests = (
@@ -42,5 +59,7 @@ if (defined $app) {
 );
 
 starttesting;
+
+
 
 

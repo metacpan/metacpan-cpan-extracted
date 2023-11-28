@@ -30,7 +30,6 @@
     MMM => "LLL",
     MMMEd => "E, d 'ne' MMM",
     MMMMEd => "E, d 'ne' MMMM",
-    "MMMMW-count-one" => "'sim\N{U+1ef9}n\N{U+1ef9}' W 'ne' MMMM",
     "MMMMW-count-other" => "'sim\N{U+1ef9}n\N{U+1ef9}' W 'ne' MMMM",
     MMMMd => "d 'ne' MMMM",
     MMMd => "d 'ne' MMM",
@@ -56,7 +55,6 @@
     yMd => "dd/MM/y",
     yQQQ => "QQQ, y",
     yQQQQ => "QQQQ, y",
-    "yw-count-one" => "'sim\N{U+1ef9}n\N{U+1ef9}' w, Y",
     "yw-count-other" => "'sim\N{U+1ef9}n\N{U+1ef9}' w, Y",
   },
   code => "kgp-BR",
@@ -274,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

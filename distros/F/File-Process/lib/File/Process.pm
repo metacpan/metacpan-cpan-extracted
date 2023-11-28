@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
-use English qw(-no_match_vars);
+use English              qw(-no_match_vars);
 use File::Process::Utils qw(:booleans :chars);
 use IO::Scalar;
 use Scalar::Util qw( openhandle );
@@ -12,7 +12,7 @@ use Data::Dumper;
 
 use parent qw( Exporter );
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 our %DEFAULT_PROCESSORS = (
   pre       => \&_pre,
@@ -422,7 +422,7 @@ text file. The class exports one method (C<process_file>) which invokes
 multiple subroutines that you can override or use in conjunction with
 your custom processors.
 
-I<See L<File::Process::Utils> for additional recipes.>
+I<See C<File::Process::Utils> for additional recipes.>
 
 =head1 EXPORTED METHODS
 
@@ -436,11 +436,15 @@ default processor methods using the tag ':all'.
 
 =head1 METHODS AND SUBROUTINES
 
-=head2 process_csv(file, options)
+=head2 process_csv
+
+ process_csv(file, options)
 
 See L<File::Process::Utils>
 
-=head2 process_file(file, options)
+=head2 process_file
+
+ process_file(file, options)
 
 You start the processing of the file by calling C<process_file> with
 the name of the file or a handle to an open file and a B<list> of
@@ -534,7 +538,7 @@ for the C<next_line()> hook
 C<process()> hooks will prevent a line from being accumulated in the
 line buffer
 
-=item *Any hook you define can terminate the process by throwing
+=item * Any hook you define can terminate the process by throwing
 an exception.
 
 =back

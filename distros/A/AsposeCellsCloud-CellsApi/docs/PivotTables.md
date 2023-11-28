@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::PivotTables
+# AsposeCellsCloud::Object::PivotTables 
 
 ## Load the model package
 ```perl
@@ -8,9 +8,8 @@ use AsposeCellsCloud::Object::PivotTables;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**link** | [**Link**](Link.md) |  | [optional] 
-**pivot_table_list** | [**ARRAY[LinkElement]**](LinkElement.md) |  | [optional] 
+**PivotTableList** | **ARRAY[LinkElement]** |  |
+**link** | **Link** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

@@ -86,20 +86,32 @@ sub check_search_chars($) {
       #   That implies $smiley_char came back as "" with no 'wide char'
       #   error from decode() in ODF::lpOD::Common::input_conversion
       #   HOW IS THIS POSSIBLE?
+      diag dvis 'UNEXPECTED: $m';
       my ($out,$err,$stat) = Capture::Tiny::capture {
          no warnings FATAL => 'all'; no warnings; use warnings;  # undo FATAL
          my $bytes_regex = qr/$smiley_char/;
          btw dvis '$ODF::lpOD::Common::INPUT_CHARSET $ODF::lpOD::Common::INPUT_ENCODER';
          my $bytes_regex_copy = $bytes_regex;
+
+         my $xdecoded_regex;
+         eval{ $xdecoded_regex = $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy) };
+         btw dvis '$xdecoded_regex $@';
+
          my $decoded_regex = eval{ $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy) };
          btw dvis '$decoded_regex $@';
+
+         my $ydecoded_regex;
+         $ydecoded_regex = $ODF::lpOD::Common::INPUT_ENCODER->decode($bytes_regex_copy);
+         btw dvis '$ydecoded_regex';
+
          my $m2 = eval{ $body->search($bytes_regex) };
-         btw dvis '$smiley_char $m2 $@';
+         btw dvis '$bytes_regex $m2 $@';
          my $m3 = eval{ $body->search(qr/${smiley_char}Unicode/) };
-         btw dvis '$m3 $@\nbody:', fmt_tree($body);
+         btw dvis '$smiley_char $m3 $@';
+         btw dvis 'body:', fmt_tree($body);
       };
       fail("bytes mode problem",
-           "OUT:$out<END stdout>\nERR:$err<END stderr>\n");
+           dvis('$m\n')."OUT:$out<END stdout>\nERR:$err<END stderr>\n");
     }
     ok(!defined($m) && $@ =~ /wide char/i,
        "bytes mode: search(wide char) blows up (regex)",

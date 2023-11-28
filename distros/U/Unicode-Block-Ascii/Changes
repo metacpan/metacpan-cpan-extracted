@@ -1,3 +1,18 @@
+0.05 2023-11-26T15:26:07+01:00
+ - Move bugtracker to github.
+ - Remove unused code in tests.
+ - Simplify usage of English.
+ - Sort modules in test.
+
+0.04 2023-11-26T15:07:50+01:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Rename example files to better names.
+ - Rewrite doc to use of =head2.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update copyright years.
+
 0.03 2018-02-07T07:49:53+01:00
  - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
  - Fix output of second example in doc.

@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Apache2::API" : "v0.1.1",
+            "Apache2::API" : "v0.1.4",
             "Apache2::Reload" : "0",
             "Compress::Raw::Zlib" : "2.091",
             "Crypt::AuthEnc::GCM" : "0.064",
@@ -45,8 +45,7 @@
             "Devel::Confess" : "0",
             "JSON" : "0",
             "MIME::Base64" : "3.15",
-            "Module::Generic" : "v0.30.5",
-            "Nice::Try" : "v1.3.1",
+            "Module::Generic" : "v0.32.8",
             "Regexp::Common" : "0",
             "Scalar::Util" : "0",
             "URI" : "0",
@@ -80,6 +79,6 @@
          "web" : "https://gitlab.com/jackdeguest/Net-API-REST"
       }
    },
-   "version" : "v1.0.2",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

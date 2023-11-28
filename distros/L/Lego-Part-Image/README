@@ -3,29 +3,36 @@ NAME
 
 SYNOPSIS
      use Lego::Part::Image;
+
      my $obj = Lego::Part::Image->new;
      $obj->image;
      $obj->image_url;
 
 METHODS
-    *       "new()"
+  * "new"
+     my $obj = Lego::Part::Image->new;
 
-             Constructor.
-             Returns object.
+    Constructor.
 
-            *       "part"
+    *       "part"
 
-                     Lego::Part object.
-                     It is required.
-                     Default value is undef.
+            Lego::Part object.
 
-    *       "image()"
+            It is required.
 
-             Abstract method for getting image.
+            Default value is undef.
 
-    *       "image_url()"
+    Returns instance of object.
 
-             Abstract method for getting image url.
+  "image"
+     $obj->image;
+
+    Abstract method for getting image.
+
+  "image_url"
+     $obj->image_url;
+
+    Abstract method for getting image url.
 
 ERRORS
      new():
@@ -41,11 +48,9 @@ ERRORS
              This is abstract class. image_url() method not implemented.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Lego::Part;
      use Lego::Part::Image;
 
@@ -83,17 +88,18 @@ SEE ALSO
         Install the Lego modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Lego-Part-Image>
+    <https://github.com/michal-josef-spacek/Lego-Part-Image>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015 Michal Špaček
-     BSD 2-Clause License
+    © 2015-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

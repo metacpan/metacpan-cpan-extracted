@@ -109,43 +109,43 @@
    "provides" : {
       "DateTime" : {
          "file" : "lib/DateTime.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::Duration" : {
          "file" : "lib/DateTime/Duration.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::Helpers" : {
          "file" : "lib/DateTime/Helpers.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::Infinite" : {
          "file" : "lib/DateTime/Infinite.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::Infinite::Future" : {
          "file" : "lib/DateTime/Infinite.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::Infinite::Past" : {
          "file" : "lib/DateTime/Infinite.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::LeapSecond" : {
          "file" : "lib/DateTime/LeapSecond.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::PP" : {
          "file" : "lib/DateTime/PP.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::PPExtra" : {
          "file" : "lib/DateTime/PPExtra.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       },
       "DateTime::Types" : {
          "file" : "lib/DateTime/Types.pm",
-         "version" : "1.63"
+         "version" : "1.65"
       }
    },
    "release_status" : "stable",
@@ -161,7 +161,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.63",
+   "version" : "1.65",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -1037,7 +1037,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.63",
+                  "tag" : "v1.65",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

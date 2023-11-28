@@ -1,6 +1,6 @@
 use v5.26.0;
 use warnings;
-package Pod::Weaver::PluginBundle::RJBS 5.024;
+package Pod::Weaver::PluginBundle::RJBS 5.025;
 # ABSTRACT: RJBS's default Pod::Weaver config
 
 #pod =head1 OVERVIEW
@@ -153,7 +153,7 @@ Pod::Weaver::PluginBundle::RJBS - RJBS's default Pod::Weaver config
 
 =head1 VERSION
 
-version 5.024
+version 5.025
 
 =head1 OVERVIEW
 

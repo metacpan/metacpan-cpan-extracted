@@ -18,3 +18,4 @@
 ^bundled-libs/.+.tar.bz2$
 ^MYMETA.yml$
 ^MYMETA.json$
+^i3test.sh$

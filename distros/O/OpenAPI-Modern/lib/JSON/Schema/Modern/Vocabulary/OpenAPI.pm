@@ -1,10 +1,9 @@
-use strict;
-use warnings;
+use strictures 2;
 package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.049';
+our $VERSION = '0.052';
 
 use 5.020;
 use Moo;
@@ -76,7 +75,7 @@ sub _eval_keyword_discriminator ($self, $data, $schema, $state) {
       Mojo::URL->new($mapping =~ /^#/ ? $mapping : '#/components/schemas/'.$mapping)->to_abs($state->{initial_schema_uri}),
     );
   }
-  elsif (($state->{document}->get_entity_at_location('/components/schemas/'.$discriminator_value)//'') eq 'schema') {
+  elsif ($state->{document}->get_entity_at_location('/components/schemas/'.$discriminator_value) eq 'schema') {
     return $self->eval_subschema_at_uri($data, $schema, { %$state, _schema_path_suffix => 'propertyName' },
       Mojo::URL->new->fragment(jsonp('/components/schemas', $discriminator_value))->to_abs($state->{initial_schema_uri}),
     );
@@ -119,7 +118,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.049
+version 0.052
 
 =head1 DESCRIPTION
 

@@ -8,7 +8,7 @@ Tk::DocumentTree - ITree based document list
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 use base qw(Tk::Derived Tk::Frame);
 
@@ -18,6 +18,32 @@ use Tk;
 use Config;
 
 Construct Tk::Widget 'DocumentTree';
+
+my $save_pixmap = '
+/* XPM */
+static char *save[]={
+"16 16 4 1",
+". c None",
+"# c #000000",
+"a c #808080",
+"b c #ffff00",
+"................",
+"..############..",
+".#aaaaaaaaaaaa#.",
+".#aaaaaaaaaaaa#.",
+".#aaaaaaaaaaaa#.",
+".#aaaaaaaaaaaa#.",
+".#aaaaaaaaaaaa#.",
+".#aaaaaaaaaaaa#.",
+".#aa########aa#.",
+".#aa########aa#.",
+".#aa########aa#.",
+".#aa########aa#.",
+".#aa#bbbbbb#aa#.",
+".#aa#bbbbbb#aa#.",
+"..############..",
+"................"};
+';
 
 =head1 SYNOPSIS
 
@@ -94,6 +120,7 @@ sub Populate {
 		-diriconcall => ['CALLBACK', undef, undef, ['DefaultDirIcon', $self]],
 		-entryselect => ['CALLBACK', undef, undef, sub {}],
 		-fileiconcall => ['CALLBACK', undef, undef, ['DefaultFileIcon', $self]],
+		-saveiconcall => ['CALLBACK', undef, undef, ['DefaultSaveIcon', $self]],
 		DEFAULT => [$tree],
 	);
 	$self->Delegates(
@@ -199,6 +226,10 @@ sub DefaultFileIcon {
 	return $_[0]->Pixmap(-file => Tk->findINC('file.xpm'))
 }
 
+sub DefaultSaveIcon {
+	return $_[0]->Pixmap(-data => $save_pixmap)
+}
+
 sub Delete {
 	my ($self, $entry) = @_;
 	my $par = $self->GetParent($entry);
@@ -247,7 +278,6 @@ sub entryAdd {
 		$new =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
 		my $compath = quotemeta($self->GetCommonPath($new));
 		my $reg = $compath . $sep;
-		print "$reg\n";
 		$new =~ s/^$reg//
 	}
 
@@ -286,6 +316,22 @@ sub entryDelete {
 	} else {
 		$self->SetPath('');
 	}
+}
+
+sub entryModified {
+	my ($self, $entry) = @_;
+	my $sep = $self->cget('-separator');
+	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
+	$entry = $self->StripPath($entry);
+	$self->entryconfigure($entry, -image => $self->GetSaveIcon);
+}
+
+sub entrySaved {
+	my ($self, $entry) = @_;
+	my $sep = $self->cget('-separator');
+	$entry =~ s/^$sep// unless $Config{osname} eq 'MSWin32';
+	$entry = $self->StripPath($entry);
+	$self->entryconfigure($entry, -image => $self->GetFileIcon);
 }
 
 =item B<entrySelect>I<($filename)>
@@ -443,6 +489,11 @@ sub GetPeers {
 	return $self->infoChildren($self->GetParent($name))
 }
 
+sub GetSaveIcon {
+	my ($self, $name) = @_;
+	return $self->Callback('-saveiconcall', $name);
+}
+
 sub IsDir {
 	my ($self, $item) = @_;
 	return 1 if $self->infoData($item) eq 'dir';
@@ -561,3 +612,4 @@ Unknown. If you find any, please contact the author.
 1;
 
 __END__
+

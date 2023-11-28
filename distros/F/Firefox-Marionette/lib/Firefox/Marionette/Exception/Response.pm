@@ -2,9 +2,9 @@ package Firefox::Marionette::Exception::Response;
 
 use strict;
 use warnings;
-use base qw(Firefox::Marionette::Exception);
+use parent qw(Firefox::Marionette::Exception);
 
-our $VERSION = '1.46';
+our $VERSION = '1.49';
 
 sub throw {
     my ( $class, $response ) = @_;
@@ -45,7 +45,7 @@ Firefox::Marionette::Exception::Response - Represents an exception thrown by Fir
 
 =head1 VERSION
 
-Version 1.46
+Version 1.49
 
 =head1 SYNOPSIS
 

@@ -1,89 +1,171 @@
-Changes on 2021-05-13 for repository at:
-  Fetch URL: git@github.com:abeltje/V
-  Push  URL: git@github.com:abeltje/V
+0.18 2023-11-22T13:04:05+01:00 (0f5fade => Abe Timmerman)
+ - (Abe Timmerman, Wed, 22 Nov 2023 13:04:05 +0100) Autocommit for
+   distribution V 0.18 (minor)
 
-Enjoy!
+0.17_01 2023-11-21T12:10:53+01:00 (cf12f87 => Abe Timmerman)
+ - (Abe Timmerman, Tue, 21 Nov 2023 12:10:53 +0100) Autocommit for
+   distribution V 0.17_01 (test)
 
-0.15 2021-05-13T17:48:24+02:00 (9235683 => Abe Timmerman)
- - (Abe Timmerman, 3 seconds ago) Autocommit for distribution V 0.15
-   (minor)
+0.17_00 2023-11-16T17:39:06+01:00 (dc1088b => Abe Timmerman)
+ - (Abe Timmerman, Thu, 16 Nov 2023 17:39:06 +0100) Autocommit for
+   distribution V 0.17_00 (test)
+ - (Abe Timmerman, Tue, 21 Nov 2023 12:08:15 +0100) Show only
+   packages/classes with a defined version
+ -     Some code clean-up
+ -     Add test for packages failing under 0.17
+
+0.17 2023-11-11T12:38:33+01:00 (0ddb542 => Abe Timmerman)
+ - (Abe Timmerman, Sat, 11 Nov 2023 12:38:33 +0100) Autocommit for
+   distribution V 0.17 (minor)
+ - (Abe Timmerman, Thu, 16 Nov 2023 16:46:18 +0100) FIX: the regexen to
+   identify versions
+ -     I broke V with the (changed/new) regexen in v0.17.
+ -     Changed the regexen and added some more examples/tests.
+ - (Abe Timmerman, Thu, 16 Nov 2023 17:38:47 +0100) Add new files to
+   MANIFEST
+
+0.16_03 2023-11-10T19:40:30+01:00 (b8a9cbe => Abe Timmerman)
+ - (Abe Timmerman, Fri, 10 Nov 2023 19:40:30 +0100) Autocommit for
+   distribution V 0.16_03 (test)
+ - (Abe Timmerman, Sat, 11 Nov 2023 12:22:10 +0100) Last minute
+   documentation work
+ -     Describe the new behaviour.
+
+0.16_02 2023-11-10T16:26:04+01:00 (e679804 => Abe Timmerman)
+ - (Abe Timmerman, Fri, 10 Nov 2023 16:26:04 +0100) Autocommit for
+   distribution V 0.16_02 (test)
+ - (Abe Timmerman, Fri, 10 Nov 2023 19:24:49 +0100) Update t::Test::abeltje
+   to 1.09
+ - (Abe Timmerman, Fri, 10 Nov 2023 19:25:12 +0100) Make an effort: we
+   support 5.10.1
+ -     The 'package Name 0.42' syntax is 5.12+ so, we need to account for
+   that.
+ -     This syntax shouldn't have an expression for the version, so it's
+   just
+ -     that what you parsed as version. warn() for $] < 5.012.
+
+0.16_01 2023-11-10T15:30:39+01:00 (4de489d => Abe Timmerman)
+ - (Abe Timmerman, Fri, 10 Nov 2023 15:30:39 +0100) Autocommit for
+   distribution V 0.16_01 (test)
+ - (Abe Timmerman, Fri, 10 Nov 2023 16:23:21 +0100) Path need to be
+   portable, use File::Spec!
+
+0.16 2022-05-26T13:23:29+02:00 (47e59b4 => Abe Timmerman)
+ - (Abe Timmerman, Thu, 26 May 2022 13:23:29 +0200) Autocommit for
+   distribution V 0.16 (minor)
+ - (abeltje, Tue, 28 Feb 2023 09:19:53 +0100) Add the debian/ directory.
+ -     Change the bugtracker to GitHub.
+ - (Abe Timmerman, Fri, 10 Nov 2023 10:09:18 +0100) Start development
+   branch
+ - (Abe Timmerman, Fri, 10 Nov 2023 11:24:30 +0100) Take package $version
+   over $VERSION=$version
+ -     This was raised in GitHub Issue 1:
+   https://github.com/abeltje/V/issues/1
+ -     So now we take current package into account (starting off with *
+   (any)),
+ -     if we can find a specific version for the package, we take that;
+ -     otherwise we take the version for 'any'.
+ - (Abe Timmerman, Fri, 10 Nov 2023 11:52:32 +0100) Add 'class' versions as
+   well
+ - (Abe Timmerman, Fri, 10 Nov 2023 15:05:34 +0100) Show all
+   packages/classes in a file
+ -     This was a request: show all package-names and class-names in the
+   file,
+ -     if they have a version, also show that.
+ -     We still look for `Â«File::Spec->catfile(split(/::/, $module)) .
+   '.pm`Â»
+ -     anywhere in @INC.
+ - (Abe Timmerman, Fri, 10 Nov 2023 15:13:57 +0100) bugtracker is part of
+   resources in CPAN::Meta
+
+0.15_01 2022-05-25T19:20:25+02:00 (2b8973d => Abe Timmerman)
+ - (Abe Timmerman, Wed, 25 May 2022 19:20:25 +0200) Autocommit for
+   distribution V 0.15_01 (test)
+ - (Abe Timmerman, Thu, 26 May 2022 13:22:41 +0200) Update version in
+   README.md
+
+0.15 2021-05-13T17:48:24+02:00 (984b594 => Abe Timmerman)
+ - (Abe Timmerman, Thu, 13 May 2021 17:48:24 +0200) Autocommit for
+   distribution V 0.15 (minor)
+ - (Abe Timmerman, Wed, 25 May 2022 19:07:22 +0200) update to
+   t::Test::abeltje 1.06
+ - (Abe Timmerman, Wed, 25 May 2022 19:16:36 +0200) Add check for new
+   version syntax
+ -     We now support the `package Blah 0.42` syntax.
 
 0.14_01 2021-05-12T18:52:57+02:00 (33bea16 => Abe Timmerman)
- - (Abe Timmerman, 23 hours ago) Autocommit for distribution V 0.14_01
-   (test)
+ - (Abe Timmerman, Wed, 12 May 2021 18:52:57 +0200) Autocommit for
+   distribution V 0.14_01 (test)
 
 0.14 2021-05-11T10:09:04+02:00 (3819d91 => Abe Timmerman)
- - (Abe Timmerman, 2 days ago) Autocommit for distribution V 0.14 (minor)
-
- - (Abe Timmerman, 23 hours ago) Update our tester-module
+ - (Abe Timmerman, Tue, 11 May 2021 10:09:04 +0200) Autocommit for
+   distribution V 0.14 (minor)
+ - (Abe Timmerman, Wed, 12 May 2021 18:51:27 +0200) Update our
+   tester-module
  -     After reading the Test::Warnings docs (again) the CPANTesters errors
  -     were to be expected
 
 0.13_04 2021-05-11T01:30:36+02:00 (4e1e942 => Abe Timmerman)
- - (Abe Timmerman, 3 days ago) Autocommit for distribution V 0.13_04 (test)
+ - (Abe Timmerman, Tue, 11 May 2021 01:30:36 +0200) Autocommit for
+   distribution V 0.13_04 (test)
 
 0.13_03 2021-05-10T18:39:36+02:00 (32ae160 => Abe Timmerman)
- - (Abe Timmerman, 3 days ago) Autocommit for distribution V 0.13_03 (test)
-
- - (Abe Timmerman, 3 days ago) Fix more things for MSWin32
+ - (Abe Timmerman, Mon, 10 May 2021 18:39:36 +0200) Autocommit for
+   distribution V 0.13_03 (test)
+ - (Abe Timmerman, Tue, 11 May 2021 01:30:05 +0200) Fix more things for
+   MSWin32
 
 0.13_02 2021-05-06T23:37:12+02:00 (f6f9add => Abe Timmerman)
- - (Abe Timmerman, 7 days ago) Autocommit for distribution V 0.13_02 (same)
-
- - (Abe Timmerman, 3 days ago) Update the (test)dependencies for
-   t::Test::abeltje.
+ - (Abe Timmerman, Thu, 6 May 2021 23:37:12 +0200) Autocommit for
+   distribution V 0.13_02 (same)
+ - (Abe Timmerman, Mon, 10 May 2021 18:37:56 +0200) Update the
+   (test)dependencies for t::Test::abeltje.
 
 0.13_01 2021-05-06T00:16:18+02:00 (d7f4f5f => Abe Timmerman)
- - (Abe Timmerman, 8 days ago) Autocommit for distribution V 0.13_01 (test)
-
- - (Abe Timmerman, 7 days ago) Introduce t::Test::abeltje
+ - (Abe Timmerman, Thu, 6 May 2021 00:16:18 +0200) Autocommit for
+   distribution V 0.13_01 (test)
+ - (Abe Timmerman, Thu, 6 May 2021 23:30:42 +0200) Introduce
+   t::Test::abeltje
  -     This needed some kwalitee changes, mostly in POD
 
 0.00_00 2003-03-09T23:16:24+00:00 (fc60a31 => abeltje)
- - (abeltje, 18 years ago) Create space for the V module
+ - (abeltje, Sun, 9 Mar 2003 23:16:24 +0000) Create space for the V module
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@64
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 18 years ago) Initial import of V-0.06
+ - (abeltje, Sun, 9 Mar 2003 23:17:33 +0000) Initial import of V-0.06
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@65
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 18 years ago) Change the way we C<< use lib $lib; >> for
-   Test-More
+ - (abeltje, Sun, 9 Mar 2003 23:37:05 +0000) Change the way we C<< use lib
+   $lib; >> for Test-More
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@66
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 18 years ago) $VERSION += 0.01
+ - (abeltje, Sun, 9 Mar 2003 23:38:13 +0000) $VERSION += 0.01
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@67
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 18 years ago) $VERSION += 0.01
+ - (abeltje, Sun, 9 Mar 2003 23:40:16 +0000) $VERSION += 0.01
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@68
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 18 years ago) * [REMOVE] No more Test::More, make it a PREREQ
+ - (abeltje, Fri, 22 Aug 2003 01:46:32 +0000) * [REMOVE] No more
+   Test::More, make it a PREREQ
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@70
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 18 years ago) * [FIX] make the tests pass again
+ - (abeltje, Fri, 22 Aug 2003 01:49:41 +0000) * [FIX] make the tests pass
+   again
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@71
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 18 years ago) * [CHANGE]
+ - (abeltje, Fri, 22 Aug 2003 01:51:06 +0000) * [CHANGE]
  -	 general cleanup and $VERSION += 0.01
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@72
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 18 years ago) * [PRIVATE] do the ChangeLog/Changes dance
+ - (abeltje, Fri, 22 Aug 2003 01:53:24 +0000) * [PRIVATE] do the
+   ChangeLog/Changes dance
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@73
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 17 years ago) * [FIX] by Merijn Brand
+ - (abeltje, Fri, 16 Jan 2004 12:58:27 +0000) * [FIX] by Merijn Brand
  -	 fix a syntax error in the PREREQ_PM target
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@74
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 17 years ago) * [ADD]
+ - (abeltje, Fri, 16 Jan 2004 13:09:03 +0000) * [ADD]
  -	 feature request by Merijn Brand:
  -	   Can you add a sub that returns the version only for a given
    module
@@ -91,45 +173,37 @@ Enjoy!
  -	 VERSION += 0.01
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@75
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 17 years ago) * regen Changes for 0.09
+ - (abeltje, Fri, 16 Jan 2004 13:13:13 +0000) * regen Changes for 0.09
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@76
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 17 years ago) * [CHANGE]
+ - (abeltje, Wed, 24 Mar 2004 06:43:27 +0000) * [CHANGE]
  -	 added the license stuff
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@77
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 17 years ago) * Regen Changes for 0.10
+ - (abeltje, Wed, 24 Mar 2004 06:44:42 +0000) * Regen Changes for 0.10
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@78
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 15 years ago) * [CHANGE]
+ - (abeltje, Fri, 3 Feb 2006 16:04:17 +0000) * [CHANGE]
  -	 add untainting stuff by Stas Bekman (2004/03/24)
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@79
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 15 years ago) * Regenerate Changes for V 0.11
+ - (abeltje, Fri, 3 Feb 2006 17:07:51 +0000) * Regenerate Changes for V
+   0.11
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@80
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 15 years ago) * [PRIVATE]
+ - (abeltje, Fri, 31 Mar 2006 14:03:49 +0000) * [PRIVATE]
  -	 redo 01basic.t for core
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@82
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 15 years ago) * [CHANGE]
+ - (abeltje, Fri, 31 Mar 2006 15:28:21 +0000) * [CHANGE]
  -	 small rework of the AUTHOR/LICENSE sections in pod
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@83
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 15 years ago) * [CORE]
+ - (abeltje, Fri, 31 Mar 2006 15:29:56 +0000) * [CORE]
  -	 put the tests for the core-distribution in their own directory
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@84
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 14 years ago) * [CHANGE]
+ - (abeltje, Wed, 7 Nov 2007 00:10:02 +0000) * [CHANGE]
  -	 FIX: bug reported by Merijn:
  -	       my $version = map { "$_ " . V::get_version( $_ ) } qw/ Cwd
    /;
@@ -137,18 +211,18 @@ Enjoy!
  -	   local()ize $_ before reading the file to find the version
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@85
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (abeltje, 14 years ago) * Regenerate Changes for V 0.13
+ - (abeltje, Wed, 7 Nov 2007 00:11:35 +0000) * Regenerate Changes for V
+   0.13
  -     git-svn-id: https://source.test-smoke.org/repos/cpan/trunk/V@86
    03e79c58-f747-0410-a819-f71e7ca513d9
-
- - (Abe Timmerman, 8 days ago) Fix bug with v-strings and update repository
+ - (Abe Timmerman, Wed, 5 May 2021 23:38:36 +0200) Fix bug with v-strings
+   and update repository
  -     Whenever a module used a v-string-version the module would return
    undef,
  -     we now use the core module 'version' to make sure we also return a
  -     version for these cases.
- -     - Moved V.pm to the lib/ directory
- -     - Moved README to README.md and added some markdown
- -     - added a .gitignore and MANIFEST.SKIP
-
- - (Abe Timmerman, 8 days ago) Fix test to also run under 'prove'
+ -     Moved V.pm to the lib/ directory
+ -     Moved README to README.md and added some markdown
+ -     added a .gitignore and MANIFEST.SKIP
+ - (Abe Timmerman, Thu, 6 May 2021 00:14:28 +0200) Fix test to also run
+   under 'prove'

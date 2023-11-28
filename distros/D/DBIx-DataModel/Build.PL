@@ -15,7 +15,7 @@ my $builder = Module::Build->new(
         'Clone'                  => 0,
 	'DBI'                    => 0,
 	'SQL::Abstract::Classic' => 1.91,
-	'SQL::Abstract::More'    => 1.39,
+	'SQL::Abstract::More'    => 1.40,
 	'Module::Build'          => 0,
         'Data::Structure::Util'  => 0,
         'Scalar::Util'           => 1.07,
@@ -26,6 +26,9 @@ my $builder = Module::Build->new(
         'Params::Validate'       => 0,
 	'Try::Tiny'              => 0,
     },
+    configure_requires => {
+        'Module::Build'       => 0,
+     },
     build_requires => {
         'Task::Weaken'        => 0,
 

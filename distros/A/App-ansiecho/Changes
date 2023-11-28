@@ -1,5 +1,9 @@
 Revision history for Perl script App-ansiecho
 
+1.0701 2023-11-21T17:06:48Z
+
+    - update test to work under the doublelong environment
+
 1.07 2023-10-27T06:23:36Z
 
     - Support vector format output.

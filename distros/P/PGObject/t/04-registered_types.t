@@ -6,6 +6,8 @@ use PGObject 'test1', 'test2';
 
 ok(PGObject::Type::Registry->inspect('test1'), 'test1 registry exists');
 ok(PGObject::Type::Registry->inspect('test2'), 'test2 registry exists');
+{
+local $SIG{__WARN__} = sub {}; # silence output on deprecated methods
 lives_ok {PGObject->new_registry('test1') } 'New registry 1 recreation lives';
 lives_ok {PGObject->new_registry('blank') } 'New registry blank created';
 lives_ok {PGObject->new_registry('test2') } 'New registry 2 recreation lives';
@@ -14,7 +16,7 @@ is(PGObject->register_type(pg_type => 'int4', perl_class => 'test1'), 1,
 is(PGObject->register_type(
         pg_type => 'int4', perl_class => 'test2', registry => 'test1'), 1,
        "Basic type registration");
-
+}
 SKIP: {
     skip 'No database connection', 11 unless $ENV{DB_TESTING};
 

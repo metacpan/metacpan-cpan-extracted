@@ -64,6 +64,10 @@ command {
     stdout => "-\tTi(2)\t2,0,9,7\n",
 };
 command {
+    args   => [qw(findin -P 3-10 -P 3-11 bes des f)],
+    stdout => "PS 3-10\nPS 3-11\n-\tT(10)\t10,1,5\n",
+};
+command {
     args   => [qw(forte2pcs 9-3)],
     stdout => "0,1,2,3,4,5,6,8,9\n",
 };
@@ -255,4 +259,4 @@ command {
     stdout => "0\n"
 };
 
-done_testing 173
+done_testing 176

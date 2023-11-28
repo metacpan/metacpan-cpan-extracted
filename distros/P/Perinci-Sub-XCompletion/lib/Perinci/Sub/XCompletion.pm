@@ -3,9 +3,9 @@ package Perinci::Sub::XCompletion;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-01'; # DATE
+our $DATE = '2023-11-18'; # DATE
 our $DIST = 'Perinci-Sub-XCompletion'; # DIST
-our $VERSION = '0.104'; # VERSION
+our $VERSION = '0.106'; # VERSION
 
 1;
 # ABSTRACT: Write completion routines in x.{,element_,index_}completion attributes
@@ -22,7 +22,7 @@ Perinci::Sub::XCompletion - Write completion routines in x.{,element_,index_}com
 
 =head1 VERSION
 
-This document describes version 0.104 of Perinci::Sub::XCompletion (from Perl distribution Perinci-Sub-XCompletion), released on 2023-03-01.
+This document describes version 0.106 of Perinci::Sub::XCompletion (from Perl distribution Perinci-Sub-XCompletion), released on 2023-11-18.
 
 =head1 SYNOPSIS
 

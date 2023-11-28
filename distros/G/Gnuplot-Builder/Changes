@@ -1,5 +1,9 @@
 Revision history for Gnuplot-Builder
 
+0.32    2023-11-13
+        [DOCUMENTATION]
+        - Revise documentation about multiplot and $ENCODING (gh#5)
+
 0.31    2015-11-29
         [ENHANCEMENTS]
         - Now Script, Dataset and JoinDict are Data::Focus-compatible.

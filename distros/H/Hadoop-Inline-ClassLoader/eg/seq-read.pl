@@ -1,8 +1,10 @@
 #!/usr/local/bin/booking-perl
-use 5.010;
+
+use 5.014;
 use strict;
 use warnings;
-use FindBin qw( $Bin);
+
+use FindBin qw( $Bin );
 use lib "$Bin/lib";
 
 use SequenceFileReader;
@@ -15,6 +17,6 @@ $uri = 'hdfs:///tmp/000000_0';
 
 # or get it from the command line
 
-$uri = shift || die "No uri specified!";
+$uri = shift || die 'No uri specified!';
 
-SequenceFileReader->new->read( $uri );
+SequenceFileReader->new->read_file( $uri );

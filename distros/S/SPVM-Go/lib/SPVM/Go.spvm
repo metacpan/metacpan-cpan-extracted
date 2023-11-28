@@ -1,0 +1,85 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go {
+  version "0.005001";
+  
+  use Go::Channel;
+  use Go::Schedule;
+  use Callback;
+  use Go::Select;
+  
+  our $GO : Go;
+  
+  has schedule : Go::Schedule;
+  
+  INIT {
+    my $go = new Go;
+    
+    my $schedule = Go::Schedule->new;
+    
+    $go->{schedule} = $schedule;
+    
+    $GO = $go;
+  }
+  
+  static method go : void ($task : Callback) {
+    
+    my $schedule = $GO->{schedule};
+    
+    $schedule->add_task($task);
+  }
+  
+  static method make : Go::Channel ($capacity : int = 0) {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $channel = Go::Channel->new({schedule => $schedule, capacity => $capacity});
+    
+    return $channel;
+  }
+  
+  static method new_select : Go::Select () {
+    
+    my $schedule = $GO->{schedule};
+    
+    my $select = Go::Select->new($schedule);
+    
+    return $select;
+  }
+  
+  static method gosched : void () {
+    
+    my $schedule = $GO->{schedule};
+    
+    $schedule->schedule;
+  }
+  
+  static method sleep : void ($seconds : double = 0) {
+    
+    my $schedule = $GO->{schedule};
+    
+    $schedule->schedule($seconds);
+  }
+  
+  static method gosched_io_read : void ($fd : int, $timeout : double = 0) {
+    
+    my $schedule = $GO->{schedule};
+    
+    $schedule->schedule_io_read($fd, $timeout);
+  }
+  
+  static method gosched_io_write : void ($fd : int, $timeout : double = 0) {
+    
+    my $schedule = $GO->{schedule};
+    
+    $schedule->schedule_io_write($fd, $timeout);
+  }
+  
+  private method DESTROY : void () {
+    
+    my $schedule = $self->{schedule};
+    
+  }
+}
+

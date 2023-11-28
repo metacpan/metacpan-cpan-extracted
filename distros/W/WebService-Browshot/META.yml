@@ -25,5 +25,5 @@ requires:
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   URI::Encode: '0'
-version: v1.24.0
+version: v1.29.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

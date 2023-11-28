@@ -4,7 +4,7 @@ JSONLD - A toolkit for transforming JSON-LD data.
 
 =head1 VERSION
 
-This document describes JSONLD version 0.005.
+This document describes JSONLD version 0.006.
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ No other JSON-LD transformation are supported at this time.
 package JSONLD {
 	use v5.14;
 	use autodie;
-	our $VERSION	= '0.005';
+	our $VERSION	= '0.006';
 	use utf8;
 	use Moo;
 	use LWP;
@@ -622,7 +622,7 @@ See L<AtteanX::Parser::JSONLD> for an API that provides this functionality.
 						println "5.2.5 " . $resp->status_line if $debug;
 						die 'loading remote context failed';
 					}
-					my $content	= $resp->decoded_content;
+					my $content	= $resp->content_is_text ? $resp->decoded_content : decode_utf8($resp->decoded_content);
 					$context		= eval { decode_json(encode('UTF-8', $content))->{'@context'} };
 					if ($@) {
 						println "5.2.5 $@" if $debug;
@@ -682,7 +682,7 @@ See L<AtteanX::Parser::JSONLD> for an API that provides this functionality.
 					die 'loading remote context failed';
 				}
 				
-				my $content	= $resp->decoded_content;
+				my $content	= $resp->content_is_text ? $resp->decoded_content : decode_utf8($resp->decoded_content);
 				my $j		= eval { decode_json(encode('UTF-8', $content))->{'@context'} };
 				if ($@) {
 					println "5.6.5 $@" if $debug;

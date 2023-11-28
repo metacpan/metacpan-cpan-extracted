@@ -1,0 +1,53 @@
+AnyEvent-KVStore
+
+This module provides a unified API for key-value stores for AnyEvent.  This is
+intended to allow you to easily plug various stores for such things into an
+AnyEvent application and perform the basic operations on it.  These include:
+
+   connect
+   read
+   write
+   watch
+
+The specific implementations use other modules released separately.  For
+example, see AnyEvent::KVStore::Etcd.
+
+Major applications include things like cluster management via event loops and
+the like.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc AnyEvent::KVStore
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=AnyEvent-KVStore
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/AnyEvent-KVStore
+
+    Search CPAN
+        https://metacpan.org/release/AnyEvent-KVStore
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2023 by Chris Travers.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+

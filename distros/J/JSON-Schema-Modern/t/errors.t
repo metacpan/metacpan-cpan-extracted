@@ -8,10 +8,6 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
-use JSON::Schema::Modern;
 use lib 't/lib';
 use Helper;
 
@@ -677,6 +673,12 @@ subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
       errors => [
         {
           instanceLocation => '',
+          keywordLocation => '/$ref/$ref/$ref/$ref/type',
+          absoluteKeywordLocation => 'http://localhost:4242/object.json#/type',
+          error => 'got integer, not object',
+        },
+        {
+          instanceLocation => '',
           keywordLocation => '/$ref/$ref/$ref/$ref/anyOf/0',
           absoluteKeywordLocation => 'http://localhost:4242/object.json#/anyOf/0',
           error => 'subschema is false',
@@ -686,12 +688,6 @@ subtest 'errors after crossing multiple $refs using $id and $anchor' => sub {
           keywordLocation => '/$ref/$ref/$ref/$ref/anyOf',
           absoluteKeywordLocation => 'http://localhost:4242/object.json#/anyOf',
           error => 'no subschemas are valid',
-        },
-        {
-          instanceLocation => '',
-          keywordLocation => '/$ref/$ref/$ref/$ref/type',
-          absoluteKeywordLocation => 'http://localhost:4242/object.json#/type',
-          error => 'got integer, not object',
         },
         {
           instanceLocation => '',

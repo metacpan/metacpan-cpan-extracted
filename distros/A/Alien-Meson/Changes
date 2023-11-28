@@ -1,5 +1,9 @@
 Revision history for Alien-Meson
 
+0.06      2023-11-08 23:09:38-05:00 America/New_York
+  - Add DESTDIR prefix hack. See issue <https://github.com/PerlAlien/Alien-Build/issues/407>
+    for more information. See <https://github.com/PerlAlien/Alien-Meson/pull/15>.
+
 0.05      2023-10-29 15:08:30-04:00 America/New_York
   - Deprecate interpolation of `%{meson}`.
     See <https://github.com/PerlAlien/Alien-Meson/pull/14>.

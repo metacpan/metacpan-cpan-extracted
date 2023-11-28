@@ -1,5 +1,5 @@
 package Parse::SAMGov::Mo;
-$Parse::SAMGov::Mo::VERSION = '0.106';
+$Parse::SAMGov::Mo::VERSION = '0.202';
 #use Mo qw'build builder default import coerce is chain';
 #   The following line of code was produced from the previous line by
 #   Mo::Inline version 0.40
@@ -17,7 +17,7 @@ Parse::SAMGov::Mo
 
 =head1 VERSION
 
-version 0.106
+version 0.202
 
 =head1 AUTHOR
 
@@ -25,7 +25,7 @@ Vikas N Kumar <vikas@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Selective Intellect LLC.
+This software is copyright (c) 2023 by Selective Intellect LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

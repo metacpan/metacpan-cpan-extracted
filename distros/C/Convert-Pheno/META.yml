@@ -4,7 +4,10 @@ author:
   - 'Manuel Rueda <mrueda@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::Deep: '1.204'
+  Test::Exception: '0.43'
   Test::More: '1.30'
+  Test::Warn: '0.37'
 configure_requires:
   ExtUtils::MakeMaker: '7.70'
   File::ShareDir::Install: '0.14'
@@ -21,7 +24,6 @@ no_index:
     - inc
     - docs
     - t
-    - share/api
 requires:
   DBD::SQLite: '1.72'
   DBI: '1.643'
@@ -34,9 +36,6 @@ requires:
   Path::Tiny: '0.144'
   Sort::Naturally: '1.03'
   Term::ANSIColor: '5.01'
-  Test::Deep: '1.204'
-  Test::Exception: '0.43'
-  Test::Warn: '0.37'
   Text::CSV_XS: '1.50'
   Text::Similarity: '0.13'
   Types::Standard: '2.004000'
@@ -48,6 +47,6 @@ resources:
   homepage: https://github.com/CNAG-Biomedical-Informatics/convert-pheno
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/CNAG-Biomedical-Informatics/convert-pheno.git
-version: '0.13'
+version: '0.14'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,21 @@
+Mojolicious::Plugin::IsBot
+
+A super simple Mojolicious plugin to test if a User-Agent header is possbily a bot.
+
+    use Mojolicious::Lite -signatures;
+
+    plugin('IsBot');
+
+    get '/' => sub {
+        my $s = shift;
+        
+        return $s->render(text => 'You are bot!') if $s->req->is_bot;
+        
+        $s->render(text => 'You are not bot!');
+    };
+
+    app->start;
+
+# LICENSE
+
+This project is licensed under the Artistic 2.0

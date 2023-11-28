@@ -7,9 +7,9 @@ use warnings;
 use Perl::osnames;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 sub meta {
     +{
@@ -49,7 +49,7 @@ Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix
 
 =head1 VERSION
 
-This document describes version 0.021 of Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 DESCRIPTION
 

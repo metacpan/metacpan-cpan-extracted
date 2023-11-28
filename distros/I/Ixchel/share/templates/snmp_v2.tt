@@ -1,0 +1,185 @@
+com2sec readonly  default         [% config.snmp.community %]
+
+[% IF config.snmp.v3_limited_enable %]
+createUser '[% config.snmp.v3_limited_user %]' MD5 '[% config.snmp.v3_limited_pass %]'
+[% END %]
+
+group Ixchelsnmp v2c        readonly
+
+[% IF config.snmp.v3_limited_enable %]
+group client usm '[% config.snmp.v3_limited_user %]'
+
+view client excluded  .1
+# hostname
+view client included  .1.3.6.1.2.1.1.5
+# uptime
+view client included  .1.3.6.1.2.1.1.3.0
+# interfaces
+view client included  .1.3.6.1.2.1.2.2.1.2
+view client included  .1.3.6.1.2.1.2.2.1.10
+view client included  .1.3.6.1.2.1.2.2.1.10.4
+view client included  .1.3.6.1.2.1.2.2.1.16
+view client included  .1.3.6.1.2.1.2.2.1.16.4
+# load
+view client included  .1.3.6.1.4.1.2021.10.1.3.1
+view client included  .1.3.6.1.4.1.2021.10.1.3.2
+view client included  .1.3.6.1.4.1.2021.10.1.3.3
+# CPU times
+view client included  .1.3.6.1.4.1.2021.11.9.0
+view client included  .1.3.6.1.4.1.2021.11.50.0
+view client included  .1.3.6.1.4.1.2021.11.10.0
+view client included  .1.3.6.1.4.1.2021.11.52.0
+view client included  .1.3.6.1.4.1.2021.11.11.0
+view client included  .1.3.6.1.4.1.2021.11.53.0
+view client included  .1.3.6.1.4.1.2021.11.51.0
+# RAM
+view client included  .1.3.6.1.4.1.2021.4.3.0
+view client included  .1.3.6.1.4.1.2021.4.4.0
+view client included  .1.3.6.1.4.1.2021.4.5.0
+view client included  .1.3.6.1.4.1.2021.4.6.0
+view client included  .1.3.6.1.4.1.2021.4.11.0
+view client included  .1.3.6.1.4.1.2021.4.13.0
+view client included  .1.3.6.1.4.1.2021.4.14.0
+view client included  .1.3.6.1.4.1.2021.4.15.0
+# DISK
+view client included  .1.3.6.1.4.1.2021.9.1.2.1
+view client included  .1.3.6.1.4.1.2021.9.1.3.1
+view client included  .1.3.6.1.4.1.2021.9.1.6.1
+view client included  .1.3.6.1.4.1.2021.9.1.7.1
+view client included  .1.3.6.1.4.1.2021.9.1.8.1
+view client included  .1.3.6.1.4.1.2021.9.1.9.1
+view client included  .1.3.6.1.4.1.2021.9.1.10.1
+view none excluded  .1
+[% END %]
+
+view all    included  .1                               80
+
+access Ixchelsnmp  ""      any       noauth    exact  all    none   none
+
+[% IF config.snmp.v3_limited_enable %]
+access client   ""      usm       noauth    exact  none    none   none
+access client   ""      usm       auth      exact  client  none   none
+[% END %]
+
+syslocation '[% config.snmp.syslocation %]'
+syscontact '[% config.snmp.syslocation %]'
+
+extend distro [% config.snmp.extend_base_dir %]/distro
+
+extend manufacturer /bin/echo [% shell_quote( sys_info.Host.manufacturer ) %]
+
+extend hardware /bin/echo [% shell_quote( sys_info.Host.product ) %]
+
+extend serial /bin/echo [% shell_quote( sys_info.Host.serial ) %]
+
+
+[% IF config.snmp.extends.osupdate.enable %]
+extend osupdate /bin/cat /var/cache/osupdate.extend
+[% END %]
+
+[% IF file_exists( '/usr/lib/libcmaX64.so' ) %]
+# HP RAID monitoring
+master          agentx
+dlmod cmaX /usr/lib/libcmaX64.so
+[% END %]
+
+
+[% IF config.nptd.enable && config.snmp.extends.ntp_client.enable %]
+extend ntp-client /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/ntp_client
+
+[% END %]
+[% IF config.snmp.extends.linux_softnet_stat.enable && is_linux %]
+extend linux_softnet_stat /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/linux_softnet_stat
+
+[% END %]
+[% IF config.suricata.enable && config.snmp.extends.suricata.enable %]
+extend suricata-stats /usr/bin/env [% config.snmp.extend_env %] suricata_stat_check -c -b
+
+[% END %]
+[% IF config.suricata.enable && config.suricata_extract.enable && config.snmp.extends.suricata_extract.enable %]
+extend suricata_extract /usr/bin/env [% config.snmp.extend_env %] suricata_extract_submit_extend
+
+[% END %]
+[% IF config.snmp.extends.sneck.enable %]
+extend /usr/bin/env [% config.snmp.extend_env %] sneck -c -b
+
+[% END %]
+[% IF config.fail2ban.enable && config.snmp.extends.fail2ban.enable %]
+extend /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/fail2ban -c
+
+[% END %]
+[% IF ( config.opensearch.enable || config.elasticsearch.enable ) && config.snmp.extends.opensearch.enable %]
+extend opensearch /bin/cat /var/cache/opensearch.json
+
+[% END %]
+[% IF config.snmp.extends.logsize.enable %]
+extend logsize /bin/cat /var/cache/logsize_extend/extend_return
+
+[% END %]
+[% IF config.mysql.enable && config.snmp.extends.mysql.enable %]
+extend mysql /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/mysql
+
+[% END %]
+[% IF config.snmp.extends.hv_monitor.enable %]
+extend hv-monitor /bin/cat /var/cache/hv-monitor.json
+
+[% END %]
+[% IF config.snmp.extends.systemd.enable && is_systemd %]
+extend systemd /bin/cat /var/cache/systemd.extend
+
+[% END %]
+[% IF config.supervisord.enable && config.snmp.extends.supervisord.enable %]
+extend supervisord /bin/cat /var/cache/supervisord.extend
+
+[% END %]
+[% IF sys_info.VirtInfo.virtualization_role != 'guest' && config.snmp.extends.smart.enable %]
+extend smart /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/smart -c [% config.snmp.extends.smart.config %]
+
+[% END %]
+[% IF config.privoxy.enable && config.snmp.extends.privoxy.enable %]
+extend privoxy /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/privoxy -f [% config.snmp.extends.privoxy.log %]
+
+[% END %]
+[% IF config.chronyd.enable && config.snmp.extends.chronyd.enable %]e
+xtend chronyd /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/chronyd
+
+[% END %]
+[% IF config.zfs.enable && config.snmp.extends.zfs.enable %]
+extend zfs /usr/bin/env [% config.snmp.extend_env %] [% config.snmp.extend_base_dir %]/zfs
+
+[% END %]
+[% IF config.squid.enable && config.snmp.extends.squid.enable %]
+proxy -v 2c -c public 127.0.0.1:3401 1.3.6.1.4.1.3495
+
+[% END %]
+[% IF config.snmp.extends.ifAlias.enable %]
+pass .1.3.6.1.2.1.31.1.1.1.18 [% config.snmp.extend_base_dir %]/ifAlias
+
+[% END %]
+[% IF config.snmp.extends.sagan.enable %]
+extend sagan-stats /usr/bin/env [% config.snmp.extend_env %] sagan_stat_check -c [% config.snmp.extends.sagan.args %] -b > /dev/null 2> /dev/null
+
+[% END %]
+[% IF config.snmp.extends.suricata.enable %]
+extend suricata-stats /usr/bin/env [% config.snmp.extend_env %] suricata_stat_check -c [% config.snmp.extends.suricata.args %] -b > /dev/null 2> /dev/null
+
+[% END %]
+
+
+[% FOREACH listen_type IN config.snmp.listen_types %]
+[% IF listen_type == 'array' %]
+[% FOREACH listen_address IN config.snmp.listen_array %]
+agentaddress [% listen_address %]
+
+[% END %]
+[% ELSIF listen_type == 'file' %]
+[% FOREACH line IN read_file( config.snmp.listen_file ) %]
+agentaddress [% line %]
+
+[% END %]
+[% ELSIF listen_type == 'localhost' %]
+agentaddress udp:127.0.0.1
+agentaddress tcp:127.0.0.1
+
+[% END %]
+[% END %]

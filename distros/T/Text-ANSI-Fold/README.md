@@ -5,7 +5,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.2102
+Version 2.2103
 
 # SYNOPSIS
 
@@ -165,14 +165,14 @@ function as well as **new** and **configure** method.
 
     $f->configure(boundary => 'word');
 
-- **width** => _n_, _\[ n, m, ... \]_
+- **width** => _n_ | _\[ n, m, ... \]_
 
-    Specify folding width.  Negative value means all the rest.
+    Specify folding width by integer.  Negative value means all the rest.
 
     Array reference can be specified but works only with **chops** method,
     and retunrs empty string for zero width.
 
-- **boundary** => `word` or `space`
+- **boundary** => `word` | `space`
 
     Option **boundary** takes `word` and `space` as a valid value.  These
     prohibit to fold a line in the middle of ASCII/Latin sequence.  Value
@@ -391,7 +391,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2018-2023 Kazumasa Utashiro.
+Copyright ©︎ 2018-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

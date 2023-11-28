@@ -36,9 +36,10 @@ no_index:
 provides:
   Alien::Meson:
     file: lib/Alien/Meson.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Alien::Base: '0.038'
+  Alien::Build::Util: '0'
   Path::Tiny: '0'
   base: '0'
   perl: '5.008004'
@@ -48,7 +49,7 @@ resources:
   IRC: irc://irc.perl.org/#native
   homepage: https://github.com/PerlAlien/Alien-Meson
   repository: https://github.com/PerlAlien/Alien-Meson.git
-version: '0.05'
+version: '0.06'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

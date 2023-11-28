@@ -231,7 +231,7 @@ Bangla India locale.
 
 =head3 Wide (format)
 
-  খ্রিস্টপূর্ব
+  খ্রিঃপূঃ
   খ্রিষ্টাব্দ
 
 =head3 Abbreviated (format)

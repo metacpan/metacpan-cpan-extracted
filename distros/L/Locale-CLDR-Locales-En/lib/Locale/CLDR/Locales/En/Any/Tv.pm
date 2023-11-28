@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Tv - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Tv;
 # This file auto generated from Data\common\main\en_TV.xml
-#	on Fri 13 Oct  9:13:31 am GMT
+#	on Sat  4 Nov  6:00:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

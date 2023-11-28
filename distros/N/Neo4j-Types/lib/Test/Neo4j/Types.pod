@@ -1,0 +1,307 @@
+# PODNAME: Test::Neo4j::Types
+# ABSTRACT: Tools for testing Neo4j type modules
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Test::Neo4j::Types - Tools for testing Neo4j type modules
+
+=head1 VERSION
+
+version 2.00
+
+=head1 SYNOPSIS
+
+ # For a node data structure that happens to match
+ # the given parameters exactly:
+ neo4j_node_ok 'Local::Node', sub {
+   my ($class, $params) = @_;
+   return bless { %$params }, $class;
+ };
+ 
+ # For a node class that happens to already have
+ # a new() constructor exactly like that:
+ neo4j_node_ok 'Local::Node', \&Local::Node::new;
+ 
+ # For a relationship data structure that needs
+ # adapting from the given parameters:
+ neo4j_relationship_ok 'Local::Reln', sub {
+   my ($class, $params) = @_;
+   return bless {
+     %$params,
+     start => $params->{start_id},
+     end   => $params->{end_id},
+   }, $class;
+ };
+ 
+ # For the typical path data structure:
+ neo4j_path_ok 'Local::Path', sub {
+   my ($class, $params) = @_;
+   return bless [ $params->{elements}->@* ], $class;
+ };
+ 
+ # For spatial / temporal data structures:
+ neo4j_point_ok 'Local::Spatial::Point', sub {...};
+ neo4j_datetime_ok 'Local::Temporal::Instant', sub {...};
+ neo4j_duration_ok 'Local::Temporal::Duration', sub {...};
+ 
+ # For a byte array data structure:
+ neo4j_bytearray_ok 'Local::ByteArray', sub {...};
+
+=head1 DESCRIPTION
+
+Offers a simple way to test your Neo4j::Types implementation for
+correctness. These test tools not only verify that the required
+methods are provided, they also try to verify that the methods
+actually work as expected. While the checks provided by this
+module certainly don't cover all requirements, they do cover
+many of them.
+
+It's possible that the checks these tools perform will be
+expanded in future. If this worries you, you should consider
+only using these tools for author tests.
+That said, if your code is on CPAN and declares this module
+as a dependency, the maintainer of this module will try to
+make every effort to avoid problems caused by such changes.
+
+=head1 FUNCTIONS
+
+L<Test::Neo4j::Types> offers the following functions.
+All functions are exported by default.
+
+=head2 neo4j_bytearray_ok
+
+ sub bytearray_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_bytearray_ok $bytearray_class, \&bytearray_new;
+ neo4j_bytearray_ok $bytearray_class, \&bytearray_new, $subtest_name;
+
+Verifies that C<$bytearray_class> is a package that implements
+the interface specified for Neo4j byte arrays by L<Neo4j::Types>.
+
+C<\&bytearray_new> must be a reference to a subroutine that can
+construct a new Neo4j byte array of the type C<$bytearray_class>
+based on the parameter provided in the hash ref C<$params>.
+The parameter has a name exactly matching the method in
+L<Neo4j::Types::ByteArray>:
+
+ $params = {
+   as_string => 'bytes',
+ };
+
+=head2 neo4j_datetime_ok
+
+ sub datetime_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_datetime_ok $datetime_class, \&datetime_new;
+ neo4j_datetime_ok $datetime_class, \&datetime_new, $subtest_name;
+
+Verifies that C<$datetime_class> is a package that implements
+the interface specified for temporal instants by L<Neo4j::Types>.
+
+C<\&datetime_new> must be a reference to a subroutine that can
+construct a new temporal instant of the type C<$datetime_class>
+based on the parameters provided in the hash ref C<$params>.
+The parameters have names exactly matching the methods in
+L<Neo4j::Types::DateTime>, but epoch and type are not provided:
+
+ $params = {
+   days        => 6560,    # 1987-12-18
+   nanoseconds => 0,
+   seconds     => 72000,   # 20:00 UTC
+   tz_name     => 'America/Los_Angeles',
+   tz_offset   => -28800,  # UTC-08
+ };
+
+=head2 neo4j_duration_ok
+
+ sub duration_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_duration_ok $duration_class, \&duration_new;
+ neo4j_duration_ok $duration_class, \&duration_new, $subtest_name;
+
+Verifies that C<$duration_class> is a package that implements
+the interface specified for temporal durations by L<Neo4j::Types>.
+
+C<\&duration_new> must be a reference to a subroutine that can
+construct a new temporal instant of the type C<$duration_class>
+based on the parameters provided in the hash ref C<$params>.
+The parameters have names exactly matching the methods in
+L<Neo4j::Types::Duration>:
+
+ $params = {
+   months      => 18,      # 1.5 years
+   days        => 42,      # 12 weeks
+   seconds     => 172800,  # 48 hours
+   nanoseconds => 0,
+ };
+
+=head2 neo4j_node_ok
+
+ sub node_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_node_ok $node_class, \&node_new;
+ neo4j_node_ok $node_class, \&node_new, $subtest_name;
+
+Verifies that C<$node_class> is a package that implements
+the interface specified for nodes by L<Neo4j::Types>.
+
+C<\&node_new> must be a reference to a subroutine that can
+construct a new node of the type C<$node_class> based
+on the parameters provided in the hash ref C<$params>.
+The parameters have names exactly matching the methods in
+L<Neo4j::Types::Node>:
+
+ $params = {
+   element_id => '4:a9bd8c39-9afb-4474-9890-c074b2002cf5:47',
+   id         => 47,
+   labels     => ['Label'],
+   properties => { key => 'value' },
+ };
+
+An unavailable S<element ID> will during tests be
+represented by an undefined parameter value.
+
+=head2 neo4j_path_ok
+
+ sub path_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_path_ok $path_class, \&path_new;
+ neo4j_path_ok $path_class, \&path_new, $subtest_name;
+
+Verifies that C<$path_class> is a package that implements
+the interface specified for paths by L<Neo4j::Types>.
+
+C<\&path_new> must be a reference to a subroutine that can
+construct a new path of the type C<$path_class> based
+on the parameter provided in the hash ref C<$params>.
+The parameter is an array of references that alternate
+between nodes and relationships, matching the method
+L<Neo4j::Types::Path/"elements">:
+
+ $params = {
+   elements => [
+     $node_0,
+     $relationship_0,
+     $node_1,
+     $relationship_1,
+     $node_2,
+   ],
+ };
+
+Inside C<path_new>, these references will purport to conform
+to the L<Neo4j::Types::Node> and L<Neo4j::Types::Relationship>
+interfaces, but shall be treated as opaque. Calling any methods
+other than C<< ->isa() >> on these references may fail.
+
+=head2 neo4j_point_ok
+
+ sub point_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_point_ok $point_class, \&point_new;
+ neo4j_point_ok $point_class, \&point_new, $subtest_name;
+
+Verifies that C<$point_class> is a package that implements
+the interface specified for spatial points by L<Neo4j::Types>.
+
+C<\&point_new> must be a reference to a subroutine that can
+construct a new node of the type C<$point_class> based
+on the parameters provided in the hash ref C<$params>.
+The parameters have names exactly matching the methods in
+L<Neo4j::Types::Point>:
+
+ $params = {
+   srid        => 4326,
+   coordinates => [ $x, $y, $z ],
+ };
+
+=head2 neo4j_relationship_ok
+
+ sub rel_new ($class, $params) {
+   return bless { ... }, $class;
+ }
+ neo4j_relationship_ok $rel_class, \&rel_new;
+ neo4j_relationship_ok $rel_class, \&rel_new, $subtest_name;
+
+Verifies that C<$rel_class> is a package that implements
+the interface specified for relationships by L<Neo4j::Types>.
+
+C<\&rel_new> must be a reference to a subroutine that can
+construct a new relationship of the type C<$rel_class> based
+on the parameters provided in the hash ref C<$params>.
+The parameters have names exactly matching the methods in
+L<Neo4j::Types::Relationship>:
+
+ $params = {
+   element_id       => '5:a9bd8c39-9afb-4474-9890-c074b2002cf5:23',
+   id               => 23,
+   start_element_id => '4:a9bd8c39-9afb-4474-9890-c074b2002cf5:81',
+   start_id         => 81,
+   end_element_id   => '4:a9bd8c39-9afb-4474-9890-c074b2002cf5:82',
+   end_id           => 82,
+   properties       => { key => 'value' },
+   type             => 'TYPE',
+ };
+
+An unavailable S<element ID> will during tests be
+represented by an undefined parameter value.
+
+=head1 BUGS AND LIMITATIONS
+
+The diagnostics are not particularly great. All of these tools
+are implemented as simple subtests. You can run C<prove -v> and
+obtain details about any failing checks, but you'll probably
+have to compare the TAP output with this modules's source code
+to make sense of them. Unfortunately, the tool source code is
+more optimised for compactness that for readability, which of
+course means me asking people to "just read the code" is quite
+shameless. However, because the number of users this module
+is anticipated to have is very low (maybe two or so), this
+limitation is unlikely to be addressed.
+
+The individual test names inside the subtests could be (and
+probably should be) improved though. Ideally, the names of
+failed tests would make sense even without reading the source.
+
+As a consequence of the subtests, it appears to be difficult
+to verify that these tools correctly identify non-conforming
+implementations, which is of course the primary job of these
+tools. So the testing of the tools themselves is incomplete.
+
+=for comment (Test::Tester doesn't work with subtests.)
+
+If these tools are ever developed further than this,
+L<switching to Test2|Test2::Manual::Tooling> should be
+considered.
+
+=head1 SEE ALSO
+
+L<Neo4j::Types::ImplementorNotes>
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

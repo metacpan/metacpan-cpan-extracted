@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Dicom::DCMTK::DCMQRSCP::Config;
 use Test::More 'tests' => 5;
 use Test::NoWarnings;

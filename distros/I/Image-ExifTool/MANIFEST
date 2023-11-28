@@ -25,6 +25,7 @@ config_files/example.config
 config_files/fotoware.config
 config_files/frameCount.config
 config_files/gps2utm.config
+config_files/guano.config
 config_files/nksc.config
 config_files/photoshop_paths.config
 config_files/picasa_faces.config
@@ -176,7 +177,9 @@ html/TagNames/Torrent.html
 html/TagNames/Unknown.html
 html/TagNames/VCard.html
 html/TagNames/Vorbis.html
+html/TagNames/WPG.html
 html/TagNames/WTV.html
+html/TagNames/XISF.html
 html/TagNames/XMP.html
 html/TagNames/ZIP.html
 html/TagNames/ZISRAW.html
@@ -210,6 +213,7 @@ lib/File/RandomAccess.pm
 lib/File/RandomAccess.pod
 lib/Image/ExifTool.pm
 lib/Image/ExifTool.pod
+lib/Image/ExifTool/7Z.pm
 lib/Image/ExifTool/AES.pm
 lib/Image/ExifTool/AFCP.pm
 lib/Image/ExifTool/AIFF.pm
@@ -416,6 +420,7 @@ lib/Image/ExifTool/Unknown.pm
 lib/Image/ExifTool/VCard.pm
 lib/Image/ExifTool/Validate.pm
 lib/Image/ExifTool/Vorbis.pm
+lib/Image/ExifTool/WPG.pm
 lib/Image/ExifTool/WTV.pm
 lib/Image/ExifTool/WriteCanonRaw.pl
 lib/Image/ExifTool/WriteExif.pl
@@ -428,6 +433,7 @@ lib/Image/ExifTool/WriteQuickTime.pl
 lib/Image/ExifTool/WriteRIFF.pl
 lib/Image/ExifTool/WriteXMP.pl
 lib/Image/ExifTool/Writer.pl
+lib/Image/ExifTool/XISF.pm
 lib/Image/ExifTool/XMP.pm
 lib/Image/ExifTool/XMP2.pl
 lib/Image/ExifTool/XMPStruct.pl
@@ -631,6 +637,7 @@ t/JVC_3.out
 t/JXL.t
 t/JXL_2.out
 t/JXL_3.out
+t/JXL_4.out
 t/Jpeg2000.t
 t/Jpeg2000_2.out
 t/Jpeg2000_3.out
@@ -856,6 +863,8 @@ t/VCard_2.out
 t/VCard_3.out
 t/Vorbis.t
 t/Vorbis_2.out
+t/WPG.t
+t/WPG_2.out
 t/WTV.t
 t/WTV_2.out
 t/Writer.t
@@ -909,6 +918,8 @@ t/Writer_6.out
 t/Writer_60.out
 t/Writer_7.out
 t/Writer_9.out
+t/XISF.t
+t/XISF_2.out
 t/XMP.t
 t/XMP_10.out
 t/XMP_11.out
@@ -965,6 +976,7 @@ t/ZIP_4.out
 t/ZIP_5.out
 t/ZIP_6.out
 t/ZIP_7.out
+t/ZIP_8.out
 t/ZISRAW.t
 t/ZISRAW_2.out
 t/images/AFCP.jpg
@@ -1047,6 +1059,7 @@ t/images/JSON.json
 t/images/JVC.jpg
 t/images/JVC2.jpg
 t/images/JXL.jxl
+t/images/JXL2.jxl
 t/images/Jpeg2000.j2c
 t/images/Jpeg2000.jp2
 t/images/Kodak.jpg
@@ -1132,8 +1145,10 @@ t/images/Unknown.jpg
 t/images/VCard.ics
 t/images/VCard.vcf
 t/images/Vorbis.ogg
+t/images/WPG.wpg
 t/images/WTV.wtv
 t/images/Writer.jpg
+t/images/XISF.xisf
 t/images/XMP.inx
 t/images/XMP.jpg
 t/images/XMP.svg
@@ -1148,6 +1163,7 @@ t/images/XMP7.xmp
 t/images/XMP8.xmp
 t/images/XMP9.xmp
 t/images/ZIP.gz
+t/images/ZIP.rar
 t/images/ZIP.zip
 t/images/ZISRAW.czi
 t/images/iWork.numbers

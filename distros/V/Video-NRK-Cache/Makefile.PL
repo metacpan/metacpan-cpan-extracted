@@ -20,16 +20,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.037009",
   "NAME" => "Video::NRK::Cache",
   "PREREQ_PM" => {
-    "Getopt::Long" => "2.33",
-    "Path::Tiny" => 0,
-    "Pod::Usage" => 0
+    "IO::Socket::SSL" => "1.56",
+    "Net::SSLeay" => "1.49",
+    "Path::Tiny" => 0
   },
   "TEST_REQUIRES" => {
     "Mock::MonkeyPatch" => 0,
     "Test::More" => "0.94",
     "Test::Warnings" => "0.009"
   },
-  "VERSION" => "3.00",
+  "VERSION" => "3.01",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,10 +37,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Getopt::Long" => "2.33",
+  "IO::Socket::SSL" => "1.56",
   "Mock::MonkeyPatch" => 0,
+  "Net::SSLeay" => "1.49",
   "Path::Tiny" => 0,
-  "Pod::Usage" => 0,
   "Test::More" => "0.94",
   "Test::Warnings" => "0.009"
 );

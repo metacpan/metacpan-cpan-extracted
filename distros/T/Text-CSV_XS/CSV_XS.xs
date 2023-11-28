@@ -614,7 +614,7 @@ static void _xs_csv_diag (pTHX_ csv_t *csv) {
 	_cache_show_str ("tmp",  (int)strlen (s), (byte *)s);
 	}
     if (csv->cache)
-	warn ("  %-20s %4d:0x%08x\n", "cache", sizeof (csv_t), csv->cache);
+	warn ("  %-20s %4d:0x%08lx\n", "cache", (int)sizeof (csv_t), (unsigned long)csv->cache);
     else
 	warn ("  %-22s --:no cache yet\n", "cache");
     } /* _csv_diag */
@@ -974,7 +974,7 @@ static char *cx_formula (pTHX_ csv_t *csv, SV *sv, STRLEN *len, int f) {
 	if (c == EOF || ser == 2) {					\
 	    sv_free (sv);						\
 	    sv = NULL;							\
-	    waitingForField = 0;					\
+	    seenSomething = FALSE;						\
 	    if (ser == 2) return FALSE;					\
 	    break;							\
 	    }								\
@@ -1423,16 +1423,16 @@ static char str_parsed[40];
 #endif
 
 #if MAINT_DEBUG > 1
+static char _sep[64];
 static char *_sep_string (csv_t *csv) {
-    char sep[64];
     if (csv->sep_len) {
 	int x;
 	for (x = 0; x < csv->sep_len; x++)
-	    (void)sprintf (sep + x * x, "%02x ", csv->sep[x]);
+	    (void)sprintf (_sep + x * x, "%02x ", csv->sep[x]);
 	}
     else
-	(void)sprintf (sep, "'%c' (0x%02x)", CH_SEP, CH_SEP);
-    return sep;
+	(void)sprintf (_sep, "'%c' (0x%02x)", CH_SEP, CH_SEP);
+    return _sep;
     } /* _sep_string */
 #endif
 
@@ -1998,9 +1998,12 @@ EOLX:
 			csv->used    = csv->size;
 			csv->fld_idx = 0;
 			c = CSV_GET;
+			seenSomething = FALSE;
 #if MAINT_DEBUG > 5
 			(void)fprintf (stderr, "# COMMENT, SKIPPED\n");
 #endif
+			if (c == EOF)
+			    break;
 			goto restart;
 			}
 		    }

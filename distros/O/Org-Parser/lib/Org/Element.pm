@@ -7,9 +7,9 @@ use Moo;
 use Scalar::Util qw(refaddr);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-08-05'; # DATE
+our $DATE = '2023-11-06'; # DATE
 our $DIST = 'Org-Parser'; # DIST
-our $VERSION = '0.560'; # VERSION
+our $VERSION = '0.561'; # VERSION
 
 has document => (is => 'rw');
 has parent => (is => 'rw');
@@ -210,7 +210,7 @@ Org::Element - Base class for Org document elements
 
 =head1 VERSION
 
-This document describes version 0.560 of Org::Element (from Perl distribution Org-Parser), released on 2023-08-05.
+This document describes version 0.561 of Org::Element (from Perl distribution Org-Parser), released on 2023-11-06.
 
 =head1 SYNOPSIS
 

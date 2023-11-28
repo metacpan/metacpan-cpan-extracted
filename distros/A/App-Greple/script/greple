@@ -12,7 +12,7 @@ use File::stat;
 use IO::Handle;
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
-use List::Util qw(min max first sum uniq shuffle notall pairs);
+use List::Util qw(min max first sum uniq shuffle notall pairs pairmap);
 use Cwd qw(getcwd abs_path);
 use Carp;
 
@@ -62,7 +62,7 @@ greple - extensible grep with lexical expression and region control
 =head1 VERSION
 
 
-Version 9.0101
+Version 9.0902
 
 
 =head1 SYNOPSIS
@@ -77,12 +77,13 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     -r, --must pattern   pattern cannot be compromised
     -t, --may  pattern   pattern may be exist
     -v, --not  pattern   pattern not to be matched
-        --re   pattern   regular expression
+    -E, --re   pattern   regular expression
         --fe   pattern   fixed expression
     -f, --file file      file contains search pattern
     --select index       select indexed pattern from -f file
   MATCH
-    -i                   ignore case
+    -i, --ignore-case    ignore case
+    -G, --capture-group  match capture groups rather than whole pattern
     --need=[+-]n         required positive match count
     --allow=[+-]n        acceptable negative match count
     --matchcount=n[,m]   required match count for each block
@@ -143,13 +144,12 @@ B<greple> [B<-M>I<module>] [ B<-options> ] pattern [ file... ]
     --pf=filter          post process filter command
     --noif               disable default input filter
   RUNTIME FUNCTION
-    --print=func         print function
-    --continue           continue after print function
-    --callback=func      callback function for matched string
     --begin=func         call function before search
     --end=func           call function after search
     --prologue=func      call function before command execution
     --epilogue=func      call function after command execution
+    --postgrep=func      call function after each grep operation
+    --callback=func      callback function for matched string
   OTHER
     --usage[=expand]     show this message
     --exit=n             command exit status
@@ -170,15 +170,28 @@ my $rcloader = Getopt::EX::Loader
     ->new(BASECLASS => \@baseclass);
 
 my @optargs;
+my %optargs;
 
 sub newopt {
     my @args = @_;
-    for (@args) {
-	next if ref;
-	s/\s+//g;
-	s/^(?=\w+-)([-\w]+)/$1 =~ tr[-][_]r . "|$1"/e; # "a-b" -> "a_b|a-b"
-    }
+    pairmap {
+	$a =~ s/\s+//g;
+	$a =~ s/^(?=\w+-)([-\w]+)/$1 =~ tr[-][_]r . "|$1"/e; # "a-b" -> "a_b|a-b"
+	$a =~ /^(\w+)/ and $optargs{$1} = $b if ref $b ne 'CODE';
+    } @args;
     push @optargs, @args;
+}
+
+sub opt :lvalue {
+    my $name = shift;
+    my $var = $optargs{$name} or die "$name: invalid option name\n";
+    if (ref $var eq 'SCALAR') {
+	return $$var;
+    } elsif (ref $var eq 'HASH' and @_ == 1) {
+	return $var->{+shift};
+    } else {
+	return $var;
+    }
 }
 
 my @opt_pattern;
@@ -191,6 +204,10 @@ my @opt_colormap;
 sub opt_colormap { push @opt_colormap, $_[1] }
 sub opt_colorsub { push @opt_colormap, "sub{ $_[1] }" }
 
+my %opt_format = (LINE => '%d:', FILE => '%s:');
+my %opt_alert  = (size => 512 * 1024, time => 2);
+my %opt_warn   = (read => 0, skip => 1, retry => 0, begin => 0);
+
 newopt
 
     ##
@@ -201,7 +218,7 @@ newopt
     ' may    |t =s ' => \&opt_pattern ,
     ' not    |v =s ' => \&opt_pattern ,
     ' le     |x =s ' => \&opt_pattern ,
-    ' re        =s ' => \&opt_pattern ,
+    ' re     |E =s ' => \&opt_pattern ,
     ' fe        =s ' => \&opt_pattern ,
     ' file   |f =s ' => \ my @opt_f ,
     ' select    =s ' => \ my $opt_select ,
@@ -213,6 +230,7 @@ newopt
     ' need                   =s ' => \ my @opt_need ,
     ' allow                  =s ' => \ my @opt_allow ,
     ' matchcount         |mc =s ' => \ my $opt_matchcount ,
+    ' capture-group      |G  !  ' => \ my $opt_capture_group ,
 
     ##
     ## STYLE
@@ -233,8 +251,10 @@ newopt
     ' newline                !  ' => \(my $opt_newline = 1) ,
     ' filestyle          |fs =s ' => \(my $opt_filestyle = 'line') ,
     ' linestyle          |ls =s ' => \(my $opt_linestyle = 'line') ,
-    # separate
-    ' format                 =s ' => \ my %opt_format ,
+    ' separate ' => sub {
+	opt('filestyle') = opt('linestyle') = $_[0];
+    },
+    ' format                 =s ' => \    %opt_format ,
     ' frame-top              :s ' => \(my $opt_frame_top    = '') ,
     ' frame-middle           :s ' => \(my $opt_frame_middle = '') ,
     ' frame-bottom           :s ' => \(my $opt_frame_bottom = '') ,
@@ -255,12 +275,20 @@ newopt
     ' colorful              !   ' => \(my $opt_colorful = 1) ,
     ' colorindex         |ci =s ' => \(my $opt_colorindex = '') ,
     ' ansicolor              =s ' => \(my $opt_ansicolor = '256') ,
-    # 256
     ' regioncolor        |rc !  ' => \ my $opt_regioncolor ,
     ' uniqcolor          |uc !  ' => \(my $opt_uniqcolor) ,
     ' uniqsub            |us =s ' => \ my @opt_uniqsub ,
-    # random
     ' face                   =s ' => \ my @opt_face ,
+    ' nocolor | no-color ' => sub {
+	opt('color') = 'never';
+    },
+    ' 256! ' => sub {
+	opt('ansicolor') = $_[1] ? '256' : '16';
+    },
+    ' random! ' => sub {
+	if ($_[1]) { opt('colorindex') .= 'R' }
+	else       { opt('colorindex') =~ s/R//gi }
+    },
 
     ##
     ## BLOCK
@@ -304,6 +332,7 @@ newopt
     ' end                    =s ' => \ my @opt_end ,
     ' prologue               =s ' => \ my @opt_prologue ,
     ' epilogue               =s ' => \ my @opt_epilogue ,
+    ' postgrep               =s ' => \ my @opt_postgrep ,
 
     ##
     ## OTHERS
@@ -314,11 +343,23 @@ newopt
     ' man  | doc                ' => \ my $opt_man ,
     ' show | less               ' => \ my $opt_show ,
     ' path                      ' => \ my $opt_path ,
-    # persist
     ' error                  =s ' => \(my $opt_error = 'skip') ,
-    # warn
-    ' alert                  =i ' => \ my %opt_alert ,
+    ' alert                  =i ' => \    %opt_alert ,
     ' debug              |d  =s ' => \ my @opt_d ,
+    ' persist                   ' => sub {
+	opt('error') = 'retry';
+    },
+    'warn|w:1%' => sub {
+	map { $opt_warn{$_} = $_[2] }
+	map { $_ eq 'all' ? keys %opt_warn : $_ }
+	$_[1] =~ /\w+/g;
+    },
+    'conceal:1%' => sub {
+	warn "Option --conceal will be deprecated.  Use --warn.\n";
+	map { $opt_warn{$_} = $_[2] ? 0 : 1 }
+	map { $_ eq 'all' ? keys %opt_warn : $_ }
+	$_[1] =~ /\w+/g;
+    },
 
     ##
     ## MODULE
@@ -339,54 +380,7 @@ newopt
 
 ;
 
-my %opt_warn = (read => 0, skip => 1, retry => 0, begin => 0);
-%opt_format  = (LINE => '%d:', FILE => '%s:');
-%opt_alert   = (size => 512 * 1024, time => 2);
-
-newopt
-
-    'separate' => sub {
-	$opt_filestyle = $opt_linestyle = $_[0];
-    },
-
-    'nocolor | no-color' => sub {
-	$opt_color = 'never';
-    },
-    '256!' => sub {
-	$opt_ansicolor = $_[1] ? '256' : '16';
-    },
-    'random!' => sub {
-	if ($_[1]) { $opt_colorindex .= 'R' }
-	else       { $opt_colorindex =~ s/R//gi }
-    },
-
-    'warn|w:1%' => sub {
-	map { $opt_warn{$_} = $_[2] }
-	map { $_ eq 'all' ? keys %opt_warn : $_ }
-	$_[1] =~ /\w+/g;
-    },
-    'conceal:1%' => sub {
-	warn "Option --conceal will be deprecated.  Use --warn.\n";
-	map { $opt_warn{$_} = $_[2] ? 0 : 1 }
-	map { $_ eq 'all' ? keys %opt_warn : $_ }
-	$_[1] =~ /\w+/g;
-    },
-    'persist !' => sub {
-	$opt_error = $_[1] ? 'retry' : 'skip';
-    },
-
-;
-
-my %optargs;
 sub setopt {
-    unless (%optargs) {
-	for (pairs @optargs) {
-	    my($spec, $ref) = @$_;
-	    while ($spec =~ /\G(\w+)\|?/g) {
-		$optargs{$1} = $ref;
-	    }
-	}
-    }
     my $opt = ref $_[0] eq 'HASH' ? shift : {};
     my $name = shift;
     if (exists $optargs{$name}) {
@@ -563,9 +557,8 @@ if (@opt_f) {
 			    $opt_f);
     }
 } else {
-    if (@opt_pattern == 0) {
-	&usage if @ARGV == 0;
-	@opt_pattern = [ le => shift @ARGV ];
+    unless (grep { $_->[0] !~ /^(not|may)/ } @opt_pattern) {
+	unshift @opt_pattern, [ le => shift @ARGV // &usage ];
     }
 }
 
@@ -753,16 +746,14 @@ if ($opt_ansicolor eq '24bit') {
     $Getopt::EX::Colormap::RGB24 = 1;
 }
 
-if (@opt_face) {
-    for my $opt (@opt_face) {
-	while ($opt =~ /(?:(?<rm>-)|\+)? (?<s>[^-+]+)/xg) {
-	    for my $c (@colors) {
-		if ($+{rm}) {
-		    $c =~ s/[\Q$+{s}\E]//g;
-		} else {
-		    my $spec = $+{s} =~ s/[\Q$c\E]//gr;
-		    $c .= '^' . ${spec} if $spec;
-		}
+for my $opt (@opt_face) {
+    while ($opt =~ /(?:(?<rm>-)|\+)? (?<s>[^-+]+)/xg) {
+	for my $c (@colors) {
+	    if ($+{rm}) {
+		$c =~ s/[\Q$+{s}\E]//g;
+	    } else {
+		my $spec = $+{s} =~ s/[\Q$c\E]//gr;
+		$c .= '^' . ${spec} if $spec;
 	    }
 	}
     }
@@ -808,7 +799,7 @@ my $uniq_color = UniqIndex->new(
 sub dump_uniqcolor {
     my $list  = $uniq_color->list;
     my $count = $uniq_color->count;
-    for my $i (0 .. $#{ $list }) {
+    for my $i (keys @$list) {
 	warn sprintf("%3d (%3d) %s\n",
 		     $i, $count->[$i],
 		     index_color($i, $list->[$i]));
@@ -886,6 +877,7 @@ for my $set (
     [ "epilogue", \@opt_epilogue, 0 ],
     [ "callback", \@opt_callback, 0 ],
     [ "uniqsub" , \@opt_uniqsub , 0 ],
+    [ "postgrep", \@opt_postgrep, 0 ],
     [ "block"   , \@opt_block   , 1 ], # need &
     [ "inside"  , \@opt_inside  , 1 ], # need &
     [ "outside" , \@opt_outside , 1 ], # need &
@@ -1014,7 +1006,7 @@ my($progress_show, $progress_reset) = do {
     my $n;
     my($s, $e) = ! $need_color ? ('', '') :
 	( ansi_code $colormap{PROGRESS}, ansi_code 'Z');
-    my $print = sub { printflush STDERR DSC, $s, @_, $e, CR, DRC };
+    my $print = sub { STDERR->printflush(DSC, $s, @_, $e, CR, DRC) };
     my $start = do {
 	if ($opt_d{n} and $opt_d{f}) {
 	    sub { $print->(++$n, " ", $current_file, ED) }
@@ -1023,7 +1015,7 @@ my($progress_show, $progress_reset) = do {
 	    sub { $print->(++$n) }
 	}
 	elsif ($opt_d{f}) {
-	    sub { printflush STDERR $current_file, ":\n" }
+	    sub { STDERR->printflush($current_file, ":\n") }
 	}
 	else {
 	    undef;
@@ -1031,7 +1023,7 @@ my($progress_show, $progress_reset) = do {
     };
     my $end = do {
 	if ($opt_d{n}) {
-	    sub { printflush STDERR ED if $n }
+	    sub { STDERR->printflush(ED) if $n }
 	} else {
 	    undef;
 	}
@@ -1243,15 +1235,21 @@ sub grep_data {
 	countcheck   => $count_match_sub,
 	allow        => $count_allow,
 	strict       => $opt_strict,
+	group_match  => $opt_capture_group,
 	region_index => $opt_regioncolor,
 	stat         => \%stat,
-	callback     => @opt_callback ? $opt_callback[-1] : undef,
+	callback     => @opt_callback ? \@opt_callback : undef,
 	alert_size   => $opt_alert{size},
 	alert_time   => $opt_alert{time},
 	join_blocks  => $opt_join_blocks,
-	)->run;
+    )->run;
     my $matched = $grep->matched;
 
+    ## --postgrep
+    for my $f (@opt_postgrep) {
+	$f->call($grep);
+    }
+    ## -m
     for my $splice (@splicer) {
 	$splice->($grep->result_ref);
     }
@@ -1306,15 +1304,16 @@ sub output {
 
     my $line = 1;
     my $lastpos = 0;
-    my @result = $grep->result;
-    for my $rix (0 .. $#result) {
-	my $result = $result[$rix];
+    my @results = $grep->result;
+    for my $rix (keys @results) {
 	my $is_top    = $rix == 0;
-	my $is_bottom = $rix == $#result;
+	my $is_bottom = $rix == $#results;
 
-	my($block_start, $block_end) = @{shift @$result};
+	my($blk, @result) = @{$results[$rix]};
+	my($block_start, $block_end) = @$blk;
 	my $block = $grep->cut($block_start, $block_end);
 
+	## --print
 	if (@opt_print) {
 	    local *_ = \$block;
 	    for my $func (@opt_print) {
@@ -1346,18 +1345,18 @@ sub output {
 
 	if ($indexer) {
 	    $indexer->reset if $indexer->block;
-	    for ($indexer->reverse ? reverse @$result : @$result) {
+	    for ($indexer->reverse ? reverse @result : @result) {
 		$_->[2] = $indexer->index;
 	    }
 	}
 
-	my $template = unpack_template($result, $block_start);
-	my @blocks = unpack($template, $block);
+	my $template = unpack_template(\@result, $block_start);
+	my @slice = unpack($template, $block);
 
 	my $mark = "\001";
-	for my $i (0 .. $#{$result}) {
-	    my($start, $end, $pi, $callback) = @{$result->[$i]};
-	    local *b = \$blocks[$i * 2 + 1];
+	for my $i (keys @result) {
+	    my($start, $end, $pi, $callback) = @{$result[$i]};
+	    local *b = \$slice[$i * 2 + 1];
 
 	    ## run callback function
 	    if ($callback) {
@@ -1365,7 +1364,7 @@ sub output {
 		    if (ref $callback eq 'CODE') {
 			$callback->($start, $end, $pi, $b);
 		    }
-		    elsif (callable $callback) {
+		    elsif (callable($callback)) {
 			$callback->call(
 			    &FILELABEL => $file,
 			    start => $start,
@@ -1389,7 +1388,7 @@ sub output {
 	    $b = index_color($pi, $b);
 	}
 
-	$block = join '', @blocks;
+	$block = join '', @slice;
 	next if $block eq "";
 
 	my @line;
@@ -1464,9 +1463,9 @@ __END__
 =head3 AND
 
 B<greple> can take multiple search patterns with the C<-e> option, but
-unlike the L<egrep(1)> command, it will searches them in an AND
-context.  For example, the next command print lines those containing
-all of C<foo> and C<bar> and C<baz>.
+unlike the L<egrep(1)> command, it will search them in AND context.
+For example, the next command print lines those containing all of
+C<foo> and C<bar> and C<baz>.
 
     greple -e foo -e bar -e baz ...
 
@@ -1520,17 +1519,17 @@ optional.  Next command is equivalent to the above example.
 
 
 B<greple> takes the first argument as a search pattern specified by
-C<--le> option.  In C<--le> pattern, you can set multiple keywords in
-a single parameter.  Each keyword is separated by spaces, and the
-first character describe the type.
+C<--le> option.  In the C<--le> pattern, you can set multiple keywords
+in a single parameter.  Each keyword is separated by spaces, and the
+first letter describes its type.
 
     none  And pattern            : --and  -e
     +     Required pattern       : --must -r
     -     Negative match pattern : --not  -v
     ?     Optional pattern       : --may  -t
 
-Just like internet search engine, you can simply provide C<foo bar
-baz> to search lines including all words.
+Just like internet search engines, you can simply provide C<foo bar
+baz> to search lines including all of them.
 
     greple 'foo bar baz'
 
@@ -1549,10 +1548,10 @@ Japanese.  Japanese text can be separated by newline almost any place
 in the text.  So the search pattern may spread out onto multiple
 lines.
 
-As for ascii word list, space character in the pattern matches any
-kind of space including newline.  Next example will search the word
-sequence of C<foo>, C<bar> and C<baz>, even they spread out to
-multiple lines.
+As for the ASCII word list, the space character in the pattern matches
+any type of space, including newlines.  The next example will search
+for the word sequence of C<foo>, C<bar> and C<baz>, even if they are
+spread over lines.
 
     greple -e 'foo bar baz'
 
@@ -1639,7 +1638,7 @@ but this command is finally translated into following option list.
         -print -- pattern
 
 
-=head2 INCLUDED MODUES
+=head2 INCLUDED MODULES
 
 
 This release include some sample modules.  Read document in each
@@ -1696,9 +1695,10 @@ L<https://github.com/kaz-utashiro/>.
 =head2 PATTERNS
 
 
-If no specific option is given, B<greple> takes the first argument as
-a search pattern specified by C<--le> option.  All of these patterns
-can be specified multiple times.
+If no positive pattern option is given (i.e. other than C<--not> and
+C<--may>), B<greple> takes the first argument as a search pattern
+specified by C<--le> option.  All of these patterns can be specified
+multiple times.
 
 Command itself is written in Perl, and any kind of Perl style regular
 expression can be used in patterns.  See L<perlre(1)> for detail.
@@ -1728,6 +1728,13 @@ Specify the optional (tentative) match pattern.  Next command print
 lines contains C<foo> and C<bar>, and highlight C<baz> if exists.
 
     greple -e foo -e bar -t baz
+
+Since it does not affect the bare pattern argument, you can add the
+highlighting word to the end of the command argument as follows.
+
+    greple foo file
+    greple foo file -t bar
+    greple foo file -t bar -t baz
 
 =item B<-r> I<pattern>, B<--must>=I<pattern>
 
@@ -1770,7 +1777,7 @@ As for Asian wide characters, pattern is cooked as zero or more white
 spaces can be allowed between any characters.  So Japanese string
 pattern C<日本語> will be converted to C<< 日\s*本\s*語 >>.
 
-If you don't want these conversion, use C<--re> option.
+If you don't want these conversion, use C<-E> (or C<--re>) option.
 
 =over 4
 
@@ -1781,9 +1788,9 @@ spaces.  Each token is interpreted by the first character.  Token
 start with C<-> means B<negative> pattern, C<?> means B<optional>, and
 C<+> does B<required>.
 
-Next example print lines which contain C<foo> and C<yabba>, and none
-of C<bar> and C<dabba>, with highlighting C<baz> and C<doo> if they
-exist.
+The next example prints lines which containing C<foo> and C<yabba>,
+and none of C<bar> and C<dabba>, with highlighting C<baz> and C<doo>
+if they exist.
 
     greple --le='foo -bar ?baz yabba -dabba ?doo'
 
@@ -1794,7 +1801,7 @@ This is the summary of start character for C<--le> option:
     ?  Optional pattern
     &  Function call (see next section)
 
-=item C<-x> [B<+?->]B<&>I<function>, C<--le>=[B<+?->]B<&>I<function>
+=item B<-x> [B<+?->]B<&>I<function>, B<--le>=[B<+?->]B<&>I<function>
 
 If the pattern start with ampersand (C<&>), it is treated as a
 function, and the function is called instead of searching pattern.
@@ -1816,18 +1823,31 @@ produce string to be shown in command output.  Callback function is
 called with four arguments (start position, end position, index,
 matched string) and expected to return replacement string.
 
-=item B<--re>=I<pattern>
+=item B<-E> I<pattern>, B<--re>=I<pattern>
 
 Specify regular expression.  No special treatment for space and wide
 characters.
 
 =item B<--fe>=I<pattern>
 
-Specify the fixed string pattern, like fgrep.
+Specify the fixed string pattern, like L<fgrep(1)>.
 
 =item B<-i>, B<--ignore-case>
 
 Ignore case.
+
+=item B<-G>, B<--capture-group>
+
+Normally, B<greple> searches for strings that match the entire
+pattern.  Even if it contains a capturing groups, they do not affect
+the search target.  When this option is given, strings corresponding
+to individual capture groups are searched, not the entire pattern.  If
+the pattern does not contain any capturing groups, it matches the
+entire pattern.
+
+For each match, a corresponding capture group number is assigned as an
+index (0 for entire match).  This will cause the strings corresponding
+to each capture group to be displayed in a different color.
 
 =item B<--need>=I<n>
 
@@ -1879,35 +1899,48 @@ match count 0 to 10, 20 to 30, and 40-or-greater.
 
 =item B<-f> I<file>, B<--file>=I<file>
 
-Specify the file which contains search pattern.  When file contains
-multiple lines, patterns are mixed together by OR context.
+Specifies the file containing the search pattern. If there are
+multiple lines in the file, each pattern is combined by an OR context.
+So the file:
+
+    A
+    B
+    C
+
+makes the pattern as C<A|B|C>.
 
 Blank line and the line starting with sharp (#) character is ignored.
 Two slashes (//) and following string are taken as a comment and
 removed with preceding spaces.
 
-When multiple files specified, each file produces individual pattern.
+In more detail, each of these patterns are evaluated under C<(?^m)>
+flags.  This is a situation where only the C<m> (Multiline) flag is
+enabled in the default environment. So if you enable some flags in a
+pattern, they are only valid within itself.
+
+If multiple files are specified, a separate group pattern is generated
+for each file.
 
 If the file name is followed by C<[index]> string, it is treated as
 specified by C<--select> option.  Next two commands are equivalent.
 
-    greple -f pattern_file'[1,5:7]'
+    greple -f pattern_file'[2,7:9]'
 
-    greple -f pattern_file --select 1,5:7
+    greple -f pattern_file --select 2,7:9
 
 See L<App::Greple::subst> module.
 
 =item B<--select>=I<index>
 
-When you want to choose specific pattern in the pattern file provided
-by C<-f> option, use C<--select> option.  I<index> is number list
+When you want to choose specific line in the pattern file provided by
+C<-f> option, use C<--select> option.  I<index> is number list
 separated by comma (,) character and each number is interpreted by
 L<Getopt::EX::Numbers> module.  Take a look at the module document for
 detail.
 
-Next command use 1st and 5,6,7th pattern in the file.
+Next command use 2nd and 7,8,9th lines in the pattern file.
 
-    greple -f pattern_file --select 1,5:7
+    greple -f pattern_file --select 2,7:9
 
 =back
 
@@ -2699,35 +2732,6 @@ entire output from B<greple> command.
 
 =over 7
 
-=item B<--print>=I<function>
-
-=item B<--print>=I<sub{...}>
-
-Specify user defined function executed before data print.  Text to be
-printed is replaced by the result of the function.  Arbitrary function
-can be defined in F<.greplerc> file or module.  Matched data is placed
-in variable C<$_>.  Filename is passed by C<&FILELABEL> key, as
-described later.
-
-It is possible to use multiple C<--print> options.  In that case,
-second function will get the result of the first function.  The
-command will print the final result of the last function.
-
-=item B<--continue>
-
-When C<--print> option is given, B<greple> will immediately print the
-result returned from print function and finish the cycle.  Option
-C<--continue> forces to continue normal printing process after print
-function called.  So please be sure that all data being consistent.
-
-=item B<--callback>=I<function>(I<...>)
-
-Callback function is called before printing every matched pattern with
-four labeled parameters: B<start>, B<end>, B<index> and B<match>,
-which corresponds to start and end position in the text, pattern
-index, and the matched string.  Matched string in the text is replaced
-by returned string from the function.
-
 =item B<--begin>=I<function>(I<...>)
 
 =item B<--begin>=I<function>=I<...>
@@ -2749,7 +2753,7 @@ processed.
         my %arg = @_;
         my $name = delete $arg{&FILELABEL} or die;
         $name =~ /\.(?:pm|pl|PL|pod)$/ or /\A#!.*\bperl/
-	    or die "skip $name\n";
+            or die "skip $name\n";
     }
 
     1;
@@ -2780,6 +2784,26 @@ Option C<--prologue> and C<--epilogue> specify functions called before
 and after processing.  During the execution, file is not opened and
 therefore, file name is not given to those functions.
 
+=item B<--postgrep>=I<function>(I<...>)
+
+=item B<--postgrep>=I<function>=I<...>
+
+Specify the function called after each search operation.  Funciton is
+called with C<App::Greple::Grep> object which cotains all information
+about the search.  This interface highly depends on the internal
+structure, so use with the utmost cation.
+
+=item B<--callback>=I<function>(I<...>)
+
+Callback function is called before printing every matched pattern with
+four labeled parameters: B<start>, B<end>, B<index> and B<match>,
+which corresponds to start and end position in the text, pattern
+index, and the matched string.  Matched string in the text is replaced
+by returned string from the function.
+
+Multiple functions can be specified, and if there are multiple search
+patterns, they are applied in order and cyclically.
+
 =item B<-M>I<module>::I<function(...)>
 
 =item B<-M>I<module>::I<function=...>
@@ -2789,6 +2813,31 @@ this form, the function will be called with module package name.  So
 you don't have to export it.  Because it is called only once at the
 beginning of command execution, before starting file processing,
 C<FILELABEL> parameter is not given exceptionally.
+
+=item B<--print>=I<function>
+
+=item B<--print>=I<sub{...}>
+
+Specify user defined function executed before data print.  Text to be
+printed is replaced by the result of the function.  Arbitrary function
+can be defined in F<.greplerc> file or module.  Matched data is placed
+in variable C<$_>.  Filename is passed by C<&FILELABEL> key, as
+described later.
+
+It is possible to use multiple C<--print> options.  In that case,
+second function will get the result of the first function.  The
+command will print the final result of the last function.
+
+This option and next B<--continue> are no more recommended to use
+because B<--colormap> and B<--callback> functions are more simple and
+powerful.
+
+=item B<--continue>
+
+When C<--print> option is given, B<greple> will immediately print the
+result returned from print function and finish the cycle.  Option
+C<--continue> forces to continue normal printing process after print
+function called.  So please be sure that all data being consistent.
 
 =back
 
@@ -2823,11 +2872,11 @@ C<$_>.  Ampersand (C<&>) is required to avoid the hash key is
 interpreted as a bare word.
 
     sub function {
-	my %arg = @_;
-	my $filename = delete $arg{&FILELABEL};
-	$arg{key1};             # 1
-	$arg{key2};             # "val2"
-	$_;                     # contents
+        my %arg = @_;
+        my $filename = delete $arg{&FILELABEL};
+        $arg{key1};             # 1
+        $arg{key2};             # "val2"
+        $_;                     # contents
     }
 
 

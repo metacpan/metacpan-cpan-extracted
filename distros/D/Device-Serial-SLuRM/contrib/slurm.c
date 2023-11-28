@@ -34,6 +34,12 @@ static uint8_t _crc8_update(uint8_t *crcp, uint8_t x)
   return x;
 }
 
+#ifdef SLURM_MULTIDROP
+static uint8_t node_id;
+
+void slurm_configure(uint8_t _id) { node_id = _id; }
+#endif
+
 /* Shared stateboard */
 static struct {
   enum {
@@ -75,12 +81,17 @@ static struct {
 
 static void transmit(uint8_t pktctrl, uint8_t b[], uint8_t len)
 {
+  do_slurm_tx_start();
+
   do_slurm_send(SLURM_SYNC); // not part of the CRC
 
   uint8_t crc = 0;
 
   /* Header */
   do_slurm_send(_crc8_update(&crc, pktctrl));
+#ifdef SLURM_MULTIDROP
+  do_slurm_send(_crc8_update(&crc, node_id));
+#endif
   do_slurm_send(_crc8_update(&crc, len));
   do_slurm_send(_crc8_update(&crc, crc));
 
@@ -88,7 +99,12 @@ static void transmit(uint8_t pktctrl, uint8_t b[], uint8_t len)
   for(uint8_t i = 0; i < len; i++)
     do_slurm_send(_crc8_update(&crc, b[i]));
   do_slurm_send(crc);
+
+  do_slurm_tx_stop();
 }
+
+__attribute__((weak)) void do_slurm_tx_start(void) { }
+__attribute__((weak)) void do_slurm_tx_stop (void) { }
 
 void slurm_notify(uint8_t b[], uint8_t len)
 {
@@ -133,6 +149,14 @@ void slurm_responderr(uint8_t seqno, uint8_t b[], uint8_t len)
 
 /* Receiver */
 
+#ifdef SLURM_MULTIDROP
+#  define HEADERLEN 4
+#  define IDX_LEN   2
+#else
+#  define HEADERLEN 3
+#  define IDX_LEN   1
+#endif
+
 static struct {
   enum {
     STATE_IDLE,
@@ -142,7 +166,7 @@ static struct {
 
   /* Big enough for header+crc+16 byte payload+crc */
   uint8_t len;
-  uint8_t buf[2+1+16+1];
+  uint8_t buf[HEADERLEN+16+1];
   uint8_t crc;
 
   uint8_t seqno;
@@ -245,7 +269,7 @@ void isr_slurm_recv(uint8_t b)
     case STATE_RECV_HEADER:
       rx.buf[rx.len] = b;
       rx.len++;
-      if(rx.len == 3) {
+      if(rx.len == HEADERLEN) {
         if(rx.crc != b)
           goto abort;
 
@@ -257,7 +281,7 @@ void isr_slurm_recv(uint8_t b)
     case STATE_RECV_PAYLOAD:
       rx.buf[rx.len] = b;
       rx.len++;
-      if(rx.len < rx.buf[1] + 4) {
+      if(rx.len < rx.buf[IDX_LEN] + HEADERLEN + 1) {
         _crc8_update(&rx.crc, b);
         break;
       }
@@ -265,7 +289,14 @@ void isr_slurm_recv(uint8_t b)
       if(rx.crc != b)
         goto abort;
 
-      on_recv(rx.buf[0], rx.buf + 3, rx.buf[1]);
+#ifdef SLURM_MULTIDROP
+      if(!(rx.buf[1] & 0x80) || (rx.buf[1] & 0x7F) != node_id) {
+        rx.state = STATE_IDLE;
+        break;
+      }
+#endif
+
+      on_recv(rx.buf[0], rx.buf + HEADERLEN, rx.buf[IDX_LEN]);
 
       rx.state = STATE_IDLE;
       break;

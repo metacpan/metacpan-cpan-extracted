@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
     },
     PREREQ_PM => {
 	'Moo' => 0,
-	'MooX::Keyword' => 0
+	'MooX::Keyword' => '0.08'
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
     },

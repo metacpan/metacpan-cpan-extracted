@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022-2023 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.76 ':experimental(adjust_params)';
+use warnings;
+use Object::Pad 0.800 ':experimental(adjust_params)';
 
-package Device::Serial::SLuRM 0.05;
+package Device::Serial::SLuRM 0.06;
 class Device::Serial::SLuRM;
 
 use Carp;
@@ -44,7 +45,7 @@ C<Device::Serial::SLuRM> - communicate the SLµRM protocol over a serial port
 
 =head1 SYNOPSIS
 
-   use v5;36;
+   use v5.36;
    use Device::Serial::SLuRM;
 
    my $slurm = Device::Serial::SLuRM->new(
@@ -67,6 +68,9 @@ packets, and sending of REQUEST packets that receive a RESPONSE.
 
 It currently does not support receiving REQUESTs, though this could be added
 relatively easily.
+
+Optionally, this module supports being the controller for a multi-drop
+("MSLµRM") bus. See the L<Device::Serial::MSLuRM> subclass.
 
 =head2 SLµRM
 
@@ -159,7 +163,7 @@ if( defined $METRICS ) {
    );
 
    $METRICS->make_counter( packets =>
-      description => "Number of SLµRM packets sent and received, by type",
+      description => "Number of packets sent and received, by type",
       labels => [qw( dir type )],
    );
 
@@ -252,6 +256,10 @@ C<request> method will make up to 3 attempts).
 
 field $_fh :param = undef;
 
+use constant is_multidrop => 0;
+
+field $_multidrop :param = __CLASS__->is_multidrop;
+
 ADJUST :params (
    :$dev    = undef,
    :$baud //= 115200,
@@ -277,10 +285,22 @@ field $_retransmit_count :param //= 2;
 
 field $_on_notify;
 
-field $_did_reset;
+class Device::Serial::SLuRM::_NodeState {
+   field $did_reset :mutator;
 
-field $_seqno_tx = 0 ;
-field $_seqno_rx :reader(_seqno_rx); # :reader just for unit-test purposes
+   field $seqno_tx  :mutator = 0;
+   field $seqno_rx  :mutator = 0;
+
+   field @_pending_slots; # [$seqno] = { payload, response_f }
+
+   method pending_slot ( $seqno ) { return $_pending_slots[ $seqno ] }
+   method set_pending_slot ( $seqno, $data ) { $_pending_slots[ $seqno ] = $data; }
+   method clear_pending_slot ( $seqno ) { undef $_pending_slots[ $seqno ]; }
+}
+
+field @_nodestate; # keyed per peer node ID
+# For unit tests
+method _nodestate ( $node_id ) { return $_nodestate[ $node_id ]; }
 
 =head1 METHODS
 
@@ -298,7 +318,7 @@ field $_recv_buffer;
 
 field $_next_resetack_f;
 
-async method recv_packet
+async method _recv
 {
    $_recv_buffer //= Future::Buffer->new(
       fill => $METRICS
@@ -309,17 +329,25 @@ async method recv_packet
          : sub { Future::IO->sysread( $_fh, 8192 ) },
    );
 
+   my $headerlen = 3 + !!$_multidrop;
+
    PACKET: {
       await $_recv_buffer->read_until( qr/\x55/ );
 
-      my ( $pktctrl, $len ) = unpack "C C", my $pkt = await $_recv_buffer->read_exactly( 3 );
+      defined( my $pkt = await $_recv_buffer->read_exactly( $headerlen ) )
+         or return; # EOF
+
+      my ( $pktctrl, $addr, $len );
+      $_multidrop ? ( ( $pktctrl, $addr, $len ) = unpack "C C C", $pkt )
+                  : ( ( $addr, $pktctrl, $len ) = ( 0, unpack "C C", $pkt ) );
 
       if( crc8( $pkt ) != 0 ) {
          # Header checksum failed
          $METRICS and
             $METRICS->inc_counter( discards => );
 
-         $_recv_buffer->unread( $pkt ) if $pkt =~ m/\x55/;
+         $pkt =~ m/\x55/ and
+            $_recv_buffer->unread( substr $pkt, $-[0] );
          redo PACKET;
       }
 
@@ -330,39 +358,53 @@ async method recv_packet
          $METRICS and
             $METRICS->inc_counter( discards => );
 
-         $_recv_buffer->unread( $pkt ) if $pkt =~ m/\x55/;
+         $pkt =~ m/\x55/ and
+            $_recv_buffer->unread( substr $pkt, $-[0] );
          redo PACKET;
       }
 
-      my $payload = substr( $pkt, 3, $len );
+      my $payload = substr( $pkt, $headerlen, $len );
 
-      printf STDERR "SLuRM <-RX {%02X/%v02X}\n", $pktctrl, $payload
-         if DEBUG > 1;
+      printf STDERR "SLuRM <-RX%s {%02X/%v02X}\n",
+         ( $_multidrop ? sprintf "(%d)", $addr : "" ), $pktctrl, $payload
+            if DEBUG > 1;
 
       $METRICS and
          $METRICS->inc_counter( packets => [ dir => "rx", type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" ] );
 
-      return $pktctrl, $payload;
+      return $pktctrl, $addr, $payload;
    }
 }
 
-field @_pending_slots; # [$seqno] = { payload, response_f }
+async method recv_packet ()
+{
+   my ( $pktctrl, undef, $payload ) = await $self->_recv;
+   return ( $pktctrl, $payload );
+}
+
 field $_run_f;
 
 async method _run
 {
    while(1) {
-      my ( $pktctrl, $payload ) = await $self->recv_packet;
+      my ( $pktctrl, $addr, $payload ) = await $self->_recv
+         or return; # EOF
+
+      redo if $addr & 0x80; # controller reflection
+      my $node_id = $addr;
+
       my $seqno = $pktctrl & 0x0F;
       $pktctrl &= 0xF0;
+
+      my $nodestate = $_nodestate[ $node_id ] //= Device::Serial::SLuRM::_NodeState->new;
 
       if( $pktctrl == SLURM_PKTCTRL_META ) {
          if( $seqno == SLURM_PKTCTRL_META_RESET or
                $seqno == SLURM_PKTCTRL_META_RESETACK ) {
-            ( $_seqno_rx ) = unpack "C", $payload;
+            ( $nodestate->seqno_rx ) = unpack "C", $payload;
 
             if( $seqno == SLURM_PKTCTRL_META_RESET ) {
-               await $self->send_packet( SLURM_PKTCTRL_META_RESETACK, pack "C", $_seqno_tx );
+               await $self->send_packet( SLURM_PKTCTRL_META_RESETACK, pack "C", $nodestate->seqno_tx );
             }
             else {
                $_next_resetack_f->done if $_next_resetack_f;
@@ -377,13 +419,13 @@ async method _run
 
       my $is_dup;
       if( !( $pktctrl & 0x80 ) ) {
-         if( defined $_seqno_rx ) {
-            my $seqdiff = $seqno - $_seqno_rx;
+         if( defined $nodestate->seqno_rx ) {
+            my $seqdiff = $seqno - $nodestate->seqno_rx;
             $seqdiff += 16 if $seqdiff < 0;
             $is_dup = !$seqdiff || $seqdiff > 8; # suppress duplicates / backsteps
          }
 
-         $_seqno_rx = $seqno;
+         $nodestate->seqno_rx = $seqno;
       }
 
       match( $pktctrl : == ) {
@@ -393,13 +435,13 @@ async method _run
             printf STDERR "SLuRM rx-NOTIFY(%d): %v02X\n", $seqno, $payload
                if DEBUG;
 
-            $_on_notify ? $_on_notify->( $payload )
+            $_on_notify ? $_on_notify->( ( $_multidrop ? ( $node_id ) : () ), $payload )
                         : warn "Received NOTIFY packet with no handler\n";
          }
 
          case( SLURM_PKTCTRL_RESPONSE ),
          case( SLURM_PKTCTRL_ERR ) {
-            my $slot = $_pending_slots[$seqno];
+            my $slot = $nodestate->pending_slot( $seqno );
             unless( $slot ) {
                warn "Received reply to unsent request seqno=$seqno\n";
                next;
@@ -428,12 +470,12 @@ async method _run
             $METRICS and
                $METRICS->report_distribution( request_success_attempts => 1 + $_retransmit_count - $slot->{retransmit_count} );
 
-            undef $_pending_slots[$seqno];
+            $nodestate->clear_pending_slot( $seqno );
 
             printf STDERR "SLuRM tx-ACK(%d)\n", $seqno
                if DEBUG;
 
-            await $self->send_packet_twice( SLURM_PKTCTRL_ACK | $seqno, "" );
+            await $self->_send_twice( SLURM_PKTCTRL_ACK | $seqno, $node_id, "" );
          }
          default {
             warn sprintf "Received unrecognised packet type=%02X\n", $pktctrl;
@@ -476,12 +518,19 @@ Will automatically L</reset> first if required.
 
 =cut
 
+async method _autoreset
+{
+   my $nodestate = $_nodestate[0] //= Device::Serial::SLuRM::_NodeState->new;
+
+   $nodestate->did_reset or
+      await $self->_reset( 0 );
+}
+
 async method run ( %args )
 {
    $_on_notify = $args{on_notify}; # TODO: save old, restore on exit?
 
-   $_did_reset or
-      await $self->reset;
+   await $self->_autoreset;
 
    await $self->_start
       ->on_cancel( sub { undef $_on_notify } );
@@ -513,12 +562,17 @@ Sends a packet to the serial port.
 
 =cut
 
-async method send_packet ( $pktctrl, $payload )
-{
-   printf STDERR "SLuRM TX-> {%02X/%v02X}\n", $pktctrl, $payload
-      if DEBUG > 1;
+async method send_packet ( $pktctrl, $payload ) { await $self->_send( $pktctrl, undef, $payload ); }
 
-   my $bytes = pack( "C C", $pktctrl, length $payload );
+async method _send ( $pktctrl, $addr, $payload )
+{
+   printf STDERR "SLuRM TX%s-> {%02X/%v02X}\n",
+      ( $_multidrop ? sprintf "(%d)", $addr & 0x7F : "" ), $pktctrl, $payload
+         if DEBUG > 1;
+
+   my $bytes = $_multidrop
+      ? pack( "C C C", $pktctrl, $addr // die( "ADDR must be defined for multidrop" ), length $payload )
+      : pack( "C C", $pktctrl, length $payload );
    $bytes .= pack( "C", crc8( $bytes ) );
 
    $bytes .= $payload;
@@ -532,11 +586,11 @@ async method send_packet ( $pktctrl, $payload )
    return await Future::IO->syswrite_exactly( $_fh, "\x55" . $bytes );
 }
 
-async method send_packet_twice ( $pktctrl, $payload )
+async method _send_twice ( $pktctrl, $node_id, $payload )
 {
-   await $self->send_packet( $pktctrl, $payload );
+   await $self->_send( $pktctrl, $node_id | 0x80, $payload );
    # TODO: Send again after a short delay
-   await $self->send_packet( $pktctrl, $payload );
+   await $self->_send( $pktctrl, $node_id | 0x80, $payload );
 }
 
 =head2 reset
@@ -550,23 +604,32 @@ L</run>, L</send_notify> or L</request> will do it if required.
 
 =cut
 
-async method reset
-{
-   $_seqno_tx = 0;
+method reset () { $self->_reset( 0 ); }
 
-   await $self->send_packet_twice( SLURM_PKTCTRL_META_RESET, pack "C", $_seqno_tx );
-   $_did_reset = 1;
+async method _reset ( $node_id )
+{
+   my $nodestate = $_nodestate[ $node_id ] //= Device::Serial::SLuRM::_NodeState->new;
+
+   $nodestate->seqno_tx = 0;
+
+   await $self->_send_twice( SLURM_PKTCTRL_META_RESET, $node_id, pack "C", $nodestate->seqno_tx );
+   $nodestate->did_reset = 1;
 
    $self->_start;
 
    # TODO: These might collide, do we need a Queue?
-   await $_next_resetack_f = $_run_f->new;
+   await Future->wait_any(
+      $_next_resetack_f = $_run_f->new,
+      Future::IO->sleep( $_retransmit_delay * 3 ),
+   );
+   die "Timed out waiting for reset\n"
+      unless $_next_resetack_f->is_done;
    undef $_next_resetack_f;
 }
 
 =head2 send_notify
 
-   await $slurm->send_notify( $payload )
+   await $slurm->send_notify( $payload );
 
 Sends a NOTIFY packet.
 
@@ -574,15 +637,19 @@ Will automatically L</reset> first if required.
 
 =cut
 
-async method send_notify ( $payload )
+method send_notify ( $payload ) { $self->_send_notify( 0, $payload ); }
+
+async method _send_notify ( $node_id, $payload )
 {
-   $_did_reset or
-      await $self->reset;
+   my $nodestate = $_nodestate[ $node_id ] //= Device::Serial::SLuRM::_NodeState->new;
 
-   ( $_seqno_tx += 1 ) &= 0x0F;
-   my $pktctrl = SLURM_PKTCTRL_NOTIFY | $_seqno_tx;
+   $nodestate->did_reset or
+      await $self->_reset( $node_id );
 
-   await $self->send_packet_twice( $pktctrl, $payload );
+   ( $nodestate->seqno_tx += 1 ) &= 0x0F;
+   my $pktctrl = SLURM_PKTCTRL_NOTIFY | $nodestate->seqno_tx;
+
+   await $self->_send_twice( $pktctrl, $node_id, $payload );
 }
 
 =head2 request
@@ -607,40 +674,48 @@ Will automatically L</reset> first if required.
 
 =cut
 
-async method request ( $payload )
-{
-   $_did_reset or
-      await $self->reset;
+method request ( $payload ) { $self->_request( 0, $payload ); }
 
-   ( $_seqno_tx += 1 ) &= 0x0F;
-   my $seqno = $_seqno_tx;
+async method _request ( $node_id, $payload )
+{
+   my $nodestate = $_nodestate[ $node_id ] //= Device::Serial::SLuRM::_NodeState->new;
+
+   $nodestate->did_reset or
+      await $self->_reset( $node_id );
+
+   ( $nodestate->seqno_tx += 1 ) &= 0x0F;
+   my $seqno = $nodestate->seqno_tx;
 
    printf STDERR "SLuRM tx-REQUEST(%d): %v02X\n", $seqno, $payload
       if DEBUG;
 
-   $_pending_slots[$seqno] and croak "TODO: Request seqno collision - pick a new one?";
+   $nodestate->pending_slot( $seqno ) and croak "TODO: Request seqno collision - pick a new one?";
 
    my $pktctrl = SLURM_PKTCTRL_REQUEST | $seqno;
 
-   await $self->send_packet( $pktctrl, $payload );
+   await $self->_send( $pktctrl, $node_id | 0x80, $payload );
 
    $self->_start;
 
-   $_pending_slots[$seqno] = {
-      payload          => $payload,
-      response_f       => my $f = $_run_f->new,
-      retransmit_count => $_retransmit_count,
-      start_time       => [ gettimeofday ],
-   };
+   $nodestate->set_pending_slot( $seqno,
+      {
+         payload          => $payload,
+         response_f       => my $f = $_run_f->new,
+         retransmit_count => $_retransmit_count,
+         start_time       => [ gettimeofday ],
+      }
+   );
 
-   $self->_set_retransmit( $seqno );
+   $self->_set_retransmit( $node_id, $seqno );
 
    return await $f;
 }
 
-method _set_retransmit ( $seqno )
+method _set_retransmit ( $node_id, $seqno )
 {
-   my $slot = $_pending_slots[$seqno] or die "ARG expected $seqno request";
+   my $nodestate = $_nodestate[ $node_id ] //= Device::Serial::SLuRM::_NodeState->new;
+
+   my $slot = $nodestate->pending_slot( $seqno ) or die "ARG expected $seqno request";
 
    $slot->{retransmit_f} = Future::IO->sleep( $_retransmit_delay )
       ->on_done( sub {
@@ -649,13 +724,13 @@ method _set_retransmit ( $seqno )
                if DEBUG;
 
             my $pktctrl = SLURM_PKTCTRL_REQUEST | $seqno;
-            $slot->{retransmit_f} = $self->send_packet( $pktctrl, $slot->{payload} )
+            $slot->{retransmit_f} = $self->_send( $pktctrl, $node_id, $slot->{payload} )
                ->on_fail( sub {
                   warn "Retransmit failed: @_";
                   $slot->{response_f}->fail( @_ );
                } )
                ->on_done( sub {
-                  $self->_set_retransmit( $seqno );
+                  $self->_set_retransmit( $node_id, $seqno );
                } );
 
             $METRICS and
@@ -671,7 +746,7 @@ method _set_retransmit ( $seqno )
             $METRICS and
                $METRICS->inc_counter( timeouts => );
 
-            undef $_pending_slots[$seqno];
+            $nodestate->clear_pending_slot( $seqno );
          }
       });
 }

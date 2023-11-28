@@ -1,5 +1,12 @@
 Revision history for School-Code-Compare
  
+0.201     2023-11-12 11:16:58+01:00 Europe/Zurich
+ - update documentation
+ - adjust hardcoded values to skip comparison (skip more often)
+
+0.2       2023-11-06 22:36:26+01:00 Europe/Zurich (TRIAL RELEASE)
+ - add option --split|-t
+
 0.104     2020-09-09 14:42:24+02:00 Europe/Zurich
  - promote v0.102 und v0.103 trial releases
  - add author test for Changes file

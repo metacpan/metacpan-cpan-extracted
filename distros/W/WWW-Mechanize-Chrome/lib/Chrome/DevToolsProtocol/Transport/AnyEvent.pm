@@ -1,6 +1,5 @@
 package Chrome::DevToolsProtocol::Transport::AnyEvent;
 use strict;
-use Filter::signatures;
 use Moo 2;
 no warnings 'experimental::signatures';
 use feature 'signatures';
@@ -12,7 +11,7 @@ use AnyEvent;
 use AnyEvent::WebSocket::Client;
 use AnyEvent::Future qw(as_future_cb);
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 our @CARP_NOT = ();
 
 =head1 NAME

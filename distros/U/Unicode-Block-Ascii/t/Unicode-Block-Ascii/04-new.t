@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use English qw(-no_match_vars);
+use English;
 use Error::Pure::Utils qw(clean);
 use Test::More 'tests' => 5;
 use Test::NoWarnings;

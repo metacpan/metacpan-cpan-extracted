@@ -25,7 +25,8 @@ WriteMakefile(
                 url  => 'git://github.com/giterlizzi/perl-URI-PackageURL',
                 web  => 'https://github.com/giterlizzi/perl-URI-PackageURL'
             },
-        }
+        },
+        x_purl => 'pkg:cpan/GDT/URI-PackageURL'
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz',},
     clean => {FILES    => 'URI-PackageURL-*'},

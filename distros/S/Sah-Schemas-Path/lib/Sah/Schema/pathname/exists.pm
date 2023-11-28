@@ -3,9 +3,9 @@ package Sah::Schema::pathname::exists;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 our $schema = ["pathname" => {
     summary => 'Path name, must exist on filesystem',
@@ -35,7 +35,7 @@ Sah::Schema::pathname::exists - Path name, must exist on filesystem
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::Schema::pathname::exists (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::Schema::pathname::exists (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 SYNOPSIS
 

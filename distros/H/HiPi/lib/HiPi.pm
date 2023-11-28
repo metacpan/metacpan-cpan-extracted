@@ -19,7 +19,7 @@ use constant hipi_export_constants();
 use Scalar::Util qw( weaken isweak refaddr );
 use Carp;
 
-our $VERSION ='0.88';
+our $VERSION ='0.90';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();
@@ -48,6 +48,77 @@ sub twos_compliment {
     my( $class, $value, $numbytes) = @_;
     my $onescomp = (~$value) & ( 2**(8 * $numbytes) -1 );
     return $onescomp + 1;
+}
+
+sub bytes_to_integer {
+    my($class, $bytes, $is_signed, $l_endian) = @_;
+    my $packformat = $class->get_integer_pack_format( scalar @$bytes, $is_signed, $l_endian );
+    my $int = unpack($packformat, pack('C*', @$bytes) );
+    return $int;
+}
+
+sub integer_to_bytes {
+    my($class, $length, $value, $is_signed, $l_endian) = @_;
+    my $packformat = $class->get_integer_pack_format( $length, $is_signed, $l_endian );
+    my @bytes = unpack('C*', pack( $packformat, $value ) );
+    return ( wantarray ) ? @bytes : \@bytes;
+}
+
+sub integer_to_bytes_calc_length {
+    my($class, $value, $is_signed, $l_endian) = @_;
+    my $length = $class->get_integer_value_byte_length($value, $is_signed);
+    my $packformat = $class->get_integer_pack_format( $length, $is_signed, $l_endian );
+    my @bytes = unpack('C*', pack( $packformat, $value ) );
+    return ( wantarray ) ? @bytes : \@bytes;
+}
+
+sub get_integer_pack_format {
+    my($class, $length, $is_signed, $l_endian) = @_;
+    my $packformat;
+    
+    if ( $length == 1 ) {
+        $packformat = 'C';
+    } elsif( $length == 2 ) {
+        $packformat = ( $l_endian ) ? 'S<' : 'S>';
+    } elsif( $length == 4 ) {
+        $packformat = ( $l_endian ) ? 'L<' : 'L>';
+    } else {
+        $packformat = 'Q>';
+        $packformat = ( $l_endian ) ? 'Q<' : 'Q>';
+    }
+    
+    $packformat = lc($packformat) if $is_signed;
+    
+    return $packformat;
+}
+
+sub get_integer_value_byte_length {
+    my( $class, $value, $signed ) = @_;
+    
+    my $absvalue = abs($value);
+    
+    my $limit = ( $signed ) ? 0x7fffffff : 0xffffffff;
+    
+    # negative integers can have an absolute
+    # value 1 greater than positive integers
+    # within a given byte length
+    if ( $signed && $value < 0 ) {
+        $absvalue --;
+    }    
+    
+    if( $absvalue      > $limit ) {
+        # anything requiring 5 bytes or more
+        # treat as 64 bit 8 byte thing and
+        # assume architecture at both ends
+        # supports it
+        return 8;
+    } elsif( $absvalue > ( $limit >> 16 ) ) {
+        return 4;
+    } elsif( $absvalue > ( $limit >> 24 ) ) {
+        return 2;
+    } else {
+        return 1;
+    }
 }
 
 sub register_exit_method {

@@ -13,17 +13,17 @@ use warnings;
 use Carp::Clan qr/^PGObject\b/;
 use Log::Any qw($log);
 use Memoize;
-
+use PGObject::Util::DBException;
 
 use PGObject::Type::Registry;
 
 =head1 VERSION
 
-Version 2.3.2
+Version 2.4.0
 
 =cut
 
-our $VERSION = '2.3.2';
+our $VERSION = '2.4.0';
 
 =head1 SYNPOSIS
 
@@ -173,6 +173,9 @@ The number of arguments
 
 =cut
 
+sub _dup_func() { '42A01' }
+sub _no_func() { '26A01' }
+
 sub function_info {
     my ( $self, %args ) = @_;
     $args{funcschema} ||= 'public';
@@ -204,26 +207,34 @@ sub function_info {
         push @queryargs, $args{argschema};
     }
 
-    my $sth = $dbh->prepare($query) || die $!;
-    $sth->execute(@queryargs) || die $dbh->errstr . ": " . $query;
+    my $sth = $dbh->prepare($query) || die PGObject::Util::DBException->new(
+                                            $dbh, $query, @queryargs);
+    $sth->execute(@queryargs) || die PGObject::Util::DBException->new(
+                                            $dbh, $query, @queryargs);
     my $rows = $sth->rows;
     if ($rows > 1) {
         if ($args{argtype1}) {
-            croak $log->fatalf(
-                'Ambiguous criteria discovering function %s.%s (with first argument type %s)',
-                $args{funcschema}, $args{funcname}, $args{argtype1}
-                );
+            my $e = PGObject::Util::DBException->internal(_dup_func,
+                    sprintf('Ambiguous criteria discovering function %s.%s (with first argument type %s)',
+                        $args{funcschema}, $args{funcname}, $args{argtype1}
+                    ), $query, @queryargs);
+            croak $e;
         }
         else {
-            croak $log->fatalf(
-                'Ambiguous criteria discovering function %s.%s',
-                $args{funcschema}, $args{funcname}
-                );
+            my $e = PGObject::Util::DBException->internal(_dup_func,
+                    sprintf('Ambiguous criteria discovering function %s.%s',
+                        $args{funcschema}, $args{funcname}
+                    ), $query, @queryargs);
+            croak $e;
         }
     }
     elsif ($rows == 0) {
-        croak $log->fatalf( 'No such function: %s.%s',
-                            $args{funcschema}, $args{funcname} );
+        my $e = PGObject::Util::DBException->internal(_no_func,
+                    sprintf('No such function: %s.%s',
+                            $args{funcschema}, $args{funcname} ),
+                    $query, @queryargs);
+
+        croak $e;
     }
     my $ref = $sth->fetchrow_hashref('NAME_lc');
 
@@ -352,7 +363,8 @@ sub call_procedure {
          ORDER BY $order |;
     }
 
-    my $sth = $dbh->prepare($query) || die $!;
+    my $sth = $dbh->prepare($query) || die PGObject::Util::DBException(
+                                        $dbh, $query, @qargs);
 
     my $place = 1;
 
@@ -379,7 +391,7 @@ sub call_procedure {
         ++$place;
     }
 
-    $sth->execute() || die $dbh->errstr . ": " . $query;
+    $sth->execute() || die PGObject::Util::DBException->new($dbh, $query, @qargs);
 
     clear_info_cache() if $dbh->state eq '42883';    # (No Such Function)
 

@@ -159,7 +159,9 @@ sidebar_defaults:
   device_netmap:
     showips:     { default: null }
     showspeed:   { default: null }
-    mapshow:     { default: neighbors }
+    mapshow:     { default: depth }
+    depth:       { default: 1 }
+    too_many_devices: { default: 1000 }
     colorby:     { default: speed }
     dynamicsize: { default: checked }
   report_moduleinventory:
@@ -276,6 +278,10 @@ defanged_api_admin: 'api_admin'
 hide_deviceports:
   'group:__ANY__':
     - 'group:__HIDE_NOTPRESENT_TYPES__'
+external_links:
+  node: []
+  device: []
+  device_port: []
 
 # -------------
 # NETDISCO CORE
@@ -417,6 +423,7 @@ expire_jobs: 14
 expire_userlog: 365
 expire_nodeip_freshness: null
 store_wireless_clients: true
+skip_modules: []
 store_modules: true
 ignore_deviceports:
   'group:__ANY__':

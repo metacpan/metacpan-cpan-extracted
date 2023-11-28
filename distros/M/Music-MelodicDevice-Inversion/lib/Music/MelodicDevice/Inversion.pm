@@ -3,13 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply melodic inversion to a series of notes
 
-our $VERSION = '0.0502';
+our $VERSION = '0.0504';
 
+use Moo;
+use strictures 2;
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
 use Music::Scales qw(get_scale_MIDI is_scale);
-use Moo;
-use strictures 2;
 use namespace::clean;
 
 with('Music::PitchNum');
@@ -127,11 +127,11 @@ Music::MelodicDevice::Inversion - Apply melodic inversion to a series of notes
 
 =head1 VERSION
 
-version 0.0502
+version 0.0504
 
 =head1 SYNOPSIS
 
-  use Music::MelodicDevice::Inversion;
+  use Music::MelodicDevice::Inversion ();
 
   my @notes = qw(C4 E4 D4 G4 C5); # either named notes or midinums
 
@@ -228,7 +228,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Gene Boggs.
+This software is copyright (c) 2020-2023 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

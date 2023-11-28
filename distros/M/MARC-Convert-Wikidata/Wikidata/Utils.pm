@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.04;
+our $VERSION = 0.06;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -152,8 +152,10 @@ sub clean_edition_number {
 	$ret_edition_number =~ s/\s*$re//ms;
 	$ret_edition_number =~ s/\s*upr\.//ms;
 	$ret_edition_number =~ s/\s*opr\.//ms;
+	$ret_edition_number =~ s/\s*oprav\.//ms;
 	$re = decode_utf8('revidované');
 	$ret_edition_number =~ s/\s*$re//ms;
+	$ret_edition_number =~ s/\s*zcela//ms;
 
 	# Czech.
 	$re = decode_utf8('(v|V) českém jazyce');
@@ -347,6 +349,7 @@ sub clean_publisher_place {
 		'Praze' => 'Praha',
 		decode_utf8('Pardubicích') => 'Pardubice',
 		decode_utf8('Brně') => 'Brno',
+		decode_utf8('Hradci Králové') => decode_utf8('Hradec Králové'),
 		decode_utf8('Jičíně') => decode_utf8('Jičín'),
 		decode_utf8('Jihlavě') => 'Jihlava',
 		decode_utf8('Jimramově') => 'Jimramov',
@@ -354,13 +357,15 @@ sub clean_publisher_place {
 		'Liberci' => 'Liberec',
 		'Nymburce' => 'Nymburk',
 		'Olomouci' => 'Olomouc',
+		decode_utf8('Ostravě') => 'Ostrava',
 		decode_utf8('Poděbradech') => decode_utf8('Poděbrady'),
+		decode_utf8('Přelouči') => decode_utf8('Přelouč'),
 		decode_utf8('Přerově') => decode_utf8('Přerov'),
+		decode_utf8('Řevnicích') => decode_utf8('Řevnice'),
+		decode_utf8('Telči') => decode_utf8('Telč'),
 		decode_utf8('Třebíč na Moravě') => decode_utf8('Třebíč'),
 		decode_utf8('Třebíči') => decode_utf8('Třebíč'),
 		decode_utf8('Třebíči na Moravě') => decode_utf8('Třebíč'),
-		decode_utf8('Ostravě') => 'Ostrava',
-		decode_utf8('Řevnicích') => decode_utf8('Řevnice'),
 	};
 
 	my $ret_publisher_place = $publisher_place;
@@ -710,6 +715,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.06
 
 =cut

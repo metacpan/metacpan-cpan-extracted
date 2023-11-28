@@ -5,9 +5,9 @@ use strict;
 use Acme::CPANModulesUtil::Misc;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-04'; # DATE
+our $DATE = '2023-10-29'; # DATE
 our $DIST = 'Acme-CPANModules-NumberRange'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
     summary => "List of modules that handle number ranges",
@@ -16,14 +16,23 @@ our $LIST = {
 **Checking membership, formatting**
 
 <pm:Array::IntSpan>
+
 <pm:Array::RealSpan>
+
 <pm:Number::Range>
+
 <pm:Number::RangeTracker>
+
 <pm:Range::Object::Serial>
+
 <pm:Set::IntSpan>
+
 <pm:Set::IntSpan::Fast>
+
 <pm:Set::IntSpan::Fast::XS>
+
 <pm:Set::IntSpan::Island>
+
 <pm:Tie::Array::IntSpan>
 
 
@@ -35,6 +44,7 @@ our $LIST = {
 **Formatting**
 
 <pm:Number::Continuation>
+
 <pm:Set::IntSpan::Util>
 
 _
@@ -57,21 +67,30 @@ Acme::CPANModules::NumberRange - List of modules that handle number ranges
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::NumberRange (from Perl distribution Acme-CPANModules-NumberRange), released on 2023-03-04.
+This document describes version 0.002 of Acme::CPANModules::NumberRange (from Perl distribution Acme-CPANModules-NumberRange), released on 2023-10-29.
 
 =head1 DESCRIPTION
 
 B<Checking membership, formatting>
 
 L<Array::IntSpan>
+
 L<Array::RealSpan>
+
 L<Number::Range>
+
 L<Number::RangeTracker>
+
 L<Range::Object::Serial>
+
 L<Set::IntSpan>
+
 L<Set::IntSpan::Fast>
+
 L<Set::IntSpan::Fast::XS>
+
 L<Set::IntSpan::Island>
+
 L<Tie::Array::IntSpan>
 
 B<Partitioning>
@@ -81,6 +100,7 @@ L<Aray::IntSpan::Partition>
 B<Formatting>
 
 L<Number::Continuation>
+
 L<Set::IntSpan::Util>
 
 =head1 ACME::CPANMODULES ENTRIES

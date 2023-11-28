@@ -5,46 +5,50 @@ package App::ccdiff;
 use 5.014000;
 use warnings;
 use charnames ();
+use File::Find;
 use List::Util      qw( first  max     );
 use Term::ANSIColor qw(:constants color);
 use Getopt::Long    qw(:config bundling);
 
-our $VERSION = "0.32";
+our $VERSION = "0.33";
 our $CMD     = $0 =~ s{.*/}{}r;
 
 sub usage {
     my $err = shift and select STDERR;
     say "usage: $CMD [options] file1 [file2]";
+    say "       $CMD [options] dir1   dir2";
     say "       $CMD --man | --info";
     say "	file1 or file2 can be - (but not both)";
-    say "   -V    --version      Show version and exit";
-    say "   -v[1] --verbose[=1]  Set verbosity";
+    say "   -V     --version      Show version and exit";
+    say "   -v[1]  --verbose[=1]  Set verbosity";
     say "  Diff options:";
-    say "   -U    --utf-8                 Input is in UTF-8";
-    say "   -u[3] --unified=3             Show a unified diff";
-    say "         --no-header             Skip header with file names/stamps";
-    say "   -I    --index                 Add indices to the change chunks";
-    say "   -I n  --index=4               Only show chunk n";
-    say "   -w    --ignore-all-space      Ignore all whitespace";
-    say "   -b    --ignore-space-change   Ignore horizontal whitespace changes";
-    say "   -Z    --ignore-trailing-space Ignore whitespace at line ending";
-    say "   -B    --ignore-blank-lines    Ignore changes where lines are all blank";
-    say "   -i    --ignore-case           Ignore case changes";
+    say "   -U     --utf-8                 Input is in UTF-8";
+    say "   -u[3]  --unified=3             Show a unified diff";
+    say "          --no-header             Skip header with file names/stamps";
+    say "   -I     --index                 Add indices to the change chunks";
+    say "   -I n   --index=4               Only show chunk n";
+    say "   -w     --ignore-all-space      Ignore all whitespace";
+    say "   -b     --ignore-space-change   Ignore horizontal whitespace changes";
+    say "   -Z     --ignore-trailing-space Ignore whitespace at line ending";
+    say "   -B     --ignore-blank-lines    Ignore changes where lines are all blank";
+    say "   -i     --ignore-case           Ignore case changes";
+    say "   --dc=C --diff-class=C          Select Algorithm::Diff (AD or PP)";
+    say "                                      or Algorithm::Diff::XS (XS = default)";
     say "  Other options:";
-    say "   -t n  --threshold=2  Horizontal line diff threshold";
-    say "   -h n  --heuristics=n Horizontal char diff threshold";
-    say "   -e n  --ellipsis=n   Compress horizontal equal sections";
-    say "   -m    --markers      Use markers to indicate change positions";
-    say "   -a    --ascii        Use ASCII instead of Unicode indicators";
-    say "         --no-color     Reset all colors to none.";
-    say "         --list-colors  List available colors and exit";
-    say "         --old=red      Color to indicate removed content";
-    say "         --new=green    Color to indicate added   content";
-    say "         --bg=white     Background color for colored indicators";
-    say "   -p    --pink         Shortcut for --old=magenta";
-    say "   -r    --reverse      Reverse/invert the colors of the indicators";
-    say "   -s    --swap         Swap old/new color indicators";
-    say "         --settings     Show default settings (after reading rc)";
+    say "   -t n   --threshold=2  Horizontal line diff threshold";
+    say "   -h n   --heuristics=n Horizontal char diff threshold";
+    say "   -e n   --ellipsis=n   Compress horizontal equal sections";
+    say "   -m     --markers      Use markers to indicate change positions";
+    say "   -a     --ascii        Use ASCII instead of Unicode indicators";
+    say "          --no-color     Reset all colors to none.";
+    say "          --list-colors  List available colors and exit";
+    say "          --old=red      Color to indicate removed content";
+    say "          --new=green    Color to indicate added   content";
+    say "          --bg=white     Background color for colored indicators";
+    say "   -p     --pink         Shortcut for --old=magenta";
+    say "   -r     --reverse      Reverse/invert the colors of the indicators";
+    say "   -s     --swap         Swap old/new color indicators";
+    say "          --settings     Show default settings (after reading rc)";
     exit $err;
     } # usage
 
@@ -100,6 +104,7 @@ my $rev_color = $rc{bg};
 my $cli_color = $ENV{CLICOLOR};	# https://bixense.com/clicolors/
 my $no_colors = $ENV{NO_COLOR}; # https://no-color.org
 my $list_colors;
+my $diff_class;
 
 if ($no_colors) {
     $ENV{CLICOLOR_FORCE}	and $no_colors = 0;
@@ -118,6 +123,7 @@ unless (caller) {
 	  "info"	=> sub { pod_text  (); },
 
 	"U|utf-8!"		=> \$opt_U,
+	  "dc|diff-class=s"	=> \$diff_class,
 
     #   "c|context:3"		=> \$opt_c,	# implement context-diff?
 	"u|unified:3"		=> \$opt_u,
@@ -252,11 +258,59 @@ sub set_options {
 	}} : undef;
     } # set_options
 
-my $diff_class = eval { require Algorithm::Diff::XS; "Algorithm::Diff::XS"; }
-	      || eval { require Algorithm::Diff;     "Algorithm::Diff";     }
-	      or die "Cannot load Algorithm::Diff:\n";
+if ($diff_class) {
+    if ($diff_class =~ m/^(?:ad|pp|algorithm(?:-|::)diff(?:(?:-|::)pp)?)$/i) {
+	$diff_class =
+	    eval { require Algorithm::Diff;     "Algorithm::Diff";     }
+	}
+    elsif ($diff_class =~ m/^(?:adx|xs|algorithm(?:-|::)diff(?:-|::)xs)$/i) {
+	$diff_class = "Algorithm::Diff::XS";
+	$diff_class =
+	    eval { require Algorithm::Diff::XS; "Algorithm::Diff::XS"; }
+	}
+    else {
+	die "$diff_class is an unsupported Diff class\n";
+	}
+    }
+else {
+    $diff_class =
+	eval { require Algorithm::Diff::XS; "Algorithm::Diff::XS"; }
+     || eval { require Algorithm::Diff;     "Algorithm::Diff";     };
+    }
+$diff_class or die "Cannot load Algorithm::Diff:\n";
 
-caller or ccdiff (@ARGV);
+unless (caller) {
+    if (@ARGV == 2 && -d $ARGV[0] && -d $ARGV[1]) {
+	my ($d_from, $d_to) = @ARGV;
+	my %fn;
+	my @f;
+	foreach my $idx (0, 1) {
+	    my $dir = $ARGV[$idx];
+	    find (sub {
+		-f && -s or return;
+		my $fn = $File::Find::name =~ s{^$dir/*}{}r;
+		$fn{$fn}++;
+		$f[$idx]{$fn}++;
+		}, $dir);
+	    }
+	foreach my $fn (sort keys %fn) {
+	    if ($f[0]{$fn} && $f[1]{$fn}) {
+		ccdiff ("$d_from/$fn", "$d_to/$fn");
+		}
+	    elsif ($f[0]{$fn}) {
+		say "Only in $d_from: $fn";
+		}
+	    else {
+		say "Only in $d_to: $fn";
+		}
+	    delete $f[0]{$fn};
+	    }
+	}
+    else {
+	ccdiff (@ARGV);
+	}
+    exit 0;
+    }
 
 sub ccdiff {
     my $f1 = shift or usage (1);
@@ -265,7 +319,7 @@ sub ccdiff {
     -b $f1 || -c $f1 || -b $f2 || -c $f2 and
 	die "Character and block devices are not supported\n";
     -d $f1 || -d $f2 and
-	die "$CMD does not yet support recursive diff and/or directory diff\n";
+	die "$CMD does not support directory diff\n";
 
     my $fh;
 
@@ -594,12 +648,21 @@ ccdiff - Colored Character diff
 =head1 SYNOPSIS
 
  ccdiff [options] file1|- file2|-
+ ccdiff [options] dir1    dir2
 
  ccdiff --help
  ccdiff --man
  ccdiff --info
 
 =head1 DESCRIPTION
+
+Show the diff between two files on a character by character base. In contrast to
+the standard diff tools, this tool uses the diff algorithm horizontally for each
+line in the vertical diff, highlighting the changes. This is very handy in hard
+to spot changes like C<O> to C<0>, C<I> to C<l> or C<1> and whitespace.
+
+If there are two argument, and both are a folder/directory, a recursive diff is
+executed. This is not available whan used as a (sub)class.
 
 =head1 OPTIONS
 
@@ -626,6 +689,28 @@ Show this manual using pod2text.
 =item --utf-8 -U
 
 All I/O (streams to compare and standard out) are in UTF-8.
+
+=item --diff-class=C --dc=C
+
+Select the class used to execute the diff. By default C<ccdiff> will select
+the first available out of C<Algorithm::Diff::XS> or C<Algorithm::Diff>.
+
+Sometime the C<XS> version fails on encoding and the pure-perl version will
+work just fine. You can force C<ccdiff> to use either
+
+Select the pure-perl version with any of C<PP>, C<AD>, C<Algorthm::Diff>,
+C<Algorithm-Diff>, or C<Algorithm::Diff::PP> (case insensitive)
+
+ --dc=pp
+ --dc=algorithm-diff
+ --diff-class=Algorithm::Diff::PP
+
+Select the XS version with any of C<XS>, C<ADX>, C<Algorthm::Diff::XS>, or
+C<Algorithm-Diff-XS> (case insensitive)
+
+ --dc=xs
+ --dc=algorithm-diff-xs
+ --diff-class=Algorithm::Diff::XS
 
 =item --unified[=3] -u [3]
 

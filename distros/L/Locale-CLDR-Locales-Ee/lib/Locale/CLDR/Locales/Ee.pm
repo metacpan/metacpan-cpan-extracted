@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ee - Package for language Ewe
 
 package Locale::CLDR::Locales::Ee;
 # This file auto generated from Data\common\main\ee.xml
-#	on Fri 13 Oct  9:12:12 am GMT
+#	on Sat  4 Nov  5:58:46 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

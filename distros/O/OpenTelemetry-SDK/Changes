@@ -1,5 +1,69 @@
 Revision history for OpenTelemetry-SDK
 
+0.020     2023-11-26 16:18:52+00:00 Europe/London
+
+    * Switch Metrics::Any client to strict mode, to allow for automatic
+      metric name generation. This means the metrics can be exported
+      with adapters that don't allow periods (eg. Prometheus). This
+      means some metrics had to be renamed:
+      - otel.bsp.export.success -> otel.bsp.success
+      - otel.bsp.export.failure -> otel.bsp.failure
+      - otel.bsp.dropped_spans -> otel.bsp.spans.dropped
+      - otel.bsp.exported_spans -> otel.bsp.spans.processed
+      - otel.bsp.buffer_utilization -> otel.bsp.buffer.utilization
+
+0.019     2023-11-23 19:31:08+00:00 Europe/London
+
+    * Validate span processors when adding them to the TracerProvider
+    * Shutting down a TracerProvider that has been shutdown is not
+      en error and no longer warns
+    * Add documentation for TracerProvider's add_span_processor
+    * Make all shutdown and force_flush methods async for consistency
+    * Remove lock from span to avoid running into file descriptor
+      limits (GH #8)
+
+0.018     2023-11-21 21:42:57+00:00 Europe/London
+
+    * Ensure shutdown and force_flush calls on the TracerProvider
+      wait for the resuts of propagating those calls down to the
+      processors
+    * Bump minimum version of OpenTelemetry to 0.010 for the
+      implementation of the API
+    * Fix an issue with reporting dropped spans due to improper
+      scalar conversion
+    * Fix an issue in the documentation of the OTEL_TRACES_EXPORTER
+      variable and add some additional details
+
+0.017     2023-11-20 21:37:36+00:00 Europe/London
+
+    * Support recent versions of bignum, which broke
+      OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased
+      (https://github.com/jjatria/perl-opentelemetry-sdk/issues/2)
+    * Drop unused dependency on String::CRC32
+
+0.016     2023-11-19 11:42:51+00:00 Europe/London
+
+    * Do not warn if ending an ended span. This is to support the use
+      case of a user manually ending the span automatically created by
+      the Tracer's in_span method.
+
+0.015     2023-11-17 00:00:04+00:00 Europe/London
+
+    * Fix link to issues in meta
+
+0.014     2023-11-09 00:05:28+00:00 Europe/London
+
+    * Handle more error classes in span's 'record_exception'
+    * Add OpenTelemetry::Exporter::OTLP as a recommended distribution
+
+0.013     2023-11-07 20:27:16+00:00 Europe/London
+
+    * Document remaining OTLP exporter environment variables
+
+0.012     2023-11-05 18:33:22+00:00 Europe/London
+
+    * Document environment variables for OTLP exporter
+
 0.011     2023-11-01 23:20:41+00:00 Europe/London
 
     * Minor cosmetic fixes to documentation to solve some indexing

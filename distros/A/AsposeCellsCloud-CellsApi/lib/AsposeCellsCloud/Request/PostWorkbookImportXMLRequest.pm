@@ -60,8 +60,8 @@ sub new {
 
 # Run Operation Request
 # PostWorkbookImportXMLRequest.name : The workbook(Excel/ODS/...) name.  ,
-# PostWorkbookImportXMLRequest.importXMLRequest : password  ,
-# PostWorkbookImportXMLRequest.password :   ,
+# PostWorkbookImportXMLRequest.importXMLRequest :   ,
+# PostWorkbookImportXMLRequest.password : password  ,
 # PostWorkbookImportXMLRequest.folder : Original workbook folder.  ,
 # PostWorkbookImportXMLRequest.storageName : Storage name.  ,
 # PostWorkbookImportXMLRequest.outPath : Output file path.  ,
@@ -157,14 +157,14 @@ __PACKAGE__->method_documentation({
      'import_xml_request' => {
      	datatype => 'ImportXMLRequest',
      	base_name => 'importXMLRequest',
-     	description => 'password',
+     	description => '',
      	format => '',
      	read_only => '',
      		},
      'password' => {
      	datatype => 'string',
      	base_name => 'password',
-     	description => '',
+     	description => 'password',
      	format => '',
      	read_only => '',
      		},

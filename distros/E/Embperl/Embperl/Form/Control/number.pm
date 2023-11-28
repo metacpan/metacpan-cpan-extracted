@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -22,6 +23,8 @@ use base 'Embperl::Form::Control::input' ;
 
 use Embperl::Inline ;
 
+use vars qw{%fdat} ;
+
 # ------------------------------------------------------------------------------------------
 
 sub get_std_control_attr
@@ -31,23 +34,103 @@ sub get_std_control_attr
     return $self -> SUPER::get_std_control_attr ($req, $id, $type, $type eq 'readonly'?'ef-control-number-readonly':$addclass) ;
     }
     
+# ------------------------------------------------------------------------------------------
+#
+#   get_display_text - returns the text that should be displayed
+#
+
+sub get_display_text
+    {
+    my ($self, $req, $value, $compact) = @_ ;
+    
+    $value = $self -> get_value ($req) if (!defined ($value)) ;
+
+    return if ($value eq '') ;
+    if ($compact)
+        {
+        return $value + 0 if (!$self -> {allow_unit}) ;
+        return $value ;
+        }
+    
+    my $unit = $self->{unit} ;
+    my $unittext = !$unit?'':$self -> form -> convert_text ($self, ($unit =~ /:/)?$unit:'unit:' . lc($unit), $unit, $req) ;
+    $unittext =~ s/^unit:// ;
+
+    return $value . ' ' . $unittext ;        
+    }
+    
+# ------------------------------------------------------------------------------------------
+#
+#   get_sort_value - returns the value that should be used to sort
+#
+
+sub get_sort_value
+    {
+    my ($self, $req, $value) = @_ ;
+    
+    $value = $self -> get_value ($req) if (!defined ($value)) ;
+    return $value + 0 ;
+    }
+    
 
 # ---------------------------------------------------------------------------
 #
 #   show_control_readonly - output the control as readonly
 #
 
-sub show_control_readonly 
+sub xshow_control_readonly 
     {
     my ($self, $req, $value) = @_ ;
 
     my $unit = $self->{unit} ;
     my $unittext = !$unit?'':$self -> form -> convert_text ($self, ($unit =~ /:/)?$unit:'unit:' . lc($unit), $unit, $req) ;
     $unittext =~ s/^unit:// ;
-    $value = $self -> {value} || $Embperl::fdat{$self -> {name}} if (!defined($value)) ;
-    $value .= $unittext if ($unit && $value ne '') ;
+    $value = $self -> get_value ($req) if (!defined ($value)) ;
 
-    $self -> SUPER::show_control_readonly ($req, $value) ;
+    $self -> SUPER::show_control_readonly ($req, $value, $unit && $value ne ''?$unittext:'') ;
+    }
+
+# ------------------------------------------------------------------------------------------
+#
+#   init_data - daten aufteilen
+#
+
+sub init_data
+    {
+    my ($self, $req, $parentctrl, $force) = @_ ;
+    
+    my $fdat  = $req -> {docdata} || \%fdat ;
+    my $name    = $self->{name} ;
+    my $val     = $fdat->{$name} ;
+    return if ($val eq '' || (!$force && $req -> {"ef_number_init_done_$name"})) ;
+
+    my $num = $self -> get_display_text ($req, $val, 1) ;
+
+    $fdat->{$name} = $num ;
+    $req -> {"ef_number_init_done_$name"} = 1 ;
+    }
+
+# ---------------------------------------------------------------------------
+#
+#   init_markup - add any dynamic markup to the form data
+#
+
+sub init_markup
+
+    {
+    my ($self, $req, $parentctl, $method) = @_ ;
+
+    return if (!$self -> is_readonly($req) && (! $parentctl || ! $parentctl -> is_readonly($req))) ;
+    
+    my $fdat  = $req -> {docdata} || \%fdat ;
+    my $name    = $self->{name} ;
+    my $val     = $fdat->{$name} ;
+    return if ($val eq '' || ($req -> {"ef_number_init_done_$name"})) ;
+
+    my $num = $self -> get_display_text ($req, $val) ;
+
+    $fdat->{$name} = $num ;
+    $req -> {"ef_number_init_done_$name"} = 1 ;
     }
 
 # ---------------------------------------------------------------------------
@@ -105,7 +188,7 @@ Embperl::Form::Control::number - A numeric input control with optional unit insi
 =head1 DESCRIPTION
 
 Used to create a numeric input control inside an Embperl Form.
-Optionaly it can display an unit after the input field.
+Optionally it can display an unit after the input field.
 See Embperl::Form on how to specify parameters.
 
 =head2 PARAMETER

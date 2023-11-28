@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Software::License::SSLeay;
-$Software::License::SSLeay::VERSION = '0.104004';
+package Software::License::SSLeay 0.104005;
+
 use parent 'Software::License';
 # ABSTRACT: The Original SSLeay License
 
@@ -23,7 +23,7 @@ Software::License::SSLeay - The Original SSLeay License
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 PERL VERSION
 
@@ -41,7 +41,7 @@ lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

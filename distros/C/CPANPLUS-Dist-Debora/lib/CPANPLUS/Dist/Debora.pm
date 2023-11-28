@@ -6,7 +6,7 @@ use 5.016;
 use warnings;
 use utf8;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use parent qw(CPANPLUS::Dist::Base);
 
@@ -218,7 +218,7 @@ CPANPLUS::Dist::Debora - Create Debian or RPM packages from Perl modules
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 
@@ -232,7 +232,7 @@ version 0.011
   $ cd ~/rpmbuild/RPMS/noarch
   $ sudo rpm -i perl-Some-Module-1.0-1.noarch.rpm
 
-  $ cd ~/.cpanplus/5.34.0/build/XXXX
+  $ cd ~/.cpanplus/5.36.1/build/XXXX
   $ sudo dpkg -i libsome-module-perl_1.0-1cpanplus_all.deb
 
 =head1 DESCRIPTION
@@ -243,7 +243,8 @@ rpm.
 
 =head2 Usage
 
-Install Perl distributions from an interactive shell.
+Install Perl distributions from an interactive shell.  The sudo command must
+be installed and configured.
 
   $ cpanp
   CPAN Terminal> i Some-Module --format=CPANPLUS::Dist::Debora
@@ -251,9 +252,6 @@ Install Perl distributions from an interactive shell.
 Or create packages from the command-line.
 
   $ cpan2dist --format CPANPLUS::Dist::Debora Some-Module
-
-The sudo command must be installed and configured if packages are installed
-with CPANPLUS.
 
 =head2 Configuration
 
@@ -379,7 +377,7 @@ File permissions could not be read.
 
 =item B<< Could not chmod 'FILE' >>
 
-File permissions could not be fixed.
+File permissions could not be set.
 
 =item B<< Could not remove 'FILE' >>
 
@@ -434,6 +432,7 @@ when all packages are rebuilt after Perl has been upgraded.
 On RPM-based systems, you might have to set the package epoch manually as
 there is no standardized database that can be queried for epochs.  On
 Debian-based systems, it is generally not necessary to set epochs manually.
+Defaults to no package epoch.
 
 =head3 DEBFULLNAME, NAME, GITLAB_USER_NAME
 
@@ -469,7 +468,7 @@ On Debian-based systems, install the packages "perl", "build-essential",
 is 12.
 
 On RPM-based systems, install the packages "perl", "rpm-build", "gcc", "make",
-"sudo" and, if available, "perl-generators".
+"sudo" and, if available, "perl-devel" and "perl-generators".
 
 =head1 INCOMPATIBILITIES
 
@@ -477,24 +476,21 @@ None.
 
 =head1 BUGS AND LIMITATIONS
 
-Enable C<verbose> mode if you would like to get feedback while CPANPLUS
-downloads the list of Perl distributions from the Comprehensive Perl Archive
-Network (CPAN).  Use L<CPAN::Mini> or a repository manager to mirror the CPAN
-locally.
+You have to install the appropriate development packages yourself if you would
+like to build Perl distributions that require C libraries.  For example,
+install the package "libssl-dev" or "openssl-devel" if the distribution uses
+the OpenSSL libraries.
+
+Enable C<verbose> mode (see above) if you would like to get feedback while
+CPANPLUS downloads the list of Perl distributions from the Comprehensive Perl
+Archive Network (CPAN).  Use L<CPAN::Mini> or a repository manager to mirror
+the CPAN locally.
 
 Some Perl distributions fail to show interactive prompts if the C<verbose>
 option is not set.
 
-You have to install the appropriate development packages yourself if you would
-like to build Perl distributions that require C libraries.
-
-The created packages may provide the same files as packages provided by your
-operating system vendor.
-
 L<Software::LicenseUtils> recognizes a lot of common licenses but isn't
 perfect.
-
-This module cannot be used in taint mode.
 
 =head1 SEE ALSO
 
@@ -506,7 +502,7 @@ Andreas Vögele E<lt>voegelas@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2022 Andreas Vögele
+Copyright (C) 2023 Andreas Vögele
 
 This module is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

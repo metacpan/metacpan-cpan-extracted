@@ -1,5 +1,13 @@
 Revision history for libXcb Perl bindings.
 
+0.22    2023-11-24
+
+    - Add cpanfile
+
+    - Add last xproto.xml eventcopy constants: FOCUS_OUT, CIRCULATE_REQUEST
+
+    - Add missing 'detail' field to FocusIn event structure
+
 0.21    2023-10-18
 
     - Add GenericError event

@@ -1,50 +1,52 @@
-use 5;
 
 package XML::Catalogs;
 
 use strict;
 use warnings;
 
-use version; our $VERSION = qv('v1.0.3');
+use version; our $VERSION = qv('v1.6.0');
 
 
 use File::ShareDir qw( );
 
 
 sub import {
-    my $class = shift;
-    for (@_) {
-        if ($_ eq -libxml) {
-            $class->notify_libxml()
-        } else {
-            require Carp;
-            Carp::croak("Unrecognized import $_");
-        }
-    }
+   my $class = shift;
+   for ( @_ ) {
+      if ( $_ eq -libxml ) {
+         $class->notify_libxml()
+      } else {
+         require Carp;
+         Carp::croak( "Unrecognized import $_" );
+      }
+   }
 }
 
 
 sub get_catalog_path {
-    my $class = shift;
-    my $path;
-    return $path if eval {
-        $path = File::ShareDir::module_file($class, 'catalog.xml'); 1 };
-    require Carp;
-    Carp::croak("Can't locate ${class}'s catalog");
+   my $class = shift;
+
+   my $path = eval { File::ShareDir::module_file( $class, 'catalog.xml' ) };
+   if ( !defined( $path ) ) {
+      require Carp;
+      Carp::croak( "Can't locate ${class}'s catalog" );
+   }
+
+   return $path;
 }
 
 
 sub get_catalog_url {
     my $class = shift;
     require URI::file;
-    return URI::file->new($class->get_catalog_path());
+    return URI::file->new( $class->get_catalog_path() );
 }
 
 
 sub notify_libxml {
     my $class = shift;
     require XML::LibXML;
-    XML::LibXML->VERSION(1.53);
+    XML::LibXML->VERSION( 1.53 );
     XML::LibXML->load_catalog(
         $class->get_catalog_path()
     );
@@ -62,7 +64,7 @@ XML::Catalogs - Basic framework to provide DTD catalogs
 
 =head1 VERSION
 
-Version 1.0.3
+Version 1.6.0
 
 
 =head1 SYNOPSIS
@@ -127,6 +129,9 @@ catalog. XML::LibXML will use the local DTDs
 referenced by the catalog instead of downloading
 them. This only affects the current process.
 
+To have any effect, XML::LibXML's
+C<< load_ext_dtd => 1 >> option must be used.
+
 This mechanism does not stop working when XML::LibXML's
 C<< no_network => 1 >> option is used.
 
@@ -161,38 +166,46 @@ Returns the file path of the subclass's catalog.
 =back
 
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-XML-Catalogs at rt.cpan.org>,
-or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=XML-Catalogs>.
-I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
-
-
-=head1 SUPPORT
+=head1 DOCUMENTATION AND SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc XML::Catalogs
 
-You can also look for information at:
+You can also find it online at this location:
 
-=over 4
+=over
 
-=item * Search CPAN
+=item * L<https://metacpan.org/dist/XML-Catalogs>
 
-L<http://search.cpan.org/dist/XML-Catalogs>
+=back
 
-=item * RT: CPAN's request tracker
+If you need help, the following are great resources:
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=XML-Catalogs>
+=over
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * L<https://stackoverflow.com/|StackOverflow>
 
-L<http://annocpan.org/dist/XML-Catalogs>
+=item * L<http://www.perlmonks.org/|PerlMonks>
 
-=item * CPAN Ratings
+=item * You may also contact the author directly.
 
-L<http://cpanratings.perl.org/d/XML-Catalogs>
+=back
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests using  L<https://github.com/ikegami/perl-XML-Catalogs/issues>.
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+
+=head1 REPOSITORY
+
+=over
+
+=item * Web: L<https://github.com/ikegami/perl-XML-Catalogs>
+
+=item * git: L<https://github.com/ikegami/perl-XML-Catalogs.git>
 
 =back
 

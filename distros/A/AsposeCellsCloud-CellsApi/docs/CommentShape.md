@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::CommentShape;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Comment** | **LinkElement** |  |
+**Comment** | **LinkElement** | Gets the comment object. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

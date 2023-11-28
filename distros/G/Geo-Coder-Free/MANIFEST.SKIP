@@ -64,6 +64,8 @@
 \.appveyor\.yml
 \.releaserc
 \.lwpcookies
+.test-script-*
+typescript
 Geo-.*
 conf/GSLAL032003003
 

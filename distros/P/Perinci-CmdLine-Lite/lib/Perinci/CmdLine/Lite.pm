@@ -16,9 +16,9 @@ extends 'Perinci::CmdLine::Base';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-24'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.928'; # VERSION
+our $VERSION = '1.929'; # VERSION
 
 has default_prompt_template => (
     is=>'rw',
@@ -231,6 +231,8 @@ sub hook_before_action {
                 # proper, it should be hash of serialized content.
                 my %validators_by_arg; # key = argname
 
+                my %arg_has_default;
+
               USE_VALIDATORS_FROM_SCHEMA_V: {
                     my $url = $r->{subcommand_data}{url};
                     $url =~ m!\A/(.+)/(\w+)\z! or last;
@@ -267,19 +269,27 @@ sub hook_before_action {
               GEN_VALIDATORS: {
                     my %validators_by_schema; # key = "$schema"
                     require Data::Sah;
+                    require Data::Sah::Resolve;
                     for my $arg (sort keys %{ $meta->{args} // {} }) {
-                        ### para1, sync with all others
-                        my $argspec = $meta->{args}{$arg};
-                        my $argschema = $argspec->{schema};
-                        next unless $argschema;
-                        my $schema_has_default = defined $argschema->[1]{default} ||
-                            $argschema->[1]{'x.perl.default_value_rules'} && @{ $argschema->[1]{'x.perl.default_value_rules'} };
-                        next unless exists($r->{args}{$arg}) || $schema_has_default;
+                        $arg_has_default{$arg} = 1 if defined $meta->{args}{$arg}{default};
 
                         # we don't support validation of input stream because
                         # this must be done after each 'get item' (but periswrap
                         # does)
                         next if $meta->{args}{$arg}{stream};
+
+                        ### para1, sync with all others
+                        my $argspec = $meta->{args}{$arg};
+                        my $argschema = $argspec->{schema};
+                        next unless $argschema;
+                        my $argschemar = Data::Sah::Resolve::resolve_schema($argschema);
+                        my $schema_has_default;
+                        for my $clset (@{ $argschemar->{"clsets_after_type.alt.merge.merged"} }) {
+                            do { $schema_has_default = 1; last } if defined $clset->{default} ||
+                                $clset->{'x.perl.default_value_rules'} && @{ $clset->{'x.perl.default_value_rules'} };
+                        }
+                        $arg_has_default{$arg} = 1 if $schema_has_default;
+                        next unless exists($r->{args}{$arg}) || $schema_has_default;
 
                         unless ($validators_by_schema{"$argschema"}) {
                             my $v = Data::Sah::gen_validator($argschema, {
@@ -298,8 +308,6 @@ sub hook_before_action {
 
                         my $argspec = $meta->{args}{$arg};
                         my $argschema = $argspec->{schema};
-                        my $schema_has_default = defined $argschema->[1]{default} ||
-                            $argschema->[1]{'x.perl.default_value_rules'} && @{ $argschema->[1]{'x.perl.default_value_rules'} };
 
                         # we want to get default value from schema, but do not
                         # want to make unspecified args spring into existence
@@ -308,12 +316,12 @@ sub hook_before_action {
                         my $arg_exists = $r->{args}{"-set_$arg"} =
                             exists($r->{args}{$arg}) ? 1:0;
 
-                        if ($schema_has_default) {
+                        if ($arg_has_default{$arg}) {
                             my $res = $v->(undef);
                             $r->{args}{"-default_$arg"} = $res->[1];
                         }
 
-                        if ($arg_exists || $schema_has_default) {
+                        if ($arg_exists || $arg_has_default{$arg}) {
                             my $res = $v->($r->{args}{$arg});
                             if ($res->[0]) {
                                 die [400, "Argument '$arg' fails validation: $res->[0]"];
@@ -655,7 +663,7 @@ Perinci::CmdLine::Lite - A Rinci/Riap-based command-line application framework
 
 =head1 VERSION
 
-This document describes version 1.928 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2022-11-24.
+This document describes version 1.929 of Perinci::CmdLine::Lite (from Perl distribution Perinci-CmdLine-Lite), released on 2023-11-23.
 
 =head1 SYNOPSIS
 
@@ -904,7 +912,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

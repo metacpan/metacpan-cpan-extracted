@@ -12,9 +12,9 @@ WriteMakefile(
       ? ('LICENSE'=> 'BSD')
       : ()),
     PL_FILES            => {},
-    PREREQ_PM           => { 
+    PREREQ_PM           => {
                            'PGObject'       => 0,
-                           'Math::BigFloat' => 0,
+                           'Math::BigFloat' => '1.999842',
                            },
     BUILD_REQUIRES	=> { 'Test::More'     => 0, },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

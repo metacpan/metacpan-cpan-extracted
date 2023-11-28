@@ -1,0 +1,621 @@
+package CLI::Simple;
+
+use strict;
+use warnings;
+
+use Carp;
+use English qw(-no_match_vars);
+use Data::Dumper;
+use FindBin qw($RealBin $RealScript);
+use Log::Log4perl;
+use JSON::PP     qw(decode_json);
+use List::Util   qw(zip none);
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use CLI::Simple::Constants qw(:booleans :chars :log-levels);
+use CLI::Simple::Utils     qw(normalize_options);
+
+our $VERSION = '0.0.2';
+
+use parent qw(Class::Accessor::Fast Exporter);
+
+__PACKAGE__->follow_best_practice;
+__PACKAGE__->mk_accessors(
+  qw(
+    _command
+    _command_args
+    _commands
+    _program
+  )
+);
+
+########################################################################
+sub _use_logger {
+########################################################################
+  return $FALSE;
+}
+
+########################################################################
+sub use_log4perl {
+########################################################################
+  my ( $self, %args ) = @_;
+
+  my $class = ref $self || $self;
+
+  my ( $level, $log4perl_conf ) = @args{qw(level config)};
+
+  {
+    no strict 'refs'; ## no critic (ProhibitNoStrict)
+
+    *{"${class}::_use_logger"}         = sub { return $TRUE };
+    *{"${class}::_get_log4perl_conf"}  = sub { return $log4perl_conf };
+    *{"${class}::_get_log4perl_level"} = sub { return $level // 'error' };
+  }
+
+  if ( !$self->can('set_logger') ) {
+    $self->mk_accessors('logger');
+  }
+
+  if ( !$self->can('set_log_level') ) {
+    $self->mk_accessors('log_level');
+  }
+
+  return $self;
+}
+
+########################################################################
+sub new {
+########################################################################
+  my ( $class, @params ) = @_;
+
+  my %args = ref $params[0] ? %{ $params[0] } : @params;
+
+  my ( $default_options, $option_specs, $commands, $extra_options )
+    = @args{qw(default_options option_specs commands extra_options)};
+
+  no strict 'refs'; ## no critic
+
+  my $stash = \%{ $class . $DOUBLE_COLON };
+
+  local (*alias);   ## no critic
+
+  use vars
+    qw($DEFAULT_OPTIONS $EXTRA_OPTIONS $OPTION_SPECS $COMMANDS $LOGGING);
+
+  *DEFAULT_OPTIONS = $stash->{DEFAULT_OPTIONS} // $EMPTY;
+  *EXTRA_OPTIONS   = $stash->{EXTRA_OPTIONS}   // $EMPTY;
+  *OPTION_SPECS    = $stash->{OPTION_SPECS}    // $EMPTY;
+  *COMMANDS        = $stash->{COMMANDS}        // $EMPTY;
+
+  $default_options //= $DEFAULT_OPTIONS;
+  $extra_options   //= $EXTRA_OPTIONS;
+  $option_specs    //= $OPTION_SPECS;
+  $commands        //= $COMMANDS;
+
+  croak 'usage: '
+    . $class
+    . '->new( option_specs => specs, commands => commands, [defaults => default-options)'
+    if !$option_specs || !$commands;
+
+  $default_options //= {};
+
+  my $options = { %{$default_options} };
+
+  if ( $class->_use_logger && none { $_ eq 'log-level' } @{$option_specs} ) {
+    push @{$option_specs}, 'log-level=s';
+  }
+
+  GetOptions( $options, @{$option_specs} );
+
+  normalize_options($options);
+
+  my %cli_options;
+
+  my @accessors = (
+    @{ $extra_options || [] },
+    map { ( split /[^[:alpha:]\-_]/xsm )[0] } @{$option_specs}
+  );
+
+  foreach (@accessors) {
+    s/\-/_/xsmg;
+
+    if ( !__PACKAGE__->can( 'get_' . $_ ) ) {
+      __PACKAGE__->mk_accessors($_);
+    }
+
+    $cli_options{$_} = $options->{$_};
+  }
+
+  my $self = $class->SUPER::new( \%cli_options );
+
+  $self->set__command( shift @ARGV // $EMPTY );
+
+  $self->set__command_args( [@ARGV] );
+
+  $self->set__commands($commands);
+
+  $self->set__program("$RealBin/$RealScript");
+
+  $self->init_logger;
+
+  $self->can('init') && $self->init();
+
+  return $self;
+}
+
+########################################################################
+sub init_logger {
+########################################################################
+  my ($self) = @_;
+
+  if ( $self->_use_logger ) {
+
+    if ( $self->_get_log4perl_conf ) {
+      my $config = $self->_get_log4perl_conf;
+      Log::Log4perl->init( \$config );
+    }
+    else {
+      Log::Log4perl->easy_init( $LOG_LEVELS{error} );
+    }
+
+    $self->set_logger( Log::Log4perl->get_logger );
+
+    my $level = $self->get_log_level // $self->_get_log4perl_level;
+
+    $self->set_log_level($level);
+
+    $self->get_logger->level( $LOG_LEVELS{$level} );
+  }
+
+  return $self;
+}
+
+########################################################################
+sub get_kv_args {
+########################################################################
+  my ($self) = @_;
+
+  my @arg_list = @{ $self->get__command_args };
+
+  my %args;
+
+  foreach (@arg_list) {
+    my ( $k, $v ) = split /=/xsm;
+    $args{$k} = $v;
+  }
+
+  return %args;
+}
+
+# sets the command args to specified keys
+# example: get_args($self, qw(vpc-id key tag))
+########################################################################
+sub get_args {
+########################################################################
+  my ( $self, @vars ) = @_;
+
+  my $command_args = $self->get__command_args;
+
+  return @{$command_args}
+    if !@vars;
+
+  my %args = map { @{$_} } zip \@vars, $command_args;
+
+  return wantarray ? %args : \%args;
+}
+
+########################################################################
+sub default_command {
+########################################################################
+  goto &usage;
+}
+
+########################################################################
+sub usage {
+########################################################################
+  my ($self) = @_;
+
+  return pod2usage( -exitval => 1, -input => $self->get__program );
+}
+
+########################################################################
+sub run {
+########################################################################
+  my ($self) = @_;
+
+  my $program = $self->get__program;
+
+  my $command = $self->get__command || 'default';
+
+  if ( $command eq 'help' || ( $self->can('get_help') && $self->get_help ) ) {
+    $self->usage;
+  }
+
+  my $commands = $self->get__commands;
+  $commands->{default} //= \&usage;
+
+  croak 'unknown command: ' . $command
+    if !defined $commands->{$command};
+
+  return $commands->{$command}->($self);
+}
+
+1;
+
+## no critic (RequirePodSections)
+
+__END__
+
+=pod
+
+=head1 NAME
+
+CLI::Simple
+
+=head1 SYNOPIS
+
+ package MyScript;
+
+ use strict;
+ use warnings;
+
+ use parent qw(CLI::Simple);
+ 
+ caller or __PACKAGE__->main();
+ 
+ sub execute { ... }
+ 
+ sub list { ... }
+
+ sub main {
+  CLI::Simple->new(
+   option_specs    => [ qw( help foo=s ) ],
+   default_options => { foo => 'bar' },
+   extra_options   => [ qw( logger bar ) ],
+   commands        => { execute => \&execute, list => \&list,  }
+ )->run;
+
+ 1;
+  
+=head1 DESCRIPTION
+
+Tired of writing the same 'ol boilerplate code for command line
+scripts? Want a standard, simple way to create a Perl script?
+C<CLI::Simple> makes it easy to create scripts that take I<options>,
+I<commands> and I<arguments>.
+
+=head2 Features
+
+=over 5
+
+=item * accept command line arguments ala L<GetOptions::Long>
+
+=item * supports commands and command arguments
+
+=item * automatically add a logger
+
+=item * easily add usage notes
+
+=item * create setter/getters for your script
+
+=back
+
+Command line scripts often take I<options>, sometimes a I<command> and
+perhaps I<arguments> to those commands.  For example, consider the
+script C<myscript> that takes options and implements a few commands
+(I<send-message>, I<receive-message>) that also take arguments.
+
+ myscript [options] command args
+
+or
+
+ myscript command [options] args
+
+Examples:
+
+ myscript --foo bar --log-level debug send-message "Hello World" now
+
+ myscript --bar --log-level info receive-message
+
+Using C<CLI::Simple> to implement this script looks like this...
+
+ package MyScript;
+
+ use parent qw(CLI::Simple);
+
+ caller or __PACKAGE__main();
+
+ sub send_message {..}
+
+ sub default {...}
+
+ sub receive_message {...}
+ 
+ sub main {
+   return __PACKAGE__->new(
+     option_specs => [
+       qw(
+         foo=s
+         bar
+         log-level
+       )
+     ],
+     commands => {
+       send    => \&send_message,
+       receive => \&receive_message,
+     },
+   )->run;
+ }
+
+=head1 METHODS AND SUBROUTINES
+
+=head2 new
+
+ new( args )
+
+C<args> is a hash or hash reference containing the following keys:
+
+=over 5
+
+=item commands (required)
+
+A hash reference containing the command names and a code reference to
+the subroutines that implement the command.
+
+Example:
+
+ { 
+   send    => \&send_message,
+   receive => \&receive_message,
+ }
+
+If your script does accept command, set a C<default> key to the
+subroutine or method that will implement your script.
+
+ { default => \&main }
+
+=item default_options (optional)
+
+A hash reference that contains the default values for your options.  
+
+=item extra_options
+
+If you want to create additional setters or getters, set
+C<extra_options> to an array variable names.
+
+Example:
+
+ extra_options => [ qw(foo bar baz) ]
+
+=item option_specs (required)
+
+An array reference of option specfications.  These are the same as
+those passed to C<Getopt::Long>.
+
+=back
+
+Instantiates a new C<CLI::Simple> object.
+
+=head2 run
+
+Execute the script with the given options, commands and arguments. The
+C<run> method interprets the command line and pass control to your command
+subroutines. Your subroutines should return a 0 for success and a
+non-zero value for failure.  This error code is passed to the shell as
+the script return code.
+
+=head2 get_args
+
+ get_args(var-name, ... );
+
+In scalar context returns a reference to the hash of arguments. In
+array context will return a hash of key/value pairs.
+
+Example:
+
+ sub send_message {
+   my ($self) = @_;
+
+   my (%args) = $self->get_args(qw(message email));
+   
+   _send_message($arg{message}, $args{email});
+
+  ...
+
+=head2 init
+
+If you define your own C<init()> function, it will be called by the
+constructor.
+
+=head1 USING PACKAGE VARIABLES
+
+You can pass the necessary parameter required to implement your
+command line scripts in the constructor or some people prefer to see
+them clearly defined in the code. Accordingly, you can use package
+variables with the same name as the constructor arguments (in upper
+case).
+
+ our $OPTION_SPECS = [
+   qw(
+     help|h
+     log-level=s|L
+     debug|d
+   )
+ ];
+ 
+ our $COMMANDS = {
+   foo => \&foo,
+   bar => \&bar,
+ };
+
+=head1 COMMAND LINE OPTIONS
+
+Command line options are set ala C<Getopt::Long>. You pass those
+options into the constructor like this:
+
+ my $cli = CLI::Simple->new(option_specs => [ qw( help|h foo bar=s log-level=s ]);
+
+In your command subroutines you can then access these options using gettters.
+
+ $cli->get_foo;
+ $cli->get_bar;
+ $cli->get_log_level;
+
+Note that options that use dashes in the name will be automatically
+converted to snake case names. Some folks find it easier to use '-'
+rather than '_' for option names.
+
+=head1 COMMAND ARGUMENTS
+
+If you want to allow your commands to accept positional arguments you
+can retrieve them as named hash elements.  This can make your code much
+easier to read and understand.
+
+ sub send_mesage {
+   my ($self) = @_;
+
+   my %args = $self->get_args(qw(phone_number message));
+
+   send_sms_mesage($args{phone_number}, $args{message});
+   ...
+ }
+
+If pass an empty list then all of the command arguments will be returned.
+
+ my ($phone_number, $message) = $self->get_args;
+
+=head1 SETTING DEFAULT VALUES FOR OPTIONS
+
+To set default values for your option, pass a hash reference as the
+C<default_options> argument to the constructur.
+
+  my $cli = CLI::Simple->new(
+    default_option => { foo => 'bar' },
+    option_specs   => [ qw(foo=s bar=s) ],
+    commands       => { foo => \&foo, bar => \&bar },
+  );
+
+=head1 ADDING ADDITIONAL SETTERS & GETTERS
+
+As note all command line options are available using getters of the
+same name preceded by C<get_>.
+
+If you want to create additional setter and getters, pass an array of
+variable names as the C<extra_options> argument to the constructor.
+
+  my $cli = CLI::Simple->new(
+    default_option => { foo => 'bar' },
+    option_specs   => [ qw(foo=s bar=s) ],
+    extra_options  => [ qw(biz buz baz) ],
+    commands       => { foo => \&foo, bar => \&bar },
+  );
+
+=head1 ADDING USAGE TO YOUR SCRIPTS
+
+To add a usage or help capability to your scripts, just add some pod
+at the bottom of your script with a USAGE section (head1).
+
+ =head1 USAGE
+
+  usage: myscript [options] command args
+  
+  Options
+  -------
+  --help, -h      help
+  ....
+
+If the command specified is 'help' or if you have added an optional
+C<--help> option, users can access the usage section from the command line.
+
+ perl myscript.pm -h
+ perl myscript.pm help
+
+=head1 LOGGING
+
+C<CLI::Simple> will enable you to automatically add logging to your
+scrip using a L<Log::Log4perl> logger. You can pass in a C<Log4perl> configuration
+string or let the class instantiat C<Log::Log4perl> in easy mode.
+
+Do this at the top of your class:
+
+ __PACKAGE__->use_log4perl(level => 'info', config => $config);
+
+The class will add a C<--log-level> option for you if you have not
+added one yourself. Additionally, you can use the C<get_logger> method
+to retrieve the logger.
+
+=head1 FAQ
+
+=over 5
+
+=item Do I need to implement commands?
+
+No, but if you don't you must provide the name of the subroutine that
+will implement your script as the C<default> command.
+
+  use CLI::Simple;
+
+  sub main {
+    my ($cli) = @_;
+
+    # do something useful...
+  }
+
+  my $cli = CLI::Simple->new(
+    default_option => { foo => 'bar' },
+    option_specs   => [ qw(foo=s bar=s) ],
+    extra_options  => [ qw(biz buz baz) ],
+    commands       => { default => \&main },
+  );
+
+  $cli->run;
+
+=item Do I have to subclass C<CLI::Simple>?
+
+No, see above example,
+
+=item How can I use the "modulino pattern"?
+
+I like to implement scripts as a Perl class and use the so-called
+"modulino" pattern popularized by Brian d foy. Essentially you create
+a class that looks something like this:
+
+ package Foo;
+
+ caller or  __PACKAGE__->main();
+
+ sub main {
+   ....
+ }
+
+Using this pattern you can write Perl modules that can also be used as
+a script or test harness.
+
+To make it easy to use such a module, I've created a C<bash> script that
+calls the module with the arguments passed on the command line.
+
+The script (C<modulino>) is include in this distribution.
+
+Use it to create a symlink to itself that will load your Perl module
+and run your modulino. Running C<modulino> will echo a command you can
+run to create the symlink.
+
+ >modulino Foo::Bar
+ ln -s /usr/local/bin/modulino foo_bar
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+This module is free software. It may be used, redistributed and/or
+modified under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Getopt::Long>, L<CLI::Simple::Utils>
+
+=head1 AUTHOR
+
+Rob Lauer - <rlauer6@comcast.net>
+
+=cut

@@ -7,7 +7,7 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 151;
+use constant TESTS_PER_DRIVER => 153;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -446,6 +446,16 @@ SKIP: {
     $users_obj->UnLimit;
     $users_obj->OrderBy( FIELD => "Login", ORDER => "ASC" );
     is $users_obj->Last->Login, "obra", "Found last record correctly before search was run";
+
+    # Check SQL produced by QueryHint() and QueryHintFormatted()
+    $users_obj->UnLimit;
+    my $hintless_sql = $users_obj->BuildSelectQuery( PreferBind => 0 );
+    unlike( $hintless_sql, qr/\/\*/, "Query hint markers aren't present when QueryHint() isn't called" );
+
+    $users_obj->UnLimit;
+    $users_obj->QueryHint( '+FooBar' );
+    my $hinted_sql = $users_obj->BuildSelectQuery( PreferBind => 0 );
+    like( $hinted_sql, qr|/\*\+FooBar \*/|, "..but are when QueryHint() IS called" );
 
 	cleanup_schema( 'TestApp', $handle );
 }} # SKIP, foreach blocks

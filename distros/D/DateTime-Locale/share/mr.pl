@@ -53,8 +53,8 @@
     yMd => "d/M/y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "Y \N{U+091a}\N{U+093e} w \N{U+0930}\N{U+093e} \N{U+0906}\N{U+0920}\N{U+0935}\N{U+0921}\N{U+093e}",
-    "yw-count-other" => "Y \N{U+091a}\N{U+093e} w \N{U+0930}\N{U+093e} \N{U+0906}\N{U+0920}\N{U+0935}\N{U+0921}\N{U+093e}",
+    "yw-count-one" => "Y \N{U+091a}\N{U+093e} w \N{U+0935}\N{U+093e} \N{U+0906}\N{U+0920}\N{U+0935}\N{U+0921}\N{U+093e}",
+    "yw-count-other" => "Y \N{U+091a}\N{U+093e} w \N{U+0935}\N{U+093e} \N{U+0906}\N{U+0920}\N{U+0935}\N{U+0921}\N{U+093e}",
   },
   code => "mr",
   date_format_full => "EEEE, d MMMM, y",
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 43,
+  version => 44,
 }

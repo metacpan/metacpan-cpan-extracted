@@ -1,13 +1,13 @@
 package App::PickRandomLines;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-29'; # DATE
-our $DIST = 'App-PickRandomLines'; # DIST
-our $VERSION = '0.020'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-11-20'; # DATE
+our $DIST = 'App-PickRandomLines'; # DIST
+our $VERSION = '0.021'; # VERSION
 
 our %SPEC;
 
@@ -64,6 +64,19 @@ _
     },
     links => [
         {url=>'pm:Data::Unixish::pick'},
+        {
+            url=>'prog:shuf',
+            summary=>'The venerable Unix utility',
+            description => <<'MARKDOWN'
+
+`shuf -n` is a Unix idiom for when wanting to pick one or several lines from an
+input. Our `pick` is generally slower than the optimized C-based utility, but
+offers several pick algorithms like `scan` (which does not need to hold the
+entire input in memory for shuffling) and `seek` (which does not need to scan
+the entire input).
+
+MARKDOWN
+        },
     ],
 };
 sub pick_random_lines {
@@ -112,7 +125,7 @@ App::PickRandomLines - Pick one or more random lines from input
 
 =head1 VERSION
 
-This document describes version 0.020 of App::PickRandomLines (from Perl distribution App-PickRandomLines), released on 2020-04-29.
+This document describes version 0.021 of App::PickRandomLines (from Perl distribution App-PickRandomLines), released on 2023-11-20.
 
 =head1 SYNOPSIS
 
@@ -125,7 +138,7 @@ See L<pick-random-lines>.
 
 Usage:
 
- pick_random_lines(%args) -> [status, msg, payload, meta]
+ pick_random_lines(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Pick one or more random lines from input.
 
@@ -165,12 +178,12 @@ return as many lines as the input contains.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -182,14 +195,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-PickRa
 
 Source repository is at L<https://github.com/perlancar/perl-App-PickRandomLines>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PickRandomLines>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 
@@ -199,11 +204,37 @@ L<Data::Unixish::pick>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-PickRandomLines>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

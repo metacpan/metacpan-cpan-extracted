@@ -1,0 +1,7 @@
+Session ID: [4m323[24m818, Policy name: P1/14, Timeout: 56, Valid
+  In: [30m[41m192.0.2.2[0m/[4m15[24m851 --> [90m[47m192.0.2.1[0m/678;udp, Conn Tag: 0x0, If: st0.1, Pkts: [4m18[24m275, Bytes: 1[4m681[24m208,
+  Out: [90m[47m192.0.2.1[0m/678 --> [30m[41m192.0.2.2[0m/[4m15[24m851;udp, Conn Tag: 0x0, If: irb.1, Pkts: [4m18[24m275, Bytes: 1[4m736[24m774,
+
+Session ID: [4m326[24m455, Policy name: P1/14, Timeout: 58, Valid
+  In: [30m[41m192.0.2.2[0m/[4m52[24m454 --> [90m[41m192.0.2.3[0m/678;udp, Conn Tag: 0x0, If: st0.1, Pkts: [4m3[24m500, Bytes: [4m321[24m908,
+  Out: [90m[41m192.0.2.3[0m/678 --> [30m[41m192.0.2.2[0m/[4m52[24m454;udp, Conn Tag: 0x0, If: irb.1, Pkts: [4m3[24m500, Bytes: [4m344[24m754,

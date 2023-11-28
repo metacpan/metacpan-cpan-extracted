@@ -48,7 +48,7 @@ my $rc=0;
 my $api = RundeckAPI->new(
 		'url'		=> "https://rundeck.company.com:4440",
 		'login'		=> "admin",
-		'token'		=> '<Token from GUI, as admin>'
+		'token'		=> '<Token from GUI, as admin>',
 		'debug'		=> 1,
  		'proxy'		=> "http://proxy.your.company:3128",
 );

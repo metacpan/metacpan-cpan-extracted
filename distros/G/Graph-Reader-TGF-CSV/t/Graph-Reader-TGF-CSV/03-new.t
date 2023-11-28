@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Graph::Reader::TGF::CSV;
 use Test::More 'tests' => 2;
 use Test::NoWarnings;

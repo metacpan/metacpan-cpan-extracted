@@ -7,13 +7,14 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  perl: '5.006'
+  perl: v5.20.0
   strict: '0'
   warnings: '0'
 configure_requires:
-  Module::Build::Tiny: '0.039'
+  Module::Build::Tiny: '0.034'
+  perl: v5.20.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,15 +23,20 @@ name: Dist-Zilla-Plugin-BuildSelf
 provides:
   Dist::Zilla::Plugin::BuildSelf:
     file: lib/Dist/Zilla/Plugin/BuildSelf.pm
-    version: '0.004'
+    version: '0.006'
 requires:
+  CPAN::Meta::Prereqs::Filter: '0'
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Role::BuildPL: '0'
   Dist::Zilla::Role::PrereqSource: '0'
   Dist::Zilla::Role::TextTemplate: '0'
   Moose: '0'
-  perl: '5.006'
+  experimental: '0'
+  perl: v5.20.0
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-BuildSelf
+  bugtracker: https://github.com/Leont/dist-zilla-plugin-buildself/issues
   repository: git://github.com/Leont/dist-zilla-plugin-buildself.git
-version: '0.004'
+version: '0.006'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

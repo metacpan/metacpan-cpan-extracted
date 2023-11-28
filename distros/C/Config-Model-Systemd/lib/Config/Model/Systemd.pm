@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Systemd;
-$Config::Model::Systemd::VERSION = '0.252.2';
+$Config::Model::Systemd::VERSION = '0.254.1';
 use strict;
 use warnings;
 
@@ -32,7 +32,7 @@ Config::Model::Systemd - Editor and validator for systemd configuration files
 
 =head1 VERSION
 
-version 0.252.2
+version 0.254.1
 
 =head1 SYNOPSIS
 

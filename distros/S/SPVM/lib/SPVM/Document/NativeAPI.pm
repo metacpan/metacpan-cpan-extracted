@@ -1963,434 +1963,443 @@ Prints a string and C<\n> to stdout. This is the same operator as the say operat
 
 Operates the warn operator.
 
+=head2 spvm_stdin
+
+  FILE* (*spvm_stdin)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+Gets the standard input opened for SPVM.
+
+=head2 spvm_stdout
+
+  FILE* (*spvm_stdout)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+Gets the standard output opened for SPVM.
+
+=head2 spvm_stderr
+
+  FILE* (*spvm_stderr)(SPVM_ENV* env, SPVM_VALUE* stack);
+
+Gets the standard error opened for SPVM.
+
 =head1 Native API IDs
 
 Native APIs have its IDs. These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
 
-  0 reserved0
-  1 runtime
-  2 api
-  3 new_env
-  4 free_env
-  5 call_init_methods
-  6 set_command_info_program_name
-  7 set_command_info_argv
-  8 set_command_info_base_time
-  9 destroy_class_vars
-  10 args_width
-  11 get_object_basic_type
-  12 get_object_basic_type_id
-  13 get_object_basic_type_name
-  14 get_object_type_dimension
-  15 get_basic_type
-  16 get_basic_type_by_name
-  17 get_basic_type_by_id
-  18 get_basic_type_id
-  19 get_basic_type_id_by_name
-  20 get_class_var
-  21 get_class_var_byte
-  22 get_class_var_short
-  23 get_class_var_int
-  24 get_class_var_long
-  25 get_class_var_float
-  26 get_class_var_double
-  27 get_class_var_object
-  28 get_class_var_string
-  29 set_class_var_byte
-  30 set_class_var_short
-  31 set_class_var_int
-  32 set_class_var_long
-  33 set_class_var_float
-  34 set_class_var_double
-  35 set_class_var_object
-  36 set_class_var_string
-  37 get_class_var_object_ref
-  38 get_class_var_byte_by_name
-  39 get_class_var_short_by_name
-  40 get_class_var_int_by_name
-  41 get_class_var_long_by_name
-  42 get_class_var_float_by_name
-  43 get_class_var_double_by_name
-  44 get_class_var_object_by_name
-  45 get_class_var_string_by_name
-  46 set_class_var_byte_by_name
-  47 set_class_var_short_by_name
-  48 set_class_var_int_by_name
-  49 set_class_var_long_by_name
-  50 set_class_var_float_by_name
-  51 set_class_var_double_by_name
-  52 set_class_var_object_by_name
-  53 set_class_var_string_by_name
-  54 get_field
-  55 get_field_static
-  56 get_field_byte
-  57 get_field_short
-  58 get_field_int
-  59 get_field_long
-  60 get_field_float
-  61 get_field_double
-  62 get_field_object
-  63 get_field_string
-  64 set_field_byte
-  65 set_field_short
-  66 set_field_int
-  67 set_field_long
-  68 set_field_float
-  69 set_field_double
-  70 set_field_object
-  71 set_field_string
-  72 get_field_byte_by_name
-  73 get_field_short_by_name
-  74 get_field_int_by_name
-  75 get_field_long_by_name
-  76 get_field_float_by_name
-  77 get_field_double_by_name
-  78 get_field_object_by_name
-  79 get_field_string_by_name
-  80 set_field_byte_by_name
-  81 set_field_short_by_name
-  82 set_field_int_by_name
-  83 set_field_long_by_name
-  84 set_field_float_by_name
-  85 set_field_double_by_name
-  86 set_field_object_by_name
-  87 set_field_string_by_name
-  88 get_field_string_chars_by_name
-  89 get_method
-  90 get_class_method
-  91 get_instance_method_static
-  92 get_instance_method
-  93 call_method_no_mortal
-  94 call_method
-  95 call_class_method_by_name
-  96 call_instance_method_static_by_name
-  97 call_instance_method_by_name
-  98 new_object_no_mortal
-  99 new_object
-  100 new_object_by_name
-  101 new_pointer_object_no_mortal
-  102 new_pointer_object
-  103 new_pointer_object_by_name
-  104 get_pointer
-  105 set_pointer
-  106 new_string_nolen_no_mortal
-  107 new_string_nolen
-  108 new_string_no_mortal
-  109 new_string
-  110 new_byte_array_no_mortal
-  111 new_byte_array
-  112 new_short_array_no_mortal
-  113 new_short_array
-  114 new_int_array_no_mortal
-  115 new_int_array
-  116 new_long_array_no_mortal
-  117 new_long_array
-  118 new_float_array_no_mortal
-  119 new_float_array
-  120 new_double_array_no_mortal
-  121 new_double_array
-  122 new_object_array_no_mortal
-  123 new_object_array
-  124 new_object_array_by_name
-  125 new_string_array
-  126 new_muldim_array_no_mortal
-  127 new_muldim_array
-  128 new_muldim_array_by_name
-  129 new_mulnum_array_no_mortal
-  130 new_mulnum_array
-  131 new_mulnum_array_by_name
-  132 new_array_proto_no_mortal
-  133 new_array_proto
-  134 length
-  135 get_elems_byte
-  136 get_elems_short
-  137 get_elems_int
-  138 get_elems_long
-  139 get_elems_float
-  140 get_elems_double
-  141 get_elem_object
-  142 get_elem_string
-  143 set_elem_object
-  144 set_elem_string
-  145 get_chars
-  146 get_bool_object_value
-  147 concat_no_mortal
-  148 concat
-  149 shorten
-  150 make_read_only
-  151 is_read_only
-  152 print
-  153 print_stderr
-  154 dump_no_mortal
-  155 dump
-  156 dumpc
-  157 copy_no_mortal
-  158 copy
-  159 get_spvm_version_string
-  160 get_spvm_version_number
-  161 get_version_string
-  162 get_version_number
-  163 die
-  164 get_exception
-  165 set_exception
-  166 new_stack_trace_no_mortal
-  167 new_stack_trace
-  168 is_string
-  169 is_class
-  170 is_pointer_class
-  171 is_array
-  172 is_object_array
-  173 is_numeric_array
-  174 is_mulnum_array
-  175 isa
-  176 isa_by_name
-  177 is_type
-  178 is_type_by_name
-  179 elem_isa
-  180 get_elem_size
-  181 get_type_name_no_mortal
-  182 get_type_name
-  183 get_compile_type_name_no_mortal
-  184 get_compile_type_name
-  185 enter_scope
-  186 leave_scope
-  187 push_mortal
-  188 reserved188
-  189 weaken
-  190 isweak
-  191 unweaken
-  192 strerror_string
-  193 strerror_string_nolen
-  194 strerror
-  195 strerror_nolen
-  196 reserved196
-  197 reserved197
-  198 reserved198
-  199 reserved199
-  200 new_memory_stack
-  201 free_memory_stack
-  202 reserved202
-  203 new_stack
-  204 free_stack
-  205 reserved205
-  206 reserved206
-  207 reserved207
-  208 get_field_object_defined_and_has_pointer_by_name
-  209 get_field_object_ref
-  210 get_field_object_ref_by_name
-  211 check_stack_env,
-  212 reserved212
-  213 reserved213
-  214 assign_object
-  215 new_string_array_no_mortal
-  
+  0 runtime
+  1 api
+  2 new_env,
+  3 free_env,
+  4 call_init_methods,
+  5 set_command_info_program_name,
+  6 set_command_info_argv,
+  7 set_command_info_base_time,
+  8 destroy_class_vars,
+  9 args_width,
+  10 get_object_basic_type,
+  11 get_object_basic_type_id,
+  12 get_object_basic_type_name,
+  13 get_object_type_dimension,
+  14 get_basic_type,
+  15 get_basic_type_by_name,
+  16 get_basic_type_by_id,
+  17 get_basic_type_id,
+  18 get_basic_type_id_by_name,
+  19 get_class_var,
+  20 get_class_var_byte,
+  21 get_class_var_short,
+  22 get_class_var_int,
+  23 get_class_var_long,
+  24 get_class_var_float,
+  25 get_class_var_double,
+  26 get_class_var_object,
+  27 get_class_var_string,
+  28 set_class_var_byte,
+  29 set_class_var_short,
+  30 set_class_var_int,
+  31 set_class_var_long,
+  32 set_class_var_float,
+  33 set_class_var_double,
+  34 set_class_var_object,
+  35 set_class_var_string,
+  36 get_class_var_object_ref,
+  37 get_class_var_byte_by_name,
+  38 get_class_var_short_by_name,
+  39 get_class_var_int_by_name,
+  40 get_class_var_long_by_name,
+  41 get_class_var_float_by_name,
+  42 get_class_var_double_by_name,
+  43 get_class_var_object_by_name,
+  44 get_class_var_string_by_name,
+  45 set_class_var_byte_by_name,
+  46 set_class_var_short_by_name,
+  47 set_class_var_int_by_name,
+  48 set_class_var_long_by_name,
+  49 set_class_var_float_by_name,
+  50 set_class_var_double_by_name,
+  51 set_class_var_object_by_name,
+  52 set_class_var_string_by_name,
+  53 get_field,
+  54 get_field_static,
+  55 get_field_byte,
+  56 get_field_short,
+  57 get_field_int,
+  58 get_field_long,
+  59 get_field_float,
+  60 get_field_double,
+  61 get_field_object,
+  62 get_field_string,
+  63 set_field_byte,
+  64 set_field_short,
+  65 set_field_int,
+  66 set_field_long,
+  67 set_field_float,
+  68 set_field_double,
+  69 set_field_object,
+  70 set_field_string,
+  71 get_field_byte_by_name,
+  72 get_field_short_by_name,
+  73 get_field_int_by_name,
+  74 get_field_long_by_name,
+  75 get_field_float_by_name,
+  76 get_field_double_by_name,
+  77 get_field_object_by_name,
+  78 get_field_string_by_name,
+  79 set_field_byte_by_name,
+  80 set_field_short_by_name,
+  81 set_field_int_by_name,
+  82 set_field_long_by_name,
+  83 set_field_float_by_name,
+  84 set_field_double_by_name,
+  85 set_field_object_by_name,
+  86 set_field_string_by_name,
+  87 get_field_string_chars_by_name,
+  88 get_method,
+  89 get_class_method,
+  90 get_instance_method_static,
+  91 get_instance_method,
+  92 call_method_no_mortal,
+  93 call_method,
+  94 call_class_method_by_name,
+  95 call_instance_method_static_by_name,
+  96 call_instance_method_by_name,
+  97 new_object_no_mortal,
+  98 new_object,
+  99 new_object_by_name,
+  100 new_pointer_object_no_mortal,
+  101 new_pointer_object,
+  102 new_pointer_object_by_name,
+  103 get_pointer,
+  104 set_pointer,
+  105 new_string_nolen_no_mortal,
+  106 new_string_nolen,
+  107 new_string_no_mortal,
+  108 new_string,
+  109 new_byte_array_no_mortal,
+  110 new_byte_array,
+  111 new_short_array_no_mortal,
+  112 new_short_array,
+  113 new_int_array_no_mortal,
+  114 new_int_array,
+  115 new_long_array_no_mortal,
+  116 new_long_array,
+  117 new_float_array_no_mortal,
+  118 new_float_array,
+  119 new_double_array_no_mortal,
+  120 new_double_array,
+  121 new_object_array_no_mortal,
+  122 new_object_array,
+  123 new_object_array_by_name,
+  124 new_string_array,
+  125 new_muldim_array_no_mortal,
+  126 new_muldim_array,
+  127 new_muldim_array_by_name,
+  128 new_mulnum_array_no_mortal,
+  129 new_mulnum_array,
+  130 new_mulnum_array_by_name,
+  131 new_array_proto_no_mortal,
+  132 new_array_proto,
+  133 length,
+  134 get_elems_byte,
+  135 get_elems_short,
+  136 get_elems_int,
+  137 get_elems_long,
+  138 get_elems_float,
+  139 get_elems_double,
+  140 get_elem_object,
+  141 get_elem_string,
+  142 set_elem_object,
+  143 set_elem_string,
+  144 get_chars,
+  145 get_bool_object_value,
+  146 concat_no_mortal,
+  147 concat,
+  148 shorten,
+  149 make_read_only,
+  150 is_read_only,
+  151 print,
+  152 print_stderr,
+  153 dump_no_mortal,
+  154 dump,
+  155 dumpc,
+  156 copy_no_mortal,
+  157 copy,
+  158 get_spvm_version_string,
+  159 get_spvm_version_number,
+  160 get_version_string,
+  161 get_version_number,
+  162 die,
+  163 get_exception,
+  164 set_exception,
+  165 new_stack_trace_no_mortal,
+  166 new_stack_trace,
+  167 is_string,
+  168 is_class,
+  169 is_pointer_class,
+  170 is_array,
+  171 is_object_array,
+  172 is_numeric_array,
+  173 is_mulnum_array,
+  174 isa,
+  175 isa_by_name,
+  176 is_type,
+  177 is_type_by_name,
+  178 elem_isa,
+  179 get_elem_size,
+  180 get_type_name_no_mortal,
+  181 get_type_name,
+  182 get_compile_type_name_no_mortal,
+  183 get_compile_type_name,
+  184 enter_scope,
+  185 leave_scope,
+  186 push_mortal,
+  187 weaken,
+  188 isweak,
+  189 unweaken,
+  190 strerror_string,
+  191 strerror_string_nolen,
+  192 strerror,
+  193 strerror_nolen,
+  194 new_memory_stack,
+  195 free_memory_stack,
+  196 new_stack,
+  197 free_stack,
+  198 get_field_object_defined_and_has_pointer_by_name,
+  199 get_field_object_ref,
+  200 get_field_object_ref_by_name,
+  201 check_stack_env,
+  202 assign_object,
+  203 new_string_array_no_mortal,
+  204 new_memory_block,
+  205 free_memory_block,
+  206 get_memory_blocks_count,
+  207 say,
+  208 warn,
+  209 spvm_stdin,
+  210 spvm_stdout,
+  211 spvm_stderr,
+
 =head1 Constant Values
 
 =head2 Basic Type IDs
 
-  0  SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN
-  1  SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF
-  2  SPVM_NATIVE_C_BASIC_TYPE_ID_VOID
-  3  SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE
-  4  SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT
-  5  SPVM_NATIVE_C_BASIC_TYPE_ID_INT
-  6  SPVM_NATIVE_C_BASIC_TYPE_ID_LONG
-  7  SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT
-  8  SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE
-  9  SPVM_NATIVE_C_BASIC_TYPE_ID_STRING
-  10 SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT
-  11 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS
-  12 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_CLASS
-  13 SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS
-  14 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS
-  15 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_CLASS
-  16 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS
-  17 SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_CLASS
-  18 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS
-  19 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS
-  20 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS
-  21 SPVM_NATIVE_C_BASIC_TYPE_ID_COMMAND_INFO_CLASS
-  22 SPVM_NATIVE_C_BASIC_TYPE_ID_ADDRESS_CLASS
-
-These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN
-
-The basic type is unknown.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF
-
-The basic type ID of undef type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_VOID
-
-The basic type ID of C<void> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE
-
-The basic type ID of C<byte> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT
-
-The basic type ID of C<short> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_INT
-
-The basic type ID of C<int> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG
-
-The basic type ID of C<long> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT
-
-The basic type ID of C<float> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE
-
-The basic type ID of C<double> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_STRING
-
-The basic type ID of C<string> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT
-
-The basic type ID of C<object> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS
-
-The basic type ID of L<Byte|SPVM::Byte> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_CLASS
-
-The basic type ID of L<Short|SPVM::Short> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS
-
-The basic type ID of L<Int|SPVM::Int> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS
-
-The basic type ID of L<Long|SPVM::Long> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_CLASS
-
-The basic type ID of L<Float|SPVM::Float> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS
-
-The basic type ID of L<Double|SPVM::Double> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_CLASS
-
-The basic type ID of L<BOOL|SPVM::BOOL> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS
-
-The basic type ID of L<Error|SPVM::Error> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS
-
-The basic type ID of L<Error::System|SPVM::Error::System> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS
-
-The basic type ID of L<Error::NotSupported|SPVM::Error::NotSupported> type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_ID_ADDRESS_CLASS
-
-The basic type ID of L<Address|SPVM::Address> type.
-
-=head2 Constant Values of Basic Type Categories
-
-  0 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN
-  1 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF
-  2 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID
-  3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC
-  4 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM
-  5 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING
-  6 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS
-  7 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE
-  8 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT
-
-These IDs are permanently same for the binary compatibility after the future release C<v1.0>.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN
-
-The basic type category for unknown types.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF
-
-The basic type category for the undefined type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID
-
-The basic type category for the void type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC
-
-The basic type category for the numeric types.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM
-
-The basic type category for the multi-numeric types.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING
-
-The basic type category for the string type.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS
-
-The basic type category for the class types.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE
-
-The basic type category for the interface types.
-
-=head3 SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT
-
-The basic type category for the any object type.
-
-=head2 Type Flags
-
-  1 SPVM_NATIVE_C_TYPE_FLAG_REF
-  2 SPVM_NATIVE_C_TYPE_FLAG_MUTABLE
-
-The type flags.
-
-=head1 Macro Functions
+=begin html
+
+<table>
+  <tr>
+    <th>ID</th><th>Name</th><th>Description</th>
+  </tr>
+  <tr>
+    <td>0</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_UNKNOWN</td><td>The basic type ID for unknown types</td>
+  </tr>
+  <tr>
+    <td>1</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_UNDEF</td><td>The basic type ID of the undef type</td>
+  </tr>
+  <tr>
+    <td>2</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_VOID</td><td>The basic type ID of the void type</td>
+  </tr>
+  <tr>
+    <td>3</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE</td><td>The basic type ID of the byte type</td>
+  </tr>
+  <tr>
+    <td>4</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT</td><td>The basic type ID of the short type</td>
+  </tr>
+  <tr>
+    <td>5</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_INT</td><td>The basic type ID of the int type</td>
+  </tr>
+  <tr>
+    <td>6</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_LONG</td><td>The basic type ID of the long type</td>
+  </tr>
+  <tr>
+    <td>7</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT</td><td>The basic type ID of the float type</td>
+  </tr>
+  <tr>
+    <td>8</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE</td><td>The basic type ID of the double type</td>
+  </tr>
+  <tr>
+    <td>9</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_STRING</td><td>The basic type ID of the string type</td>
+  </tr>
+  <tr>
+    <td>10</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_ANY_OBJECT</td><td>The basic type ID of the any object type</td>
+  </tr>
+  <tr>
+    <td>11</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_BYTE_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Byte">Byte</a> class</td>
+  </tr>
+  <tr>
+    <td>12</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_SHORT_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Short">Short</a> class</td>
+  </tr>
+  <tr>
+    <td>13</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Int">Int</a> class</td>
+  </tr>
+  <tr>
+    <td>14</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Long">Long</a> class</td>
+  </tr>
+  <tr>
+    <td>15</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_FLOAT_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Float">Float</a> class</td>
+  </tr>
+  <tr>
+    <td>16</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Double">Double</a> class</td>
+  </tr>
+  <tr>
+    <td>17</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_BOOL_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Bool">Bool</a> class</td>
+  </tr>
+  <tr>
+    <td>18</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Error">Error</a> class</td>
+  </tr>
+  <tr>
+    <td>19</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Error::System">Error::System</a> class</td>
+  </tr>
+  <tr>
+    <td>20</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_NOT_SUPPORTED_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Error::NotSupported">Error::NotSupported</a> class</td>
+  </tr>
+  <tr>
+    <td>21</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_COMMAND_INFO_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::CommandInfo">CommandInfo</a> class</td>
+  </tr>
+  <tr>
+    <td>22</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_ADDRESS_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Address">Address</a> class</td>
+  </tr>
+  <tr>
+    <td>23</td><td>SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_COMPILE_CLASS</td><td>The basic type ID of the <a href="https://metacpan.org/pod/SPVM::Error::Compile">Error::Compile</a> class</td>
+  </tr>
+</table>
+
+=end html
+
+=head2 Basic Type Category IDs
+
+=begin html
+
+<table>
+  <tr>
+    <th>ID</th><th>Name</th><th>Description</th>
+  </tr>
+  <tr>
+    <td>0</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNKNOWN</td><td>The basic type category for unknown types</td>
+  </tr>
+  <tr>
+    <td>1</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_UNDEF</td><td>The basic type category for the undef type</td>
+  </tr>
+  <tr>
+    <td>2</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_VOID</td><td>The basic type category for the void type</td>
+  </tr>
+  <tr>
+    <td>3</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_NUMERIC</td><td>The basic type category for numeric types</td>
+  </tr>
+  <tr>
+    <td>4</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_MULNUM</td><td>The basic type category for multi-numeric types</td>
+  </tr>
+  <tr>
+    <td>5</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_STRING</td><td>The basic type category for the string type</td>
+  </tr>
+  <tr>
+    <td>6</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_CLASS</td><td>The basic type category for class types</td>
+  </tr>
+  <tr>
+    <td>7</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_INTERFACE</td><td>The basic type category for interface types</td>
+  </tr>
+  <tr>
+    <td>8</td><td>SPVM_NATIVE_C_BASIC_TYPE_CATEGORY_ANY_OBJECT</td><td>The basic type category for the any object type</td>
+  </tr>
+</table>
+
+=end html
+
+=head2 Type Flag IDs
+
+=begin html
+
+<table>
+  <tr>
+    <th>ID</th><th>Name</th><th>Description</th>
+  </tr>
+  <tr>
+    <td>1</td><td>SPVM_NATIVE_C_TYPE_FLAG_REF</td><td>A flag indicating that it is a reference type</td>
+  </tr>
+  <tr>
+    <td>2</td><td>SPVM_NATIVE_C_TYPE_FLAG_MUTABLE</td><td>A flag indicating that a mutable modifier is present</td>
+  </tr>
+</table>
+
+=end html
 
 =head2 SPVM_NATIVE_VERSION_NUMBER
 
 The version number of the SPVM language.
 
+Examples:
+  
+  // 0.989062
+  double spvm_version_number = SPVM_NATIVE_VERSION_NUMBER;
+
 =head2 SPVM_NATIVE_VERSION_STRING
 
-The version string of the SPVM language.
+The version string of the SPVM language. This is a string constant.
+
+Examples:
+  
+  // "0.989062"
+  const char* spvm_version_string = SPVM_NATIVE_VERSION_STRING;
+
+=head1 Macro Functions
 
 =head2 spvm_warn
 
-  void spvm_warn(const char* format, ...)
+  #define spvm_warn(format, ...)
 
-Prints the formatted message to C<stderr> with a new line.
+Prints the formatted message I<format> to C<stderr> with a new line.
+
+I<format> must be the C<char*> type.
 
 Examples:
 
   spvm_warn("Hello");
   spvm_warn("Hello %s%d", "Foo", 3);
 
+=head2 spvm_warnf
+
+  #define spvm_warnf(stream, format, ...)
+
+Prints the formatted message I<format> to the stream I<stream> with a new line.
+
+I<format> must be the C<char*> type.
+
+I<stream> must be the C<FILE> type.
+
+Examples:
+
+  spvm_warnf(env->spvm_stderr(env, stack), "Hello");
+  spvm_warnf(env->spvm_stderr(env, stack), "Hello %s%d", "Foo", 3);
+
 =head2 SPVM_NATIVE_GET_POINTER
 
 C<#define SPVM_NATIVE_GET_POINTER(object)>
 
-Gets the pointer saved in the object.
+Gets the pointer stored in the object I<object> and returns it. The return type is the void* type.
 
 =head2 SPVM_NATIVE_SET_POINTER
 
 C<#define SPVM_NATIVE_SET_POINTER(object, pointer)>
 
-Sets the pointer in the object.
+Sets the pointer I<pointer> in the object I<object>.
 
 =head1 Examples
 

@@ -19,9 +19,9 @@ name: Astro-WaveBand
 provides:
   Astro::WaveBand:
     file: lib/Astro/WaveBand.pm
-    version: '0.10'
+    version: '0.11'
 resources:
   homepage: https://github.com/timj/perl-Astro-WaveBand/tree/master
   license: http://dev.perl.org/licenses/
   repository: https://github.com/timj/perl-Astro-WaveBand.git
-version: '0.10'
+version: '0.11'

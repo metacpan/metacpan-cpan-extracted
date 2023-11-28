@@ -1,0 +1,13 @@
+0.03 2023-11-20T16:13:04+01:00
+ - Rewrite to new Data::MARC::Leader::Utils.
+
+0.02 2023-11-20T12:25:06+01:00
+ - Add ANSI support.
+ - Add constructor parameters to doc.
+ - Add naive constructor test.
+ - Fix dependencies.
+ - Regen example.
+ - Remove trailing space in code.
+
+0.01 2023-11-19T17:44:04+01:00
+ - First version.

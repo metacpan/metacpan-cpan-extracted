@@ -1,7 +1,7 @@
 #########################################################################################
 # Package        HiPi::Energenie::ENER314_RT
 # Description :  Control Energenie ENER314-RT board
-# Copyright    : Copyright (c) 2016-2020 Mark Dootson
+# Copyright    : Copyright (c) 2016-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -24,7 +24,7 @@ __PACKAGE__->create_accessors( qw( device devicename led_green led_red
                               led_on _green_pin _red_pin ook_repeat
                               backend default_config ook_config gpiodev rf_high_power ) );
 
-our $VERSION ='0.82';
+our $VERSION ='0.89';
 
 sub new {
     my( $class, %userparams ) = @_;
@@ -32,7 +32,7 @@ sub new {
     my %params = (
         devicename     => '/dev/spidev0.1',
         backend        => 'spi',
-        speed          => 9600000,  # 9.6 mhz
+        speed          => 8000000,  # 8 mhz
         bitsperword    => 8,
         delay          => 0,
         device         => undef,
@@ -88,12 +88,10 @@ sub new {
             [ RF69_REG_FIFOTHRESH, 	 0x1E ],   # Condition to start packet transmission: wait for 30 bytes in FIFO
             [ RF69_REG_OPMODE, 		 RF69_MASK_OPMODE_TX ],	# Transmitter mode
         ],
-        
-        rf_high_power => 0,
     );
     
     foreach my $key (sort keys(%userparams)) {
-        $params{$key} = $userparams{$key};
+        $params{$key} = $userparams{$key} if(defined($userparams{$key}));
     }
     
     unless( defined($params{device}) ) {
@@ -107,8 +105,8 @@ sub new {
             backend      => $params{backend},
             fsk_config   => $params{default_config},
             ook_config   => $params{ook_config},
-            high_power_module  => $params{rf_high_power},
-            max_power_on => ( $params{rf_high_power} ) ? 1 : 0,
+            high_power_module  => $params{high_power_module} || $params{rf_high_power},
+            transmit_dbm => $params{transmit_dbm},
         );
     }
     
@@ -224,11 +222,24 @@ sub reset {
 }
 
 sub receive_fsk_message {
-    my ($self, $encryptionid) = @_;
+    my ($self, $inparam ) = @_;
+    
+    ## If $inparams is a hashref, it is multiple parameters for
+    ## any new message received.
+    ## If it is a scalar, it's an encrypt / decrypt seed
+    ## Legacy use
+    
+    my %msgparams = ();
+    if ( ref($inparam) ) {
+        %msgparams = %$inparam;
+    } else {
+        $msgparams{cryptseed} = $inparam;
+    }
+    
     if( my $buffer = $self->device->receive_message ) {
+        $msgparams{databuffer} = $buffer;
         my $msg = HiPi::RF::OpenThings::Message->new(
-            databuffer => $buffer,
-            cryptseed  => $encryptionid,
+            %msgparams
         );
         $msg->inspect_buffer;
         return $msg;

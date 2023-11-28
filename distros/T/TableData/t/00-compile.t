@@ -6,12 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'TableData.pm',
     'TableData/Test/Spec/Basic.pm',
-    'TableDataRole/Spec/Basic.pm'
+    'TableDataRole/Spec/Basic.pm',
+    'TableDataRole/Spec/GetRowByPos.pm'
 );
 
 

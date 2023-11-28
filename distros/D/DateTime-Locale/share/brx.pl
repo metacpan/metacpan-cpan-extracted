@@ -30,7 +30,6 @@
     MMM => "LLL",
     MMMEd => "E, MMM d",
     MMMMEd => "E, MMMM d",
-    "MMMMW-count-one" => "'week' W 'of' MMMM",
     "MMMMW-count-other" => "'week' W 'of' MMMM",
     MMMMd => "MMMM d",
     MMMd => "d-MMM",
@@ -52,7 +51,6 @@
     yMd => "dd-MM-y",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-one" => "'week' w 'of' Y",
     "yw-count-other" => "'week' w 'of' Y",
   },
   code => "brx",
@@ -270,5 +268,5 @@
   time_format_medium => "a h:mm:ss",
   time_format_short => "a \N{U+0928}\N{U+093f} h:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

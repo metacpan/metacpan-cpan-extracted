@@ -4,6 +4,7 @@ NAME
 
 SYNOPSIS
      use Error::Pure::Output::Tags::HTMLCustomPage qw(err_pretty);
+
      err_pretty($tags_obj, $encoding, $content_type, $xml_version, $tags_structure_ar);
 
 SUBROUTINES
@@ -12,11 +13,9 @@ SUBROUTINES
              Helper routine use Tags $tags_obj object and print output to stdout.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::Output::Tags::HTMLCustomPage qw(err_pretty);
      use Tags::Output::Indent;
 
@@ -57,11 +56,9 @@ EXAMPLE1
      # </html>
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Error::Pure::Output::Tags::HTMLCustomPage qw(err_pretty);
      use Tags::Output::Raw;
 
@@ -93,24 +90,26 @@ EXAMPLE2
      # <?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html><head><title>Foo</title></head><div>Bar</div></html>
 
 DEPENDENCIES
-    HTTP::Headers::Fast, Readonly.
+    Exporter, HTTP::Headers::Fast, Readonly.
 
 SEE ALSO
     Task::Error::Pure
         Install the Error::Pure modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Error-Pure-Output-Tags-HTMLCustomPage>
+    <https://github.com/michal-josef-spacek/Error-Pure-Output-Tags-HTMLCusto
+    mPage>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

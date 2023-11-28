@@ -9,7 +9,7 @@ Game::Lottery
 
 =head1 VERSION
 
-version 1.03
+version 1.04
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ use 5.038;
 use experimental qw/class/;
 
 class Game::Lottery;
-our $VERSION="1.03";
+our $VERSION="1.04";
 use Math::Random::Secure;
 use Path::Tiny;
 # use Data::Dumper;

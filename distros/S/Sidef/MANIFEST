@@ -80,6 +80,8 @@ lib/Sidef/Types/Number/Number.pm
 lib/Sidef/Types/Number/Number.pod
 lib/Sidef/Types/Number/Polynomial.pm
 lib/Sidef/Types/Number/Polynomial.pod
+lib/Sidef/Types/Number/PolynomialMod.pm
+lib/Sidef/Types/Number/PolynomialMod.pod
 lib/Sidef/Types/Number/Quadratic.pm
 lib/Sidef/Types/Number/Quadratic.pod
 lib/Sidef/Types/Number/Quaternion.pm
@@ -211,6 +213,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/lucas_carmichael_with_n_factors.sf'
 'scripts/Extended tests/lucas_sequences.sf'
 'scripts/Extended tests/mertens_function.sf'
+'scripts/Extended tests/misc_number_tests.sf'
 'scripts/Extended tests/nth_prime.sf'
 'scripts/Extended tests/nth_prime_near_powers_of_10.sf'
 'scripts/Extended tests/number_methods.sf'
@@ -820,6 +823,7 @@ scripts/Tests/function_composition.sf
 scripts/Tests/functional_modules.sf
 scripts/Tests/functional_style.sf
 scripts/Tests/gather_take.sf
+scripts/Tests/gaussian_divisors.sf
 scripts/Tests/gaussian_integers.sf
 scripts/Tests/gcd.sf
 scripts/Tests/get_value_cyclic_references.sf
@@ -965,6 +969,7 @@ scripts/Tests/pipeline_cross_operator.sf
 scripts/Tests/pipeline_map_operator.sf
 scripts/Tests/pipeline_operator.sf
 scripts/Tests/pipeline_zip_operator.sf
+scripts/Tests/polymod.sf
 scripts/Tests/polynomial.sf
 scripts/Tests/polynomial_regression.sf
 scripts/Tests/postfix_exclamation_mark.sf

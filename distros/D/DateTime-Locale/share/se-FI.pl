@@ -245,7 +245,7 @@
     "4. njealj\N{U+00e1}das",
   ],
   quarter_stand_alone_abbreviated => [
-    "Q1",
+    "1Q",
     "2Q",
     "3Q",
     "4Q",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

@@ -26,6 +26,7 @@ my @files = (
     't/openapi-constructor.t',
     't/operationIds.t',
     't/parameters.t',
+    't/recursive_get.t',
     't/results/oas-vocabulary.txt',
     't/validate_request.t',
     't/validate_response.t',

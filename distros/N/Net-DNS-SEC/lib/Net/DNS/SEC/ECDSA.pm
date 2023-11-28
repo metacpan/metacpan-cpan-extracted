@@ -3,7 +3,7 @@ package Net::DNS::SEC::ECDSA;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: ECDSA.pm 1937 2023-09-11 09:27:16Z willem $)[2];
+our $VERSION = (qw$Id: ECDSA.pm 1940 2023-10-30 15:59:20Z willem $)[2];
 
 
 =head1 NAME
@@ -65,7 +65,7 @@ sub sign {
 	die 'private key not ECDSA' unless $curve;
 
 	my $rawkey = pack "a$keylen", decode_base64( $private->PrivateKey );
-	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_ECDSA( $curve, $rawkey, '' );
+	my $evpkey = Net::DNS::SEC::libcrypto::EVP_PKEY_new_ECDSA( $curve, $rawkey );
 
 	my $asn1 = Net::DNS::SEC::libcrypto::EVP_sign( $sigdata, $evpkey, $evpmd );
 	return _ASN1decode( $asn1, $keylen );

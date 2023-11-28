@@ -1,5 +1,14 @@
 Revision history for Perl extension App-Greple-tee
 
+0.9902 2023-11-19T01:51:47Z
+
+    - make --fillup to work with or w/o --discrete
+    - replace tr by perl, because tr on ubuntu does not convert non-ascii chars
+    - introduce --squeeze option
+    - use "gpty" command to make Japanese manual desumasu-style.
+    - extract pod part for i18n documentation
+    - change option name --blockmatch -> --blocks
+
 0.9901 2023-10-28T01:33:56Z
 
     - make --fillup option to work with --discrete option

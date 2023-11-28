@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,74 +17,74 @@ name: Ufal-UDPipe
 provides:
   Ufal::UDPipe:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Bytes:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Children:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Comments:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::EmptyNode:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::EmptyNodes:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Evaluator:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::InputFormat:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Model:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::MultiwordToken:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::MultiwordTokens:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::OutputFormat:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Pipeline:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::ProcessingError:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Sentence:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Sentences:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Token:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Trainer:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Version:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Word:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipe::Words:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
   Ufal::UDPipec:
     file: lib/Ufal/UDPipe.pm
-    version: v1.3.0.1
+    version: v1.3.1.1
 resources:
   bugtracker: https://github.com/ufal/udpipe/issues
   homepage: http://ufal.mff.cuni.cz/udpipe
   license: https://www.mozilla.org/en-US/MPL/2.0/
   repository: https://github.com/ufal/udpipe.git
-version: v1.3.0.1
+version: v1.3.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

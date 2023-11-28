@@ -1,0 +1,15 @@
+0.04 2023-11-20T16:14:23+01:00
+ - Regen README file.
+ - Rewrite to new Data::MARC::Leader data object.
+
+0.03 2023-11-19T14:19:04+01:00
+ - Add example to doc for parse() and pretty print of object.
+ - Fix typo of variable in doc.
+
+0.02 2023-11-18T18:56:29+01:00
+ - Add doc.
+ - Add serialize() example to doc.
+ - Add support for length with blank string.
+
+0.01 2023-11-18T01:17:56+01:00
+ - First version.

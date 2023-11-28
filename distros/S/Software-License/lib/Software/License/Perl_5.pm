@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Software::License::Perl_5;
-$Software::License::Perl_5::VERSION = '0.104004';
+package Software::License::Perl_5 0.104005;
+
 use parent 'Software::License';
 # ABSTRACT: The Perl 5 License (Artistic 1 & GPL 1)
 
@@ -42,7 +42,7 @@ Software::License::Perl_5 - The Perl 5 License (Artistic 1 & GPL 1)
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 PERL VERSION
 
@@ -60,7 +60,7 @@ lower the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

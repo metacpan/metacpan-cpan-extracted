@@ -9,10 +9,10 @@ my $builder = Module::Build->new(
     dist_version_from   => 'lib/Excel/ValueReader/XLSX.pm',
 
     requires => {
-      'perl'                      => "5.010001",
+      'perl'                      => "5.012001",
       'utf8'                      => 0,
       'Carp'                      => 0,
-      'Archive::Zip'              => 0,
+      'Archive::Zip'              => "1.61",
       'Module::Load'              => 0,
       'Moose'                     => 0,
       'Date::Calc'                => 0,
@@ -23,10 +23,10 @@ my $builder = Module::Build->new(
       'XML::LibXML::Reader'       => 0,
      },
     test_requires => {
-      'Test::More'                => 0,
+      'Test::More'                => "1.302195",
       'List::Util'                => 0,
       'List::MoreUtils'           => 0,
-      'Module::Load::Conditional' => 0,
+      'Module::Load::Conditional' => "0.66",
       'Clone'                     => 0,
     },
 

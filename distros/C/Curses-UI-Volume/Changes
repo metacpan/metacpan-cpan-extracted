@@ -1,3 +1,9 @@
+0.04 2023-11-22T23:33:24+01:00
+ - Move bugtracker to github.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update copyright years.
+
 0.03 2022-12-10T19:20:52+01:00
  - Change example files to better names.
  - Fix use of Module::Install.

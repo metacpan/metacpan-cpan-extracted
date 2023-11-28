@@ -33,7 +33,7 @@ no_index:
 provides:
   Mojo::WebSocketProxy::Backend::ConsumerGroups:
     file: lib/Mojo/WebSocketProxy/Backend/ConsumerGroups.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Data::UUID: '0'
   IO::Async::Loop::Mojo: '0'
@@ -54,13 +54,17 @@ resources:
   bugtracker: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups/issues
   homepage: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups
   repository: https://github.com/binary-com/perl-Mojo-WebSocketProxy-Backend-ConsumerGroups.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:DERIV
 x_contributors:
   - 'aisha-deriv <aisha@deriv.com>'
-  - 'chylli-deriv <chylli@binary.com>'
+  - 'aisha-deriv <aisha@regentmarkets.com>'
+  - 'kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>'
+  - 'aisha-deriv <116639606+aisha-deriv@users.noreply.github.com>'
   - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Kalaiselvan <kalaiselvan@deriv.com>'
   - 'Mario <115534871+mariovw-deriv@users.noreply.github.com>'
+  - 'mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>'
   - 'Raunak Kathuria <raunakkathuria@gmail.com>'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

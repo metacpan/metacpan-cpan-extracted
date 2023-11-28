@@ -2,20 +2,13 @@
 
 use strict;
 use warnings;
-use Test::More;
+use Test::Lib;
+use Test::XML::Sig;
 use File::Which;
 use File::Spec::Functions qw(catfile);
 
-BEGIN {
-    use_ok( 'XML::Sig' );
-}
-
-sub slurp_file {
-    my $name = shift;
-    open (my $fh, '<', $name) or die "Unable to open $name";
-    local $/ = undef;
-    return <$fh>;
-}
+my $xmlsec = get_xmlsec_features;
+my $openssl = get_openssl_features;
 
 my $xml = slurp_file('t/unsigned/saml_request.xml');
 
@@ -32,14 +25,15 @@ foreach my $key ('t/dsa.private-2048.key', 't/dsa.private-3072.key', 't/dsa.priv
 
     my $dsasig = XML::Sig->new({ key => $key });
     my $dsa_signed_xml = $dsasig->sign($xml);
-    ok( open XML, '>', 't/dsa.xml' );
-    print XML $dsa_signed_xml;
-    ok( close XML, "DSA: Signed t/dsa.xml written Sucessfully with $key");
+
     my $dsaret = $dsasig->verify($dsa_signed_xml);
     ok($dsaret, "XML:Sig DSA: Verifed Successfully");
 
     SKIP: {
-        skip "xmlsec1 not installed", 1 unless which('xmlsec1');
+        skip "xmlsec1 not installed", 1 unless $xmlsec->{installed};
+
+        skip "xmlsec1 no sha1 support", 1
+            if ($dsasig->{ sig_hash } eq 'sha1' and $xmlsec->{sha1_support} ne 1);
 
         # Try whether xmlsec is correctly installed which
         # doesn't seem to be the case on every cpan testing machine
@@ -47,43 +41,40 @@ foreach my $key ('t/dsa.private-2048.key', 't/dsa.private-3072.key', 't/dsa.priv
         my $output = `xmlsec1 --version`;
         skip "xmlsec1 not correctly installed", 1 if $?;
 
-        # Verify with xmlsec1
-        open my $dsafile, 't/dsa.xml' or die "no dsa signed xml";
-        my $dsaxml;
-        {
-            local undef $/;
-            $dsaxml = <$dsafile>;
-        }
+        test_xmlsec1_ok("DSA verify XML:Sig signed with $key: xmlsec1 Response is OK",
+            $dsa_signed_xml,
+            qw(--verify --id-attr:ID "ArtifactResolve")
+        );
 
-        my $verify_response = `xmlsec1 --verify --id-attr:ID "ArtifactResolve" t/dsa.xml 2>&1`;
-        ok( $verify_response =~ m/OK/, "DSA verify XML:Sig signed with $key: xmlsec1 Response is OK" )
-            or warn "calling xmlsec1 failed: '$verify_response'\n";
-        unlink 't/dsa.xml';
     }
 }
 
-# Test that XML::Sig can verify a xmlsec1 DSA signed xml
-$xml = slurp_file('t/signed/saml_request-xmlsec1-dsa-signed.xml');
-my $xmlsec1_dsasig = XML::Sig->new();
-my $xmlsec_ret = $xmlsec1_dsasig->verify($xml);
-ok($xmlsec_ret, "xmlsec1: DSA Verifed Successfully");
 
 # Ensure xmlsec still verifies properly
 {
+    # Test that XML::Sig can verify a xmlsec1 DSA signed xml
+    $xml = slurp_file('t/signed/saml_request-xmlsec1-dsa-signed.xml');
+    my $xmlsec1_dsasig = XML::Sig->new();
+    my $xmlsec_ret = $xmlsec1_dsasig->verify($xml);
+    ok($xmlsec_ret, "xmlsec1: DSA Verifed Successfully");
+
     my $key = 't/dsa.public.pem';
     SKIP: {
-        skip "xmlsec1 not installed", 1 unless which('xmlsec1');
-        my $verify_response = `xmlsec1 --verify --id-attr:ID "ArtifactResolve" t/signed/saml_request-xmlsec1-dsa-signed.xml 2>&1`;
-        ok( $verify_response =~ m/OK/, "DSA verify XML:Sig signed with $key: xmlsec1 Response is OK" )
-            or warn "calling xmlsec1 failed: '$verify_response'\n";
+        skip "xmlsec1 not installed", 1 unless $xmlsec->{installed};
+
+        skip "xmlsec1 no sha1 support", 1
+            if ($xmlsec1_dsasig->{ sig_hash } eq 'sha1' and $xmlsec->{sha1_support} ne 1);
+
+        test_xmlsec1_ok(
+            "DSA verify XML:Sig signed with $key: xmlsec1 Response is OK",
+            $xml, qw(--verify --id-attr:ID "ArtifactResolve"));
     }
 }
 
 # Test that XML::Sig can verify a xmlsec1 RSA signed xml
 $xml = slurp_file('t/signed/saml_request-xmlsec1-rsa-signed.xml');
-my $xmlsec1_rsasig = XML::Sig->new( {x509 => 1, cert => 't/rsa.cert.pem'} );
-$xmlsec_ret = $xmlsec1_rsasig->verify($xml);
-ok($xmlsec_ret, "xmlsec1: RSA Verifed Successfully");
+my $xmlsec1_rsasig = XML::Sig->new({ x509 => 1, cert => 't/rsa.cert.pem' });
+ok($xmlsec1_rsasig->verify($xml), "RSA Verifed Successfully");
 
 # SAML metadata
 my $md = slurp_file(catfile(qw(t unsigned saml_metadata.xml)));

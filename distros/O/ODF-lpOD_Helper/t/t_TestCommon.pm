@@ -36,7 +36,7 @@
 
 package t_TestCommon;
 
-use t_Common qw/oops mytempfile mytempdir/;
+use t_Common qw/oops mytempfile mytempdir/; # also List::Util etc.
 
 use v5.16; # must have PerlIO for in-memory files for ':silent';
 
@@ -84,6 +84,7 @@ our @EXPORT = qw/silent
                  @quotes
                  string_to_tempfile
                  tmpcopy_if_writeable
+                 my_capture my_capture_merged my_tee_merged
                 /;
 our @EXPORT_OK = qw/$savepath $debug $silent $verbose %dvs dprint dprintf/;
 
@@ -99,6 +100,7 @@ unless (Cwd::abs_path(__FILE__) =~ /Data-Dumper-Interp/) {
 use Cwd qw/getcwd abs_path/;
 use POSIX qw/INT_MAX/;
 use File::Basename qw/dirname/;
+use Capture::Tiny qw/capture capture_merged tee_merged/;
 use Env qw/@PATH @PERL5LIB/;  # ties @PATH, @PERL5LIB
 use Config;
 
@@ -244,19 +246,26 @@ sub string_to_tempfile($@) {
 #
 #
 sub run_perlscript(@) {
-  my $tf; # keep in scope until no longer needed
+  my @tfs; # keep in scope until no longer needed
   my @perlargs = ("-CIOE", @_);
   @perlargs = ((map{ "-I$_" } @INC), @perlargs);
   unshift @perlargs, "-MCarp=verbose" if $Carp::Verbose;
   unshift @perlargs, "-MCarp::Always=verbose" if $Carp::Always::Verbose;
   if ($^O eq "MSWin32") {
     for (my $ix=0; $ix <= $#perlargs; $ix++) {
-      if ($perlargs[$ix] =~ /^-w?[Ee]$/) {
+      if ($perlargs[$ix] =~ /^-(w?)([Ee])$/) {
         # Passing perl code in an argument is impractical in DOS/Windows
-        $tf = Path::Tiny->tempfile("perlcode_XXXXX");
-        $tf->spew_utf8($perlargs[$ix+1]);
-        splice(@perlargs, $ix, 2, $tf->stringify);
+        my $tf = Path::Tiny->tempfile("perlcode_XXXXX");
+        push @tfs, $tf;
+        # N.B. -e (not -E) can be an arg to odfedit as well
+        $tf->append_utf8("use feature qw/:all/;\n") if $2 eq 'E';
+        $tf->append_utf8($perlargs[$ix+1]);
+warn "============= DUMP OF -$1$2 FILE ===========\n", "".scalar($tf->slurp_utf8), "\n=============(end)============\n" if $debug;
+        splice @perlargs, $ix, 2, ($1 ? ("-w") : ()), $tf->canonpath;
+        $ix += 2;
       }
+    }
+    for (my $ix=0; $ix <= $#perlargs; $ix++) {
       for ($perlargs[$ix]) {
         if (/^-\*[Ee]/) { oops "unhandled perl arg" }
         s/"/\\"/g;
@@ -268,6 +277,7 @@ sub run_perlscript(@) {
   }
 
   local $ENV{LC_ALL} = "C";
+  my $perlexe = $Config{perlpath}; # some say $^X is not reliable
 
   if ($debug) {
     my $msg = "%%% run_perlscript >";
@@ -275,11 +285,19 @@ sub run_perlscript(@) {
       next unless $k =~ /^(LC|LANG)/;
       $msg .= " $k='$ENV{$k}'"
     }
-    $msg .= " $^X";
-    $msg .= " '${_}'" foreach (@perlargs);
+    $msg .= " $perlexe";
+    $msg .= " <<${_}>>" foreach (@perlargs);
     print STDERR "$msg\n";
   }
-  my $wstat = system $^X, @perlargs;
+  my $wstat;
+  if ($^O eq "MSWin32") {
+    # This might avoid pseudo-forking
+    my $prochandle = system(1, $perlexe, @perlargs); # see man perlport
+    waitpid($prochandle, 0);
+    $wstat = $?;
+  } else {
+    $wstat = system $perlexe, @perlargs;
+  }
   print STDERR "%%%(returned from 'system', wstat=",sprintf("0x%04X",$wstat),")%%%\n" if $debug;
   $wstat
 }
@@ -575,8 +593,8 @@ sub mycheckeq_literal($$$) {
                           .($vposn > 0 ? "(line ".($vposn+1).")\n" : "\n")
         ." at line ", (caller(0))[2]."\n"
        ) ;
-  #goto &Carp::confess;
-  Carp::confess(@_);
+  goto &Carp::confess;
+  #Carp::confess(@_);
 }
 sub expect1($$) {
   @_ = ("", @_);
@@ -761,6 +779,29 @@ sub tmpcopy_if_writeable($) {
     return $tpath;
   }
   $path
+}
+
+sub clean_capture_output($) {
+  my $str = shift;
+  # For some reason I can not track down, tests on Windows in VirtualBox sometimes emit
+  # this message.  I think (unproven) that this occurs because the current directory
+  # is a VBox host-shared directory mounted read-only.   But nobody should be writing
+  # to the cwd!
+  $str =~ s/The media is write protected\S*\R//gs;
+  $str
+}
+
+sub my_capture(&) {
+  my ($out, $err, @results) = &capture($_[0]);
+  return( clean_capture_output($out), clean_capture_output($err), @results );
+}
+sub my_capture_merged(&) {
+  my ($merged, @results) = &capture_merged($_[0]);
+  return( clean_capture_output($merged), @results );
+}
+sub my_tee_merged(&) {
+  my ($merged, @results) = &tee_merged($_[0]);
+  return( clean_capture_output($merged), @results );
 }
 
 1;

@@ -274,8 +274,8 @@
   territory => "Bulgaria",
   time_format_full => "H:mm:ss '\N{U+0447}'. zzzz",
   time_format_long => "H:mm:ss '\N{U+0447}'. z",
-  time_format_medium => "H:mm:ss '\N{U+0447}'.",
-  time_format_short => "H:mm '\N{U+0447}'.",
+  time_format_medium => "H:mm:ss",
+  time_format_short => "H:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

@@ -1,5 +1,15 @@
 Revision history for Device-Serial-SLuRM
 
+0.06    2023-11-13
+        [CHANGES]
+         * Define and support multi-drop MSLµRM protocol
+         * Clean shutdown on EOF from TTY device
+         * Swap all unit tests from `Test::More` to `Test2::V0`
+         * Use Object::Pad v0.800
+         * contrib/slurm.[ch]:
+            + Support optional TX/RX direction control for RS-485 bus, etc
+            + Support MSLµRM multi-drop mode as a non-controller node
+
 0.05    2022-12-17
         [CHANGES]
          * Updated for Object::Pad v0.76:

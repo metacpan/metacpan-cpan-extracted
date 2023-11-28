@@ -25,7 +25,7 @@ sub new {
         $self->{'x_pos'} = $self->GetPosition->x;
         $self->{'y_pos'} = $self->GetPosition->y;
 
-        if (exists $self->{'data'}{'new'}) {
+        if (exists $self->{'flag'}{'new'}) {
             $self->{'dc'}->Blit (0, 0, $self->{'size'}{'x'} + $self->{'x_pos'},
                                        $self->{'size'}{'y'} + $self->{'y_pos'} + $self->{'menu_size'},
                                        $self->paint( Wx::PaintDC->new( $self ), $self->{'size'}{'x'}, $self->{'size'}{'y'} ), 0, 0);
@@ -49,7 +49,7 @@ sub draw {
 sub sketch {
     my( $self, $settings ) = @_;
     return unless $self->set_settings( $settings );
-    $self->{'data'}{'sketch'} = 5;
+    $self->{'flag'}{'sketch'} = 5;
     $self->Refresh;
 }
 
@@ -57,7 +57,7 @@ sub set_settings {
     my( $self, $settings ) = @_;
     return 0 unless ref $settings eq 'HASH';
     $self->{'data'} = $settings;
-    $self->{'data'}{'new'} = 1;
+    $self->{'flag'}{'new'} = 1;
 }
 
 sub set_size {
@@ -82,6 +82,7 @@ sub paint {
     my $grid_max_x = $grid_d * $self->{'cells'}{'x'};
     my $grid_max_y = $grid_d * $self->{'cells'}{'y'};
 
+
     my $background_color = Wx::Colour->new( 255, 255, 255 );
     $dc->SetBackground( Wx::Brush->new( $background_color, &Wx::wxBRUSHSTYLE_SOLID ) );     # $dc->SetBrush( $fgb );
     $dc->Clear();
@@ -101,7 +102,7 @@ sub paint {
     $dc->SetBrush( Wx::Brush->new( $color, &Wx::wxBRUSHSTYLE_SOLID ) );
     my $grid = App::GUI::Cellgraph::Compute::Grid::now( [$self->{'cells'}{'x'}, $self->{'cells'}{'y'}], $self->{'data'} );
 
-    my $sketch_length = exists $self->{'data'}{'sketch'} ? $self->{'data'}{'sketch'} : 0;
+    my $sketch_length = exists $self->{'flag'}{'sketch'} ? $self->{'flag'}{'sketch'} : 0;
     if ($self->{'data'}{'global'}{'paint_direction'} eq 'inside_out') {
         my $mid = int($self->{'cells'}{'x'} / 2);
         if ($self->{'cells'}{'x'} % 2){
@@ -163,8 +164,8 @@ sub paint {
             }
         }
     }
-    delete $self->{'data'}{'new'};
-    delete $self->{'data'}{'sketch'};
+
+    delete $self->{'flag'};
     $dc;
 }
 

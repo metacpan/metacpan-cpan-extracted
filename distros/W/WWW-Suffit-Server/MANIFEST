@@ -11,8 +11,11 @@ TODO                                     TO DO
 
 # Libs
 lib/WWW/Suffit/Server.pm                 Main library
+lib/WWW/Suffit/Server/BasicAuth.pm       BasicAuth plugin
 lib/WWW/Suffit/Server/Suffit.pm          The Suffit controller
 lib/WWW/Suffit/Server/ServerInfo.pm      The ServerInfo route handler
+lib/WWW/Suffit/Server/CommonHelpers.pm   Common helpers plugin for Suffit servers
+lib/WWW/Suffit/Server/Syslog.pm          Logging to Syslog
 
 # Tests
 t/00-fixme.t                             FIXME/TODO/BUG warnings

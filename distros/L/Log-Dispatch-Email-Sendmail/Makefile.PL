@@ -1,13 +1,29 @@
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;	# 6.64 for TEST_REQUIRES
-use Devel::CheckBin;
 
-check_bin('/usr/sbin/sendmail');
-# unless((-f '/usr/sbin/sendmail') && (-x '/usr/sbin/sendmail')) {
-	# print STDERR "NA: sendmail not installed\n";
-	# exit(0);
-# }
+BEGIN {
+	if($ENV{'AUTOMATED_TESTING'}) {
+		# TODO: I suppose it would be better to return "UNKNOWN" on
+		#	platforms without Devel::CheckBin
+		#	Note this is also disabled in GitHub Actions
+		print STDERR "NA: Automatic testing disabled until I can work out how to tell smokers to install Devel::CheckBin\n";
+		exit(0);
+	}
+
+	require Devel::CheckBin;
+	Devel::CheckBin->import();
+}
+
+# Allow me (and CI tools) to test on systems without sendmail
+unless(defined($ENV{'AUTHOR_TESTING'})) {
+	# check_bin('/usr/sbin/sendmail');
+	can_run('/usr/sbin/sendmail');
+	# unless((-f '/usr/sbin/sendmail') && (-x '/usr/sbin/sendmail')) {
+		# print STDERR "NA: sendmail not installed\n";
+		# exit(0);
+	# }
+}
 
 WriteMakefile(
     NAME                => 'Log::Dispatch::Email::Sendmail',

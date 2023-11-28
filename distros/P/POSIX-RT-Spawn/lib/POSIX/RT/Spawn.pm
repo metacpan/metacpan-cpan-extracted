@@ -6,7 +6,7 @@ use warnings;
 use Exporter qw(import);
 use XSLoader;
 
-our $VERSION    = '0.12';
+our $VERSION    = '0.13';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
@@ -73,7 +73,7 @@ backticks, open, system) with versions that use posix_spawn.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2011-2022 gray <gray at cpan.org>
+Copyright (c) 2011 gray <gray at cpan.org>
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.

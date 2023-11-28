@@ -47,7 +47,7 @@
    "provides" : {
       "DBM::Deep" : {
          "file" : "lib/DBM/Deep.pm",
-         "version" : "2.0017"
+         "version" : "2.0019"
       },
       "DBM::Deep::Array" : {
          "file" : "lib/DBM/Deep/Array.pm"
@@ -128,15 +128,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/DrHyde/perl-modules-DBM-Deep/issues"
+         "web" : "https://github.com/DBM-Deep/DBM-Deep/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "https://github.com/DrHyde/perl-modules-DBM-Deep"
+         "url" : "https://github.com/DBM-Deep/DBM-Deep"
       }
    },
-   "version" : "2.0017",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "2.0019",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,0 +1,300 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::Exporter::OTLP - An OpenTelemetry Protocol span exporter
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry;
+    use OpenTelemetry::Exporter::OTLP;
+    use OpenTelemetry::SDK::Trace::Span::Processor::Batch;
+
+    # Use it with a span processor
+    my $processor = OpenTelemetry::SDK::Trace::Span::Processor::Batch->new(
+        exporter => OpenTelemetry::Exporter::OTLP->new( ... ),
+    );
+
+    # Register it with the OpenTelemetry tracer provider
+    OpenTelemetry->tracer_provider->add_span_processor($processor);
+
+=head1 DESCRIPTION
+
+This module provides an exporter that implements the
+L<OpenTelemetry::Exporter> role to export telemetry data using the
+OpenTelemetry Protocol (OTLP). It is the default exporter used by
+L<OpenTelemetry::SDK>, and can be used to export data either using plain
+JSON strings, or binary protocol buffer blobs. See below for details.
+
+=head1 METHODS
+
+This class implements the L<OpenTelemetry::Exporter> role. Please consult
+that module's documentation for details on the behaviours it provides.
+
+=head2 new
+
+    $exporter = OpenTelemetry::Exporter::OTLP->new(
+        certificate        => $file_path,           # optional
+        client_certificate => $file_path,           # optional
+        client_key         => $file_path,           # optional
+        compression        => $compression,         # optional
+        endpoint           => $url,                 # optional
+        headers            => \%headers || $string, # optional
+        protocol           => $protocol,            # optional
+        timeout            => $seconds,             # optional
+    );
+
+Constructs a new instance of the exporter. It takes the following named
+parameters, both of which are optional:
+
+=over
+
+=item certificate
+
+A string with the path to a file containing the trusted certificate to use
+when verifying a server's TLS credentials. If not set, this will be read from
+L<"OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TRACES_CERTIFICATE>,
+or
+L<"OTEL_EXPORTER_OTLP_CERTIFICATE"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_CERTIFICATE>
+if that variable is not set.
+
+If none of those values are set, this will remain undefined.
+
+=item client_certificate
+
+A string with the path to a file containing the client certificate/chain trust
+for the client's private key use in mTLS communication. The file should be in
+PEM format. If not set, this will be read from
+L<"OTEL_EXPORTER_OTLP_TRACES_CLIENT_CERTIFICATE"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TRACES_CLIENT_CLIENT_CERTIFICATE>,
+or
+L<"OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_CLIENT_CERTIFICATE>
+if that variable is not set.
+
+If none of those values are set, this will remain undefined.
+
+=item client_key
+
+A string with the path to a file containing the client's private key to use
+in mTLS communication. The file should be in PEM format. If not set, this will
+be read from
+L<"OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TRACES_CLIENT_KEY>,
+or
+L<"OTEL_EXPORTER_OTLP_CLIENT_KEY"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_CLIENT_KEY>
+if that variable is not set.
+
+If none of those values are set, this will remain undefined.
+
+=item compression
+
+Controls if and how the exported data will be compressed before sending
+out. Possible values are "none", in which case no compression will be
+done, and "gzip", in which case that compression algorithm will be used.
+
+If not set, the default value will be read from the
+L<"OTEL_EXPORTER_OTLP_TRACES_COMPRESSION"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TRACES_COMPRESSION>
+environment variable, or
+L<"OTEL_EXPORTER_OTLP_COMPRESSION"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_COMPRESSION>
+if the first one is not set.
+
+If none of these values is set, the default will depend on availability.
+If L<Compress::Zlib> is installed, the compression will default to "gzip",
+otherwise none will be used.
+
+If the value is set to a value other than the ones laid out above,
+construction will throw an L<OpenTelemetry::X::Unsupported> exception.
+
+=item endpoint
+
+Specifies the target URL to which exported data will be sent. If set, it
+must be set to a valid URL with scheme and host. It may include a port,
+and should contain a path, but must not contain any additional parts.
+
+Although
+L<the OTLP exporter specification|https://opentelemetry.io/docs/specs/otel/protocol/exporter>
+specifies that endpoints should be signal-specific, this currently only
+applies to traces, since this exporter currently only supports exporting
+tracing data.
+
+If not set, a default value will be read from
+L<"OTEL_EXPORTER_OTLP_TRACES_ENDPOINT"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TRACES_ENDPOINT>.
+If this is set, it will be used as-is.
+
+If that value was not set, the "/v1/traces" path will be added to a base URL
+read from
+L<"OTEL_EXPORTER_OTLP_ENDPOINT"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_ENDPOINT>.
+If this environment variable was not set, this base URL will default to
+"http://localhost:4318".
+
+=item headers
+
+A set of key/value pairs to send as headers for the HTTP request. This value
+can be set to either a hash reference with the desired key value pairs, or
+to a string in a format matching the
+L<W3C Correlation-Context|https://github.com/w3c/baggage/blob/master/baggage/HTTP_HEADER_FORMAT.md>,
+except that additional semi-colon delimited metadata is not allowed, as
+described in the
+L<OTLP exporter specification|https://opentelemetry.io/docs/specs/otel/protocol/exporter/#specifying-headers-via-environment-variables>.
+
+This would be a valid example: C<key1=value1,key2=value2>.
+
+When parsing this string, both keys and values will be independently
+URL-decoded and leading and trailing whitespace will be trimmed.
+
+If this parameter is not set, it will be read from the
+L<"OTEL_EXPORTER_OTLP_TRACES_HEADERS"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TRACES_HEADERS>
+environment variable, or
+L<"OTEL_EXPORTER_OTLP_HEADERS"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_HEADERS>
+if the first one is not set.
+
+If none of these is set, it will default to an empty hash.
+
+=item protocol
+
+OTLP supports multiple protocols. This exporter currently supports only
+"http/json", which exports data as a JSON string over HTTP, and
+"http/protobuf", which exports it as a Protobuf-encoded binary blob.
+
+This parameter can be set to either of them to control which encoding
+to use. If not set, the default value will be read from the
+L<"OTEL_EXPORTER_OTLP_PROTOCOL"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_PROTOCOL>
+environment variable.
+
+If a value is not set in the environment value, the default value will
+depend on availability. If L<Google::ProtocolBuffers::Dynamic> is installed,
+the protocol will default to "http/protobuf". Otherwise the exporter will
+fall back to "http/json", using whatever encoding back-end is provided by
+L<JSON::MaybeXS>.
+
+If the value is set to a value other than the ones laid out above,
+construction will throw an L<OpenTelemetry::X::Unsupported> exception.
+
+=item timeout
+
+The maximum number of seconds to wait before disconnecting. Note that
+although the specification suggests this should apply to the entire
+request, this currently applies to each individual open, read, or
+write operation on the socket.
+
+If not set, this value will be read from
+L<"OTEL_EXPORTER_OTLP_TRACES_TIMEOUT"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TRACES_TIMEOUT>,
+or from
+L<"OTEL_EXPORTER_OTLP_TIMEOUT"|OpenTelemetry::SDK/OTEL_EXPORTER_OTLP_TIMEOUT>
+if that variable is not set.
+
+If none of these values is set, this will default to 10.
+
+=back
+
+=head1 METRICS
+
+This exporter generates a number of metrics to keep track of its regular
+operation. At the time of writing, these metrics are non-standard, but their
+inclusion in the standard
+L<is being discussed|https://github.com/open-telemetry/semantic-conventions/issues/83>.
+
+=over
+
+=item C<otel.exporter.otlp.failure>
+
+Incremented every time an error is encountered during export. This may be a
+recoverable error that disappears after a retry.
+
+Reported with the following attributes:
+
+=over
+
+=item reason
+
+=over
+
+=item C<timeout>
+
+The connection to the collector timed out.
+
+=item C<socket_error>
+
+There was a socket-related error while sending the data to the collector.
+This could be that the socket couldn't be opened, or closed, or written
+to, or otherwise properly configured.
+
+=item C<ssl_error>
+
+There was an error either establishing an SSL connection, or terminating a
+previous SSL connection.
+
+=item C<eof_error>
+
+There was an unexpected end of stream.
+
+=item C<parse_error>
+
+There was an error parsing the URL to send the exported data to.
+
+=item C<zlib_error>
+
+An error was encountered when compressing payload.
+
+=item HTTP status code
+
+An error was encountered when calling the export endpoint. The reason will
+be set to the non-successful numeric status code received from the server.
+
+=back
+
+=item C<otel.exporter.otlp.success>
+
+Incremented every time an export operation completes successfully.
+
+=back
+
+=item C<otel.exporter.otlp.message.compressed.size>
+
+Set to the size of the request content after compression is done. This is
+not sent if no compression is done.
+
+=item C<otel.exporter.otlp.message.uncompressed.size>
+
+Set to the size of the request content before compression is done.
+
+=item C<otel.exporter.otlp.request.duration>
+
+Set to the number of seconds, as a fraction, that the request took to
+complete. It is set with the following attributes:
+
+=over
+
+=item status
+
+Set to the HTTP status code of the response.
+
+=back
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Compress::Zlib>
+
+=item L<Google::ProtocolBuffers::Dynamic>
+
+=item L<JSON::MaybeXS>
+
+=item L<OpenTelemetry::Exporter>
+
+=item L<OpenTelemetry::X::Unsupported>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Special thanks to L<CV-Library Ltd.|https://cv-library.co.uk> for their
+support in the development of this library.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

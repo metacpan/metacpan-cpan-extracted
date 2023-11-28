@@ -1,0 +1,52 @@
+{
+   "abstract" : "Implement a B-Tree as a silicon chip.",
+   "author" : [
+      "philiprbrenan@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Silicon-Chip-Btree",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4224"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Table::Text" : "20201029",
+            "Silicon::Chip" : "20231031",
+            "Test2::API" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Silicon::Chip::Btree" : {
+         "file" : "lib/Silicon/Chip/Btree.pm",
+         "version" : "20231112"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/philiprbrenan/SiliconChipBtree/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/philiprbrenan/SiliconChipBtree"
+      }
+   },
+   "version" : "20231112",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

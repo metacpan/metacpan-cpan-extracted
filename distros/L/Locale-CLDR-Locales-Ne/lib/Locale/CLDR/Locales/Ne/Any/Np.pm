@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ne::Any::Np - Package for language Nepali
 
 package Locale::CLDR::Locales::Ne::Any::Np;
 # This file auto generated from Data\common\main\ne_NP.xml
-#	on Fri 13 Oct  9:30:27 am GMT
+#	on Sat  4 Nov  6:16:52 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

@@ -123,9 +123,54 @@ the L</schema_url> resulting from the merge described above. The generated
 tracer instance will be cached internally, and any combination of parameters
 that would result in an equivalent set will receive that same tracer instance.
 
+=head2 shutdown
+
+    $result = await $tracer_provider->shutdown( $timeout // undef );
+
+Takes an optional timeout value and returns a L<Future> that will be done
+when this tracer provider has completed shutting down. During this process,
+the L<"shutdown"|OpenTelemetry::Trace::Span::Processor/shutdown> method
+will be called on every span processor registered with this provider using
+L</add_span_processor>, described below.
+
+The value of the returned future will be one of the
+L<OpenTelemetry::Constants/Trace Export Results>. If any of the propagated
+calls returns a failure code, the result will be a failure. If a timeout
+is provided and this runs out while shutting down the processors, the
+result will be a timeout. In this last case, some span processors might not
+be shut down.
+
+=head2 force_flush
+
+    $result = await $tracer_provider->force_flush( $timeout // undef );
+
+Takes an optional timeout value and returns a L<Future> that will be done
+when this tracer provider has completed flushing. During this process,
+the L<"force_flush"|OpenTelemetry::Trace::Span::Processor/force_flush> method
+will be called on every span processor registered with this provider using
+L</add_span_processor>, described below.
+
+The value of the returned future will be one of the
+L<OpenTelemetry::Constants/Trace Export Results>. If any of the propagated
+calls returns a failure code, the result will be a failure. If a timeout
+is provided and this runs out while flushing the processors, the result will
+be a timeout. In this last case, some span processors might not be flushed.
+
+=head2 add_span_processor
+
+    $tracer_provider = $tracer_provider->add_span_processor($processor);
+
+Takes an instance of a class that implements the
+L<OpenTelemetry::Trace::Span::Processor> role and registers it as a span
+processor for spans created by the tracers this tracer provider generates.
+
+This method is chainable.
+
 =head1 SEE ALSO
 
 =over
+
+=item L<Future>
 
 =item L<OpenTelemetry::SDK::InstrumentationScope>
 

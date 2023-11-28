@@ -21,7 +21,7 @@ SEE ALSO
         Install the Error::Pure modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Error-Pure-HTTP>
+    <https://github.com/michal-josef-spacek/Error-Pure-HTTP>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -29,9 +29,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2012-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2012-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.15
+    0.16
 

@@ -8,7 +8,7 @@ use AsposeCellsCloud::Object::GroupBox;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Shadow** | **boolean** |  |
+**Shadow** | **boolean** | Indicates whether the groupbox has shadow. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

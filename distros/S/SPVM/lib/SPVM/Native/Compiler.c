@@ -65,14 +65,14 @@ int32_t SPVM__Native__Compiler__compile(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* compiler = env->get_pointer(env, stack, obj_self);
   
   // Compile SPVM
-  int32_t compile_die_error_id = env->api->compiler->compile(compiler, basic_type_name);
+  int32_t status = env->api->compiler->compile(compiler, basic_type_name);
   
-  int32_t success = 0;
-  if (compile_die_error_id == 0) {
-    success = 1;
+  if (!(status == 0)) {
+    
+    env->die(env, stack, "Compilation errors occurred.", __func__, FILE_NAME, __LINE__);
+    
+    return SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_COMPILE_CLASS;
   }
-  
-  stack[0].ival = success;
   
   return 0;
 }
@@ -162,6 +162,25 @@ int32_t SPVM__Native__Compiler__add_include_dir(SPVM_ENV* env, SPVM_VALUE* stack
     include_dir = env->get_chars(env, stack, obj_include_dir);
   }
   env->api->compiler->add_include_dir(compiler, include_dir);
+  
+  return 0;
+}
+
+int32_t SPVM__Native__Compiler__prepend_include_dir(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  void* obj_self = stack[0].oval;
+  
+  void* obj_include_dir = stack[1].oval;
+  
+  void* compiler = env->get_pointer(env, stack, obj_self);
+  
+  const char* include_dir = NULL;
+  if (obj_include_dir) {
+    include_dir = env->get_chars(env, stack, obj_include_dir);
+  }
+  env->api->compiler->prepend_include_dir(compiler, include_dir);
   
   return 0;
 }

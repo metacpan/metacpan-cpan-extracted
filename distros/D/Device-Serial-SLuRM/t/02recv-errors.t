@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Future::IO;
 
 use constant HAVE_TEST_METRICS_ANY => eval { require Test::Metrics::Any };
@@ -31,6 +31,8 @@ my $emptybytes = "\x55" . with_crc8( with_crc8( "\x1F\x00" ) );
 my $OKbytes    = "\x55" . with_crc8( with_crc8( "\x11\x02" ) . "OK" );
 my $expect = [ 0x11, "OK" ];
 
+# Test logic is simpler if we *don't* use_sysread_buffer for this one
+
 # Missing SYNC byte
 {
    $controller->expect_sysread( "DummyFH", 8192 )
@@ -39,7 +41,7 @@ my $expect = [ 0x11, "OK" ];
          $OKbytes
       );
 
-   is_deeply( [ await $slurm->recv_packet ], $expect,
+   is( [ await $slurm->recv_packet ], $expect,
       'Packet received by ->recv_packet after missing SYNC byte' );
 
    $controller->check_and_clear( '->recv_packet after missing SYNC byte' );
@@ -53,7 +55,7 @@ my $expect = [ 0x11, "OK" ];
          $OKbytes
       );
 
-   is_deeply( [ await $slurm->recv_packet ], $expect,
+   is( [ await $slurm->recv_packet ], $expect,
       'Packet received by ->recv_packet after corrupted SYNC byte' );
 
    $controller->check_and_clear( '->recv_packet after corrupted SYNC byte' );
@@ -67,7 +69,7 @@ my $expect = [ 0x11, "OK" ];
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( $badbytes . $OKbytes );
 
-   is_deeply( [ await $slurm->recv_packet ], $expect,
+   is( [ await $slurm->recv_packet ], $expect,
       'Packet received by ->recv_packet after corrupted header' );
 
    if( HAVE_TEST_METRICS_ANY ) {
@@ -87,7 +89,7 @@ my $expect = [ 0x11, "OK" ];
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( $badbytes . $OKbytes );
 
-   is_deeply( [ await $slurm->recv_packet ], $expect,
+   is( [ await $slurm->recv_packet ], $expect,
       'Packet received by ->recv_packet after corrupted payload CRC' );
 
    if( HAVE_TEST_METRICS_ANY ) {
@@ -104,9 +106,9 @@ my $expect = [ 0x11, "OK" ];
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( $emptybytes . "X" . $OKbytes );
 
-   is_deeply( [ await $slurm->recv_packet ], [ 0x1F, "" ],
+   is( [ await $slurm->recv_packet ], [ 0x1F, "" ],
       'First packet received before spurious noise byte' );
-   is_deeply( [ await $slurm->recv_packet ], $expect,
+   is( [ await $slurm->recv_packet ], $expect,
       'Packet received by ->recv_packet after spurious noise byte' );
 
    $controller->check_and_clear( '->recv_packet after spurious noise byte' );
@@ -120,7 +122,7 @@ my $expect = [ 0x11, "OK" ];
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( $badbytes . $OKbytes );
 
-   is_deeply( [ await $slurm->recv_packet ], $expect,
+   is( [ await $slurm->recv_packet ], $expect,
       'Packet received by ->recv_packet after missing payload byte' );
 
    $controller->check_and_clear( '->recv_packet after missing payload byte' );

@@ -16,7 +16,7 @@ use Sys::SigAction qw( set_sig_handler );
 use IPC::Shareable;
 use Time::HiRes qw( sleep );
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 ##############################################################################
             
@@ -32,6 +32,9 @@ sub new
                PREFORK => $opt{ 'PREFORK' }, # how many preforked processes
                MAXFORK => $opt{ 'MAXFORK' }, # max count of preforked processes
                NOFORK  => $opt{ 'NOFORK'  }, # foreground process
+               TIMEOUT => $opt{ 'TIMEOUT' } || 4, # timeout for accept(), default 4 seconds
+               
+               PROP_SIGUSR => $opt{ 'PROP_SIGUSR' },
     
                SSL     => $opt{ 'SSL'     }, # use SSL
                OPT     => \%opt,
@@ -55,6 +58,10 @@ sub new
     $self->{ 'PREFORK' } = abs( $pf );
     $self->{ 'MAXFORK' } = abs( $pf ) unless $mf > 0;
     }
+
+  # timeout cap
+  $self->{ 'TIMEOUT' } =    1 if $self->{ 'TIMEOUT' } <    1; # avoid busyloop
+  $self->{ 'TIMEOUT' } = 3600 if $self->{ 'TIMEOUT' } > 3600; # 1 hour max should be enough :)
              
   bless $self, $class;
   return $self;
@@ -118,8 +125,8 @@ sub run
     $self->on_listen_ok();
     }
 
-  tie my %SHA, 'IPC::Shareable', { size => 1024*1024 };
-  $self->{ 'SHA' } = \%SHA;
+  $self->{ 'SHAK' } = tie my %SHA, 'IPC::Shareable', { size => 256*1024 }; # shared mem control knot
+  $self->{ 'SHAH' } = \%SHA;                                               # shared memory hash
 
   while(4)
     {
@@ -134,9 +141,12 @@ sub run
       {  
       $self->__run_forking( $server_socket );
       }
+#$self->{ 'SHAK' }->lock();
+#print STDERR "sleeping for 4 secs...........................$self->{ 'KIDS' } / $bk...........\n" . Dumper( $self->{ 'SHAH' } );
+#$self->{ 'SHAK' }->unlock();
     }
 
-  tied( %{ $self->{ 'SHA' } } )->remove();
+  $self->{ 'SHAK' }->remove();
 
   $self->on_server_close( $server_socket );
   close( $server_socket );
@@ -151,12 +161,21 @@ sub __run_forking
   my $self          = shift;
   my $server_socket = shift;
 
-  my $client_socket = $server_socket->accept();
+#print STDERR "----------- ACCEPT: ".scalar(localtime)."\n\n";
+  if( ! socket_can_read( $server_socket, $self->{ 'TIMEOUT' } ) )
+    {
+    $self->on_forking_idle();
+    return '0E0';
+    }
+
+  my $client_socket = $server_socket->accept() or return '0E0';
   if( ! $client_socket )
     {
+#print STDERR "----------- ACCEPT: ERROR $client_socket\n\n";
     $self->on_accept_error();
     return;
     }
+#print STDERR "----------- ACCEPT: OK $client_socket\n\n";
 
   binmode( $client_socket );
   $self->{ 'CLIENT_SOCKET' } = $client_socket;
@@ -195,19 +214,24 @@ sub __run_forking
       }
     }
   # --------- kid here ---------
+  $self->{ 'CHILD'  } = 1;
   delete $self->{ 'SERVER_SOCKET' };
+  delete $self->{ 'KIDS' };
+  delete $self->{ 'KID_PIDS' };
 
   # reinstall signal handlers in the kid
-  $SIG{ 'INT'  } = 'DEFAULT';
-  $SIG{ 'CHLD' } = 'DEFAULT';
-  $SIG{ 'USR1' } = 'DEFAULT';
-  $SIG{ 'USR2' } = 'DEFAULT';
+  $SIG{ 'INT'   } = 'DEFAULT';
+  $SIG{ 'CHLD'  } = 'DEFAULT';
+  $SIG{ 'USR1'  } = sub { $self->__child_sig_usr1();  };
+  $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
+  $SIG{ 'RTMIN' } = 'DEFAULT';
+  $SIG{ 'RTMAX' } = 'DEFAULT';
 
   srand();
 
-  $self->{ 'CHILD' } = 1;
-
   $client_socket->autoflush( 1 );
+  $self->on_child_start();
+
   $self->im_busy();
   $self->on_process( $client_socket );
   $self->on_close( $client_socket );
@@ -270,6 +294,19 @@ sub __run_prefork
         $self->{ 'CHILD'  } = 1;
         $self->{ 'SPTIME' } = time();
         delete $self->{ 'SERVER_SOCKET' };
+        delete $self->{ 'KIDS' };
+        delete $self->{ 'KID_PIDS' };
+
+        # reinstall signal handlers in the kid
+        $SIG{ 'INT'   } = 'DEFAULT';
+        $SIG{ 'CHLD'  } = 'DEFAULT';
+        $SIG{ 'USR1'  } = sub { $self->__child_sig_usr1();  };
+        $SIG{ 'USR2'  } = sub { $self->__child_sig_usr2();  };
+        $SIG{ 'RTMIN' } = 'DEFAULT';
+        $SIG{ 'RTMAX' } = 'DEFAULT';
+        
+        $self->on_child_start();
+        
         $self->im_idle();
 
         my $kid_idle;
@@ -289,9 +326,9 @@ sub __run_prefork
 #print STDERR "--ESTIMATE-- $tk = $kk + $prefork_count if $ik < ( 1 + $kk / 10 );\n";    
       }
     
-#tied( %{ $self->{ 'SHA' } } )->unlock();
-#print STDERR "sleeping for 4 secs...........................$self->{ 'KIDS' } / $bk...........\n" . Dumper( $self->{ 'SHA' } );
-#tied( %{ $self->{ 'SHA' } } )->lock();
+#$self->{ 'SHAK' }->lock();
+#print STDERR "sleeping for 4 secs...........................$self->{ 'KIDS' } / $bk...........\n" . Dumper( $self->{ 'SHAH' } );
+#$self->{ 'SHAK' }->unlock();
     sleep(4);
     }
 }
@@ -301,7 +338,7 @@ sub __run_preforked_child
   my $self          = shift;
   my $server_socket = shift;
 
-  if( ! socket_can_read( $server_socket, 4 ) )
+  if( ! socket_can_read( $server_socket, $self->{ 'TIMEOUT' } ) )
     {
     $self->on_prefork_child_idle();
     return '0E0';
@@ -318,14 +355,6 @@ sub __run_preforked_child
   my $sockport = $client_socket->sockport();
 
   $self->on_accept_ok( $client_socket );
-
-  # reinstall signal handlers in the kid
-  $SIG{ 'INT'   } = 'DEFAULT';
-  $SIG{ 'CHLD'  } = 'DEFAULT';
-  $SIG{ 'USR1'  } = 'DEFAULT';
-  $SIG{ 'USR2'  } = 'DEFAULT';
-  $SIG{ 'RTMIN' } = 'DEFAULT';
-  $SIG{ 'RTMAX' } = 'DEFAULT';
 
   srand();
 
@@ -362,11 +391,13 @@ sub get_client_socket
 sub get_busy_kids_count
 {
   my $self = shift;
+  return -1 unless exists $self->{ 'SHAK' };
   
-  tied( %{ $self->{ 'SHA' } } )->lock();
-  my $busy_count = scalar( grep { substr( $_, 0, 1 ) eq  '*' } values %{ $self->{ 'SHA' } } ) || 0;
-  tied( %{ $self->{ 'SHA' } } )->unlock();
-  return $busy_count;
+  $self->{ 'SHAK' }->lock();
+  my $fork_count = scalar( keys %{ $self->{ 'SHAH' } } ) || 0;
+  my $busy_count = scalar( grep { substr( $_, 0, 1 ) eq  '*' } values %{ $self->{ 'SHAH' } } ) || 0;
+  $self->{ 'SHAK' }->unlock();
+  return wantarray ? ( $busy_count, $fork_count ) : $busy_count;
 }
 
 sub get_parent_pid
@@ -374,6 +405,15 @@ sub get_parent_pid
   my $self = shift;
   
   return $self->{ 'PARENT_PID' };
+}
+
+sub get_kid_pids
+{
+  my $self = shift;
+
+  return () if $self->is_child();
+  
+  return keys %{ $self->{ 'KID_PIDS' } || {} };
 }
 
 sub im_busy
@@ -398,9 +438,9 @@ sub __im_in_state
   my $ppid = $self->get_parent_pid();
   return 0 if $ppid == $$; # states are available only for kids
 
-  tied( %{ $self->{ 'SHA' } } )->lock();
-  $self->{ 'SHA' }{ $$ } = $state . "/" . $self->{ 'BUSY_COUNT' };
-  tied( %{ $self->{ 'SHA' } } )->unlock();
+  $self->{ 'SHAK' }->lock();
+  $self->{ 'SHAH' }{ $$ } = $state . "/" . $self->{ 'BUSY_COUNT' };
+  $self->{ 'SHAK' }->unlock();
   
   return kill( 'RTMIN', $ppid ) if $state eq '-';
   return kill( 'RTMAX', $ppid ) if $state eq '*';
@@ -430,6 +470,17 @@ sub is_child
   return $self->{ 'CHILD' };
 }
 
+sub propagate_signal
+{
+  my $self = shift;
+  my $sig  = shift;
+  
+  for my $kpid ( $self->get_kid_pids() )
+    {
+    kill( $sig, $kpid );
+    }
+}
+
 sub __sig_child
 {
   my $self = shift;
@@ -437,9 +488,9 @@ sub __sig_child
   my $child_pid;
   while( ( $child_pid = waitpid( -1, WNOHANG ) ) > 0 )
     {
-    tied( %{ $self->{ 'SHA' } } )->lock();
-    delete $self->{ 'SHA' }{ $child_pid };
-    tied( %{ $self->{ 'SHA' } } )->unlock();
+    $self->{ 'SHAK' }->lock();
+    delete $self->{ 'SHAH' }{ $child_pid };
+    $self->{ 'SHAK' }->unlock();
     
     $self->{ 'KIDS' }--;
     delete $self->{ 'KID_PIDS' }{ $child_pid };
@@ -453,6 +504,7 @@ sub __sig_usr1
   my $self = shift;
 
   $self->on_sig_usr1();
+  $self->propagate_signal( 'USR1' ) if $self->{ 'PROP_SIGUSR' };
   $SIG{ 'USR1' } = sub { $self->__sig_usr1();  };
 }
 
@@ -461,10 +513,26 @@ sub __sig_usr2
   my $self = shift;
 
   $self->on_sig_usr2();
+  $self->propagate_signal( 'USR2' ) if $self->{ 'PROP_SIGUSR' };
   $SIG{ 'USR2' } = sub { $self->__sig_usr2();  };
 }
 
-use Data::Dumper;
+sub __child_sig_usr1
+{
+  my $self = shift;
+
+  $self->on_child_sig_usr1();
+  $SIG{ 'USR1' } = sub { $self->__child_sig_usr1();  };
+}
+
+sub __child_sig_usr2
+{
+  my $self = shift;
+
+  $self->on_child_sig_usr2();
+  $SIG{ 'USR2' } = sub { $self->__child_sig_usr2();  };
+}
+
 
 sub __sig_kid_idle
 {
@@ -508,7 +576,17 @@ sub on_prefork_child_idle
 {
 }
 
+# called on forking mode parent side, when noone connects in 'TIMEOUT' secods.
+sub on_forking_idle
+{
+}
+
 sub on_maxforked
+{
+}
+
+# called right after fork, in the forked child, after initial setup but just before processing start
+sub on_child_start
 {
 }
 
@@ -546,6 +624,14 @@ sub on_sig_kid_idle
 }
 
 sub on_sig_kid_busy
+{
+}
+
+sub on_child_sig_usr1
+{
+}
+
+sub on_child_sig_usr2
 {
 }
 
@@ -630,7 +716,10 @@ Creates new Net::Waiter object and sets its options:
    PREFORK =>    8, # how many preforked processes
    MAXFORK =>   32, # max count of preforked processes
    NOFORK  =>    0, # if 1 will not fork, only single client will be accepted
+   TIMEOUT =>    4, # timeout for accepting connections, defaults to 4 seconds
    SSL     =>    1, # use SSL
+
+   PROP_SIGUSR => 1, # if true, will propagate USR1/USR2 signals to childs
 
 if PREFORK is negative, the absolute value will be used both for PREFORK and
 MAXFORK counts.
@@ -675,7 +764,23 @@ Returns server (listening) socket object. Valid in parent only, otherwise return
 
 =head2 get_client_socket()
 
+Returns connected client socket.
+
+=head2 get_busy_kids_count()
+
+Returns the count of all forked busy processes (which are already accepted connection).
+In array contect returns two integers: busy process count and all forked processes count.
+This method is accessible from parent and all forked processes and reflect all processes.
+
 Returns client (connected) socket object. Valid in kids only, otherwise returns undef.
+
+=head2 get_kid_pids()
+
+Returns list of forked child pids. Available only in parent processes.
+
+=head2 propagate_signal( 'SIGNAME' )
+
+Sends signal 'SIGNAME' to all child processes.
 
 =head1 HANDLER FUNCTIONS
 
@@ -705,6 +810,14 @@ Called when new process is forked. This will be executed inside the server
 Called when socket is ready to be used. This is the place where the actual
 work must be done.
 
+=head2 on_prefork_child_idle
+
+Called on preforked childs, when accept timeouts (see 'TIMEOUT' option).
+
+=head2 on_forking_idle
+
+Called on forking mode parent, when accept timeouts (see 'TIMEOUT' option).
+
 =head2 on_maxforked( $client_socket )
 
 Called if client socket is accepted but MAXFORK count reached. This can be
@@ -714,6 +827,10 @@ client socket close.
 note: this handler is only used for FORKING server. preforked servers will
 not accept the socket at all if MAXFORK has been reached. the reason is that
 forking server may release child process during the accept() call.
+
+=head2 on_child_start()
+
+Called right after fork, in the forked child, after initial setup but just before processing start.
 
 =head2 on_child_exit()
 
@@ -740,13 +857,19 @@ process and gets child pid as 1st argument.
 
 =head2 on_sig_usr1()
 
-Called when server or forked (child) process receives USR1 signal.
-(is_child() can be used here)
+Called when server process receives USR1 signal.
 
 =head2 on_sig_usr2()
 
-Called when server or forked (child) process receives USR2 signal.
-(is_child() can be used here)
+Called when server process receives USR2 signal.
+                                                                                        
+=head2 on_child_sig_usr1()
+
+Called when forked (child) process receives USR1 signal.
+
+=head2 on_child_sig_usr2()
+
+Called whenforked (child) process receives USR2 signal.
                                                                                         
 =head1 TODO
 

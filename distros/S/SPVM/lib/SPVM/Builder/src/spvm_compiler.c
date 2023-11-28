@@ -455,6 +455,7 @@ void SPVM_COMPILER_use_default_loaded_classes(SPVM_COMPILER* compiler) {
   SPVM_COMPILER_use(compiler, "Error::NotSupported", "Error::NotSupported", 0);
   SPVM_COMPILER_use(compiler, "CommandInfo", "CommandInfo", 0);
   SPVM_COMPILER_use(compiler, "Address", "Address", 0);
+  SPVM_COMPILER_use(compiler, "Error::Compile", "Error::Compile", 0);
 }
 
 void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
@@ -551,6 +552,14 @@ void SPVM_COMPILER_set_default_loaded_class_files(SPVM_COMPILER* compiler) {
     const char* class_name = "Address";
     const char* rel_file = "Address.spvm";
     const char* content = "class Address : pointer {\n  static method new : Address () {\n    my $self = new Address;\n    return $self;\n  }\n}";
+    SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
+  }
+  
+  // Add Error::Compile class file
+  {
+    const char* class_name = "Error::Compile";
+    const char* rel_file = "Error/Compile.spvm";
+    const char* content = "class Error::Compile extends Error;";
     SPVM_COMPILER_set_default_loaded_class_file(compiler, class_name, rel_file, content);
   }
 }
@@ -1012,6 +1021,14 @@ void SPVM_COMPILER_add_include_dir(SPVM_COMPILER* compiler, const char* include_
   char* compiler_include_dir = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->global_allocator, include_dir_length + 1);
   memcpy(compiler_include_dir, include_dir, include_dir_length);
   SPVM_LIST_push(compiler->include_dirs, (void*)compiler_include_dir);
+}
+
+void SPVM_COMPILER_prepend_include_dir(SPVM_COMPILER* compiler, const char* include_dir) {  
+  int32_t include_dir_length = strlen(include_dir);
+  char* compiler_include_dir = SPVM_ALLOCATOR_alloc_memory_block_tmp(compiler->global_allocator, include_dir_length + 1);
+  memcpy(compiler_include_dir, include_dir, include_dir_length);
+  
+  SPVM_LIST_unshift(compiler->include_dirs, (void*)compiler_include_dir);
 }
 
 void SPVM_COMPILER_clear_include_dirs(SPVM_COMPILER* compiler) {

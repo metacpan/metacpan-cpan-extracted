@@ -18,8 +18,7 @@
          "t",
          "inc",
          "docs",
-         "t",
-         "share/api"
+         "t"
       ]
    },
    "prereqs" : {
@@ -47,9 +46,6 @@
             "Path::Tiny" : "0.144",
             "Sort::Naturally" : "1.03",
             "Term::ANSIColor" : "5.01",
-            "Test::Deep" : "1.204",
-            "Test::Exception" : "0.43",
-            "Test::Warn" : "0.37",
             "Text::CSV_XS" : "1.50",
             "Text::Similarity" : "0.13",
             "Types::Standard" : "2.004000",
@@ -60,7 +56,10 @@
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1.30"
+            "Test::Deep" : "1.204",
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.30",
+            "Test::Warn" : "0.37"
          }
       }
    },
@@ -79,7 +78,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/convert-pheno"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

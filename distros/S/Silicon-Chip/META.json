@@ -32,7 +32,7 @@
    "provides" : {
       "Silicon::Chip" : {
          "file" : "lib/Silicon/Chip.pm",
-         "version" : "20231031"
+         "version" : "20231118"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "url" : "https://github.com/philiprbrenan/SiliconChip"
       }
    },
-   "version" : "20231031",
+   "version" : "20231118",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

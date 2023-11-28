@@ -91,7 +91,7 @@ Offers flexible configuration options to suite individual tastes and needs.
 
 =item *
 
-Fully integrated into Apache and mod_perl to acheive the best performance. 
+Fully integrated into Apache and mod_perl to achieve the best performance.
 Can also run as a free standing CGI-script, off-line or can be called from another Perl program.
 
 

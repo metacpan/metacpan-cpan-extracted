@@ -1,0 +1,296 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Select {
+  allow Go;
+  
+  use Go::Select::Case;
+  use Go::Select::Result;
+  use Go::Channel;
+  use List;
+  use Fn;
+  use Sys;
+  
+  # Fields
+  has read_cases_h : Hash of Go::Channel;
+  
+  has write_cases_h : Hash of Go::Channel;
+  
+  has non_blocking : rw byte;
+  
+  has seed : int;
+  
+  has schedule : Go::Schedule;
+  
+  # Class Methods
+  private static method new : Go::Select ($schedule : Go::Schedule) {
+    
+    my $self = new Go::Select;
+    
+    $self->{read_cases_h} = Hash->new;
+    
+    $self->{write_cases_h} = Hash->new;
+    
+    $self->{seed} = Sys->process_id * (int)Sys->time;
+    
+    $self->{schedule} = $schedule;
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method add_read : void ($channel : Go::Channel) {
+    
+    unless ($channel) {
+      die "\$channel must be defined";
+    }
+    
+    my $read_cases_h = $self->{read_cases_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    my $exists = $read_cases_h->exists($address);
+    
+    if ($exists) {
+      die "\$channel is already exists";
+    }
+    
+    my $case = Go::Select::Case->new;
+    
+    $case->{channel} = $channel;
+    
+    $read_cases_h->set($address, $case);
+  }
+  
+  method add_write : void ($channel : Go::Channel, $value : object) {
+    
+    unless ($channel) {
+      die "\$channel must be defined";
+    }
+    
+    my $write_cases_h = $self->{write_cases_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    my $exists = $write_cases_h->exists($address);
+    
+    if ($exists) {
+      die "\$channel is already exists";
+    }
+    
+    my $case = Go::Select::Case->new;
+    
+    $case->{channel} = $channel;
+    
+    $case->{value} = $value;
+    
+    $case->{is_write} = 1;
+    
+    $write_cases_h->set($address, $case);
+  }
+  
+  method remove_read : void ($channel : Go::Channel) {
+    
+    unless ($channel) {
+      die "\$channel must be defined";
+    }
+    
+    my $read_cases_h = $self->{read_cases_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    my $exists = $read_cases_h->exists($address);
+    
+    unless ($exists) {
+      die "\$channel is not found";
+    }
+    
+    $read_cases_h->delete($address);
+  }
+  
+  method remove_write : void ($channel : Go::Channel) {
+    
+    unless ($channel) {
+      die "\$channel must be defined";
+    }
+    
+    my $write_cases_h = $self->{write_cases_h};
+    
+    my $address = Fn->to_address($channel);
+    
+    my $exists = $write_cases_h->exists($address);
+    
+    unless ($exists) {
+      die "\$channel is not found";
+    }
+    
+    $write_cases_h->delete($address);
+  }
+  
+  method select : Go::Select::Result () {
+    
+    my $read_cases_h = $self->{read_cases_h};
+    
+    my $write_cases_h = $self->{write_cases_h};
+    
+    my $read_cases_length = $read_cases_h->keys_length;
+    
+    my $write_cases_length = $write_cases_h->keys_length;
+    
+    my $cases_list = List->new(new Go::Select::Case[0]);
+    
+    for my $address (@{$read_cases_h->keys}) {
+      my $read_case = $read_cases_h->get($address);
+      
+      $cases_list->push($read_case);
+    }
+    
+    for my $address (@{$write_cases_h->keys}) {
+      my $write_case = $write_cases_h->get($address);
+      
+      $cases_list->push($write_case);
+    }
+    
+    my $cases_length = $cases_list->length;
+    
+    my $cases = (Go::Select::Case[])$cases_list->to_array;
+    
+    my $seed = $self->{seed};
+    
+    &shuffle($cases, \$seed);
+    
+    $self->{seed} = $seed;
+    
+    my $result = (Go::Select::Result)undef;
+    
+    my $found = 0;
+    
+    while (1) {
+      for my $case (@$cases) {
+        
+        my $channel = $case->{channel};
+        
+        my $is_write = $case->{is_write};
+        
+        if ($is_write) {
+          
+          my $can_write = 0;
+          
+          {
+            my $length = $channel->{length};
+            
+            my $capacity = $channel->{capacity};
+            
+            if ($length < $capacity) {
+              $can_write = 1;
+            }
+            else {
+              if ($channel->{read_waits}->length) {
+                $can_write = 1;
+              }
+            }
+          }
+          
+          if ($can_write) {
+            my $value = $case->{value};
+            
+            $channel->write($value);
+            
+            $result = Go::Select::Result->new;
+            
+            $result->{ok} = 1;
+            
+            $result->{channel} = $channel;
+            
+            $result->{is_write} = 1;
+            
+            $found = 1;
+            
+            last;
+          }
+        }
+        else {
+          
+          my $can_read = 0;
+          
+          if ($channel->{write_waits}->length) {
+            $can_read = 1;
+          }
+          
+          if ($can_read) {
+            my $ok = 0;
+            
+            my $value = $channel->read(\$ok);
+            
+            $result = Go::Select::Result->new;
+            
+            $result->{ok} = (byte)$ok;
+            
+            $result->{channel} = $channel;
+            
+            $result->{value} = $value;
+            
+            $found = 1;
+            
+            last;
+          }
+        }
+      }
+      
+      if ($found) {
+        last;
+      }
+      else {
+        my $non_blocking = $self->{non_blocking};
+        
+        if ($non_blocking) {
+          last;
+        }
+        else {
+          my $schedule = $self->{schedule};
+          
+          $schedule->schedule;
+        }
+      }
+    }
+    
+    return $result;
+  }
+  
+  private static method shuffle : void ($array : object[], $seed_ref : int*) {
+    
+    my $array_length = @$array;
+    
+    for (my $i = $array_length - 1; $i > 0; $i--) {
+      
+      my $j = Fn->crand($seed_ref) % ($i + 1);
+      
+      my $temp = $array->[$i];
+      
+      $array->[$i] = $array->[$j];
+      
+      $array->[$j] = $temp;
+    }
+  }
+  
+  method is_empty : int () {
+    
+    my $read_cases_h = $self->{read_cases_h};
+    
+    my $write_cases_h = $self->{write_cases_h};
+    
+    my $read_cases_length = $read_cases_h->keys_length;
+    
+    my $write_cases_length = $write_cases_h->keys_length;
+    
+    my $cases_length = $read_cases_length  + $write_cases_length;
+    
+    my $is_empty = 1;
+    
+    if ($cases_length > 0) {
+      $is_empty = 0;
+    }
+    
+    return $is_empty;
+  }
+}

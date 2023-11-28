@@ -1,0 +1,53 @@
+NAME
+    bin-search - Tool to bitwise search of data in hexadecimal stream.
+
+SYNOPSIS
+     bin-search [-b] [-h] [-v] [--version] hex_stream search
+
+ARGUMENTS
+    *       "-b"
+
+            Print in binary (default hexadecimal).
+
+    *       "-h"
+
+            Print help.
+
+    *       "-v"
+
+            Verbose mode.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "hex_stream"
+
+            Hexadecimal stream.
+
+    *       "search"
+
+            Search string (in hexadecimal).
+
+EXAMPLE
+     bin-search FFABCD D5
+
+     # Output:
+     # Found D5E68 at 8 bit
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Bin-Search>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.02
+

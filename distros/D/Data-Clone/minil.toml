@@ -1,0 +1,9 @@
+name = "Data-Clone"
+badges = ["github-actions/test.yml"]
+module_maker="ModuleBuild"
+
+[XSUtil]
+generate_xshelper_h = "lib/Data/xshelper.h"
+generate_ppport_h = "lib/Data/ppport.h"
+cc_warnings = 1
+

@@ -40,10 +40,10 @@ Māori locale.
 
 =head3 Abbreviated (format)
 
-  Mane
+  Man
   Tūr
-  Wene
-  Tāit
+  Wen
+  Tāi
   Par
   Rāh
   Rāt
@@ -52,7 +52,7 @@ Māori locale.
 
   M
   T
-  E
+  W
   T
   P
   Rh
@@ -71,10 +71,10 @@ Māori locale.
 
 =head3 Abbreviated (stand-alone)
 
-  Mane
+  Man
   Tūr
-  Wene
-  Tāit
+  Wen
+  Tāi
   Par
   Rāh
   Rāt
@@ -113,13 +113,13 @@ Māori locale.
   Māe
   Āpe
   Mei
-  Hune
+  Hun
   Hūr
   Āku
   Hep
   Oke
-  Noem
-  Tīhe
+  Noe
+  Tīh
 
 =head3 Narrow (format)
 
@@ -142,7 +142,7 @@ Māori locale.
   Hānuere
   Pēpuere
   Māehe
-  Āpereira
+  Āperira
   Mei
   Hune
   Hūrae
@@ -159,13 +159,13 @@ Māori locale.
   Māe
   Āpe
   Mei
-  Hune
+  Hun
   Hūr
   Āku
   Hep
   Oke
-  Noem
-  Tīhe
+  Noe
+  Tīh
 
 =head3 Narrow (stand-alone)
 
@@ -261,7 +261,7 @@ Māori locale.
 =head3 Medium
 
    2008-02-05T18:30:30 = 5 Pēp 2008
-   1995-12-22T09:05:02 = 22 Tīhe 1995
+   1995-12-22T09:05:02 = 22 Tīh 1995
   -0010-09-15T04:44:23 = 15 Hep -10
 
 =head3 Short
@@ -315,7 +315,7 @@ Māori locale.
 =head3 Medium
 
    2008-02-05T18:30:30 = 5 Pēp 2008 6:30:30 PM
-   1995-12-22T09:05:02 = 22 Tīhe 1995 9:05:02 AM
+   1995-12-22T09:05:02 = 22 Tīh 1995 9:05:02 AM
   -0010-09-15T04:44:23 = 15 Hep -10 4:44:23 AM
 
 =head3 Short
@@ -402,19 +402,19 @@ Māori locale.
 =head3 GyMMM (MMM y G)
 
    2008-02-05T18:30:30 = Pēp 2008 CE
-   1995-12-22T09:05:02 = Tīhe 1995 CE
+   1995-12-22T09:05:02 = Tīh 1995 CE
   -0010-09-15T04:44:23 = Hep -10 BCE
 
 =head3 GyMMMEd (E, d MMM y G)
 
    2008-02-05T18:30:30 = Tūr, 5 Pēp 2008 CE
-   1995-12-22T09:05:02 = Par, 22 Tīhe 1995 CE
+   1995-12-22T09:05:02 = Par, 22 Tīh 1995 CE
   -0010-09-15T04:44:23 = Rāh, 15 Hep -10 BCE
 
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Pēp 2008 CE
-   1995-12-22T09:05:02 = 22 Tīhe 1995 CE
+   1995-12-22T09:05:02 = 22 Tīh 1995 CE
   -0010-09-15T04:44:23 = 15 Hep -10 BCE
 
 =head3 GyMd (GGGGG y-MM-dd)
@@ -468,13 +468,13 @@ Māori locale.
 =head3 MMM (LLL)
 
    2008-02-05T18:30:30 = Pēp
-   1995-12-22T09:05:02 = Tīhe
+   1995-12-22T09:05:02 = Tīh
   -0010-09-15T04:44:23 = Hep
 
 =head3 MMMEd (E, d MMM)
 
    2008-02-05T18:30:30 = Tūr, 5 Pēp
-   1995-12-22T09:05:02 = Par, 22 Tīhe
+   1995-12-22T09:05:02 = Par, 22 Tīh
   -0010-09-15T04:44:23 = Rāh, 15 Hep
 
 =head3 MMMMW-count-other ('wiki' W 'o' MMMM)
@@ -492,7 +492,7 @@ Māori locale.
 =head3 MMMd (d MMM)
 
    2008-02-05T18:30:30 = 5 Pēp
-   1995-12-22T09:05:02 = 22 Tīhe
+   1995-12-22T09:05:02 = 22 Tīh
   -0010-09-15T04:44:23 = 15 Hep
 
 =head3 Md (dd-MM)
@@ -564,13 +564,13 @@ Māori locale.
 =head3 yMMM (MMM y)
 
    2008-02-05T18:30:30 = Pēp 2008
-   1995-12-22T09:05:02 = Tīhe 1995
+   1995-12-22T09:05:02 = Tīh 1995
   -0010-09-15T04:44:23 = Hep -10
 
 =head3 yMMMEd (E, d MMM y)
 
    2008-02-05T18:30:30 = Tūr, 5 Pēp 2008
-   1995-12-22T09:05:02 = Par, 22 Tīhe 1995
+   1995-12-22T09:05:02 = Par, 22 Tīh 1995
   -0010-09-15T04:44:23 = Rāh, 15 Hep -10
 
 =head3 yMMMM (MMMM y)
@@ -582,7 +582,7 @@ Māori locale.
 =head3 yMMMd (d MMM y)
 
    2008-02-05T18:30:30 = 5 Pēp 2008
-   1995-12-22T09:05:02 = 22 Tīhe 1995
+   1995-12-22T09:05:02 = 22 Tīh 1995
   -0010-09-15T04:44:23 = 15 Hep -10
 
 =head3 yMd (dd-MM-y)
@@ -625,7 +625,7 @@ No
 =head3 %c (%a %b %e %H:%M:%S %Y) - date time format
 
    2008-02-05T18:30:30 = Tūr Pēp  5 18:30:30 2008
-   1995-12-22T09:05:02 = Par Tīhe 22 09:05:02 1995
+   1995-12-22T09:05:02 = Par Tīh 22 09:05:02 1995
   -0010-09-15T04:44:23 = Rāh Hep 15 04:44:23 -10
 
 =head3 %x (%m/%d/%y) - date format

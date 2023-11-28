@@ -1,5 +1,10 @@
 use Test::More;
 
+use_ok('Parse::SAMGov::Entity::Address');
+use_ok('Parse::SAMGov::Entity::PointOfContact');
+use_ok('Parse::SAMGov::Entity');
+use_ok('Parse::SAMGov::Exclusion::Name');
+use_ok('Parse::SAMGov::Exclusion');
 use_ok('Parse::SAMGov');
 
 my $p = new_ok('Parse::SAMGov');

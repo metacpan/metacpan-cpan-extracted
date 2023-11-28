@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XQuery.pm
-## Version v0.2.1
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v0.2.2
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/01
-## Modified 2023/05/18
+## Modified 2023/11/06
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( @EXPORT $DEBUG $VERSION );
     our @EXPORT = qw( xq );
     our $DEBUG = 0;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -48,7 +48,6 @@ BEGIN
     # use HTML::Object::DOM::Text;
     use HTML::Selector::XPath 0.20 qw( selector_to_xpath );
     use List::Util ();
-    use Nice::Try;
     # use Promise::XS ();
     # use Promise::Me;
     use HTML::Object::XPath;
@@ -890,14 +889,16 @@ sub find
 #                 warn( "Error while calling findnodes on element id \"", $_->id, "\" and tag \"", $_->tag, "\": $e\n" );
 #             }
 #         });
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my @nodes = $self->findnodes( $xpath );
             $collection->children->push( @nodes );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            warn( "Error while calling findnodes on element id \"", $_->id, "\" and tag \"", $_->tag, "\": $e\n" );
+            warn( "Error while calling findnodes on element id \"", $_->id, "\" and tag \"", $_->tag, "\": $@\n" );
         }
     }
     return( $collection );
@@ -1563,22 +1564,26 @@ sub load
     ( $url, my $target ) = split( /[[:blank:]\h]+/, $url, 2 );
     
     my $uri;
-    try
+    # try-catch
+    local $@;
+    eval
     {
         $uri = URI->new( "$url" );
-    }
-    catch( $e )
+    };
+    if( $@ )
     {
-        return( $self->error( "Bad url provided \"$url\": $e" ) );
+        return( $self->error( "Bad url provided \"$url\": $@" ) );
     }
     
-    try
+    my $content;
+    my $resp;
+    # try-catch
+    eval
     {
         my $ua = LWP::UserAgent->new(
             agent   => "HTML::Object/$VERSION",
             timeout => $opts->{timeout},
         );
-        my $resp;
         # "The POST method is used if data is provided as an object; otherwise, GET is assumed."
         # <https://api.jquery.com/load/#load-url-data-complete>
         if( defined( $data ) )
@@ -1590,55 +1595,12 @@ sub load
             $resp = $ua->get( $uri, ( ref( $opts->{headers} ) eq 'HASH' && scalar( keys( %{$opts->{headers}} ) ) ) ? %{$opts->{headers}} : () );
         }
         
-        if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
-        {
-            $complete->( $resp->decoded_content, 'error', $resp );
-            return( $self->error({
-                code => $resp->code,
-                message => $resp->message,
-            }) );
-        }
-        my $content = $resp->decoded_content;
-        my $parser = $self->new_parser;
-        # HTML::Object::DOM::Document
-        my $doc = $parser->parse_data( $content );
-        my $new = $doc->children;
-        # "When this method executes, it retrieves the content of ajax/test.html, but then jQuery parses the returned document to find the element with an ID of container. This element, along with its contents, is inserted into the element with an ID of result, and the rest of the retrieved document is discarded."
-        if( defined( $target ) )
-        {
-            my $elem = $doc->find( $target ) || return( $self->pass_error( $doc->error ) );
-            # $new = $self->new_array( $elem );
-            $new = $elem->children;
-        }
-        
-        # "If a "complete" callback is provided, it is executed after post-processing and HTML insertion has been performed. The callback is fired once for each element in the collection, and $_ is set to each DOM element in turn."
-        $children->foreach(sub
-        {
-            my $child = shift( @_ );
-            # Make a deep copy for each child element and set each child element's children
-            my $clone = $new->map(sub{ $_->clone });
-            $child->children( $clone );
-            $child->reset(1);
-            my $status = 'error';
-            if( $resp->code >= 200 && $resp->code < 300 )
-            {
-                $status = 'success';
-            }
-            elsif( $resp->code == 304 )
-            {
-                $status = 'notmodified';
-            }
-            elsif( $resp->is_error )
-            {
-                $status = 'error';
-            }
-            $complete->( $content, $status, $resp );
-        });
-    }
-    catch( $e )
+        $content = $resp->decoded_content;
+    };
+    if( $@ )
     {
         require HTTP::Response;
-        my $err = "Error trying to get url \"$url\": $e";
+        my $err = "Error trying to get url \"$url\": $@";
         my $resp2 = HTTP::Response->new( 500, "Unexpected error", [], $err );
         $complete->( $err, 'error', $resp2 );
         return( $self->error({
@@ -1646,6 +1608,50 @@ sub load
             message => $err,
         }) );
     }
+    
+    if( $resp->header( 'Client-Warning' ) || !$resp->is_success )
+    {
+        $complete->( $content, 'error', $resp );
+        return( $self->error({
+            code => $resp->code,
+            message => $resp->message,
+        }) );
+    }
+    my $parser = $self->new_parser;
+    # HTML::Object::DOM::Document
+    my $doc = $parser->parse_data( $content );
+    my $new = $doc->children;
+    # "When this method executes, it retrieves the content of ajax/test.html, but then jQuery parses the returned document to find the element with an ID of container. This element, along with its contents, is inserted into the element with an ID of result, and the rest of the retrieved document is discarded."
+    if( defined( $target ) )
+    {
+        my $elem = $doc->find( $target ) || return( $self->pass_error( $doc->error ) );
+        # $new = $self->new_array( $elem );
+        $new = $elem->children;
+    }
+    
+    # "If a "complete" callback is provided, it is executed after post-processing and HTML insertion has been performed. The callback is fired once for each element in the collection, and $_ is set to each DOM element in turn."
+    $children->foreach(sub
+    {
+        my $child = shift( @_ );
+        # Make a deep copy for each child element and set each child element's children
+        my $clone = $new->map(sub{ $_->clone });
+        $child->children( $clone );
+        $child->reset(1);
+        my $status = 'error';
+        if( $resp->code >= 200 && $resp->code < 300 )
+        {
+            $status = 'success';
+        }
+        elsif( $resp->code == 304 )
+        {
+            $status = 'notmodified';
+        }
+        elsif( $resp->is_error )
+        {
+            $status = 'error';
+        }
+        $complete->( $content, $status, $resp );
+    });
     return( $self );
 }
 
@@ -1745,14 +1751,16 @@ sub not
         my $doc = $self->filter(sub
         {
             my $elem = shift( @_ );
-            try
+            # try-catch
+            my $rv = eval
             {
                 return( !$elem->matches( $xpath ) );
-            }
-            catch( $e )
+            };
+            if( $@ )
             {
-                return( $self->error( "Caught an exception while calling matches with xpath '$xpath' for element of class ", ref( $elem ), " and tag '", $elem->tag, "': $e" ) );
+                return( $self->error( "Caught an exception while calling matches with xpath '$xpath' for element of class ", ref( $elem ), " and tag '", $elem->tag, "': $@" ) );
             }
+            return( $rv );
         });
         $collection->children( $doc->children );
     }

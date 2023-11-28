@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 use Test::Future::IO 0.05;
 
 use constant HAVE_TEST_METRICS_ANY => eval {
@@ -42,6 +42,8 @@ sub with_crc8
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x01\x01" ) . "\x00" ) );
    $controller->expect_sysread( "DummyFH", 8192 )
       ->will_done( "\x55" . with_crc8( with_crc8( "\x02\x01" ) . "\x00" ) );
+   $controller->expect_sleep( 0.05 * 3 )
+      ->remains_pending;
 
    $controller->expect_syswrite( "DummyFH",
       "\x55" . with_crc8( with_crc8( "\x31\x03" ) . "req" ) )
@@ -93,7 +95,7 @@ sub with_crc8
 
    my $f = $slurm->request( "req" );
    $f->await;
-   is_deeply( [ $f->failure ], [ "Received ERR packet <65.72.72>", slurm => "err" ],
+   is( [ $f->failure ], [ "Received ERR packet <65.72.72>", slurm => "err" ],
       'Request future failed with error' );
 
    $controller->check_and_clear( '->request for error' );
@@ -154,7 +156,7 @@ sub with_crc8
 
    my $f = $slurm->request( "req3" );
    $f->await;
-   is_deeply( [ $f->failure ], [ "Request timed out after 3 attempts\n", slurm => undef ],
+   is( [ $f->failure ], [ "Request timed out after 3 attempts\n", slurm => undef ],
       'Eventual failure of ->request timeout' );
 
    if( HAVE_TEST_METRICS_ANY ) {

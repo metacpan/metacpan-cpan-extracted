@@ -1,293 +1,39 @@
 NAME
-    WebService::Kramerius::API4 - Class to Kramerius v4+ API.
-
-SYNOPSIS
-     use WebService::Kramerius::API4;
-     my $obj = WebService::Kramerius::API4->new(%params);
-     my $item_json = get_item($item_id)
-     my $item_children_json = get_item_children($item_id);
-     my $item_siblings_json = get_item_siblings($item_id);
-     my $item_streams_json = get_item_streams($item_id);
-     my $item_stream = get_item_streams_one($item_id, $stream_id);
-     my $item_image = get_item_image($item_id);
-     my $item_preview_image = get_item_preview($item_id);
-     my $thumb_image = get_item_thumb($item_id);
-     my $foxml_xml = get_item_foxml($item_id);
-
-METHODS
-    "new(%params)"
-             Constructor.
-
-            *       "library_url"
-
-                     Library URL.
-                     This parameter is required.
-                     Default value is undef.
-
-            *       "output_dispatch"
-
-                     Output dispatch hash structure.
-                     Key is content-type and value is subroutine, which converts content to what do you want.
-                     Default value is blank hash array.
-
-    "get_item($item_id)"
-             Get item JSON structure.
-             Returns JSON string when JSON output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-    "get_item_children($item_id)"
-             Get item children JSON structure.
-             Returns JSON string when JSON output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-    "get_item_siblings($item_id)"
-             Get item siblings JSON structure.
-             Returns JSON string when JSON output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-    "get_item_streams($item_id)"
-             Get item streams JSON structure.
-             Returns JSON string when JSON output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-    "get_item_streams_one($item_id, $stream_id)"
-             Get item stream.
-             Returns stream value when particular output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-    "get_item_image($item_id)"
-             Get item image.
-             Returns image when particular output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-    "get_item_preview($item_id)"
-             Get item preview image.
-             Returns image when particular output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-    "get_item_thumb($item_id)"
-             Get item thumbnail image.
-             Returns image when particular output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-    "get_item_foxml($item_id)"
-             Get item foxml XML structure.
-             Returns XML string when XML output dispatch doesn't set.
-             Otherwise returns value from output dispatch.
-
-ERRORS
-     new():
-             Parameter 'library_url' is required.
-             From Class::Utils::set_params():
-                     Unknown parameter '%s'.
-
-     get_item():
-             Cannot get '%s' URL.
-
-     get_item_children():
-             Cannot get '%s' URL.
-
-     get_item_siblings():
-             Cannot get '%s' URL.
-
-     get_item_streams():
-             Cannot get '%s' URL.
-
-     get_item_streams_one():
-             Cannot get '%s' URL.
-
-     get_item_image():
-             Cannot get '%s' URL.
-
-     get_item_preview():
-             Cannot get '%s' URL.
-
-     get_item_thumb():
-             Cannot get '%s' URL.
-
-     get_item_foxml()
-             Cannot get '%s' URL.
-
-EXAMPLE1
-     use strict;
-     use warnings;
-
-     use WebService::Kramerius::API4;
-
-     if (@ARGV < 2) {
-             print STDERR "Usage: $0 library_url work_id\n";
-             exit 1;
-     }
-     my $library_url = $ARGV[0];
-     my $work_id = $ARGV[1];
-
-     my $obj = WebService::Kramerius::API4->new(
-             'library_url' => $library_url,
-     );
-
-     # Get item JSON structure.
-     my $item_json = $obj->get_item($work_id);
-
-     print $item_json."\n";
-
-     # Output for 'http://kramerius.mzk.cz/' and '314994e0-490a-11de-ad37-000d606f5dc6'
-     # {"datanode":true,"context":[[{"pid":"uuid:5a2dd690-54b9-11de-8bcd-000d606f5dc6","model":"periodical"},{"pid":"uuid:303c91b0-490a-11de-921d-000d606f5dc6","model":"periodicalvolume"},{"pid":"uuid:bf1d5df0-49d8-11de-8cb4-000d606f5dc6","model":"periodicalitem"},{"pid":"uuid:314994e0-490a-11de-ad37-000d606f5dc6","model":"page"}]],"pid":"uuid:314994e0-490a-11de-ad37-000d606f5dc6","model":"page","handle":{"href":"http://kramerius.mzk.cz/search/handle/uuid:314994e0-490a-11de-ad37-000d606f5dc6"},"zoom":{"type":"zoomify","url":"http://kramerius.mzk.cz/search/zoomify/uuid:314994e0-490a-11de-ad37-000d606f5dc6"},"details":{"type":"TitlePage","pagenumber":"[1] \n                        "},"title":"[1]","iiif":"http://kramerius.mzk.cz/search/iiif/uuid:314994e0-490a-11de-ad37-000d606f5dc6","root_title":"Davidova houpačka","root_pid":"uuid:5a2dd690-54b9-11de-8bcd-000d606f5dc6","policy":"public"}
-
-EXAMPLE2
-     use strict;
-     use warnings;
-
-     use Data::Printer;
-     use JSON;
-     use WebService::Kramerius::API4;
-
-     if (@ARGV < 2) {
-             print STDERR "Usage: $0 library_url work_id\n";
-             exit 1;
-     }
-     my $library_url = $ARGV[0];
-     my $work_id = $ARGV[1];
-
-     my $obj = WebService::Kramerius::API4->new(
-             'library_url' => $library_url,
-             'output_dispatch' => {
-                     'application/json' => sub {
-                             my $json = shift;
-                             return JSON->new->decode($json);
-                     },
-             },
-     );
-
-     # Get item JSON structure as Perl hash.
-     my $item_json = $obj->get_item($work_id);
-
-     p $item_json;
-
-     # Output for 'http://kramerius.mzk.cz/' and '314994e0-490a-11de-ad37-000d606f5dc6'
-     # \ {
-     #     context      [
-     #         [0] [
-     #             [0] {
-     #                 model   "periodical",
-     #                 pid     "uuid:5a2dd690-54b9-11de-8bcd-000d606f5dc6"
-     #             },
-     #             [1] {
-     #                 model   "periodicalvolume",
-     #                 pid     "uuid:303c91b0-490a-11de-921d-000d606f5dc6"
-     #             },
-     #             [2] {
-     #                 model   "periodicalitem",
-     #                 pid     "uuid:bf1d5df0-49d8-11de-8cb4-000d606f5dc6"
-     #             },
-     #             [3] {
-     #                 model   "page",
-     #                 pid     "uuid:314994e0-490a-11de-ad37-000d606f5dc6"
-     #             }
-     #         ]
-     #     ],
-     #     datanode     JSON::PP::Boolean  {
-     #         Parents       Types::Serialiser::BooleanBase
-     #         public methods (0)
-     #         private methods (0)
-     #         internals: 1
-     #     },
-     #     details      {
-     #         pagenumber   "[1] 
-     #                         ",
-     #         type         "TitlePage"
-     #     },
-     #     handle       {
-     #         href   "http://kramerius.mzk.cz/search/handle/uuid:314994e0-490a-11de-ad37-000d606f5dc6"
-     #     },
-     #     iiif         "http://kramerius.mzk.cz/search/iiif/uuid:314994e0-490a-11de-ad37-000d606f5dc6",
-     #     model        "page",
-     #     pid          "uuid:314994e0-490a-11de-ad37-000d606f5dc6",
-     #     policy       "public",
-     #     root_pid     "uuid:5a2dd690-54b9-11de-8bcd-000d606f5dc6",
-     #     root_title   "Davidova houpačka",
-     #     title        "[1]",
-     #     zoom         {
-     #         type   "zoomify",
-     #         url    "http://kramerius.mzk.cz/search/zoomify/uuid:314994e0-490a-11de-ad37-000d606f5dc6"
-     #     }
-     # }
-
-EXAMPLE3
-     use strict;
-     use warnings;
-
-     use Data::Printer;
-     use JSON;
-     use WebService::Kramerius::API4;
-
-     if (@ARGV < 2) {
-             print STDERR "Usage: $0 library_url work_id\n";
-             exit 1;
-     }
-     my $library_url = $ARGV[0];
-     my $work_id = $ARGV[1];
-
-     my $obj = WebService::Kramerius::API4->new(
-             'library_url' => $library_url,
-             'output_dispatch' => {
-                     'application/json' => sub {
-                             my $json = shift;
-                             return JSON->new->decode($json);
-                     },
-             },
-     );
-
-     # Get item streams JSON structure as Perl hash.
-     my $item_streams_json = $obj->get_item_streams($work_id);
-
-     p $item_streams_json;
-
-     # Output for 'http://kramerius.mzk.cz/' and '314994e0-490a-11de-ad37-000d606f5dc6'
-     # \ {
-     #     BIBLIO_MODS    {
-     #         label      "BIBLIO_MODS description of current object",
-     #         mimeType   "text/xml"
-     #     },
-     #     DC             {
-     #         label      "Dublin Core Record for this object",
-     #         mimeType   "text/xml"
-     #     },
-     #     IMG_FULL       {
-     #         label      "",
-     #         mimeType   "image/jpeg"
-     #     },
-     #     IMG_FULL_ADM   {
-     #         label      "Image administrative metadata",
-     #         mimeType   "text/xml"
-     #     },
-     #     IMG_PREVIEW    {
-     #         label      "",
-     #         mimeType   "image/jpeg"
-     #     },
-     #     IMG_THUMB      {
-     #         label      "",
-     #         mimeType   "image/jpeg"
-     #     },
-     #     TEXT_OCR       {
-     #         label      "",
-     #         mimeType   "text/plain"
-     #     },
-     #     TEXT_OCR_ADM   {
-     #         label      "Image administrative metadata",
-     #         mimeType   "text/xml"
-     #     }
-     # }
-
-DEPENDENCIES
-    Class::Utils, Error::Pure, LWP::UserAgent.
+    WebService::Kramerius::API4 - Classes to Kramerius v4+ API.
 
 SEE ALSO
-    WebService::Kramerius::API4::Struct
-        Class to Kramerius v4+ API, which returns Perl structures instead
-        raw data.
+    WebService::Kramerius::API4::AsyncPDF
+        TODO
+
+    WebService::Kramerius::API4::Base
+        TODO
+
+    WebService::Kramerius::API4::Feed
+        Class to feed endpoint in Kramerius v4+ API.
+
+    WebService::Kramerius::API4::Info
+        Class to info endpoint in Kramerius v4+ API.
+
+    WebService::Kramerius::API4::Item
+        Class to item endpoint in Kramerius v4+ API.
+
+    WebService::Kramerius::API4::PDF
+        TODO
+
+    WebService::Kramerius::API4::Rights
+        Class to rights endpoint in Kramerius v4+ API.
+
+    WebService::Kramerius::API4::Search
+        TODO
+
+    WebService::Kramerius::API4::User
+        Class to user endpoint in Kramerius v4+ API.
+
+    WebService::Kramerius::API4::VC
+        TODO
 
 REPOSITORY
-    <https://github.com/tupinek/WebService-Kramerius-API4>
+    <https://github.com/michal-josef-spacek/WebService-Kramerius-API4>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -295,9 +41,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Josef Špaček 2015-2017
-     BSD 2-Clause License
+    © Michal Josef Špaček 2015-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

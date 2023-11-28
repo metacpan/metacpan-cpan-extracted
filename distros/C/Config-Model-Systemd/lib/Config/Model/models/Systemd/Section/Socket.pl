@@ -424,8 +424,8 @@ C<USBFunctionStrings> options set.
       'SocketProtocol',
       {
         'choice' => [
-          'udplite',
-          'sctp'
+          'sctp',
+          'udplite'
         ],
         'description' => 'Takes one of C<udplite>
 or C<sctp>. The socket will use the UDP-Lite
@@ -437,8 +437,8 @@ or C<sctp>. The socket will use the UDP-Lite
       'BindIPv6Only',
       {
         'choice' => [
-          'default',
           'both',
+          'default',
           'ipv6-only'
         ],
         'description' => 'Takes one of C<default>,
@@ -459,12 +459,13 @@ C<both>.',
       },
       'Backlog',
       {
-        'description' => 'Takes an unsigned integer argument. Specifies
-the number of connections to queue that have not been accepted
-yet. This setting matters only for stream and sequential
-packet sockets. See
-L<listen(2)>
-for details. Defaults to SOMAXCONN (128).',
+        'description' => 'Takes an unsigned 32-bit integer argument. Specifies the number of connections to
+queue that have not been accepted yet. This setting matters only for stream and sequential packet
+sockets. See
+L<listen(2)> for
+details. Note that this value is silently capped by the C<net.core.somaxconn> sysctl,
+which typically defaults to 4096. By default this is set to 4294967295, so that the sysctl takes full
+effect.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -538,6 +539,11 @@ sockets it got with C<Accept=no>, but it may do so for sockets it got with
 C<Accept=yes> set. Setting C<Accept=yes> is mostly useful to allow
 daemons designed for usage with L<inetd(8)> to work
 unmodified with systemd socket activation.
+
+Note that depending on this setting the services activated by units of this type are either
+regular services (in case of C<Accept>C<no>) or instances of templated
+services (in case of C<Accept>C<yes>). See the Description section
+above for a more detailed discussion of the naming rules of triggered services.
 
 For IPv4 and IPv6 connections, the C<REMOTE_ADDR> environment variable will
 contain the remote IP address, and C<REMOTE_PORT> will contain the remote port. This
@@ -628,8 +634,9 @@ socket option (see
 L<socket(7)>
 and the L<TCP
 Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.)
-Defaults value is 7200 seconds (2 hours).',
+Default value is 7200 seconds (2 hours).',
         'type' => 'leaf',
+        'upstream_default' => '7200',
         'value_type' => 'integer'
       },
       'KeepAliveIntervalSec',
@@ -638,8 +645,9 @@ Defaults value is 7200 seconds (2 hours).',
 socket option C<SO_KEEPALIVE> has been set on this socket. This controls the
 C<TCP_KEEPINTVL> socket option (see L<socket(7)> and
 the L<TCP Keepalive
-HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Defaults value is 75 seconds.',
+HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Default value is 75 seconds.',
         'type' => 'leaf',
+        'upstream_default' => '75',
         'value_type' => 'integer'
       },
       'KeepAliveProbes',
@@ -650,9 +658,10 @@ connection dead and notifying the application layer. This
 controls the TCP_KEEPCNT socket option (see
 L<socket(7)>
 and the L<TCP
-Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Defaults value is
+Keepalive HOWTO|http://www.tldp.org/HOWTO/html_single/TCP-Keepalive-HOWTO/> for details.) Default value is
 9.',
         'type' => 'leaf',
+        'upstream_default' => '9',
         'value_type' => 'integer'
       },
       'NoDelay',
@@ -935,15 +944,15 @@ C<false>.',
       'Timestamping',
       {
         'choice' => [
+          'ns',
+          'nsec',
           'off',
           'us',
           'usec',
-          "\x{b5}s",
-          'ns',
-          'nsec'
+          "\x{3bc}s"
         ],
         'description' => "Takes one of C<off>, C<us> (alias:
-C<usec>, C<\x{b5}s>) or C<ns> (alias:
+C<usec>, C<\x{3bc}s>) or C<ns> (alias:
 C<nsec>). This controls the C<SO_TIMESTAMP> or
 C<SO_TIMESTAMPNS> socket options, and enables whether ingress network traffic shall
 carry timestamping metadata. Defaults to C<off>.",
@@ -1134,7 +1143,7 @@ limit is enforced before the service activation is enqueued.",
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 252 doc',
+    'generated_by' => 'parse-man.pl from systemd 254 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

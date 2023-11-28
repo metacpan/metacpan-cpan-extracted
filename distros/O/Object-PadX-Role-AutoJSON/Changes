@@ -1,0 +1,10 @@
+1.2 2023-11-22 New features!
+	- Switch to using Test2::v0 for more modern testing, not a big thing yet
+	- Add JSONList attribute for handling lists of numbers or strings
+
+1.1 2023-11-19 Minor updates
+	- Remove unused ::Equ module
+	- Lower perl version to 5.26, minimum requirement for some of the role features in use
+
+1.0 2023-11-15 Initial release
+	- first release

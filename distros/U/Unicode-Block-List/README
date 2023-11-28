@@ -3,21 +3,30 @@ NAME
 
 SYNOPSIS
      use Unicode::Block::List;
+
      my $obj = Unicode::Block->new(%parameters);
      my $block = $obj->block($block);
      my @list = $obj->list;
 
 METHODS
-    "new(%parameters)"
-            Constructor.
+  "new"
+     my $obj = Unicode::Block->new(%parameters);
 
-    "block($block)"
-             Get Unicode::Block object for defined Unicode block.
-             Returns Unicode::Block object.
+    Constructor.
 
-    "list()"
-             Get list of blocks.
-             Returns array of Unicode block names.
+    Returns instance of object.
+
+  "block"
+     my $block = $obj->block($block);
+
+    Get Unicode::Block object for defined Unicode block.
+
+    Returns Unicode::Block object.
+
+  "list"
+     my @list = $obj->list;
+
+    Get list of blocks. Returns array of Unicode block names.
 
 ERRORS
      new():
@@ -365,7 +374,7 @@ DEPENDENCIES
     Class::Utils, Unicode::Block, Unicode::UCD.
 
 REPOSITORY
-    <https://github.com/tupinek/Unicode-Block-List>
+    <https://github.com/michal-josef-spacek/Unicode-Block-List>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -373,9 +382,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2013-2018 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2013-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

@@ -1,15 +1,17 @@
 #!perl
 
-use Test::More tests => 43;
+use Test::More tests => 45;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 use Time::HiRes;
 
-my $sleepwait = 1000;
+my $sleepwait = 5000;
 
 SKIP: {
-      skip 'not in dist testing', 43 unless $ENV{HIPI_MODULES_DIST_TEST_SYSFS};
+      skip 'not in dist testing', 45 unless ( $ENV{HIPI_MODULES_DIST_TEST_SYSFS} );
 
+my $syspin36 = HiPi::RaspberryPi::has_rp1() ? RPI_PIN_36 + 399 : RPI_PIN_36;
+my $syspin37 = HiPi::RaspberryPi::has_rp1() ? RPI_PIN_37 + 399 : RPI_PIN_37;
       
 diag('DEVICE GPIO (sysfs) tests are running');
 
@@ -25,14 +27,14 @@ is($gpio->pin_status( RPI_PIN_36 ), DEV_GPIO_PIN_STATUS_NONE, 'pin status not ex
 $gpio->set_pin_mode( RPI_PIN_36, RPI_MODE_INPUT );
 Time::HiRes::usleep($sleepwait);
 is ( $gpio->get_pin_mode( RPI_PIN_36 ), RPI_MODE_INPUT, 'pin mode input');
-is ( $gpio->get_pin_function( RPI_PIN_36 ), 'INPUT', 'gpio function name' );
+is ( $gpio->get_pin_function( RPI_PIN_36 ), 'INPUT', 'gpio function name INPUT' );
 
-is($gpio->pin_status( RPI_PIN_36 ), DEV_GPIO_PIN_STATUS_EXPORTED, 'pin status exported after pud');
+is($gpio->pin_status( RPI_PIN_36 ), DEV_GPIO_PIN_STATUS_EXPORTED, 'pin status exported');
 
 $gpio->set_pin_mode( RPI_PIN_36, RPI_MODE_OUTPUT );
 Time::HiRes::usleep($sleepwait);
 is( $gpio->get_pin_mode( RPI_PIN_36 ), RPI_MODE_OUTPUT, 'pin mode output');
-is ( $gpio->get_pin_function( RPI_PIN_36 ), 'OUTPUT', 'gpio function name' );
+is ( $gpio->get_pin_function( RPI_PIN_36 ), 'OUTPUT', 'gpio function name OUTPUT' );
 
 
 $gpio->set_pin_mode( RPI_PIN_36, RPI_MODE_INPUT );
@@ -40,21 +42,23 @@ Time::HiRes::usleep($sleepwait);
 is( $gpio->get_pin_mode( RPI_PIN_36 ), RPI_MODE_INPUT, 'pin mode input reset');
 
 $gpio->set_pin_pud( RPI_PIN_36, RPI_PUD_UP );
+is( $gpio->get_pin_pud( RPI_PIN_36 ), RPI_PUD_UP, 'pin pud up setting');
 Time::HiRes::usleep($sleepwait);
-is( $gpio->pin_read( RPI_PIN_36 ), RPI_HIGH, 'pin pud up');
+is( $gpio->pin_read( RPI_PIN_36 ), RPI_HIGH, 'pin pud up - read');
 is( $gpio->get_pin_level( RPI_PIN_36 ), RPI_HIGH, 'pin pud up - level');
 
 $gpio->set_pin_pud( RPI_PIN_36, RPI_PUD_OFF );
 Time::HiRes::usleep($sleepwait);
 
 $gpio->set_pin_pud( RPI_PIN_36, RPI_PUD_DOWN );
+is( $gpio->get_pin_pud( RPI_PIN_36 ), RPI_PUD_DOWN, 'pin pud down setting');
 Time::HiRes::usleep($sleepwait);
-is( $gpio->pin_read( RPI_PIN_36 ), RPI_LOW, 'pin pud low');
+is( $gpio->pin_read( RPI_PIN_36 ), RPI_LOW, 'pin pud low - read');
 is( $gpio->get_pin_level( RPI_PIN_36 ), RPI_LOW, 'pin pud low - level');
 
 $gpio->set_pin_pud( RPI_PIN_36, RPI_PUD_OFF );
 
-is( $gpio->get_pin_interrupt_filepath( RPI_PIN_36 ), '/sys/class/gpio/gpio16/value', 'pin interrupt filepath');
+is( $gpio->get_pin_interrupt_filepath( RPI_PIN_36 ), qq(/sys/class/gpio/gpio$syspin36/value), 'pin interrupt filepath');
 
 is( $gpio->get_pin_activelow( RPI_PIN_36 ), 0, 'active low is 0');
 
@@ -104,7 +108,7 @@ is( $pin->value(  ), RPI_LOW, 'pin pud low');
 
 $pin->set_pud( RPI_PUD_OFF );
 
-is( $pin->get_interrupt_filepath(), '/sys/class/gpio/gpio16/value', 'PIN pin interrupt filepath');
+is( $pin->get_interrupt_filepath(), qq(/sys/class/gpio/gpio$syspin36/value), 'PIN pin interrupt filepath');
 
 is( $pin->active_low( ), 0, 'PIN active low is 0');
 

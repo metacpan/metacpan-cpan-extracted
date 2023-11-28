@@ -8,11 +8,11 @@ use AsposeCellsCloud::Object::Spinner;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**CurrentValue** | **int** |  |
-**IncrementalChange** | **int** |  |
-**Max** | **int** |  |
-**Min** | **int** |  |
-**Shadow** | **boolean** |  |
+**CurrentValue** | **int** | Gets or sets the current value. |
+**IncrementalChange** | **int** | Gets or sets the amount that the scroll bar or spinner is incremented a line scroll. |
+**Max** | **int** | Gets or sets the maximum value of a scroll bar or spinner range. |
+**Min** | **int** | Gets or sets the minimum value of a scroll bar or spinner range. |
+**Shadow** | **boolean** | Indicates whether the shape has 3-D shading. |
 **Name** | **string** |  |
 **MsoDrawingType** | **string** |  |
 **AutoShapeType** | **string** |  |

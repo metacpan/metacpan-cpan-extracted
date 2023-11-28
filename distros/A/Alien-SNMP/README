@@ -1,9 +1,6 @@
 NAME
     Alien::SNMP - Alien package for the Net-SNMP library
 
-VERSION
-    Version 2.001000
-
 SYNOPSIS
      use Alien::SNMP;
      # then it's just like SNMP.pm
@@ -25,6 +22,7 @@ DESCRIPTION
     "--with-mibs="""
     "--with-perl-modules"
     "--disable-embedded-perl"
+    "--enable-blumenthal-aes"
     "--with-defaults"
 
 METHODS

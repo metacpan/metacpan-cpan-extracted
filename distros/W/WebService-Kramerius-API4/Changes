@@ -1,2 +1,18 @@
+0.02 2023-11-26T14:57:16+01:00
+ - Add META.json to MANIFEST file.
+ - Add hack for ALTO content type.
+ - Add tests for WebService::Kramerius::API4::Struct.
+ - Fix description section in doc.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Implement much better structured API classes.
+ - Move bugtracker to github.
+ - Obsolete WebService::Kramerius::API4 API.
+ - Remove WebService::Kramerius::API4::Struct API.
+ - Rename example files to better names.
+ - Rewrite to List::Util.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update copyright years.
+
 0.01 2017-02-12T21:48:04+01:00
  - First version.

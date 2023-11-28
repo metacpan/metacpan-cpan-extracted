@@ -1,11 +1,10 @@
-use strict;
-use warnings;
+use strictures 2;
 package JSON::Schema::Modern::Document::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One OpenAPI v3.1 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.049';
+our $VERSION = '0.052';
 
 use 5.020;
 use Moo;
@@ -22,10 +21,8 @@ use File::ShareDir 'dist_dir';
 use Path::Tiny;
 use List::Util 'pairs';
 use Ref::Util 'is_plain_hashref';
-use MooX::HandlesVia;
 use MooX::TypeTiny 0.002002;
 use Types::Standard qw(InstanceOf HashRef Str Enum);
-use Storable 'dclone';
 use namespace::clean;
 
 extends 'JSON::Schema::Modern::Document';
@@ -45,6 +42,7 @@ use constant DEFAULT_SCHEMAS => {
 use constant DEFAULT_BASE_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema-base/2022-10-07';
 use constant DEFAULT_METASCHEMA => 'https://spec.openapis.org/oas/3.1/schema/2022-10-07';
 
+# warning: this is weak_ref'd, so it may not exist after construction/traverse time
 has '+evaluator' => (
   required => 1,
 );
@@ -59,34 +57,19 @@ has json_schema_dialect => (
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
 );
 
-my $reffable_entities = Enum[qw(response parameter example request-body header security-scheme link callbacks path-item)];
-
-# json pointer => entity name
-has entities => (
-  is => 'bare',
-  isa => HashRef[$reffable_entities],
-   handles_via => 'Hash',
-   handles => {
-     _add_entity_location => 'set',
-     get_entity_at_location => 'get',
-  },
-  lazy => 1,
-  default => sub { {} },
-
-);
+# json pointer => entity name (indexed by integer); overrides parent
+sub __entities { qw(schema response parameter example request-body header security-scheme link callbacks path-item) }
 
 # operationId => document path
-has operationIds => (
-  is => 'bare',
+has _operationIds => (
+  is => 'ro',
   isa => HashRef[Str],
-   handles_via => 'Hash',
-   handles => {
-     _add_operationId => 'set',
-     get_operationId_path => 'get',
-  },
   lazy => 1,
   default => sub { {} },
 );
+
+sub get_operationId_path { $_[0]->_operationIds->{$_[1]} }
+sub _add_operationId { $_[0]->_operationIds->{$_[1]} = Str->($_[2]) }
 
 sub traverse ($self, $evaluator) {
   $self->_add_vocab_and_default_schemas;
@@ -103,6 +86,7 @@ sub traverse ($self, $evaluator) {
     configs => {},
     spec_version => $evaluator->SPECIFICATION_VERSION_DEFAULT,
     vocabularies => [],
+    subschemas => [],
   };
 
   # this is an abridged form of https://spec.openapis.org/oas/3.1/schema/latest
@@ -177,9 +161,8 @@ sub traverse ($self, $evaluator) {
           return 1;
         },
         '$ref' => sub ($data, $schema, $state) {
-          my ($entity) = ($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)?$});
-          $self->_add_entity_location($state->{data_path}, $entity)
-            if $entity and $reffable_entities->check($entity);
+          my ($entity) = ($schema->{'$ref'} =~ m{#/\$defs/([^/]+?)(?:-or-reference)$});
+          $self->_add_entity_location($state->{data_path}, $entity) if $entity;
 
           push @operation_paths, [ $data->{operationId} => $state->{data_path} ]
             if $schema->{'$ref'} eq '#/$defs/operation' and defined $data->{operationId};
@@ -189,7 +172,6 @@ sub traverse ($self, $evaluator) {
       },
     },
   );
-  $self->_add_entity_location($_, 'schema') foreach @json_schema_paths;
 
   if (not $result) {
     $_->mode('evaluate') foreach $result->errors;
@@ -229,6 +211,8 @@ sub traverse ($self, $evaluator) {
     $self->_traverse_schema($self->get($json_schema_paths[$idx]), { %$state, schema_path => $json_schema_paths[$idx] });
   }
 
+  $self->_add_entity_location($_, 'schema') foreach $state->{subschemas}->@*;
+
   foreach my $pair (@operation_paths) {
     my ($operation_id, $path) = @$pair;
     if (my $existing = $self->get_operationId_path($operation_id)) {
@@ -243,26 +227,6 @@ sub traverse ($self, $evaluator) {
   }
 
   return $state;
-}
-
-sub recursive_get ($self, $uri_reference) {
-  my $base = $self->canonical_uri;
-  my $ref = $uri_reference;
-  my ($depth, $schema);
-
-  while ($ref) {
-    die 'maximum evaluation depth exceeded' if $depth++ > $self->evaluator->max_traversal_depth;
-    my $uri = Mojo::URL->new($ref)->to_abs($base);
-
-    my $schema_info = $self->evaluator->_fetch_from_uri($uri);
-    die('unable to find resource ', $uri) if not $schema_info;
-    $schema = $schema_info->{schema};
-    $base = $schema_info->{canonical_uri};
-    $ref = $schema->{'$ref'};
-  }
-
-  $schema = dclone($schema);
-  return wantarray ? ($schema, $base) : $schema;
 }
 
 ######## NO PUBLIC INTERFACES FOLLOW THIS POINT ########
@@ -316,11 +280,12 @@ sub _traverse_schema ($self, $schema, $state) {
   return if $subschema_state->{errors}->@*;
 
   push $state->{identifiers}->@*, $subschema_state->{identifiers}->@*;
+  push $state->{subschemas}->@*, $subschema_state->{subschemas}->@*;
 }
 
 # callback hook for Sereal::Decoder
 sub THAW ($class, $serializer, $data) {
-  foreach my $attr (qw(schema evaluator entities)) {
+  foreach my $attr (qw(schema evaluator _entities)) {
     die "serialization missing attribute '$attr': perhaps your serialized data was produced for an older version of $class?"
       if not exists $class->{$attr};
   }
@@ -341,7 +306,7 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.1 document
 
 =head1 VERSION
 
-version 0.049
+version 0.052
 
 =head1 SYNOPSIS
 
@@ -366,7 +331,7 @@ C<https://spec.openapis.org/oas/3.1/schema-base/latest> (an alias for the latest
 
 and the L<OpenAPI v3.1 specification|https://spec.openapis.org/oas/v3.1.0>.
 
-=for Pod::Coverage THAW
+=for Pod::Coverage THAW get_entity_at_location
 
 =head1 ATTRIBUTES
 
@@ -415,26 +380,6 @@ longer be assumed.
 Returns the json pointer location of the operation containing the provided C<operationId> (suitable
 for passing to C<< $document->get(..) >>), or C<undef> if the location does not exist in the
 document.
-
-=head2 recursive_get
-
-Given a uri or uri-reference, get the definition at that location, following any C<$ref>s along the
-way. Returns the data in scalar context, or a tuple of the data and the canonical URI of the
-referenced location in list context.
-
-If the provided location is relative, the current document is used as the base URI.
-If you have a local json pointer you want to resolve, you can turn it into a uri-reference by
-prepending C<#>.
-
-  # starts with a JSON::Schema::Modern::Document::OpenAPI object
-  $document->recursive_get('#/components/parameters/Content-Encoding');
-
-  # starts with an OpenAPI::Modern object
-  $openapi->openapi_document->recursive_get('#/components/parameters/Content-Encoding');
-
-  # starts with a JSON::Schema::Modern object (TODO)
-  $js->recursive_get('https:///openapi_doc.yaml#/components/schemas/my_object')
-  $js->recursive_get('https://localhost:1234/my_spec#/$defs/my_object')
 
 =head1 SEE ALSO
 

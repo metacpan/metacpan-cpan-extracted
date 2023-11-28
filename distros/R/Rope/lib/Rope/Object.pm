@@ -21,6 +21,13 @@ sub compile {
 	$self->{sort_keys} = [sort {
 		$self->{properties}->{$a}->{index} <=> $self->{properties}->{$b}->{index}
 	} grep { $self->{properties}->{$_}->{enumerable} } keys %{$self->{properties}}];
+	if ($self->{requires}) {
+		for (keys %{$self->{requires}}) {
+			die sprintf "Failed to instantiate %s object requires property %s", $self->{name}, $_
+				unless $self->{properties}->{$_} 
+					&& defined $self->{properties}->{$_}->{value};
+		}
+	}
 	return $self;
 }
 

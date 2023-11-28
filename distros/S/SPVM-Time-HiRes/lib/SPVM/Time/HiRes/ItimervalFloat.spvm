@@ -1,0 +1,17 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Time::HiRes::ItimervalFloat {
+  # Fields
+  has it_interval : rw double;
+  
+  has it_value : rw double;
+  
+  # Class Methods
+  static method new : Time::HiRes::ItimervalFloat () {
+    my $self = new Time::HiRes::ItimervalFloat;
+    
+    return $self;
+  }
+  
+}

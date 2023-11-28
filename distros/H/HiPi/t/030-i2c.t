@@ -1,6 +1,6 @@
 #!perl
 
-use Test::More tests => 93;
+use Test::More tests => 95;
 use HiPi qw( :rpi :i2c );
 use HiPi::RaspberryPi;
 use Time::HiRes;
@@ -8,7 +8,7 @@ use Time::HiRes;
 my $sleepwait = 1000;
 
 SKIP: {
-        skip 'not in dist testing', 93 unless $ENV{HIPI_MODULES_DIST_TEST_I2C};
+        skip 'not in dist testing', 95 unless $ENV{HIPI_MODULES_DIST_TEST_I2C};
         
         diag('I2C tests are running');
         use_ok( HiPi::Device::I2C );
@@ -19,10 +19,10 @@ SKIP: {
         my $mpladdress = 0x60;
         
         my $driver = HiPi::Device::I2C->get_driver;
-        like( $driver, qr/^i2c_bcm2708|i2c_bcm2835$/, 'known driver types');
+        like( $driver, qr/^i2c_bcm2708|i2c_bcm2835|i2c_designware_platform$/, 'known driver types');
         is( (HiPi::Device::I2C->get_device_list)[0], '/dev/i2c-1', 'get device list');
         is( HiPi::Device::I2C->get_baudrate, 100_000, 'get baud rate');
-        is( HiPi::Device::I2C->get_combined, ( $driver eq 'i2c_bcm2835') ? 'Y' : 'N', 'combined');
+        is( HiPi::Device::I2C->get_combined, ( $driver ne 'i2c_bcm2708') ? 'Y' : 'N', 'combined');
         
         my $i2c = HiPi::Device::I2C->new;
         

@@ -1,0 +1,24 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Select::Result {
+  allow Go::Select;
+  
+  use Go::Channel;
+  
+  # Fields
+  has ok : ro byte;
+  
+  has value : ro object;
+  
+  has channel : ro Go::Channel;
+  
+  has is_write : ro byte;
+  
+  private static method new : Go::Select::Result () {
+    
+    my $self = new Go::Select::Result;
+    
+    return $self;
+  }
+}

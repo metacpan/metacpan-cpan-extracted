@@ -119,14 +119,14 @@ sub blocks {
 sub listpair {
     my $obj = shift;
     my @labels = $obj->labels;
-    map { $labels[$_] => $obj->{LISTS}[$_] } 0 .. $#labels;
+    map { $labels[$_] => $obj->{LISTS}[$_] } keys @labels;
 }
 
 sub blockpair {
     my $obj = shift;
     my @labels = $obj->labels;
     my @blocks = $obj->blocks;
-    map { $labels[$_] => $blocks[$_] } 0 .. $#labels;
+    map { $labels[$_] => $blocks[$_] } keys @labels;
 }
 
 sub match {
@@ -139,11 +139,11 @@ sub match {
 		local $_ = $labels[$_];
 		$cond->();
 	    }
-	    0 .. $#labels;
+	    keys @labels;
 	} elsif (ref $cond eq 'Regexp') {
-	    grep { $labels[$_] =~ $cond } 0 .. $#labels;
+	    grep { $labels[$_] =~ $cond } keys @labels;
 	} else {
-	    grep { $labels[$_] eq $cond } 0 .. $#labels;
+	    grep { $labels[$_] eq $cond } keys @labels;
 	}
     };
     @{$obj->{LISTS}}[ @index ];

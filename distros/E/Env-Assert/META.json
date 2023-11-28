@@ -43,6 +43,7 @@
             "Test::Version" : "1"
          },
          "suggests" : {
+            "App::FatPacker" : "0.010008",
             "Dist::Zilla::app::Command::podpreview" : "0.004"
          }
       },
@@ -70,7 +71,7 @@
    "provides" : {
       "Env::Assert" : {
          "file" : "lib/Env/Assert.pm",
-         "version" : "0.008"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -79,18 +80,19 @@
          "mailto" : "bug-Env-Assert@rt.cpan.org",
          "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Env-Assert"
       },
-      "homepage" : "https://metacpan.org/release/Env-Assert",
+      "homepage" : "https://metacpan.org/dist/Env-Assert",
       "repository" : {
          "type" : "git",
          "web" : "https://github.com/mikkoi/env-assert.git"
       }
    },
-   "version" : "0.008",
+   "version" : "0.009",
    "x_contributors" : [
-      "Ivan Bessarabov <ivan@bessarabov.ru>"
+      "Ivan Bessarabov <ivan@bessarabov.ru>",
+      "gregor herrmann <gregoa@debian.org>"
    ],
    "x_generated_by_perl" : "v5.34.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

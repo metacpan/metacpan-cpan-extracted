@@ -4,13 +4,13 @@
       "Gerald Richter <richter at embperl dot org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Embperl",
    "no_index" : {
@@ -37,5 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.5.0"
+   "version" : "v3.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

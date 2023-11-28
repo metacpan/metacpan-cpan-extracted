@@ -1,5 +1,19 @@
 Revision history for Perl module Module::Generic
 
+v0.32.8 2023-11-17T21:27:29+0900
+    - Updated method as_hash in Module::Generic
+    - Improved code for method _set_get_hash_as_object and __instantiate_object in Module::Generic and Module::Generic::Dynamic
+
+v0.32.7 2023-11-15T09:12:22+0900
+    - Updated AUTOLOAD in Module::Generic::Dynamic
+    - Updated method _set_get_scalar_as_object in Module::Generic
+
+v0.32.6 2023-10-20T07:51:04+0900
+    - Changed is_hash() in Module::Generic into a stricter appreciation of hash as non-blessed
+    - Correcting _message in Module::Generic
+    - Improvement in method new_json() in Module::Generic to accept any option that can also be set in JSON
+    - Minor correction in _parse_timestamp in Module::Generic
+
 v0.32.5 2023-10-11T20:31:59+0900
     - Corrected malformed signature for distribution release
 

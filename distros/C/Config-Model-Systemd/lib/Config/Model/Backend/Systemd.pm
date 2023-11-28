@@ -8,7 +8,7 @@
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
 package Config::Model::Backend::Systemd ;
-$Config::Model::Backend::Systemd::VERSION = '0.252.2';
+$Config::Model::Backend::Systemd::VERSION = '0.254.1';
 use strict;
 use warnings;
 use 5.020;
@@ -210,29 +210,6 @@ sub write ($self, %args) {
     # check      => yes|no|skip
 
     # file write is handled by Unit backend
-    return 1 if $self->instance->application =~ /file/;
-    return 1 if $self->instance->application eq 'systemd';
-
-    my $root_path = $args{root} || path('/');
-    my $dir = $args{root}->path($args{config_dir});
-    die "Unknown directory $dir" unless $dir->is_dir;
-
-    my $select_unit = $self->get_backend_arg;
-
-    # delete files for non-existing elements (deleted services)
-    foreach my $file ($dir->children($filter) ) {
-        my ($unit_type) = ($file =~ $filter);
-        my $unit_name = $file->basename($filter);
-
-        next if ($select_unit ne '*' and $unit_name !~ /$select_unit/);
-
-        my $unit_collection = $self->node->fetch_element($unit_type);
-        if (not $unit_collection->defined($unit_name)) {
-            $user_logger->warn("removing file $file of deleted service");
-            $file->remove;
-        }
-    }
-
     return 1;
 }
 
@@ -255,7 +232,7 @@ Config::Model::Backend::Systemd - R/W backend for systemd configurations files
 
 =head1 VERSION
 
-version 0.252.2
+version 0.254.1
 
 =head1 SYNOPSIS
 

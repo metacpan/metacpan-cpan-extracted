@@ -4,7 +4,7 @@ no warnings 'experimental::class';
 use utf8;
 
 package Video::NRK::Cache::ProgramId;  # Dist::Zilla doesn't know about class yet
-$Video::NRK::Cache::ProgramId::VERSION = '3.00';
+$Video::NRK::Cache::ProgramId::VERSION = '3.01';
 class Video::NRK::Cache::ProgramId;
 # ABSTRACT: NRK on-demand "PRF" program ID
 
@@ -116,7 +116,7 @@ Video::NRK::Cache::ProgramId - NRK on-demand "PRF" program ID
 
 =head1 VERSION
 
-version 3.00
+version 3.01
 
 =head1 SYNOPSIS
 

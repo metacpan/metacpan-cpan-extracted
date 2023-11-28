@@ -1,6 +1,6 @@
 #!perl
 
-# Note: This script is a CLI for Riap function /App/FileSortUtils/largest
+# Note: This script is a CLI for Riap function /File/Util/Sort/largest
 # and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
@@ -11,12 +11,12 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-31'; # DATE
+our $DATE = '2023-11-26'; # DATE
 our $DIST = 'App-FileSortUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
-    url => "/App/FileSortUtils/largest",
+    url => "/File/Util/Sort/largest",
     program_name => "largest",
     log => 1,
     read_config => 0,
@@ -25,7 +25,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Return the largest file(s) in a directory
+# ABSTRACT: Return the largest file(s) in one or more directories
 # PODNAME: largest
 
 __END__
@@ -36,11 +36,11 @@ __END__
 
 =head1 NAME
 
-largest - Return the largest file(s) in a directory
+largest - Return the largest file(s) in one or more directories
 
 =head1 VERSION
 
-This document describes version 0.005 of largest (from Perl distribution App-FileSortUtils), released on 2023-10-31.
+This document describes version 0.009 of largest (from Perl distribution App-FileSortUtils), released on 2023-11-26.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<largest> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?
 
 B<largest> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<largest> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num-ranks|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>|B<L<-N|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>] [B<L<--num-results|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--type|/"--type=s, -t">>=I<str>|B<L<-d|/"--type=s, -t">>|B<L<-f|/"--type=s, -t">>|B<L<-t|/"--type=s, -t">>=I<str>] -- [I<L<dir|/"--dir=s">>]
+B<largest> [B<L<--all|/"--all, -a">>|B<L<-a|/"--all, -a">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [(B<L<--dir|/"--dirs-json=s">>=I<L<dirname|Sah::Schema::dirname>>)+|B<L<--dirs-json|/"--dirs-json=s">>=I<json>] [B<L<--exclude-filename-pattern|/"--exclude-filename-pattern=s, -X">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-X|/"--exclude-filename-pattern=s, -X">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--include-filename-pattern|/"--include-filename-pattern=s, -I">>=I<L<re_from_str|Sah::Schema::re_from_str>>|B<L<-I|/"--include-filename-pattern=s, -I">>=I<L<re_from_str|Sah::Schema::re_from_str>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num-ranks|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>|B<L<-N|/"--num-ranks=s, -N">>=I<L<uint|Sah::Schema::uint>>] [B<L<--num-results|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>|B<L<-n|/"--num-results=s, -n">>=I<L<uint|Sah::Schema::uint>>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--recursive|/"--recursive, -R">>|B<L<-R|/"--recursive, -R">>] [B<L<--type|/"--type=s, -t">>=I<str>|B<L<-d|/"--type=s, -t">>|B<L<-f|/"--type=s, -t">>|B<L<-t|/"--type=s, -t">>=I<str>] -- [I<L<dir|/"--dirs-json=s">>] ...
 
 =head1 DESCRIPTION
 
@@ -91,6 +91,18 @@ Number of results to return.
 
 =over
 
+=item B<--all>, B<-a>
+
+Do not ignore entries starting with ..
+
+=item B<--exclude-filename-pattern>=I<s>, B<-X>
+
+Exclude filenames that match a regex pattern.
+
+=item B<--include-filename-pattern>=I<s>, B<-I>
+
+Only include filenames that match a regex pattern.
+
 =item B<--type>=I<s>, B<-t>
 
 Only include files of certain type.
@@ -117,11 +129,29 @@ See C<--type>.
 
 =over
 
-=item B<--dir>=I<s>
+=item B<--dir>=I<s@>
 
 Directory to sort files of, defaults to current directory.
 
-Can also be specified as the 1st command-line argument.
+Default value:
+
+ ["."]
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
+
+=item B<--dirs-json>=I<s>
+
+Directory to sort files of, defaults to current directory (JSON-encoded).
+
+See C<--dir>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--recursive>, B<-R>
+
+Recurse into subdirectories.
 
 =back
 

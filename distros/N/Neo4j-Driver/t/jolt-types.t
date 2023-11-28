@@ -199,6 +199,7 @@ subtest 'composite types sparse' => sub {
 
 subtest 'structural types v1' => sub {
 	plan tests => 44;
+	no warnings 'Neo4j::Types';  # Jolt v1 doesn't provide element IDs
 	lives_and { ok $r = $s->run('structural v1') } 'run';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get n101';
 	lives_and { isa_ok $v, 'Neo4j::Types::Node' } 'n101 blessed';
@@ -297,6 +298,7 @@ subtest 'structural types v2' => sub {
 
 subtest 'structural types paths v1' => sub {
 	plan tests => 30;
+	no warnings 'Neo4j::Types';  # Jolt v1 doesn't provide element IDs
 	lives_and { ok $r = $s->run('structural paths v1') } 'run';
 	lives_and { $v = 0; ok $v = $r->fetch->get() } 'get path1';
 	lives_and { isa_ok $v, 'Neo4j::Types::Path' } 'path1 blessed';

@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.21",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -33,6 +33,7 @@
       },
       "develop" : {
          "recommends" : {
+            "App::Greple::subst::desumasu" : "0",
             "App::Greple::xp" : "0.04",
             "Pod::Markdown" : "0"
          },
@@ -54,7 +55,7 @@
             "File::Share" : "0",
             "Hash::Util" : "0",
             "JSON" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.56",
             "Text::ANSI::Fold" : "2.20",
             "perl" : "v5.14.0"
          }
@@ -68,11 +69,21 @@
    "provides" : {
       "App::Greple::xlate" : {
          "file" : "lib/App/Greple/xlate.pm",
-         "version" : "0.25"
+         "version" : "0.28"
+      },
+      "App::Greple::xlate::Cache" : {
+         "file" : "lib/App/Greple/xlate/Cache.pm"
+      },
+      "App::Greple::xlate::Lang" : {
+         "file" : "lib/App/Greple/xlate/Lang.pm"
       },
       "App::Greple::xlate::deepl" : {
          "file" : "lib/App/Greple/xlate/deepl.pm",
-         "version" : "0.25"
+         "version" : "0.28"
+      },
+      "App::Greple::xlate::gpt3" : {
+         "file" : "lib/App/Greple/xlate/gpt3.pm",
+         "version" : "0.28"
       }
    },
    "release_status" : "stable",
@@ -87,7 +98,7 @@
          "web" : "https://github.com/kaz-utashiro/App-Greple-xlate"
       }
    },
-   "version" : "0.25",
+   "version" : "0.28",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

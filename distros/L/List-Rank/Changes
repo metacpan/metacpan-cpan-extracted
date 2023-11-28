@@ -1,8 +1,23 @@
-0.002   2018-01-26 (PERLANCAR)
+0.004   2023-11-23  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc][ux] Explain difference with List::Rank, add example of
+          ranking records.
+
+
+0.003   2023-10-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Fix example in Synopsis.
+
+
+0.002   2018-01-26  Released-By: PERLANCAR
 
 	- [Bugfix] Forgot to set $VERSION in List::Rank.
 
 
-0.001   2018-01-25 (PERLANCAR)
+0.001   2018-01-25  Released-By: PERLANCAR
 
         - First version.

@@ -49,10 +49,10 @@ my %WriteMakefileArgs = (
     "Sub::Install" => 0,
     "Term::ANSIColor" => 0,
     "XML::LibXML" => "2.0202",
-    "base" => 0,
     "constant" => 0,
     "feature" => 0,
     "open" => 0,
+    "parent" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -78,7 +78,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.20230913",
+  "VERSION" => "3.20231123",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -134,11 +134,11 @@ my %FallbackPrereqs = (
   "Test::RequiresInternet" => 0,
   "Try::Tiny" => 0,
   "XML::LibXML" => "2.0202",
-  "base" => 0,
   "constant" => 0,
   "feature" => 0,
   "lib" => 0,
   "open" => 0,
+  "parent" => 0,
   "strict" => 0,
   "warnings" => 0
 );

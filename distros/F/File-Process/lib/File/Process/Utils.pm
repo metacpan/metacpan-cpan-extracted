@@ -52,7 +52,7 @@ sub is_code   { push @_, 'CODE';  goto &_is_type; }
 ########################################################################
 
 ########################################################################
-sub is_hash { ## no critic (RequireArgUnpacking)
+sub is_hash {  ## no critic (RequireArgUnpacking)
 ########################################################################
   my $result = _is_hash( $_[0] );
 
@@ -63,7 +63,7 @@ sub is_hash { ## no critic (RequireArgUnpacking)
 }
 
 ########################################################################
-sub is_array { ## no critic (RequireArgUnpacking)
+sub is_array {  ## no critic (RequireArgUnpacking)
 ########################################################################
   my $result = _is_array( $_[0] );
 
@@ -260,7 +260,7 @@ names will be in the keys for the hashes returned.
 
 I<Note: By setting C<column_names> to an empty array, you can force
 the return of an array of hashes instead of an array of arrays. The
-keys will be set the strings C<col0>..C<col{n-1}>.
+keys will be set the strings C<col0>..C<col{n-1}>>.
 
 =item csv_options
 

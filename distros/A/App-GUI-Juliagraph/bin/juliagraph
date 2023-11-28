@@ -1,0 +1,10 @@
+#!/usr/bin/perl -w
+use v5.12;
+use lib 'lib', '../lib';
+use App::GUI::Juliagraph;
+
+App::GUI::Juliagraph->new->MainLoop( );
+
+exit 0;
+__END__
+

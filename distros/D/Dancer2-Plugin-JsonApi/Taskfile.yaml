@@ -1,0 +1,17 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+  TARGET_BRANCH: main
+
+tasks:
+  tidy:
+    cmds:
+      - git diff-ls --diff-filter=ACMR {{.TARGET_BRANCH}} | grep -e '\.pm$\|\.t$|\.pod$' | xargs -IX perltidy -b X
+    
+  default:
+    cmds:
+      - echo "{{.GREETING}}"
+    silent: true

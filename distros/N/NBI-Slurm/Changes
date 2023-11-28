@@ -1,4 +1,8 @@
-0.8.0  2023-10-13
+0.8.2   2023-11-08
+
+* Bugfix: test 10-hpc had a typo and didnt work on Slurm clusters
+
+0.8.1  2023-10-13
 
 * Bugfix on stderr file name automatically assigned
 

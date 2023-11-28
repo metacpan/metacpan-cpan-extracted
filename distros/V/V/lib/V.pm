@@ -2,9 +2,11 @@ package V;
 use strict;
 
 use vars qw( $VERSION $NO_EXIT );
-$VERSION  = '0.16';
+$VERSION  = "0.18";
 
 $NO_EXIT ||= 0; # prevent import() from exit()ing and fall of the edge
+
+our $DEBUG ||= $ENV{PERL_V_DEBUG} || 0;
 
 =head1 NAME
 
@@ -24,13 +26,27 @@ modules without loading them:
     require V;
     printf "%s has version '%s'\n", "V", V::get_version( "V" );
 
+Starting with version B<0.17>, V will show all C<package>s or C<class>es in a
+file that have a version. If one wants to see all packages/classes from that
+file, set the environment variable C<PERL_V_SHOW_ALL> to a I<true> value.
+
 If you want all available files/versions from C<@INC>:
 
     require V;
     my @all_V = V::Module::Info->all_installed("V");
     printf "%s:\n", $all_V[0]->name;
-    printf "\t%-50s - %s\n", $_->file, $_->version
-        for @all_V;
+    for my $file (@all_V) {
+        my ($versions) = $file->version; # Must be list context
+        if (@$versions > 1) {
+            printf "\t%s:\n", $file->name;
+            for my $ver (@versions) {
+                print "\t    %-30s: %s\n", $ver->{pkg}, $ver->{version};
+            }
+        }
+        else {
+            printf "\t%-50s - %s\n", $file->file, $versions->[0]{version};
+        }
+    }
 
 Each element in that array isa C<V::Module::Info> object with 3 attributes and a method:
 
@@ -51,8 +67,41 @@ The base directory (from C<@INC>) where the package-file was found.
 =item I<method> B<version>
 
 This method will look through the file to see if it can find a version
-assignment in the file and uses that determine the version. As of version
-0.13_01, all versions found are passed through the L<version> module.
+assignment in the file and uses that to determine the version. As of version
+B<0.13_01>, all versions found are passed through the L<version> module.
+
+As of version B<0.16_03> we look for all types of version declaration:
+
+    package Foo;
+    our $VERSION = 0.42;
+
+and
+
+    package Foo 0.42;
+
+and
+
+    package Foo 0.42 { ... }
+
+Not only do we look for the C<package> keyword, but also for C<class>.
+In list context this method will return an arrayref to a list of structures:
+
+=over 8
+
+=item I<pkg>
+
+The name of the C<package>/C<class>.
+
+=item I<version>
+
+The version for that C<package>/C<class>. (Can be absent if C<$PERL_V_SHOW_ALL>
+is true.)
+
+=item I<ord>
+
+The ordinal number of occurrence in the file.
+
+=back
 
 =back
 
@@ -131,7 +180,16 @@ sub report_pkg($@) {
     print "$pkg\n";
     @_ or print "\tNot found\n";
     for my $module ( @_ ) {
-        printf "\t%s: %s\n", $module->file, $module->version || '?';
+        my ($versions) = $module->version;
+        if (@$versions > 1) {
+            printf "\t%s:\n", $module->file;
+            for my $option (@$versions) {
+                printf "\t    %s: %s\n", $option->{pkg}, $option->{version} || '';
+            }
+        }
+        else {
+            printf "\t%s: %s\n", $module->file, $versions->[0]{version} || '?';
+        }
     }
 }
 
@@ -198,10 +256,11 @@ sub all_installed {
         }
     }
 
+    do {print {*STDERR} "# $file: @{[scalar $_->version]}\n" for @modules} if $V::DEBUG;
     return @modules;
 }
 
-# Thieved from ExtUtils::MM_Unix 1.12603
+# Once thieved from ExtUtils::MM_Unix 1.12603
 sub version {
     my($self) = shift;
 
@@ -210,47 +269,99 @@ sub version {
     open(my $mod, '<', $parsefile) or die "open($parsefile): $!";
 
     my $inpod = 0;
-    my $result;
     local $_;
+    my %eval;
+    my ($cur_pkg, $cur_ord) = ("main", 0);
+    $eval{$cur_pkg} = { ord => $cur_ord };
     while (<$mod>) {
         $inpod = /^=(?!cut)/ ? 1 : /^=cut/ ? 0 : $inpod;
         next if $inpod || /^\s*#/;
+        next if m/^\s*#/;
 
         chomp;
-        my $eval;
-        if (m/([\$*])(([\w\:\']*)\bVERSION)\b.*\=/) {
-            { local($1, $2); ($_ = $_) = m/(.*)/; } # untaint
-            $eval = qq{
-                package V::Module::Info::_version;
-                no strict;
+        if (m/^\s* (?:package|class) \s+ (\w+(?:::\w+)*) /x) {
+            $cur_pkg = $1;
+            $eval{$cur_pkg} = { ord => ++$cur_ord } if !exists($eval{$cur_pkg});
+        }
 
-                local $1$2;
-                \$$2=undef; do {
+        next if $cur_pkg =~ m{^V::Module::Info};
+
+        if (m/(?:our)?\s*([\$*])(([\w\:\']*)\bVERSION)\s*\=(?![=~])/) {
+            { local($1, $2); ($_ = $_) = m/(.*)/; } # untaint
+            my ($sigil, $name) = ($1, $2);
+            next if m/\$$name\s*=\s*eval.+\$$name/;
+            $eval{$cur_pkg}{prg} = qq{
+                package V::Module::Info::_version_var;
+                # $cur_pkg
+                no strict;
+                local $sigil$name;
+                \$$name=undef; do {
                     $_
-                }; \$$2
+                }; \$$name
             };
         }
         # perl 5.12.0+
-        elsif (m/^\s* package \s+ [^\s]+ \s+ ([^;\{]+) [;\{]/x) {
-            $eval = qq{
-                package V::Module::Info::_version $1;
-                V::Module::Info::_version->VERSION;;
-            };
-        }
-        if (defined($eval)) {
-            local $^W = 0;
-            $result = eval($eval);
-            warn "Could not eval '$eval' in $parsefile: $@" if $@;
-            $result = "undef" unless defined $result;
-
-            # use the version modulue to deal with v-strings
-            require version;
-            $result = version->parse($result);
-            last;
+        elsif (m/^\s* (?:package|class) \s+ [^\s]+ \s+ (v?[0-9.]+) \s* [;\{]/x) {
+            my $ver = $1;
+            if ( $] >= 5.012000 ) {
+                $eval{$cur_pkg}{prg} = qq{
+                    package V::Module::Info::_version_static $ver;
+                    # $cur_pkg
+                    V::Module::Info::_version_static->VERSION;
+                };
+            }
+            else {
+                warn("Your perl doesn't understand the version declaration of $cur_pkg\n");
+                $eval{$cur_pkg}{prg} = qq{ $ver };
+            }
         }
     }
     close($mod);
-    return $result;
+
+    # remove our stuff
+    delete($eval{$_}) for grep { m/^V::Module::Info/ } keys %eval;
+
+    my @results;
+    while (my ($pkg, $dat) = each(%eval)) {
+        my $result;
+        if ($dat->{prg}) {
+            print {*STDERR} "# $pkg: $dat->{prg}\n" if $V::DEBUG;
+            local $^W = 0;
+            $result = eval($dat->{prg});
+            warn("Could not eval '$dat->{prg}' in $parsefile: $@")
+                if $@ && $V::DEBUG;
+
+            # use the version modulue to deal with v-strings
+            require version;
+            $dat->{ver} = $result = version->parse($result);
+        }
+        push(
+            @results,
+            {
+                (exists($dat->{ver}) ? (version => $result) : ()),
+                pkg => $pkg,
+                ord => $dat->{ord}
+            }
+        );
+    }
+    if (! $ENV{PERL_V_SHOW_ALL}) {
+        @results = grep { exists($_->{version}) } @results;
+    }
+
+    if (@results > 1) {
+        @results = grep {
+            $_->{pkg} ne 'main' || exists($_->{version})
+        } @results;
+    }
+
+    if (! wantarray ) {
+        for my $option (@results) {
+            next unless $option->{pkg} eq $self->name;
+            return $option->{version};
+        }
+        return;
+    }
+    return [ sort {$a->{ord} <=> $b->{ord} } @results ];
 }
 
 sub accessor {

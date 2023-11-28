@@ -3,7 +3,7 @@
    "author" : [
       "Rick Myers <jrm@cpan.org>"
    ],
-   "dynamic_config" : 1,
+   "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
@@ -33,16 +33,31 @@
       },
       "runtime" : {
          "requires" : {
+            "DynaLoader" : "0",
+            "Exporter" : "0",
             "perl" : "5.005"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0"
+            "CPAN::Meta" : "0",
+            "DynaLoader" : "0",
+            "Exporter" : "0",
+            "ExtUtils::Manifest" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       }
    },
+   "provides" : {
+      "UUID" : {
+         "file" : "UUID.pm",
+         "version" : "0.31"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.30",
+   "version" : "0.31",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

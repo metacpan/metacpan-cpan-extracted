@@ -1,8 +1,38 @@
 #!/usr/bin/env perl
 
+use File::Find::Rule;
+use warnings;
+use strict;
+use Config::Tiny;
+use File::Slurp qw(append_file write_file read_file);
+use Time::Piece;
+use File::MimeInfo::Magic;
+use Net::Subnet qw(subnet_matcher);
+use LWP::UserAgent;
+use HTTP::Request::Common;
+use File::Temp qw/ tempdir  /;
+use File::Copy;
+use POSIX 'strftime';
+use Sys::Syslog;
+use JSON;
+use Sys::Hostname;
+use Proc::PID::File;
+use Pod::Usage;
+use Getopt::Long;
+
 =head1 NAME
 
 suricata_extract_submit - Submits files extracted by Suricata to mojo_cape_submit for detonation via CAPEv2
+
+=head1 VERSION
+
+0.1.0
+
+=cut
+
+sub version {
+	print "suricata_extract_submit v. 0.1.0\n";
+}
 
 =head1 SYNOPSIS
 
@@ -40,6 +70,9 @@ file with a M time of older than 5 minutes.
 
     /usr/local/libexec/nagios/check_file_age -i -f /var/run/suricata_extract_submit.pid
 
+Safe to dump the output of this to dev null in cron as the output is also sent to syslog
+as 'suricata_extract_submit' to the 'daemon' log.
+
 =head1 CONFIGURATION
 
 The config file used is '/usr/local/etc/suricata_extract_submit.ini'.
@@ -65,29 +98,22 @@ The config file used is '/usr/local/etc/suricata_extract_submit.ini'.
 
 =cut
 
-use File::Find::Rule;
-use warnings;
-use strict;
-use Config::Tiny;
-use File::Slurp qw(append_file write_file read_file);
-use Time::Piece;
-use File::MimeInfo::Magic;
-use Crypt::Digest::MD5 qw( md5 md5_hex md5_b64 md5_b64u
-	md5_file md5_file_hex md5_file_b64 md5_file_b64u );
-use Crypt::Digest::SHA256 qw( sha256 sha256_hex sha256_b64 sha256_b64u
-	sha256_file sha256_file_hex sha256_file_b64 sha256_file_b64u );
-use Crypt::Digest::SHA1 qw( sha1 sha1_hex sha1_b64 sha1_b64u
-	sha1_file sha1_file_hex sha1_file_b64 sha1_file_b64u );
-use Net::Subnet qw(subnet_matcher);
-use LWP::UserAgent;
-use HTTP::Request::Common;
-use File::Temp qw/ tempdir  /;
-use File::Copy;
-use POSIX 'strftime';
-use Sys::Syslog;
-use JSON;
-use Sys::Hostname;
-use Proc::PID::File;
+my $help;
+my $version;
+GetOptions(
+	'h'       => \$help,
+	'help'    => \$help,
+	'version' => \$version,
+	'v'       => \$version,
+);
+
+if ($version) {
+	version;
+	exit 255;
+}
+if ($help) {
+	pod2usage( -exitval => 255, -verbose => 2, -output => \*STDOUT, );
+}
 
 my $t          = localtime;
 my $today_name = $t->strftime('%F');
@@ -202,8 +228,8 @@ my $stats;
 
 # compute the deltas for these items
 my @to_delta = (
-	'sub',     'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
-	'sub_5xx', 'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
+	'sub',       'sub_fail', 'zero_sized',   'sub_2xx',    'sub_3xx',        'sub_4xx',
+	'sub_5xx',   'errors',   'ignored_host', 'ignored_ip', 'ignored_ip_src', 'ignored_ip_dest',
 	'truncated', 'sub_size',
 );
 
@@ -288,7 +314,7 @@ if ( defined($ignoreHosts_file) && -f $ignoreHosts_file ) {
 } ## end if ( defined($ignoreHosts_file) && -f $ignoreHosts_file)
 
 # create a tmpdir and chdir to it
-my $tempdir = tempdir();
+my $tempdir = tempdir( CLEANUP => 1 );
 chdir($tempdir);
 
 # find any json files
@@ -359,9 +385,15 @@ foreach my $file (@files) {
 
 		my $filename = $file_json->{fileinfo}{filename};
 
-		my $md5    = lc( md5_hex($data) );
-		my $sha1   = lc( sha1_hex($data) );
-		my $sha256 = lc( sha256_hex($data) );
+		my $md5    = `md5sum $data_file`;
+		my $sha1   = `sha1sum $data_file`;
+		my $sha256 = `sha256sum $data_file`;
+		chomp($md5);
+		chomp($sha1);
+		chomp($sha256);
+		$md5    =~ s/[\ \t].+//;
+		$sha1   =~ s/[\ \t].+//;
+		$sha256 =~ s/[\ \t].+//;
 		my $extUID = lc( substr( $md5, 0, 18 ) );
 
 		my $mime = mimetype($filename);

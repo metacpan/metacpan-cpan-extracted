@@ -62,8 +62,8 @@
     "yw-count-other" => "Y\N{U+b144} w\N{U+bc88}\N{U+c9f8} \N{U+c8fc}",
   },
   code => "ko",
-  date_format_full => "y\N{U+b144} M\N{U+c6d4} d\N{U+c77c} EEEE",
-  date_format_long => "y\N{U+b144} M\N{U+c6d4} d\N{U+c77c}",
+  date_format_full => "y\N{U+b144} MMMM d\N{U+c77c} EEEE",
+  date_format_long => "y\N{U+b144} MMMM d\N{U+c77c}",
   date_format_medium => "y. M. d.",
   date_format_short => "yy. M. d.",
   datetime_format_full => "{1} {0}",
@@ -276,5 +276,5 @@
   time_format_medium => "a h:mm:ss",
   time_format_short => "a h:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

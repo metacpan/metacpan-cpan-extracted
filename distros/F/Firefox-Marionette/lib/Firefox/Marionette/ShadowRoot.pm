@@ -2,30 +2,11 @@ package Firefox::Marionette::ShadowRoot;
 
 use strict;
 use warnings;
+use parent qw(Firefox::Marionette::LocalObject);
 
-our $VERSION = '1.46';
+our $VERSION = '1.49';
 
 sub IDENTIFIER { return 'shadow-6066-11e4-a52e-4f735466cecf' }
-
-sub new {
-    my ( $class, $browser, %parameters ) = @_;
-    my $shadow_root = bless {
-        browser => $browser,
-        %parameters
-    }, $class;
-    return $shadow_root;
-}
-
-sub TO_JSON {
-    my ($self) = @_;
-    my $json = { IDENTIFIER() => $self->uuid() };
-    return $json;
-}
-
-sub uuid {
-    my ($self) = @_;
-    return $self->{ IDENTIFIER() };
-}
 
 1;    # Magic true value required at end of module
 __END__
@@ -36,7 +17,7 @@ Firefox::Marionette::ShadowRoot - Represents a Firefox shadow root retrieved usi
 
 =head1 VERSION
 
-Version 1.46
+Version 1.49
 
 =head1 SYNOPSIS
 

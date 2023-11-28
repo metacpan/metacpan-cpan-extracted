@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -118,7 +119,7 @@ on a new line.
 
 =head1 Author
 
-G. Richter (richter at embperl dot org), A. Beckert (beckert@ecos.de)
+G. Richter (richter at embperl dot org), A. Beckert
 
 =head1 See Also
 

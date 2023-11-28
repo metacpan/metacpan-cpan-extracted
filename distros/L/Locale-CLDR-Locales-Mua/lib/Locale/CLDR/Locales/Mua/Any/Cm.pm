@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mua::Any::Cm - Package for language Mundang
 
 package Locale::CLDR::Locales::Mua::Any::Cm;
 # This file auto generated from Data\common\main\mua_CM.xml
-#	on Fri 13 Oct  9:28:22 am GMT
+#	on Sat  4 Nov  6:14:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

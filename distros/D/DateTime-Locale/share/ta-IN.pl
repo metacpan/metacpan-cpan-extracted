@@ -1,6 +1,6 @@
 {
   am_pm_abbreviated => [
-    "\N{U+0bae}\N{U+0bc1}\N{U+0bb1}\N{U+0bcd}\N{U+0baa}\N{U+0b95}\N{U+0bb2}\N{U+0bcd}",
+    "AM",
     "\N{U+0baa}\N{U+0bbf}\N{U+0bb1}\N{U+0bcd}\N{U+0baa}\N{U+0b95}\N{U+0bb2}\N{U+0bcd}",
   ],
   available_formats => {
@@ -271,5 +271,5 @@
   time_format_medium => "a h:mm:ss",
   time_format_short => "a h:mm",
   variant => undef,
-  version => 43,
+  version => 44,
 }

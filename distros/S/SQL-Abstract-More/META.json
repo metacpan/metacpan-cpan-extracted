@@ -1,0 +1,59 @@
+{
+   "abstract" : "extension of SQL::Abstract with more constructs and more flexible API",
+   "author" : [
+      "Laurent Dami <dami@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4232",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SQL-Abstract-More",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "SQL::Abstract::Test" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "MRO::Compat" : "0",
+            "Params::Validate" : "0",
+            "SQL::Abstract::Classic" : "0",
+            "Scalar::Util" : "0",
+            "namespace::clean" : "0",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "SQL::Abstract::More" : {
+         "file" : "lib/SQL/Abstract/More.pm",
+         "version" : "1.40"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/SQL-Abstract-More"
+      }
+   },
+   "version" : "1.40",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

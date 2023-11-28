@@ -4,8 +4,9 @@ use 5.006;
 use strict;
 use warnings;
 
-use Carp;
 use UML::PlantUML::Encoder qw(encode_p);
+
+=for html <a href="https://travis-ci.com/ranwitter/perl5-WWW-PlantUML"><img src="https://travis-ci.com/ranwitter/perl5-WWW-PlantUML.svg?branch=master"></a>&nbsp;</a><a title="Artistic-2.0" href="https://opensource.org/licenses/Artistic-2.0"><img src="https://img.shields.io/badge/License-Perl-0298c3.svg"></a>
 
 =head1 NAME
 
@@ -13,11 +14,11 @@ WWW::PlantUML - a simple Perl remote client interface to a plantuml server.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.03
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 our $URL     = 'http://www.plantuml.com/plantuml';
 
 =head1 SYNOPSIS
@@ -30,7 +31,7 @@ our $URL     = 'http://www.plantuml.com/plantuml';
     }, 'png');
 
     print $url; 
-    # prints  http://www.plantuml.com/plantuml/png/69NZKb1moazIqBLJSCp9J4vLi5B8ICt9oUS204a_1dy0
+    # prints  http://www.plantuml.com/plantuml/png/~169NZKb1GSCp9J4vLqBLJSCfFKh1Io4ZDoSdd0W1EMmQV
 
 =head1 DESCRIPTION
 
@@ -80,8 +81,6 @@ sub fetch_url {
     my $self = shift;
     my $base = $self->{'baseurl'};
 
-    #my $path           = $self->{'infopath'};
-    #my ( $type, $code ) = $self->_parse_args(@_);
     my $code = shift;
     my $type = shift;
 
@@ -116,9 +115,9 @@ You can also look for information at:
 
 L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=WWW-PlantUML>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * GitHub Repository
 
-L<http://annocpan.org/dist/WWW-PlantUML>
+L<https://github.com/ranwitter/perl5-WWW-PlantUML>
 
 =item * CPAN Ratings
 
@@ -133,6 +132,7 @@ L<https://metacpan.org/release/WWW-PlantUML>
 
 =head1 ACKNOWLEDGEMENTS
 
+Author is inspired by the work of L<WWW::xkcd>, which was written by L<Sawyer X|https://metacpan.org/author/XSAWYERX>.
 
 =head1 LICENSE AND COPYRIGHT
 

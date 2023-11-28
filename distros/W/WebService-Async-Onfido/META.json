@@ -70,6 +70,7 @@
             "List::UtilsBy" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
+            "MIME::Base64" : "0",
             "Net::Async::HTTP" : "0",
             "Net::Async::HTTP::Server" : "0",
             "Path::Tiny" : "0",
@@ -119,63 +120,63 @@
    "provides" : {
       "WebService::Async::Onfido" : {
          "file" : "lib/WebService/Async/Onfido.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Address" : {
          "file" : "lib/WebService/Async/Onfido/Address.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Applicant" : {
          "file" : "lib/WebService/Async/Onfido/Applicant.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Base::Address" : {
          "file" : "lib/WebService/Async/Onfido/Base/Address.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Base::Applicant" : {
          "file" : "lib/WebService/Async/Onfido/Base/Applicant.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Base::Check" : {
          "file" : "lib/WebService/Async/Onfido/Base/Check.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Base::Document" : {
          "file" : "lib/WebService/Async/Onfido/Base/Document.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Base::Photo" : {
          "file" : "lib/WebService/Async/Onfido/Base/Photo.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Base::Report" : {
          "file" : "lib/WebService/Async/Onfido/Base/Report.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Base::Video" : {
          "file" : "lib/WebService/Async/Onfido/Base/Video.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Check" : {
          "file" : "lib/WebService/Async/Onfido/Check.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Document" : {
          "file" : "lib/WebService/Async/Onfido/Document.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Photo" : {
          "file" : "lib/WebService/Async/Onfido/Photo.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Report" : {
          "file" : "lib/WebService/Async/Onfido/Report.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       },
       "WebService::Async::Onfido::Video" : {
          "file" : "lib/WebService/Async/Onfido/Video.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -190,7 +191,7 @@
          "web" : "https://github.com/binary-com/perl-WebService-Async-Onfido"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "Raunak Kathuria <raunakkathuria@gmail.com>",
@@ -199,16 +200,18 @@
       "kathleen-deriv <122329285+lim-deriv@users.noreply.github.com>",
       "Mohammad Reza Hamedanchi <mohammad@binary.com>",
       "chengyang-binary <45479072+chengyang-binary@users.noreply.github.com>",
-      "Arshad Munir <55420460+arshad-binary@users.noreply.github.com>",
       "chylli-deriv <52912308+chylli-deriv@users.noreply.github.com>",
       "felipe-deriv <64797927+felipe-deriv@users.noreply.github.com>",
-      "chylli-deriv <chylli@binary.com>",
+      "Arshad Munir <55420460+arshad-binary@users.noreply.github.com>",
+      "Felipe Martinez <felipe@regentmarkets.com>",
+      "nihal-deriv <105702884+nihal-deriv@users.noreply.github.com>",
       "felipe-binary <64797927+felipe-binary@users.noreply.github.com>",
       "Jean-Yves Sireau <jy@binary.com>",
       "junbon-binary <junbon@binary.com>",
+      "mukesh-deriv <85932084+mukesh-deriv@users.noreply.github.com>",
       "Tazeek <tazeek@binary.com>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
+   "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

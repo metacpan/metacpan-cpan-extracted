@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Luy - Package for language Luyia
 
 package Locale::CLDR::Locales::Luy;
 # This file auto generated from Data\common\main\luy.xml
-#	on Fri 13 Oct  9:26:18 am GMT
+#	on Sat  4 Nov  6:12:34 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

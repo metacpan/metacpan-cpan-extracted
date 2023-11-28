@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Or::Any::In - Package for language Odia
 
 package Locale::CLDR::Locales::Or::Any::In;
 # This file auto generated from Data\common\main\or_IN.xml
-#	on Fri 13 Oct  9:32:46 am GMT
+#	on Sat  4 Nov  6:19:10 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

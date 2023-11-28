@@ -3,9 +3,14 @@ package SequenceFileReader;
 # Translated from
 # http://stackoverflow.com/questions/10798060/convert-sequence-file-and-get-key-value-pairs-via-map-and-reduce-tasks-in-hadoo
 #
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
+
+use constant {
+    GIVE_UP_LIMIT => 4,
+    SAMPLE_LEN    => 200,
+};
 
 use Moo;
 use Data::Dumper;
@@ -40,13 +45,13 @@ use Inline::Java qw(
 my $LOG = cast 'org.slf4j.Logger'
                     => org::slf4j::LoggerFactory->getLogger( __PACKAGE__ );
 
-$LOG->info("Now we can use the native logger too");
+$LOG->info( 'Now we can use the native logger too' );
 
-sub read {
+sub read_file {
     my $self = shift;
     my $uri  = shift;
 
-    $LOG->info("Starting the reader");
+    $LOG->info( 'Starting the reader' );
 
     # aliased from org::apache::* (which is also available)
     #
@@ -76,18 +81,18 @@ sub read {
 
     my $tot;
     while ( my @f = $reader->next($key, $value) ) {
-        my $syncSeen = $reader->syncSeen ? "*" : "";
+        my $syncSeen = $reader->syncSeen ? q{*} : q{};
         printf("[%s%s]\t%s\t%s\n", $position, $syncSeen, $key, $value);
         $position = $reader->getPosition;
 
-        say substr $value->toString, 0, 200;
+        say substr $value->toString, 0, SAMPLE_LEN;
 
-        say "Enough!", last if $tot++ > 4;
+        say 'Enough!', last if $tot++ > GIVE_UP_LIMIT;
     }
 
     Hadoop::Io::IOUtils->closeStream( $reader );
 
-    $LOG->info("FIN.");
+    $LOG->info( 'FIN.' );
 
     return;
 }
@@ -95,4 +100,3 @@ sub read {
 1;
 
 __END__
-

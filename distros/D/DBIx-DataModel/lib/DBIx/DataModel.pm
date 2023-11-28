@@ -11,7 +11,7 @@ use MRO::Compat;
 use DBIx::DataModel::Meta::Utils qw/does/;
 use Carp::Clan qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-our $VERSION = '3.05';
+our $VERSION = '3.06';
 
 # compatibility setting : see import()
 our $COMPATIBILITY = $VERSION; # from 2.20, no longer automatic compatibility
@@ -60,12 +60,14 @@ DBIx::DataModel - UML-based Object-Relational Mapping (ORM) framework
 C<DBIx::DataModel> is a framework for building Perl
 abstractions (classes, objects and methods) that interact
 with relational database management systems (RDBMS).
-Of course the ubiquitous L<DBI|DBI> module is used as
-a basic layer for communicating with databases; on top of that,
-C<DBIx::DataModel> provides facilities for generating SQL queries,
+Working above the L<DBI|DBI> module, it provides facilities for generating SQL queries,
 joining tables automatically, navigating through the results,
 converting values, building complex datastructures and packaging
 the results in various formats.
+
+This framework is complex and rich in functionalities, so a fair amount of
+time is needed for discovering the documentation and experimenting with the
+various features.
 
 More explanations are given in the L</DESCRIPTION> section below,
 after the synopsis.
@@ -648,7 +650,7 @@ needs to know about them).
 
 C<DBIx::DataModel> does not keep track of data mutations
 in memory, and therefore provides no support for automatically
-propagating changes into the database; the client code has
+propagating changes into the database; the client code has to
 explicitly manage C<insert> and C<update> operations.
 
 =item no 'cascaded update' nor 'insert or update'

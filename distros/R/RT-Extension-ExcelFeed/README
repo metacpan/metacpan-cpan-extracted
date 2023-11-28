@@ -29,6 +29,14 @@ INSTALLATION
 
     Restart your webserver
 
+CONFIGURATION
+    $HideChartDownloadButton
+        By default, a "Download as Microsoft Execel Spreadsheet" button is
+        enabled on Charts. You can disable it by adding the following config
+        to your RT_SiteConfig.pm:
+
+            Set( $HideChartDownloadButton, 1 );
+
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
 

@@ -1,5 +1,7 @@
 Revision history for PayProp-API-Public-Client
 
-0.02  2023-11-02 10:22:06 SAST
-        - Update documentation
+0.03  2023-11-17 02:32:01 SAST
+
+        - Fix documentation formatting and spelling errors.
+        - 0.01  2023-11-02 11:54:05 SAST
         - Initial release

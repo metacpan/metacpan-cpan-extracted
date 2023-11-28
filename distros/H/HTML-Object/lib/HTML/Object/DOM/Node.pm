@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Node.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2022/09/20
+## Modified 2023/11/06
 ## All rights reserved
 ## 
 ## 
@@ -18,7 +18,6 @@ BEGIN
     use warnings;
     use parent qw( HTML::Object::EventTarget );
     use vars qw( @EXPORT $XP $VERSION );
-    use Nice::Try;
     use Want;
     use constant {
         DOCUMENT_POSITION_IDENTICAL     => 0,
@@ -73,7 +72,7 @@ BEGIN
         'eq'    => \&isSameNode,
     );
     our $XP;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -581,15 +580,16 @@ sub find
 #                 warn( "Error while calling findnodes on element id \"", $_->id, "\" and tag \"", $_->tag, "\": $e\n" );
 #             }
 #         });
-        try
+        # try-catch
+        local $@;
+        eval
         {
             my @nodes = $self->findnodes( $xpath );
             $results->push( @nodes );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            # warn( "Error while calling findnodes on element id \"", ( $self->id // '' ), "\" and tag \"", ( $self->tag // '' ), "\": $e\n" );
-            warn( "Error while calling findnodes on element with tag \"", ( $self->tag // '' ), "\": $e\n" );
+            warn( "Error while calling findnodes on element with tag \"", ( $self->tag // '' ), "\": $@\n" );
         }
     }
     return( $results );
@@ -1356,14 +1356,17 @@ sub _xpath_value
     {
         $self->_load_class( 'HTML::Selector::XPath' ) ||
             return( $self->pass_error );
-        try
+        # try-catch
+        local $@;
+        my $rv = eval
         {
             return( HTML::Selector::XPath::selector_to_xpath( $this, %$opts ) );
-        }
-        catch( $e )
+        };
+        if( $@ )
         {
-            return( $self->error( "Bad selector \"$this\": $e" ) );
+            return( $self->error( "Bad selector \"$this\": $@" ) );
         }
+        return( $rv );
     }
 }
 
@@ -1385,7 +1388,7 @@ HTML::Object::DOM::Node - HTML Object DOM Node Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

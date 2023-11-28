@@ -9,11 +9,7 @@ no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 
 use Test::Without::Module 0.21 'Time::Moment';
-use Test::More 0.96;
-use if $ENV{AUTHOR_TESTING}, 'Test::Warnings';
-use Test::Deep;
 use Test::Fatal;
-use JSON::Schema::Modern;
 use Scalar::Util 'refaddr';
 use lib 't/lib';
 use Helper;
@@ -57,6 +53,11 @@ cmp_deeply(
   {
     valid => false,
     errors => [
+      {
+        instanceLocation => '',
+        keywordLocation => '/required',
+        error => 'object is missing property: bar',
+      },
       {
         instanceLocation => '',
         keywordLocation => '/allOf/0/type',
@@ -192,11 +193,6 @@ cmp_deeply(
         keywordLocation => '/propertyNames',
         error => 'not all property names are valid',
       },
-      {
-        instanceLocation => '',
-        keywordLocation => '/required',
-        error => 'object is missing property: bar',
-      },
     ],
   },
   'basic format includes all errors linearly',
@@ -217,6 +213,11 @@ cmp_deeply(
   {
     valid => false,
     errors => [
+      {
+        instanceLocation => '',
+        keywordLocation => '/required',
+        error => 'object is missing property: bar',
+      },
       {
         instanceLocation => '',
         keywordLocation => '/allOf/0/type',
@@ -306,11 +307,6 @@ cmp_deeply(
         error => 'pattern does not match',
       },
       # - "summary" error from /propertyNames is omitted
-      {
-        instanceLocation => '',
-        keywordLocation => '/required',
-        error => 'object is missing property: bar',
-      },
     ],
   },
   'terse format omits errors from redundant applicator keywords',

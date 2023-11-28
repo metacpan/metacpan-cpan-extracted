@@ -12,6 +12,7 @@ build_requires:
   Test::Fatal: '0.016'
   Test::HexString: '0'
   Test::MemoryGrowth: '0'
+  Test::MockModule: '0'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -32,26 +33,27 @@ no_index:
 provides:
   Net::Async::Redis::Cluster::Node::XS:
     file: lib/Net/Async/Redis/Cluster/Node/XS.pm
-    version: '0.014'
+    version: '1.000'
   Net::Async::Redis::Cluster::XS:
     file: lib/Net/Async/Redis/Cluster/XS.pm
-    version: '0.014'
+    version: '1.000'
   Net::Async::Redis::Protocol::XS:
     file: lib/Net/Async/Redis/XS.pm
-    version: '0.014'
+    version: '1.000'
   Net::Async::Redis::XS:
     file: lib/Net/Async/Redis/XS.pm
-    version: '0.014'
+    version: '1.000'
 requires:
   Future::AsyncAwait: '0.61'
   IO::Async::Loop: '0'
-  Net::Async::Redis: '4.002'
+  Net::Async::Redis: '5.000'
+  Object::Pad: '0'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Redis-XS/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Redis-XS
   repository: https://github.com/team-at-cpan/Net-Async-Redis-XS.git
-version: '0.014'
+version: '1.000'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Tom Molesworth <tom@deriv.com>'

@@ -1,0 +1,48 @@
+use alienfile;
+
+plugin PkgConfig => 'serd-0';
+
+eval {
+  require Alien::Meson;
+  Alien::Meson->_apply_destdir_prefix_hack;
+};
+
+share {
+  requires 'Alien::Build::Plugin::Download::GitLab';
+  requires 'Alien::Meson' => '0.06';
+  requires 'Alien::Ninja';
+
+  # https://gitlab.com/drobilla/serd
+  # https://drobilla.net/software/serd.html
+  plugin 'Download::GitLab' => (
+    gitlab_user    => 'drobilla',
+    gitlab_project => 'serd',
+  );
+
+
+  plugin Extract => 'tar.gz';
+
+  meta->prop->{destdir} = 1;
+  my $build_dir = '_build';
+  build [
+    map {
+      my  $linkage = $_; (
+      sub {
+        my $build = shift;
+        Alien::Build::CommandSequence->new([
+          Alien::Meson->exe, 'setup',
+            "-Ddefault_library=$linkage",
+            '--prefix=%{.install.prefix}',
+            '--libdir=lib',
+            '--buildtype=release',
+            '-Ddocs=disabled', # no docs
+            "${build_dir}_$linkage",
+        ])->execute($build);
+      },
+      [ '%{ninja}', qw(-C), "${build_dir}_$linkage", "test" ],
+      [ '%{ninja}', qw(-C), "${build_dir}_$linkage", 'install' ],
+    ) } qw(shared static)
+  ];
+
+  plugin 'Gather::IsolateDynamic';
+}

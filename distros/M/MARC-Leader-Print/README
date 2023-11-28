@@ -1,0 +1,137 @@
+NAME
+    MARC::Leader::Print - MARC leader class for print.
+
+SYNOPSIS
+     use MARC::Leader::Print;
+
+     my $obj = MARC::Leader::Print->new(%params);
+     my @ret = $obj->print($leader_obj);
+     my $ret = $obj->print($leader_obj);
+
+METHODS
+  "new"
+     my $obj = MARC::Leader->new(%params);
+
+    Constructor.
+
+    *       "mode_ansi"
+
+            Mode for ANSI color support:
+
+             1 - ANSI color support enabled.
+             0 - ANSI color support disabled.
+
+            When is undefined, env variables "COLOR" or "NO_COLOR" could
+            control ANSI color support.
+
+            Default value is undef.
+
+    *       "mode_desc"
+
+            Use description instead of raw leader values.
+
+            Default value is 1.
+
+    *       "output_separator"
+
+            Output separator used in scalar context of "print()" method.
+
+            Default value is "\n".
+
+    Returns instance of object.
+
+  "print"
+     my @ret = $obj->print($leader_obj);
+     my $ret = $obj->print($leader_obj);
+
+    Process Data::MARC::Leader instance to output print. In scalar context
+    compose printing output as one string. In array context compose list of
+    printing lines.
+
+    Color (ANSI colors) output is controlled by 'mode_ansi' parameter or env
+    variables "COLOR" and "NO_COLOR".
+
+    Returns string in scalar context. Returns array of string in array
+    context.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     use strict;
+     use warnings;
+
+     use Data::MARC::Leader;
+     use MARC::Leader::Print;
+
+     # Print object.
+     my $print = MARC::Leader::Print->new;
+
+     # Data object.
+     my $data_marc_leader = Data::MARC::Leader->new(
+             'bibliographic_level' => 'm',
+             'char_coding_scheme' => 'a',
+             'data_base_addr' => 541,
+             'descriptive_cataloging_form' => 'i',
+             'encoding_level' => ' ',
+             'impl_def_portion_len' => '0',
+             'indicator_count' => '2',
+             'length' => 2200,
+             'length_of_field_portion_len' => '4',
+             'multipart_resource_record_level' => ' ',
+             'starting_char_pos_portion_len' => '5',
+             'status' => 'c',
+             'subfield_code_count' => '2',
+             'type' => 'e',
+             'type_of_control' => ' ',
+             'undefined' => '0',
+     );
+
+     # Print to output.
+     print scalar $print->print($data_marc_leader), "\n";
+
+     # Output:
+     # Record length: 2200
+     # Record status: Corrected or revised
+     # Type of record: Cartographic material
+     # Bibliographic level: Monograph/Item
+     # Type of control: No specified type
+     # Character coding scheme: UCS/Unicode
+     # Indicator count: Number of character positions used for indicators
+     # Subfield code count: Number of character positions used for a subfield code (2)
+     # Base address of data: 541
+     # Encoding level: Full level
+     # Descriptive cataloging form: ISBD punctuation included
+     # Multipart resource record level: Not specified or not applicable
+     # Length of the length-of-field portion: Number of characters in the length-of-field portion of a Directory entry (4)
+     # Length of the starting-character-position portion: Number of characters in the starting-character-position portion of a Directory entry (5)
+     # Length of the implementation-defined portion: Number of characters in the implementation-defined portion of a Directory entry (0)
+     # Undefined: Undefined
+
+DEPENDENCIES
+    Class::Utils, Data::MARC::Leader::Utils, English, Error::Pure.
+
+    And optional Term::ANSIColor for ANSI color support.
+
+SEE ALSO
+    Data::MARC::Leader
+        Data object for MARC leader.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/MARC-Leader-Print>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

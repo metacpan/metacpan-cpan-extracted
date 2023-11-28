@@ -1,5 +1,18 @@
 Revision history for Geo-Gpx
 
+1.10 [2023-11-25]
+    New methods for waypoints:
+        - waypoint_rename(), waypoints_print(),
+        - waypoints_clip() -- only supported on systems with the xclip utility
+
+    New methods for tracks:
+        - track_rename(), track_delete(), tracks_delete_all(), tracks_print()
+
+    New method for routes:
+        - routes_delete_all
+
+    Fixed error when a filehandle is used as input
+
 1.09 [2022-12-06]
     Fixed bug in parsing absolute and relative paths in MSWin32
 

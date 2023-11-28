@@ -9,6 +9,7 @@ my $build_requires = {
 
 my $prereq_pm = {
         'Mojolicious'           => 7.94,    # Ubuntu = libmojolicious-perl          RHEL = perl-Mojolicious
+        'Sys::Syslog'           => 0,
         'WWW::Suffit'           => 1.00,    # Ubuntu = libwww-suffit-perl           RHEL = perl-WWW-Suffit
     };
 

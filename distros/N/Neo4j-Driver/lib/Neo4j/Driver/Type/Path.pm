@@ -5,7 +5,7 @@ use utf8;
 
 package Neo4j::Driver::Type::Path;
 # ABSTRACT: Directed sequence of relationships between two nodes
-$Neo4j::Driver::Type::Path::VERSION = '0.40';
+$Neo4j::Driver::Type::Path::VERSION = '0.41';
 
 use parent 'Neo4j::Types::Path';
 use overload '@{}' => \&_array, fallback => 1;
@@ -76,7 +76,7 @@ Neo4j::Driver::Type::Path - Directed sequence of relationships between two nodes
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 
@@ -96,6 +96,9 @@ Its direction may be separate from that of the relationships traversed.
 It is allowed to be of length 0, meaning there are no relationships
 in it. In this case, it contains only a single node which is both the
 start and the end of the path.
+
+I<B<Note:> This module documentation will soon be replaced entirely
+by L<Neo4j::Driver::Types> and L<Neo4j::Types::Path>.>
 
 =head1 METHODS
 
@@ -148,7 +151,7 @@ their labels and types. This is due to an issue in the Neo4j server.
 
 =over
 
-=item * L<Neo4j::Driver>
+=item * L<Neo4j::Driver::Types>
 
 =item * L<Neo4j::Types::Path>
 

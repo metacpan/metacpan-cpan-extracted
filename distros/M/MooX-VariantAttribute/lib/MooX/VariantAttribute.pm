@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use Carp qw/croak/;
 use MooX::ReturnModifiers;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub import {
     my ( $package, @import ) = @_;
 
     my $target = caller;
-    my %modifiers = return_modifiers( $target, [qw/has around with/] );
+    my %modifiers = return_modifiers( $target, [qw/has around with sub/] );
 
     my $variant = sub {
         my ( $name, %spec ) = @_;
@@ -30,7 +30,7 @@ sub import {
     $target->can('_given_when')
       or $modifiers{with}->('MooX::VariantAttribute::Role');
 
-    { no strict 'refs'; *{"${target}::variant"} = $variant; }
+    $modifiers{sub}->('variant', $variant);
 
     return 1;
 }
@@ -91,7 +91,7 @@ MooX::VariantAttribute - a щ（ﾟДﾟщ）Attribute...
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 

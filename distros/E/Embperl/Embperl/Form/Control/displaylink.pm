@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -93,7 +94,7 @@ Embperl::Form::Control::displaylink - A control to display links inside an Embpe
   type   => 'displaylink',
   text   => 'blabla', 
   link   => ['ecos', 'bb5000'],
-  href   => ['http://www.ecos.de', 'http://www.bb5000.info']  
+  href   => ['https://www.actevy.io', 'http://www.bb5000.info']  
   }
 
 =head1 DESCRIPTION

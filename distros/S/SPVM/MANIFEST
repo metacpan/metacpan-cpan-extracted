@@ -215,7 +215,6 @@ lib/SPVM/Comparator/Long.pm
 lib/SPVM/Comparator/Long.spvm
 lib/SPVM/Comparator/String.pm
 lib/SPVM/Comparator/String.spvm
-lib/SPVM/Compiler.pm
 lib/SPVM/Complex_2d.pm
 lib/SPVM/Complex_2d.spvm
 lib/SPVM/Complex_2f.pm
@@ -255,8 +254,11 @@ lib/SPVM/EqualityChecker.spvm
 lib/SPVM/EqualityChecker/Address.pm
 lib/SPVM/EqualityChecker/Address.spvm
 lib/SPVM/Error.pm
+lib/SPVM/Error/Compile.pm
 lib/SPVM/Error/NotSupported.pm
 lib/SPVM/Error/System.pm
+lib/SPVM/Error/Unicode/InvalidUTF8.pm
+lib/SPVM/Error/Unicode/InvalidUTF8.spvm
 lib/SPVM/ExchangeAPI.pm
 lib/SPVM/ExchangeAPI/Class.pm
 lib/SPVM/ExchangeAPI/Error.pm
@@ -375,8 +377,6 @@ lib/SPVM/Sync/Mutex.c
 lib/SPVM/Sync/Mutex.config
 lib/SPVM/Sync/Mutex.pm
 lib/SPVM/Sync/Mutex.spvm
-lib/SPVM/Time.pm
-lib/SPVM/Time/Info.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
@@ -586,6 +586,7 @@ t/02_vm/03_definition/accessor.t
 t/02_vm/03_definition/alias.t
 t/02_vm/03_definition/allow.t
 t/02_vm/03_definition/enum.t
+t/02_vm/03_definition/inheritance.t
 t/02_vm/03_definition/interface.t
 t/02_vm/03_definition/type_comment.t
 t/02_vm/04_statement/die.t
@@ -617,7 +618,6 @@ t/02_vm/05_op/constant.t
 t/02_vm/05_op/copy.t
 t/02_vm/05_op/divide.t
 t/02_vm/05_op/dump.t
-t/02_vm/05_op/error_code.t
 t/02_vm/05_op/field.t
 t/02_vm/05_op/increment.t
 t/02_vm/05_op/init.t
@@ -665,6 +665,7 @@ t/02_vm/08_module/CommandInfo.t
 t/02_vm/08_module/default_loaded_modules.t
 t/02_vm/08_module/Double.t
 t/02_vm/08_module/DoubleList.t
+t/02_vm/08_module/Error.t
 t/02_vm/08_module/Error_System.t
 t/02_vm/08_module/Float.t
 t/02_vm/08_module/FloatList.t
@@ -683,6 +684,7 @@ t/02_vm/08_module/IntList.t
 t/02_vm/08_module/List.t
 t/02_vm/08_module/Long.t
 t/02_vm/08_module/LongList.t
+t/02_vm/08_module/Native/Compiler.t
 t/02_vm/08_module/Native/MethodCall.t
 t/02_vm/08_module/Point.t
 t/02_vm/08_module/Point3D.t
@@ -692,8 +694,10 @@ t/02_vm/08_module/ShortList.t
 t/02_vm/08_module/Sort.t
 t/02_vm/08_module/StringBuffer.t
 t/02_vm/08_module/StringList.t
+t/02_vm/08_module/Sync/Mutex.t
 t/02_vm/08_module/Sync_Mutex.t
 t/02_vm/09_stdio/stdio.t
+t/02_vm/10_thread_safe/thread_safe.t
 t/02_vm/99_extra/examples.t
 t/02_vm/99_extra/issues.t
 t/02_vm/99_extra/version.t
@@ -738,7 +742,6 @@ t/02_vm/lib/SPVM/TestCase/DumpTest1.spvm
 t/02_vm/lib/SPVM/TestCase/Empty.spvm
 t/02_vm/lib/SPVM/TestCase/Enum.spvm
 t/02_vm/lib/SPVM/TestCase/Enum/Data1.spvm
-t/02_vm/lib/SPVM/TestCase/ErrorCode.spvm
 t/02_vm/lib/SPVM/TestCase/Examples.spvm
 t/02_vm/lib/SPVM/TestCase/Exception.spvm
 t/02_vm/lib/SPVM/TestCase/ExchangeAPI.spvm
@@ -749,6 +752,7 @@ t/02_vm/lib/SPVM/TestCase/For.spvm
 t/02_vm/lib/SPVM/TestCase/If.spvm
 t/02_vm/lib/SPVM/TestCase/IfRequire.spvm
 t/02_vm/lib/SPVM/TestCase/Increment.spvm
+t/02_vm/lib/SPVM/TestCase/Inheritance.spvm
 t/02_vm/lib/SPVM/TestCase/Init.spvm
 t/02_vm/lib/SPVM/TestCase/InitStatement.spvm
 t/02_vm/lib/SPVM/TestCase/Inline.spvm
@@ -788,6 +792,7 @@ t/02_vm/lib/SPVM/TestCase/Module/ByteList.spvm
 t/02_vm/lib/SPVM/TestCase/Module/CommandInfo.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Double.spvm
 t/02_vm/lib/SPVM/TestCase/Module/DoubleList.spvm
+t/02_vm/lib/SPVM/TestCase/Module/Error.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Float.spvm
 t/02_vm/lib/SPVM/TestCase/Module/FloatList.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Fn.spvm
@@ -805,6 +810,8 @@ t/02_vm/lib/SPVM/TestCase/Module/IntList.spvm
 t/02_vm/lib/SPVM/TestCase/Module/List.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Long.spvm
 t/02_vm/lib/SPVM/TestCase/Module/LongList.spvm
+t/02_vm/lib/SPVM/TestCase/Module/Mutex.spvm
+t/02_vm/lib/SPVM/TestCase/Module/Native/Compiler.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Native/MethodCall.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Point.spvm
 t/02_vm/lib/SPVM/TestCase/Module/Point3D.spvm
@@ -822,6 +829,7 @@ t/02_vm/lib/SPVM/TestCase/Move.spvm
 t/02_vm/lib/SPVM/TestCase/Mulnum.spvm
 t/02_vm/lib/SPVM/TestCase/MulnumArray.spvm
 t/02_vm/lib/SPVM/TestCase/Multiply.spvm
+t/02_vm/lib/SPVM/TestCase/Mutex.spvm
 t/02_vm/lib/SPVM/TestCase/NativeAPI.c
 t/02_vm/lib/SPVM/TestCase/NativeAPI.config
 t/02_vm/lib/SPVM/TestCase/NativeAPI.spvm
@@ -881,12 +889,14 @@ t/02_vm/lib/SPVM/TestCase/Return.spvm
 t/02_vm/lib/SPVM/TestCase/Say.spvm
 t/02_vm/lib/SPVM/TestCase/Seqop.spvm
 t/02_vm/lib/SPVM/TestCase/Simple.spvm
+t/02_vm/lib/SPVM/TestCase/SimpleChild.spvm
 t/02_vm/lib/SPVM/TestCase/SpecialAssign.spvm
 t/02_vm/lib/SPVM/TestCase/Stdio.spvm
 t/02_vm/lib/SPVM/TestCase/String.spvm
 t/02_vm/lib/SPVM/TestCase/Subtract.spvm
 t/02_vm/lib/SPVM/TestCase/Switch.spvm
 t/02_vm/lib/SPVM/TestCase/SymbolName_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_.spvm
+t/02_vm/lib/SPVM/TestCase/ThreadSafe.spvm
 t/02_vm/lib/SPVM/TestCase/TypeCast.spvm
 t/02_vm/lib/SPVM/TestCase/TypeComment.spvm
 t/02_vm/lib/SPVM/TestCase/TypeConversion.spvm
@@ -904,6 +914,15 @@ t/02_vm/lib/SPVM/TestCase/UseResource/Mylib1.spvm
 t/02_vm/lib/SPVM/TestCase/UseResource/Mylib2.c
 t/02_vm/lib/SPVM/TestCase/UseResource/Mylib2.config
 t/02_vm/lib/SPVM/TestCase/UseResource/Mylib2.spvm
+t/02_vm/lib/SPVM/TestCase/Util/Thread.config
+t/02_vm/lib/SPVM/TestCase/Util/Thread.cpp
+t/02_vm/lib/SPVM/TestCase/Util/Thread.spvm
+t/02_vm/lib/SPVM/TestCase/Util/Thread/ID.config
+t/02_vm/lib/SPVM/TestCase/Util/Thread/ID.cpp
+t/02_vm/lib/SPVM/TestCase/Util/Thread/ID.spvm
+t/02_vm/lib/SPVM/TestCase/Util/Thread/ThisThread.config
+t/02_vm/lib/SPVM/TestCase/Util/Thread/ThisThread.cpp
+t/02_vm/lib/SPVM/TestCase/Util/Thread/ThisThread.spvm
 t/02_vm/lib/SPVM/TestCase/Warn.spvm
 t/02_vm/lib/SPVM/TestCase/Weaken.spvm
 t/02_vm/lib/SPVM/TestCase/While.spvm
@@ -931,6 +950,7 @@ t/04_spvmcc/SPVM_Builder_Exe.t
 t/04_spvmcc/spvmcc.t
 t/05_spvmdist/command.t
 t/05_spvmdist/module.t
+t/test_add_class/SPVM/MyPoint.spvm
 t/test_files/file_eof.txt
 t/test_files/fread.txt
 t/test_files/fread_eof.txt

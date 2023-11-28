@@ -68,7 +68,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.29';
+our $VERSION = '0.36';
 
 #########################################################################
 
@@ -102,7 +102,7 @@ our %T =
      _1_does_not_exist
      => "%s doesn't exist!",
      _1_has_incompatible_state__2
-     => "%s already has incompatible state to configuration of %s",
+     => '%s already has incompatible state to configuration of %s',
      _1_is_not_a_symbolic_link
      => '%s is not a symbolic link',
      _1_may_be_inaccessible
@@ -123,6 +123,8 @@ our %T =
      => "bad debugging level '%s'",
      bad_directory__1
      => "bad directory '%s'",
+     bad_ldd_interpreter__1
+     => "bad interpreter '%s' doesn't use ld-linux.so for dynamic linkage",
      bad_master__1
      => "bad MASTER value '%s'",
      broken_user_mapping__1
@@ -174,6 +176,8 @@ our %T =
      => "message '%s' missing, falling back to en",
      missing_directory__1
      => 'directory %s is missing',
+     modify__1
+     => 'modify %s',
      modify_file
      => 'modify file permissions',
      modify_filter
@@ -194,6 +198,8 @@ our %T =
      => 'screen %dx%d to small for window, need >= 27x94 for all UI variants',
      select_configuration_directory
      => 'select or enter configuration directory',
+     select_files4library_package
+     => 'select files for needed library packages',
      select_files4package
      => 'select files for packages',
      select_files_directory
@@ -227,7 +233,10 @@ our %T =
      => "The first column contains whole packages to be included into the\n"
      ."generated container.  With '-' you can remove a selected entry.  With\n"
      ."'+' you open a file-selection dialog, where you can select a file or\n"
-     ."directory, whose (installed) package(s) are added to the list.\n\n"
+     ."directory, whose (installed) package(s) are added to the list. '*'\n"
+     ."allows you to modify an existing entry.  Finally '++' allows adding\n"
+     ."dependencies to libraries used by an application (or other library).\n"
+     ."Note that the later is only needed for 3rd party applications.\n\n"
      ."The second column contains single files and/or directories to be\n"
      ."included into the generated container.  '-' again removes a selected\n"
      ."entry.  '+' again allows adding an entry using a file-selection dialog.\n"
@@ -243,7 +252,7 @@ our %T =
      ."modification dialog accessed by '*' there are three other possible\n"
      ."variants: 'CP' copies exactly that item (useful for symbolic links),\n"
      ."'EM' creates it empty and 'NM' prevents merging sub-directories of that\n"
-     ."path.\n\n"
+     ."path when creating (and optimising) the container.\n\n"
      ."The network box determines if the created container has full network\n"
      ."access, may only access the host or can use no network at all.\n\n"
      ."The features box allows to enable additional features like the X11\n"

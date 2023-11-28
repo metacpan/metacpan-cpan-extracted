@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "NAME" => "MojoX::Linda",
   "PREREQ_PM" => {
     "Class::Method::Modifiers" => 0,
-    "Config::App" => "1.16",
+    "Config::App" => "1.17",
     "File::Find" => 0,
     "Mojo::File" => 0,
     "Mojo::Server::Morbo" => 0,
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "1.02",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Method::Modifiers" => 0,
-  "Config::App" => "1.16",
+  "Config::App" => "1.17",
   "File::Find" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,

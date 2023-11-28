@@ -1,0 +1,15 @@
+ChangeLog		Change history
+README			Docs
+MANIFEST		This file
+META.json		META
+META.yml		META
+cpanfile		Dependency list for cpan/cpanm
+CONTRIBUTING.md		Guide in how to contribute
+lib/Test/CVE.pm		Test CVE functionality
+Makefile.PL		Makefile generator
+t/10_base.t		Base tests (combine and parse only)
+t/12_options.t		Accessor methods
+t/20_cpanfile.t		Reading a cpanfile
+scripts/cpan-cve.pl	CLI to Test::CVE
+files/cpanfile-SR	cpanfile from Spreadsheet::Read
+examples/70_cve.t	An example test file

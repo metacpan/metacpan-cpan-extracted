@@ -33,9 +33,8 @@
       "runtime" : {
          "requires" : {
             "SPVM" : "0.9706",
-            "SPVM::IO" : "0.204003",
-            "SPVM::Regex" : "0.243",
-            "SPVM::Sys" : "0.483"
+            "SPVM::IO" : "0.211",
+            "SPVM::Regex" : "0.243"
          }
       },
       "test" : {
@@ -48,6 +47,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

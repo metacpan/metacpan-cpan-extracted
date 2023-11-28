@@ -3,13 +3,13 @@ package Geo::Gpx;
 use warnings;
 use strict;
 
-our $VERSION = '1.09';
+our $VERSION = '1.10';
 
 use Carp;
 use DateTime::Format::ISO8601;
 use DateTime;
 use HTML::Entities qw( encode_entities encode_entities_numeric );
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed looks_like_number );
 use XML::Descent;
 use File::Basename;
 use Cwd qw(cwd abs_path);
@@ -23,16 +23,16 @@ Geo::Gpx - Create and parse GPX files
 
 =head1 SYNOPSIS
 
-  my ($gpx, $waypoints, $tracks);
+    my ($gpx, $waypoints, $tracks);
 
-  # From a filename, an open file, or an XML string:
+    # From a filename, an open file, or an XML string:
 
-  $gpx = Geo::Gpx->new( input => $fname );
-  $gpx = Geo::Gpx->new( input => $fh    );
-  $gpx = Geo::Gpx->new(   xml => $xml   );
+    $gpx = Geo::Gpx->new( input => $fname );
+    $gpx = Geo::Gpx->new( input => $fh    );
+    $gpx = Geo::Gpx->new(   xml => $xml   );
 
-  my $waypoints = $gpx->waypoints();
-  my $tracks    = $gpx->tracks();
+    my $waypoints = $gpx->waypoints();
+    my $tracks    = $gpx->tracks();
 
 =head1 DESCRIPTION
 
@@ -40,86 +40,75 @@ C<Geo::Gpx> supports the parsing and generation of GPX data.
 
 =cut
 
-# Values that are encoded as attributes
-my %AS_ATTR = (
-  wpt   => qr{^lat|lon$},
-  rtept => qr{^lat|lon$},
-  trkpt => qr{^lat|lon$},
-  email => qr{^id|domain$},
-  link  => qr{^href$}
-);
+my %AS_ATTR = (                 # values that are encoded as attributes
+    wpt   => qr{^lat|lon$},
+    rtept => qr{^lat|lon$},
+    trkpt => qr{^lat|lon$},
+    email => qr{^id|domain$},
+    link  => qr{^href$}
+    );
 
 my %KEY_ORDER = (
-  wpt => [
-    qw(
-     ele time magvar geoidheight name cmt desc src link sym type fix
-     sat hdop vdop pdop ageofdgpsdata dgpsid extensions
-     )
-  ],
-);
+    wpt => [
+        qw(
+            ele time magvar geoidheight name cmt desc src link sym type fix
+            sat hdop vdop pdop ageofdgpsdata dgpsid extensions
+            )
+        ],
+    );
 
-# Map hash keys to GPX names
-my %XMLMAP = (
-  waypoints => { waypoints => 'wpt' },
-  routes    => {
-    routes => 'rte',
-    points => 'rtept'
-  },
-  tracks => {
-    tracks   => 'trk',
-    segments => 'trkseg',
-    points   => 'trkpt'
-  }
-);
+my %XMLMAP = (                  # map hash keys to GPX names
+    waypoints => { waypoints => 'wpt' },
+    routes    => {
+        routes => 'rte',
+        points => 'rtept'
+        },
+    tracks => {
+        tracks   => 'trk',
+        segments => 'trkseg',
+        points   => 'trkpt'
+        }
+    );
 
-my @META;
-my @ATTR;
-
+my (@META, @ATTR);
 BEGIN {
-  @META = qw( name desc author time keywords copyright link );
-  @ATTR = qw( version );
+    @META = qw( name desc author time keywords copyright link );
+    @ATTR = qw( version );
 
-  # Generate accessors
-  for my $attr ( @META, @ATTR ) {
-    no strict 'refs';
-    *{ __PACKAGE__ . '::' . $attr } = sub {
-      my $self = shift;
-      $self->{$attr} = shift if @_;
-      return $self->{$attr};
-    };
-  }
+    # Generate accessors
+    for my $attr ( @META, @ATTR ) {
+        no strict 'refs';
+        *{ __PACKAGE__ . '::' . $attr } = sub {
+            my $self = shift;
+            $self->{$attr} = shift if @_;
+            return $self->{$attr};
+        }
+    }
 }
 
 sub _time_string_to_epoch {
-  my $dt = DateTime::Format::ISO8601->parse_datetime( shift );
-  return $dt->epoch
+    my $dt = DateTime::Format::ISO8601->parse_datetime( shift );
+    return $dt->epoch
 }
 
 sub _time_epoch_to_string {
-  my $dt = DateTime->from_epoch( epoch => shift, time_zone => 'UTC' );
-  my $str = $dt->strftime( '%Y-%m-%dT%H:%M:%S%z' );
-  $str =~ s/(\d{2})$/:$1/;
-  $str =~ s/\+00:00$/Z/;
-  return $str
+    my $dt = DateTime->from_epoch( epoch => shift, time_zone => 'UTC' );
+    my $str = $dt->strftime( '%Y-%m-%dT%H:%M:%S%z' );
+    $str =~ s/(\d{2})$/:$1/;
+    $str =~ s/\+00:00$/Z/;
+    return $str
 }
 
 sub _init_shiny_new {
-  my ( $self, $args ) = @_;
-
-  $self->{schema} = [];
-
-  $self->{waypoints} = [];  # these need to be defined for the *_count accessors
-  $self->{routes} = [];
-  $self->{tracks} = [];
-
-  $self->{handler} = {
-    create => sub {
-      return {@_};
-    },
-    time => sub {
-      return _time_epoch_to_string( $_[0] );
-    },
-  };
+    my ( $self, $args ) = @_;
+    $self->{schema}    = [];
+    $self->{waypoints} = [];
+    $self->{routes}    = [];
+    $self->{tracks}    = [];
+    $self->{handler} = {
+        create => sub { return {@_}; },
+        time =>   sub { return _time_epoch_to_string( $_[0] ); }
+        }
 }
 
 =head2 Constructor
@@ -137,173 +126,164 @@ The optional C<work_dir> (or C<wd> for short) specifies where to save any workin
 =cut
 
 sub new {
-  my ( $class, @args ) = @_;
-  my $self = bless( {}, $class );
+    my ( $class, @args ) = @_;
+    my $self = bless( {}, $class );
 
-  # CORE::time because we have our own time method.
-  $self->{time} = CORE::time();
+    # CORE::time because we have our own time method.
+    $self->{time} = CORE::time();
 
-  if ( @args % 2 == 0 ) {
-    my %args = @args;
-    $self->_init_shiny_new( \%args );
+    if ( @args % 2 == 0 ) {
+        my %args = @args;
+        $self->_init_shiny_new( \%args );
 
-    if ( exists $args{input} ) {
-        my ($fh, $arg);
-        $arg = $args{input};
-        $arg =~ s/~/$ENV{'HOME'}/ if $arg =~ /^~/;
-        if (-f $arg) {
-            open( $fh , '<', $arg ) or  die "can't open file $arg $!";
-            $self->_parse( $fh );
-            $self->set_filename($arg)
-        } else { $self->_parse( $args{input} ) }
+        if ( exists $args{input} ) {
+            my ($fh, $arg);
+            $arg = $args{input};
+            $arg =~ s/~/$ENV{'HOME'}/ if $arg =~ /^~/;
+            if (-f $arg and $arg !~ /^GLOB/) {
+                open( $fh , '<', $arg ) or  die "can't open file $arg $!";
+                $self->_parse( $fh );
+                $self->set_filename($arg)
+            } else { $self->_parse( $args{input} ) }
+        } elsif ( exists $args{xml} ) {
+            $self->_parse( \$args{xml} )
+        }
+        $self->set_wd( $args{work_dir} || $args{wd} )
     }
-    elsif ( exists $args{xml} ) {
-      $self->_parse( \$args{xml} );
+    else {
+        croak( "Invalid arguments" )
     }
-    $self->set_wd( $args{work_dir} || $args{wd} );
-  }
-  else {
-    croak( "Invalid arguments" );
-  }
-  return $self
+    return $self
 }
 
-# Not a method
 sub _trim {
-  my $str = shift;
-  $str =~ s/^\s+//;
-  $str =~ s/\s+$//;
-  $str =~ s/\s+/ /g;
-  return $str;
+    my $str = shift;
+    $str =~ s/^\s+//;
+    $str =~ s/\s+$//;
+    $str =~ s/\s+/ /g;
+    return $str
 }
 
 sub _parse {
-  my $self   = shift;
-  my $source = shift;
+    my $self   = shift;
+    my $source = shift;
 
-  my $p = XML::Descent->new( { Input => $source } );
+    my $p = XML::Descent->new( { Input => $source } );
 
-  $p->on(
-    gpx => sub {
-      my ( $elem, $attr ) = @_;
+    $p->on(
+        gpx => sub {
+            my ( $elem, $attr ) = @_;
+            $p->context( $self );
 
-      $p->context( $self );
+            my $version = $self->{version} = ( $attr->{version} || '1.0' );
 
-      my $version = $self->{version} = ( $attr->{version} || '1.0' );
+            my $parse_deep = sub {
+                my ( $elem, $attr ) = @_;
+                my $ob = $attr;    # Get attributes
+                $p->context( $ob );
+                $p->walk();
+                return $ob
+                };
 
-      my $parse_deep = sub {
-        my ( $elem, $attr ) = @_;
-        my $ob = $attr;    # Get attributes
-        $p->context( $ob );
-        $p->walk();
-        return $ob;
-      };
+            # Parse a point
+            my $parse_point = sub {
+                my ( $elem, $attr ) = @_;
+                my $pt = $parse_deep->( $elem, $attr );
+                return Geo::Gpx::Point->new( %{$pt} )
+                };
 
-      # Parse a point
-      my $parse_point = sub {
-        my ( $elem, $attr ) = @_;
-        my $pt = $parse_deep->( $elem, $attr );
-        return Geo::Gpx::Point->new( %{$pt} )
-      };
+            $p->on(
+                '*' => sub {
+                    my ( $elem, $attr, $ctx ) = @_;
+                    $ctx->{$elem} = _trim( $p->text() )
+                    },
+                time => sub {
+                    my ( $elem, $attr, $ctx ) = @_;
+                    my $tm = _time_string_to_epoch( _trim( $p->text() ) );
+                    $ctx->{$elem} = $tm if defined $tm
+                    }
+                );
 
-      $p->on(
-        '*' => sub {
-          my ( $elem, $attr, $ctx ) = @_;
-          $ctx->{$elem} = _trim( $p->text() );
-        },
-        time => sub {
-          my ( $elem, $attr, $ctx ) = @_;
-          my $tm = _time_string_to_epoch( _trim( $p->text() ) );
-          $ctx->{$elem} = $tm if defined $tm;
-        }
-      );
-
-      if ( _cmp_ver( $version, '1.1' ) >= 0 ) {
-
-        # Handle 1.1 metadata
-        $p->on(
-          metadata => sub {
-            $p->walk();
-          },
-          [ 'link', 'email', 'author' ] => sub {
-            my ( $elem, $attr, $ctx ) = @_;
-            $ctx->{$elem} = $parse_deep->( $elem, $attr );
-          }
-        );
-      }
-      else {
-
-        # Handle 1.0 metadata
-        $p->on(
-          url => sub {
-            my ( $elem, $attr, $ctx ) = @_;
-            $ctx->{link}->{href} = _trim( $p->text() );
-          },
-          urlname => sub {
-            my ( $elem, $attr, $ctx ) = @_;
-            $ctx->{link}->{text} = _trim( $p->text() );
-          },
-          author => sub {
-            my ( $elem, $attr, $ctx ) = @_;
-            $ctx->{author}->{name} = _trim( $p->text() );
-          },
-          email => sub {
-            my ( $elem, $attr, $ctx ) = @_;
-            my $em = _trim( $p->text() );
-            if ( $em =~ m{^(.+)\@(.+)$} ) {
-              $ctx->{author}->{email} = {
-                id     => $1,
-                domain => $2
-              };
+            if ( _cmp_ver( $version, '1.1' ) >= 0 ) {
+                # Handle 1.1 metadata
+                $p->on(
+                    metadata => sub {
+                        $p->walk();
+                    },
+                    [ 'link', 'email', 'author' ] => sub {
+                        my ( $elem, $attr, $ctx ) = @_;
+                        $ctx->{$elem} = $parse_deep->( $elem, $attr )
+                        }
+                    );
+            } else {
+                # Handle 1.0 metadata
+                $p->on(
+                    url => sub {
+                        my ( $elem, $attr, $ctx ) = @_;
+                        $ctx->{link}->{href} = _trim( $p->text() )
+                        },
+                    urlname => sub {
+                        my ( $elem, $attr, $ctx ) = @_;
+                        $ctx->{link}->{text} = _trim( $p->text() )
+                        },
+                    author => sub {
+                        my ( $elem, $attr, $ctx ) = @_;
+                        $ctx->{author}->{name} = _trim( $p->text() )
+                        },
+                    email => sub {
+                        my ( $elem, $attr, $ctx ) = @_;
+                        my $em = _trim( $p->text() );
+                        if ( $em =~ m{^(.+)\@(.+)$} ) {
+                            $ctx->{author}->{email} = {
+                                id     => $1,
+                                domain => $2
+                                };
+                        }
+                        }
+                    );
             }
-          }
-        );
-      }
 
-      $p->on(
-        bounds => sub {
-          my ( $elem, $attr, $ctx ) = @_;
-          $ctx->{$elem} = $parse_deep->( $elem, $attr );
-        },
-        keywords => sub {
-          my ( $elem, $attr ) = @_;
-          $self->{keywords}
-           = [ map { _trim( $_ ) } split( /,/, $p->text() ) ];
-        },
-        wpt => sub {
-          my ( $elem, $attr ) = @_;
-          push @{ $self->{waypoints} }, $parse_point->( $elem, $attr );
-        },
-        [ 'trkpt', 'rtept' ] => sub {
-          my ( $elem, $attr, $ctx ) = @_;
-          push @{ $ctx->{points} }, $parse_point->( $elem, $attr );
-        },
-        rte => sub {
-          my ( $elem, $attr ) = @_;
-          my $rt = $parse_deep->( $elem, $attr );
-          push @{ $self->{routes} }, $rt;
-        },
-        trk => sub {
-          my ( $elem, $attr ) = @_;
-          my $tk = {};
-          $p->context( $tk );
-          $p->on(
-            trkseg => sub {
-              my ( $elem, $attr ) = @_;
-              my $seg = $parse_deep->( $elem, $attr );
-              push @{ $tk->{segments} }, $seg;
+            $p->on(
+                bounds => sub {
+                    my ( $elem, $attr, $ctx ) = @_;
+                    $ctx->{$elem} = $parse_deep->( $elem, $attr )
+                    },
+                keywords => sub {
+                    my ( $elem, $attr ) = @_;
+                    $self->{keywords} = [ map { _trim( $_ ) } split( /,/, $p->text() ) ]
+                    },
+                wpt => sub {
+                    my ( $elem, $attr ) = @_;
+                    push @{ $self->{waypoints} }, $parse_point->( $elem, $attr )
+                    },
+                [ 'trkpt', 'rtept' ] => sub {
+                    my ( $elem, $attr, $ctx ) = @_;
+                    push @{ $ctx->{points} }, $parse_point->( $elem, $attr )
+                    },
+                rte => sub {
+                    my ( $elem, $attr ) = @_;
+                    my $rt = $parse_deep->( $elem, $attr );
+                    push @{ $self->{routes} }, $rt
+                    },
+                trk => sub {
+                    my ( $elem, $attr ) = @_;
+                    my $tk = {};
+                    $p->context( $tk );
+                    $p->on(
+                        trkseg => sub {
+                            my ( $elem, $attr ) = @_;
+                            my $seg = $parse_deep->( $elem, $attr );
+                            push @{ $tk->{segments} }, $seg;
+                            }
+                        );
+                    $p->walk();
+                    push @{ $self->{tracks} }, $tk
+                    }
+                );
+            $p->walk()
             }
-          );
-          $p->walk();
-          push @{ $self->{tracks} }, $tk;
-        }
-      );
-
-      $p->walk();
-    }
-  );
-
-  $p->walk();
+        );
+    $p->walk()
 }
 
 =over 4
@@ -318,13 +298,12 @@ Returns a deep copy of a C<Geo::Gpx> instance.
 
 =cut
 
-sub clone {
+sub clone {                     # actually it can clone anything
     my $clone;
     eval(Data::Dumper->Dump([ shift ], ['$clone']));
     confess $@ if $@;
     return $clone
 }
-# actually it can clone anything
 
 =head2 Methods
 
@@ -334,7 +313,9 @@ sub clone {
 
 Without arguments, returns the array reference of waypoints.
 
-With an argument, returns a reference to the waypoint whose C<name> field is an exact match with I<$name> or the one at integer index I<$int> (1-indexed). Returns C<undef> if none are found such that this method can be used to check if a specific point exists (i.e. no exception is raised if I<$name> or I<$int> do not exist) .
+With an argument, returns a reference to the waypoint whose C<name> field is an exact match with I<$name>. If an integer is specified instead of the C<name> key/value pair, returns the waypoint at position I<$int> in the array reference (1-indexed with negative integers also counting from the end of the array).
+
+Returns C<undef> if no corresponding waypoints are found such that this method can be used to check if a specific point exists (i.e. no exception is raised if I<$name> or I<$int> do not exist) .
 
 =back
 
@@ -351,7 +332,10 @@ sub waypoints {
             $waypoint = $pt if $pt->name eq $_[1]
         }
     } else {
-        $waypoint = $aref->[ ($_[0] - 1) ]
+        my $index = $_[0];
+        croak 'waypoints are 1-indexed, please specify a non-zero integer' if $index==0;
+        $index -= 1 if $index > 0;          # such that -1, -2, still count from end
+        $waypoint = $aref->[ $index ]
     }
     return $waypoint
 }
@@ -375,19 +359,24 @@ Add one or more waypoints. Each waypoint must be either a L<Geo::Gpx::Point> or 
 =cut
 
 sub waypoints_add {
-  my $self = shift;
+    my $self = shift;
 
-  for my $wpt ( @_ ) {
-    eval { keys %$wpt };
-    croak "waypoint argument must be a hash reference"
-     if $@;
+    for my $wpt ( @_ ) {
+        eval { keys %$wpt };
+        croak "waypoint argument must be a hash reference" if $@;
 
-    croak "'lat' and 'lon' keys are mandatory in waypoint hash"
-     unless exists $wpt->{lon} && exists $wpt->{lat};
+        croak "'lat' and 'lon' keys are mandatory in waypoint hash"
+            unless exists $wpt->{lon} && exists $wpt->{lat};
 
-    push @{ $self->{waypoints} }, Geo::Gpx::Point->new( %$wpt );
-  }
-  #TODO: Should return 1
+        my $pt = Geo::Gpx::Point->new( %$wpt );
+
+        if (defined $pt->name ) {
+            my $new_name = $pt->name;
+            croak "there already is a waypoint named $new_name, please select another name" if $self->waypoints( 'name' => $new_name );
+        }
+        push @{ $self->{waypoints} }, $pt
+    }
+    #TODO: Should return 1
 }
 
 =over 4
@@ -414,15 +403,47 @@ sub waypoints_search {
 
 =over 4
 
-=item waypoints_count()
+=item waypoints_clip( $name | $regex | LIST )
 
-returns the number of waypoints in the object.
+=item way_clip( )
+
+Sends the coordinates of the waypoint(s) whose name is either C<$name> or matches C<$regex> to the clipboard (all points found are sent to the clipboard) and returns an array of points found. By default, the regex is case-sensitive; specify C<qr/(?i:...)/> to ignore case.
+
+Alternatively, an array of C<Geo::GXP::Points> can be provided. C<way_clip()> is a short-hand for this method (convenient when used interactively in the debugger).
+
+This method is only supported on unix-based systems that have the C<xclip> utility installed (see DEPENDENCIES).
 
 =back
 
 =cut
 
-sub waypoints_count { return scalar @{ shift->{waypoints} } }
+sub way_clip { waypoints_clip( @_ ) }
+sub waypoints_clip {
+    my $gpx = shift;
+
+    my @points;
+    if ( blessed $_[0] and $_[0]->isa('Geo::Gpx::Point' )) {
+        @points = @_
+    } else {
+        my $first_arg = shift;
+        if ( ref( $first_arg ) eq 'Regexp' )  {
+            @points = $gpx->waypoints_search( name => $first_arg )
+        } else {
+            my $match = $gpx->waypoints( name => $first_arg );
+            push @points, $match if $match
+        }
+        croak 'no point matches the supplied regex' unless @points
+    }
+    my @points_reversed = reverse @points;
+
+    for my $pt (@points_reversed) {
+        croak 'way_clip() expects list of Geo::Gpx::Point objects' unless $pt->isa('Geo::Gpx::Point');
+        my $coords = $pt->lat . ', ';
+        $coords   .= $pt->lon;
+        system("echo $coords | xclip -selection clipboard")
+    }
+    return @points
+}
 
 =over 4
 
@@ -445,7 +466,7 @@ sub waypoints_delete_all {
 
 =item waypoint_delete( $name )
 
-delete the waypoint whose C<name> is an exact match, case sensitively. Returns true if successful, C<undef> if the name cannot be found.
+delete the waypoint whose C<name> field is an exact match for I<$name> (case sensitively). Returns true if successful, C<undef> if the name cannot be found.
 
 =back
 
@@ -466,6 +487,36 @@ sub waypoint_delete {
     }
     splice @{$gpx->{waypoints}}, $index, 1 if $found_match;
     return $found_match
+}
+
+=over 4
+
+=item waypoint_rename( $name, $new_name )
+
+rename the waypoint whose C<name> field is an exact match for I<$name> (case sensitively) to I<$new_name>. Returns the point's new name if successful, C<undef> otherwise.
+
+=back
+
+=cut
+
+sub waypoint_rename {
+    my $gpx = shift;
+    croak 'waypoint_rename() expects $name and $new_name as arguments' unless @_ == 2;
+    my ($name, $new_name) = @_;
+    my $ret_val;
+
+    croak "there already is a waypoint named $new_name, please select another name" if $gpx->waypoints( 'name' => $new_name );
+
+    my $iter = $gpx->iterate_waypoints();
+    while ( my $pt = $iter->() ) {
+        if (defined $pt->name) {
+            if ($pt->name eq $name) {
+                $ret_val = $pt->name( $new_name );
+                last
+            }
+        }
+    }
+    return $ret_val
 }
 
 =over 4
@@ -539,9 +590,45 @@ sub waypoint_closest_to {
 
 =over 4
 
+=item waypoints_print()
+
+print the list of waypoints to screen, along with their names and descriptions if defined. Returns true.
+
+=back
+
+=cut
+
+sub waypoints_print {
+    my $gpx = shift;
+    croak 'waypoints_print() expects no arguments' if @_;
+
+    my $iter = $gpx->iterate_waypoints();
+    while ( my $pt = $iter->() ) {
+        my ($name, $desc);
+        $name = defined $pt->name ? $pt->name : 'Unnamed';
+        $desc = defined $pt->desc ? $pt->desc : 'No description';
+        print $name, ': ', $desc, "\n\t", $pt->lat, " ", $pt->lon, "\n"
+    }
+    return 1
+}
+
+=over 4
+
+=item waypoints_count()
+
+returns the number of waypoints in the object.
+
+=back
+
+=cut
+
+sub waypoints_count { return scalar @{ shift->{waypoints} } }
+
+=over 4
+
 =item routes( integer or name => 'name' )
 
-Returns the array reference of routes when called without argument. Optionally accepts a single integer referring to the route number from routes aref (1-indexed) or a key value pair with the name of the route to be returned.
+Returns the array reference of routes when called without argument. Optionally accepts a single integer referring to the route number from routes aref (1-indexed with negative integers also counting from the end of the array) or a key value pair with the name of the route to be returned.
 
 =back
 
@@ -557,7 +644,11 @@ sub routes {
         }
         croak "no route named $_[1] in route list" unless $route
     } else {
-        $route = $o->{routes}[($_[0] - 1)];
+        my $index = $_[0];
+        croak 'routes are 1-indexed, please specify a non-zero integer' if $index==0;
+
+        $index -= 1 if $index > 0;          # such that -1, -2, still count from end
+        $route = $o->{routes}[ $index ];
         croak "route $_[0] not found" unless $route
     }
     return $route
@@ -611,6 +702,23 @@ sub routes_add {
 
 =over 4
 
+=item routes_delete_all()
+
+delete all routes. Returns true.
+
+=back
+
+=cut
+
+sub routes_delete_all {
+    my $gpx = shift;
+    croak 'routes_delete_all() expects no arguments' if @_;
+    $gpx->{routes} = [];
+    return 1
+}
+
+=over 4
+
 =item routes_count()
 
 returns the number of routes in the object.
@@ -625,7 +733,7 @@ sub routes_count { return scalar @{ shift->{routes} } }
 
 =item tracks( integer or name => 'name' )
 
-Returns the array reference of tracks when called without argument. Optionally accepts a single integer referring to the track number from tracks aref (1-indexed) or a key value pair with the name of the track to be returned.
+Returns the array reference of tracks when called without argument. Optionally accepts a single integer referring to the track number from the tracks aref (1-indexed with negative integers also counting from the end of the array) or a key value pair with the name of the track to be returned.
 
 =back
 
@@ -641,7 +749,11 @@ sub tracks {
         }
         croak "no track named $_[1] in track list" unless $track
     } else {
-        $track = $o->{tracks}[($_[0] - 1)];
+        my $index = $_[0];
+        croak 'tracks are 1-indexed, please specify a non-zero integer' if $index==0;
+
+        $index -= 1 if $index > 0;          # such that -1, -2, still count from end
+        $track = $o->{tracks}[ $index ];
         croak "track $_[0] not found" unless $track
     }
     return $track
@@ -704,9 +816,101 @@ sub tracks_add {
     # let's try a default behaviour of adding time of first point if name is not defined (could provide option to turn this off)
     if ( ! defined $c->{name} ) {
         my $first_pt_time = $c->{segments}[0]{points}[0]->time;
-        $c->{name} = _time_epoch_to_string( $first_pt_time ) if $first_pt_time;
+        $c->{name} = _time_epoch_to_string( $first_pt_time ) if $first_pt_time
     }
     push @{ $o->{tracks} }, $c;
+    return 1
+}
+
+=over 4
+
+=item tracks_delete_all()
+
+delete all tracks. Returns true.
+
+=back
+
+=cut
+
+sub tracks_delete_all {
+    my $gpx = shift;
+    croak 'tracks_delete_all() expects no arguments' if @_;
+    $gpx->{tracks} = [];
+    return 1
+}
+
+=over 4
+
+=item track_delete( $name )
+
+delete the track whose C<name> field is an exact match for I<$name> (case sensitively). Returns true if successful, C<undef> if the name cannot be found.
+
+=back
+
+=cut
+
+sub track_delete {
+    my ($gpx, $name) = @_;
+    my ($index, $found_match) = (0, undef);
+    for my $t ( @{ $gpx->{tracks} } ) {
+        if ($t->{name} eq $name) {
+            $found_match = 1;
+            last
+        }
+        ++$index
+    }
+    splice @{$gpx->{tracks}}, $index, 1 if $found_match;
+    return $found_match
+}
+
+=over 4
+
+=item track_rename( $name, $new_name )
+
+rename the track whose C<name> field is an exact match for I<$name> (case sensitively) to I<$new_name>. Returns the track's new name if successful, C<undef> otherwise.
+
+Alternatively, an integer may be specified as the first argument, referring to the track number from tracks aref (1-indexed). This is a convenience as it is quite common for tracks to be named with the timestamp fo the first point.
+
+=back
+
+=cut
+
+sub track_rename {
+    my $gpx = shift;
+    croak 'track_rename() expects $name (or an integer) and $new_name as arguments' unless @_ == 2;
+    my ($first_arg, $new_name) = @_;
+
+    for my $t ( @{ $gpx->{tracks} } ) {
+        croak "there already is a track named $new_name, please select another name" if $t->{name} eq $new_name
+    }
+
+    my $track;
+    my $is_index = looks_like_number( $first_arg );
+    $track = $is_index ? $gpx->tracks( $first_arg ) : $gpx->tracks( name => $first_arg );
+
+    if (defined $track) {
+        return $track->{name} = $new_name
+    }
+    return undef
+}
+
+=over 4
+
+=item tracks_print()
+
+print the list of tracks to screen, by their C<name> field. Returns true.
+
+=back
+
+=cut
+
+sub tracks_print {
+    my $gpx = shift;
+    croak 'tracks_print() expects no arguments' if @_;
+
+    for my $t ( @{ $gpx->{tracks} } ) {
+        print $t->{name}, "\n"
+    }
     return 1
 }
 
@@ -722,35 +926,29 @@ returns the number of tracks in the object.
 
 sub tracks_count { return scalar @{ shift->{tracks} } }
 
-# Not a method
 sub _iterate_points {
-  my $pts = shift || [];    # array ref
-
-  unless ( defined $pts ) {
+    my $pts = shift || [];    # array ref
+    unless ( defined $pts ) {
+        return sub { return }
+    }
+    my $max = scalar( @{$pts} );
+    my $pos = 0;
     return sub {
-      return;
-    };
-  }
-
-  my $max = scalar( @{$pts} );
-  my $pos = 0;
-  return sub {
-    return if $pos >= $max;
-    return $pts->[ $pos++ ];
-  };
+        return if $pos >= $max;
+        return $pts->[ $pos++ ]
+        }
 }
 
-# Not a method
 sub _iterate_iterators {
-  my @its = @_;
-  return sub {
-    for ( ;; ) {
-      return undef unless @its;
-      my $next = $its[0]->();
-      return $next if defined $next;
-      shift @its;
-    }
-   }
+    my @its = @_;
+    return sub {
+        for ( ;; ) {
+            return undef unless @its;
+            my $next = $its[0]->();
+            return $next if defined $next;
+            shift @its
+        }
+        }
 }
 
 =over 4
@@ -766,62 +964,56 @@ Get an iterator for all of the waypoints, trackpoints, or routepoints in a C<Geo
 =cut
 
 sub iterate_waypoints {
-  my $self = shift;
-  return _iterate_points( $self->{waypoints} );
+    my $self = shift;
+    return _iterate_points( $self->{waypoints} )
 }
 
 sub iterate_routepoints {
-  my $self = shift;
-
-  my @iter = ();
-  if ( exists( $self->{routes} ) ) {
-    for my $rte ( @{ $self->{routes} } ) {
-      push @iter, _iterate_points( $rte->{points} );
+    my $self = shift;
+    my @iter = ();
+    if ( exists( $self->{routes} ) ) {
+        for my $rte ( @{ $self->{routes} } ) {
+            push @iter, _iterate_points( $rte->{points} )
+        }
     }
-  }
-
-  return _iterate_iterators( @iter );
-
+    return _iterate_iterators( @iter )
 }
 
 sub iterate_trackpoints {
-  my $self = shift;
-
-  my @iter = ();
-  if ( exists( $self->{tracks} ) ) {
-    for my $trk ( @{ $self->{tracks} } ) {
-      if ( exists( $trk->{segments} ) ) {
-        for my $seg ( @{ $trk->{segments} } ) {
-          push @iter, _iterate_points( $seg->{points} );
+    my $self = shift;
+    my @iter = ();
+    if ( exists( $self->{tracks} ) ) {
+        for my $trk ( @{ $self->{tracks} } ) {
+            if ( exists( $trk->{segments} ) ) {
+                for my $seg ( @{ $trk->{segments} } ) {
+                    push @iter, _iterate_points( $seg->{points} )
+                }
+            }
         }
-      }
     }
-  }
-
-  return _iterate_iterators( @iter );
+    return _iterate_iterators( @iter )
 }
 
 =item iterate_points()
 
 Get an iterator for all of the points in a C<Geo::Gpx> instance, including waypoints, trackpoints, and routepoints.
 
-  my $iter = $gpx->iterate_points();
-  while ( my $pt = $iter->() ) {
-    print "Point: ", join( ', ', $pt->{lat}, $pt->{lon} ), "\n";
-  }
+    my $iter = $gpx->iterate_points();
+    while ( my $pt = $iter->() ) {
+        print "Point: ", join( ', ', $pt->{lat}, $pt->{lon} ), "\n";
+    }
 
 =back
 
 =cut
 
 sub iterate_points {
-  my $self = shift;
-
-  return _iterate_iterators(
-    $self->iterate_waypoints(),
-    $self->iterate_routepoints(),
-    $self->iterate_trackpoints()
-  );
+    my $self = shift;
+    return _iterate_iterators(
+        $self->iterate_waypoints(),
+        $self->iterate_routepoints(),
+        $self->iterate_trackpoints()
+        )
 }
 
 =over 4
@@ -847,102 +1039,87 @@ C<$iterator> defaults to C<$self-E<gt>iterate_points> if not specified.
 =cut
 
 sub bounds {
-  my ( $self, $iter ) = @_;
-  $iter ||= $self->iterate_points;
+    my ( $self, $iter ) = @_;
+    $iter ||= $self->iterate_points;
 
-  my $bounds = {};
-
-  while ( my $pt = $iter->() ) {
-    $bounds->{minlat} = $pt->{lat}
-     if !defined $bounds->{minlat} || $pt->{lat} < $bounds->{minlat};
-    $bounds->{maxlat} = $pt->{lat}
-     if !defined $bounds->{maxlat} || $pt->{lat} > $bounds->{maxlat};
-    $bounds->{minlon} = $pt->{lon}
-     if !defined $bounds->{minlon} || $pt->{lon} < $bounds->{minlon};
-    $bounds->{maxlon} = $pt->{lon}
-     if !defined $bounds->{maxlon} || $pt->{lon} > $bounds->{maxlon};
-  }
-
-  return $bounds;
+    my $bounds = {};
+    while ( my $pt = $iter->() ) {
+        $bounds->{minlat} = $pt->{lat}
+            if !defined $bounds->{minlat} || $pt->{lat} < $bounds->{minlat};
+        $bounds->{maxlat} = $pt->{lat}
+            if !defined $bounds->{maxlat} || $pt->{lat} > $bounds->{maxlat};
+        $bounds->{minlon} = $pt->{lon}
+            if !defined $bounds->{minlon} || $pt->{lon} < $bounds->{minlon};
+        $bounds->{maxlon} = $pt->{lon}
+            if !defined $bounds->{maxlon} || $pt->{lon} > $bounds->{maxlon};
+    }
+    return $bounds
 }
 
 sub _enc {
-  return encode_entities_numeric( $_[0] );
+    return encode_entities_numeric( $_[0] )
 }
 
 sub _tag {
-  my $name = shift;
-  my $attr = shift || {};
-  my @tag  = ( '<', $name );
+    my $name = shift;
+    my $attr = shift || {};
+    my @tag  = ( '<', $name );
 
-  # Sort keys so the tests can depend on hash output order
-  for my $n ( sort keys %{$attr} ) {
-    my $v = $attr->{$n};
-    push @tag, ' ', $n, '="', _enc( $v ), '"';
-  }
+    # Sort keys so the tests can depend on hash output order
+    for my $n ( sort keys %{$attr} ) {
+        my $v = $attr->{$n};
+        push @tag, ' ', $n, '="', _enc( $v ), '"'
+    }
 
-  if ( @_ ) {
-    push @tag, '>', @_, '</', $name, ">\n";
-  }
-  else {
-    push @tag, " />\n";
-  }
-
-  return join( '', @tag );
+    if ( @_ ) { push @tag, '>', @_, '</', $name, ">\n"
+    } else {    push @tag, " />\n" }
+    return join( '', @tag )
 }
 
 sub _xml {
-  my $self     = shift;
-  my $name     = shift;
-  my $value    = shift;
-  my $name_map = shift || {};
+    my $self     = shift;
+    my $name     = shift;
+    my $value    = shift;
+    my $name_map = shift || {};
 
-  my $tag = $name_map->{$name} || $name;
-  my $is_geo_gpx_point = blessed $value and $value->isa('Geo::Gpx::Point');
+    my $tag = $name_map->{$name} || $name;
+    my $is_geo_gpx_point = blessed $value and $value->isa('Geo::Gpx::Point');
 
-  if ( defined( my $enc = $self->{encoder}->{$name} ) ) {
-    return $enc->( $name, $value );
-  }
-  elsif ( ref $value eq 'HASH' or $is_geo_gpx_point ) {
-    my $attr    = {};
-    my @cont    = ( "\n" );
-    my $as_attr = $AS_ATTR{$name};
+    if ( defined( my $enc = $self->{encoder}->{$name} ) ) {
+        return $enc->( $name, $value )
+    } elsif ( ref $value eq 'HASH' or $is_geo_gpx_point ) {
+        my $attr    = {};
+        my @cont    = ( "\n" );
+        my $as_attr = $AS_ATTR{$name};
 
-    # Shallow copy so we can delete keys as we output them
-    my %v = %{$value};
-    for my $k ( @{ $KEY_ORDER{$name} || [] }, sort keys %v ) {
-      if ( defined( my $vv = delete $v{$k} ) ) {
-        if ( defined $as_attr && $k =~ $as_attr ) {
-          $attr->{$k} = $vv;
+        # Shallow copy so we can delete keys as we output them
+        my %v = %{$value};
+        for my $k ( @{ $KEY_ORDER{$name} || [] }, sort keys %v ) {
+            if ( defined( my $vv = delete $v{$k} ) ) {
+                if ( defined $as_attr && $k =~ $as_attr ) {
+                    $attr->{$k} = $vv
+                } else {
+                    push @cont, $self->_xml( $k, $vv, $name_map )
+                }
+            }
         }
-        else {
-          push @cont, $self->_xml( $k, $vv, $name_map );
-        }
-      }
+        return _tag( $tag, $attr, @cont )
+    } elsif ( ref $value eq 'ARRAY' ) {
+        return join '', map { $self->_xml( $tag, $_, $name_map ) } @{$value}
+    } else {
+        return _tag( $tag, {}, _enc( $value ) )
     }
-
-    return _tag( $tag, $attr, @cont );
-  }
-  elsif ( ref $value eq 'ARRAY' ) {
-    return join '',
-     map { $self->_xml( $tag, $_, $name_map ) } @{$value};
-  }
-  else {
-    return _tag( $tag, {}, _enc( $value ) );
-  }
 }
 
 sub _cmp_ver {
-  my ( $v1, $v2 ) = @_;
-  my @v1 = split( /[.]/, $v1 );
-  my @v2 = split( /[.]/, $v2 );
-
-  while ( @v1 && @v2 ) {
-    my $cmp = ( shift @v1 <=> shift @v2 );
-    return $cmp if $cmp;
-  }
-
-  return @v1 <=> @v2;
+    my ( $v1, $v2 ) = @_;
+    my @v1 = split( /[.]/, $v1 );
+    my @v2 = split( /[.]/, $v2 );
+    while ( @v1 && @v2 ) {
+        my $cmp = ( shift @v1 <=> shift @v2 );
+        return $cmp if $cmp
+    }
+    return @v1 <=> @v2
 }
 
 =item xml( $version )
@@ -954,118 +1131,104 @@ If the version is omitted it defaults to the value of the C<version> attribute. 
 =cut
 
 sub xml {
-  my $self = shift;
-  my $version = shift || $self->{version} || '1.0';
+    my $self = shift;
+    my $version = shift || $self->{version} || '1.0';
+    my @ret = ();
+    push @ret, qq{<?xml version="1.0" encoding="utf-8"?>\n};
 
-  my @ret = ();
+    $self->{encoder} = {
+        time => sub {
+            my ( $n, $v ) = @_;
+            return _tag( $n, {}, _enc( $self->{handler}->{time}->( $v ) ) )
+            },
+        keywords => sub {
+            my ( $n, $v ) = @_;
+            return _tag( $n, {}, _enc( join( ', ', @{$v} ) ) )
+             }
+        };
 
-  push @ret, qq{<?xml version="1.0" encoding="utf-8"?>\n};
-
-  $self->{encoder} = {
-    time => sub {
-      my ( $n, $v ) = @_;
-      return _tag( $n, {}, _enc( $self->{handler}->{time}->( $v ) ) );
-    },
-    keywords => sub {
-      my ( $n, $v ) = @_;
-      return _tag( $n, {}, _enc( join( ', ', @{$v} ) ) );
-     }
-  };
-
-  # Limit to the latest version we know about
-  if ( _cmp_ver( $version, '1.1' ) >= 0 ) {
-    $version = '1.1';
-  }
-  else {
-
-    # Modify encoder
-    $self->{encoder}->{link} = sub {
-      my ( $n, $v ) = @_;
-      my @v = ();
-      push @v, $self->_xml( 'url', $v->{href} )
-       if exists( $v->{href} );
-      push @v, $self->_xml( 'urlname', $v->{text} )
-       if exists( $v->{text} );
-      return join( '', @v );
-    };
-    $self->{encoder}->{email} = sub {
-      my ( $n, $v ) = @_;
-      if ( exists( $v->{id} ) && exists( $v->{domain} ) ) {
-        return _tag( 'email', {},
-          _enc( join( '@', $v->{id}, $v->{domain} ) ) );
-      }
-      else {
-        return '';
-      }
-    };
-    $self->{encoder}->{author} = sub {
-      my ( $n, $v ) = @_;
-      my @v = ();
-      push @v, _tag( 'author', {}, _enc( $v->{name} ) )
-       if exists( $v->{name} );
-      push @v, $self->_xml( 'email', $v->{email} )
-       if exists( $v->{email} );
-      return join( '', @v );
-    };
-  }
-
-  # Turn version into path element
-  ( my $vpath = $version ) =~ s{[.]}{/}g;
-
-  my $ns = "http://www.topografix.com/GPX/$vpath";
-  my $schema = join( ' ', $ns, "$ns/gpx.xsd", @{ $self->{schema} } );
-
-  push @ret, qq{<gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" },
-   qq{xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" },
-   qq{version="$version" creator="Geo::Gpx" },
-   qq{xsi:schemaLocation="$schema" }, qq{xmlns="$ns">\n};
-
-  my @meta = ();
-
-  for my $fld ( @META ) {
-    if ( exists( $self->{$fld} ) ) {
-      push @meta, $self->_xml( $fld, $self->{$fld} );
+    # Limit to the latest version we know about
+    if ( _cmp_ver( $version, '1.1' ) >= 0 ) {
+        $version = '1.1';
+    } else {
+        # Modify encoder
+        $self->{encoder}->{link} = sub {
+            my ( $n, $v ) = @_;
+            my @v = ();
+            push @v, $self->_xml( 'url', $v->{href} )     if exists( $v->{href} );
+            push @v, $self->_xml( 'urlname', $v->{text} ) if exists( $v->{text} );
+            return join( '', @v )
+            };
+        $self->{encoder}->{email} = sub {
+            my ( $n, $v ) = @_;
+            if ( exists( $v->{id} ) && exists( $v->{domain} ) ) {
+                return _tag( 'email', {}, _enc( join( '@', $v->{id}, $v->{domain} ) ) )
+            } else {
+                return ''
+            }
+            };
+        $self->{encoder}->{author} = sub {
+            my ( $n, $v ) = @_;
+            my @v = ();
+            push @v, _tag( 'author', {}, _enc( $v->{name} ) ) if exists( $v->{name} );
+            push @v, $self->_xml( 'email', $v->{email} )      if exists( $v->{email} );
+            return join( '', @v )
+            };
     }
-  }
 
-  my $bounds = $self->bounds( $self->iterate_points() );
-  if ( %{$bounds} ) {
-    push @meta, _tag( 'bounds', $bounds );
-  }
+    # Turn version into path element
+    ( my $vpath = $version ) =~ s{[.]}{/}g;
 
-  # Version 1.1 nests metadata in a metadata tag
-  if ( _cmp_ver( $version, '1.1' ) >= 0 ) {
-    push @ret, _tag( 'metadata', {}, "\n", @meta );
-  }
-  else {
-    push @ret, @meta;
-  }
+    my $ns = "http://www.topografix.com/GPX/$vpath";
+    my $schema = join( ' ', $ns, "$ns/gpx.xsd", @{ $self->{schema} } );
 
- my @existing_keys;        # waypoints should be generated first, applications like MapSource croak if not
- for my $k ( sort keys %XMLMAP ) {
-    if ( exists( $self->{$k} ) ) {
-        if ($k eq 'waypoints') { unshift @existing_keys, $k }
-        else { push @existing_keys, $k }
+    push @ret, qq{<gpx xmlns:xsd="http://www.w3.org/2001/XMLSchema" },
+        qq{xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" },
+        qq{version="$version" creator="Geo::Gpx" },
+        qq{xsi:schemaLocation="$schema" }, qq{xmlns="$ns">\n};
+
+    my @meta = ();
+
+    for my $fld ( @META ) {
+        if ( exists( $self->{$fld} ) ) {
+            push @meta, $self->_xml( $fld, $self->{$fld} )
+        }
     }
-  }
 
-  for my $k ( @existing_keys ) {
-    push @ret, $self->_xml( $k, $self->{$k}, $XMLMAP{$k} );
-  }
+    my $bounds = $self->bounds( $self->iterate_points() );
+    if ( %{$bounds} ) {
+        push @meta, _tag( 'bounds', $bounds )
+    }
 
-  push @ret, qq{</gpx>\n};
+    # Version 1.1 nests metadata in a metadata tag
+    if ( _cmp_ver( $version, '1.1' ) >= 0 ) {
+        push @ret, _tag( 'metadata', {}, "\n", @meta )
+    } else {
+        push @ret, @meta
+    }
 
-  return join( '', @ret );
+    my @existing_keys;        # waypoints should be generated first, applications like MapSource croak if not
+    for my $k ( sort keys %XMLMAP ) {
+        if ( exists( $self->{$k} ) ) {
+            if ($k eq 'waypoints') { unshift @existing_keys, $k }
+            else { push @existing_keys, $k }
+        }
+    }
+    for my $k ( @existing_keys ) {
+        push @ret, $self->_xml( $k, $self->{$k}, $XMLMAP{$k} )
+    }
+    push @ret, qq{</gpx>\n};
+    return join( '', @ret )
 }
 
 =item TO_JSON
 
 For compatibility with L<JSON> modules. Convert this object to a hash with keys that correspond to the above methods. Generated ala:
 
-  my %json = map { $_ => $self->$_ }
-   qw(name desc author keywords copyright
-   time link waypoints tracks routes version );
-  $json{bounds} = $self->bounds( $iter );
+    my %json = map { $_ => $self->$_ }
+        qw( name desc author keywords copyright
+            time link waypoints tracks routes version );
+    $json{bounds} = $self->bounds( $iter );
 
 With one difference: the keys will only be set if they are defined.
 
@@ -1074,21 +1237,21 @@ With one difference: the keys will only be set if they are defined.
 =cut
 
 sub TO_JSON {
-  my $self = shift;
-  my %json;    #= map {$_ => $self->$_} ...
-  my @keys = (@META, @ATTR);
-  push @keys, 'waypoints' if  $self->waypoints_count;
-  push @keys, 'routes'    if  $self->routes_count;
-  push @keys, 'tracks'    if  $self->tracks_count;
+    my $self = shift;
+    my %json;    #= map {$_ => $self->$_} ...
+    my @keys = (@META, @ATTR);
+    push @keys, 'waypoints' if  $self->waypoints_count;
+    push @keys, 'routes'    if  $self->routes_count;
+    push @keys, 'tracks'    if  $self->tracks_count;
 
-  for my $key ( @keys ) {
-    my $val = $self->$key;
-    $json{$key} = $val if defined $val;
-  }
-  if ( my $bounds = $self->bounds ) {
-    $json{bounds} = $self->bounds;
-  }
-  return \%json;
+    for my $key ( @keys ) {
+        my $val = $self->$key;
+        $json{$key} = $val if defined $val
+    }
+    if ( my $bounds = $self->bounds ) {
+        $json{bounds} = $self->bounds
+    }
+    return \%json
 }
 
 =over 4
@@ -1278,6 +1441,8 @@ L<Math::Trig>,
 L<Scalar::Util>,
 L<XML::Descent>
 
+The C<< waypoints_clip() >> method is only supported on unix-based systems that have the C<xclip> utility installed.
+
 =head1 SEE ALSO
 
 L<JSON>
@@ -1298,7 +1463,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-gpx>.
 
 =head1 VERSION
 
-1.09
+1.10
 
 =head1 LICENSE AND COPYRIGHT
 

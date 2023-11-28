@@ -253,7 +253,8 @@ sub fetch_class
     my $art = $doc->look_down( _tag => 'article', class => 'main-page-content' )->first;
     die( "Unable to find the article tag with class 'main-page-content'\n" ) if( !$art );
     my $title = $art->getElementsByTagName( 'h1' )->first;
-    my $desc_div = $title->nextElementSibling;
+    # my $desc_div = $title->nextElementSibling;
+    my $desc_div = $art->look_down( _tag => 'div', class => 'section-content' )->first;
     die( "Unable to find a div containing the class description.\n" ) if( !ref( $desc_div ) );
     die( "Element found to contain the class description is not a div -> '", $desc_div->getName, "'\n" ) if( $desc_div->getName ne 'div' );
     my $desc_p = $desc_div->getElementsByTagName( 'p' )->first;
@@ -1044,7 +1045,11 @@ sub _get_detail_page_info
     $codes->foreach(sub
     {
         my $pre = $_->getElementsByTagName( 'pre' )->first;
-        die( "Could not find the tag pre inside the code: ", $_->as_string, "\n" ) if( !ref( $pre ) );
+        if( !ref( $pre ) )
+        {
+            warn( "Warning only: could not find the tag pre inside the code: ", $_->as_string, ". Skipping.\n" );
+            return;
+        }
         my $code = $pre->as_trimmed_text;
         die( "Code is empty!\n" ) if( !length( $code ) );
         my $vars = {};

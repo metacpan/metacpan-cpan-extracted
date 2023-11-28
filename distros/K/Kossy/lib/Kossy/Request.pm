@@ -11,7 +11,7 @@ use HTTP::Entity::Parser;
 use WWW::Form::UrlEncoded qw/parse_urlencoded_arrayref build_urlencoded_utf8/;
 use Cookie::Baker;
 
-our $VERSION = '0.60';
+our $VERSION = '0.63';
 
 sub new {
     my($class, $env, %opts) = @_;
@@ -78,6 +78,12 @@ $json_parser->register(
     'HTTP::Entity::Parser::JSON'
 );
 
+my $json_only_parser = HTTP::Entity::Parser->new();
+$json_only_parser->register(
+    'application/json',
+    'HTTP::Entity::Parser::JSON'
+);
+
 sub _build_request_body_parser {
     my $self = shift;
     if ( $self->env->{'kossy.request.parse_json_body'} ) {
@@ -116,13 +122,39 @@ sub uploads {
 
 sub body_parameters {
     my ($self) = @_;
-    $self->env->{'kossy.request.body'} ||= 
-        Hash::MultiValue->new(map { Encode::decode_utf8($_) } @{$self->_body_parameters()});
+    $self->env->{'kossy.request.body'} ||= do {
+        Hash::MultiValue->new(map { _decode_recursively($_) } @{$self->_body_parameters()});
+    }
+}
+
+sub json_parameters {
+    my ($self) = @_;
+    $self->env->{'kossy.request.json_body'} ||= do {
+        +{ map { _decode_recursively($_) } @{$self->_json_parameters()} }
+    }
+}
+
+sub _decode_recursively {
+    my $v = shift;
+    if (my $r = ref $v) {
+        if ($r eq 'ARRAY') {
+            return [ map { _decode_recursively($_) } @$v ];
+        }
+        elsif ($r eq 'HASH') {
+            return { map { Encode::decode_utf8($_) => _decode_recursively($v->{$_}) } keys %$v };
+        }
+        else {
+            die 'Cannot decode ' . $v;
+        }
+    }
+    else {
+        return Encode::decode_utf8($v);
+    }
 }
 
 sub query_parameters {
     my ($self) = @_;
-    $self->env->{'kossy.request.query'} ||= 
+    $self->env->{'kossy.request.query'} ||=
         Hash::MultiValue->new(map { Encode::decode_utf8($_) } @{$self->_query_parameters()});
 }
 
@@ -131,7 +163,7 @@ sub parameters {
     $self->env->{'kossy.request.merged'} ||= do {
         Hash::MultiValue->new(
             $self->query_parameters->flatten,
-            $self->body_parameters->flatten,            
+            $self->body_parameters->flatten,
         );
     };
 }
@@ -141,12 +173,22 @@ sub _body_parameters {
     unless ($self->env->{'kossy.request.body_parameters'}) {
         $self->_parse_request_body;
     }
-    return $self->env->{'kossy.request.body_parameters'};    
+    return $self->env->{'kossy.request.body_parameters'};
 }
+
+sub _json_parameters {
+    my $self = shift;
+    unless ($self->env->{'kossy.request.json_parameters'}) {
+        my ($params) = $json_only_parser->parse($self->env);
+        $self->env->{'kossy.request.json_parameters'} = $params;
+    }
+    return $self->env->{'kossy.request.json_parameters'};
+}
+
 sub _query_parameters {
     my $self = shift;
     unless ( $self->env->{'kossy.request.query_parameters'} ) {
-        $self->env->{'kossy.request.query_parameters'} = 
+        $self->env->{'kossy.request.query_parameters'} =
             parse_urlencoded_arrayref($self->env->{'QUERY_STRING'});
     }
     return $self->env->{'kossy.request.query_parameters'};

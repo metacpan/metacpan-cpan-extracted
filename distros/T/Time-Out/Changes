@@ -1,23 +1,49 @@
-Revision history for Perl extension Time::Out.
+Release history for Time-Out
+
+0.24  Mon Nov 27 08:11:23 CET 2023
+      - Document eval inside timeout handling [rt.cpan.org #128908]
+      - Use exception object instead of coderef in ALRM handler
+ 
+0.23  Tue Nov 14 10:47:04 CET 2023
+      - Improve author extensions
+      - Add test case that times out the POSIX pause function
+      - Add missing runtime dependency
+
+0.22  Tue Nov  7 09:57:51 CET 2023
+      - Streamline exception handling
+      - Introduce experimental timeout exception class
+
+0.21  Sun Nov  5 15:16:08 CET 2023
+      - Use Try::Tiny
+      - Temporarily fix all Perl::Critic complaints
+      - Change license
+      - Properly classify some tests as release tests
+  
+0.20  Fri Nov  3 08:33:59 CET 2023
+      - Fix POD sample code [rt.cpan.org #100886] 
+      - Nested timeouts require minimum Time::HiRes version [rt.cpan.org #84141]
+      - Handle calling context properly [rt.cpan.org #115809]
+      - Change TAP producer: Test to Test::More
+      - Add missing test descriptions
+      - Rename test scripts and add new ones
+      - Consider Perl::Critic feedback (work in progress)
 
 0.11  Tue Jan 15 11:36:27 EST 2008
-    - Applied patch by Jens Heunemann to fix a race condition as well as some errors
-      related to exception handling
+      - Applied patch by Jens Heunemann to fix a race condition as well as some
+        errors related to exception handling
 
 0.10  Thu Sep 13 22:53:28 EDT 2007
-    - Added support for nested timeouts (thanks to chocolateboy for the patch)
-    - Removed the useless 'affects' syntax
-    - 'timeout' now exported via @EXPORT_OK instead of @EXPORT
+      - Added support for nested timeouts (thanks to chocolateboy for the patch)
+      - Removed the useless 'affects' syntax
+      - 'timeout' now exported via @EXPORT_OK instead of @EXPORT
 
 0.05  Fri Jan  7 13:33:31 EST 2005
-    - Updated documentation
+      - Updated documentation
 
 0.04  Thu Jan  6 13:33:31 EST 2005
-    - Added tests for blocking I/O
-	- Added support for Time::HiRes
+      - Added tests for blocking I/O
+      - Added support for Time::HiRes
 
 0.01  Tue Jan  4 10:18:55 2005
-	- original version; created by h2xs 1.22 with options
-		-AX Time::Out
-	
-
+      - original version; created by h2xs 1.22 with options
+      - AX Time::Out

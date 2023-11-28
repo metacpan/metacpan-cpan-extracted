@@ -1,3 +1,22 @@
+0.008   2023-11-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Update doc to reflect fibonacci support.
+
+
+0.007   2023-11-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Fix typo in example in Synopsis.
+
+
+0.006   2023-11-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Recognize fibonacci sequence.
+
+
 0.005   2022-01-21  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

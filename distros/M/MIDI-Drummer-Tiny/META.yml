@@ -27,7 +27,6 @@ requires:
   MIDI::Util: '0.1201'
   Math::Bezier: '0'
   Moo: '2'
-  Music::CreatingRhythms: '0.0700'
   Music::Duration: '0.0900'
   Music::RhythmSet::Util: '0'
   constant: '0'
@@ -37,10 +36,10 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Drummer-Tiny
   repository: https://github.com/ology/MIDI-Drummer-Tiny.git
-version: '0.4303'
+version: '0.4305'
 x_Dist_Zilla:
   perl:
-    version: '5.032001'
+    version: '5.038000'
   plugins:
     -
       class: Dist::Zilla::Plugin::VersionFromModule
@@ -76,74 +75,74 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: '4.017'
+              version: '4.019'
       name: PodWeaver
-      version: '4.008'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
@@ -179,7 +178,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: t/00-compile.t
@@ -330,9 +329,9 @@ x_Dist_Zilla:
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
+      is_trial: 0
     version: '6.030'
 x_authority: cpan:GENE
-x_generated_by_perl: v5.32.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

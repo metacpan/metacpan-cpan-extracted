@@ -1,0 +1,193 @@
+Perl interface to the PC/SC smart card library
+==============================================
+
+This package contains a Perl wrapper to the PC/SC smartcard library
+(pcsc-lite) [1] from MUSCLE [2] together with some small examples.
+
+You can find applications using this wrapper in the pcsc-tools package
+[3].
+
+[1] http://pcsclite.alioth.debian.org/
+[2] http://www.musclecard.com/
+[3] http://ludovic.rousseau.free.fr/softwares/pcsc-tools/
+
+
+Build and Install:
+==================
+
+A very quick documentation on how to build and install the wrapper.
+
+$ perl Makefile.PL
+$ make
+
+Insert a smart card in the (first) PCSC reader
+
+$ make test
+$ sudo make install
+
+
+Remarks:
+========
+
+For Windows users:
+
+Status behaves different on Unix and from Win32
+	it returns the Atr len
+	it does not return any error like
+
+
+Authors:
+========
+
+- Lionel VICTOR for the main part of the job
+- Ludovic ROUSSEAU for the debug and maintainance
+
+
+Licences:
+=========
+
+    pcsc-perl: wrapper to the PC/SC smartcard library
+    Copyright (C) 2001-2003  Lionel VICTOR
+    Copyright (C) 2001-2010  Ludovic ROUSSEAU
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+History:
+========
+
+1.4.15 - 18 November 2023, Ludovic ROUSSEAU
+    - add support of SCARD_W_SECURITY_VIOLATION error code
+
+1.4.14 - 19 November 2015, Ludovic ROUSSEAU
+    - Fix _StringifyError() on Mac OS X. The string version of
+      PCSC::errno now works.
+
+1.4.13 - 1 April 2013, Ludovic ROUSSEAU
+    - Fix a warning with Perl 5.16
+
+1.4.12 - 6 March 2011, Ludovic ROUSSEAU
+    - Also check for SVt_PVIV and not just SVt_IV.
+    Fixes Debian bug #613722 "libpcsc-perl: GetStatusChange error after print"
+
+1.4.11 - 27 October 2010, Ludovic ROUSSEAU
+    - Do not use SCardSetTimout() since it is no more present in
+      pcsc-lite > 1.6.4
+
+1.4.10 - 18 August 2010, Ludovic ROUSSEAU
+    - Use LPSCARD_READERSTATE instead of LPSCARD_READERSTATE_A since it
+      is no more defined in pcsc-lite >= 1.6.2
+
+1.4.9 - 30 June 2010, Ludovic ROUSSEAU
+    - remove reference to SCARD_W_INSERTED_CARD since it is no more
+      define in pcsc-lite 1.6.0 Thanks to Olivier Huber for the bug
+      report
+
+1.4.8 - 23 September 2009, Ludovic ROUSSEAU
+    - minor bugs fixed
+
+1.4.7 - 26 March 2008, Ludovic ROUSSEAU
+    - merge all the Makefile.PL.* in Makefile.PL
+
+1.4.6 - 7 March 2007, Ludovic ROUSSEAU
+    - add support of GNU/kFreeBSD
+
+1.4.5 - 2 March 2007, Ludovic ROUSSEAU
+    - remove some pcsc-lite specific constants to make it compile
+      against pcsc-lite 1.4.0
+
+1.4.4 - 12 August 2006, Ludovic ROUSSEAU
+    - add support of extended APDU
+
+1.4.3 - 16 May 2006, Ludovic ROUSSEAU
+    - update for Mac OS X Tiger
+
+1.4.2 - 6 August 2004, Ludovic ROUSSEAU
+    - allow to use SCARD_PROTOCOL_T0 | SCARD_PROTOCOL_T1 as the protocol
+      this is used by gscriptor 1.4.0
+
+1.4.1 - 4 July 2004, Ludovic ROUSSEAU
+    - Card/Card.pm:
+     . ISO7816Error(): return an error if given $sw if not 5 chars long
+       "xx xx"
+     . Transmit(): return (undef) if the protocol is not defined. This
+       happens if you change a T=0 card with a T=1 (or vice versa) and
+       try to exchange an APDU without disconnecting first.
+    - PCSCperl.h: replace LPCSTR by LPCTSTR (pcsc-lite 1.2.9 beta4)
+
+1.4.0 - 20 May 2004, Ludovic ROUSSEAU
+    - use a new Control() API to reflect the change in SCardControl() in
+      pcsc-lite. We now have
+      $RecvData = $hCard->Control($control_code, \@SendData);
+    - load libpcsclite.so.1 instead of libpcsclite.so.0
+
+1.3.1 - 2 April 2004, Ludovic ROUSSEAU
+    - do not use PCSCLITE_MAX_CHANNELS anymor since it is no more
+      defined by pcsc-lite > 1.2.0 and is not defined under Windows
+    - test.pl: add demo code for GetStatusChange()
+    - PCSC.pod: document GetStatusChange()
+    - allow commands to be in the form "00A40100020100" instead of just
+      "00 A4 01 0 0 02 01 00"
+
+1.3.0 - 13 December 2003, Ludovic ROUSSEAU
+    - add support of SCardControl with $out = $hContext->Control (\@in);
+      Thanks to Andrew Kay.
+    - more support of Windows PC/SC and compiler.
+      Thanks to Andrew Kay and Troy Curtiss
+    - array_to_ascii() returns an empty string for an empty list
+    - add Makefile_win.PL for Windows
+    - Card.pm: by default use T=0 | T=1 protocols instead of just T=0
+
+1.2.2 - 27 May 2003, Ludovic ROUSSEAU
+    - add two constant definitions in PCSC.pm. Thanks to Ville Skyttä
+      for report and patch
+    - add a PL_FILES section in Makefile*.PL to avoid problem since we
+      have Makefile.PL and Makefile_OSX.PL. Again thanks goes to Ville
+      Skyttä
+    - Also thanks to Wolfgang Hommel for uploading the package to CPAN
+      and registering the official name Chipcard::PCSC (Wolfgang is
+      maintainer of the Chipcard::CTAPI wrapper)
+
+1.2.1 - 24 May 2003, Ludovic ROUSSEAU
+    - redesign the Makefile.PL to make the modules at least installable
+    - add Card/Makefile.PL to also install Chipcard::PCSC::Card
+    - modified test.pl to accept any SW in TransmitWithCheck
+
+1.2.0 - 9 May 2003, Ludovic ROUSSEAU
+    - naming scheme migration from PCSC to Chipcard::PCSC
+    - add TransmitWithCheck() and Chipcard::PCSC::Card::ISO7816Error()
+      functions
+
+1.1.3 - 7 Nov 2002, Ludovic ROUSSEAU
+    - small modifications to support Perl 5.8
+
+1.1.2 - 28 Aug 2002, Ludovic ROUSSEAU
+    - small modification to link against libpcsclite.so.0 instead of
+      libpcsclite.so since libpcsclite.so should only be available on
+      development platforms (-dev packages).
+
+1.1.1 - 7 Mar 2002, Ludovic ROUSSEAU
+    - small typesetting modifications od .pod files
+
+1.1.0 - 6 Mar 2002, Ludovic ROUSSEAU
+    - create this README file with the history
+    - complete reindentation of .pod files
+
+1.0.9 - 5 Mar 2002, Ludovic ROUSSEAU
+    - the minium APDU length is 4 bytes and not 5
+    - correctly test if a digit is hexa or not
+
+1.0.8 - 18 Oct 2001, Ludovic ROUSSEAU
+

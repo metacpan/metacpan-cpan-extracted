@@ -1,5 +1,9 @@
 Revision history for POSIX-RT-Spawn
 
+0.13  Fri Nov 24 11:26:29 UTC 2023
+    - Fix compilation on Perl >= 5.38 (RT #148890)
+    - Upgraded ppport.h.
+
 0.12  Fri Apr 29 15:46:29 UTC 2022
     - Fix compilation on Perl >= 5.02707 (RT #125666)
     - Updated prereqs.

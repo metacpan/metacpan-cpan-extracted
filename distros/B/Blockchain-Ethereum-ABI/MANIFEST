@@ -25,7 +25,6 @@ lib/Blockchain/Ethereum/ABI/Type/Tuple.pm
 lib/Blockchain/Ethereum/ABI/TypeRole.pm
 t/00-check-deps.t
 t/00-compile.t
-t/00-load.t
 t/author-critic.t
 t/author-distmeta.t
 t/author-mojibake.t
@@ -35,6 +34,7 @@ t/author-test-version.t
 t/complex.t
 t/data-validation.t
 t/decode.t
+t/int.t
 t/readme.t
 t/release-dist-manifest.t
 t/release-test-legal.t

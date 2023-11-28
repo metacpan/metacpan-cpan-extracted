@@ -10,6 +10,7 @@ META.yml
 README
 t/00-load.t
 t/60-text-urlclean.t
+t/61-text-urlclean-unicode.t
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t

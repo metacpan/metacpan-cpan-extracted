@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::WorksheetReplaceResponse
+# AsposeCellsCloud::Object::WorksheetReplaceResponse 
 
 ## Load the model package
 ```perl
@@ -8,11 +8,10 @@ use AsposeCellsCloud::Object::WorksheetReplaceResponse;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**status** | **string** |  | [optional] 
-**code** | **int** |  | 
-**matches** | **int** |  | 
-**worksheet** | [**LinkElement**](LinkElement.md) |  | [optional] 
+**Matches** | **int** |  |
+**Worksheet** | **LinkElement** |  |
+**Code** | **int** |  |
+**Status** | **string** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

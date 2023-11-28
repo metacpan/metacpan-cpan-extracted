@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use Carp;
 
-package Software::LicenseUtils;
+package Software::LicenseUtils 0.104005;
 # ABSTRACT: little useful bits of code for licensey things
-$Software::LicenseUtils::VERSION = '0.104004';
+
 use File::Spec;
 use IO::Dir;
 use Module::Load;
@@ -277,7 +277,7 @@ Software::LicenseUtils - little useful bits of code for licensey things
 
 =head1 VERSION
 
-version 0.104004
+version 0.104005
 
 =head1 PERL VERSION
 
@@ -349,7 +349,7 @@ Known spdx license identifiers are C<BSD>, C<MPL-1.0>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

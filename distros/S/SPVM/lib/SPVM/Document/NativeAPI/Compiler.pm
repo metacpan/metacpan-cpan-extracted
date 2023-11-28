@@ -74,6 +74,12 @@ Gets a directory for searching modules by an index.
 
 Adds a directory for searching modules.
 
+=head2 prepend_include_dir
+  
+  void (*prepend_include_dir)(void* compiler, const char* include_dir);
+
+Prepends a directory for searching modules.
+
 =head2 clear_include_dirs
   
   void (*clear_include_dirs)(SPVM_COMPILER* compiler);
@@ -143,6 +149,7 @@ Gets the runtime.
   14 get_error_message
   15 get_error_messages_length
   16 get_runtime
+  17 prepend_include_dir
 
 =head1 Copyright & License
 

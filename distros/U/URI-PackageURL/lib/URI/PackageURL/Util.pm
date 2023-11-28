@@ -8,7 +8,7 @@ use warnings;
 use Carp;
 use Exporter qw(import);
 
-our $VERSION = '2.02';
+our $VERSION = '2.04';
 our @EXPORT  = qw(purl_to_urls);
 
 sub purl_to_urls {
@@ -21,16 +21,19 @@ sub purl_to_urls {
     }
 
     my %TYPES = (
-        cargo    => \&_cargo_urls,
-        composer => \&_composer_urls,
-        cpan     => \&_cpan_urls,
-        gem      => \&_gem_urls,
-        github   => \&_github_urls,
-        gitlab   => \&_gitlab_urls,
-        maven    => \&_maven_urls,
-        npm      => \&_npm_urls,
-        nuget    => \&_nuget_urls,
-        pypi     => \&_pypi_urls,
+        bitbucket => \&_bitbucket_urls,
+        cargo     => \&_cargo_urls,
+        composer  => \&_composer_urls,
+        cpan      => \&_cpan_urls,
+        docker    => \&_docker_urls,
+        gem       => \&_gem_urls,
+        github    => \&_github_urls,
+        gitlab    => \&_gitlab_urls,
+        golang    => \&_golang_urls,
+        maven     => \&_maven_urls,
+        npm       => \&_npm_urls,
+        nuget     => \&_nuget_urls,
+        pypi      => \&_pypi_urls,
     );
 
     my $urls = {};
@@ -55,7 +58,7 @@ sub _github_urls {
     my $namespace      = $purl->namespace;
     my $version        = $purl->version;
     my $qualifiers     = $purl->qualifiers;
-    my $file_ext       = $qualifiers->{ext}            || 'zip';
+    my $file_ext       = $qualifiers->{ext}            || 'tar.gz';
     my $version_prefix = $qualifiers->{version_prefix} || '';
 
     my $urls = {};
@@ -90,7 +93,7 @@ sub _gitlab_urls {
     my $namespace      = $purl->namespace;
     my $version        = $purl->version;
     my $qualifiers     = $purl->qualifiers;
-    my $file_ext       = $qualifiers->{ext}            || 'zip';
+    my $file_ext       = $qualifiers->{ext}            || 'tar.gz';
     my $version_prefix = $qualifiers->{version_prefix} || '';
 
     my $urls = {};
@@ -206,7 +209,7 @@ sub _cpan_urls {
 
     $name =~ s/\:\:/-/g;    # TODO
 
-    my $urls = {repository => "https://metacpan.org/pod/$name"};
+    my $urls = {repository => "https://metacpan.org/dist/$name"};
 
     if ($name && $version && $author) {
 
@@ -281,6 +284,86 @@ sub _composer_urls {
 
 }
 
+sub _bitbucket_urls {
+
+    my $purl = shift;
+
+    my $name           = $purl->name;
+    my $namespace      = $purl->namespace;
+    my $version        = $purl->version;
+    my $qualifiers     = $purl->qualifiers;
+    my $file_ext       = $qualifiers->{ext}            || 'tar.gz';
+    my $version_prefix = $qualifiers->{version_prefix} || '';
+
+    my $urls = {};
+
+    if ($name && $namespace) {
+        $urls->{repository} = "https://bitbucket.org/$namespace/$name";
+    }
+
+    if ($version) {
+        $urls->{download} = "https://bitbucket.org/$namespace/$name/get/$version_prefix$version.$file_ext";
+    }
+
+    return $urls;
+
+}
+
+sub _docker_urls {
+
+    my $purl = shift;
+
+    my $name           = $purl->name;
+    my $namespace      = $purl->namespace;
+    my $version        = $purl->version;
+    my $qualifiers     = $purl->qualifiers;
+    my $repository_url = $qualifiers->{repository_url} || 'https://hub.docker.com';
+
+    if ($repository_url !~ /^(http|https):\/\//) {
+        $repository_url = 'https://' . $repository_url;
+    }
+
+    my $urls = {};
+
+    if ($repository_url !~ /hub.docker.com/) {
+        return $urls;
+    }
+
+    if (!$namespace) {
+        $urls->{repository} = "$repository_url/_/$name";
+    }
+
+    if ($name && $namespace) {
+        $urls->{repository} = "$repository_url/r/$namespace/$name";
+    }
+
+    return $urls;
+
+}
+
+sub _golang_urls {
+
+    my $purl = shift;
+
+    my $name      = $purl->name;
+    my $namespace = $purl->namespace;
+    my $version   = $purl->version;
+
+    my $urls = {};
+
+    if ($name && $namespace) {
+        $urls->{repository} = "https://pkg.go.dev/$namespace/$name";
+    }
+
+    # TODO  ???
+    # if ($name && $namespace && $version) {
+    #    $urls->{repository} = "https://pkg.go.dev/$namespace/$name\@v$version";
+    # }
+
+    return $urls;
+
+}
+
 1;
 
 __END__
@@ -309,33 +392,37 @@ URL::PackageURL::Util is the utility package for URL::PackageURL.
 Converts the given Package URL string or L<URI::PackageURL> instance and return
 the hash with C<repository> and/or C<download> URL.
 
-B<NOTE>: This utility support few purl types (C<cargo>, C<composer>, C<cpan>,
-C<gem>, C<github>, C<gitlab>, C<maven>, C<npm>, C<nuget>, C<pypi>).
+B<NOTE>: This utility support few purl types (C<bitbucket>,  C<cargo>, C<composer>,
+C<cpan>, C<docker>, C<gem>, C<github>, C<gitlab>, C<maven>, C<npm>, C<nuget>, C<pypi>).
 
-  +----------+------------+--------------+
-  | Type     | Repository | Download (*) |
-  +----------+------------+--------------|
-  | cargo    | Y          | Y            |
-  | composer | Y          | N            |
-  | cpan     | Y          | Y            |
-  | gem      | Y          | Y            |
-  | github   | Y          | Y            |
-  | gitlab   | Y          | Y            |
-  | maven    | Y          | Y            |
-  | npm      | Y          | Y            |
-  | nuget    | Y          | Y            |
-  | pypi     | Y          | N            |
-  |----------|------------|--------------+
+  +-----------+------------+--------------+
+  | Type      | Repository | Download (*) |
+  +-----------+------------+--------------|
+  | bitbucket | YES        | YES          |
+  | cargo     | YES        | YES          |
+  | composer  | YES        | NO           |
+  | cpan      | YES        | YES          |
+  | docker    | YES        | NO           |
+  | gem       | YES        | YES          |
+  | generic   | NO         | YES (**)     |
+  | github    | YES        | YES          |
+  | gitlab    | YES        | YES          |
+  | maven     | YES        | YES          |
+  | npm       | YES        | YES          |
+  | nuget     | YES        | YES          |
+  | pypi      | YES        | NO           |
+  |-----------|------------|--------------+
 
-(*) Only with B<version> component
+(*)  Only with B<version> component
+(**) Only if B<download_url> qualifier is provided
 
-  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.01');
+  $urls = purl_to_urls('pkg:cpan/GDT/URI-PackageURL@2.04');
 
   print Dumper($urls);
 
   # $VAR1 = {
-  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.01',
-  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.01.tar.gz'
+  #           'repository' => 'https://metacpan.org/release/GDT/URI-PackageURL-2.04',
+  #           'download' => 'http://www.cpan.org/authors/id/G/GD/GDT/URI-PackageURL-2.04.tar.gz'
   #         };
 
 =back

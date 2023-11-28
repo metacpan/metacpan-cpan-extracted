@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::Filter 1.376;
+package Config::Model::Tk::Filter 1.377;
 
 use 5.10.1;
 use strict;
@@ -25,6 +25,7 @@ sub _get_filter_action {
     my ($elt, $elt_filter, $filtered_state, $unfiltered_state, $default_state) = @_;
 
     my $action = $default_state;
+    # filter is active only when the filter string is 3 or more chars long
     if (length($elt_filter) > 2) {
         if ($elt =~ /$elt_filter/) {
             $action = $filtered_state ;
@@ -54,36 +55,29 @@ sub apply_filter {
     # flush the hash, but keep the ref
     %$actions = ();
 
-    # need 3 state logic. '' means that tree node is left as is,
-    # either closed or opened, depending on user choice.
+    # actions need 3 state logic. '' means that tree node is left as
+    # is, either closed or opened, depending on user's choice.
 
     # 'show' trumps '' which trumps 'hide'
-    my %combine_as_is_over_hide = (
+    my %combine_actions = (
         show => { show => 'show', '' => 'show', hide => 'show'},
         ''   => { show => 'show', '' => ''    , hide => ''    },
         hide => { show => 'show', '' => ''    , hide => 'hide'},
-    );
-
-    # inner hide or show wins
-    my %combine_for_node = (
-        show => { show => 'show', hide => 'hide', '' => 'show'},
-        ''   => { show => 'show', hide => 'hide', '' => ''    },
-        hide => { show => 'show', hide => 'hide', '' => 'hide'},
     );
 
     my $leaf_cb = sub {
         my ($scanner, $data_ref, $node,$element_name,$index, $leaf_object) = @_ ;
         my $loc = $leaf_object->location;
         my $action = '';
-        if ( $show_only_custom and not $leaf_object->has_data) {
-            $action = 'hide';
+        if ($show_only_custom) {
+            $action = $leaf_object->has_data ? 'show' : 'hide';
         }
         if ( $hide_empty_values ) {
             my $v = $leaf_object->fetch(qw/check no/);
             $action = 'hide' unless (defined $v and length($v)) ;
         }
         $action = 'show' if $loc eq $fd_path;
-        $logger->trace("'$loc' leaf filter is '$action'");
+        $logger->trace("leaf '$loc' filter is '$action'");
         $data_ref->{return} = $data_ref->{actions}{$loc} = $action ;
     };
 
@@ -91,11 +85,11 @@ sub apply_filter {
         my ($scanner, $data_ref,$node,$element_name,undef, $obj) = @_;
         my $loc = $obj->location;
         my $action = '';
-        if ( $hide_empty_values and not $obj->fetch(mode => 'user')) {
+        if ( $hide_empty_values and not $obj->fetch()) {
              $action = 'hide';
         }
         $action = 'show' if $loc eq $fd_path;
-        $logger->trace("'$loc' check_list filter is '$action'");
+        $logger->trace("check_list '$loc' filter is '$action'");
         $data_ref->{return} = $data_ref->{actions}{$loc} = $action ;
     };
 
@@ -109,10 +103,10 @@ sub apply_filter {
         foreach my $key (@keys) {
             my $inner_ref = { actions => $data_ref->{actions}, filter => $data_ref->{filter} };
             $scanner->scan_hash($inner_ref, $node, $element_name, $key);
-            $hash_action = $combine_as_is_over_hide{$hash_action}{$inner_ref->{return}};
+            $hash_action = $combine_actions{$hash_action}{$inner_ref->{return}};
         }
         $hash_action = 'show' if $loc eq $fd_path;
-        $logger->trace("'$loc' hash filter is '$hash_action'");
+        $logger->trace("hash '$loc' filter is '$hash_action'");
         $data_ref->{return} = $data_ref->{actions}{$loc} = $hash_action;
     };
 
@@ -121,30 +115,45 @@ sub apply_filter {
         my $node_loc = $node->location;
         my $elt_filter = $data_ref->{filter};
 
-        my $node_action = $hide_empty_values || $show_only_custom ? 'hide' : '';
+        # check if filter is active on any element. If yes, not
+        # matching elements are hidden
+        my $filter_active = scalar grep {_get_filter_action($_,$elt_filter,'show','hide','') eq 'show'} @element_list;
+        my $all_elt_action = $show_only_custom ? 'hide' : '';
+
         foreach my $elt ( @element_list ) {
             my $filter_action = _get_filter_action($elt,$elt_filter,'show','hide','');
             my $obj = $node->fetch_element($elt);
             my $loc = $obj->location;
             # make sure that the hash ref stays attached to $data_ref
             $data_ref->{actions} //= {};
-            my $inner_ref = {
-                actions => $data_ref->{actions},
-                # stop filter propagation when current element is
-                # shown so all elements below can be shown or hidden
-                # at user's choice
-                filter => $filter_action eq 'show' ? '' : $data_ref->{filter}
-            };
-            $scanner->scan_element($inner_ref, $node,$elt);
-            my $elt_action = $combine_for_node{$filter_action}{$inner_ref->{return}};
-            $logger->trace("'$loc' node elt filter is '$elt_action'");
-            $data_ref->{actions}{$loc} = $elt_action;
-            $node_action = $combine_as_is_over_hide{$node_action}{$elt_action};
+            my $elt_action;
+
+            if ($filter_active) {
+                my $inner_ref = {
+                    actions => $data_ref->{actions},
+                    # stop filter propagation when current element is
+                    # shown so all elements below can be shown or hidden
+                    # at user's choice
+                    filter => ''
+                };
+                $scanner->scan_element($inner_ref, $node,$elt);
+                # this clobbers the elt_action computed in leaf
+                $elt_action = $data_ref->{actions}{$loc} = $filter_action;
+                $logger->trace("node '$loc' elt $elt filter is active '$elt_action'");
+            } else {
+                my $inner_ref = { actions => $data_ref->{actions}, filter => $data_ref->{filter} };
+                $scanner->scan_element($inner_ref, $node,$elt);
+                $elt_action = $inner_ref->{return};
+                $logger->trace("node '$loc' elt $elt filter is not active '$elt_action'");
+            }
+
+            $all_elt_action = $combine_actions{$all_elt_action}{$elt_action};
+            $logger->trace("node '$loc' elt $elt all_elt_action is '$all_elt_action'");
         }
 
-        $node_action = 'show' if $node_loc eq $fd_path;
+        my $node_action = $node_loc eq $fd_path ? 'show' : $all_elt_action;
 
-        $logger->trace("'$node_loc' node filter is '$node_action'");
+        $logger->trace("node '$node_loc' filter is '$node_action'");
         $data_ref->{return} = $data_ref->{actions}{$node_loc} = $node_action;
     };
 

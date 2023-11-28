@@ -17,8 +17,8 @@ package ODF::MailMerge;
 # ...but don't let CPAN or test harnes scanners see this as defining $VERSION
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 999.999; }
 
-our $VERSION = '1.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2023-10-31'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1.006'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2023-11-16'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 our @CARP_NOT = ("ODF::lpOD_Helper", "ODF::lpOD");

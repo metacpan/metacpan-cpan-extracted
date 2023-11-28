@@ -1,0 +1,58 @@
+use alienfile;
+
+use Env qw(@PKG_CONFIG_PATH @ACLOCAL_PATH);
+
+plugin PkgConfig => 'hdt';
+
+share {
+  # NOTE Disable using Alien::Autotools and
+  #   '%{autoreconf} -vfi',
+  # for now.
+  #requires 'Alien::Autotools';
+  requires 'Alien::Serd';
+  requires 'Alien::zlib';
+
+  # https://github.com/rdfhdt/hdt-cpp
+  # https://www.rdfhdt.org/
+  start_url 'https://github.com/rdfhdt/hdt-cpp/archive/d9ae092bb37d9fe85558dfb3edfe0bb6ddddf41a.tar.gz';
+  plugin Download => ();
+  plugin Extract => 'tar.gz';
+  plugin 'Build::Autoconf';
+
+  my $patch = [
+    '%{patch} -p4 -d libhdt/src/util  < %{.install.patch}/gh-pr-273.patch'
+  ];
+
+  patch $patch;
+
+  eval {
+    eval "require Alien::Serd;" or die "Could not load Alien::Serd";
+    push @PKG_CONFIG_PATH, Alien::Serd->pkg_config_path;
+  } or warn "Unable to add to \$PKG_CONFIG_PATH (@PKG_CONFIG_PATH): $@";
+
+  if( exists $ENV{MSYSTEM} ) {
+    # Need for call to `autoreconf` in `./autogen.sh`.
+    push @ACLOCAL_PATH,
+      (
+        'm4',
+        "/@{[ lc $ENV{MSYSTEM} ]}/share/aclocal"
+      );
+  }
+
+  build [
+
+    # shared
+    'sh ./autogen.sh',
+    '%{configure} --disable-static --enable-shared',
+    '%{make}',
+    '%{make} install',
+
+    # static
+    'sh ./autogen.sh',
+    '%{configure} --enable-static --disable-shared',
+    '%{make}',
+    '%{make} install',
+  ];
+
+  plugin 'Gather::IsolateDynamic';
+}

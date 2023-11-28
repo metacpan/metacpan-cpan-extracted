@@ -4,7 +4,7 @@ Geo::Location::Point - Location information
 
 # VERSION
 
-Version 0.09
+Version 0.11
 
 # SYNOPSIS
 
@@ -64,6 +64,7 @@ Are two points different?
 ## tz
 
 Returns the timezone of the location.
+Needs [TimeZone::TimeZoneDB](https://metacpan.org/pod/TimeZone%3A%3ATimeZoneDB).
 
 ## timezone
 
@@ -81,6 +82,9 @@ Get/set location attributes, e.g. city
     $location->country('UK');
     print $location->as_string(), "\n";
     print "$location\n";        # Calls as_string
+
+Because of the way that the cache works, the location() value is cleared by this, so
+you may wish to manually all location() afterwards to set the value.
 
 # AUTHOR
 

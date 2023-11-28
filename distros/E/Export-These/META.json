@@ -1,5 +1,5 @@
 {
-   "abstract" : "Terse Symbol (Re)Exporting",
+   "abstract" : "Terse Module Configuration and Symbol (Re)Exporting",
    "author" : [
       "Ruben Westerberg <drclaw@mac.com>"
    ],
@@ -42,7 +42,7 @@
          "web" : "http://github.com/drclaw1394/perl-export-these"
       }
    },
-   "version" : "v0.1.2",
+   "version" : "v0.2.0",
    "x_bugtracker" : {
       "web" : "https://github.com/drclaw1394/perl-export-these/issues"
    },

@@ -182,7 +182,7 @@ githooks-docker.sh - Manage Docker images and containers to run Git::Hooks
 
 =head1 VERSION
 
-version 3.5.0
+version 3.6.0
 
 =head1 AUTHOR
 

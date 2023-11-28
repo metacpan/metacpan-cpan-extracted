@@ -11,41 +11,6 @@ with qw/ PayProp::API::Public::Client::Role::Attribute::Authorization /;
 
 use PayProp::API::Public::Client::Exception::Response;
 
-=head1 NAME
-
-	PayProp::API::Public::Client::Role::APIRequest - Role to encapsulate API requests.
-
-=head1 SYNOPSIS
-
-	package PayProp::API::Public::Client::Request::*;
-	with qw/ PayProp::API::Public::Client::Role::APIRequest /;
-
-	...;
-
-	__PACKAGE__->meta->make_immutable;
-
-=head1 DESCRIPTION
-
-Define methods to call various API endpoints via retry flow.
-
-=cut
-
-=head2 api_request_p
-
-Method to be called from API modules that implements retry mechanism and handls exceptions.
-
-	my $Promise = $self->api_request_p({
-		method => 'POST',
-		params => { ... },
-	});
-
-Return:
-
-	C<Mojo::Promise> resolving to underlying API response modules on success
-	or C<PayProp::API::Public::Client::Exception::Response> on API error response.
-
-=cut
-
 sub api_request_p {
 	my ( $self, $args ) = @_;
 
@@ -154,3 +119,60 @@ sub _can_retry_request {
 }
 
 1;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+PayProp::API::Public::Client::Role::APIRequest - Role to encapsulate API requests.
+
+=head1 SYNOPSIS
+
+	package PayProp::API::Public::Client::Request::*;
+	with qw/ PayProp::API::Public::Client::Role::APIRequest /;
+
+	...;
+
+	__PACKAGE__->meta->make_immutable;
+
+=head1 DESCRIPTION
+
+Define methods to call various API endpoints via retry flow.
+
+=head1 METHODS
+
+=head2 api_request_p(\%args)
+
+Method to be called from API modules that implements retry mechanism and handles exceptions.
+
+	my $Promise = $self->api_request_p({
+		method => 'POST',
+		params => { ... },
+	});
+
+Returns C<Mojo::Promise> resolving to underlying API response modules on success or C<PayProp::API::Public::Client::Exception::Response> on API error response.
+
+=head1 AUTHOR
+
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2023- PayProp
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
+
+L<https://github.com/Humanstate/api-client-public-module>
+
+=cut
+

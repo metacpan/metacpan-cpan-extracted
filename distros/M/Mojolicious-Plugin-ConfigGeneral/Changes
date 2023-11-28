@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.02 Fri 17 Nov 2023 13:48:50 MSK
+    * Added 'noload' option
+
 1.01 Sun 29 Oct 2023 20:02:47 MSK
     * Added the config_pointer option to store the pointer
 

@@ -15,56 +15,66 @@ License: public domain
 # public domain code by salzr@certo.com
 # (formerly rsalz@osf.org, rsalz@bbn.com, mirror!rs)
 
-require 'getopts.pl';
+use strict;
 
-sub
-Usage
-{
-    print STDERR "@_.\nUsage: $av0 files...\n";
-    exit(1);
+use File::Basename qw(basename);
+use Getopt::Std qw(getopts);
+
+use constant EX_SUCCESS => 0;
+use constant EX_FAILURE => 1;
+
+my $Program = basename($0);
+
+sub usage {
+    warn "usage: $Program file...\n";
+    exit EX_FAILURE;
 }
 
+getopts('') or usage();
 binmode STDOUT;
 
-# Parse JCL.
-$av0 = $0;
-$av0 =~ s@.*/@@;
-&Getopts("") || &Usage("Usage error");
-
-# Do work.
-$dirty = 0;
+my $dirty = 0;
 ARGUMENT: for my $f ( @ARGV ) {
-    if ( ! open(FH, '<', $f) ) {
-	warn "$av0: can't open $f, $!\n";
+    unless ($dirty) {
+	print '# --cut here--
+# To extract, remove everything before the "cut here" line
+# and run the command "sh file".
+';
+	$dirty = 1;
+    }
+    if (-d $f) {
+	print "echo x - $f/\n";
+	print "mkdir -p $f\n";
+	next ARGUMENT;
+    }
+    unless (open FH, '<', $f) {
+	warn "$Program: can't open '$f': $!\n";
 	next ARGUMENT;
     }
     binmode FH;
 
-    if ( $dirty++ == 0 ) {
-	print '# --cut here--
-#! /bin/sh
-# To unshar, remove everything before the "cut here" line
-# and feed the result to /bin/sh
-'
-    }
+    print "echo x - $f\n";
     if (-B $f) {
-	$mode = (stat $f)[2];
+	my $mode = (stat $f)[2];
 	$mode = (join '', 0, ($mode&0700)>>6, ($mode&0070)>>3, ($mode&0007));
 	print "sed -e 's/^X//' | uudecode <<'FUNKY_STUFF'\n";
 	print "begin $mode $f\n";
+	my $block;
 	print pack 'u', $block while read FH, $block, 45;
 	print "end\n";
-	print "FUNKY_STUFF\n";
     } else {
 	print "sed -e 's/^X//' >$f <<'FUNKY_STUFF'\n";
 	print 'X', $_ while ( <FH> );
-	print "FUNKY_STUFF\n";
     }
+    print "FUNKY_STUFF\n";
     close(FH);
 }
 
-&Usage("No input files") unless $dirty;
-exit(0);
+unless ($dirty) {
+    warn "$Program: no input files were processed\n";
+    exit EX_FAILURE;
+}
+exit EX_SUCCESS;
 
 __END__
 
@@ -74,13 +84,16 @@ shar - create a shell archive of files
 
 =head1 SYNOPSIS
 
-B<shar> file [files...]
+B<shar> file...
 
 =head1 DESCRIPTION
 
-B<shar> creates a shell archive of the I<files> on the command line. The shell
-archive is a shell script, and executing it will recreate the I<files>.
-Directories are I<not> recreated.
+B<shar> reads input files and writes a shell archive to standard output.
+The shell archive is a shell script, and executing it will recreate the I<files>.
+File permissions are not preserved for archived files.
+Extracted files are created with the default file permissions and owner.
+Directories will be recreated, but directory arguments must be provided before
+the files they contain.
 
 =head1 SEE ALSO
 

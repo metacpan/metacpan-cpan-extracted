@@ -2,11 +2,11 @@
 #
 #   A script that performs semantic similarity in PXF|BFF data structures
 #
-#   Last Modified: Sep/29/2023
+#   Last Modified: Nov/27/2023
 #
 #   Version 0.00
 #
-#   Copyright (C) 2023 Manuel Rueda - CNAG (manuel.rueda@cnag.crg.eu)
+#   Copyright (C) 2023 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
 #
 #   License: Artistic License 2.0
 #
@@ -233,6 +233,8 @@ pheno-ranker -r <individuals.json> -t <patient.json> [-options]
 
 pheno-ranker: A script that performs semantic similarity in PXF/BFF data structures and beyond (JSON|YAML)
 
+The script also accepts CSV files that have been pre-processed using the C<csv2pheno-ranker> utility (included).
+
 =head1 SUMMARY
 
 Pheno-Ranker is a lightweight and easily to install tool specifically designed for performing semantic similarity analysis on phenotypic data structured in JSON format, such as Beacon v2 Models or Phenopackets v2.
@@ -307,7 +309,7 @@ Install system level dependencies:
   
   sudo apt-get install cpanminus libperl-dev
 
-Now you have two choose between one of the 3 options below:
+Now you have two choose between one of the 2 options below:
 
 B<Option 1:> Install dependencies (they're harmless to your system) as C<sudo>:
 
@@ -324,21 +326,13 @@ To ensure Perl recognizes your local modules every time you start a new terminal
 
   echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
 
-B<Option 3:> Install the dependencies in a "virtual environment" (at C<local/>) . We'll be using the module C<Carton> for that:
-
-  mkdir local
-  cpanm --notest --local-lib=local/ Carton
-  export PATH=$PATH:local/bin; export PERL5LIB=$(pwd)/local/lib/perl5:$PERL5LIB
-  carton install
-  carton exec -- bin/pheno-ranker -help
-
 =head3 From CPAN
 
 First install system level dependencies:
 
   sudo apt-get install cpanminus libperl-dev
 
-Now you have two choose between one of the 3 options below:
+Now you have two choose between one of the 2 options below:
 
 B<Option 1:> System-level installation:
 
@@ -354,15 +348,6 @@ B<Option 2:> Install Pheno-Ranker and the dependencies at C<~/perl5>
 To ensure Perl recognizes your local modules every time you start a new terminal, you should type:
 
   echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
-
-B<Option 3:> Install Pheno-Ranker and the dependencies in a "virtual environment" (at C<local/>) . We'll be using the module C<Carton> for that:
-
-  mkdir local
-  cpanm --notest --local-lib=local/ Carton
-  echo "requires 'Pheno::Ranker';" > cpanfile
-  export PATH=$PATH:local/bin; export PERL5LIB=$(pwd)/local/lib/perl5:$PERL5LIB
-  carton install
-  carton exec -- pheno-ranker -help
 
 =head3 System requirements
 
@@ -412,7 +397,7 @@ B<Examples:>
      line 1 did not have X elements
      Calls: as.matrix -> read.table -> scan
      Execution halted
-   Solution: Make sure your "id" do not contain spaces (e.g., "my fav id" must be "my_fav_id")
+   Solution: Make sure that the values of your primary key (e.g., "id") do not contain spaces (e.g., "my fav id" must be "my_fav_id")
 
  * Error message: Foo
    Solution: Bar
@@ -421,7 +406,7 @@ B<Examples:>
 
 The author requests that any published work that utilizes C<Pheno-Ranker> includes a cite to the the following reference:
 
-Rueda, M et al., (2023). Advancing Semantic Similarity Analysis of Phenotypic Data Stored in GA4GH Standards and Beyond. I<Manuscript in preparation>.
+Rueda, M et al., (2023). Advancing Semantic Similarity Analysis of Phenotypic Data Stored in GA4GH Standards and Beyond. I<Submitted>.
 
 =head1 AUTHOR 
 

@@ -22,7 +22,7 @@ Readonly::Scalar our $LEFT_ONE_QUARTER_BLOCK => decode_utf8('▎');
 Readonly::Scalar our $LEFT_ONE_EIGHTH_BLOCK => decode_utf8('▏');
 
 # Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -327,7 +327,7 @@ Install the Curses::UI modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Curses-UI-Volume>
+L<https://github.com/michal-josef-spacek/Curses-UI-Volume>
 
 =head1 AUTHOR
 
@@ -337,12 +337,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2022 Michal Josef Špaček
+© 2014-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -19,8 +19,8 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Fcntl" => 0,
     "File::HomeDir::FreeDesktop" => 0,
-    "File::MoreUtil" => "0.625",
     "File::Remove" => 0,
+    "File::Util::Test" => "0.628",
     "List::Util" => "1.54",
     "Log::ger" => "0.038",
     "String::Wildcard::Bash" => "0.044",
@@ -32,6 +32,7 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Cwd" => 0,
+    "File::MoreUtil" => "0.625",
     "File::Path" => "2.09",
     "File::Slurper" => 0,
     "File::Spec" => 0,
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.205",
+  "VERSION" => "0.207",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,6 +60,7 @@ my %FallbackPrereqs = (
   "File::Slurper" => 0,
   "File::Spec" => 0,
   "File::Temp" => "0.2307",
+  "File::Util::Test" => "0.628",
   "File::chdir" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

@@ -256,47 +256,69 @@
 
 #include "const-c.inc"
 
-typedef IV SysRet;  /* returns -1 as undef, 0 as "0 but true", other unchanged */
+typedef IV SysRet; /* returns -1 as undef, 0 as "0 but true", other unchanged */
 typedef IV SysRet0; /* returns -1 as undef, other unchanged */
 typedef IV SysRetTrue; /* returns 0 as "0 but true", undef otherwise */
 typedef IV psx_fd_t; /* checks for file handle or descriptor via typemap */
 
+#ifdef I64TYPE
+#define INT_MAX_TYPE I64TYPE
+#define UINT_MAX_TYPE U64TYPE
+#else
+#define INT_MAX_TYPE I32TYPE
+#define UINT_MAX_TYPE U32TYPE
+#endif
+
 /* Convert unsigned value to string. Shamelessly plagiarized from libowfat. */
-#define FMT_UINT(uint_val, utmp_val, udest, ulen) {                     \
-    UV ulen2;                                                           \
-    char *ud = (char*)(udest);                                          \
-    /* count digits */                                                  \
-    for (ulen=1, utmp_val=(uint_val); utmp_val>9; ++ulen)               \
-      utmp_val /= 10;                                                   \
-    if (ud)                                                             \
-      for (utmp_val=(uint_val), ud+=len, ulen2=ulen+1; --ulen2; utmp_val/=10) \
-        *--ud = (char)((utmp_val%10)+'0');                              \
+#ifdef PERL_STATIC_INLINE
+PERL_STATIC_INLINE UV
+#else
+static UV
+#endif
+_fmt_uint(char *dest, UINT_MAX_TYPE u) {
+  UV len, len2;
+  UINT_MAX_TYPE tmp;
+  /* count digits */
+  for (len=1, tmp=u; tmp>9; ++len)
+    tmp /= 10;
+  if (dest)
+    for (tmp=u, dest+=len, len2=len+1; --len2; tmp/=10)
+      *--dest = (char)((tmp%10)+'0');
+  return len;
 }
 
-/* Push int_val as an IV, UV or PV depending on how big the value is.
- * tmp_val must be a variable of the same type as int_val to get the
- * string conversion right. */
-#define PUSH_INT_OR_PV(int_val, tmp_val) {                \
-    UV len;                                               \
-    char buf[24];                                         \
-    if ((int_val) < 0) {                                  \
-      if ((int_val) >= IV_MIN)                            \
-        mPUSHi(int_val);                                  \
-      else {                                              \
-        buf[0] = '-';                                     \
-        FMT_UINT(-(int_val), tmp_val, buf+1, len);        \
-        mPUSHp(buf, len+1);                               \
-      }                                                   \
-    }                                                     \
-    else {                                                \
-      if ((int_val) <= UV_MAX)                            \
-        mPUSHu(int_val);                                  \
-      else {                                              \
-        FMT_UINT((int_val), tmp_val, buf, len);           \
-        mPUSHp(buf, len);                                 \
-      }                                                   \
-    }                                                     \
+#ifdef PERL_STATIC_INLINE
+PERL_STATIC_INLINE UV
+#else
+static UV
+#endif
+_fmt_sint(char *dest, INT_MAX_TYPE i) {
+  if (dest)
+    *dest++ = '-';
+  return _fmt_uint(dest, (UINT_MAX_TYPE)(-i)) + 1;
 }
+
+/* Push int_val as an IV, UV or PV depending on how big the value is. */
+#define PUSH_INT_OR_PV(int_val) {               \
+    if ((int_val) < 0) {                        \
+      if ((int_val) >= IV_MIN)                  \
+        mPUSHi(int_val);                        \
+      else {                                    \
+        char buf[24];                           \
+        UV len = _fmt_sint(buf, int_val);       \
+        mPUSHp(buf, len);                       \
+      }                                         \
+    }                                           \
+    else {                                      \
+      if ((int_val) <= UV_MAX)                  \
+        mPUSHu(int_val);                        \
+      else {                                    \
+        char buf[24];                           \
+        UV len = _fmt_uint(buf, int_val);       \
+        mPUSHp(buf, len);                       \
+      }                                         \
+    }                                           \
+  }
 
 /*
  * We return decimal strings for values outside the IV_MIN..UV_MAX range.
@@ -307,44 +329,42 @@ typedef IV psx_fd_t; /* checks for file handle or descriptor via typemap */
  */
 static SV**
 _push_stat_buf(pTHX_ SV **SP, struct stat *st) {
-  struct stat st_tmp;
-
-  PUSH_INT_OR_PV(st->st_dev, st_tmp.st_dev);
-  PUSH_INT_OR_PV(st->st_ino, st_tmp.st_ino);
-  PUSH_INT_OR_PV(st->st_mode, st_tmp.st_mode);
-  PUSH_INT_OR_PV(st->st_nlink, st_tmp.st_nlink);
-  PUSH_INT_OR_PV(st->st_uid, st_tmp.st_uid);
-  PUSH_INT_OR_PV(st->st_gid, st_tmp.st_gid);
-  PUSH_INT_OR_PV(st->st_rdev, st_tmp.st_rdev);
-  PUSH_INT_OR_PV(st->st_size, st_tmp.st_size);
-  PUSH_INT_OR_PV(st->st_atime, st_tmp.st_atime);
-  PUSH_INT_OR_PV(st->st_mtime, st_tmp.st_mtime);
+  PUSH_INT_OR_PV(st->st_dev);
+  PUSH_INT_OR_PV(st->st_ino);
+  PUSH_INT_OR_PV(st->st_mode);
+  PUSH_INT_OR_PV(st->st_nlink);
+  PUSH_INT_OR_PV(st->st_uid);
+  PUSH_INT_OR_PV(st->st_gid);
+  PUSH_INT_OR_PV(st->st_rdev);
+  PUSH_INT_OR_PV(st->st_size);
+  PUSH_INT_OR_PV(st->st_atime);
+  PUSH_INT_OR_PV(st->st_mtime);
 #ifdef PSX2008_HAS_ST_CTIME
-  PUSH_INT_OR_PV(st->st_ctime, st_tmp.st_ctime);
+  PUSH_INT_OR_PV(st->st_ctime);
 #else
   PUSHs(&PL_sv_undef);
 #endif
   /* actually these come before the times but we follow core stat */
 #ifdef USE_STAT_BLOCKS
-  PUSH_INT_OR_PV(st->st_blksize, st_tmp.st_blksize);
-  PUSH_INT_OR_PV(st->st_blocks, st_tmp.st_blocks);
+  PUSH_INT_OR_PV(st->st_blksize);
+  PUSH_INT_OR_PV(st->st_blocks);
 #else
   PUSHs(&PL_sv_undef);
   PUSHs(&PL_sv_undef);
 #endif
 #if defined(PSX2008_HAS_ST_ATIM)
-  PUSH_INT_OR_PV(st->st_atim.tv_nsec, st_tmp.st_atim.tv_nsec);
-  PUSH_INT_OR_PV(st->st_mtim.tv_nsec, st_tmp.st_mtim.tv_nsec);
+  PUSH_INT_OR_PV(st->st_atim.tv_nsec);
+  PUSH_INT_OR_PV(st->st_mtim.tv_nsec);
 # ifdef PSX2008_HAS_ST_CTIME
-  PUSH_INT_OR_PV(st->st_ctim.tv_nsec, st_tmp.st_ctim.tv_nsec);
+  PUSH_INT_OR_PV(st->st_ctim.tv_nsec);
 # else
   PUSHs(&PL_sv_undef);
 # endif
 #elif defined PSX2008_HAS_ST_ATIMENSEC
-  PUSH_INT_OR_PV(st->st_atimensec, st_tmp.st_atimensec);
-  PUSH_INT_OR_PV(st->st_mtimensec, st_tmp.st_mtimensec);
+  PUSH_INT_OR_PV(st->st_atimensec);
+  PUSH_INT_OR_PV(st->st_mtimensec);
 # ifdef PSX2008_HAS_ST_CTIME
-  PUSH_INT_OR_PV(st->st_ctimensec, st_tmp.st_ctimensec);
+  PUSH_INT_OR_PV(st->st_ctimensec);
 # else
   PUSHs(&PL_sv_undef);
 # endif
@@ -2142,19 +2162,23 @@ readlinkat(psx_fd_t dirfd, const char *path);
 char *
 realpath(const char *path);
     CODE:
-        errno = 0;
         RETVAL = realpath(path, NULL);
     OUTPUT:
         RETVAL
     CLEANUP:
-        if (RETVAL != NULL)
-          safesysfree(RETVAL);
+        free(RETVAL);
 
 #endif
 
 #ifdef PSX2008_HAS_RENAMEAT
 SysRetTrue
 renameat(psx_fd_t olddirfd, const char *oldpath, psx_fd_t newdirfd, const char *newpath);
+
+#endif
+
+#ifdef PSX2008_HAS_RENAMEAT2
+SysRetTrue
+renameat2(psx_fd_t olddirfd, const char *oldpath, psx_fd_t newdirfd, const char *newpath, unsigned int flags=0);
 
 #endif
 
@@ -2481,7 +2505,7 @@ ttyname(int fd);
 ## be equivalent to unlink() for non-directories).
 ##
 ## This could be fixed like this (correct errno check depends on OS):
-## 'unlink $_[0] or ($!{EISDIR} || $!{EPERM} ? rmdir $_[0] : undef)'
+## 'unlink $_[0] or ($!{EISDIR} or $!{EPERM}) and rmdir $_[0]'
 ##
 ## Or just use the actual library call like we do here.
 ##
@@ -2884,13 +2908,13 @@ logb(double x);
 void
 lround(double x)
   INIT:
-    PSX2008_LROUND_T ret, tmp;
+    PSX2008_LROUND_T ret;
   PPCODE:
     errno = 0;
     feclearexcept(FE_ALL_EXCEPT);
     ret = PSX2008_LROUND(x);
     if (errno == 0 && fetestexcept(FE_ALL_EXCEPT) == 0)
-      PUSH_INT_OR_PV(ret, tmp);
+      PUSH_INT_OR_PV(ret);
 
 #endif
 

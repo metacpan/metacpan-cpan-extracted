@@ -1,0 +1,6 @@
+---
+title: "Liteblog: A Minimalist File-Based Blog Engine for Perl"
+tags:
+  - "Dancer2"
+  - "Blog"
+excerpt: "Powered by Perl's Dancer2 framework, LiteBlog strips away the unnecessary overhead and brings you a file-based blog engine that's both intuitive and powerful. The go-to Dancer2 plugin for Perl enthusiasts who want to run a blog without unecessary complexity."

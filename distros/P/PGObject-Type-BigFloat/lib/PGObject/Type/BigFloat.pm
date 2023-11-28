@@ -13,11 +13,11 @@ PGObject::Type::BigFloat - Math::BigFloat wrappers for PGObject classes
 
 =head1 VERSION
 
-Version 2.001
+Version 2.001001
 
 =cut
 
-our $VERSION = 2.001000;
+our $VERSION = 2.001001;
 
 our ($accuracy, $precision, $round_mode, $div_scale);
 

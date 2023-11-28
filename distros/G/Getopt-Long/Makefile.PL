@@ -1,9 +1,8 @@
 # Makefile.PL -- Makefile generator for Getopt::Long
 # Author          : Johan Vromans
 # Created On      : Sat Mar 16 11:43:21 1996
-# Last Modified By: Johan Vromans
-# Last Modified On: Thu Nov 17 17:45:51 2022
-# Update Count    : 124
+# Last Modified On: Thu Nov  9 23:08:55 2023
+# Update Count    : 132
 # Status          : Unknown, Use with caution!
 
 use Config;
@@ -11,7 +10,7 @@ use ExtUtils::MakeMaker 5.0;
 
 use lib "./lib";
 use Getopt::Long;
-my $version = "2.54";
+my $version = $Getopt::Long::VERSION;
 
 my $mm_version = $ExtUtils::MakeMaker::VERSION;
 if ($mm_version =~ /_/) {
@@ -95,8 +94,9 @@ WriteMakefile(
         ),
 
 	INSTALLDIRS => ($] < 5.011 ? 'perl' : 'site'),
-	PM 	  => { "lib/newgetopt.pl"  => '$(INST_LIB)/newgetopt.pl',
+	PM 	  => { "lib/newgetopt.pl"   => '$(INST_LIB)/newgetopt.pl',
 		       "lib/Getopt/Long.pm" => '$(INST_LIB)/Getopt/Long.pm',
+		       "lib/Getopt/Long/Parser.pm" => '$(INST_LIB)/Getopt/Long/Parser.pm',
 		     },
 	dist      => { COMPRESS => 'gzip', SUFFIX => 'gz',
 		     },
@@ -105,11 +105,17 @@ WriteMakefile(
         ($mm_version <= 6.45) ? () : (
             META_MERGE => {
                 'meta-spec' => { version => 2 },
+		no_index => {
+		    package => [ qw(Getopt::Long::CallBack) ],
+		},
                 resources => {
                     repository => {
                         type => "git",
                         url => "https://github.com/sciurius/perl-Getopt-Long.git",
                         web => "https://github.com/sciurius/perl-Getopt-Long",
+                    },
+                    bugtracker => {
+                        web => "https://github.com/sciurius/perl-Getopt-Long/issues",
                     },
                 },
             },

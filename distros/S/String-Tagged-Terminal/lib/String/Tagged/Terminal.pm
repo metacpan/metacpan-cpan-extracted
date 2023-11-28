@@ -3,12 +3,14 @@
 #
 #  (C) Paul Evans, 2017-2023 -- leonerd@leonerd.org.uk
 
-package String::Tagged::Terminal 0.06;
+package String::Tagged::Terminal 0.07;
 
 use v5.14;
 use warnings;
 
 use base qw( String::Tagged );
+
+use Carp;
 
 use constant HAVE_MSWIN32 => $^O eq "MSWin32";
 HAVE_MSWIN32 and require String::Tagged::Terminal::Win32Console;
@@ -115,6 +117,102 @@ sub new_from_formatting
    );
 }
 
+=head2 parse_terminal
+
+   $st = String::Tagged::Terminal->parse_terminal( $str );
+
+I<Since version 0.07.>
+
+Returns a new instance by parsing a string containing SGR terminal escape
+sequences mixed with plain string content.
+
+The parser will only accept 7- or 8-bit encodings of the SGR escape sequence
+(C<\e[ ... m> or C<\x9b[ ... m>). If any other escape sequences are present,
+an exception is thrown.
+
+Conversely, unrecognised formatting codes in SGR sequences are simply ignored
+without warning.
+
+=cut
+
+my $CSI_args = qr/[0-9;:]*/;
+
+sub parse_terminal
+{
+   my $class = shift;
+   my ( $s ) = @_;
+
+   my $self = $class->new;
+
+   pos($s) = 0;
+
+   my %tags;
+
+   while( pos($s) < length($s) ) {
+      if( $s =~ m/\G([^\e]+)/gc ) {
+         $self->append_tagged( $1, %tags );
+      }
+      elsif( $s =~ m/\G\e\[($CSI_args)m/gc || $s =~ m/\G\x9b($CSI_args)m/gc ) {
+         my $args = $1;
+         length $args or $args = "0";
+         foreach my $arg ( split m/;/, $args ) {
+            my ( $a0, @arest ) = map { int $_ } split m/:/, $arg;
+
+            # Reset
+            if( $a0 == 0 ) { %tags = () }
+
+            # Simple boolean attributes
+            elsif( $a0 ==  1 ) { $tags{bold} = 1; }
+            elsif( $a0 == 22 ) { delete $tags{bold}; }
+            elsif( $a0 ==  4 ) { $tags{under} = 1; }
+            elsif( $a0 == 24 ) { delete $tags{under}; }
+            elsif( $a0 ==  3 ) { $tags{italic} = 1; }
+            elsif( $a0 == 23 ) { delete $tags{italic}; }
+            elsif( $a0 ==  9 ) { $tags{strike} = 1; }
+            elsif( $a0 == 29 ) { delete $tags{strike}; }
+            elsif( $a0 ==  5 ) { $tags{blink} = 1; }
+            elsif( $a0 == 25 ) { delete $tags{blink}; }
+            elsif( $a0 ==  7 ) { $tags{reverse} = 1; }
+            elsif( $a0 == 27 ) { delete $tags{reverse}; }
+
+            # Numerical attributes
+            elsif( $a0 >= 10 && $a0 <= 19 ) {
+               $a0 > 10 ? $tags{altfont} = $a0 - 10 : delete $tags{altfont};
+            }
+
+            # Colours
+            elsif( $a0 >= 30 && $a0 <= 39 or $a0 >= 90 && $a0 <= 97 or
+                   $a0 >= 40 && $a0 <= 49 or $a0 >= 100 && $a0 <= 107 ) {
+               my $hi = $a0 >= 90 ? 8 : 0; $a0 -= 60 if $hi;
+               my $attr = $a0 < 40 ? "fgindex" : "bgindex";
+               $a0 %= 10;
+
+               if   ( $a0 == 9 ) { delete $tags{$attr} }
+               elsif( $a0 == 8 ) {
+                  if( @arest >= 2 and $arest[0] == 5 ) {
+                     $tags{$attr} = $arest[1];
+                  }
+                  # Else unrecognised
+               }
+               else              { $tags{$attr} = $a0 + $hi }
+            }
+
+            # Sub/superscript
+            elsif( $a0 == 73 ) { $tags{sizepos} = "super"; }
+            elsif( $a0 == 74 ) { $tags{sizepos} = "sub"; }
+            elsif( $a0 == 75 ) { delete $tags{sizepos}; }
+
+            # Else unrecognised
+         }
+      }
+      else {
+         croak "Found an escape sequence that is not SGR";
+      }
+   }
+
+   return $self;
+}
+
 =head1 METHODS
 
 The following methods are provided in addition to those provided by
@@ -124,7 +222,7 @@ L<String::Tagged|String::Tagged/METHODS>.
 
 =head2 build_terminal
 
-   $str = $st->build_terminal( %opts )
+   $str = $st->build_terminal( %opts );
 
 Returns a string containing terminal escape sequences mixed with string
 content to render the string to a terminal.
@@ -232,6 +330,7 @@ sub build_terminal
       {
          if( defined $pen{sizepos} and !defined $tags{sizepos} ) {
             push @sgr, 75; # reset
+            delete $pen{sizepos};
          }
          elsif( defined $pen{sizepos} and defined $tags{sizepos} and $pen{sizepos} eq $tags{sizepos} ) {
             # Leave it
@@ -265,7 +364,7 @@ sub build_terminal
 
 =head2 as_formatting
 
-   $fmt = $st->as_formatting
+   $fmt = $st->as_formatting;
 
 Returns a new C<String::Tagged> instance tagged with
 L<String::Tagged::Formatting> standard tags.
@@ -295,7 +394,7 @@ sub as_formatting
 
 =head2 print_to_terminal
 
-   $str->print_to_terminal( $fh )
+   $str->print_to_terminal( $fh );
 
 I<Since version 0.03.>
 
@@ -328,7 +427,7 @@ sub print_to_terminal
 
 =head2 say_to_terminal
 
-   $str->say_to_terminal( $fh )
+   $str->say_to_terminal( $fh );
 
 I<Since version 0.03.>
 
@@ -374,17 +473,6 @@ any Windows version.
 =item *
 
 On Windows, only a single output console is supported.
-
-=back
-
-=head1 TODO
-
-=over 4
-
-=item *
-
-Consider a C<< ->parse_terminal >> constructor method, which would attempt to
-parse SGR sequences from a given source string.
 
 =back
 

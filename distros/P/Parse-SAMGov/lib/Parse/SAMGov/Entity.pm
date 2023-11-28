@@ -1,5 +1,5 @@
 package Parse::SAMGov::Entity;
-$Parse::SAMGov::Entity::VERSION = '0.106';
+$Parse::SAMGov::Entity::VERSION = '0.202';
 use strict;
 use warnings;
 use 5.010;
@@ -20,8 +20,10 @@ use overload fallback => 1,
         my $str = '';
         $str .= $self->name if $self->name;
         $str .= ' dba ' . $self->dba_name if $self->dba_name;
+        $str .= "\nUEI: " . $self->UEI if $self->UEI;
         $str .= "\nDUNS: " . $self->DUNS if $self->DUNS;
-        $str .= '+' . $self->DUNSplus4 if $self->DUNSplus4 ne '0000';
+        $str .= '+' . $self->DUNSplus4 if $self->DUNS and $self->DUNSplus4 ne '0000';
+        $str .= '\nEntity EFT Indicator: ' . $self->EEFTI if defined $self->EEFTI;
         $str .= "\nCAGE: " . $self->CAGE if $self->CAGE;
         $str .= "\nDODAAC: " . $self->DODAAC if $self->DODAAC;
         $str .= "\nStatus: " . $self->extract_code if $self->extract_code;
@@ -67,12 +69,15 @@ use overload fallback => 1,
             $str .= "\nDisaster Response Type: " . Dumper($self->disaster_response);
         }
         $str .= "\nIs Private Listing: " . ($self->is_private ? 'Yes' : 'No');
+        $str .= "\nD&B Open Data Flag: " . $self->dnb_open_data if defined $self->dnb_open_data;
         return $str;
     };
 
 
+has 'UEI';
 has 'DUNS';
 has DUNSplus4 =>  default => sub { '0000' };
+has 'EEFTI';
 has 'CAGE';
 has 'DODAAC';
 
@@ -121,6 +126,19 @@ has 'start_date' => coerce => sub { _parse_yyyymmdd $_[0] };
 has 'fiscalyear_date' => coerce => sub { _parse_yyyymmdd $_[0] };
 has 'url' => coerce => sub { URI->new($_[0]) };
 has 'entity_structure';
+has entity_structure_descriptions => default => sub {
+    {
+        '2J' => 'Sole Proprietorship',
+        '2K' => 'Partnership or Limited Liability Partnership',
+        '2L' => 'Corporate Entity (Not Tax Exempt)',
+        '8H' => 'Corporate Entity (Tax Exempt)',
+        '2A' => 'U.S. Government Entity',
+        'CY' => 'Country - Foreign Government',
+        'X6' => 'International Organization',
+        'ZZ' => 'Other',
+    }
+};
+
 
 
 has 'incorporation_state';
@@ -149,6 +167,7 @@ has 'POC_elec_alt' => default => sub {
 has 'delinquent_fed_debt';
 has 'exclusion_status';
 has 'is_private';
+has 'dnb_open_data';
 has 'disaster_response' => default => sub { {} };
 has 'SBA' => default => sub { {} };
 
@@ -158,6 +177,8 @@ has 'SBA_descriptions' => default => sub {
         A6 => 'SBA Certified 8A Program Participant',
         JT => 'SBA Certified 8A Joint Venture',
         XX => 'SBA Certified HUBZone Firm',
+        A9 => 'SBA Certified Women-Owned Small Business',
+        A0 => 'SBA Certified Economically Disadvantaged Women-Owned Small Business',
     }
 };
 
@@ -181,6 +202,15 @@ sub _trim {
 }
 
 sub load {
+    my $self = shift;
+    my $ncols = scalar(@_);
+    return $self->load_v1(@_) if $ncols eq 150;
+    return $self->load_v2(@_) if $ncols eq 142;
+    carp "Unknown version of data file found with $ncols columns";
+    return undef;
+}
+
+sub load_v1 {
     my $self = shift;
     return unless (scalar(@_) == 150);
     $self->DUNS(shift);
@@ -229,7 +259,7 @@ sub load {
         shift; # ignore
     }
     my $pnaics = _trim(shift);
-    $self->NAICS->{$pnaics} = {};
+    $self->NAICS->{$pnaics} = { is_primary => 1 } if length($pnaics);
     $count = int(_trim(shift) || 0) + (length($pnaics) ? 1 : 0);
     if ($count > 0) {
         my @naics = grep { length($_) > 0 } split /~/, shift;
@@ -353,6 +383,181 @@ sub load {
     return 1;
 }
 
+sub load_v2 {
+    my $self = shift;
+    return unless (scalar(@_) == 142);
+    $self->UEI(shift);## UEI SAM 12 chars
+    $self->DUNS(shift);## DUNS UEI 9 chars
+    $self->EEFTI(shift);## 4 chars
+    $self->CAGE(shift);## 5 chars
+    $self->DODAAC(shift);## 9 chars
+    $self->updated(0);
+    my $code = shift;
+    if ($code =~ /A|2|3/x) {
+        $self->extract_code('active');
+        $self->updated(1) if $code eq '3';
+    } elsif ($code =~ /E|1|4/x) {
+        $self->extract_code('expired');
+        $self->updated(1) if $code eq '1';
+    }
+    $self->regn_purpose(shift);
+    $self->regn_date(shift);
+    $self->expiry_date(shift);
+    $self->lastupdate_date(shift);
+    $self->activation_date(shift);
+    $self->name(_trim(shift));
+    $self->dba_name(_trim(shift));
+    $self->company_division(_trim(shift));## entity division
+    $self->division_no(_trim(shift)); ## entity division number
+    my $paddr = Parse::SAMGov::Entity::Address->new(
+        # the order of shifting matters
+        address => _trim(join(' ', shift, shift)),
+        city => shift,
+        state => shift,
+        zip => sprintf("%s-%s", shift, shift),
+        country => shift,
+        district => shift,
+    );
+    $self->physical_address($paddr);
+    $self->dnb_open_data(shift);# D&B Open Data flag
+    $self->start_date(shift);
+    $self->fiscalyear_date(shift);
+    $self->url(_trim(shift));
+    $self->entity_structure(shift);
+    $self->incorporation_state(shift);
+    $self->incorporation_country(shift);
+    my $count = int(_trim(shift) || 0);
+    if ($count > 0) {
+        my @biztypes = grep { length($_) > 0 } split /~/, shift;
+        $self->biztype([@biztypes]);
+    } else {
+        shift; # ignore
+    }
+    my $pnaics = _trim(shift);
+    $self->NAICS->{$pnaics} = { is_primary => 1 } if length ($pnaics);
+    $count = int(_trim(shift) || 0) + (length($pnaics) ? 1 : 0);
+    if ($count > 0) {
+        my @naics = grep { length($_) > 0 } split /~/, shift;
+        foreach my $c (@naics) {
+            if ($c =~ /(\d+)(Y|N|E)/) {
+                $self->NAICS->{$1} = {} unless ref $self->NAICS->{$1} eq 'HASH';
+                $self->NAICS->{$1}->{is_primary} = 1 if $pnaics eq $1;
+                $self->NAICS->{$1}->{small_biz} = 1 if $2 eq 'Y';
+                $self->NAICS->{$1}->{small_biz} = 0 if $2 eq 'N';
+                $self->NAICS->{$1}->{exception} = {} if $2 eq 'E';
+            }
+        }
+    } else {
+        shift; # ignore
+    }
+    $count = int(_trim(shift) || 0);
+    if ($count > 0) {
+        my @psc = grep { length ($_) > 0 } split /~/, shift;
+        $self->PSC([@psc]);
+    } else {
+        shift; # ignore
+    }
+    $self->creditcard((shift eq 'Y') ? 1 : 0);
+    $code = shift; # re-use variable
+    $self->correspondence_type('mail') if $code eq 'M';
+    $self->correspondence_type('fax') if $code eq 'F';
+    $self->correspondence_type('email') if $code eq 'E';
+    my $maddr = Parse::SAMGov::Entity::Address->new(
+        # the order of shifting matters
+        address => _trim(join(' ', shift, shift)),
+        city => shift,
+        zip => sprintf("%s-%s", shift, shift),
+        country => shift,
+        state => shift,
+    );
+    $self->mailing_address($maddr);
+    for my $i (0..5) {
+        ### V2 has no email/phone/fax
+        my $poc = Parse::SAMGov::Entity::PointOfContact->new(
+            first => _trim(shift),
+            middle => _trim(shift),
+            last => _trim(shift),
+            title => _trim(shift),
+            address => _trim(join(' ', shift, shift)),
+            city => shift,
+            zip => sprintf("%s-%s", shift, shift),
+            country => shift,
+            state => shift,
+        );
+        $self->POC_gov($poc) if $i == 0;
+        $self->POC_gov_alt($poc) if $i == 1;
+        $self->POC_pastperf($poc) if $i == 2;
+        $self->POC_pastperf_alt($poc) if $i == 3;
+        $self->POC_elec($poc) if $i == 4;
+        $self->POC_elec_alt($poc) if $i == 5;
+    }
+    $count = int(_trim(shift) || 0);
+    if ($count > 0) {
+        my @naics = grep { length($_) > 0 } split /~/, shift;
+        foreach my $c (@naics) {
+            if ($c =~ /(\d+)([YN ]*)/) {
+                my @es = split //, $2;
+                if (@es) {
+                    $self->NAICS->{$1}->{exception} = {} unless ref $self->NAICS->{$1}->{exception} eq 'HASH';
+                    $self->NAICS->{$1}->{exception}->{small_biz} = 1 if $es[0] eq 'Y';
+                    $self->NAICS->{$1}->{exception}->{small_biz} = 0 if $es[0] eq 'N';
+                }
+            }
+        }
+    } else {
+        shift; # ignore
+    }
+    $code = shift;
+    $self->delinquent_fed_debt(1) if $code eq 'Y';
+    $self->delinquent_fed_debt(0) if $code eq 'N';
+    $self->exclusion_status(_trim(shift));
+    $count = int(_trim(shift) || 0);
+    if ($count > 0) {
+        my @sba = grep { length($_) > 0 } split /~/, shift;
+        foreach my $c (@sba) {
+            if ($c =~ /(\w{2})(\d{8})/) {
+                my $t = $1;
+                $self->SBA->{$t} = {} unless ref $self->SBA->{$t} eq 'HASH';
+                $self->SBA->{$t}->{description} = $self->SBA_descriptions->{$t};
+                $self->SBA->{$t}->{expiration} = _parse_yyyymmdd($2);
+            }
+        }
+    } else {
+        shift; # ignore
+    }
+    $self->is_private(length(shift) ? 1 : 0);
+    $count = int(_trim(shift) || 0);
+    if ($count > 0) {
+        my @dres = grep { length($_) > 0 } split /~/, shift;
+        my $h = {};
+        my %desc = (
+            ANY => 'Any area',
+            CTY => 'County',
+            STA => 'State',
+            MSA => 'Metropolitan Service Area',
+        );
+        foreach my $c (@dres) {
+            if ($c =~ /(\w{3})(\w*)/) {
+                $h->{$1} = {} unless ref $h->{$1} eq 'HASH';
+                $h->{$1}->{description} = $desc{$1};
+                $h->{$1}->{areas} = [] unless ref $h->{$1}->{areas} eq 'HASH';
+                my $a = _trim($2);
+                push @{$h->{$1}->{areas}}, $a if length $a;
+            }
+        }
+        $self->disaster_response($h);
+    } else {
+        shift; # ignore
+    }
+    ## field 122-141 are Flex Fields with length 0
+    for (122 .. 141) {
+        shift;#ignore
+    }
+    my $eof = shift;
+    carp "Invalid end of record '$eof' seen. Expected '!end'" if $eof ne '!end';
+    return 1;
+}
+
 1;
 
 =pod
@@ -365,25 +570,37 @@ Parse::SAMGov::Entity - Object to denote each Entity in SAM
 
 =head1 VERSION
 
-version 0.106
+version 0.202
 
 =head1 SYNOPSIS
 
-    my $e = Parse::SAMGov::Entity->new(DUNS => 12345);
-    say $e; #... stringification supported ...
+    ### for V2 files
+    my $e_v2 = Parse::SAMGov::Entity->new(UEI => 12345);
+    say $e_v2; #... stringification supported ...
+    ### for V1 files
+    my $e_v1 = Parse::SAMGov::Entity->new(DUNS => 12345);
+    say $e_v1; #... stringification supported ...
 
 =head1 METHODS
+
+=head2 UEI
+
+This holds the SAM Unique Entity Identifier (UEI) and is 12 characters long. This number is only valid for V2 files on or after 2022.
 
 =head2 DUNS
 
 This holds the unique identifier of the entity, currently the Data
 Universal Numbering System (DUNS) number. This has a maximum length of 9 characters.
-This number can be gotten from Dun & Bradstreet.
+This number can be gotten from Dun & Bradstreet. This is only valid for V1 files on or before 2021.
 
 =head2 DUNSplus4
 
 This holds the DUNS+4 value which is of 4 characters. If an entity doesn't have
-this value set, it will be set as '0000'.
+this value set, it will be set as '0000'. This is only valid for V1 files on or before 2021.
+
+=head2 EEFTI
+
+The Entity EFT Indicator is an entity-selected Electronics Funds Transfer (EFT) Identifier used to distinguish more than one remittance location for payment. An entity can only provide an Entity EFT Indicator if they provide an additional set of EFT information. If the entity does not need to provide additional EFT information, the registration will show a value of null. CAGE codes are assigned at the Entity EFT Indicator level.
 
 =head2 CAGE
 
@@ -438,11 +655,11 @@ The Doing Business As (DBA) name of the entity.
 
 =head2 company_division
 
-The company division listed in the entity.
+The company division (V1) listed in the entity. Same as Entity Division in V2.
 
 =head2 division_no
 
-The divison number of the company division.
+The divison number of the company division (V1) or entity division (V2).
 
 =head2 physical_address
 
@@ -466,7 +683,11 @@ string value.
 
 =head2 entity_structure
 
-Get/Set the entity structure of the entity.
+Get/Set the entity structure of the entity. This is a 2-letter code
+
+=head2 entity_structure_descriptions
+
+Describe the 2-letter code for entity structure (V2).
 
 =head2 incorporation_state
 
@@ -554,7 +775,7 @@ holds an L<Parse::SAMGov::Entity::PointOfContact> object.
 
 =head2 delinquent_fed_debt
 
-Get/Set the delinquent federal debt flag.
+Get/Set the delinquent federal debt flag. Also known as Debt Subject to Offset Flag in V2.
 
 =head2 exclusion_status
 
@@ -563,6 +784,10 @@ Get/Set the exclusion status flag.
 =head2 is_private
 
 This flag denotes whether the listing is private or not.
+
+=head2 dnb_open_data
+
+This flag denotes whether this is a D&B Open Data or not. V2 only.
 
 =head2 SBA
 
@@ -573,7 +798,7 @@ This holds a hash-ref of Small Business Administration codes such as Hubzone,
         A4 => { description => 'SBA Certified Small Disadvantaged Busines',
                 expiration => '2016-12-01', #... this is a DateTime object...
               },
-    }    
+    } 
 
 =head2 disaster_response
 
@@ -586,7 +811,7 @@ Vikas N Kumar <vikas@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Selective Intellect LLC.
+This software is copyright (c) 2023 by Selective Intellect LLC.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

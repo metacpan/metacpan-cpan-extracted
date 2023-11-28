@@ -1,12 +1,12 @@
 package Locale::CLDR::Transformations::Bgn::Ko::Ko_latn;
 # This file auto generated from Data\common\transforms\Korean-Latin-BGN.xml
-#	on Fri 13 Oct  9:03:46 am GMT
+#	on Sat  4 Nov  5:50:47 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

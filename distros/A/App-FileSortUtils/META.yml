@@ -1,5 +1,5 @@
 ---
-abstract: 'Utilities related to sorting files in a directory'
+abstract: 'CLI utilities related to sorting files in one or more directories'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,38 +19,35 @@ name: App-FileSortUtils
 provides:
   App::FileSortUtils:
     file: lib/App/FileSortUtils.pm
-    version: '0.005'
+    version: '0.009'
 requires:
+  Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
   Data::Sah::Compiler::perl::TH::code: '0.914'
   Data::Sah::Compiler::perl::TH::hash: '0.914'
   Data::Sah::Compiler::perl::TH::int: '0.914'
+  Data::Sah::Compiler::perl::TH::re: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
   Data::Sah::Filter::perl::Code::eval: '0'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
-  Exporter: '5.57'
-  Fcntl: '0'
-  File::chdir: '0'
-  List::Rank: '0'
+  Data::Sah::Filter::perl::Re::re_from_str: '0'
+  File::Util::Sort: '0'
   Log::ger: '0.038'
   Perinci::CmdLine::Any: '0.154'
   Perinci::CmdLine::Lite: '1.924'
-  Perinci::Sub::Util: '0.472'
   Perinci::Sub::XCompletion::sortsub_spec: '0'
   Sah::Schema::code_from_str: '0'
-  Sah::Schema::dirname::default_curdir: '0'
+  Sah::Schema::dirname: '0'
+  Sah::Schema::re_from_str: '0'
   Sah::Schema::true: '0'
   Sah::Schema::uint: '0'
-  Sort::Sub: '0.120'
-  perl: '5.010001'
   strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FileSortUtils
   homepage: https://metacpan.org/release/App-FileSortUtils
   repository: git://github.com/perlancar/perl-App-FileSortUtils.git
-version: '0.005'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -170,7 +167,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.608'
+      version: '0.610'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -486,14 +483,6 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.030'
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: develop
-          type: x_spec
-      name: DevelopX_spec
       version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode

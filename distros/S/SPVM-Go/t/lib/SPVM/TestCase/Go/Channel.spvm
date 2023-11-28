@@ -1,0 +1,456 @@
+class TestCase::Go::Channel {
+  use Go;
+  
+  our $RESULT : IntList;
+  
+  static method unbuffered_minimal : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make;
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        $ch->write(1);
+      });
+      
+      my $ok = 0;
+      
+      my $value = (int)$ch->read(\$ok);
+      
+      $RESULT->push($value);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [1])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method unbuffered : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make;
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        $ch->write(1);
+        
+        $ch->write(2);
+        
+        $ch->close;
+      });
+      
+      my $ok = 0;
+      
+      my $value1 = (int)$ch->read(\$ok);
+      
+      $RESULT->push($value1);
+      
+      $RESULT->push($ok);
+      
+      my $value2 = (int)$ch->read(\$ok);
+      
+      $RESULT->push($value2);
+      
+      $RESULT->push($ok);
+      my $value3 = $ch->read(\$ok);
+      
+      if ($value3) {
+        $RESULT->push(1);
+      }
+      else {
+        $RESULT->push(0);
+      }
+      
+      $RESULT->push($ok);
+    });
+    
+    Go->gosched;
+    
+    # value, ok
+    my $expected = [
+      1, 1,
+      2, 1,
+      0, 0
+    ];
+    
+    unless (Array->equals_int($RESULT->to_array, $expected)) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method buffered_minimal : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make(1);
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        my $ok = 0;
+        
+        my $value = (int)$ch->read(\$ok);
+        
+        $RESULT->push($value);
+      });
+      
+      $ch->write(2);
+      
+      $RESULT->push(1);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [1, 2])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method buffered : int () {
+    
+    $RESULT = IntList->new;
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make(1);
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        my $ok = 0;
+        
+        my $value1 = (int)$ch->read(\$ok);
+        
+        $RESULT->push(-2);
+        
+        $RESULT->push($ch->len);
+        
+        $RESULT->push($value1);
+        
+        my $value2 = (int)$ch->read(\$ok);
+        
+        $RESULT->push(-3);
+        
+        $RESULT->push($value2);
+      });
+      
+      $ch->write(10);
+      
+      $RESULT->push(-1);
+      
+      $RESULT->push($ch->len);
+      
+      $ch->write(11);
+      
+      $RESULT->push(-4);
+    });
+    
+    Go->gosched;
+    
+    unless (Array->equals_int($RESULT->to_array, [-1, 1, -2, 0, 10, -3, 11, -4])) {
+      return 0;
+    }
+    
+    $RESULT = undef;
+    
+    return 1;
+  }
+  
+  static method cap : int () {
+    
+    {
+      my $ch = Go->make;
+      
+      unless ($ch->cap == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ch = Go->make(0);
+      
+      unless ($ch->cap == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ch = Go->make(2);
+      
+      unless ($ch->cap == 2) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method len : int () {
+    
+    {
+      my $ch = Go->make;
+      
+      unless ($ch->len == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      my $ch = Go->make(0);
+      
+      unless ($ch->len == 0) {
+        return 0;
+      }
+    }
+    
+    {
+      $RESULT = IntList->new;
+      
+      Go->go(method : void () {
+        
+        my $ch = Go->make(1);
+        
+        Go->go([has ch : Go::Channel = $ch] method : void () {
+          
+          my $ch = $self->{ch};
+          
+          $ch->write(1);
+          
+          $RESULT->push($ch->len);
+        });
+        
+        Go->sleep(0.1);
+        
+        my $ok = 0;
+        
+        $ch->read(\$ok);
+        
+        $RESULT->push($ch->len);
+      });
+      
+      Go->gosched;
+      
+      unless (Array->equals_int($RESULT->to_array, [1, 0])) {
+        return 0;
+      }
+      
+      $RESULT = undef;
+    }
+    
+    return 1;
+  }
+  
+  static method close : int () {
+    
+    {
+      my $ch = Go->make;
+      
+      $ch->close;
+      
+      eval { $ch->close; }
+      
+      unless (Fn->contains($@, "This channel is already closed.")) {
+        return 0;
+      }
+      
+      $@ = undef;
+      
+      my $ok = 0;
+      my $value = $ch->read(\$ok);
+      
+      unless ($ok == 0) {
+        return 0;
+      }
+      
+      if ($value) {
+        return 0;
+      }
+    }
+    
+    {
+      $RESULT = IntList->new;
+      
+      Go->go(method : void () {
+        
+        my $ch = Go->make;
+        
+        Go->go([has ch : Go::Channel = $ch] method : void () {
+          
+          my $ch = $self->{ch};
+          
+          $ch->write(1);
+          
+          $ch->write(2);
+          
+          $ch->close;
+        });
+        
+        my $ok = 0;
+        
+        my $value1 = (int)$ch->read(\$ok);
+        
+        $RESULT->push($value1);
+        
+        $RESULT->push($ok);
+        
+        my $value2 = (int)$ch->read(\$ok);
+        
+        $RESULT->push($value2);
+        
+        $RESULT->push($ok);
+        my $value3 = $ch->read(\$ok);
+        
+        if ($value3) {
+          $RESULT->push(1);
+        }
+        else {
+          $RESULT->push(0);
+        }
+        
+        $RESULT->push($ok);
+      });
+      
+      Go->gosched;
+      
+      # value, ok
+      my $expected = [
+        1, 1,
+        2, 1,
+        0, 0
+      ];
+      
+      unless (Array->equals_int($RESULT->to_array, $expected)) {
+        return 0;
+      }
+      
+      $RESULT = undef;
+    }
+    
+    return 1;
+  }
+  
+  static method extra : int () {
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make(2);
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        my $len1 = $ch->len;
+        
+        $ch->write(3);
+        
+        my $len2 = $ch->len;
+        
+        $ch->write(4);
+        
+        my $len3 = $ch->len;
+        
+        $ch->write(5);
+        
+        my $len4 = $ch->len;
+      });
+      
+      Go->gosched;
+      
+      Go->sleep(0.1);
+      
+      my $ok = 0;
+      
+      my $len1 = $ch->len;
+      
+      my $value1 = (int)$ch->read(\$ok);
+      
+      my $len2 = $ch->len;
+      
+      my $value2 = (int)$ch->read(\$ok);
+      
+      my $len3 = $ch->len;
+      
+      my $value3 = (int)$ch->read(\$ok);
+      
+      my $len4 = $ch->len;
+      
+      my $cap = $ch->cap;
+    });
+    
+    Go->go(method : void () {
+      
+      my $ch = Go->make(2);
+      
+      Go->go([has ch : Go::Channel = $ch] method : void () {
+        
+        my $ch = $self->{ch};
+        
+        my $len1 = $ch->len;
+        
+        $ch->write(3);
+        
+        my $len2 = $ch->len;
+        
+        $ch->write(4);
+        
+        my $len3 = $ch->len;
+        
+        $ch->write(5);
+        
+        my $len4 = $ch->len;
+      });
+      
+      my $ok = 0;
+      
+      my $len1 = $ch->len;
+      
+      my $value1 = (int)$ch->read(\$ok);
+      
+      my $len2 = $ch->len;
+      
+      my $value2 = (int)$ch->read(\$ok);
+      
+      my $len3 = $ch->len;
+      
+      my $value3 = (int)$ch->read(\$ok);
+      
+      my $len4 = $ch->len;
+      
+      my $cap = $ch->cap;
+      
+    });
+    
+    Go->gosched;
+    
+    return 1;
+  }
+  
+}

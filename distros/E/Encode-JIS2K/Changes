@@ -1,8 +1,19 @@
 #
-# $Id: Changes,v 0.03 2015/06/05 03:57:30 dankogai Exp dankogai $
+# $Id: Changes,v 0.05 2023/11/15 04:14:40 dankogai Exp dankogai $
 # Revision history for Perl extension Encode::JIS2K.
 #
-$Revision: 0.03 $ $Date: 2015/06/05 03:57:30 $
+$Revision: 0.05 $ $Date: 2023/11/15 04:14:40 $
+! JIS2K.pm README
+  update POD and pod2text JIS2K.pm > README
+
+0.04 2023/11/15 03:55:42
+! JIS2K.pm
+  resolved RT#150457: typo in documentation
+  https://rt.cpan.org/Ticket/Display.html?id=150457
+! t/JIS2K.t
+  s/import Config/Config->import()/
+
+0.03 2015/06/05 03:57:30
 ! Makefile.PL
   fix RT#67531 & RT#104967
   https://rt.cpan.org/Ticket/Display.html?id=67531

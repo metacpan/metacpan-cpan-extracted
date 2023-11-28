@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-IPv6.t 1930 2023-08-21 14:10:10Z willem $ -*-perl-*-
+# $Id: 08-IPv6.t 1945 2023-11-22 08:02:31Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -412,19 +412,19 @@ SKIP: {
 }
 
 
-{					## exercise error path in bgbusy() and _bgread()
-	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, udp_timeout => 0 );
+{					## exercise error path in bgbusy() and bgread()
+	my $resolver = Net::DNS::Resolver->new( nameservers => $IP, udp_timeout => 5 );
+	my $original = $resolver->_make_query_packet(qw(net-dns.org SOA));
+	my $mismatch = $resolver->_make_query_packet(qw(net-dns.org SOA));
+	my $handle   = $resolver->_bgsend_udp( $original, $mismatch->data );
+	ok( !$resolver->bgread($handle), 'bgread()	id mismatch' );
 
-	ok( !$resolver->bgread(undef), '_bgread()	undefined handle' );
+	ok( !$resolver->bgread(undef), 'bgread()	undefined handle' );
 
-	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
-	my $broken = bless {%$packet, id => 0xffff ^ $packet->header->id}, ref($packet);
-	my $handle = $resolver->_bgsend_udp( $packet, $broken->data );
-	ok( !$resolver->bgread($handle), '_bgread()	no reply' );
-
-	ok( !$resolver->bgread( ref($handle)->new ), '_bgread()	timeout' );
+	ok( !$resolver->bgread( ref($handle)->new ), 'bgread()	timeout' );
 
 	$resolver->tcp_timeout(10);
+	my $packet = $resolver->_make_query_packet(qw(net-dns.org SOA));
 	my $socket = $resolver->_bgsend_tcp( $packet, $packet->data );
 	while ( $resolver->bgbusy($socket) ) { sleep 1 }
 	my $discard;

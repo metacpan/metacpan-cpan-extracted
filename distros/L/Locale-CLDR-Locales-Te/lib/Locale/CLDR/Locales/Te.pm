@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Te - Package for language Telugu
 
 package Locale::CLDR::Locales::Te;
 # This file auto generated from Data\common\main\te.xml
-#	on Fri 13 Oct  9:43:27 am GMT
+#	on Sat  4 Nov  6:25:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

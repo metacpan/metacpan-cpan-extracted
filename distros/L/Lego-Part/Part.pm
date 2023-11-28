@@ -1,15 +1,12 @@
 package Lego::Part;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -83,6 +80,7 @@ Lego::Part - Lego part object.
 =head1 SYNOPSIS
 
  use Lego::Part;
+
  my $obj = Lego::Part->new;
  my $color = $obj->color($color);
  my $design_id = $obj->design_id($design_id);
@@ -116,11 +114,11 @@ Lego::Part - Lego part object.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=create_part_and_print1.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Lego::Part;
 
  # Object.
@@ -139,11 +137,11 @@ Lego::Part - Lego part object.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=create_part_and_print2.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Lego::Part;
 
  # Object.
@@ -174,21 +172,22 @@ Install the Lego modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Lego-Part>
+L<https://github.com/michal-josef-spacek/Lego-Part>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2015 Michal Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

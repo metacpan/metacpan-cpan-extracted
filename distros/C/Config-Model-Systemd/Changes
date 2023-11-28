@@ -1,3 +1,13 @@
+0.254.1 2023-11-24
+
+  Model update:
+    * generate model from systemd 254 doc
+
+  Model generator (parse-man.pl) changes:
+    * parse-man: include <programlisting> tag in description
+    * parse-man: extract more default values from documentation
+    * parse-man: sort enum choices
+
 0.252.2 2023-02-04
 
   Bug fix:
@@ -38,13 +48,13 @@
     - systemd-service: applies to one system service 
       e.g. "cme edit systemd transmission-daemon.service"
     - systemd-timer: applies to one system timer 
-    - systemd-socker: applies to one system socker 
+    - systemd-socket: applies to one system socket
 
   * For service developers:
     - systemd-service-file: applies to one system service file.
       e.g. "cme edit systemd ./src/transmission-daemon.service"
     - systemd-timer-file: applies to one system timer file
-    - systemd-socker-file: applies to one system socker file
+    - systemd-socket-file: applies to one system socket file
 
   * For users:
     - systemd-user: applies to all user service

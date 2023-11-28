@@ -1,0 +1,89 @@
+#! perl
+
+use strict;
+use warnings;
+
+use CPAN::Static::Install ':all';
+
+sub all {
+	configure(@_);
+	build;
+	test;
+	install;
+}
+
+my %dispatch = (
+	configure => \&configure,
+	build     => \&build,
+	test      => \&test,
+	install   => \&install,
+	all       => \&all,
+);
+
+my $command    = shift @ARGV;
+my $dispatcher = $dispatch{$command} or die "No such subcommand $command\n";
+my %opts       = opts_from_args_list(@ARGV);
+
+my $static_version = supports_static_install;
+$opts{static_version} = $static_version if defined $static_version;
+
+$dispatcher->(%opts);
+
+# PODNAME: cpan-static
+# ABSTRACT: a small command line tool for static installation.
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpan-static - a small command line tool for static installation.
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+$ cpan-static configure --install_base ~/my_app
+$ cpan-static build
+$ cpan-static test
+$ cpan-static install
+
+=head1 DESCRIPTION
+
+This is a small tool to facilitate static installation of CPAN modules.
+
+All subcommands take the same arguments as a Build.PL would, but it's recommended to only pass them to configure.
+
+=head2 configure
+
+This will configure the distribution. This should be run first.
+
+=head2 build
+
+This will build all files in the staging directory. One must first call C<configure> before calling this. Note that you should have any build, test and runtime dependencies installed before this action.
+
+=head2 test
+
+This will run the test for the distribution. One must first call C<build> before calling this.
+
+=head2 install
+
+This will install the distribution. One must first call C<build> before calling this, one may also call C<test> before running this.
+
+=head1 AUTHOR
+
+Leon Timmermans <leont@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Leon Timmermans.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

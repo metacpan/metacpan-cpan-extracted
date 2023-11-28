@@ -33,5 +33,5 @@ requires:
 resources:
   bugtracker: https://github.com/tsee/extutils-cppguess/issues
   repository: git://github.com/tsee/extutils-cppguess
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

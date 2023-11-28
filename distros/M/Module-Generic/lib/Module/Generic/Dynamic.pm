@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.2.2
-## Copyright(c) 2022 DEGUEST Pte. Ltd.
+## Version v1.2.4
+## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/11/12
+## Modified 2023/11/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,9 +17,11 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use warnings::register;
+    use vars qw( $VERSION $DEBUG );
     use Scalar::Util ();
     # use Class::ISA;
-    our $VERSION = 'v1.2.2';
+    our $DEBUG = 0;
+    our $VERSION = 'v1.2.4';
 };
 
 use strict;
@@ -38,6 +40,7 @@ sub new
     if( scalar( @_ ) == 1 && ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' )
     {
         $hash = shift( @_ );
+        $self->{debug} = $DEBUG if( $DEBUG && !CORE::exists( $hash->{debug} ) );
     }
     elsif( @_ )
     {
@@ -80,18 +83,15 @@ EOT
     {
         if( ref( $hash->{ $k } ) eq 'HASH' )
         {
-            # my $clean_field = $k;
-            # $clean_field =~ tr/-/_/;
-            # $clean_field =~ s/\_{2,}/_/g;
-            # $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
-            # $clean_field =~ s/^\d+//g;
             my( $new_class, $clean_field ) = $make_class->( $k );
             next unless( length( $clean_field ) );
             eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_object( '$clean_field', '$new_class', \@_ ) ); }" );
             die( $@ ) if( $@ );
-            $self->$clean_field( $hash->{ $k } );
+            my $rv = $self->$clean_field( $hash->{ $k } );
+            return( $self->pass_error ) if( !defined( $rv ) && $self->error );
         }
-        elsif( ref( $hash->{ $k } ) eq 'ARRAY' )
+        # elsif( ref( $hash->{ $k } ) eq 'ARRAY' )
+        elsif( $self->_is_array( $hash->{ $k } ) )
         {
             my( $new_class, $clean_field ) = $make_class->( $k );
             # We take a peek at what we have to determine how we will handle the data
@@ -105,16 +105,15 @@ EOT
                     $this->{_looping} = $o;
                     CORE::push( @$all, $o );
                 }
-                # $data->{ $clean_field } = $all;
                 eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_object_array_object( '$clean_field', '$new_class', \@_ ) ); }" );
             }
             else
             {
-                # $data->{ $clean_field } = $hash->{ $k };
                 eval( "sub ${new_class}::${clean_field} { return( shift->_set_get_array_as_object( '$clean_field', \@_ ) ); }" );
             }
             die( $@ ) if( $@ );
-            $self->$clean_field( $hash->{ $k } );
+            my $rv = $self->$clean_field( $hash->{ $k } );
+            return( $self->pass_error ) if( !defined( $rv ) && $self->error );
         }
         elsif( !ref( $hash->{ $k } ) )
         {
@@ -135,7 +134,8 @@ EOT
                 $func_name = '_set_get_uri';
             }
             eval( "sub ${class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }" );
-            $self->$clean_field( $hash->{ $k } );
+            my $rv = $self->$clean_field( $hash->{ $k } );
+            return( $self->pass_error ) if( !defined( $rv ) && $self->error );
         }
         else
         {
@@ -144,7 +144,8 @@ EOT
             $clean_field =~ s/\_{2,}/_/g;
             $clean_field =~ s/[^a-zA-Z0-9\_]+//g;
             $clean_field =~ s/^\d+//g;
-            $self->$clean_field( $hash->{ $k } );
+            my $rv = $self->$clean_field( $hash->{ $k } );
+            return( $self->pass_error ) if( !defined( $rv ) && $self->error );
         }
     }
     return( $self );
@@ -207,18 +208,20 @@ sub AUTOLOAD
     # my( $class, $method ) = our $AUTOLOAD =~ /^(.*?)::([^\:]+)$/;
     no overloading;
     my $self = shift( @_ );
+    my @args = @_;
     my $class = ref( $self ) || $self;
     my $code;
     # print( STDERR __PACKAGE__, "::$method(): Called\n" );
     if( $code = $self->can( $method ) )
     {
-        return( $code->( @_ ) );
+        return( $code->( @args ) );
     }
     ## elsif( CORE::exists( $self->{ $method } ) )
     else
     {
         my $ref = lc( ref( $_[0] ) );
-        my $handler = '_set_get_scalar_as_object';
+        # Default
+        my $handler = ( $ref eq 'scalar' || !$ref ) ? '_set_get_scalar_as_object' : '_set_get_scalar';
         # if( @_ && ( $ref eq 'hash' || $ref eq 'array' ) )
         if( $ref eq 'hash' || $ref eq 'array' )
         {
@@ -230,6 +233,10 @@ sub AUTOLOAD
             ( $ref eq 'scalar' && ( $$ref == 1 || $$ref == 0 ) ) )
         {
             $handler = '_set_get_boolean';
+        }
+        elsif( $ref eq 'regexp' )
+        {
+            $handler = '_set_get_scalar';
         }
         elsif( !$ref && $method =~ /(?<=[^a-zA-Z0-9])(date|datetime)(?!>[^a-zA-Z0-9])/ )
         {
@@ -245,7 +252,7 @@ sub AUTOLOAD
         }
         eval( "sub ${class}::${method} { return( shift->$handler( '$method', \@_ ) ); }" );
         die( $@ ) if( $@ );
-        return( $self->$method( @_ ) );
+        return( $self->$method( @args ) );
     }
 };
 

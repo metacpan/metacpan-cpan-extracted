@@ -4,7 +4,7 @@
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2023/07/25
-## Modified 2023/09/26
+## Modified 2023/11/24
 ## All rights reserved
 ## 
 ## 
@@ -494,7 +494,7 @@ Net::API::CPAN::Release - Meta CPAN API Release Class
         my $scalar = $this->module;
         my $scalar = $this->phase;
         my $scalar = $this->relationship;
-        my $HASH(0xaaaaf2bead20) = $this->version;
+        my $HASH(0xaaaac89729f0) = $this->version;
     }
     my $bool = $obj->deprecated;
     my $string = $obj->distribution;
@@ -726,7 +726,7 @@ Sets or gets a datetime value, and returns a L<DateTime object|DateTime> that st
         $this->relationship( "requires" );
         my $scalar = $this->relationship;
         $this->version( 0 );
-        my $HASH(0xaaaaf2bead20) = $this->version;
+        my $HASH(0xaaaac89729f0) = $this->version;
     }
 
 Sets or gets an array of dynamic class objects with class name C<Net::API::CPAN::Release::Dependency> and having the folowing properties also accessible as methods, and returns an L<array object|Module::Generic::Array> even if there is no value.

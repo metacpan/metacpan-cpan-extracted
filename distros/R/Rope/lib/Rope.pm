@@ -1,7 +1,7 @@
 package Rope;
 
 use 5.006; use strict; use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Rope::Object;
 my (%META, %PRO);
@@ -56,6 +56,13 @@ BEGIN {
 				};
 			}
 		},
+		requires => sub {
+			my ($caller) = shift;
+			return sub {
+				my (@requires) = @_;
+				$META{$caller}{requires}{$_}++ for (@requires);
+			};
+		},
 		function => sub {
 			my ($caller) = shift;
 			return sub {
@@ -102,6 +109,43 @@ BEGIN {
 				}
 			}
 		},
+		with => sub {
+			my ($caller) = shift;
+			return sub {
+				my (@withs) = @_;
+				for my $with (@withs) {
+					if (!$META{$with}) {
+						(my $name = $with) =~ s!::!/!g;
+						$name .= ".pm";
+						CORE::require($name);
+					}
+					my $initial = $META{$caller};
+					my $merge = $PRO{clone}($META{$with});
+					$merge->{name} = $initial->{name};
+					$merge->{locked} = $initial->{locked};
+					for (keys %{$initial->{properties}}) {
+						$initial->{properties}->{$_}->{index} = ++$merge->{keys};
+						if ($merge->{properties}->{$_}) {
+							if ($merge->{properties}->{writeable}) {
+								$merge->{properties}->{$_} = $initial->{properties}->{$_};
+							} elsif ($merge->{properties}->{configurable}) {
+								if ((ref($merge->{properties}->{$_}->{value}) || "") eq (ref($initial->{properties}->{$_}->{value} || ""))) {
+									$merge->{properties}->{$_} = $initial->{properties}->{$_};
+								} else {
+									die "Cannot include $with and change property $_ type";
+								}
+							} else {
+								die "Cannot include $with and override property $_";
+							}
+						} else {
+							$merge->{properties}->{$_} = $initial->{properties}->{$_};
+						}
+					}
+					$merge->{requires} = {%{$merge->{requires}}, %{$initial->{requires}}};
+					$META{$caller} = $merge;
+				}
+			}
+		},
 		extends => sub {
 			my ($caller) = shift;
 			return sub {
@@ -134,6 +178,7 @@ BEGIN {
 							$merge->{properties}->{$_} = $initial->{properties}->{$_};
 						}
 					}
+					$merge->{requires} = {%{$merge->{requires}}, %{$initial->{requires}}};
 					my $isa = '@' . $caller . '::ISA';
 					eval "push $isa, '$extend'";
 					$META{$caller} = $merge;
@@ -159,23 +204,27 @@ BEGIN {
 }
 
 sub import {
-	my ($pkg, $options, $caller) = (shift, {}, caller());
+	my ($pkg, $options, $caller) = (shift, {@_}, caller());
+	return if $options->{no_import};
+	$caller = $options->{caller} if $options->{caller};
 	if (!$META{$caller}) {
 		$META{$caller} = {
 			name => $caller,
 			locked => 0,
 			properties => {},
+			requires => {},
 			keys => 0
 		};
 	}
 	$PRO{keyword}($caller, '((', sub {});
-	$PRO{keyword}($caller, '(%{}', sub {	
+	$PRO{keyword}($caller, '(%{}', sub {
 		${$_[0]}->{prototype};
 	});
 	$PRO{keyword}($caller, $_, $PRO{$_}($caller))
-		for qw/function property prototyped extends new/;
+		for $options->{import} 
+			? @{$options->{import}} 
+			: qw/function property prototyped extends with requires new/;
 }
-
 
 1;
 
@@ -187,7 +236,7 @@ Rope - Tied objects
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 

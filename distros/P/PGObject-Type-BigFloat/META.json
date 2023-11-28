@@ -4,13 +4,13 @@
       "Chris Travers <chris.travers@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "bsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PGObject-Type-BigFloat",
    "no_index" : {
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Math::BigFloat" : "0",
+            "Math::BigFloat" : "1.999842",
             "PGObject" : "0"
          }
       }
@@ -45,5 +45,6 @@
          "web" : "https://github.com/ledgersmb/PGObject-Type-BigFloat"
       }
    },
-   "version" : 2.001
+   "version" : 2.001001,
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

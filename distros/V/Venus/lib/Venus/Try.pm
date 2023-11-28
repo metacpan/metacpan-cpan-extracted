@@ -198,6 +198,7 @@ sub result {
 
     for my $catcher (@$catchers) {
       if (UNIVERSAL::isa($caught, $catcher->[0])) {
+        local $_ = $caught;
         @returned = ($catcher->[1]->($caught));
         last;
       }
@@ -206,6 +207,7 @@ sub result {
     # catchall
     if(!@returned) {
       if ($default) {
+        local $_ = $caught;
         @returned = ($default->($caught))
       }
     }
@@ -1151,7 +1153,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+Copyright (C) 2022, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

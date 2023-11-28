@@ -40,7 +40,7 @@ use Exception::Class (
 	},
 );
 
-our $VERSION = '2.23';
+our $VERSION = '2.24';
 
 sub set_time {
 	my ( $self, %conf ) = @_;
@@ -658,6 +658,8 @@ sub parse_xml_part {
 		$e_astime //= $e_atime;
 
 		my $delay = $e_delay ? $e_delay->getAttribute('delayMinutes') : 0;
+		my $delay_arr
+		  = $e_delay ? $e_delay->getAttribute('delayMinutesArr') : 0;
 
 		my ( @dep_rms, @dep_sms, @arr_rms, @arr_sms );
 
@@ -673,8 +675,8 @@ sub parse_xml_part {
 		}
 
 		my $hash = {
-			delay              => $delay,
 			departure_date     => $self->itddate_str($e_ddate),
+			departure_delay    => $delay,
 			departure_time     => $self->itdtime_str($e_dtime),
 			departure_sdate    => $self->itddate_str($e_dsdate),
 			departure_stime    => $self->itdtime_str($e_dstime),
@@ -685,6 +687,7 @@ sub parse_xml_part {
 			train_product      => $e_mot->getAttribute('productName'),
 			train_destination  => $e_mot->getAttribute('destination'),
 			arrival_date       => $self->itddate_str($e_adate),
+			arrival_delay      => $delay_arr,
 			arrival_time       => $self->itdtime_str($e_atime),
 			arrival_sdate      => $self->itddate_str($e_asdate),
 			arrival_stime      => $self->itdtime_str($e_astime),
@@ -714,8 +717,8 @@ sub parse_xml_part {
 		$hash->{arrival_stationmaps}   = \@arr_sms;
 
 		for my $ve ( $e->findnodes($xp_via) ) {
-			my $e_vdate = ( $ve->findnodes($xp_date) )[-1];
-			my $e_vtime = ( $ve->findnodes($xp_time) )[-1];
+			my $e_vdate = ( $ve->findnodes($xp_date) )[0];
+			my $e_vtime = ( $ve->findnodes($xp_time) )[0];
 
 			if ( not( $e_vdate and $e_vtime )
 				or ( $e_vdate->getAttribute('weekday') == -1 ) )
@@ -723,8 +726,9 @@ sub parse_xml_part {
 				next;
 			}
 
-			my $name     = $ve->getAttribute('name');
-			my $platform = $ve->getAttribute('platformName');
+			my $name      = $ve->getAttribute('name');
+			my $platform  = $ve->getAttribute('platformName');
+			my $arr_delay = $ve->getAttribute('arrDelay');
 
 			if (   $name eq $hash->{departure_stop}
 				or $name eq $hash->{arrival_stop} )
@@ -738,7 +742,8 @@ sub parse_xml_part {
 					$self->itddate_str($e_vdate),
 					$self->itdtime_str($e_vtime),
 					$name,
-					$platform
+					$platform,
+					$arr_delay,
 				]
 			);
 		}
@@ -976,7 +981,7 @@ Travel::Routing::DE::EFA - unofficial interface to EFA-based itinerary services
 
 =head1 VERSION
 
-version 2.23
+version 2.24
 
 =head1 DESCRIPTION
 

@@ -1,17 +1,14 @@
 package Lego::Part::Action;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-# Version.
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -82,6 +79,7 @@ Lego::Part::Action - Lego part action object.
 =head1 SYNOPSIS
 
  use Lego::Part::Action;
+
  my $obj = Lego::Part::Action->new;
  $obj->load_design_id($part_transfer_class, $part);
  $obj->load_element_id($part_transfer_class, $part);
@@ -120,9 +118,10 @@ Lego::Part::Action - Lego part action object.
 
 =head1 EXAMPLE
 
+=for comment filename=design_to_element_and_print.pl
+
  package Lego::Part::Transfer::Example;
 
- # Pragmas.
  use base qw(Lego::Part::Transfer);
  use strict;
  use warnings;
@@ -139,11 +138,9 @@ Lego::Part::Action - Lego part action object.
 
  package main;
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use Lego::Part;
  use Lego::Part::Action;
 
@@ -191,21 +188,22 @@ Install the Lego modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Lego-Part>
+L<https://github.com/michal-josef-spacek/Lego-Part>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2015 Michal Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

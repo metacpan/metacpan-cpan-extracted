@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 sub MY::distsignature
 {
-    return << 'EOT';
+    return <<'EOT';
 distsignature : distmeta
 	$(NOECHO) ./dev/cleanup.pl
 	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) }' \

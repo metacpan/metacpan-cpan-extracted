@@ -1,5 +1,11 @@
 Revision history for Env-Assert
 
+0.009     2023-11-15 19:35:06+01:00 Europe/Stockholm
+          * Add App::FatPacker to deps.
+          * Add contributor gregor herrmann <gregoa@debian.org>
+          * Add Repology link to README.md.
+          * Available as a Debian package. (gregor herrmann <gregoa@debian.org>)
+
 0.008     2023-08-13 13:25:41+02:00 Europe/Berlin
           * Fix dist.ini Run::AfterRelease action.
           * Create CLI option --exact

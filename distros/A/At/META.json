@@ -1,0 +1,143 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "The AT Protocol for Social Networking",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.23",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "At",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Code::TidyAll" : "0",
+            "Code::TidyAll::Plugin::PodTidy" : "0",
+            "Data::Dump" : "0",
+            "Perl::Tidy" : "0",
+            "Pod::Tidy" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Pod" : "0",
+            "Test::Spellunker" : "0"
+         },
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "Minilla" : "0",
+            "Pod::Markdown::Github" : "0",
+            "Software::License::Artistic_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Version::Next" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Mojo::UserAgent" : "0"
+         },
+         "requires" : {
+            "DateTime::Tiny" : "0",
+            "IO::Socket::SSL" : "1.42",
+            "JSON::Tiny" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0",
+            "perl" : "v5.38.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "At" : {
+         "file" : "lib/At.pm",
+         "version" : "0.02"
+      },
+      "At::Bluesky" : {
+         "file" : "lib/At/Bluesky.pm"
+      },
+      "At::Bluesky::Facet" : {
+         "file" : "lib/At/Lexicons/app/bsky/richtext/facet.pm",
+         "version" : "1"
+      },
+      "At::Bluesky::Facet::byteSlice" : {
+         "file" : "lib/At/Lexicons/app/bsky/richtext/facet.pm"
+      },
+      "At::Bluesky::Facet::link" : {
+         "file" : "lib/At/Lexicons/app/bsky/richtext/facet.pm"
+      },
+      "At::Bluesky::Facet::tag" : {
+         "file" : "lib/At/Lexicons/app/bsky/richtext/facet.pm"
+      },
+      "At::Bluesky::Post" : {
+         "file" : "lib/At/Lexicons/app/bsky/feed/post.pm",
+         "version" : "1"
+      },
+      "At::Lexicon::AtProto::Repo" : {
+         "file" : "lib/At.pm"
+      },
+      "At::Lexicon::AtProto::Server" : {
+         "file" : "lib/At.pm"
+      },
+      "At::Lexicons::app::bsky::feed::post" : {
+         "file" : "lib/At/Lexicons/app/bsky/feed/post.pm",
+         "version" : "0.02"
+      },
+      "At::Lexicons::app::bsky::richtext::facet" : {
+         "file" : "lib/At/Lexicons/app/bsky/richtext/facet.pm",
+         "version" : "0.02"
+      },
+      "At::Protocol::DID" : {
+         "file" : "lib/At.pm"
+      },
+      "At::Protocol::Session" : {
+         "file" : "lib/At.pm"
+      },
+      "At::UserAgent" : {
+         "file" : "lib/At.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/At.pm/issues"
+      },
+      "homepage" : "https://github.com/sanko/At.pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sanko/At.pm.git",
+         "web" : "https://github.com/sanko/At.pm"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

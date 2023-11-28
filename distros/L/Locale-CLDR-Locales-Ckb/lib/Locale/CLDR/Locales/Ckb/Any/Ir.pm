@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ckb::Any::Ir - Package for language Central Kurdish
 
 package Locale::CLDR::Locales::Ckb::Any::Ir;
 # This file auto generated from Data\common\main\ckb_IR.xml
-#	on Fri 13 Oct  9:10:13 am GMT
+#	on Sat  4 Nov  5:56:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

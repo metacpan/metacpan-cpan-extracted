@@ -56,7 +56,7 @@ chdir "./t";
 );
 @loads = (
 	{
-		File => {localFilesystemPath => ".",dontKeepHistory => 1,filename => "test.zip",extract => 1,format_sep => "\t",format_skip => 1,format_header => "col1	col2	col3",},
+		File => {localFilesystemPath => ".",dontKeepHistory => 1,filename => "test.zip",extract => 1,format_sep => qr/\t/,format_skip => 1,format_header => "col1	col2	col3",},
 	},
 	{
 		DB => {query => "select * from theTestTable"},
@@ -118,7 +118,7 @@ uploadFileToFTP($loads[1]);
 getFilesFromFTP($loads[1]);
 $result = checkFiles($loads[1]);
 # 13
-is($result,1,"checkFiles \$loads[1] successful");
+is($result,1,"openFTPConn, uploadFileToFTP, getFilesFromFTP and checkFiles \$loads[1] successful");
 markProcessed($loads[1]);
 processingEnd();
 

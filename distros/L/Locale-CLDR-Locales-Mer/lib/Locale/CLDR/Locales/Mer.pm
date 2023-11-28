@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Mer - Package for language Meru
 
 package Locale::CLDR::Locales::Mer;
 # This file auto generated from Data\common\main\mer.xml
-#	on Fri 13 Oct  9:26:37 am GMT
+#	on Sat  4 Nov  6:12:54 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

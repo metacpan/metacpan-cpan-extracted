@@ -13,7 +13,7 @@ sub ARGS {
   return (!@args)
     ? ($self->DATA)
     : ((@args == 1 && ref($args[0]) eq 'HASH')
-    ? (!%{$args[0]} ? $self->DATA : {%{$args[0]}})
+    ? (do{my %args = %{$args[0]}; !CORE::keys(%args) ? $self->DATA : {%args}})
     : (@args % 2 ? {@args, undef} : {@args}));
 }
 
@@ -30,7 +30,9 @@ sub ATTR {
 
   $${"@{[$self->NAME]}::META"}{ATTR}{$attr} = [$index, [$attr, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
+  my $metacache = join '::', $self->NAME, $self->METACACHE;
+
+  ${$metacache} = undef;
 
   return $self;
 }
@@ -58,7 +60,9 @@ sub BASE {
 
   $${"@{[$self->NAME]}::META"}{BASE}{$base} = [$index, [$base, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
+  my $metacache = join '::', $self->NAME, $self->METACACHE;
+
+  ${$metacache} = undef;
 
   return $self;
 }
@@ -74,22 +78,13 @@ sub BLESS {
 
   $anew->BUILD($data);
 
-  # FYI, every call to "new" calls "BUILD" which dispatches to each "BUILD"
-  # defined in each attached role.
+  return $anew if $name eq 'Venus::Meta';
 
-  # If one (or more) roles use reflection (i.e. calls "META") to introspect the
-  # package's configuration, which could cause a performance problem given that
-  # the Venus::Meta class uses recursion to introspect all superclasses and
-  # roles to determine and present aggregate lists of package members.  It's
-  # your classic n+1 problem.
+  require Venus::Meta;
 
-  # The solution to this is to cache the associated Venus::Meta object which
-  # itself caches the results of its recursive lookups. The cache is stored on
-  # the subclass (i.e. on the calling package) and the cache will go away
-  # whenever the package does.
+  my $metacache = join '::', $self->NAME, $self->METACACHE;
 
-  ${"${name}::@{[$self->METACACHE]}"} ||= Venus::Meta->new(name => $name)
-    if $name ne 'Venus::Meta';
+  ${$metacache} ||= Venus::Meta->new(name => $name);
 
   return $anew;
 }
@@ -109,7 +104,7 @@ sub BUILDARGS {
 sub DATA {
   my ($self, $data) = @_;
 
-  return $data ? {%$data} : {};
+  return $data || {};
 }
 
 sub DESTROY {
@@ -173,10 +168,9 @@ sub META {
 
   require Venus::Meta;
 
-  my $name = $self->NAME;
+  my $metacache = join '::', my $name = $self->NAME, $self->METACACHE;
 
-  return ${"${name}::@{[$self->METACACHE]}"}
-    || Venus::Meta->new(name => $name);
+  return ${$metacache} ||= Venus::Meta->new(name => $name);
 }
 
 sub METACACHE {
@@ -204,7 +198,9 @@ sub MIXIN {
 
   $${"@{[$self->NAME]}::META"}{MIXIN}{$mixin} = [$index, [$mixin, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
+  my $metacache = join '::', $self->NAME, $self->METACACHE;
+
+  ${$metacache} = undef;
 
   return $self;
 }
@@ -234,7 +230,9 @@ sub ROLE {
 
   $${"@{[$self->NAME]}::META"}{ROLE}{$role} = [$index, [$role, @args]];
 
-  ${"@{[$self->NAME]}::@{[$self->METACACHE]}"} = undef;
+  my $metacache = join '::', $self->NAME, $self->METACACHE;
+
+  ${$metacache} = undef;
 
   return $self;
 }
@@ -1590,7 +1588,7 @@ Awncorp, C<awncorp@cpan.org>
 
 =head1 LICENSE
 
-Copyright (C) 2000, Awncorp, C<awncorp@cpan.org>.
+Copyright (C) 2022, Awncorp, C<awncorp@cpan.org>.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Apache license version 2.0.

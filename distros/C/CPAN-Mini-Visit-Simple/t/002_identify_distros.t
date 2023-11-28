@@ -8,7 +8,7 @@ use Carp;
 use File::Path qw( make_path );
 use File::Spec;
 use File::Temp qw( tempfile tempdir );
-use IO::CaptureOutput qw( capture );
+use Capture::Tiny qw( capture_stdout );
 use Tie::File;
 
 use Test::More;
@@ -111,12 +111,7 @@ like($@, qr/Value of 'list' must be non-empty/,
     ok( $self->identify_distros_from_derived_list({ list => \@list, }),
         "identify_distros_from_derived_list() returned true value" );
 
-    my ($stdout, $stderr);
-    capture(
-        sub { $self->say_list(); },
-        \$stdout,
-        \$stderr,
-    );
+    my $stdout = capture_stdout { $self->say_list(); };
     my $seen = 0;
     foreach my $el (@list) {
         $seen++ if $stdout =~ m/$el/;
@@ -232,15 +227,10 @@ like($@, qr/'pattern' is a regex, which means it must be a REGEXP ref/,
         "'identify_distros() returned true value"
     );
 
-    my ($stdout, $stderr);
-    capture(
-        sub { $self->say_list(); },
-        \$stdout,
-        \$stderr,
-    );
+    my $stdout = capture_stdout { $self->say_list(); };
     my @expected = qw(
-        ExtUtils-ModuleMaker-PBP
         ExtUtils-ModuleMaker
+        File-Copy-Recursive-Reduced
         List-Compare
     );
     my $seen = 0;
@@ -260,14 +250,8 @@ like($@, qr/'pattern' is a regex, which means it must be a REGEXP ref/,
     );
     ok( $self->identify_distros( \%distro_args ),
         "'identify_distros() returned true value" );
-    my ($stdout, $stderr);
-    capture(
-        sub { $self->say_list(); },
-        \$stdout,
-        \$stderr,
-    );
+    my $stdout = capture_stdout { $self->say_list(); };
     my @expected = qw(
-        ExtUtils-ModuleMaker-PBP
         ExtUtils-ModuleMaker
     );
     my $seen = 0;

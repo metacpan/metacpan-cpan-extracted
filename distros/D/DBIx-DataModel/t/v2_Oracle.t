@@ -11,8 +11,8 @@ SKIP: {
   eval "use DBD::Oracle; 1"
     or plan skip_all => "DBD::Oracle is not installed";
 
-  $ENV{DBI_DSN}
-    or plan skip_all => "ENV{DBI_DSN} is not defined";
+  $ENV{DBI_DSN} && $ENV{DBI_USER} && $ENV{DBI_PASS}
+    or plan skip_all => "need environment variables DBI_DSN, DBI_USER and DBI_PASS to run Oracle tests";
 
   # declare datamodel
   eval "use DBIx::DataModel::Statement::Oracle; 1";

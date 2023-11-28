@@ -1,9 +1,11 @@
+.editorconfig
 Build.PL
 Changes
 contrib/slurm.c
 contrib/slurm.h
 doc/protocol.md
 examples/slurm-recv.pl
+lib/Device/Serial/MSLuRM.pm
 lib/Device/Serial/SLuRM.pm
 LICENSE
 MANIFEST			This list of files
@@ -13,7 +15,10 @@ README
 t/00use.t
 t/01packet.t
 t/02recv-errors.t
+t/03multi-packet.t
 t/10reset.t
 t/11notify.t
 t/13request.t
+t/21multi-notify.t
+t/23multi-request.t
 t/99pod.t

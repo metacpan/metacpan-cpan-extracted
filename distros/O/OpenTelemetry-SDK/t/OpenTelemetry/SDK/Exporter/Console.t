@@ -65,10 +65,10 @@ is $exporter->export([]), TRACE_EXPORT_SUCCESS, 'Timeout is optional';
 
 is $out, '', 'Nothing exported if no spans are given';
 
-is $exporter->force_flush( 100 ), TRACE_EXPORT_SUCCESS, 'Can force flush';
-is $exporter->force_flush, TRACE_EXPORT_SUCCESS, 'Force flushing is optional';
+is $exporter->force_flush( 100 )->get, TRACE_EXPORT_SUCCESS, 'Can force flush';
+is $exporter->force_flush->get, TRACE_EXPORT_SUCCESS, 'Force flushing is optional';
 
-is $exporter->shutdown( 100 ), TRACE_EXPORT_SUCCESS, 'Can shutdown exporter';
+is $exporter->shutdown( 100 )->get, TRACE_EXPORT_SUCCESS, 'Can shutdown exporter';
 
 $out = '';
 is $exporter->export([$span]), TRACE_EXPORT_FAILURE,

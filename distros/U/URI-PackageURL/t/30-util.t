@@ -16,14 +16,21 @@ my @tests = (
 
     {
         purl         => 'pkg:github/package-url/purl-spec@40d01e26f9ae0af6b50a1309e6b089c14d6d2244',
-        download_url => 'https://github.com/package-url/purl-spec/archive/40d01e26f9ae0af6b50a1309e6b089c14d6d2244.zip',
+        download_url =>
+            'https://github.com/package-url/purl-spec/archive/40d01e26f9ae0af6b50a1309e6b089c14d6d2244.tar.gz',
         repository_url => 'https://github.com/package-url/purl-spec'
     },
 
     {
         purl           => 'pkg:gitlab/gitlab-org/gitlab-runner@16.0.2?version_prefix=v',
-        download_url   => 'https://gitlab.com/gitlab-org/gitlab-runner/-/archive/v16.0.2/gitlab-runner-v16.0.2.zip',
+        download_url   => 'https://gitlab.com/gitlab-org/gitlab-runner/-/archive/v16.0.2/gitlab-runner-v16.0.2.tar.gz',
         repository_url => 'https://gitlab.com/gitlab-org/gitlab-runner'
+    },
+
+    {
+        purl           => 'pkg:bitbucket/birkenfeld/pygments-main@244fd47e07d1014f0aed9c',
+        download_url   => 'https://bitbucket.org/birkenfeld/pygments-main/get/244fd47e07d1014f0aed9c.tar.gz',
+        repository_url => 'https://bitbucket.org/birkenfeld/pygments-main'
     },
 
     {
@@ -59,6 +66,13 @@ my @tests = (
     {purl => 'pkg:pypi/django@1.11.1', repository_url => 'https://pypi.org/project/django/1.11.1'},
 
     {purl => 'pkg:composer/laravel/laravel@5.5.0', repository_url => 'https://packagist.org/packages/laravel/laravel'},
+
+    {purl => 'pkg:docker/cassandra@latest', repository_url => 'https://hub.docker.com/_/cassandra'},
+
+    {
+        purl           => 'pkg:docker/smartentry/debian@dc437cc87d10',
+        repository_url => 'https://hub.docker.com/r/smartentry/debian'
+    },
 
 );
 

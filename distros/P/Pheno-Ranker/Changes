@@ -2,6 +2,10 @@ Revision history for Perl distribution Pheno-Ranker
 
 0.03 2023-XX-XXT00:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
- - Testing deployment in CPAN
+ - Changed Align.pm to switch to full 2D-matrix computation for >5K rows 
+ - Got rid of trailing \t at the end of the rows in matrix.txt
+ - Minor changes in STDERR messages
+ - Added a TODO block to t/sim.t (t3) which fails in ~10% of CPAN systems tested
+ - Deleted Carton install instructions from README.md
 
-NOTE: All versions prior to 0.03 were used for testing deployment via CPAN.
+NOTE: All versions <= 0.02 were used for testing deployment via CPAN.

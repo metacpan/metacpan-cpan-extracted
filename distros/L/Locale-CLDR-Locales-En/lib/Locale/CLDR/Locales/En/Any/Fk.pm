@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Fk - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Fk;
 # This file auto generated from Data\common\main\en_FK.xml
-#	on Fri 13 Oct  9:13:18 am GMT
+#	on Sat  4 Nov  5:59:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

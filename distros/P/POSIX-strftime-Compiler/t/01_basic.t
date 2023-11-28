@@ -2,10 +2,12 @@ use strict;
 use warnings;
 
 BEGIN {
-    # Windows can't change timezone inside Perl script
     if (($ENV{TZ}||'') ne 'GMT') {
         $ENV{TZ} = 'GMT';
-        exec $^X (map { "-I\"$_\"" } @INC), $0;
+        # Windows can't change timezone inside Perl script
+        if ($^O eq 'MSWin32') {
+            exec { $^X } map "\"$_\"", $^X, (map "-I$_", @INC), $0, @ARGV;
+        }
     };
 }
 

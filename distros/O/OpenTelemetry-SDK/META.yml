@@ -32,70 +32,70 @@ no_index:
 provides:
   OpenTelemetry::SDK:
     file: lib/OpenTelemetry/SDK.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Exporter::Console:
     file: lib/OpenTelemetry/SDK/Exporter/Console.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::InstrumentationScope:
     file: lib/OpenTelemetry/SDK/InstrumentationScope.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Resource:
     file: lib/OpenTelemetry/SDK/Resource.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Sampler:
     file: lib/OpenTelemetry/SDK/Trace/Sampler.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Sampler::AlwaysOff:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOff.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Sampler::AlwaysOn:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/AlwaysOn.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Sampler::ParentBased:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/ParentBased.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Sampler::Result:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/Result.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Sampler::TraceIDRatioBased:
     file: lib/OpenTelemetry/SDK/Trace/Sampler/TraceIDRatioBased.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Span:
     file: lib/OpenTelemetry/SDK/Trace/Span.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Span::Processor::Batch:
     file: lib/OpenTelemetry/SDK/Trace/Span/Processor/Batch.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Span::Processor::Simple:
     file: lib/OpenTelemetry/SDK/Trace/Span/Processor/Simple.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Span::Readable:
     file: lib/OpenTelemetry/SDK/Trace/Span/Readable.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::SpanLimits:
     file: lib/OpenTelemetry/SDK/Trace/SpanLimits.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::Tracer:
     file: lib/OpenTelemetry/SDK/Trace/Tracer.pm
-    version: '0.011'
+    version: '0.020'
   OpenTelemetry::SDK::Trace::TracerProvider:
     file: lib/OpenTelemetry/SDK/Trace/TracerProvider.pm
-    version: '0.011'
+    version: '0.020'
+recommends:
+  OpenTelemetry::Exporter::OTLP: '0'
 requires:
   Feature::Compat::Try: '0'
-  Future: '0.26'
   Future::AsyncAwait: '0.38'
   IO::Async::Loop: '0'
   Metrics::Any: '0'
   Mutex: '0'
   Object::Pad: '0.74'
-  OpenTelemetry: '0'
-  String::CRC32: '0'
+  OpenTelemetry: '0.010'
   perl: v5.32.0
 resources:
-  bugtracker: https://gitlab.com/jjatria/perl-opentelemetry-sdk/issues
+  bugtracker: https://github.com/jjatria/perl-opentelemetry-sdk/issues
   repository: git://github.com/jjatria/perl-opentelemetry-sdk.git
-version: '0.011'
+version: '0.020'
 x_Dist_Zilla:
   perl:
     version: '5.038000'
@@ -200,7 +200,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.34.1
           repo_root: .
       name: '@Starter::Git/Git::Check'
       version: '2.048'
@@ -259,7 +259,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -272,11 +272,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.011'
+          tag: '0.020'
           tag_format: '%v'
           tag_message: ''
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -308,7 +308,7 @@ x_Dist_Zilla:
             - (?^:^)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.40.1
+          git_version: 2.34.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -382,7 +382,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.40.1
+          git_version: 2.34.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -438,6 +438,9 @@ x_Dist_Zilla:
     config:
       is_trial: 0
     version: '6.030'
+x_contributors:
+  - 'Ask Bjørn Hansen <ask@develooper.com>'
+  - 'Tom Molesworth <tom@audioboundary.com>'
 x_generated_by_perl: v5.38.0
 x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

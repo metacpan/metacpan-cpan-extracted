@@ -1,0 +1,56 @@
+{
+   "abstract" : "An Etcd driver for AnyEvent::KVStore",
+   "author" : [
+      "Chris Travers <chris.travers@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "AnyEvent-KVStore-Etcd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent::KVStore" : "0",
+            "JSON" : "0",
+            "Net::Etcd" : "0",
+            "Type::Tiny" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Capture::Tiny" : "0",
+            "Data::Dumper" : "0",
+            "MIME::Base64" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

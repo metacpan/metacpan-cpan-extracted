@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Bs - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Bs;
 # This file auto generated from Data\common\main\en_BS.xml
-#	on Fri 13 Oct  9:13:13 am GMT
+#	on Sat  4 Nov  5:59:46 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

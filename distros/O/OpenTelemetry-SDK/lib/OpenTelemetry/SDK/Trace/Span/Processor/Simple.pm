@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::Span::Processor::Simple;
 
-our $VERSION = '0.011';
+our $VERSION = '0.020';
 
 class OpenTelemetry::SDK::Trace::Span::Processor::Simple
     :does(OpenTelemetry::Trace::Span::Processor)
@@ -39,10 +39,10 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Simple
     }
 
     async method shutdown ( $timeout = undef ) {
-        $exporter->shutdown( $timeout );
+        await $exporter->shutdown( $timeout );
     }
 
     async method force_flush ( $timeout = undef ) {
-        $exporter->force_flush( $timeout );
+        await $exporter->force_flush( $timeout );
     }
 }

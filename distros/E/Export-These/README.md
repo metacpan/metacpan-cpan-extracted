@@ -1,10 +1,10 @@
 # NAME
 
-Export::These - Terse Symbol (Re)Exporting
+Export::These - Terse Module Configuration and Symbol (Re)Exporting
 
 # SYNOPSIS
 
-A fine package, exporting subroutines,
+Take a fine package, exporting subroutines,
 
 ```perl
 package My::ModA;
@@ -43,10 +43,36 @@ use My::ModB qw<:colors dog>
 # suburtines blue, green , more_colors and dog  imported
 ```
 
+Also can use to pass in configuration information to a module:
+
+```perl
+package My::ModB;
+
+use Export::These;
+
+sub _preexport {
+  
+  my @refs=grep ref, @_;
+  my @non_ref= grep !ref, @_;
+  
+  # Use @refs as configuration data
+  
+  @non_ref;
+}
+
+
+# Import the module, with configuration data
+use My::ModB {option1=>"hello"}, "symbol";
+
+...
+```
+
 # DESCRIPTION
 
-A module to make exporting symbols less verbose and facilitate reexporting of
-symbols from dependencies with minimal input from the module author.
+A module to make exporting symbols less verbose and more powerful. Facilitate
+reexporting and filtering of symbols from dependencies with minimal input from
+the module author. Also provide the ability to pass in 'config data' data to a
+module during import.
 
 By default listing a symbol for export, even in a group/tag, means it will be
 automatically marked as 'export\_ok', saving on duplication and managing two
@@ -57,13 +83,23 @@ routine from `Exporter`. It injects its own `import` subroutine into the each
 calling package. This injected subroutine adds the desired symbols to the
 target package  as you would expect.
 
-If the exporting package has a `_reexport` subroutine, it is called when being
-imported. This is the 'hook' location where its safe to call `->import` on
-any dependencies modules it might want to export. The symbols from these
-packages will automatically be installed into the target package with no extra
-configuration needed.
+If the exporting package has a `_preexport` subroutine, it is called as a
+filter 'hook' prior to normal 'importing' to allow module wide configuration or
+pre processing of requested import list. The return from this subroutine will
+be the arguments used at subsequent stages so remember to return an appropriate
+list.
 
-Finally warnings about symbols redefinition in the export process (i.e. exporting
+If the exporting package has a `_reexport` subroutine, it is called after
+normal importing. This is the 'hook' location where its safe to call
+`->import` on any dependencies modules it might want to export. The
+symbols from these packages will automatically be installed into the target
+package with no extra configuration needed.
+
+Any reference types specified in an import are ignored during the normal import
+process.  This allows custom module configuration to be passed during import
+and processed in the `_preexport` and `_reexport` hooks.
+
+Finally, warnings about symbols redefinition in the export process (i.e. exporting
 to two subroutines with the same name into the same namespace) are silenced to
 keep warning noise to a minimum. The last symbol definition will ultimately be
 the one used.
@@ -76,9 +112,34 @@ also needs to use the subroutines from the configuration module. The consumer
 of the server module has to also add the configuration module as a dependency.
 
 With this module the server can simply reexport the required configuration
-routines, injecting the dependency, in stead of hard coding it.
+routines, injecting the dependency, instead of the consumer hard coding it.
 
 # USAGE
+
+## Importing a module which uses this module
+
+Importing is achieved just like normal.
+
+```perl
+require My::Module;
+My::Moudle->import;
+
+use My::Moudle qw<:tag_name name2 ...>;
+```
+
+However, from **v0.2.0** importing of a module can also take a reference value
+as a key without error. This allows passing non names as configuration data for
+the module to use:
+
+```perl
+eg
+
+  use My::Module {prefork=>1, workers=>10}, "symname1", ":group1",['more', 'config'];
+```
+
+In this hypothetical example, the My::Module uses the hash and array ref as
+configuration internally, and the normal scalars as the symbols/tag groups to
+export
 
 ## Specifying Symbols to Export
 
@@ -116,7 +177,22 @@ eg
   # use Export::These qw<sym1>;
 ```
 
-If the item has another name, it is a tag name and the items in the following
+If the item name is "export\_pass", then the items in the following array ref
+symbols will be allowed to be requested for import even if the module does not
+export them directly.  Use an empty array ref to allow any names for
+reexporting:
+
+```perl
+eg 
+
+  # Allow sym1 to be reexported from sub modules
+  use Export::These export_pass=>[qw<sym1>];
+
+  # Allow any name to be reexported from submodules
+  use Export::These export_pass=>[];
+```
+
+If the item has any other name, it is a tag name and the items in the following
 array ref are added to the `%EXPORT_TAGS`  variable and to `@EXPORT_OK`
 
 ```perl

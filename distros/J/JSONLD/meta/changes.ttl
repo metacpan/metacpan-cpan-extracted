@@ -28,7 +28,18 @@ my:project
 	:bug-database			<https://github.com/kasei/perl-jsonld/issues> ;
 	doap:download-page		<https://metacpan.org/release/JSONLD/> ;
 	doap:download-mirror	<http://kasei.us/code/files/> ;
-	:release				my:v_0-001 , my:v_0-002 , my:v_0-003 , my:v_0-004 , my:v_0-005 ;
+	:release				my:v_0-001 , my:v_0-002 , my:v_0-003 , my:v_0-004 , my:v_0-005 , my:v_0-006 ;
+	.
+
+my:v_0-006
+	a					:Version ;
+	dc:issued			"2023-11-18"^^xsd:date ;
+	:revision			"0.006" ;
+	dcterms:replaces	my:v_0-005 ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Update ; rdfs:label "Fix utf-8 decoding of remote context data (#6)." ] 
+	]
 	.
 
 my:v_0-005

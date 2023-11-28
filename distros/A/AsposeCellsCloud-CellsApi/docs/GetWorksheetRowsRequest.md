@@ -8,10 +8,10 @@ use AsposeCellsCloud::Request::GetWorksheetRows;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**name** | **string** |  |
-**sheet_name** | **string** |  |
-**offset** | **int** |  |
-**count** | **int** |  |
+**name** | **string** | The workbook name. |
+**sheet_name** | **string** | The worksheet name. |
+**offset** | **int** | Original workbook folder. |
+**count** | **int** | Storage name. |
 **folder** | **string** |  |
 **storage_name** | **string** |  |  
 

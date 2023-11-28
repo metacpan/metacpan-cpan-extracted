@@ -2,7 +2,7 @@ package Kossy;
 
 use strict;
 use warnings;
-use 5.008004;
+use 5.014004;
 use utf8;
 use Carp qw//;
 use Cwd qw//;
@@ -13,7 +13,7 @@ use JSON qw//;
 use Scalar::Util qw//;
 use Try::Tiny;
 use Encode;
-use Router::Boom;
+use Router::Boom::Method;
 use Class::Accessor::Lite (
     new => 0,
     rw => [qw/root_dir/]
@@ -25,7 +25,7 @@ use Kossy::Request;
 use Kossy::Response;
 use HTTP::Headers::Fast;
 
-our $VERSION = '0.60';
+our $VERSION = '0.63';
 our @EXPORT = qw/new root_dir psgi build_app _router _connect get post router filter _wrap_filter/;
 
 our $XSLATE_CACHE = 1;
@@ -74,9 +74,6 @@ sub psgi {
 sub build_app {
     my $self = shift;
 
-    #router
-    my $router = Router::Boom->new;
-    $router->add($_ => $self->_router->{$_} ) for keys %{$self->_router};
     my $security_header_local = $SECURITY_HEADER;
     my %match_cache;
 
@@ -110,24 +107,24 @@ sub build_app {
                     return @{$match_cache{$cache_key}};
                 }
                 my $path_info = Encode::decode_utf8( $env->{PATH_INFO},  Encode::FB_CROAK | Encode::LEAVE_SRC );
-                my @match = $router->match($path_info);
-                if ( !@match ) {
-                    $c->halt(404);
-                }
-                
-                if ( !exists $match[0]->{$method}) {
+                my ($dest, $captured, $method_not_allowed) = $self->_router->match($method, $path_info);
+                if ($method_not_allowed) {
                     $c->halt(405);
                 }
-                $match_cache{$cache_key} = [$match[0]->{$method},$match[1]]
-                    if ! scalar keys %{$match[1]};
-                return ($match[0]->{$method},$match[1]);
+
+                if (!$dest) {
+                    $c->halt(404);
+                }
+
+                $match_cache{$cache_key} = [$dest, $captured];
+                return ($dest, $captured);
             } catch {
                 if ( ref $_ && ref $_ eq 'Kossy::Exception' ) {
                     die $_; #rethrow
                 }
                 $c->halt(400,'unexpected character in request');
             };
-            
+
             my $code = $match->{__action__};
             my $filters = $match->{__filter__} || [];
             if ( $] == 5.020000 || $] == 5.020100 ) {
@@ -161,7 +158,7 @@ sub build_app {
                 }
                 $response;
             };
-            
+
             for my $filter ( reverse @$filters ) {
                 $app = $self->_wrap_filter($filter,$app);
             }
@@ -223,7 +220,7 @@ sub _router {
     my $klass = shift;
     my $class = ref $klass ? ref $klass : $klass;
     if ( !$_ROUTER->{$class} ) {
-        $_ROUTER->{$class} = {};
+        $_ROUTER->{$class} = Router::Boom::Method->new;
     }
     $_ROUTER->{$class};
 }
@@ -236,12 +233,13 @@ sub _connect {
         $code = $filter;
         $filter = [];
     }
-    for my $method ( @$methods ) {
-        $class->_router->{$pattern}->{$method} = {
-            __action__ => $code,
-            __filter__ => $filter
-        };
+    unless ( (ref $code ||'') eq 'CODE') {
+        Carp::croak "\$code argument must be a CODE reference";
     }
+    $class->_router->add($methods, $pattern, {
+        __action__ => $code,
+        __filter__ => $filter
+    });
 }
 
 sub get {
@@ -264,7 +262,7 @@ sub filter {
     my $class = caller;
     if ( !$_FILTER->{$class} ) {
         $_FILTER->{$class} = {};
-    }    
+    }
     if ( @_ ) {
         $_FILTER->{$class}->{$_[0]} = $_[1];
     }
@@ -273,13 +271,13 @@ sub filter {
 
 sub _wrap_filter {
     my $klass = shift;
-    my $class = ref $klass ? ref $klass : $klass; 
+    my $class = ref $klass ? ref $klass : $klass;
     if ( !$_FILTER->{$class} ) {
         $_FILTER->{$class} = {};
     }
     my ($filter,$app) = @_;
     my $filter_subref = $_FILTER->{$class}->{$filter};
-    Carp::croak sprintf("Filter:%s is not exists", $filter) unless $filter_subref;    
+    Carp::croak sprintf("Filter:%s is not exists", $filter) unless $filter_subref;
     return $filter_subref->($app);
 }
 
@@ -296,16 +294,16 @@ Kossy - Sinatra-ish Simple and Clear web application framework
   % kossy-setup MyApp
   % cd MyApp
   % plackup app.psgi
-  
+
   ## lib/MyApp/Web.pm
-  
+
   use Kossy;
-  
+
   get '/' => sub {
       my ( $self, $c )  = @_;
       $c->render('index.tx', { greeting => "Hello!" });
   };
-  
+
   get '/json' => sub {
       my ( $self, $c )  = @_;
       my $result = $c->req->validator([
@@ -318,9 +316,9 @@ Kossy - Sinatra-ish Simple and Clear web application framework
       ]);
       $c->render_json({ greeting => $result->valid->get('q') });
   };
-  
+
   1;
-  
+
   ## views/index.tx
   : cascade base
   : around content -> {
@@ -386,7 +384,7 @@ setup router and dispatch code
       my ( $self:Kossy, $c:Kossy::Connection )  = @_;
       $c->render('index.tx', { greeting => "Hello!" });
   };
-  
+
   get '/json' => sub {
       my ( $self:Kossy, $c:Kossy::Connection )  = @_;
       $c->render_json({ greeting => "Hello!" });
@@ -421,7 +419,13 @@ per-request object, herds request and response
 
 =item args:HashRef
 
-Router::Simple->match result
+path parameters captured by Router::Boom
+
+    get '/user/:id' => sub {
+        my ($self, $c) = @_;
+        my $id = $c->args->{id};
+        ...
+    };
 
 =item halt(status_code, message)
 
@@ -484,7 +488,7 @@ This class is child class of Plack::Request, decode query/body parameters automa
 
 build absolute URI with path and $args
 
-  my $uri = $c->req->uri_for('/login',[ arg => 'Hello']);  
+  my $uri = $c->req->uri_for('/login',[ arg => 'Hello']);
 
 =item validator($rule):Kossy::Validator::Result
 
@@ -513,6 +517,35 @@ validate parameters using L<Kossy::Validator>
 
 These methods are the accessor to raw values. 'raw' means the value is not decoded.
 
+=item body_parameters
+
+Accessor to decoded body parameters. It's Hash::MultiValue object.
+
+=item query_parameters
+
+Accessor to decoded query parameters. It's Hash::MultiValue object.
+
+=item json_parameters
+
+Accessor to decoded JSON body parameters. It's B<NOT> Hash::MultiValue object.
+
+    post '/api' => sub {
+        my ($self, $c) = @_;
+        my $foo = $c->req->json_parameters->{foo}; # bar
+    };
+
+    # requrest
+    # $ua->requrest(
+    #     HTTP::Request->new(
+    #         "POST",
+    #         "http://example.com/api",
+    #         [ "Content-Type" => 'application/json', "Content-Length" => 13 ],
+    #         '{"foo":"bar"}'
+    #     )
+    # );
+
+NOTE: Not need to set C<kossy.request.parse_json_body> to 1
+
 =back
 
 =head1 Kossy::Response
@@ -525,7 +558,7 @@ This class is child class of Plack::Response
 
 =item X-Frame-Options
 
-By default, Kossy outputs "X-Frame-Options: DENY". You can change this header 
+By default, Kossy outputs "X-Frame-Options: DENY". You can change this header
 
   get '/iframe' => sub {
       my ($self, $c) = @_;

@@ -72,7 +72,7 @@ environment variable, which in turn defaults to 2048.
 If an attempt is made to queue a span when the queue is full, the older
 spans will be removed from the queue until there is enough space for the
 newer spans. The number of dropped spans will be reported to the
-C<otel.bsp.dropped_spans> metric with the C<buffer-full> reason. See
+C<otel.bsp.spans.dropped> metric with the C<buffer-full> reason. See
 L</METRICS> for more details on this and other reported metrics.
 
 =item C<schedule delay>
@@ -109,7 +109,7 @@ Empties the internal queue by sending any unexported spans to the exporter.
 
 Takes an optional timeout in seconds. If this has been set, any spans
 remaining after the time has run out will be dropped and the number of dropped
-spans will be reported to the C<otel.bsp.dropped_spans> metric with the
+spans will be reported to the C<otel.bsp.spans.dropped> metric with the
 C<force-flush> reason. See L</METRICS> for more details on this and other
 reported metrics.
 
@@ -130,19 +130,23 @@ to L</on_end> and L</on_start> will immediately return and do nothing.
 
 =head1 METRICS
 
-This exporter generates a number of metrics to keep track of its regular
+This processor generates a number of metrics to keep track of its regular
 operation. At the time of writing, these metrics are non-standard, but their
 inclusion in the standard
 L<is being discussed|https://github.com/open-telemetry/semantic-conventions/issues/83>.
 
 =over
 
-=item C<otel.bsp.buffer_utilization>
+=item C<otel.bsp.buffer.utilization>
 
 Set to the size of the internal queue divided by the L</max_queue_size>
 immediately before a batch is picked up for processing.
 
-=item C<otel.bsp.dropped_spans>
+=item C<otel.bsp.failure>
+
+Incremented every time the span processing failed irrecoverably.
+
+=item C<otel.bsp.spans.dropped>
 
 The number of spans that have been dropped and not successfully exported. This
 could be because they were never set to the exporter, of because the exporter
@@ -177,18 +181,13 @@ The processor was shutdown and some spans remained in its internal queue.
 
 =back
 
-=item C<otel.bsp.export.failure>
+=item C<otel.bsp.spans.processed>
 
-Incremented every time an error is reported by the exporter, or the export
-operation times out.
+The number of spans successfully processed.
 
-=item C<otel.bsp.export.success>
+=item C<otel.bsp.success>
 
-Incremented every time a successful export operation takes place.
-
-=item C<otel.bsp.exported_spans>
-
-The number of spans successfully exported.
+Incremented every time the span processing completed successfully.
 
 =back
 

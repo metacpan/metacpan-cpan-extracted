@@ -1,22 +1,35 @@
 package Hadoop::Inline::ClassLoader;
 
-use 5.010;
+use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002'; # VERSION
 
-use Carp           qw( croak      );
-use File::Basename qw( dirname    );
+use Carp           qw( croak   );
+use File::Basename qw( dirname );
 use Ref::Util      qw(
     is_arrayref
     is_hashref
 );
 
-use Constant::FromGlobal DEBUG => { int => 1, default => 0, env => 1 };
+use Constant::FromGlobal
+    DEBUG => {
+        default => 0,
+        env     => 1,
+        int     => 1,
+    },
+;
+
 use constant {
-    HADOOP_COMMAND => '/usr/bin/hadoop',
-    IJ_DEBUG       => DEBUG && DEBUG > 1,
+    CHAR_COLON        => q{:},
+    EMPTY_STRING      => q{ },
+    HADOOP_COMMAND    => '/usr/bin/hadoop',
+    IJ_DEBUG          => DEBUG && DEBUG > 1,
+    PACKAGE_DELIMITER => q{::},
+    RE_MULTI_LF       => qr{ \n+ }xms,
+    RE_PATH_SEP_CHAR  => qr{ [:] }xms,
+    RE_WS             => qr{ \s+ }xms,
 };
 
 my $ENV_INITIALIZED;
@@ -26,9 +39,10 @@ my %DEFAULT = (
 );
 
 sub import {
-    my $class        = shift;
-    my $opt          = @_ && is_hashref $_[0] ? shift(@_) : { %DEFAULT };
-    my @java_classes = @_ or croak "No java classes were defined";
+    my($class, @args) = @_;
+
+    my $opt          = @args && is_hashref $args[0] ? shift(@args) : { %DEFAULT };
+    my @java_classes = @args or croak 'No java classes were defined';
     my $caller       = $opt->{export_to} || caller 1;
 
     if ( ! $ENV_INITIALIZED ) {
@@ -56,7 +70,7 @@ sub import {
         1;
     } or do {
         my $eval_error = $@ || 'Zombie error';
-        croak sprintf "Unable to inject Inline::Java into the caller(%s): %s",
+        croak sprintf 'Unable to inject Inline::Java into the caller(%s): %s',
                         $caller,
                         $eval_error,
         ;
@@ -88,19 +102,19 @@ sub _collect_env {
     my $cmd = $opt->{hadoop_command} || HADOOP_COMMAND;
 
     if ( ! -e $cmd || ! -x _ ) {
-        croak sprintf "This module requires `%s` to be present as an executable",
+        croak sprintf 'This module requires `%s` to be present as an executable',
                         $cmd,
         ;
     }
 
     my $q = _capture( $cmd => 'classpath' );
 
-    my @paths = split m{[:]}xms, $q;
+    my @paths = split RE_PATH_SEP_CHAR, $q;
 
     push @paths, @{ $opt->{extra_classpath} } if is_arrayref $opt->{extra_classpath};
 
     if ( DEBUG ) {
-        print STDERR "CLASSPATH(before expansion):\n";
+        print STDERR 'CLASSPATH(before expansion):\n';
         print STDERR "\t$_\n" for @paths;
     }
 
@@ -114,17 +128,18 @@ sub _collect_env {
     @paths = map { glob $_ } @paths;
 
     if ( DEBUG ) {
-        print STDERR "CLASSPATH(after expansion):\n";
+        print STDERR 'CLASSPATH(after expansion):\n';
         print STDERR "\t$_\n" for @paths;
     }
 
+    state $re_path_sep = RE_PATH_SEP_CHAR;
     my %n = do {
         my $native = _capture( $cmd => 'checknative' );
-        my @n = split m{\n+}xms, $native;
+        my @n = split RE_MULTI_LF, $native;
         shift @n;
         map {
-            my @k = split m{\s+}xms, $_, 3;
-            $k[0] =~ s{ [:] \z }{}xms;
+            my @k = split RE_WS, $_, 3; ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+            $k[0] =~ s{ $re_path_sep \z }{}xms;
             $k[0] => {
                 status => $k[1],
                 value  => $k[2],
@@ -132,15 +147,15 @@ sub _collect_env {
         } @n;
     };
 
-    my $hadoop = $n{hadoop} || croak "Failed to collect the hadoop native binary path";
+    my $hadoop = $n{hadoop} || croak 'Failed to collect the hadoop native binary path';
     my $native = dirname $hadoop->{value};
     my $hopts = '-Djava.library.path=' . dirname $native;
 
     my %henv;
-    $henv{CLASSPATH}                    = join ':', @paths;
+    $henv{CLASSPATH}                    = join CHAR_COLON, @paths;
     $henv{HADOOP_COMMON_LIB_NATIVE_DIR} = $native;
     $henv{HADOOP_OPTS}                  = $ENV{HADOOP_OPTS}
-                                        ? $ENV{HADOOP_OPTS} . ' ' . $hopts
+                                        ? $ENV{HADOOP_OPTS} . EMPTY_STRING . $hopts
                                         : $hopts
                                         ;
 
@@ -152,7 +167,7 @@ sub _collect_env {
         JAVA_LIBRARY_PATH
         LD_LIBRARY_PATH
     /) {
-        $henv{ $path } = $ENV{ $path } ? $ENV{ $path } . ':' . $native : $native;
+        $henv{ $path } = $ENV{ $path } ? $ENV{ $path } . CHAR_COLON . $native : $native;
     }
 
     return \%henv, \@paths;
@@ -162,42 +177,56 @@ sub _map_java_imports_to_short_names {
     my $class = shift;
     # Give somewhat meaningful names to the imported Java classes
 
+    state $package_delimiter = PACKAGE_DELIMITER;
+
     my $base_ns = 'org::apache::hadoop::';
     my $filter  = do {
-        my @rv = split m{ [:]{2} }xms, $base_ns;
+        my @rv = split m{ $package_delimiter }xms, $base_ns;
         pop @rv;
-        join '::', @rv;
+        join PACKAGE_DELIMITER, @rv;
     };
 
     my @ns = $class->_namespace_probe( $base_ns );
     shift @ns;
 
-    @ns = grep { m{ [:]{2} \z }xms } @ns;
+    @ns = grep { m{ $package_delimiter \z }xms } @ns;
 
     no strict qw( refs );
     foreach my $class ( @ns ) {
-        (my $short_name = $class) =~ s{ \Q$filter\E:: }{}xms;
-        $short_name = join '::',
-                            map { ucfirst $_ } split m{ [:]{2} }xms,
+        (my $short_name = $class) =~ s{
+            \Q$filter\E
+            $package_delimiter
+        }{}xms;
+        $short_name = join  PACKAGE_DELIMITER,
+                            map { ucfirst $_ } split m{ $package_delimiter }xms,
                             $short_name
         ;
         # import() was called multiple times?
-        next if %{ $short_name . '::' };
+        next if %{ $short_name . PACKAGE_DELIMITER };
 
-        printf STDERR "Mapping %s => %s", $short_name, $class if DEBUG;
+        printf STDERR 'Mapping %s => %s', $short_name, $class if DEBUG;
 
-        *{ $short_name . '::' } = \*{ $class };
+        *{ $short_name . PACKAGE_DELIMITER } = \*{ $class };
     }
+
+    return;
 }
 
 sub _namespace_probe {
     my $class = shift;
     my $sym   = shift;
+
     my @names;
     no strict qw( refs );
-    foreach my $type ( grep { m{ \A [a-z] }xmsi } keys %{ $sym } ) {
+    foreach my $type (
+        grep {
+            m{ \A [a-z] }xmsi
+        }
+        keys %{ $sym }
+    ) {
         push @names, $class->_namespace_probe( $sym . $type );
     }
+
     return $sym, @names;
 }
 
@@ -215,7 +244,7 @@ Hadoop::Inline::ClassLoader
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -225,8 +254,8 @@ version 0.001
 =head1 DESCRIPTION
 
 Hadoop Java class loader through Inline::Java. This module tries to setup the
-environment needed for tha Hadoop classes and also has aut-study feature and
-shart name aliasing for Perl packages name mappings.
+environment needed for the Hadoop classes and also has auto-study feature and
+short name aliasing for Perl packages' name mappings.
 
 =head1 NAME
 
@@ -236,35 +265,43 @@ Hadoop::Inline::ClassLoader - Hadoop Java class loader through Inline::Java
 
 =head2 Options
 
-You can specify a hashref with the optional options to override some functionality.
-
-Setting options hash yourself will disable most defaults, so if you set one of
-them, then you may need to specify the rest if you need those to be present.
+You can specify a hashref with the optional options to override some
+functionality. When setting this options hash yourself, you will be
+disabling most defaults. So, if you set one of them, then you may
+need to specify the rest, if you need those to be present.
 
 =head3 alias
 
-Boolean. Enable or disable short name aliasing. Enabled by default.
+Boolean. Enable or disable short name aliasing. This will create short
+names for the undelying Java class name mappings.
+
+Enabled by default.
 
 =head3 export_to
 
-By default the environment and definitions will be in the caller namespace
-which can be altered by this option. Normally you won't need this but can
-be useful if you'd like to wrap this module.
+By default, the environment and definitions will be in the caller namespace
+which can be altered by this option. Normally, you won't need this, but it
+can be useful if you'd like to wrap this module.
 
 =head3 extra_classpath
 
-Hadoop configuration might be missing some classpaths and it you need
-to include them them this option can be used. It need to be an arrayref.
+Hadoop configuration might be missing some of the classpaths and if you need
+to include them, then this option can be used.
+
+It needs to be an arrayref.
 
 =head3 hadoop_command
 
-The full path to the hadoop commandline which will be used to probe the
-hadoop classpaths and other options to be used by this module.
+The full path to the hadoop command line executable, which will be used
+to probe the Hadoop Class Paths and other options to be utilized by this
+module.
+
+The default value is C</usr/bin/hadoop>.
 
 =head2 Java Classes
 
 You need to define a list of java classes to be loaded by this module.
-they will be auto-studied and made available to your program.
+they will be auto-studied and will be made available to your program.
 
 =head1 AUTHOR
 

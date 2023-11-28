@@ -333,29 +333,33 @@ EOF
     } else {
 	######################################################################
 	# Debian-like (Debian, Ubuntu, LinuxMint ...)
-	my @packages = (
-	    'libipc-run-perl',
-	    ($distro_spec eq 'ubuntu:precise' ? () : 'libnet-openssh-perl'),
-	    'sudo',
-	    'rsync',
-	    'git',
-	);
-	my $packages_spec = join(" \\\n", map { "    $_" } @packages);
-	my $more_packages_spec = '';
-	if ($more_testing) {
-	    my @more_packages = (
-		'libbsd-resource-perl',
-		'libcapture-tiny-perl',
-		'libconfig-inifiles-perl',
-		'libcpan-meta-perl',
-		'libdevel-hide-perl',
-		'libwww-perl',
-		'perl-modules',
-		'locales',
-		'file',
-		($distro_spec eq 'ubuntu:precise' ? () : 'python3-pip'),
-	    );
-	    $more_packages_spec = join(" \\\n", map { "    $_" } @more_packages);
+	my $packages_spec;
+	{
+	    my @packages;
+	    {
+		push @packages, (
+		    'libipc-run-perl',
+		    ($distro_spec eq 'ubuntu:precise' ? () : 'libnet-openssh-perl'),
+		    'sudo',
+		    'rsync',
+		    'git',
+		);
+	    }
+	    if ($more_testing) {
+		push @packages, (
+		    'libbsd-resource-perl',
+		    'libcapture-tiny-perl',
+		    'libconfig-inifiles-perl',
+		    'libcpan-meta-perl',
+		    'libdevel-hide-perl',
+		    'libwww-perl',
+		    'perl-modules',
+		    'locales',
+		    'file',
+		    ($distro_spec eq 'ubuntu:precise' ? () : 'python3-pip'),
+		);
+	    }
+	    $packages_spec = join(" \\\n", map { "    $_" } @packages);
 	}
 
 	if ($distro_spec =~ m{^(ubuntu:precise)$}) {
@@ -368,8 +372,7 @@ EOF
 ENV DEBIAN_FRONTEND noninteractive 
 
 RUN apt-get$add_opts->{apt_get_update_opts} update && apt-get install -y --no-install-recommends$add_opts->{apt_get_install_opts} \\
-$packages_spec \\
-$more_packages_spec
+$packages_spec
 
 EOF
 	if ($more_testing) {
@@ -512,6 +515,7 @@ sub distdir {
     for my $line (split /\0/, $doit->info_qx({quiet=>1}, 'git', 'ls-files', '-z')) {
 	next if ($line =~ m{^(   \.travis\.yml
 			     |   \.?appveyor\.yml
+			     |   \.github/.*
 			     |   \.gitignore
 			     )$}x);
 	# XXX maybe implement also MANIFEST.SKIP?
@@ -684,8 +688,8 @@ sub install {
 		    $INST_ARCHLIB => "$opt{destdir}$Config{installarchlib}",
 		    $INST_BIN     => "$opt{destdir}$Config{installbin}",
 		    $INST_SCRIPT  => "$opt{destdir}$Config{installscript}",
-		    $INST_MAN1DIR => "$opt{destdir}$Config{installman1dir}",
-		    $INST_MAN3DIR => "$opt{destdir}$Config{installman3dir}",
+		    ($Config{installman1dir} ? ($INST_MAN1DIR => "$opt{destdir}$Config{installman1dir}") : ()),
+		    ($Config{installman3dir} ? ($INST_MAN3DIR => "$opt{destdir}$Config{installman3dir}") : ()),
 		)
 		:
 		($opt{installdirs}||'') eq 'vendor'
@@ -697,8 +701,8 @@ sub install {
 		    $INST_ARCHLIB => "$opt{destdir}$Config{installvendorarch}",
 		    $INST_BIN     => "$opt{destdir}$Config{installvendorbin}",
 		    $INST_SCRIPT  => "$opt{destdir}$Config{installvendorscript}",
-		    $INST_MAN1DIR => "$opt{destdir}$Config{installvendorman1dir}",
-		    $INST_MAN3DIR => "$opt{destdir}$Config{installvendorman3dir}",
+		    ($Config{installvendorman1dir} ? ($INST_MAN1DIR => "$opt{destdir}$Config{installvendorman1dir}") : ()),
+		    ($Config{installvendorman3dir} ? ($INST_MAN3DIR => "$opt{destdir}$Config{installvendorman3dir}") : ()),
 		)
 		: # default is site
 		(
@@ -708,8 +712,8 @@ sub install {
 		    $INST_ARCHLIB => "$opt{destdir}$Config{installsitearch}",
 		    $INST_BIN     => "$opt{destdir}$Config{installsitebin}",
 		    $INST_SCRIPT  => "$opt{destdir}$Config{installsitescript}",
-		    $INST_MAN1DIR => "$opt{destdir}$Config{installsiteman1dir}",
-		    $INST_MAN3DIR => "$opt{destdir}$Config{installsiteman3dir}",
+		    ($Config{installsiteman1dir} ? ($INST_MAN1DIR => "$opt{destdir}$Config{installsiteman1dir}") : ()),
+		    ($Config{installsiteman3dir} ? ($INST_MAN3DIR => "$opt{destdir}$Config{installsiteman3dir}") : ()),
 		)
 	    )
 	},
@@ -778,6 +782,7 @@ sub _generate_META ($;$) {
 	abstract => 'a scripting framework',
 	license  => 'perl',
 	version  => MM->parse_version("$FindBin::RealBin/lib/Doit.pm"),
+	dynamic_config => 0,
 	prereqs  => {
 	    configure => {
 		requires => {
@@ -1073,6 +1078,12 @@ EOF
 	$preamble .= $argv_serialized;
 	$doit->write_binary({quiet=>1}, 'Build', $preamble . qq{# line 1 "Build.PL"\n} . $Build_PL_file_contents);
 	$doit->chmod(0755, 'Build');
+
+	eval {
+	    generate_META_json("MYMETA.json");
+	    generate_META_yml("MYMETA.yml" );
+	};
+	warning "Failure while generating MYMETA.* files, continue without.\nError was:\n$@" if $@;
     }
     exit;
 }
@@ -1095,6 +1106,17 @@ sub _fix_Dockerfile_for_dist {
 	<<EOF;
 RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian $codename main'                   >  /etc/apt/sources.list
 RUN echo 'deb [check-valid-until=no] http://archive.debian.org/debian-security/ $codename/updates main' >> /etc/apt/sources.list
+EOF
+    } elsif ($distro_spec =~ m{^perl:(5\.18\.\d+|.*stretch)$}) { # XXX add more perl versions based on jessie/stretch/... containers
+	# docker perl images are based on debian base images; older
+	# ones need patching
+	$add_opts_ref->{apt_get_install_opts} = ' -o APT::Get::AllowUnauthenticated=true';
+	<<'EOF';
+RUN perl -i -pe \
+    's{deb http://(?:http.debian.net|deb.debian.org)/debian (\S+) main}{deb [check-valid-until=no] http://archive.debian.org/debian $1 main}; \
+     s{deb http://security.debian.org.* ([^/]+)/updates main}{deb [check-valid-until=no] http://archive.debian.org/debian-security/ $1/updates main}; \
+     $_ = "" if m{^deb .*-updates main}; \
+    ' /etc/apt/sources.list
 EOF
     } else {
 	$add_opts_ref->{apt_get_update_opts} = '';

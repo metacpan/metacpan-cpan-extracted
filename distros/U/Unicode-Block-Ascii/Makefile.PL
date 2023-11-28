@@ -23,16 +23,15 @@ requires 'Readonly' => 0;
 requires 'Text::UnicodeBox' => 0;
 requires 'Text::UnicodeBox::Control' => 0;
 requires 'Unicode::Block' => 0.02;
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Unicode-Block-Ascii';
-resources 'homepage' => 'https://github.com/tupinek/Unicode-Block-Ascii';
-resources 'repository' => 'git://github.com/tupinek/Unicode-Block-Ascii';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Unicode-Block-Ascii/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Unicode-Block-Ascii';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Unicode-Block-Ascii';
 test_requires 'English' => 0;
 test_requires 'File::Object' => 0.06;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.05';
 
 # Run.
 WriteAll();

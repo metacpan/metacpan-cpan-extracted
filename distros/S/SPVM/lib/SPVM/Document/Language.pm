@@ -1274,7 +1274,7 @@ The SPVM language is assumed to be parsed by yacc/bison.
 
 The definition of syntax parsing of SPVM language. This is written by yacc/bison syntax.
 
-  %token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
+  token <opval> CLASS HAS METHOD OUR ENUM MY USE AS REQUIRE ALIAS ALLOW CURRENT_CLASS MUTABLE
   %token <opval> ATTRIBUTE MAKE_READ_ONLY INTERFACE EVAL_ERROR_ID ARGS_WIDTH VERSION_DECL
   %token <opval> IF UNLESS ELSIF ELSE FOR WHILE LAST NEXT SWITCH CASE DEFAULT BREAK EVAL
   %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
@@ -1282,10 +1282,10 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %token <opval> FATCAMMA RW RO WO INIT NEW OF BASIC_TYPE_ID EXTENDS SUPER
   %token <opval> RETURN WEAKEN DIE WARN PRINT SAY CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
   %type <opval> grammar
-  %type <opval> opt_modules modules module module_block version_decl
+  %type <opval> opt_classes classes class class_block version_decl
   %type <opval> opt_definitions definitions definition
   %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
-  %type <opval> method anon_method opt_args args arg has use require alias our anon_method_has_list anon_method_has
+  %type <opval> method anon_method opt_args args arg use require alias our has has_for_anon_list has_for_anon
   %type <opval> opt_attributes attributes
   %type <opval> opt_statements statements statement if_statement else_statement
   %type <opval> for_statement while_statement foreach_statement
@@ -1299,7 +1299,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %type <opval> var_decl var interface union_type
   %type <opval> operator opt_operators operators opt_operator logical_operator void_return_operator
   %type <opval> field_name method_name alias_name is_read_only
-  %type <opval> type qualified_type basic_type array_type module_type
+  %type <opval> type qualified_type basic_type array_type class_type
   %type <opval> array_type_with_length ref_type  return_type type_comment opt_type_comment
   %right <opval> ASSIGN SPECIAL_ASSIGN
   %left <opval> LOGICAL_OR
@@ -1316,27 +1316,27 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %left <opval> ARROW
 
   grammar
-    : opt_modules
+    : opt_classes
 
-  opt_modules
+  opt_classes
     : /* Empty */
-    | modules
+    | classes
 
-  modules
-    : modules module
-    | module
+  classes
+    : classes class
+    | class
 
-  module
-    : CLASS module_type opt_extends module_block END_OF_FILE
-    | CLASS module_type opt_extends ':' opt_attributes module_block END_OF_FILE
-    | CLASS module_type opt_extends ';' END_OF_FILE
-    | CLASS module_type opt_extends ':' opt_attributes ';' END_OF_FILE
+  class
+    : CLASS class_type opt_extends class_block END_OF_FILE
+    | CLASS class_type opt_extends ':' opt_attributes class_block END_OF_FILE
+    | CLASS class_type opt_extends ';' END_OF_FILE
+    | CLASS class_type opt_extends ':' opt_attributes ';' END_OF_FILE
 
   opt_extends
     : /* Empty */
     | EXTENDS basic_type
 
-  module_block
+  class_block
     : '{' opt_definitions '}'
 
   opt_definitions
@@ -1414,7 +1414,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
 
   anon_method
     : opt_attributes METHOD ':' return_type '(' opt_args ')' block
-    | '[' anon_method_has_list ']' opt_attributes METHOD ':' return_type '(' opt_args ')' block
+    | '[' has_for_anon_list ']' opt_attributes METHOD ':' return_type '(' opt_args ')' block
 
   opt_args
     : /* Empty */
@@ -1429,14 +1429,15 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     : var ':' qualified_type opt_type_comment
     | var ':' qualified_type opt_type_comment ASSIGN operator
 
-  anon_method_has_list
-    : anon_method_has_list ',' anon_method_has
-    | anon_method_has_list ','
-    | anon_method_has
+  has_for_anon_list
+    : has_for_anon_list ',' has_for_anon
+    | has_for_anon_list ','
+    | has_for_anon
 
-  anon_method_has
-    : has ASSIGN operator
-    | has
+  has_for_anon
+    : HAS field_name ':' opt_attributes qualified_type opt_type_comment
+    | HAS field_name ':' opt_attributes qualified_type opt_type_comment ASSIGN operator
+    | var ':' opt_attributes qualified_type opt_type_comment
 
   opt_attributes
     : /* Empty */
@@ -1480,6 +1481,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | DIE
     | DIE type operator
     | DIE type
+    | DIE operator ',' operator
 
   void_return_operator
     : warn
@@ -1743,7 +1745,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | array_type
     | ref_type
 
-  module_type
+  class_type
     : basic_type
 
   basic_type
@@ -2750,6 +2752,8 @@ The following classes are loaded by default. These classes are deeply related to
 =item * L<Error::System|SPVM::Error::System>
 
 =item * L<Error::NotSupported|SPVM::Error::NotSupported>
+
+=item * L<Error::Compile|SPVM::Error::Compile>
 
 =item * L<CommandInfo|SPVM::CommandInfo>
 
@@ -6937,16 +6941,23 @@ The type of the OPERAND must be able to L<assign|/"Assignability"> to the return
 
 The C<die> statement throws an L<exception|/"Throwing Exception">.
 
-  die OPERAND;
-  die;
+  die OPERAND_MESSAGE
+  die
+  die ERROR_TYPE OPERAND_MESSAGE
+  die ERROR_TYPE
+  die OPERAND_ERROR_ID ',' OPERAND_MESSAGE
 
-The OPERAND is an error message. The error message is set to the L<exception variable|/"Exception Variable"> C<$@>.
+OPERAND_MESSAGE is an error message. The error message is set to the L<exception variable|/"Exception Variable"> C<$@>.
 
 If an exception is thrown, the program prints the error message to the standard error with the stack traces and finishes with error ID 255.
 
-The operand must be the L<string type|/"string Type"> or the L<undef type|/"undef Type">. Otherwise a compilation error occurs.
+If OPERAND_MESSAGE is omitted or L<undef|/"Undefined Value">, "Error" is set to the L<exception variable|/"Exception Variable"> C<$@>.
 
-If the OPERAND is omitted or the value of the OPERAND is L<undef|/"Undefined Value">, The OPERAND is set to the string C<"Error">.
+ERROR_TYPE is a class type. If ERROR_TYPE is given, the basic type id of the class is the value got by the L</"eval_error_id Operator">.
+
+OPERAND_ERROR_ID is an integer value within int type. If OPERAND_ERROR_ID is given, it is the value got by the L</"eval_error_id Operator">.
+
+the L<integer promotional conversion|/"Integer Promotional Conversion"> is performed on OPERAND_ERROR_ID.
 
 The return type is the L<void type|/"void Type">.
 
@@ -6957,6 +6968,14 @@ The following one is an example of a stack trace. Each line of the stack trace c
     TestCase->main at SPVM/TestCase.spvm line 1198
 
 The exception can be caught by the L<eval block|/"Exception Catching">.
+
+Comlication Errors:
+
+OPERAND_MESSAGE must be the L<string type|/"string Type"> or the L<undef type|/"undef Type">. Otherwise a compilation error occurs.
+
+ERROR_TYPE must be a class type. Otherwise a compilation error occurs.
+
+OPERAND_ERROR_ID must be an integer type within int. Otherwise a compilation error occurs.
 
 Examples:
   
@@ -6970,7 +6989,12 @@ Examples:
   if ($@) {
     # ...
   }
-
+  
+  die Error::System "System Error";
+  
+  my $error_id = 10;
+  die $error_id, "Some Error";
+  
 =head2 Operator Statement
 
 The operator statement is the L<statement|/"Statement"> to execute an L<operator|/"Operator">.
@@ -8292,6 +8316,8 @@ If the class variable does not found, a compilation error occurs.
 
 If the class variable is C<private> and it is accessed outside of the class, a compilation error occurs.
 
+If the class variable is used in an anon method and C<CLASS_NAME::> can be omitted, its current class means its outer class.
+
 Examples:
 
   class Foo {
@@ -8300,6 +8326,11 @@ Examples:
     static method bar : int () {
       my $var1 = $Foo::VAR;
       my $var2 = $VAR;
+      
+      my $cb = method : void () {
+        # $Foo::BAR
+        $VAR;
+      }
     }
   }
 
@@ -8327,6 +8358,8 @@ If the type of the assigned value is an L<object type|/"Object Type">, the refer
 
 If an object has already been assigned to $CLASS_VARIABLE_NAME before the assignment, the reference count of the object is decremented by 1.
 
+If the class variable is used in an anon method and C<CLASS_NAME::> can be omitted, its current class means its outer class.
+
 Examples:
 
   class Foo {
@@ -8335,6 +8368,10 @@ Examples:
     static method bar : int () {
       $Foo::VAR = 1;
       $VAR = 3;
+    }
+    my $cb = method : void () {
+      # $Foo::VAR
+      $VAR = 5;
     }
   }
 
@@ -8751,12 +8788,21 @@ The C<__PACKAGE__> operator gets the current class name.
 
   __PACKAGE__
 
+The return type is the string type.
+
+If the __PACKAGE__ operator is used in anon method, it returns its outer class.
+
 Examples:
 
   class Foo::Bar {
     static method baz : void () {
       # Foo::Bar
-      my $current_basic_type_name = __PACKAGE__;
+      my $current_class_name = __PACKAGE__;
+      
+      my $cb = method : void () {
+        # Foo::Bar
+        my $current_class_name = __PACKAGE__;
+      };
     }
   }
 
@@ -8857,19 +8903,33 @@ The anon method field definition is the syntax to define the field of the anon c
   # Anon method field definitions with field default values
   [has FIELD_NAME : TYPE1 = OPERAND1, has FIELD_NAME : TYPE2 = OPERAND2, ...] ANON_METHOD_DEFINITION
   
+  [VAR1 : TYPE1, VAR2 : TYPE2, ...] ANON_METHOD_DEFINITION
+  
 Examples:
 
   class Foo::Bar {
     method some_method : void () {
-      # Externally defined local variables
       my $foo = 1;
       my $bar = 5L;
       
-      # Capture
       my $comparator = (Comparator)[has foo : int = $foo, has bar : long = $bar] method : int ($x1 : object, $x2 : object) {
         my $foo = $self->{foo};
         my $bar = $self->{bar};
         
+        print "$foo\n";
+        print "$bar\n";
+      };
+    }
+  }
+
+Same as avobe but more simple:
+
+  class Foo::Bar {
+    method some_method : void () {
+      my $foo = 1;
+      my $bar = 5L;
+      
+      my $comparator = (Comparator)[$foo : int, $bar : long] method : int ($x1 : object, $x2 : object) {
         print "$foo\n";
         print "$bar\n";
       };
@@ -9101,14 +9161,38 @@ The method call calls a L<method|/"Method">.
 A method defined as the L<class method|/"Class Method"> can be called using the class method call.
 
   ClassName->MethodName(ARGS1, ARGS2, ...);
+  
+  &MethodName(ARGS1, ARGS2, ...);
 
 If the number of arguments does not correct, a compilation error occurs.
 
 If the types of arguments have no type compatible, a compilation error occurs.
 
-Examples:
+C<&> means the current class.
 
-  my $ret = Foo->bar(1, 2, 3);
+If C<&> is used in anon method, it means its outer class.
+
+Examples:
+  
+  class Foo {
+    
+    static method main : void () {
+      
+      my $ret = Foo->bar(1, 2, 3);
+      
+      # Same as Foo->bar
+      my $ret = &bar(1, 2, 3);
+      
+      my $cb = method : void () {
+        # Same as Foo->bar;
+        my $ret = &foo;
+      };
+    }
+    
+    static method foo : int () {
+      return 5;
+    }
+  }
 
 =head2 Instance Method Call
 

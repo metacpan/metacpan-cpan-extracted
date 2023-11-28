@@ -1,4 +1,4 @@
-Log-Dispatch-Email-Sendmail Version 0.03
+Log-Dispatch-Email-Sendmail Version 0.04
 
 INSTALLATION
 
@@ -25,15 +25,11 @@ You can also look for information at:
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Log-Dispatch-Email-Sendmail
 
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Log-Dispatch-Email-Sendmail
-
     Search CPAN
         http://search.cpan.org/dist/Log-Dispatch-Email-Sendmail/
 
-
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2013-2022 Nigel Horne
+Copyright (C) 2013-2023 Nigel Horne
 
 This program is released under the following licence: GPL2

@@ -1,3 +1,10 @@
+Travel::Status::DE::VRR 1.23 - Fri Nov 24 2023
+
+    * efa-m: Do not show free-text messages by default. Use the newly
+      introduced -Om option to show them
+    * efa-m: Show real-time departure rather than scheduled time + delay
+    * Result: Add train_type and train_name accessors
+
 Travel::Status::DE::VRR 1.22 - Sat Sep 02 2023
 
     * Do not use now-deprecated smartmatch features

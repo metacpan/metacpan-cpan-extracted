@@ -70,7 +70,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.212';
+our $VERSION = '1.213';
 
 use Quiq::Option;
 use Quiq::Math;
@@ -520,7 +520,7 @@ sub secondsToString {
 
 =head1 VERSION
 
-1.212
+1.213
 
 =head1 AUTHOR
 

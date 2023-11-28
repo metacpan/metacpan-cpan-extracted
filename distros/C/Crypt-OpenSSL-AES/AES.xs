@@ -61,61 +61,86 @@ char * get_option_svalue (pTHX_ HV * options, char * name) {
 
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
 #ifdef LIBRESSL_VERSION_NUMBER
-const EVP_CIPHER * get_cipher(pTHX_ HV * options) {
+const EVP_CIPHER * get_cipher(pTHX_ HV * options, STRLEN keysize) {
 #else
-EVP_CIPHER * get_cipher(pTHX_ HV * options) {
+EVP_CIPHER * get_cipher(pTHX_ HV * options, STRLEN keysize) {
 #endif
     char * name = get_option_svalue(aTHX_ options, "cipher");
 
-    if (name == NULL)
-        return (EVP_CIPHER * ) EVP_aes_256_ecb();
-    else if (strcmp(name, "AES-128-ECB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_128_ecb();
-    else if (strcmp(name, "AES-192-ECB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_192_ecb();
-    else if (strcmp(name, "AES-256-ECB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_256_ecb();
-    else if (strcmp(name, "AES-128-CBC") == 0)
-        return (EVP_CIPHER * ) EVP_aes_128_cbc();
-    else if (strcmp(name, "AES-192-CBC") == 0)
-        return (EVP_CIPHER * ) EVP_aes_192_cbc();
-    else if (strcmp(name, "AES-256-CBC") == 0)
-        return (EVP_CIPHER * ) EVP_aes_256_cbc();
-    else if (strcmp(name, "AES-128-CFB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_128_cfb();
-    else if (strcmp(name, "AES-192-CFB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_192_cfb();
-    else if (strcmp(name, "AES-256-CFB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_256_cfb();
+    if (keysize == 16) {
+        if (name == NULL)
+            return (EVP_CIPHER * ) EVP_aes_128_ecb();
+        else if (strcmp(name, "AES-128-ECB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_128_ecb();
+        else if (strcmp(name, "AES-128-CBC") == 0)
+            return (EVP_CIPHER * ) EVP_aes_128_cbc();
+        else if (strcmp(name, "AES-128-CFB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_128_cfb();
+        else if (strcmp(name, "AES-128-CTR") == 0)
 #if OPENSSL_VERSION_NUMBER >=  0x10001000L
-    else if (strcmp(name, "AES-128-CTR") == 0)
-        return (EVP_CIPHER * ) EVP_aes_128_ctr();
-    else if (strcmp(name, "AES-192-CTR") == 0)
-        return (EVP_CIPHER * ) EVP_aes_192_ctr();
-    else if (strcmp(name, "AES-256-CTR") == 0)
-        return (EVP_CIPHER * ) EVP_aes_256_ctr();
+            return (EVP_CIPHER * ) EVP_aes_128_ctr();
 #else
-    else if (
-        (strcmp(name, "AES-128-CTR") == 0) ||
-        (strcmp(name, "AES-192-CTR") == 0) ||
-        (strcmp(name, "AES-256-CTR") == 0))
+            croak ("CTR ciphers not supported on this version of OpenSSL");
+#endif
+        else if (strcmp(name, "AES-128-OFB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_128_ofb();
+        else
+            croak ("You specified an unsupported cipher for this keysize: 16");
+    } else if (keysize == 24) {
+        if (name == NULL)
+            return (EVP_CIPHER * ) EVP_aes_192_ecb();
+        else if (strcmp(name, "AES-192-ECB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_192_ecb();
+        else if (strcmp(name, "AES-192-CBC") == 0)
+            return (EVP_CIPHER * ) EVP_aes_192_cbc();
+        else if (strcmp(name, "AES-192-CFB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_192_cfb();
+        else if (strcmp(name, "AES-192-CTR") == 0)
+#if OPENSSL_VERSION_NUMBER >=  0x10001000L
+            return (EVP_CIPHER * ) EVP_aes_192_ctr();
+#else
+            croak ("CTR ciphers not supported on this version of OpenSSL");
+#endif
+        else if (strcmp(name, "AES-192-OFB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_192_ofb();
+        else
+            croak ("You specified an unsupported cipher for this keysize: 24");
+    } else if (keysize == 32) {
+        if (name == NULL)
+            return (EVP_CIPHER * ) EVP_aes_256_ecb();
+        else if (strcmp(name, "AES-256-ECB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_256_ecb();
+        else if (strcmp(name, "AES-256-CBC") == 0)
+            return (EVP_CIPHER * ) EVP_aes_256_cbc();
+        else if (strcmp(name, "AES-256-CFB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_256_cfb();
+        else if (strcmp(name, "AES-256-CTR") == 0)
+#if OPENSSL_VERSION_NUMBER >=  0x10001000L
+            return (EVP_CIPHER * ) EVP_aes_256_ctr();
+#else
         croak ("CTR ciphers not supported on this version of OpenSSL");
 #endif
-    else if (strcmp(name, "AES-128-OFB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_128_ofb();
-    else if (strcmp(name, "AES-192-OFB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_192_ofb();
-    else if (strcmp(name, "AES-256-OFB") == 0)
-        return (EVP_CIPHER * ) EVP_aes_256_ofb();
+        else if (strcmp(name, "AES-256-OFB") == 0)
+            return (EVP_CIPHER * ) EVP_aes_256_ofb();
+        else
+            croak ("You specified an unsupported cipher for this keysize: 32");
+    }
     else
-        croak ("You specified an unsupported cipher");
+        croak ("You specified an unsupported keysize (16, 24 or 32 bytes only)");
 }
 #endif
 
-char * get_cipher_name (pTHX_ HV * options) {
+char * get_cipher_name (pTHX_ HV * options, long long keysize) {
     char * value = get_option_svalue(aTHX_ options, "cipher");
     if (value == NULL)
-        return "AES-256-ECB";
+        if (keysize == 16)
+            return "AES-128-ECB";
+        else if (keysize == 24)
+            return "AES-192-ECB";
+        else if (keysize == 32)
+            return "AES-256-ECB";
+        else
+            croak ("get_cipher_name - Unsupported Key Size");
 
     return value;
 }
@@ -182,9 +207,9 @@ CODE:
         Newz(0, RETVAL, 1, struct state);
         RETVAL->padding = get_padding(aTHX_ options);
 #if OPENSSL_VERSION_NUMBER >= 0x00908000L
-        cipher = get_cipher(aTHX_ options);
+        cipher = get_cipher(aTHX_ options, keysize);
         iv = get_iv(aTHX_ options);
-        cipher_name = get_cipher_name(aTHX_ options);
+        cipher_name = get_cipher_name(aTHX_ options, keysize);
         if ((strcmp(cipher_name, "AES-128-ECB") == 0 ||
             strcmp(cipher_name, "AES-192-ECB") == 0 ||
             strcmp(cipher_name, "AES-256-ECB") == 0)

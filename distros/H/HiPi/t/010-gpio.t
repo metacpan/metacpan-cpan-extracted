@@ -1,6 +1,6 @@
 #!perl
 
-use Test::More tests => 34;
+use Test::More tests => 47;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 use Time::HiRes;
@@ -8,10 +8,7 @@ use Time::HiRes;
 my $sleepwait = 1000;
 
 SKIP: {
-      skip 'not in dist testing', 34 unless $ENV{HIPI_MODULES_DIST_TEST_GPIO};
-
-
-
+      skip 'not in dist testing', 47 unless $ENV{HIPI_MODULES_DIST_TEST_GPIO};
 
 diag('GPIO (/dev/gpiomem) tests are running');
 
@@ -146,6 +143,38 @@ sleep(4); # see the LED
 $pinout->mode( RPI_MODE_INPUT );
 is ( $pinout->get_function(), 'INPUT', 'pin function name' );
 
+SKIP: {
+        skip 'does not have RP1', 13 unless HiPi::RaspberryPi::has_rp1();
+        $gpio->set_pin_mode( RPI_PIN_36, RPI_MODE_INPUT );
+        Time::HiRes::usleep($sleepwait);
+        is( $gpio->get_pin_mode( RPI_PIN_36 ), RPI_MODE_INPUT, 'gpio mode input reset');
+        
+        is( $gpio->get_pin_slew( RPI_PIN_36 ), RPI_SLEW_SLOW, 'gpio slew starts slow');
+        $gpio->set_pin_slew( RPI_PIN_36, RPI_SLEW_FAST );
+        is( $gpio->get_pin_slew( RPI_PIN_36 ), RPI_SLEW_FAST, 'gpio slew set fast');
+        $gpio->set_pin_slew( RPI_PIN_36, RPI_SLEW_SLOW);
+        is( $gpio->get_pin_slew( RPI_PIN_36 ), RPI_SLEW_SLOW, 'gpio slew reset slow');
+        
+        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_OFF, 'gpio schmitt starts off');
+        $gpio->set_pin_schmitt( RPI_PIN_36, RPI_SCHMITT_ON );
+        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_ON, 'gpio schmitt set on');
+        $gpio->set_pin_schmitt( RPI_PIN_36, RPI_SCHMITT_OFF );
+        is( $gpio->get_pin_schmitt( RPI_PIN_36 ), RPI_SCHMITT_OFF, 'gpio schmitt reset off');
+        
+        is( $pin->slew(), RPI_SLEW_SLOW, 'pin slew starts low');
+        $pin->slew( RPI_SLEW_FAST );
+        is( $pin->slew(), RPI_SLEW_FAST, 'pin slew set fast');
+        $pin->slew( RPI_SLEW_SLOW );
+        is( $pin->slew(), RPI_SLEW_SLOW, 'pin slew reset low');
+        
+        is( $pin->schmitt(), RPI_SCHMITT_OFF, 'pin schmitt starts off');
+        $pin->schmitt( RPI_SCHMITT_ON );
+        is( $pin->schmitt(), RPI_SCHMITT_ON, 'pin schmitt set on');
+        $pin->schmitt( RPI_SCHMITT_OFF );
+        is( $pin->schmitt(), RPI_SCHMITT_OFF, 'pin schmitt reset off');
+        
+      
+} # END SKIP NOT RP1
 
 } # End SKIP
 

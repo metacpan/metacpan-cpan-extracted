@@ -72,6 +72,26 @@ sub _do_getpud {
     return HiPi::GPIO->get_pin_pud($self->pinid);
 }
 
+sub _do_setschmitt {
+    my( $self, $val ) = @_;
+    return HiPi::GPIO->set_pin_schmitt($self->pinid, $val);
+}
+
+sub _do_getschmitt {
+    my( $self ) = @_;
+    return HiPi::GPIO->get_pin_schmitt($self->pinid);
+}
+
+sub _do_setslew {
+    my( $self, $val ) = @_;
+    return HiPi::GPIO->set_pin_slew($self->pinid, $val);    
+}
+
+sub _do_getslew {
+    my( $self ) = @_;
+    return HiPi::GPIO->get_pin_slew($self->pinid);
+}
+
 sub _do_get_interrupt_filepath {
     my($self) = @_;
     return HiPi::GPIO->get_pin_interrupt_filepath( $self->pinid );

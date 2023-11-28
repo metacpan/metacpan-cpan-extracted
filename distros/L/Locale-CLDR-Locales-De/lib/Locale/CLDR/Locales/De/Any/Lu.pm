@@ -8,13 +8,13 @@ Locale::CLDR::Locales::De::Any::Lu - Package for language German
 
 package Locale::CLDR::Locales::De::Any::Lu;
 # This file auto generated from Data\common\main\de_LU.xml
-#	on Fri 13 Oct  9:11:54 am GMT
+#	on Sat  4 Nov  5:58:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

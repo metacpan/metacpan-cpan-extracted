@@ -483,12 +483,6 @@ Nheengatu Brazil locale.
    1995-12-22T09:05:02 = yuk, 22 yepé-mukũi
   -0010-09-15T04:44:23 = sau, 15 pú-irũdí
 
-=head3 MMMMW-count-one (W'ª' 'sẽmãna' MMMM)
-
-   2008-02-05T18:30:30 = 1ª sẽmãna mukũi
-   1995-12-22T09:05:02 = 3ª sẽmãna yepé-mukũi
-  -0010-09-15T04:44:23 = 2ª sẽmãna pú-irũdí
-
 =head3 MMMMW-count-other (W'ª' 'sẽmãna' MMMM)
 
    2008-02-05T18:30:30 = 1ª sẽmãna mukũi
@@ -638,12 +632,6 @@ Nheengatu Brazil locale.
    2008-02-05T18:30:30 = yepésáwa musapíri-yasí 2008
    1995-12-22T09:05:02 = irũdisawa musapíri-yasí 1995
   -0010-09-15T04:44:23 = musapírisawa musapíri-yasí -10
-
-=head3 yw-count-one (w'ª' 'sẽmãna' Y)
-
-   2008-02-05T18:30:30 = 6ª sẽmãna 2008
-   1995-12-22T09:05:02 = 51ª sẽmãna 1995
-  -0010-09-15T04:44:23 = 37ª sẽmãna -10
 
 =head3 yw-count-other (w'ª' 'sẽmãna' Y)
 

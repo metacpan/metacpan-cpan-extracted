@@ -1,0 +1,182 @@
+# PODNAME: Neo4j::Types::Point
+# ABSTRACT: Represents a Neo4j spatial point value
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Types::Point - Represents a Neo4j spatial point value
+
+=head1 VERSION
+
+version 2.00
+
+=head1 SYNOPSIS
+
+ $neo4j_srid  = $point->srid;
+ 
+ @coordinates = $point->coordinates;
+ ($x, $y, $z) = $point->coordinates;
+
+=head1 DESCRIPTION
+
+Represents a spatial point value in Neo4j. Includes coordinates in
+two or three dimensions and an SRID that may define their semantics.
+
+The SRID and thereby the coordinate semantics are defined by Neo4j.
+See L</"srid"> for details.
+
+The coordinate reference systems of spatial points in Neo4j are
+currently severely constrained. There is no way to tag points with
+the CRS they actually use, and for geographic coordinates (lat/lon),
+only a single, subtly non-standard CRS is even supported.
+This deviates from common OGC standards for geospatial databases.
+Prudence suggests to expect future changes in Neo4j. Such changes
+would likely necessitate breaking changes to this module.
+For uses that don't require the spatial functions that Neo4j offers,
+it might be best to eschew the point type completely and store
+coordinate tuples as a simple list in the Neo4j database instead.
+
+I<Supported in Neo4j S<version 3.4> and above.>
+
+=head1 METHODS
+
+L<Neo4j::Types::Point> specifies the following methods.
+Additionally, a C<new()> method is currently available
+as a backwards compatibility alias for C<new()> in
+L<Neo4j::Types::Generic/"Point">.
+
+=head2 coordinates
+
+ @coordinates = $point->coordinates;
+ ($x, $y, $z) = @coordinates;
+
+Retrieve the point's coordinates as a list.
+
+In scalar context, return the number of coordinates for this
+point (C<2> for points in two-dimensional coordinate systems,
+C<3> for three-dimensional systems).
+
+ $dimensions = scalar $point->coordinates;
+
+=head2 srid
+
+ $neo4j_srid = $point->srid;
+
+Retrieve an identifier for this point's spatial reference system.
+This SRID has no meaning outside the context of Neo4j; in particular,
+it is B<not an EPSG code.>
+
+=begin comment
+
+Neo4j actually does falsely claim EPSG or spatialreference.org conformance in at least one place. However:
+
+- EPSG:4326/EPSG:4979 treat the earth as a WGS84 ellipsoid, NEO4J:4326/NEO4J:4979 use spherical development of WGS84 ellipsoidal coordinates
+- EPSG:4326 uses the axis order latitude/longitude, NEO4J:4326 uses longitude/latitude
+- EPSG:4979 uses the axis order latitude/longitude/height, NEO4J:4326 uses longitude/latitude/height
+- SR-ORG:4326/SR-ORG:4979 are undefined, NEO4J:4326/NEO4J:4979 are not
+- EPSG:7203 is undefined, NEO4J:7203 is generic Euclidian plane
+- EPSG:9157 is Angola RSAO13 UTM 33, NEO4J:9157 is generic Euclidian 3D space
+- SR-ORG:7203/SR-ORG:9157 define units and axis orientation, NEO4J:7203/NEO4J:9157 do not
+
+=end comment
+
+To date, Neo4j has defined four SRIDs: 4326, 4979, 7203, and 9157.
+Every point retrieved from Neo4j is referred to a coordinate system
+identified by one of them.
+
+=over
+
+=item Neo4j SRID 4326
+
+Geographical ellipsoidal coordinates, referred to WGS84
+(but spherically developed with C<distance()> in Cypher).
+Axes: longitude (East), latitude (North). Units: decimal degrees.
+Neo4j moniker: C<wgs-84>.
+
+=item Neo4j SRID 4979
+
+Geographical ellipsoidal coordinates, referred to WGS84
+(but spherically developed with C<distance()> in Cypher).
+Axes: longitude (East), latitude (North), height (Up).
+Units: decimal degrees; height in metres. The height is
+referred to the ellipsoid (which is not at sea level).
+Neo4j moniker: C<wgs-84-3d>.
+
+=item Neo4j SRID 7203
+
+Coordinates in a two-dimensional Euclidian space (a plane).
+The geodetic datum, axis orientation and units are all undefined,
+but both axes must use the same unit.
+Neo4j moniker: C<cartesian>.
+
+=item Neo4j SRID 9157
+
+Coordinates in a three-dimensional Euclidian space. The geodetic
+datum, axis orientation and units are all undefined, but all axes
+must use the same unit.
+Neo4j moniker: C<cartesian-3d>.
+
+=back
+
+The primary semantics of a Neo4j SRID can be easily determined by
+simple boolean expressions.
+
+ $is_geographic = $neo4j_srid == 4326 or $neo4j_srid == 4979;
+ $is_euclidian  = $neo4j_srid == 7203 or $neo4j_srid == 9157;
+ $is_2d         = $neo4j_srid == 4326 or $neo4j_srid == 7203;
+ $is_3d         = $neo4j_srid == 4979 or $neo4j_srid == 9157;
+
+Note that Neo4j does not support geographic coordinates that are
+referred to any other geodetic datum than WGS84 (such as GCJ02,
+ETRS89, NAD27, or local datums), nor does it support geographic
+coordinates that are referred to an unknown datum. While it is
+technically possible to ignore Neo4j SRID semantics and just use
+other geographic coordinate reference systems anyway, you should
+be aware that this may create interoperability issues, particularly
+if more than a single client uses the Neo4j database.
+
+Neo4j does I<not> impose constraints on the datum of Euclidian
+coordinates, so using (for example) cartesian coordinates referred
+to WGS84 is possible. However, Neo4j does not offer a way to tag
+point values with the datum they actually use. Care should be taken
+not to mix different geodetic datums in the same database without
+considering the interoperability issues that this may cause, again
+particularly if more than a single client uses the Neo4j database.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Neo4j::Types>
+
+=item * L<Neo4j::Types::Generic/"Point">
+
+=item * L<Neo4j::Types::ImplementorNotes/"Point">
+
+=item * L<Neo4j::Bolt::Point>
+
+=item * L<Neo4j::Driver::Types>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

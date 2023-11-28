@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::filenames;
 
-our $DATE = '2023-10-29'; # DATE
-our $VERSION = '0.021'; # VERSION
+our $DATE = '2023-11-23'; # DATE
+our $VERSION = '0.025'; # VERSION
 
 our $rschema = do{my$var={base=>"array",clsets_after_base=>[{description=>"\nCoerces from string by expanding the glob pattern in the string.\n\n",of=>["filename",{req=>1}],summary=>"List of filesystem file names","x.element_completion"=>["filename"],"x.perl.coerce_rules"=>["From_str::expand_glob"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["array"],type=>"array",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::filenames - List of filesystem file names
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::SchemaR::filenames (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::SchemaR::filenames (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 DESCRIPTION
 

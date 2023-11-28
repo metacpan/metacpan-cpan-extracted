@@ -1,8 +1,7 @@
 package WWW::Mechanize::Chrome::Node;
 use strict;
-use 5.016; # __SUB__
+use 5.020; # __SUB__, signatures
 use Moo 2;
-use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 use Carp qw( croak );
@@ -21,7 +20,7 @@ WWW::Mechanize::Chrome::Node - represent a Chrome HTML node in Perl
 
 =cut
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 =head1 MEMBERS
 
@@ -456,7 +455,7 @@ Fetches the tag name of this node
 =cut
 
 sub get_tag_name( $self ) {
-    my $tag = $self->nodeName;
+    my $tag = $self->nodeName // "";
     $tag =~ s!\..*!!; # strip away the eventual classname
     $tag
 }

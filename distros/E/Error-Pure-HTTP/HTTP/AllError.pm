@@ -14,7 +14,7 @@ Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
 # Version.
-our $VERSION = 0.15;
+our $VERSION = 0.16;
 
 # Ignore die signal.
 $SIG{__DIE__} = 'IGNORE';
@@ -65,6 +65,7 @@ Error::Pure::HTTP::AllError - Error::Pure module with full backtrace over HTTP.
 =head1 SYNOPSIS
 
  use Error::Pure::HTTP::AllError qw(err);
+
  err "This is a fatal error.", "name", "value";
 
 =head1 SUBROUTINES
@@ -78,6 +79,8 @@ Error::Pure::HTTP::AllError - Error::Pure module with full backtrace over HTTP.
 =back
 
 =head1 EXAMPLE1
+
+=for comment filename=all_error.pl
 
  use strict;
  use warnings;
@@ -95,6 +98,8 @@ Error::Pure::HTTP::AllError - Error::Pure module with full backtrace over HTTP.
  # main  err  ./script.pl  12
 
 =head1 EXAMPLE2
+
+=for comment filename=all_error_plus_extra.pl
 
  use strict;
  use warnings;
@@ -139,7 +144,7 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-HTTP>
+L<https://github.com/michal-josef-spacek/Error-Pure-HTTP>
 
 =head1 AUTHOR
 
@@ -149,11 +154,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2012-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2012-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.16
 
 =cut

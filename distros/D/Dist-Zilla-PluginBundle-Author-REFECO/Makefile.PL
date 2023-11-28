@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.026000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,8 +14,13 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-REFECO",
   "LICENSE" => "mit",
+  "MIN_PERL_VERSION" => "5.026000",
   "NAME" => "Dist::Zilla::PluginBundle::Author::REFECO",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "Dist::Zilla" => "6.030",
+    "Moose" => "2.2206",
+    "namespace::clean" => "0.27"
+  },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "IO::Handle" => 0,
@@ -23,7 +28,7 @@ my %WriteMakefileArgs = (
     "Test::CheckDeps" => "0.010",
     "Test::More" => "0.94"
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -31,11 +36,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Dist::Zilla" => "6.030",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Moose" => "2.2206",
   "Test::CheckDeps" => "0.010",
-  "Test::More" => "0.94"
+  "Test::More" => "0.94",
+  "namespace::clean" => "0.27"
 );
 
 

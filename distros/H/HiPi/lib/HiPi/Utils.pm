@@ -1,7 +1,7 @@
 #########################################################################################
 # Package       HiPi::Utils
 # Description:  HiPi Utilities
-# Copyright:    Copyright (c) 2013-2017 Mark Dootson
+# Copyright:    Copyright (c) 2013-2023 Mark Dootson
 # License      : This is free software; you can redistribute it and/or modify it under
 #                the same terms as the Perl 5 programming language system itself.
 #########################################################################################
@@ -21,7 +21,7 @@ use XSLoader;
 use HiPi qw( :rpi );
 use HiPi::RaspberryPi;
 
-our $VERSION ='0.81';
+our $VERSION ='0.90';
 
 our $defaultuser = 'pi';
 

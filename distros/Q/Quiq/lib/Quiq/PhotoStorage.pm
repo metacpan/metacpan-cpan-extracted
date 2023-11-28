@@ -52,7 +52,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.212';
+our $VERSION = '1.213';
 
 use Quiq::Path;
 use Quiq::LockedCounter;
@@ -146,7 +146,7 @@ sub add {
     if ($ext eq 'jpg' || $ext eq 'jpeg') {
         # Bild ist JPEG
     }
-    elsif ($ext eq 'png' || $ext eq 'webp') {
+    elsif ($ext eq 'png' || $ext eq 'webp' || $ext eq 'gif') {
         # Bilddatei nach JPEG wandeln
         
         my $sh = Quiq::Shell->new;
@@ -207,7 +207,7 @@ sub addAllByTime {
 
 =head1 VERSION
 
-1.212
+1.213
 
 =head1 AUTHOR
 

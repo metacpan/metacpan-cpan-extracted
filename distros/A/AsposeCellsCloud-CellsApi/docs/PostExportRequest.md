@@ -8,7 +8,7 @@ use AsposeCellsCloud::Request::PostExport;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**file** | **string** | File to upload |
+**file** | **string** | workbook/worksheet/chart/comment/picture/shape/listobject/oleobject |
 **object_type** | **string** | workbook/worksheet/chart/comment/picture/shape/listobject/oleobject |
 **format** | **string** | The format to convert(CSV/XLS/HTML/MHTML/ODS/PDF/XML/TXT/TIFF/XLSB/XLSM/XLSX/XLTM/XLTX/XPS/PNG/JPG/JPEG/GIF/EMF/BMP/MD[Markdown]/Numbers) |
 **password** | **string** |  |

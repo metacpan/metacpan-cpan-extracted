@@ -64,6 +64,7 @@ is_deeply($execute{alreadyMovedOrDeleted},{"test.txt"=>1},"moveFilesToHistory \$
 
 delete $execute{retrievedFiles};
 $process{filenames} = ();
+$process{successfullyDone} = "";
 getLocalFiles({File => {localFilesystemPath => "redo", filename => "*.csv"}});
 # 13
 file_exists_ok("test_1.csv","getLocalFiles test_1.csv");

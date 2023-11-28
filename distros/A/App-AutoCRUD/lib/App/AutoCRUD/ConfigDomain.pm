@@ -102,36 +102,99 @@ App::AutoCRUD::ConfigDomain - checking configuration data
 
 =head2 Configuration example
 
-  TODO
 
   app:
     # global settings for the application
     # maybe application name, stuff for the homepage, etc.
     name: Demo
+    title: AutoCRUD demo application
+    readonly: 0
     default:
         page_size : 50
 
   datasources :
-    DEVCI :
+    Chinook :
       dbh:
         connect:
-          - "dbi:SQLite:dbname=D:/Temp/DEVCI_MINI_unicode.sqlite"
+          - "dbi:SQLite:dbname=Chinook_Sqlite_AutoIncrementPKs.sqlite"
           - ""
           - ""
           - RaiseError: 1
             sqlite_unicode: 1
-      structure: DM
+            sqlite_open_flags: 2 # SQLITE_OPEN_READWRITE
 
-    DEVPJ :
-      dbh:
-        connect:
-          - "dbi:SQLite:dbname=D:/Temp/DEVPJ_MINI_unicode.sqlite"
-          - ""
-          - ""
-          - RaiseError: 1
-            sqlite_unicode: 1
-      structure: DM
+      tablegroups :
+        - name: Music
+          descr: Tables describing music content
+          node: open
+          tables :
+            - Artist
+            - Album
+            - Track
 
+        - name: Playlist
+          descr: Tables for structuring playlists
+          node: open
+          tables :
+            - Playlist
+            - PlaylistTrack
+
+        # ...
+
+      tables:
+        Track:
+          colgroups:
+            - name: keys
+              columns:
+                - name: TrackId
+                  descr: Primary key
+                - name: AlbumId
+                  descr: foreign key to the album where this track belongs
+                - name: GenreId
+                  descr: foreign key to the genre of this track
+                - name: MediaTypeId
+                  descr: foreign key to the media type of this track
+            - name: Textual information
+              columns:
+                - name: Name
+                  descr: name of this track
+                - name: Composer
+                  descr: name of composer of this track
+            - name: Technical details
+              columns:
+                - name: Bytes
+                - name: Milliseconds
+            - name: Commercial details
+              columns:
+                - name: UnitPrice
+
+        Customer:
+          colgroups:
+            - name: keys
+              columns:
+                - name: CustomerId
+                  descr: Primary key
+                - name: SupportRepId
+                  descr: foreign key to the support employee
+            - name: Name
+              columns:
+                - name: FirstName
+                - name: LastName
+                - name: Company
+            - name: Address
+              columns:
+                - name: Address
+                - name: PostalCode
+                - name: City
+                - name: State
+                - name: Country
+            - name: Other coordinates
+              columns:
+                - name: Email
+                - name: Fax
+                - name: Phone
+
+        # ...
 
 
 =head1 DESCRIPTION
@@ -148,7 +211,6 @@ to check if the configuration is correct.
     app         => <app>,
     datasources => [ <datasource>+ ]
   }
-
 
   <app> : {
     name        => <string>,
@@ -169,7 +231,28 @@ to check if the configuration is correct.
     schema_class => <string>,
     tablegroups  => [ <tablegroup>+ ],
     tables       => [ <table>+ ],
+    filters      => { [ include => <string>, ] [exclude => <string>] }
   }
+
+  <tablegroup> : {
+    name => string,
+    [ descr => string, ]
+    [ node  => 'open' | 'closed', ]
+    tables  => <string>+
+
+  <table> : {
+    <string> => {
+      [ descr => <string>, ]
+      colgroups => {
+        name => <string>
+        [ descr => string, ]
+        [ node  => 'open' | 'closed', ]
+        columns => {
+          name => <string>,
+          [ descr => <string> ]
+        }+
+      }+
+    }
 
 =head1 CONFIGURATION SECTIONS
 
@@ -300,22 +383,23 @@ The ordered list of tables within this group.
 
 =item filters
 
-Allows to hide some tables by using regexes, this only hides tables which are NOT
+Allows to hide some tables by using inclusion and/or exclusion regexes.
+These rules only apply to tables to tables NOT
 explicitely defined in the configuration.
 
-They are hidden from display, but there is absolutely no acces restriction
-(access is still possible by using the right URL).
+These rules are for display comfort, not for security : 
+tables hidden from display remain accessible through the URL API, if the
+proper URL is supplied by hand.
 
 =over
 
 =item include
 
-This is evaluated as a regex and only shows tables who have matching names.
+Only tables matching this regex will be displayed.
 
-=item exclude 
+=item exclude
 
-This is evaluated as a regex and hides tables who have matching names.
-
+Tables matching this regex will not be displayed.
 Exclude takes precedence over include.
 
 =back

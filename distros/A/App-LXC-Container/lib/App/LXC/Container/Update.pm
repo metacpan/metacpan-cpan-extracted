@@ -40,7 +40,7 @@ use Cwd 'abs_path';
 use File::Path qw(make_path remove_tree);
 use File::stat;
 
-our $VERSION = "0.29";
+our $VERSION = "0.36";
 
 use App::LXC::Container::Data;
 use App::LXC::Container::Mounts;
@@ -117,6 +117,7 @@ sub new($@)
 			 package_sources => [],
 			 packages => [],
 			 root_fs => '/var/lib/lxc',
+			 specials => [],
 			 user_ids => [],
 			 users => {},
 			 users_from => [],
@@ -195,6 +196,7 @@ sub main($)
     $self->_parse_packages();
     $self->_parse_mounts();
     $self->_parse_filter();
+    $self->_parse_specials();
 
     m/^(no-|local-)?network$/  and  $self->{containers} = [ $_ ];
 
@@ -625,6 +627,45 @@ sub _parse_packages($)
 
 #########################################################################
 
+=head2 B<_parse_specials> - parse special configuration file
+
+    $self->_parse_specials();
+
+=head3 description:
+
+This method parses the container's optional special configuration file(s)
+into the configuration object.
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+sub _parse_specials($)
+{
+    my $self = shift;
+    debug(2, __PACKAGE__, '::_parse_specials($self)');
+
+    foreach my $container (@{$self->{containers}})
+    {
+	my $fname = substr($container, 0, 1) . substr($container, -1, 1)
+	    . '-SPC-' . $container . '.special';
+	my $path = _ROOT_DIR_ . '/conf/' . $fname;
+	-f $path  or  next;
+	open my $in, '<', $path  or  fatal 'can_t_open__1__2', $path, $!;
+	local $_;
+
+	while (<$in>)
+	{
+	    next if m/^\s*(?:#|$)/;
+	    s/\s*#.*$//;
+	    s/\r?\n$//;
+	    push @{$self->{specials}}, $_;
+	}
+	close $in;
+    }
+}
+
+#########################################################################
+
 =head2 B<_parse_users> - add mounts for users' home directories
 
     $self->_parse_users();
@@ -790,7 +831,15 @@ sub _write_lxc_configuration($)
     {   say $out 'lxc.idmap = g 0 100000 65536';   }
 
     ################################
-    # part 2 - explicit mounts:
+    # part 2 - special configuration:
+    if (@{$self->{specials}})
+    {
+	say $out HEADER_1, 'special configuration', HEADER_2;
+	say $out $_ foreach @{$self->{specials}};
+    }
+
+    ################################
+    # part 3 - explicit mounts:
     my $mounts = App::LXC::Container::Mounts->new();
     foreach my $source (@{$self->{mount_sources}})
     {
@@ -804,7 +853,7 @@ sub _write_lxc_configuration($)
     }
 
     ################################
-    # part 3a - implicit mounts (from packages) - determine prerequisites:
+    # part 4a - implicit mounts (from packages) - determine prerequisites:
     print $out "\n";
     foreach my $source (@{$self->{package_sources}})
     {
@@ -845,7 +894,7 @@ sub _write_lxc_configuration($)
 	keys %referenced_packages;
 
     ################################
-    # part 3b - implicit mounts (from packages) - prepare filters:
+    # part 4b - implicit mounts (from packages) - prepare filters:
     my $header = 0;
     foreach my $key (sort keys %{$self->{filter}})
     {
@@ -878,7 +927,7 @@ sub _write_lxc_configuration($)
     }
 
     ################################
-    # part 3c - implicit mounts (from packages) - gather and merge paths of
+    # part 4c - implicit mounts (from packages) - gather and merge paths of
     # packages (while respecting the filters!):
 
     foreach my $package (@packages)
@@ -909,12 +958,12 @@ sub _write_lxc_configuration($)
     }
 
     ################################
-    # part 3d - implicit mounts (from packages) - write configuration:
+    # part 4d - implicit mounts (from packages) - write configuration:
     say $out HEADER_1, 'mounts derived from above packages', HEADER_2;
     say $out $_  foreach  $mounts->implicit_mount_lines('/');
 
     ################################
-    # part 4 - create all mount points:
+    # part 5 - create all mount points:
     my $errors = [];
     $_ = $self->{root_fs} . '/' . $container;
     -d $_  and  remove_tree($_, {error => \$errors, safe => 1});
@@ -923,7 +972,7 @@ sub _write_lxc_configuration($)
     $self->_create_mount_points($mounts, '/');
 
     ################################
-    # part 5 - create all empty files:
+    # part 6 - create all empty files:
     foreach (@{$self->{empty_files}})
     {
 	$_ = $self->{root_fs} . '/' . $container . $_;

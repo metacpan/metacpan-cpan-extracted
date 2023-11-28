@@ -1,0 +1,113 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Go::Poll {
+  allow Go::Schedule;
+  allow Go::Schedule::Task;
+  
+  use Go::Coroutine;
+  use List;
+  use Sys::Poll::PollfdArray;
+  use Sys::Poll::Constant as POLL;
+  use Sys::Poll;
+  
+  has coroutines_h : Hash of Go::Coroutine;
+  
+  static method new : Go::Poll () {
+    
+    my $self = new Go::Poll;
+    
+    $self->{coroutines_h} = Hash->new;
+    
+    return $self;
+  }
+  
+  private method check : void () {
+    my $poll_coroutines_h = $self->{coroutines_h};
+    
+    my $poll_coroutines_length = $poll_coroutines_h->keys_length;
+    
+    if ($poll_coroutines_length > 0) {
+      my $poll_fd_array = Sys::Poll::PollfdArray->new($poll_coroutines_length);
+      
+      my $poll_coroutine_addresses = $poll_coroutines_h->keys;
+      
+      my $poll_index = 0;
+      for my $address (@$poll_coroutine_addresses) {
+        
+        my $poll_coroutine = (Go::Coroutine)$poll_coroutines_h->get($address);
+        
+        my $fd = $poll_coroutine->{fd};
+        
+        $poll_fd_array->set_fd($poll_index, $fd);
+        
+        my $is_write = $poll_coroutine->{is_write};
+        
+        if ($is_write) {
+          $poll_fd_array->set_events($poll_index, POLL->POLLOUT);
+        }
+        else {
+          $poll_fd_array->set_events($poll_index, POLL->POLLIN);
+        }
+        
+        $poll_coroutine->{poll_index} = $poll_index;
+        
+        $poll_index++;
+      }
+      
+      my $status = Sys::Poll->poll($poll_fd_array, $poll_coroutines_length, 0);
+      
+      for my $address (@$poll_coroutine_addresses) {
+        my $poll_coroutine = (Go::Coroutine)$poll_coroutines_h->get($address);
+        
+        my $poll_index = $poll_coroutine->{poll_index};
+        
+        my $revent = $poll_fd_array->revents($poll_index);
+        
+        my $io_ready = 0;
+        if ($poll_coroutine->{is_write}) {
+          if ($revent & POLL->POLLOUT) {
+            $io_ready = 1;
+          }
+        }
+        else {
+          if ($revent & POLL->POLLIN) {
+            $io_ready = 1;
+          }
+        }
+        
+        my $io_timeout_occured = 0;
+        unless ($io_ready) {
+          my $deadline_base_io_timeout = $poll_coroutine->{deadline_base_io_timeout};
+          
+          if ($deadline_base_io_timeout) {
+            my $io_timeout = $poll_coroutine->{io_timeout};
+            
+            my $io_timeout_occur = &check_io_timeout($deadline_base_io_timeout, $io_timeout);
+            
+            $poll_coroutine->{io_timeout_occur} = (byte)$io_timeout_occur;
+          }
+        }
+        
+        if ($io_ready || $io_timeout_occured) {
+          my $ready_coroutine = (Go::Coroutine)$poll_coroutines_h->delete($address);
+          $ready_coroutine->{disable} = 0;
+          $ready_coroutine->{fd} = -1;
+          $ready_coroutine->{deadline_base_io_timeout} = undef;
+        }
+      }
+    }
+  }
+  
+  private static method check_io_timeout : int ($deadline_base : Sys::Time::Timespec, $timeout : double) {
+    
+    my $deadline_now = Go::Schedule->create_deadline_base;
+    
+    my $interval = ($deadline_now->tv_sec - $deadline_base->tv_sec) + (($deadline_now->tv_nsec - $deadline_base->tv_nsec) / 1_000_000_000);
+    
+    my $timeout_occur = $timeout - $interval < 0;
+    
+    return $timeout_occur;
+  }
+  
+}

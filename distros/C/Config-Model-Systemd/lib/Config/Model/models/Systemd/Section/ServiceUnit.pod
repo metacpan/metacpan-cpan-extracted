@@ -155,12 +155,11 @@ failed, and no job is queued for them. While a C<Wants> dependency on another un
 has a one-time effect when this units started, a C<Upholds> dependency on it has a
 continuous effect, constantly restarting the unit if necessary. This is an alternative to the
 C<Restart> setting of service units, to ensure they are kept running whatever
-happens.
+happens. The restart happens without delay, and usual per-unit rate-limit applies.
 
 When C<Upholds=b.service> is used on C<a.service>, this
 dependency will show as C<UpheldBy=a.service> in the property listing of
-C<b.service>. The C<UpheldBy> dependency cannot be specified
-directly. I< Optional. Type uniline.  > 
+C<b.service>. I< Optional. Type uniline.  > 
 
 =head2 Conflicts
 
@@ -263,8 +262,7 @@ creates the corresponding device unit without delay. I< Optional. Type list of u
 =head2 OnFailure
 
 A space-separated list of one or more units that are activated when this unit enters
-the C<failed> state.  A service unit using C<Restart> enters the
-failed state only after the start limits are reached. I< Optional. Type uniline.  > 
+the C<failed> state. I< Optional. Type uniline.  > 
 
 =head2 OnSuccess
 
@@ -302,16 +300,18 @@ units that are linked to it using these two settings. I< Optional. Type uniline.
 =head2 JoinsNamespaceOf
 
 For units that start processes (such as service units), lists one or more other units
-whose network and/or temporary file namespace to join. This only applies to unit types which support
-the C<PrivateNetwork>, C<NetworkNamespacePath>,
+whose network and/or temporary file namespace to join. If this is specified on a unit (say, a.service
+has C<JoinsNamespaceOf=b.service>), then this the inverse dependency
+(C<JoinsNamespaceOf=a.service> for b.service) is implied. This only applies to unit
+types which support the C<PrivateNetwork>, C<NetworkNamespacePath>,
 C<PrivateIPC>, C<IPCNamespacePath>, and
 C<PrivateTmp> directives (see
 L<systemd.exec(5)> for
 details). If a unit that has this setting set is started, its processes will see the same
 C</tmp/>, C</var/tmp/>, IPC namespace and network namespace as
-one listed unit that is started. If multiple listed units are already started, it is not defined
-which namespace is joined. Note that this setting only has an effect if
-C<PrivateNetwork>/C<NetworkNamespacePath>,
+one listed unit that is started. If multiple listed units are already started and these do not share
+their namespace, then it is not defined which namespace is joined. Note that this setting only has an
+effect if C<PrivateNetwork>/C<NetworkNamespacePath>,
 C<PrivateIPC>/C<IPCNamespacePath> and/or
 C<PrivateTmp> is enabled for both the unit that joins the namespace and the unit
 whose namespace is joined. I< Optional. Type uniline.  > 
@@ -328,6 +328,24 @@ mounted automatically through C<local-fs.target>,
 but are still honored for the purposes of this option, i.e. they
 will be pulled in by this unit. I< Optional. Type uniline.  > 
 
+=head2 OnSuccessJobMode
+
+Takes a value of
+C<fail>,
+C<replace>,
+C<replace-irreversibly>,
+C<isolate>,
+C<flush>,
+C<ignore-dependencies> or
+C<ignore-requirements>. Defaults to
+C<replace>. Specifies how the units listed in
+C<OnSuccess>/C<OnFailure> will be enqueued. See
+L<systemctl(1)>'s
+C<--job-mode=> option for details on the
+possible values. If this is set to C<isolate>,
+only a single unit may be listed in
+C<OnSuccess>/C<OnFailure>. I< Optional. Type uniline.  > 
+
 =head2 OnFailureJobMode
 
 Takes a value of
@@ -339,12 +357,12 @@ C<flush>,
 C<ignore-dependencies> or
 C<ignore-requirements>. Defaults to
 C<replace>. Specifies how the units listed in
-C<OnFailure> will be enqueued. See
+C<OnSuccess>/C<OnFailure> will be enqueued. See
 L<systemctl(1)>'s
 C<--job-mode=> option for details on the
 possible values. If this is set to C<isolate>,
 only a single unit may be listed in
-C<OnFailure>. I< Optional. Type uniline.  > 
+C<OnSuccess>/C<OnFailure>. I< Optional. Type uniline.  > 
 
 Note: OnFailureJobMode is migrated with 'C<$unit>' and with: 
 
@@ -475,7 +493,7 @@ Both settings take a time span with the default unit of seconds, but other units
 specified, see
 L<systemd.time(5)>.
 The default is C<infinity> (job timeouts disabled), except for device units where
-C<JobRunningTimeoutSec> defaults to C<DefaultTimeoutStartSec>.
+C<JobRunningTimeoutSec> defaults to C<DefaultDeviceTimeoutSec>.
 
 Note: these timeouts are independent from any unit-specific timeouts (for example, the timeout
 set with C<TimeoutStartSec> in service units). The job timeout has no effect on the
@@ -494,7 +512,7 @@ Both settings take a time span with the default unit of seconds, but other units
 specified, see
 L<systemd.time(5)>.
 The default is C<infinity> (job timeouts disabled), except for device units where
-C<JobRunningTimeoutSec> defaults to C<DefaultTimeoutStartSec>.
+C<JobRunningTimeoutSec> defaults to C<DefaultDeviceTimeoutSec>.
 
 Note: these timeouts are independent from any unit-specific timeouts (for example, the timeout
 set with C<TimeoutStartSec> in service units). The job timeout has no effect on the
@@ -530,7 +548,7 @@ Configure an additional action to take if the rate limit configured with
 C<StartLimitIntervalSec> and C<StartLimitBurst> is hit. Takes the same
 values as the C<FailureAction>/C<SuccessAction> settings. If
 C<none> is set, hitting the rate limit will trigger no action except that
-the start will not be permitted. Defaults to C<none>. I< Optional. Type enum. choice: 'none', 'reboot', 'reboot-force', 'reboot-immediate', 'poweroff', 'poweroff-force', 'poweroff-immediate', 'exit', 'exit-force'.  > 
+the start will not be permitted. Defaults to C<none>. I< Optional. Type enum. choice: 'exit', 'exit-force', 'halt', 'halt-force', 'halt-immediate', 'kexec', 'kexec-force', 'none', 'poweroff', 'poweroff-force', 'poweroff-immediate', 'reboot', 'reboot-force', 'reboot-immediate', 'soft-reboot', 'soft-reboot-force'.  > 
 
 =head2 SourcePath
 
@@ -610,6 +628,7 @@ C<uml>,
 C<bhyve>,
 C<qnx>,
 C<apple>,
+C<sre>,
 C<openvz>,
 C<lxc>,
 C<lxc-libvirt>,
@@ -698,8 +717,8 @@ C<ConditionSecurity> may be used to check whether the given
 security technology is enabled on the system. Currently, the recognized values are
 C<selinux>, C<apparmor>, C<tomoyo>,
 C<ima>, C<smack>, C<audit>,
-C<uefi-secureboot> and C<tpm2>. The test may be negated by prepending
-an exclamation mark. I< Optional. Type list of uniline.  > 
+C<uefi-secureboot>, C<tpm2> and C<cvm>.
+The test may be negated by prepending an exclamation mark. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionCapability
 
@@ -858,14 +877,21 @@ C<@system>. I< Optional. Type list of uniline.  >
 =head2 ConditionControlGroupController
 
 Check whether given cgroup controllers (e.g. C<cpu>) are available
-for use on the system.
+for use on the system or whether the legacy v1 cgroup or the modern v2 cgroup hierarchy is used.
 
 Multiple controllers may be passed with a space separating them; in this case the condition
 will only pass if all listed controllers are available for use. Controllers unknown to systemd are
-ignored. Valid controllers are C<cpu>, C<cpuset>,
-C<io>, C<memory>, and C<pids>. Even if available in
-the kernel, a particular controller may not be available if it was disabled on the kernel command
-line with C<cgroup_disable=controller>. I< Optional. Type list of uniline.  > 
+ignored. Valid controllers are C<cpu>, C<io>,
+C<memory>, and C<pids>. Even if available in the kernel, a
+particular controller may not be available if it was disabled on the kernel command line with
+C<cgroup_disable=controller>.
+
+Alternatively, two special strings C<v1> and C<v2> may be
+specified (without any controller names). C<v2> will pass if the unified v2 cgroup
+hierarchy is used, and C<v1> will pass if the legacy v1 hierarchy or the hybrid
+hierarchy are used. Note that legacy or hybrid hierarchies have been deprecated. See
+L<systemd(1)> for
+more information. I< Optional. Type list of uniline.  > 
 
 =head2 ConditionMemory
 
@@ -1406,27 +1432,38 @@ B<Deprecated> I< Optional. Type uniline.  >
 
 =head2 FailureAction
 
-Configure the action to take when the unit stops and enters a failed state or inactive state.
-Takes one of C<none>, C<reboot>, C<reboot-force>,
-C<reboot-immediate>, C<poweroff>, C<poweroff-force>,
-C<poweroff-immediate>, C<exit>, and C<exit-force>. In system mode,
-all options are allowed. In user mode, only C<none>, C<exit>, and
-C<exit-force> are allowed. Both options default to C<none>.
+Configure the action to take when the unit stops and enters a failed state or
+inactive state.  Takes one of C<none>, C<reboot>,
+C<reboot-force>, C<reboot-immediate>, C<poweroff>,
+C<poweroff-force>, C<poweroff-immediate>, C<exit>,
+C<exit-force>, C<soft-reboot>, C<soft-reboot-force>,
+C<kexec>, C<kexec-force>, C<halt>,
+C<halt-force> and C<halt-immediate>. In system mode, all options are
+allowed. In user mode, only C<none>, C<exit>,
+C<exit-force>, C<soft-reboot> and C<soft-reboot-force> are
+allowed. Both options default to C<none>.
 
-If C<none> is set, no action will be triggered. C<reboot> causes a reboot
-following the normal shutdown procedure (i.e. equivalent to systemctl reboot).
-C<reboot-force> causes a forced reboot which will terminate all processes forcibly but should
-cause no dirty file systems on reboot (i.e. equivalent to systemctl reboot -f) and
-C<reboot-immediate> causes immediate execution of the
-L<reboot(2)> system call, which
-might result in data loss (i.e. equivalent to systemctl reboot -ff). Similarly,
-C<poweroff>, C<poweroff-force>, C<poweroff-immediate> have the effect
-of powering down the system with similar semantics. C<exit> causes the manager to exit following
-the normal shutdown procedure, and C<exit-force> causes it terminate without shutting down
-services. When C<exit> or C<exit-force> is used by default the exit status of the
-main process of the unit (if this applies) is returned from the service manager. However, this may be overridden
-with C<FailureActionExitStatus>/C<SuccessActionExitStatus>, see
-below. I< Optional. Type enum. choice: 'none', 'reboot', 'reboot-force', 'reboot-immediate', 'poweroff', 'poweroff-force', 'poweroff-immediate', 'exit', 'exit-force'.  > 
+If C<none> is set, no action will be triggered. C<reboot> causes a
+reboot following the normal shutdown procedure (i.e. equivalent to systemctl
+reboot).  C<reboot-force> causes a forced reboot which will terminate all
+processes forcibly but should cause no dirty file systems on reboot (i.e. equivalent to
+systemctl reboot -f) and C<reboot-immediate> causes immediate
+execution of the
+L<reboot(2)> system
+call, which might result in data loss (i.e. equivalent to systemctl reboot -ff).
+Similarly, C<poweroff>, C<poweroff-force>,
+C<poweroff-immediate>, C<kexec>, C<kexec-force>,
+C<halt>, C<halt-force> and C<halt-immediate> have the
+effect of powering down the system, executing kexec, and halting the system respectively with similar
+semantics. C<exit> causes the manager to exit following the normal shutdown procedure,
+and C<exit-force> causes it terminate without shutting down services. When
+C<exit> or C<exit-force> is used by default the exit status of the main
+process of the unit (if this applies) is returned from the service manager. However, this may be
+overridden with
+C<FailureActionExitStatus>/C<SuccessActionExitStatus>, see below.
+C<soft-reboot> will trigger a userspace reboot operation.
+C<soft-reboot-force> does that too, but does not go through the shutdown transaction
+beforehand. I< Optional. Type enum. choice: 'exit', 'exit-force', 'halt', 'halt-force', 'halt-immediate', 'kexec', 'kexec-force', 'none', 'poweroff', 'poweroff-force', 'poweroff-immediate', 'reboot', 'reboot-force', 'reboot-immediate', 'soft-reboot', 'soft-reboot-force'.  > 
 
 Note: FailureAction is migrated with 'C<$service>' and with: 
 
@@ -1442,27 +1479,38 @@ C<$service> => C<- - Service FailureAction>
 
 =head2 SuccessAction
 
-Configure the action to take when the unit stops and enters a failed state or inactive state.
-Takes one of C<none>, C<reboot>, C<reboot-force>,
-C<reboot-immediate>, C<poweroff>, C<poweroff-force>,
-C<poweroff-immediate>, C<exit>, and C<exit-force>. In system mode,
-all options are allowed. In user mode, only C<none>, C<exit>, and
-C<exit-force> are allowed. Both options default to C<none>.
+Configure the action to take when the unit stops and enters a failed state or
+inactive state.  Takes one of C<none>, C<reboot>,
+C<reboot-force>, C<reboot-immediate>, C<poweroff>,
+C<poweroff-force>, C<poweroff-immediate>, C<exit>,
+C<exit-force>, C<soft-reboot>, C<soft-reboot-force>,
+C<kexec>, C<kexec-force>, C<halt>,
+C<halt-force> and C<halt-immediate>. In system mode, all options are
+allowed. In user mode, only C<none>, C<exit>,
+C<exit-force>, C<soft-reboot> and C<soft-reboot-force> are
+allowed. Both options default to C<none>.
 
-If C<none> is set, no action will be triggered. C<reboot> causes a reboot
-following the normal shutdown procedure (i.e. equivalent to systemctl reboot).
-C<reboot-force> causes a forced reboot which will terminate all processes forcibly but should
-cause no dirty file systems on reboot (i.e. equivalent to systemctl reboot -f) and
-C<reboot-immediate> causes immediate execution of the
-L<reboot(2)> system call, which
-might result in data loss (i.e. equivalent to systemctl reboot -ff). Similarly,
-C<poweroff>, C<poweroff-force>, C<poweroff-immediate> have the effect
-of powering down the system with similar semantics. C<exit> causes the manager to exit following
-the normal shutdown procedure, and C<exit-force> causes it terminate without shutting down
-services. When C<exit> or C<exit-force> is used by default the exit status of the
-main process of the unit (if this applies) is returned from the service manager. However, this may be overridden
-with C<FailureActionExitStatus>/C<SuccessActionExitStatus>, see
-below. I< Optional. Type enum. choice: 'none', 'reboot', 'reboot-force', 'reboot-immediate', 'poweroff', 'poweroff-force', 'poweroff-immediate', 'exit', 'exit-force'.  > 
+If C<none> is set, no action will be triggered. C<reboot> causes a
+reboot following the normal shutdown procedure (i.e. equivalent to systemctl
+reboot).  C<reboot-force> causes a forced reboot which will terminate all
+processes forcibly but should cause no dirty file systems on reboot (i.e. equivalent to
+systemctl reboot -f) and C<reboot-immediate> causes immediate
+execution of the
+L<reboot(2)> system
+call, which might result in data loss (i.e. equivalent to systemctl reboot -ff).
+Similarly, C<poweroff>, C<poweroff-force>,
+C<poweroff-immediate>, C<kexec>, C<kexec-force>,
+C<halt>, C<halt-force> and C<halt-immediate> have the
+effect of powering down the system, executing kexec, and halting the system respectively with similar
+semantics. C<exit> causes the manager to exit following the normal shutdown procedure,
+and C<exit-force> causes it terminate without shutting down services. When
+C<exit> or C<exit-force> is used by default the exit status of the main
+process of the unit (if this applies) is returned from the service manager. However, this may be
+overridden with
+C<FailureActionExitStatus>/C<SuccessActionExitStatus>, see below.
+C<soft-reboot> will trigger a userspace reboot operation.
+C<soft-reboot-force> does that too, but does not go through the shutdown transaction
+beforehand. I< Optional. Type enum. choice: 'exit', 'exit-force', 'halt', 'halt-force', 'halt-immediate', 'kexec', 'kexec-force', 'none', 'poweroff', 'poweroff-force', 'poweroff-immediate', 'reboot', 'reboot-force', 'reboot-immediate', 'soft-reboot', 'soft-reboot-force'.  > 
 
 Note: SuccessAction is migrated with 'C<$service>' and with: 
 

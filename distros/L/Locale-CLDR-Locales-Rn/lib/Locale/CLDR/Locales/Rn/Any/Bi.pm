@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Rn::Any::Bi - Package for language Rundi
 
 package Locale::CLDR::Locales::Rn::Any::Bi;
 # This file auto generated from Data\common\main\rn_BI.xml
-#	on Fri 13 Oct  9:34:49 am GMT
+#	on Sat  4 Nov  6:20:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

@@ -9,7 +9,7 @@ use AsposeCellsCloud::Request::DeleteUnProtectWorkbook;
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **name** | **string** | The workbook name. |
-**protection** | **WorkbookProtectionRequest** | Protection settings, only password can be specified. |
+**password** | **string** | Protection settings, only password can be specified. |
 **folder** | **string** | Original workbook folder. |
 **storage_name** | **string** | Storage name. |  
 

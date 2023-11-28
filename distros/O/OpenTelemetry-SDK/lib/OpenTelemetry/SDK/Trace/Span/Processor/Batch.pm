@@ -3,7 +3,7 @@ use Object::Pad ':experimental(init_expr)';
 
 package OpenTelemetry::SDK::Trace::Span::Processor::Batch;
 
-our $VERSION = '0.011';
+our $VERSION = '0.020';
 
 class OpenTelemetry::SDK::Trace::Span::Processor::Batch
     :does(OpenTelemetry::Trace::Span::Processor)
@@ -19,8 +19,34 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
     use OpenTelemetry::X;
     use OpenTelemetry;
 
-    use Metrics::Any '$metrics', strict => 0;
     my $logger = OpenTelemetry->logger;
+
+    use Metrics::Any '$metrics', strict => 1,
+        name_prefix => [qw( otel bsp )];
+
+    $metrics->make_counter( 'failure',
+        description => 'Number of times the span processing pipeline failed irrecoverably',
+    );
+
+    $metrics->make_counter( 'success',
+        description => 'Number of spans that were successfully processed',
+    );
+
+    $metrics->make_counter( 'dropped',
+        name        => [qw( spans dropped )],
+        description => 'Number of spans that could not be processed and were dropped',
+        labels      => [qw( reason )],
+    );
+
+    $metrics->make_counter( 'processed',
+        name        => [qw( spans processed )],
+        description => 'Number of spans that were successfully processed',
+    );
+
+    $metrics->make_gauge( 'buffer_use',
+        name        => [qw( buffer utilization )],
+        description => 'Number of spans that could not be processed and were dropped',
+    );
 
     field $batch_size       :param //= config('BSP_MAX_EXPORT_BATCH_SIZE') //    512;
     field $exporter_timeout :param //= config('BSP_EXPORT_TIMEOUT')        // 30_000;
@@ -32,7 +58,6 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
 
     field $done;
     field $function;
-    field @futures;
     field @queue;
 
     ADJUST {
@@ -70,18 +95,14 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
         $function->start;
     }
 
-    method $report_dropped_spans ( $count, $reason ) {
-        $metrics->inc_counter_by(
-            'otel.bsp.dropped_spans' => $count, { reason => $reason },
-        );
+    method $report_dropped_spans ( $reason, $count ) {
+        $metrics->inc_counter_by( dropped => $count, [ reason => $reason ] );
     }
 
-    method $report_result ( $code, $batch ) {
-        my $count = @$batch;
-
+    method $report_result ( $code, $count ) {
         if ( $code == TRACE_EXPORT_SUCCESS ) {
-            $metrics->inc_counter('otel.bsp.export.success');
-            $metrics->inc_counter_by( 'otel.bsp.exported_spans' => $count );
+            $metrics->inc_counter('success');
+            $metrics->inc_counter_by( processed => $count );
             return;
         }
 
@@ -91,8 +112,8 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
             ),
         );
 
-        $metrics->inc_counter('otel.bsp.export.failure');
-        $self->$report_dropped_spans( $count, 'export-failure' );
+        $metrics->inc_counter('failure');
+        $self->$report_dropped_spans( 'export-failure' => $count );
     }
 
     method $maybe_process_batch ( $force = undef ) {
@@ -101,7 +122,7 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
                 return [] if @queue < $batch_size && !$force;
 
                 $metrics->set_gauge_to(
-                    'otel.bsp.buffer_utilization' => @queue / $max_queue_size,
+                    buffer_use => @queue / $max_queue_size,
                 ) if @queue;
 
                 [ map $_->snapshot, splice @queue, 0, $batch_size ];
@@ -113,10 +134,11 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
         $function->call(
             args => [ $exporter, $batch, $exporter_timeout ],
             on_result => sub ( $type, $result ) {
-                return $self->$report_result( TRACE_EXPORT_FAILURE, $batch )
+                my $count = @$batch;
+                return $self->$report_result( TRACE_EXPORT_FAILURE, $count )
                     unless $type eq 'return';
 
-                $self->$report_result( $result, $batch );
+                $self->$report_result( $result, $count );
             },
         );
 
@@ -143,8 +165,7 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
                         # blocks until there is room in the buffer.
                         splice @queue, 0, $overflow;
                         $self->$report_dropped_spans(
-                            $overflow,
-                            'buffer-full',
+                            'buffer-full' => $overflow,
                         );
                     }
 
@@ -175,12 +196,14 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
         # times out. Is this correct?
         await $self->force_flush( maybe_timeout $timeout, $start );
 
-        $self->$report_dropped_spans( +@queue, 'terminating' ) if @queue;
+        $self->$report_dropped_spans( terminating => scalar @queue )
+            if @queue;
+
         @queue = ();
 
         $function->stop->get if $function->workers;
 
-        $exporter->shutdown( maybe_timeout $timeout, $start );
+        await $exporter->shutdown( maybe_timeout $timeout, $start );
     }
 
     async method force_flush ( $timeout = undef ) {
@@ -194,7 +217,8 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
             # If we still have any spans left it has to be because we
             # timed out and couldn't export them. In that case, we drop
             # them and report
-            $self->$report_dropped_spans( +@stack, 'force-flush' ) if @stack;
+            $self->$report_dropped_spans( 'force-flush' => scalar @stack )
+                if @stack;
         }
 
         while ( @stack ) {
@@ -202,22 +226,23 @@ class OpenTelemetry::SDK::Trace::Span::Processor::Batch
             return TRACE_EXPORT_TIMEOUT if $timeout and !$remaining;
 
             my $batch = [ map $_->snapshot, splice @stack, 0, $batch_size ];
+            my $count = @$batch;
 
             try {
                 my $result = await $function->call(
                     args => [ $exporter, $batch, $remaining ],
                 );
 
-                $self->$report_result( $result, $batch );
+                $self->$report_result( $result, $count );
 
                 return $result unless $result == TRACE_EXPORT_SUCCESS;
             }
             catch ($e) {
-                return $self->$report_result( TRACE_EXPORT_FAILURE, $batch );
+                return $self->$report_result( TRACE_EXPORT_FAILURE, $count );
             }
         }
 
-        $exporter->force_flush( maybe_timeout $timeout, $start );
+        await $exporter->force_flush( maybe_timeout $timeout, $start );
     }
 
     method DESTROY {

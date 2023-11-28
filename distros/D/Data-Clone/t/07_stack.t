@@ -17,6 +17,6 @@ use Data::Clone;
 
 my $before = bless [], Bar::;
 my $after  = clone($before);
-isn't $after, $before, 'stack reallocation during callback';
+isnt $after, $before, 'stack reallocation during callback';
 
 done_testing;

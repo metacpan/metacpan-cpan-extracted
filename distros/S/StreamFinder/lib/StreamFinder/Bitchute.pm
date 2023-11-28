@@ -4,7 +4,7 @@ StreamFinder::Bitchute - Fetch actual raw streamable URLs from Bitchute.com.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2023 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -337,7 +337,7 @@ L<http://search.cpan.org/dist/StreamFinder-Bitchute/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2017-2023 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -564,7 +564,7 @@ sub new
 			$self->{'cnt'} = scalar @{$self->{'streams'}};
 		}
 	}
-	if ($html =~ m#\<p\s+class\=\"name\"\>\<a\s+href\=\"([^\"]+)\"\s+class\=\"[^\"]*\"\>([^\<]+)\<\/a\>#) {
+	if ($html =~ m#\<p\s+class\=\"name\"\>\<a\s+href\=\"([^\"]+)\"[^\>]*\>([^\<]+)\<\/a\>#) {
 		$self->{'albumartist'} = 'https://www.bitchute.com' . $1;
 		$self->{'artist'} = $2;
 	}
@@ -641,9 +641,13 @@ sub new
 	$self->{'imageurl'} = $self->{'iconurl'};
 	$self->{'total'} = $self->{'cnt'};
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
-	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
-			if ($DEBUG && $self->{'cnt'} > 0);
-	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+	if ($DEBUG) {
+		foreach my $i (sort keys %{$self}) {
+			print STDERR "--KEY=$i= VAL=".$self->{$i}."=\n";
+		}
+		print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
+				if ($self->{'cnt'} > 0);
+	}
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

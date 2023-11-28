@@ -1,7 +1,7 @@
 package Factory::Sub;
 use 5.006; use strict; use warnings;
 use Import::Into; use Carp qw/croak/; use Coerce::Types::Standard qw//;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use overload 
 	"&{}" => sub {my $self = shift; sub { $self->call(@_) }},
@@ -16,7 +16,8 @@ sub import {
 }
 
 sub new {
-	bless { factory => [ ] }, $_[0];
+	my $self = shift;
+	bless { factory => [ @_ ] }, $self;
 }
 
 sub add {
@@ -63,7 +64,7 @@ Factory::Sub - Generate a factory of subs
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
@@ -101,11 +102,33 @@ Perhaps a little code snippet.
 
 =head1 SUBROUTINES/METHODS
 
+=head2 new
+
+Instantiate a new Factory::Sub object. This does not accept any argurments.
+
+	my $factory = Factory::Sub->new(
+		[Str, Str, sub { return 1 }],
+		[Str, HashRef, sub { return 2 }],
+		[ArrayRef, HashRef, sub { return 3 }]
+	);
+
 =head2 add
+
+Add a new condition to the factory. 
+
+	$factory->add(StrToArray->by(', '), StrToHash->by(' '), HashToArray->by('keys'), sub { 
+		return 4;
+	});
 
 =cut
 
 =head2 call
+
+Call the factory. If o matching factory sub is not found for the given params then the code currently croaks with an error.
+
+	$factory->call('t, h, e', 'end', { name => 'day ender' });
+...
+	$factory->('t, h, e', 'end', { name => 'day ender' });	
 
 =cut
 

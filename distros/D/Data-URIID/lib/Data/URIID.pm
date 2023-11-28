@@ -20,7 +20,7 @@ use I18N::LangTags::Detect;
 use Data::URIID::Result;
 use Data::URIID::Service;
 
-our $VERSION = v0.03;
+our $VERSION = v0.04;
 
 my %names = (
     service => {
@@ -46,6 +46,16 @@ my %names = (
         'open-library'      => '173f7237-9ca0-490d-8a98-6a04c386769a',
         'ngv'               => '01aa1e39-6d90-41c6-a010-f3850844f2e1',
         'geonames'          => '2860d918-ac49-42a1-818d-68abd84972b3',
+        'find-a-grave'      => '30deaf5b-470b-46da-8af1-6e5174d0eaf4',
+        'nla'               => '0715561c-0189-4c1f-99bf-21cc6746f5ee', # National Library of Australia
+        'agsa'              => 'a61dda0f-b914-496a-b473-2a333b9f0f9f', # Art Gallery of South Australia
+        'amc'               => 'fec16f49-a9fe-4d89-bad2-7dbb44860e83', # Australian Music Centre
+        'a-p-and-p'         => '91a4981f-c1c7-4136-9e2f-39f2cd2eda7f', # Australian Prints + Printmaking
+        'tww'               => 'aafdcd22-828b-413e-be0c-ed9a92d941db', # The Watercolour World
+        'factgrid'          => '9a6b8382-c004-458a-bf2a-68f03d863282', # FactGrid
+        'grove-art-online'  => 'be8b12e5-b32d-4b89-9301-84827a79589e', # Grove Art Online
+        'wikitree'          => '70b9de08-2b73-4c0d-91d2-e89561cf94d2', # WikiTree
+        'doi'               => '60387716-fa98-4c92-ae2b-7f4496d6f9be', # doi.org
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -53,12 +63,12 @@ my %names = (
         'uri'                           => 'a8d1637d-af19-49e9-9ef8-6bc1fbcf6439',
         'tagname'                       => 'bfae7574-3dae-425d-89b1-9c087c140c23',
         'wikidata-identifier'           => 'ce7aae1e-a210-4214-926a-0ebca56d77e3',
-        'musicbrainz-identifier'        => '95bd826b-bd3e-4b40-b16a-aa20c9f673e4',
-        'british-museum-term'           => '310776dc-1433-4623-9ffa-42d038d400a4',
-        'gnd-identifier'                => '893a7d5c-124c-4ad6-9a56-0ea8be50b536',
+        'musicbrainz-identifier'        => '95bd826b-bd3e-4b40-b16a-aa20c9f673e4', # P434, P435, P436, P966, P982, P1004, P1330, P1407, P4404, P5813, P6423, and P8052
+        'british-museum-term'           => '310776dc-1433-4623-9ffa-42d038d400a4', # P1711 (special)!
+        'gnd-identifier'                => '893a7d5c-124c-4ad6-9a56-0ea8be50b536', # P227
         'fellig-box-number'             => 'c036d4d9-d983-4322-917c-acbf6133df64',
         'fellig-identifier'             => '90ecb0c5-f99a-4702-8575-430247de8f48',
-        'youtube-video-identifier'      => '0d88a8f0-0fce-41ae-beef-88d74d83eb32',
+        'youtube-video-identifier'      => '0d88a8f0-0fce-41ae-beef-88d74d83eb32', # P1651
         'e621tagtype'                   => 'da72fa90-5990-46b4-b4ca-05eaf68170a5',
         'wikimedia-commons-identifier'  => 'a6b1a981-48a0-445e-adc7-11df14e91769',
         'e621-post-identifier'          => '4a7fc2e2-854b-42ec-b24f-c7fece371865',
@@ -76,6 +86,16 @@ my %names = (
         'ngv-artist-identifier'         => '8fb7807b-c15a-4ae1-8f15-4b3d8e4f5cef', # P2041
         'ngv-artwork-identifier'        => '4d25c32b-a169-40f5-be88-3d609b7d05ff', # P4684
         'geonames-identifier'           => '02e34fcc-cf5e-445a-ba54-bf6df8ae036a', # P1566
+        'find-a-grave-identifier'       => '39ea7c88-3fc2-4a01-89f9-547f451764f7', # P535
+        'libraries-australia-identifier'=> '22a80a6d-0c69-41f5-b5be-6c889f8e601b', # P409
+        'agsa-creator-identifier'       => 'fb3bac19-7d4e-4995-9ef0-08dbcea7f340', # P6804
+        'amc-artist-identifier'         => '0b907ca8-a84f-4780-b708-910a858228a8', # P9575
+        'a-p-and-p-artist-identifier'   => '5bafcbd4-5fcf-4823-848f-7eab8175a80c', # P10086
+        'nla-trove-people-identifier'   => '0edc2854-37bf-4562-a05b-ac4113ead938', # P1315
+        'tww-artist-identifier'         => 'b49d88ba-1b61-4f13-b5c9-73a09ffb2b3f', # P6735
+        'grove-art-online-identifier'   => '80c548f6-4d23-43c1-ab50-b4546319c752', # P8406
+        'wikitree-person-identifier'    => 'a6f7d17a-ced2-4cf7-8ce7-fcb4a98f7aa0', # P2949
+        'doi'                           => '931f155e-5a24-499b-9fbb-ed4efefe27fe', # P356
     },
     action => {
         #What about: search/lookup? list? content?
@@ -222,7 +242,7 @@ sub known {
 sub name_to_ise {
     my ($self, $class, $name) = @_;
     return $name if $self->is_ise($name); # return name if name is already an ISE
-    return $names{$class // ''}{$name // ''} // croak 'Invalid class or name';
+    return $names{$class // ''}{$name // ''} // croak sprintf('Invalid class or name: %s: %s', $class // '<undef>', $name // '<undef>');
 }
 
 
@@ -270,7 +290,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.03
+version v0.04
 
 =head1 SYNOPSIS
 
@@ -377,7 +397,7 @@ See also L<"new">.
 
 =head2 known
 
-    my $ise = $extractor->name_to_ise( $class );
+    my @list = $extractor->known( $class );
 
 Returns a list of known items of a class.
 Not all items may have the same level of support by this module.

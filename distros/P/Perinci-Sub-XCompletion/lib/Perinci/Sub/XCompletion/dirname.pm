@@ -8,9 +8,9 @@ use Complete::Util qw(hashify_answer);
 use Complete::File qw(complete_dir);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-03-01'; # DATE
+our $DATE = '2023-11-18'; # DATE
 our $DIST = 'Perinci-Sub-XCompletion'; # DIST
-our $VERSION = '0.104'; # VERSION
+our $VERSION = '0.106'; # VERSION
 
 our %SPEC;
 
@@ -43,7 +43,7 @@ Perinci::Sub::XCompletion::dirname - Generate completion for directory name
 
 =head1 VERSION
 
-This document describes version 0.104 of Perinci::Sub::XCompletion::dirname (from Perl distribution Perinci-Sub-XCompletion), released on 2023-03-01.
+This document describes version 0.106 of Perinci::Sub::XCompletion::dirname (from Perl distribution Perinci-Sub-XCompletion), released on 2023-11-18.
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,38 @@
+Module:
+    Test::CVE
+
+Description:
+    Test::CVE provides functionality to test a release against known CVE's
+
+    It enables checking the current release only or include its prereqs too.
+
+Copying:
+    Copyright (c) 2023-2023 H.Merijn Brand.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.
+
+    Recent changes can be (re)viewed in the public GIT repository at
+    https://github.com/CPAN-Security/Test-CVE
+    Feel free to clone your own copy:
+
+     $ git clone https://github.com/CPAN-Security/Test-CVE Text-CVE
+
+    or get it as a tgz:
+
+     $ wget --output-document=Test-CVE-git.tgz \
+	https://github.com/CPAN-Security/Test-CVE/archive/main.tar.gz
+
+Prerequisites:
+    perl 5.14.0 or up and internet access
+
+Build/Installation:
+    Standard build/installation:
+	perl Makefile.PL
+	make test
+	make install
+
+Author:
+    H.Merijn Brand <hmbrand@cpan.org>
+    Perl Toolchain Gang
+    CPAN Security Group

@@ -3,7 +3,7 @@ use warnings;
 
 package Pod::Weaver::PluginBundle::Author::AJNN::Author;
 # ABSTRACT: Pod section naming the author
-$Pod::Weaver::PluginBundle::Author::AJNN::Author::VERSION = '0.05';
+$Pod::Weaver::PluginBundle::Author::AJNN::Author::VERSION = '0.06';
 
 use Carp qw(croak);
 use Moose;
@@ -58,7 +58,7 @@ Pod::Weaver::PluginBundle::Author::AJNN::Author - Pod section naming the author
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

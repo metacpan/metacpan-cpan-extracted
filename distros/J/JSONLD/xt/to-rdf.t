@@ -270,10 +270,10 @@ foreach my $t (@$tests) {
 						eval {
 							my $eqtest		= Attean::BindingEqualityTest->new();
 							my $expected	= load_nq($outfile);
-# 							local $SIG{ALRM} = sub { die "timeout" };
-# 							alarm(30);
+							local $SIG{ALRM} = sub { die "timeout" };
+							alarm(30);
 							my $ok			= ok($eqtest->equals($got, $expected), "$id: $name");
-# 							alarm(0);
+							alarm(0);
 							if ($ok) {
 								earl_pass_test( $earl, $test_iri );
 							} else {

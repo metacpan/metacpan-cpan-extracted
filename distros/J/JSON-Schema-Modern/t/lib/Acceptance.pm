@@ -15,7 +15,7 @@ use Feature::Compat::Try;
 use Path::Tiny;
 
 use if $ENV{AUTHOR_TESTING}, 'Test::Warnings' => ':fail_on_warning'; # hooks into done_testing unless overridden
-use Test::JSON::Schema::Acceptance 1.014;
+use Test::JSON::Schema::Acceptance 1.021;
 use Test::Memory::Cycle;
 use Test::File::ShareDir -share => { -dist => { 'JSON-Schema-Modern' => 'share' } };
 use JSON::Schema::Modern;
@@ -41,7 +41,7 @@ sub acceptance_tests (%options) {
   $accepter = $accepter->new(%$accepter,
       test_dir => $accepter->test_dir->child($options{acceptance}{test_subdir}))
     if not $ENV{TEST_DIR} and $options{acceptance}{test_subdir};
-  $accepter->_json_decoder->allow_bignum; # TODO: switch to public accessor with TJSA 1.015
+  $accepter->json_decoder->allow_bignum;  # TODO: remove with TJSA 1.022
 
   my $js = JSON::Schema::Modern->new($options{evaluator}->%*);
   my $js_short_circuit = $ENV{NO_SHORT_CIRCUIT} || JSON::Schema::Modern->new($options{evaluator}->%*, short_circuit => 1);

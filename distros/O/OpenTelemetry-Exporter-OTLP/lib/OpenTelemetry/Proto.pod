@@ -1,0 +1,167 @@
+=encoding UTF-8
+
+=head1 NAME
+
+OpenTelemetry::Proto - The protobuf definitions for the OpenTelemetry Protocol
+
+=head1 SYNOPSIS
+
+    use OpenTelemetry::Proto;
+
+    my $blob = OpenTelemetry::Proto::Collector::Trace::V1::ExportTraceServiceRequest
+        ->new_and_check(\%payload)
+        ->encode;
+
+    $useragent->post( $url => { content => $blob } );
+
+=head1 DESCRIPTION
+
+This module contains Perl bindings for the OTLP Protobuf interface. These can
+be used to decode OTLP binary data into Perl data structures, or to do the
+inverse and encode Perl data structures into OTLP binary data. It is used
+most notably by L<OpenTelemetry::Exporter::OTLP> to encode the data it sends
+when using a binary encoding.
+
+Importing this module will import all the classes generated from the v1.0.0
+OTLP language-independent interface type definitions available at
+L<the OTLP specification repository|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0>.
+
+These classes are generated using L<Google::ProtocolBuffers::Dynamic>
+internally, so please consult the documentation of that distribution
+(L<Google::ProtocolBuffers::Dynamic::Message> in particular) for details on
+the methods that can be called on them.
+
+=head1 CLASSES
+
+=begin comment
+
+The list of classes was automatically generated with the following snippet:
+
+    git -C proto grep --line-number --perl-regexp '^message ' -- ./**/*.proto |
+        perl -Ilib -Mwarnings -Mexperimental=try -MOpenTelemetry::Proto -aE '
+            chomp;
+            my ($path, $fragment) = split /:/, $_;
+            s/:[0-9]+:/:/; s{/(.)}{::\U$1}g;
+            s/\.proto:message /::/;
+            s/ \{$//;
+            s/opentelemetry::/OpenTelemetry::/;
+            s/::V1::[^:]+::/::V1::/;
+            try {
+                $_->new;
+                say "=item L<$_|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/$path#L$fragment>\n";
+            }
+            catch ($e) {
+                warn "$_ did not work: $e";
+            }
+        ' >> lib/OpenTelemetry/Proto.pod
+
+=end comment
+
+This section lists the classes that become available by importing this module.
+Each entry links to the definition of that protobuf message in the
+specification. Please refer to these for details on their fields and their
+meanings.
+
+=over
+
+=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L36>
+
+=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L45>
+
+=item L<OpenTelemetry::Proto::Collector::Logs::V1::ExportLogsPartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/logs/v1/logs_service.proto#L64>
+
+=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L36>
+
+=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L45>
+
+=item L<OpenTelemetry::Proto::Collector::Metrics::V1::ExportMetricsPartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/metrics/v1/metrics_service.proto#L64>
+
+=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTraceServiceRequest|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L36>
+
+=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTraceServiceResponse|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L45>
+
+=item L<OpenTelemetry::Proto::Collector::Trace::V1::ExportTracePartialSuccess|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/collector/trace/v1/trace_service.proto#L64>
+
+=item L<OpenTelemetry::Proto::Common::V1::AnyValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L28>
+
+=item L<OpenTelemetry::Proto::Common::V1::ArrayValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L44>
+
+=item L<OpenTelemetry::Proto::Common::V1::KeyValueList|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L54>
+
+=item L<OpenTelemetry::Proto::Common::V1::KeyValue|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L64>
+
+=item L<OpenTelemetry::Proto::Common::V1::InstrumentationScope|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/common/v1/common.proto#L71>
+
+=item L<OpenTelemetry::Proto::Logs::V1::LogsData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/logs/v1/logs.proto#L38>
+
+=item L<OpenTelemetry::Proto::Logs::V1::ResourceLogs|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/logs/v1/logs.proto#L48>
+
+=item L<OpenTelemetry::Proto::Logs::V1::ScopeLogs|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/logs/v1/logs.proto#L64>
+
+=item L<OpenTelemetry::Proto::Logs::V1::LogRecord|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/logs/v1/logs.proto#L126>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::MetricsData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L38>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::ResourceMetrics|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L48>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::ScopeMetrics|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L64>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::Metric|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L162>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::Gauge|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L196>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::Sum|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L202>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::Histogram|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L215>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::ExponentialHistogram|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L225>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::Summary|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L239>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::NumberDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L336>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::HistogramDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L384>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::ExponentialHistogramDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L465>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::SummaryDataPoint|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L578>
+
+=item L<OpenTelemetry::Proto::Metrics::V1::Exemplar|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/metrics/v1/metrics.proto#L645>
+
+=item L<OpenTelemetry::Proto::Resource::V1::Resource|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/resource/v1/resource.proto#L28>
+
+=item L<OpenTelemetry::Proto::Trace::V1::TracesData|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L38>
+
+=item L<OpenTelemetry::Proto::Trace::V1::ResourceSpans|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L48>
+
+=item L<OpenTelemetry::Proto::Trace::V1::ScopeSpans|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L64>
+
+=item L<OpenTelemetry::Proto::Trace::V1::Span|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L80>
+
+=item L<OpenTelemetry::Proto::Trace::V1::Status|https://github.com/open-telemetry/opentelemetry-proto/tree/v1.0.0/opentelemetry/proto/trace/v1/trace.proto#L256>
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Google::ProtocolBuffers::Dynamic>
+
+=item L<OpenTelemetry::Exporter::OTLP>
+
+=item L<The OTLP Specification|https://github.com/open-telemetry/opentelemetry-proto>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+Special thanks to L<CV-Library Ltd.|https://cv-library.co.uk> for their
+support in the development of this library.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

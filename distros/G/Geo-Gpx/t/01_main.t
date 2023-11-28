@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 20;
+use Test::More tests => 31;
 use Geo::Gpx;
 use File::Temp qw/ tempfile tempdir /;
 use Cwd qw(cwd abs_path);
@@ -37,6 +37,11 @@ isa_ok ($o_trk_only1,  'Geo::Gpx');
 my $fname_trk2 = 't/larose_trk2.gpx';
 my $o_trk_only2 = Geo::Gpx->new( input => "$fname_trk2" );
 isa_ok ($o_trk_only2,  'Geo::Gpx');
+
+# new(): from filehandle
+open( my $fh , '<', $fname_wpt1 ) or  die "can't open file $fname_wpt1 $!";
+my $o_from_fh = Geo::Gpx->new( input => $fh );
+isa_ok ($o_from_fh,  'Geo::Gpx');
 
 # NextSteps: create a new empty gpx file, add the waypoints, add a track, then add another track (do we have a method to add another track like waypoints_add()
 
@@ -121,9 +126,26 @@ my ($closest, $dist) = $o_wpt_only1->waypoint_closest_to( $pt2 );
 isa_ok ($closest,  'Geo::Gpx::Point');
 is($dist, 241.593745,                  "    waypoints_closest_to(): check the distance to the closest waypoint");
 
+# waypoint_rename():
+is( $o_wpt_only1->waypoint_rename('LP1', 'LP1_renamed'), 'LP1_renamed', "    waypoint_rename(): check if rename is successful");
+is( $o_wpt_only1->waypoint_rename('LP1', 'Another name'), undef,        "    waypoint_rename(): check return value if unsuccessful");
+
 # waypoint_delete():
-$o_wpt_only1->waypoint_delete('LP1');
-$o_wpt_only1->waypoints_count;      # was 3 should now be 2
+is( $o_wpt_only1->waypoint_delete('LP1'), undef,    "    waypoint_delete(): check return value if waypoint name is not found");
+$o_wpt_only1->waypoint_rename('LP1_renamed', 'LP1');
+is( $o_wpt_only1->waypoint_delete('LP1'), 1,        "    waypoint_delete(): check if waypoint deletion is successful");
+is( $o_wpt_only1->waypoints_count, 2,               "    waypoint_delete(): had 3 points, should now have 2");
+
+# track_rename():
+is( $o_ta->track_rename('A track with one segment', 'Single segment track'), 'Single segment track', "    track_rename(): check if rename is successful");
+# is( $o_ta->track_rename( -0, 'Really just one'), 'Really just one', "    track_rename(): check if rename is successful");
+# ... counting from the end is undocumented and will change in the future i.e. -1 will refer to last not -0
+# is( $o_ta->track_rename('A track with one segment', 'LP1_renamed'),  undef,        "    track_rename(): check return value if unsuccessful");
+# ... this one croaks instead of returing undef, I think waypoint_rename() should behave the same way and croak
+
+# track_delete():
+$o_ta->track_delete( 'Single segment track' );
+is($o_ta->tracks_count, 1,             "    tracks_delete(): test the number of tracks remaining");
 
 # save(): a few saves
 $o->set_wd( $tmp_dir );
@@ -136,6 +158,14 @@ $o_wpt_only1->set_wd( '-' );
 # save() - new instance based on saved file
 my $saved_then_read  = Geo::Gpx->new( input => $tmp_dir . '/test_save.gpx' );
 isa_ok ($saved_then_read,  'Geo::Gpx');
+
+# delete_all's
+$o->waypoints_delete_all;
+is( $o->waypoints_count, 0,            "    waypoints_delete_all(): count should now be 0");
+$o_ta->tracks_delete_all;
+is( $o_ta->tracks_count, 0,            "    waypoints_delete_all(): count should now be 0");
+$o_ta->routes_delete_all;
+is( $o_ta->routes_count, 0,            "    waypoints_delete_all(): count should now be 0");
 
 print "so debugger doesn't exit\n";
 

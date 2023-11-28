@@ -1,5 +1,11 @@
 Revision history for Perl module YAML::PP
 
+v0.37.0 2023-11-09 16:46:43+01:00
+
+    - Breaking change: Make cyclic_refs fatal by default for safety, like
+      announced (avoid memory leaks)
+    - Add support for plain scalars ending with colons (Issue #48, ingy++)
+
 0.036 2023-05-10 17:09:48+02:00
 
     - Add option -dumpcode to turn of dumping coderefs in YAML::PP::Schema::Perl

@@ -6,14 +6,13 @@ use strict;
 use warnings;
 use 5.014;
 
-no if $] >= 5.018, warnings => 'experimental::smartmatch';
-
 use parent 'Class::Accessor';
 use DateTime::Format::Strptime;
-use List::Util qw(any);
+use List::Util   qw(any);
+use Scalar::Util qw(weaken);
 use Travel::Status::DE::HAFAS::Stop;
 
-our $VERSION = '4.18';
+our $VERSION = '5.01';
 
 Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 	qw(datetime sched_datetime rt_datetime
@@ -28,7 +27,6 @@ Travel::Status::DE::HAFAS::Journey->mk_ro_accessors(
 sub new {
 	my ( $obj, %opt ) = @_;
 
-	my @locL  = @{ $opt{common}{locL}  // [] };
 	my @prodL = @{ $opt{common}{prodL} // [] };
 	my @opL   = @{ $opt{common}{opL}   // [] };
 	my @icoL  = @{ $opt{common}{icoL}  // [] };
@@ -36,10 +34,11 @@ sub new {
 	my @remL  = @{ $opt{common}{remL}  // [] };
 	my @himL  = @{ $opt{common}{himL}  // [] };
 
+	my $locL    = $opt{locL};
 	my $hafas   = $opt{hafas};
 	my $journey = $opt{journey};
 
-	my $date = $journey->{date};
+	my $date = $opt{date} // $journey->{date};
 
 	my $direction = $journey->{dirTxt};
 	my $jid       = $journey->{jid};
@@ -110,77 +109,22 @@ sub new {
 	my @stops;
 	my $route_end;
 	for my $stop ( @{ $journey->{stopL} // [] } ) {
-		my $loc       = $locL[ $stop->{locX} ];
-		my $sched_arr = $stop->{aTimeS};
-		my $rt_arr    = $stop->{aTimeR};
-		my $sched_dep = $stop->{dTimeS};
-		my $rt_dep    = $stop->{dTimeR};
+		my $loc = $locL->[ $stop->{locX} ];
 
-		# dIn. / aOut. -> may passengers enter / exit the train?
+		my $stopref = {
+			loc          => $loc,
+			stop         => $stop,
+			common       => $opt{common},
+			hafas        => $hafas,
+			date         => $date,
+			datetime_ref => $datetime_ref,
+		};
 
-		my $sched_platform   = $stop->{aPlatfS}  // $stop->{dPlatfS};
-		my $rt_platform      = $stop->{aPlatfR}  // $stop->{dPlatfR};
-		my $changed_platform = $stop->{aPlatfCh} // $stop->{dPlatfCh};
+		weaken( $stopref->{hafas} );
 
-		for my $timestr ( $sched_arr, $rt_arr, $sched_dep, $rt_dep ) {
-			if ( not defined $timestr ) {
-				next;
-			}
+		push( @stops, $stopref );
 
-			$timestr = handle_day_change(
-				input    => $timestr,
-				date     => $date,
-				strp_obj => $hafas->{strptime_obj},
-				ref      => $datetime_ref
-			);
-
-		}
-
-		my $arr_delay
-		  = ( $sched_arr and $rt_arr )
-		  ? ( $rt_arr->epoch - $sched_arr->epoch ) / 60
-		  : undef;
-
-		my $dep_delay
-		  = ( $sched_dep and $rt_dep )
-		  ? ( $rt_dep->epoch - $sched_dep->epoch ) / 60
-		  : undef;
-
-		my $arr_cancelled = $stop->{aCncl};
-		my $dep_cancelled = $stop->{dCncl};
-
-		my $tco = {};
-		for my $tco_id ( @{ $stop->{dTrnCmpSX}{tcocX} // [] } ) {
-			my $tco_kv = $tcocL[$tco_id];
-			$tco->{ $tco_kv->{c} } = $tco_kv->{r};
-		}
-
-		push(
-			@stops,
-			{
-				loc   => $loc,
-				extra => {
-					sched_arr           => $sched_arr,
-					rt_arr              => $rt_arr,
-					arr                 => $rt_arr // $sched_arr,
-					arr_delay           => $arr_delay,
-					arr_cancelled       => $arr_cancelled,
-					sched_dep           => $sched_dep,
-					rt_dep              => $rt_dep,
-					dep                 => $rt_dep // $sched_dep,
-					dep_delay           => $dep_delay,
-					dep_cancelled       => $dep_cancelled,
-					delay               => $dep_delay // $arr_delay,
-					direction           => $stop->{dDirTxt},
-					sched_platform      => $sched_platform,
-					rt_platform         => $rt_platform,
-					is_changed_platform => $changed_platform,
-					platform            => $rt_platform // $sched_platform,
-					load                => $tco,
-				}
-			}
-		);
-		$route_end = $loc->{name};
+		$route_end = $loc->name;
 	}
 
 	if ( $journey->{stbStop} ) {
@@ -222,14 +166,14 @@ sub new {
 		}
 	}
 	else {
-		$ref->{route_start} = $stops[0]{loc}{name};
+		$ref->{route_start} = $stops[0]{loc}->name;
 	}
 
 	bless( $ref, $obj );
 
 	if ( $journey->{stbStop} ) {
-		$ref->{station}     = $locL[ $journey->{stbStop}{locX} ]->{name};
-		$ref->{station_eva} = 0 + $locL[ $journey->{stbStop}{locX} ]->{extId};
+		$ref->{station}        = $locL->[ $journey->{stbStop}{locX} ]->name;
+		$ref->{station_eva}    = 0 + $locL->[ $journey->{stbStop}{locX} ]->eva;
 		$ref->{sched_platform} = $journey->{stbStop}{dPlatfS};
 		$ref->{rt_platform}    = $journey->{stbStop}{dPlatfR};
 		$ref->{platform}       = $ref->{rt_platform} // $ref->{sched_platform};
@@ -244,7 +188,7 @@ sub new {
 				next;
 			}
 
-			$timestr = handle_day_change(
+			$timestr = Travel::Status::DE::HAFAS::Stop::handle_day_change(
 				input    => $timestr,
 				date     => $date,
 				strp_obj => $hafas->{strptime_obj},
@@ -290,24 +234,6 @@ sub new {
 }
 
 # }}}
-
-sub handle_day_change {
-	my (%opt)   = @_;
-	my $date    = $opt{date};
-	my $timestr = $opt{input};
-	if ( length($timestr) == 8 ) {
-
-		# arrival time includes a day offset
-		my $offset_date = $opt{ref}->clone;
-		$offset_date->add( days => substr( $timestr, 0, 2, q{} ) );
-		$offset_date = $offset_date->strftime('%Y%m%d');
-		$timestr = $opt{strp_obj}->parse_datetime("${offset_date}T${timestr}");
-	}
-	else {
-		$timestr = $opt{strp_obj}->parse_datetime("${date}T${timestr}");
-	}
-	return $timestr;
-}
 
 # {{{ Accessors
 
@@ -355,7 +281,7 @@ sub route {
 	my ($self) = @_;
 
 	if ( $self->{route} ) {
-		if ( $self->{route}[0] and $self->{route}[0]{extra} ) {
+		if ( $self->{route}[0] and $self->{route}[0]{stop} ) {
 			$self->{route}
 			  = [ map { Travel::Status::DE::HAFAS::Stop->new( %{$_} ) }
 				  @{ $self->{route} } ];
@@ -477,7 +403,7 @@ journey received by Travel::Status::DE::HAFAS
 
 =head1 VERSION
 
-version 4.18
+version 5.01
 
 =head1 DESCRIPTION
 
@@ -496,28 +422,28 @@ undef for non-station journeys.
 
 =item $journey->name
 
-Returns the journey or line name, either in a format like "Bus SB16" (Bus line
+Journey or line name, either in a format like "Bus SB16" (Bus line
 SB16) or "RE 10111" (RegionalExpress train 10111, no line information).  May
 contain extraneous whitespace characters.
 
 =item $journey->type
 
-Returns the type of this journey, e.g. "S" for S-Bahn, "RE" for Regional Express
+Type of this journey, e.g. "S" for S-Bahn, "RE" for Regional Express
 or "STR" for tram / StraE<szlig>enbahn.
 
 =item $journey->type_long
 
-Returns the long type of this journey, e.g. "S-Bahn" or "Regional-Express".
+Long type of this journey, e.g. "S-Bahn" or "Regional-Express".
 
 =item $journey->class
 
-Returns an integer identifying the the mode of transport class.
+An integer identifying the the mode of transport class.
 Semantics depend on backend, e.g. "1" and "2" for long-distance trains and
 "4" and "8" for regional trains.
 
 =item $journey->line
 
-Returns the journey or line name, either in a format like "Bus SB16" (Bus line
+Journey or line name, either in a format like "Bus SB16" (Bus line
 SB16), "RE 42" (RegionalExpress train 42) or "IC 2901" (InterCity train 2901,
 no line information).  May contain extraneous whitespace characters.  Note that
 this accessor does not return line information for IC/ICE/EC services, even if
@@ -525,18 +451,18 @@ it is available. Use B<line_no> for those.
 
 =item $journey->line_no
 
-Returns the line identifier, or undef if it is unknown.
+Line identifier, or undef if it is unknown.
 The line identifier may be a single number such as "11" (underground train
 line U 11), a single word (e.g. "AIR") or a combination (e.g. "SB16").
 May also provide line numbers of IC/ICE services.
 
 =item $journey->number
 
-Returns the journey number (e.g. train number), or undef if it is unknown.
+Journey number (e.g. train number), or undef if it is unknown.
 
 =item $journey->id
 
-Returns tha HAFAS-internal journey ID.
+HAFAS-internal journey ID.
 
 =item $journey->rt_datetime (station only)
 
@@ -556,7 +482,7 @@ undef if neither is available.
 
 =item $journey->delay (station only)
 
-Returns the delay in minutes, or undef if it is unknown.
+Delay in minutes, or undef if it is unknown.
 Also returns undef if the arrival/departure has been cancelled.
 
 =item $journey->is_cancelled
@@ -596,13 +522,13 @@ Undef if unknown.
 
 =item $journey->messages
 
-Returns a list of message strings related to this journey. Messages usually are
-service notices (e.g. "missing carriage") or detailed delay reasons
-(e.g. "switch damage between X and Y, expect delays").
+List of Travel::Status::DE::HAFAS::Message(3pm) instances related to this
+journey. Messages usually are service notices (e.g. "missing carriage") or
+detailed delay reasons (e.g. "switch damage between X and Y, expect delays").
 
 =item $journey->operator
 
-Returns the operator responsible for this journey. Returns undef
+The operator responsible for this journey. Returns undef
 if the backend does not provide an operator.
 
 =item $journey->station (station only)
@@ -615,16 +541,15 @@ UIC/EVA ID of the station at which this journey was requested.
 
 =item $journey->route
 
-Returns a list of Travel::Status::DE::HAFAS::Stop(3pm) objects that describe
-individual stops along the journey. In stationboard mode, the list only
-contains arrivals prior to the requested station or departures after the
-requested station. In journey mode, it contains the entire route.
+List of Travel::Status::DE::HAFAS::Stop(3pm) objects that describe individual
+stops along the journey. In stationboard mode, the list only contains arrivals
+prior to the requested station or departures after the requested station. In
+journey mode, it contains the entire route.
 
 =item $journey->route_interesting([I<count>])
 
-Return up to I<count> (default: B<3>) parts of C<< $journey->route >> that may
+Up to I<count> (default: B<3>) parts of C<< $journey->route >> that may
 be particularly helpful, e.g. main stations or airports.
-Returns a list of hashes, see above for the layout.
 
 =item $journey->route_end
 
@@ -690,7 +615,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2022 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

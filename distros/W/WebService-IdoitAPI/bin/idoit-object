@@ -1,0 +1,146 @@
+#!/usr/bin/env perl
+# vim: set sw=4 ts=4 et ai si:
+#
+use strict;
+use warnings;
+
+use Data::Dumper;
+use Getopt::Long;
+use Pod::Usage;
+use WebService::IdoitAPI::Object;
+
+sub initialize {
+    my $config = {};
+    my $opt = {};
+    GetOptions($opt, qw(
+        config=s
+        get-information|information=i
+        get-data|data=i
+        pretty
+        help|h|? man version|V
+    ));
+    pod2usage(-exitstatus => 0, -input => \*DATA)       if $opt->{help};
+    pod2usage(-exitstatus => 0, -input => \*DATA,
+              -verbose => 2)                            if $opt->{man};
+    pod2usage(-exitstatus => 0, -input => \*DATA,
+              -verbose => 99, -sections => 'VERSION')   if $opt->{version};
+
+    $config = WebService::IdoitAPI::read_config($opt->{config});
+
+    $config->{opt} = $opt;
+
+    return $config;
+} # initialize()
+
+sub print_json {
+    my ($opt,$data) = @_;
+
+    my $json = JSON->new();
+
+    if ( $opt->{pretty} ) {
+        print $json->canonical->pretty->encode($data);
+    }
+    else {
+        print $json->encode($data);
+    }
+} # print_json()
+
+my ($api,$config,$object,$opt);
+
+$config = initialize();
+$api = WebService::IdoitAPI->new($config);
+$opt = $config->{opt};
+$object = WebService::IdoitAPI::Object->new($api,$opt->{id});
+
+if (my $id = $opt->{'get-information'}) {
+    my $data = $object->get_information($id);
+    print_json($opt, $data);
+}
+elsif ($id = $opt->{'get-data'}) {
+    my $data = $object->get_data($id);
+    print_json($opt, $data);
+}
+
+exit 0;
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+idoit-object - handle objects in i-doit
+
+=head1 VERSION
+
+This is version v0.3.1 of the program.
+
+=head1 SYNOPSIS
+
+  idoit-object [ options ]
+
+=head1 OPTIONS
+
+=head2 --help | -h | -?
+
+Show a short description and exit.
+
+=head2 --man
+
+Show the full man page and exit.
+
+=head2 --config path
+
+Read configuration values from a file found at the given path.
+
+=head3 --get-data id | --data id
+
+Print a subset of the information for object with ID I<id> as JSON.
+
+=head3 --get-information id | --information id
+
+Print all information for the object with ID I<id> as JSON.
+
+=head3 --pretty
+
+Pretty print JSON output.
+
+=head3 --version | -V
+
+Show the version and exit.
+
+=head1 CONFIGURATION FILE FORMAT
+
+The configuration file should contain lines with a key and a value
+separated by equal sign (I<=>) or colon (I<:>).
+The key and the value may be enclosed
+in single (I<'>) or double (I<">) quotation marks.
+Leading and trailing white space is removed
+as well as a comma (I<,>) at the the end of the line.
+
+The program needs the following keys in the file:
+
+=over 4
+
+=item key
+
+The API key for i-doit.
+
+=item url
+
+The URL of the i-doit instance.
+
+=item username
+
+The username for the login (optional).
+
+=item password
+
+The password for the login (optional).
+
+=back
+
+=head1 AUTHOR
+
+Mathias Weidner C<< <mamawe@cpan.org> >>
+

@@ -1,5 +1,9 @@
 Revision history for perl module Sys::Virt
 
+9.8.0 2023-11-13
+
+ - Add network metadata change event callback
+
 9.7.0 2023-09-01
 
  - Add virNetworkSetMetadata/virNetworkGetMetadata and

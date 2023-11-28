@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use 5.012;
+use warnings;
+
+# :squash-remove-start:
+use FindBin qw//;
+use lib "$FindBin::RealBin/lib";
+# :squash-remove-end:
+
+require App::Hack::Exe;
+
+if (($ARGV[0] // '') eq '--help') {
+    print HELP_MESSAGE();
+    exit 0;
+}
+
+if (($ARGV[0] // '') eq '--version') {
+    print VERSION_MESSAGE();
+    exit 0;
+}
+
+if (@ARGV != 1) {
+    print STDERR USAGE();
+    exit 2;
+}
+
+sub USAGE {
+    return <<'EOUSAGE'
+Usage: hack.exe HOSTNAME
+EOUSAGE
+}
+
+sub HELP_MESSAGE {
+    return USAGE() . <<'EOHELP';
+An animated terminal app that pretends to hack a website, just like in the movies
+
+Options:
+    --help      Show this message
+    --version   Show version
+EOHELP
+}
+
+sub VERSION_MESSAGE {
+    return <<"EOVERSION";
+hack.exe (App::Hack::Exe) $App::Hack::Exe::VERSION
+EOVERSION
+}
+
+App::Hack::Exe->new->run(@ARGV);

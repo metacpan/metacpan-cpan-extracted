@@ -6,7 +6,7 @@ use namespace::autoclean;
 
 # ABSTRACT: Appropriate errors for missing $VERSIONs in GSG dists
 use version;
-our $VERSION = 'v0.5.2'; # VERSION
+our $VERSION = 'v0.5.3'; # VERSION
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -47,7 +47,7 @@ Dist::Zilla::Plugin::Author::GSG::HasVersionTests - Appropriate errors for missi
 
 =head1 VERSION
 
-version v0.5.2
+version v0.5.3
 
 =head1 SYNOPSIS
 

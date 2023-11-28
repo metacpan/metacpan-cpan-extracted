@@ -2,8 +2,8 @@ NAME
     Data::Sah::Filter - Filtering for Data::Sah
 
 VERSION
-    This document describes version 0.021 of Data::Sah::Filter (from Perl
-    distribution Data-Sah-Filter), released on 2023-06-21.
+    This document describes version 0.022 of Data::Sah::Filter (from Perl
+    distribution Data-Sah-Filter), released on 2023-08-16.
 
 SYNOPSIS
      use Data::Sah::Filter qw(gen_filter);
@@ -18,7 +18,7 @@ SYNOPSIS
 
 DESCRIPTION
     This distribution contains a standard set of filter rules for Data::Sah
-    (to be used in "prefilters" and "postfilter" cause). It is separated
+    (to be used in "prefilters" and "postfilters" clauses). It is separated
     from the "Data-Sah" distribution and can be used independently.
 
     A filter rule is put in
@@ -26,9 +26,12 @@ DESCRIPTION
     example: Data::Sah::Filter::perl::Str::trim for trimming whitespace at
     the beginning and end of string.
 
-    Basically, a filter rule will provide an expression ("expr_filter") to
-    convert data to another. Multiple filter rules will be combined to form
-    the final filtering code.
+    Basically, a filter rule will provide a Perl expression ("expr_filter")
+    to convert one data to another. Multiple filter rules can be combined to
+    form the final filtering code. This code can be used by "Data::Sah" when
+    generating validator code from Sah schema, or can be used directly. Some
+    projects which use filtering rules directly include: App::orgadb (which
+    lets users specify filters from the command-line).
 
   meta()
     The filter rule module must contain "meta" subroutine which must return
@@ -46,11 +49,11 @@ DESCRIPTION
     *   might_fail => bool
 
         Whether coercion might fail, e.g. because of invalid input. If set
-        to 1, "expr_filter" key that the "filter()" routine returns must be
-        an expression that returns an array (envelope) of "(error_msg,
-        data)" instead of just filtered data. Error message should be a
-        string that is set when filtering fails and explains why. Otherwise,
-        if filtering succeeds, the error message string should be set to
+        to 1, "expr_filter" key that the filter() routine returns must be an
+        expression that returns an array (envelope) of "(error_msg, data)"
+        instead of just filtered data. Error message should be a string that
+        is set when filtering fails and explains why. Otherwise, if
+        filtering succeeds, the error message string should be set to
         undefined value.
 
         This is used for filtering rules that act as a data checker.

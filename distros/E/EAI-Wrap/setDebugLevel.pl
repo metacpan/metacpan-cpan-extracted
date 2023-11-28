@@ -12,7 +12,13 @@ if (!$env) {
 	# if not configured, use default mapping (usually ''=>"Prod" for production)
 	$env = $config{folderEnvironmentMapping}{''};
 }
-my $logconfig = "$ENV{EAI_WRAP_CONFIG_PATH}/$env/log.config";
+my $logconfig;
+if ($config{prodEnvironmentInSeparatePath}) {
+	$logconfig = "$ENV{EAI_WRAP_CONFIG_PATH}/$env/log.config";
+} else {
+	$logconfig = $ENV{EAI_WRAP_CONFIG_PATH}.($config{folderEnvironmentMapping}{$homedirnode} ? '/'.$config{folderEnvironmentMapping}{$homedirnode} : "").'/log.config';
+}
+
 # main loop: read log.config and write back changes made by user choices
 while (1) {
 	system $^O eq 'MSWin32' ? 'cls' : 'clear'; # clear screen first

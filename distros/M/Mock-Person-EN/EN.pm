@@ -1,13 +1,11 @@
 package Mock::Person::EN;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use utf8;
 use warnings;
 
-# Modules.
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Readonly;
 
 # Constants.
@@ -19,8 +17,7 @@ Readonly::Array our @EXPORT_OK => qw(first_male first_female middle_female
 # Variables.
 our $TYPE = 'two';
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # First and middle male names.
 our @first_male = our @middle_male = qw(
@@ -1610,6 +1607,7 @@ Mock::Person::EN - Generate random sets of English names.
 
  use Mock::Person::EN qw(first_male first_female last_male last_female
          middle_male middle_female name name_female name_male);
+
  my $first_male = first_male();
  my $first_female = first_female();
  my $last_male = last_male();
@@ -1699,11 +1697,11 @@ Returns random female name.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=print_random_english_name.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::EN qw(name);
 
@@ -1715,11 +1713,11 @@ Returns random female name.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=print_random_english_name_with_middle.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::EN qw(name);
 
@@ -1734,11 +1732,11 @@ Returns random female name.
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=list_last_male_names.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::EN;
 
@@ -3039,7 +3037,7 @@ Returns random female name.
 =head1 DEPENDENCIES
 
 L<Exporter>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -3054,21 +3052,22 @@ Install the Mock::Person modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Mock-Person-EN>
+L<https://github.com/michal-josef-spacek/Mock-Person-EN>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2023
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

@@ -1,5 +1,18 @@
 Revision history for WebService-IdoitAPI
 
+v0.3.1 Fri Nov 10 20:10:14 CET 2023
+	- fix: install idoit-object
+	- fix: idoit-object: make option --version (and -V) work
+	- feat: idoit-reports: when printing CSV, sort columns alphabetically
+	- feat: add function WebService::IdoitAPI::Object->get_data()
+	- feat: idoit-object: access get_data() with option --get-data
+
+v0.3.0 Wed Nov  8 19:53:37 CET 2023
+	- add module WebService::IdoitAPI::Object with functions 
+	  that deal with i-doit objects
+	- add script idoit-object that provides access to
+          WebService::IdoitAPI::Object from the command line
+
 v0.2.2 Sun May  7 11:03:46 CEST 2023
 	- add IO::ScalarArray to test dependencies
 

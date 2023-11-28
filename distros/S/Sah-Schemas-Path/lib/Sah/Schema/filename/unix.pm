@@ -3,9 +3,9 @@ package Sah::Schema::filename::unix;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-10-29'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Sah-Schemas-Path'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.025'; # VERSION
 
 our $schema = ["str" => {
     summary => 'Filesystem file name on a Unix system',
@@ -49,7 +49,7 @@ Sah::Schema::filename::unix - Filesystem file name on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.021 of Sah::Schema::filename::unix (from Perl distribution Sah-Schemas-Path), released on 2023-10-29.
+This document describes version 0.025 of Sah::Schema::filename::unix (from Perl distribution Sah-Schemas-Path), released on 2023-11-23.
 
 =head1 SYNOPSIS
 
@@ -83,11 +83,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "foo/bar";
+ $data = "foo//bar";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "foo\0";
+ $data = "";
  my $errmsg = $validator->($data); # => "Must match regex pattern \\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z"
 
 Often a schema has coercion rule or default value rules, so after validation the
@@ -98,12 +98,12 @@ validated value will be different from the original. To return the validated
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "foo/bar";
+ $data = "foo//bar";
  my $res = $validator->($data); # => ["","foo/bar"]
  
  # a sample invalid data
- $data = "foo\0";
- my $res = $validator->($data); # => ["Must match regex pattern \\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z","foo\0"]
+ $data = "";
+ my $res = $validator->($data); # => ["Must match regex pattern \\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",""]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like

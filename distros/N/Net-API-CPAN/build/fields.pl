@@ -2513,6 +2513,10 @@
                     {
                         type => "string",
                     },
+                    maturity =>
+                    {
+                        type => "string",
+                    },
                     status =>
                     {
                         type => "string",

@@ -1,0 +1,41 @@
+=head1 NAME
+
+hack.exe - An animated terminal app that pretends to hack a website, just like in the movies
+
+=head1 SYNOPSIS
+
+B<hack.exe> I<HOSTNAME>
+
+I<HOSTNAME> is the host to simulate a hack on.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --help
+
+Show a help message and exit.
+
+=item --version
+
+Show version information and exit.
+
+=back
+
+=head1 AUTHOR
+
+Dan Church (h3xx<attyzatzat>gmx<dottydot>com).
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2023 Dan Church.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 AVAILABILITY
+
+The latest version of this library is likely to be available from CPAN as well
+as:
+
+L<https://codeberg.org/h3xx/perl-App-Hack-Exe>

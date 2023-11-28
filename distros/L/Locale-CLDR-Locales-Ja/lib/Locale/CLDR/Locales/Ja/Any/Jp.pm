@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ja::Any::Jp - Package for language Japanese
 
 package Locale::CLDR::Locales::Ja::Any::Jp;
 # This file auto generated from Data\common\main\ja_JP.xml
-#	on Fri 13 Oct  9:22:20 am GMT
+#	on Sat  4 Nov  6:08:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

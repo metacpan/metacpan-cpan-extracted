@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Unicode::Block;
 use Unicode::UCD qw(charblock charblocks);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -61,29 +61,35 @@ Unicode::Block::List - List of unicode blocks.
 =head1 SYNOPSIS
 
  use Unicode::Block::List;
+
  my $obj = Unicode::Block->new(%parameters);
  my $block = $obj->block($block);
- my @list = $obj->list; 
+ my @list = $obj->list;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Unicode::Block->new(%parameters);
 
 Constructor.
 
-=item C<block($block)>
+Returns instance of object.
 
- Get Unicode::Block object for defined Unicode block.
- Returns Unicode::Block object.
+=head2 C<block>
 
-=item C<list()>
+ my $block = $obj->block($block);
 
- Get list of blocks.
- Returns array of Unicode block names.
+Get Unicode::Block object for defined Unicode block.
 
-=back
+Returns Unicode::Block object.
+
+=head2 C<list>
+
+ my @list = $obj->list;
+
+Get list of blocks.
+Returns array of Unicode block names.
 
 =head1 ERRORS
 
@@ -92,6 +98,8 @@ Constructor.
                  Unknown parameter '%s'.
 
 =head1 EXAMPLE1
+
+=for comment filename=print_unicode_block.pl
 
  use strict;
  use warnings;
@@ -141,6 +149,8 @@ Constructor.
  # Block 'foo' doesn't exist.
 
 =head1 EXAMPLE2
+
+=for comment filename=list_unicode_blocks.pl
 
  use strict;
  use warnings;
@@ -372,6 +382,8 @@ Constructor.
 
 =head1 EXAMPLE3
 
+=for comment filename=print_unicode_block_in_curses_ui.pl
+
  use strict;
  use warnings;
  
@@ -439,7 +451,7 @@ L<Unicode::UCD>.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Unicode-Block-List>
+L<https://github.com/michal-josef-spacek/Unicode-Block-List>
 
 =head1 AUTHOR
 
@@ -449,11 +461,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2018 Michal Josef Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

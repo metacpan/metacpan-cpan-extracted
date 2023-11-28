@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::OoxmlSaveOptions
+# AsposeCellsCloud::Object::OoxmlSaveOptions 
 
 ## Load the model package
 ```perl
@@ -8,16 +8,19 @@ use AsposeCellsCloud::Object::OoxmlSaveOptions;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**enable_http_compression** | **boolean** |  | [optional] 
-**save_format** | **string** |  | [optional] 
-**clear_data** | **boolean** | Make the workbook empty after saving the file. | [optional] 
-**cached_file_folder** | **string** | The cached file folder is used to store some large data. | [optional] 
-**validate_merged_areas** | **boolean** | Indicates whether validate merged areas before saving the file. The default value is false.              | [optional] 
-**refresh_chart_cache** | **boolean** |  | [optional] 
-**create_directory** | **boolean** | If true and the directory does not exist, the directory will be automatically created before saving the file.              | [optional] 
-**sort_names** | **boolean** |  | [optional] 
-**export_cell_name** | **boolean** |  | [optional] 
+**ExportCellName** | **boolean** | Indicates if export cell name to Excel2007 .xlsx (.xlsm, .xltx, .xltm) file.               If the output file may be accessed by SQL Server DTS, this value must be               true.  Setting the value to false will highly increase the performance and               reduce the file size when creating large file.  Default value is false. |
+**UpdateZoom** | **boolean** | Indicates whether update scaling factor before saving the file if the PageSetup.FitToPagesWide and PageSetup.FitToPagesTall properties control how the worksheet is scaled. |
+**EnableZip64** | **boolean** | Always use ZIP64 extensions when writing zip archives, even when unnecessary. |
+**EmbedOoxmlAsOleObject** | **boolean** | Indicates whether embedding Ooxml files of OleObject as ole object. |
+**CompressionType** | **string** | Gets and sets the compression type for ooxml file. |
+**SaveFormat** | **string** |  |
+**CachedFileFolder** | **string** |  |
+**ClearData** | **boolean** |  |
+**CreateDirectory** | **boolean** |  |
+**EnableHTTPCompression** | **boolean** |  |
+**RefreshChartCache** | **boolean** |  |
+**SortNames** | **boolean** |  |
+**ValidateMergedAreas** | **boolean** |  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

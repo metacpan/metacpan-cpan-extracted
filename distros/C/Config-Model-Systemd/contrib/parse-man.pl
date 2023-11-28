@@ -107,7 +107,7 @@ sub parse_xml ($list, $map) {
             return $condition_variable->($t, $elt);
         }
 
-        my @para_text = map {$_->text} $elt->first_child('listitem')->children('para');
+        my @para_text = map {$_->text} $elt->first_child('listitem')->children(qr/para|programlisting/);
         my $desc = join("\n\n", @para_text);
 
         # detect deprecated param and what replaces them
@@ -299,15 +299,15 @@ sub setup_element ($meta_root, $config_class, $element, $desc, $extra_info, $sup
 
         die "Error in $config_class: cannot find the values of $element enum type from «$desc»\n"
             unless @choices;
-        push @log, "enum choices are '".join("', '", @choices)."'";
-        push @load_extra, 'choice='.join(',',@choices);
+        push @log, "enum choices are '".join("', '", sort @choices)."'";
+        push @load_extra, 'choice='.join(',',sort @choices);
     }
 
 
     push @load_extra, "min=$min" if defined $min;
     push @load_extra, "max=$max" if defined $max;
 
-    if ($value_type eq 'integer' and $desc =~ /defaults? (?:to|is) (\d+)/i) {
+    if ($value_type eq 'integer' and $desc =~ /defaults? (?:value )?(?:to|is) (\d+)/i) {
         push @load_extra, "upstream_default=$1" ;
     }
 
@@ -418,6 +418,9 @@ foreach my $config_class (keys $data->{class}->%*) {
 
     $desc_text.="\nThis configuration class was generated from systemd documentation.\n"
         ."by L<parse-man.pl|https://github.com/dod38fr/config-model-systemd/contrib/parse-man.pl>\n";
+
+    # detect verbatim parts setup with programlisting tag
+    $desc_text =~ s/^\+-\+/    /gm;
 
     my $steps = "class:$config_class class_description";
     $meta_root->grab(step => $steps, autoadd => 1)->store($desc_text);

@@ -1,5 +1,14 @@
 Revision history for Music-MelodicDevice-Ornamentation
 
+0.0706 2023-11-26 15:15:15
+    - Need a <p> tag I guess. ¯\_(ツ)_/¯
+
+0.0705 2023-11-26 15:07:33
+    - Add cool image of Bach notation.
+
+0.0704 2023-11-25 22:39:56
+    - Fix import order!
+
 0.0703 2022-11-08 00:29:34
     - Change the grace_note() to a 64th.
     - Improve tests.

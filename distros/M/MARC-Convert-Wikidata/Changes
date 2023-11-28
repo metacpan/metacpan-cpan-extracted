@@ -1,3 +1,14 @@
+0.06 2023-11-20T14:16:34+01:00
+ - Rewrite to use of MARC::Leader.
+
+0.05 2023-11-11T22:02:39+01:00
+ - Add Přelouč to publishing places cleanup.
+ - Add edition number use case.
+ - Add publisher place use case.
+ - Add test for clean_cover().
+ - Add verbose parameter.
+ - Fix test messages in clean_cover().
+
 0.04 2023-06-11T18:24:52+02:00
  - Add publication date use case.
  - Improve clean_publication_date() code.

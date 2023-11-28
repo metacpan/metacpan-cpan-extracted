@@ -155,7 +155,7 @@ __END__
 
 =head1 NAME
 
-	PayProp::API::Public::Client::Request::Export::Beneficiaries - Beneficiary export module.
+PayProp::API::Public::Client::Request::Export::Beneficiaries - Beneficiary export module.
 
 =head1 SYNOPSIS
 
@@ -173,92 +173,92 @@ __END__
 
 =head1 DESCRIPTION
 
-	Implementation for retrieving beneficiary export results via API.
-	This module is intended to be accessed via instance of C<PayProp::API::Public::Client>.
+Implementation for retrieving beneficiary export results via API.
+This module is intended to be accessed via instance of C<PayProp::API::Public::Client>.
 
 =head1 ATTRIBUTES
 
-	C<PayProp::API::Public::Client::Request::Export::Beneficiaries> implements the following attributes.
+C<PayProp::API::Public::Client::Request::Export::Beneficiaries> implements the following attributes.
 
 =head2 url
 
-	An abstraction of the API endpoint receiving the request(s). It is dependant on the API_DOMAIN.com given.
+An abstraction of the API endpoint receiving the request(s). It is dependant on the API_DOMAIN.com given.
 
 =head1 METHODS
 
 =head2 list_p(\%query_params)
 
-	Issues a C<HTTP GET> request to PayProp API C</export/beneficiaries> endpoint. It takes an optional hashref of query parameters.
-	See L</"QUERY PARAMETERS"> for a list of available parameters.
+Issues a C<HTTP GET> request to PayProp API C</export/beneficiaries> endpoint. It takes an optional hashref of query parameters.
+See L</"QUERY PARAMETERS"> for a list of available parameters.
 
 	$beneficiaries_export
 		->list_p({...})
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
+
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
 
 
 =head1 QUERY PARAMETERS
 
 =head2 rows
 
-	B<integer>
-	Restrict rows returned.
+B<integer>
+Restrict rows returned.
 
 	$beneficiaries_export
 		->list_p({ rows => 1 })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 page
 
-	B<integer>
-	Return given page number.
+B<integer>
+Return given page number.
 
 	$beneficiaries_export
 		->list_p({ page => 1 })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 owners
 
-	B<boolean>
-	Return only Beneficiaries that are owners.
+B<boolean>
+Return only Beneficiaries that are owners.
 
 	$beneficiaries_export
 		->list_p({ owners => true })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 search_by
 
-	B<Array of string>
-	Items Enum: C<business_name>, C<first_name>, C<last_name>, C<email_address>
+B<Array of string>
+Items Enum: C<business_name>, C<first_name>, C<last_name>, C<email_address>
 
-	To be used with L</"search_value">.
+To be used with L</"search_value">.
 
 	$beneficiaries_export
 		->list_p(
@@ -270,16 +270,16 @@ __END__
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 search_value
 
-	B<string> C<[3..50] characters>
-	To be used with L</"search_by">.
+B<string> C<[3..50] characters>
+To be used with L</"search_by">.
 
 	$beneficiaries_export
 		->list_p(
@@ -291,126 +291,126 @@ __END__
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 external_id
 
-	B<string> C<<= 32 characters>
-	External ID of beneficiary.
+B<string> C<E<lt>= 32 characters>
+External ID of beneficiary.
 
 	$beneficiaries_export
 		->list_p({ external_id => 'ABCD1234' })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 bank_account_number
 
-	B<string> C<<= 32 characters /^[a-zA-Z0-9]+$/>
-	Filter beneficiaries by bank account number.
+B<string> C<E<lt>= 32 characters /^[a-zA-Z0-9]+$/>
+Filter beneficiaries by bank account number.
 
 	$beneficiaries_export
 		->list_p({ bank_account_number => 'ab123' })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 bank_branch_code
 
-	B<string> C<<= 32 characters /^[a-zA-Z0-9]+$/>
-	Filter beneficiaries by bank branch code.
+B<string> C<E<lt>= 32 characters /^[a-zA-Z0-9]+$/>
+Filter beneficiaries by bank branch code.
 
 	$beneficiaries_export
 		->list_p({ bank_branch_code => 'ab123' })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 is_archived
 
-	B<boolean>
-	Return only beneficiaries that have been archived. Defaults to C<false>.
+B<boolean>
+Return only beneficiaries that have been archived. Defaults to C<false>.
 
 	$beneficiaries_export
 		->list_p({ is_archived => true })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 customer_id
 
-	B<string> C<<= 50 characters>
-	Lookup entities based on C<customer_id>.
+B<string> C<E<lt>= 50 characters>
+Lookup entities based on C<customer_id>.
 
 	$beneficiaries_export
 		->list_p({ customer_id => 'ABC123' })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head2 customer_reference
 
-	B<string> C<<= 50 characters>
-	Customer reference of beneficiary.
+B<string> C<E<lt>= 50 characters>
+Customer reference of beneficiary.
 
 	$beneficiaries_export
 		->list_p({ customer_reference => 'ABC123' })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
-
-			See L<PayProp::API::Public::Client::Response::Export::Beneficiary>.
 		} )
 		->wait
 	;
 
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Beneficiary> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
+
 =head1 AUTHOR
 
-	Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
+Yanga Kandeni E<lt>yangak@cpan.orgE<gt>
 
-	Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
+Valters Skrupskis E<lt>malishew@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-	Copyright 2023- PayProp
+Copyright 2023- PayProp
 
 =head1 LICENSE
 
-	This library is free software; you can redistribute it and/or modify
-	it under the same terms as Perl itself.
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
-	If you would like to contribute documentation
-	or file a bug report then please raise an issue / pull request:
+If you would like to contribute documentation
+or file a bug report then please raise an issue / pull request:
 
-	L<https://github.com/Humanstate/api-client-public-module>
+L<https://github.com/Humanstate/api-client-public-module>
 
 =cut

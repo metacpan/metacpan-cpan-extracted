@@ -1,3 +1,4 @@
+# Check that d2s() is working as expected.
 use strict;
 use warnings;
 use Math::Ryu qw(:all);

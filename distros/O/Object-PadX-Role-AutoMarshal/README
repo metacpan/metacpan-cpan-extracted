@@ -1,0 +1,80 @@
+Object::PadX::Role::AutoMarshal
+
+This role adds an ADJUST sub that reads the MarshalTo attributes to try
+to instantiate new objects with the listed class. It doesn't require
+that the subobjects to be made with Object::Pad but it does require the
+constructor to be expecting all parameters as a hash, not a hashref or
+positional arguments.
+
+  CAVEATS
+
+*   This module is VERY opinionated. All constructors of sub-objects
+    must be expecting a hash as their only input.
+
+*   It only handles fields at object creation time. Assignment later
+    does not get considered, so you can overwrite the field with a
+    different type/class.
+
+*   IT DOES NOT CHECK TYPES. Do not use this module if you are expecting
+    type checking.
+
+*   It relies on experimental APIs and will likely break.
+
+  IMPORTS
+
+  use Object::PadX::Role::AutoMarshal '-toplevel';
+
+  class Foo :does(AutoMarshal) {
+    ...
+  }
+
+This is the only import right now, it creates a top level namespace role
+AutoJSON for lazy people (like me). This is a bad idea, don't do it it
+pollutes this globally since there is no such thing as lexical role
+imports.
+
+  ATTRIBUTES
+
+*   :MarshalTo(ClassName)
+
+    Set the type of object to be instantiated during object creation.
+    It'll get called as "ClassName->new($field_value->%*)", expecting
+    the field to have been set with a hashref on the original ->new call
+    to your class.
+
+*   :MarshalTo([ClassName])
+
+    Create this as an array ref of ClassName objects. It'll iterate
+    through the field value as an array ref and call
+    "ClassName->new($element->%*)". All elements of the array are
+    expected to be hash-refs that will be dereferenced for creating the
+    subobjects.
+
+*   :MarshalTo({ClassName})
+
+    Create this as a hash ref of ClassName objects. It'll iterate
+    through the field value as an hash setting each $key and call
+    "ClassName->new($value->%*)" for each value. All elements of the top
+    level hash-ref are expected to be hash-refs that will be
+    dereferenced for creating the subobjects.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+LICENSE
+
+This module is available under the Artistic 2.0 License

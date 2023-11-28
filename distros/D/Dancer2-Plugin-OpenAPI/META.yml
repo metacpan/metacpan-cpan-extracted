@@ -1,0 +1,65 @@
+---
+abstract: 'create OpenAPI documentation of your application'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  Dancer2: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::PSGI: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-OpenAPI
+provides:
+  Dancer2::Plugin::OpenAPI:
+    file: lib/Dancer2/Plugin/OpenAPI.pm
+    version: v1.0.1
+  Dancer2::Plugin::OpenAPI::Path:
+    file: lib/Dancer2/Plugin/OpenAPI/Path.pm
+    version: v1.0.1
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Clone: '0'
+  Dancer2::Plugin: '0'
+  File::ShareDir::Tarball: '0'
+  Hash::Merge: '0'
+  JSON: '0'
+  List::AllUtils: '0'
+  Moo: '0'
+  MooseX::MungeHas: '0'
+  Path::Tiny: '0'
+  PerlX::Maybe: '0'
+  Scalar::Util: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dancer2-Plugin-OpenAPI/issues
+  homepage: https://github.com/yanick/Dancer2-Plugin-OpenAPI
+  repository: https://github.com/yanick/Dancer2-Plugin-OpenAPI.git
+version: 1.0.1
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributor_covenant:
+  version: 0.02
+x_contributors:
+  - 'Kaveh Mehranfar <kaveh.mehranfar@usts.com>'
+  - 'kmehranfar <kaveh_mehranfar@yahoo.com>'
+  - 'moltar <moltar@moltar.net>'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

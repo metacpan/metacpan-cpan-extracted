@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.32.5
+## Version v0.32.8
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2023/10/11
+## Modified 2023/11/17
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.32.5';
+    our $VERSION     = 'v0.32.8';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -1141,6 +1141,13 @@ sub error
         }
         
         my $err_callback = $self->_on_error;
+        if( !defined( $err_callback ) &&
+            CORE::exists( $args->{callback} ) &&
+            ref( $args->{callback} ) eq 'CODE' )
+        {
+            $err_callback = $args->{callback};
+        }
+        
         if( defined( $err_callback ) && 
             ref( $err_callback ) eq 'CODE' )
         {
@@ -1563,20 +1570,28 @@ sub log_handler { return( shift->_set_get_code( '_log_handler', @_ ) ); }
 
 {
     no warnings 'once';
+    # NOTE: aliasing message to _message
     *message = \&_message;
 
+    # NOTE: aliasing messagec to message_colour
     *messagec = \&message_colour;
 
+    # NOTE: aliasing message_check to _message_check
     *message_check = \&_message_check;
 
+    # NOTE: aliasing message_color to message_colour
     *message_color = \&message_colour;
 
+    # NOTE: aliasing message_frame to _message_frame
     *message_frame = \&_message_frame;
 
+    # NOTE: aliasing message_log to _message_log
     *message_log = \&_message_log;
 
+    # NOTE: aliasing message_log_io to _message_log_io
     *message_log_io = \&_message_log_io;
 
+    # NOTE: aliasing messagef to _messagef
     *messagef = \&_messagef;
 }
 
@@ -1619,8 +1634,46 @@ sub new_hash
 sub new_json
 {
     my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
     $self->_load_class( 'JSON' ) || return( $self->pass_error );
     my $j = JSON->new->allow_nonref->allow_blessed->convert_blessed->allow_tags->relaxed;
+    # Same as in Module::Generic::File::unload_json()
+    my $equi =
+    {
+        order => 'canonical',
+        ordered => 'canonical',
+        sorted => 'canonical',
+        sort => 'canonical',
+    };
+    
+    foreach my $opt ( keys( %$opts ) )
+    {
+        my $ref;
+        $ref = $j->can( exists( $equi->{ $opt } ) ? $equi->{ $opt } : $opt ) || do
+        {
+            warn( "Unknown JSON option '${opt}'\n" ) if( $self->_warnings_is_enabled );
+            next;
+        };
+        
+        # try-catch
+        local $@;
+        eval
+        {
+            $ref->( $j, $opts->{ $opt } );
+        };
+        if( $@ )
+        {
+            if( $@ =~ /perl[[:blank:]\h]+structure[[:blank:]\h]+exceeds[[:blank:]\h]+maximum[[:blank:]\h]+nesting[[:blank:]\h]+level/i )
+            {
+                my $max = $j->get_max_depth;
+                return( $self->error( "Unable to set json option ${opt}: $@ (max_depth value is ${max})" ) );
+            }
+            else
+            {
+                return( $self->error( "Unable to set json option ${opt}: $@" ) );
+            }
+        }
+    }
     return( $j );
 }
 
@@ -1765,6 +1818,7 @@ sub pass_error
     my $err;
     my $class;
     my $code;
+    my $callback;
     no strict 'refs';
     if( scalar( @_ ) )
     {
@@ -1788,6 +1842,7 @@ sub pass_error
     # $class = CORE::delete( $opts->{class} ) if( scalar( keys( %$opts ) ) == 1 && [keys( %$opts )]->[0] eq 'class' );
     $class = $opts->{class} if( CORE::exists( $opts->{class} ) && defined( $opts->{class} ) && CORE::length( $opts->{class} ) );
     $code  = $opts->{code} if( CORE::exists( $opts->{code} ) && defined( $opts->{code} ) && CORE::length( $opts->{code} ) );
+    $callback = $opts->{callback} if( CORE::exists( $opts->{callback} ) && defined( $opts->{callback} ) && ref( $opts->{callback} ) );
     
     # called with no argument, most likely from the same class to pass on an error 
     # set up earlier by another method; or
@@ -1814,6 +1869,7 @@ sub pass_error
         $this->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
         $this->{error}->code( $code ) if( defined( $code ) );
         my $err_callback = $self->_on_error;
+        $err_callback = $callback if( !defined( $err_callback ) && defined( $callback ) );
         if( defined( $err_callback ) && 
             ref( $err_callback ) eq 'CODE' )
         {
@@ -1825,6 +1881,7 @@ sub pass_error
                 $err_callback->( $self, $this->{error} );
             };
         }
+        
         if( $this->{fatal} || ( defined( ${"${class}\::FATAL_ERROR"} ) && ${"${class}\::FATAL_ERROR"} ) )
         {
             die( $this->{error} );
@@ -2313,7 +2370,7 @@ sub __instantiate_object
     {
         return( $self->error({ code => 500, message => $@ }) );
     }
-    return( $self->pass_error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
+    return( $self->error( "Unable to instantiate an object of class $class: ", $class->error ) ) if( !defined( $o ) );
     $o->debug( $this->{debug} ) if( $o->can( 'debug' ) );
     return( $o );
 }
@@ -2604,7 +2661,15 @@ sub _is_hash
 {
     return(0) if( scalar( @_ < 2 ) );
     return(0) if( !defined( $_[1] ) );
-    my $type = Scalar::Util::reftype( $_[1] );
+    my $type;
+    if( @_ > 2 && defined( $_[2] ) && $_[2] eq 'strict' )
+    {
+        $type = ref( $_[1] );
+    }
+    else
+    {
+        $type = Scalar::Util::reftype( $_[1] );
+    }
     return(0) if( !defined( $type ) );
     return( $type eq 'HASH' );
 }
@@ -2746,20 +2811,14 @@ sub _message
         my $opts = {};
         $opts = pop( @$ref ) if( ref( $ref->[-1] ) eq 'HASH' );
 
-        my $stackFrame = $self->_message_frame( (caller(1))[3] ) || 1;
-        $stackFrame = 1 unless( $stackFrame =~ /^\d+$/ );
-#         $stackFrame-- if( $stackFrame );
-#         $stackFrame++ if( ( (caller(1))[3] // '' ) eq 'Module::Generic::messagef' || 
-#                           ( (caller(1))[3] // '' ) eq 'Module::Generic::message_colour' );
-#         $stackFrame++ if( ( (caller(2))[3] // '' ) eq 'Module::Generic::messagef_colour' );
-        if( ( (caller( $stackFrame + 1 ))[3] // '' ) =~ /^Module::Generic::(?:_)?(messagef|message|messagec|message_color|message_colour)/ )
+        my $stackFrame = $self->_message_frame( (caller(1))[3] ) || 0;
+        $stackFrame = 0 unless( $stackFrame =~ /^\d+$/ );
+        $stackFrame += int( $opts->{skip_frames} ) if( CORE::exists( $opts->{skip_frames} ) );
+        while( ( (caller( $stackFrame + 1 ))[3] // '' ) =~ /^Module::Generic::(?:_)?(messagef|message|messagec|message_color|message_colour|AUTOLOAD)/ )
         {
-            while( ( (caller( $stackFrame + 1 ))[3] // '' ) =~ /^Module::Generic::(?:_)?(messagef|message|messagec|message_color|message_colour)/ )
-            {
-                $stackFrame++;
-            }
             $stackFrame++;
         }
+        
         my( $pkg, $file, $line, @otherInfo ) = caller( $stackFrame );
         my $sub = ( caller( $stackFrame + 1 ) )[3] // '';
         my $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
@@ -2775,13 +2834,7 @@ sub _message
                 }
             }
         }
-        if( $sub2 eq '_message' )
-        {
-            $stackFrame++;
-            ( $pkg, $file, $line, @otherInfo ) = caller( $stackFrame );
-            my $sub = ( caller( $stackFrame + 1 ) )[3] // '';
-            $sub2 = substr( $sub, rindex( $sub, '::' ) + 2 );
-        }
+
         my $txt;
         if( $opts->{message} )
         {
@@ -4007,6 +4060,84 @@ sub _set_get_hash_as_mix_object : lvalue
     }, @_ ) );
 }
 
+# There is no lvalue here on purpose
+sub _set_get_hash_as_object
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $field = shift( @_ ) || return( $self->error( "No field provided for _set_get_hash_as_object" ) );
+    my $class;
+    @_ = () if( @_ == 1 && !defined( $_[0] ) );
+    no strict 'refs';
+    if( @_ )
+    {
+        # No class was provided
+        if( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' )
+        {
+            my $new_class = $field;
+            $new_class =~ tr/-/_/;
+            $new_class =~ s/\_{2,}/_/g;
+            $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
+            $class = ( ref( $self ) || $self ) . "\::${new_class}";
+        }
+        elsif( ref( $_[0] ) )
+        {
+            return( $self->error( "Class name in _set_get_hash_as_object helper method cannot be a reference. Received: \"", overload::StrVal( $_[0] // 'undef' ), "\"." ) );
+        }
+        elsif( CORE::length( $_[0] // '' ) )
+        {
+            $class = shift( @_ );
+        }
+    }
+    else
+    {
+        my $new_class = $field;
+        $new_class =~ tr/-/_/;
+        $new_class =~ s/\_{2,}/_/g;
+        $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
+        $class = ( ref( $self ) || $self ) . "\::${new_class}";
+    }
+    # my $class = shift( @_ );
+    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    unless( Class::Load::is_class_loaded( $class ) )
+    {
+        my $perl .= <<EOT;
+package $class;
+BEGIN
+{
+    use strict;
+    use warnings::register;
+    use Module::Generic;
+    use parent qw( Module::Generic::Dynamic );
+};
+
+use strict;
+use warnings;
+
+1;
+
+EOT
+        local $@;
+        my $rc = eval( $perl );
+        die( "Unable to dynamically create module \"$class\" for field \"$field\" based on our own class \"", ( ref( $self ) || $self ), "\": $@" ) if( $@ );
+    }
+    
+    if( @_ )
+    {
+        my $hash = shift( @_ );
+        no warnings 'once';
+        $Module::Generic::Dynamic::DEBUG = $self->debug unless( CORE::exists( $hash->{debug} ) );
+        my $o = $self->__instantiate_object( $field, $class, $hash ) || return( $self->pass_error );
+        $data->{ $field } = $o;
+    }
+    
+    if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
+    {
+        my $o = $data->{ $field } = $self->__instantiate_object( $field, $class, $data->{ $field } );
+    }
+    return( $data->{ $field } );
+}
+
 sub _set_get_ip : lvalue
 {
     my $self = shift( @_ );
@@ -4958,12 +5089,12 @@ sub _set_get_scalar_as_object : lvalue
                 $v = $callbacks->{get}->( $self, $v );
             }
             
-            if( !$v->defined )
+            if( !CORE::defined( $v ) || !$v->defined )
             {
                 # We might have need to specify, because I found a race condition where
                 # even though the context is object, once in Null, the context became 'code'
                 # return( Module::Generic::Null->new( wants => 'OBJECT' ) );
-                if( $ctx->{object} )
+                if( $ctx->{object} && CORE::defined( $v ) )
                 {
                     return( $v );
                 }
@@ -5408,6 +5539,7 @@ sub as_hash
     my $me = $self->_obj2h;
     my $seen = $p->{seen} || {};
     my $levels = $p->{levels} || [];
+    my $keys = $p->{fields} || [];
 
     my $added_subs = CORE::exists( $me->{_added_method} ) && ref( $me->{_added_method} ) eq 'HASH'
         ? $me->{_added_method}
@@ -5560,9 +5692,17 @@ sub as_hash
     };
     
     my $ref = {};
-    my @keys = grep( !/^(debug|verbose)$/, keys( %$me ) );
-    push( @keys, 'debug' ) if( $self->_has_symbol( 'debug' ) );
-    push( @keys, 'verbose' ) if( $self->_has_symbol( 'verbose' ) );
+    my @keys = ();
+    if( $self->_is_array( $keys ) && scalar( @$keys ) )
+    {
+        @keys = @$keys;
+    }
+    else
+    {
+        @keys = grep( !/^(debug|verbose)$/, keys( %$me ) );
+        push( @keys, 'debug' ) if( $self->_has_symbol( 'debug' ) );
+        push( @keys, 'verbose' ) if( $self->_has_symbol( 'verbose' ) );
+    }
     foreach my $k ( @keys )
     {
         next if( substr( $k, 0, 1 ) eq '_' );
@@ -7451,6 +7591,8 @@ PERL
     _parse_timestamp => <<'PERL',
 # Ref:
 # <https://en.wikipedia.org/wiki/Date_format_by_country>
+# Ref:
+# <https://en.wikipedia.org/wiki/Date_format_by_country>
 sub _parse_timestamp
 {
     my $self = shift( @_ );
@@ -7469,11 +7611,11 @@ sub _parse_timestamp
     # "Cannot determine local time zone"
     if( !defined( $HAS_LOCAL_TZ ) )
     {
+        $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
         # try-catch
         local $@;
         eval
         {
-            $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
             $tz = DateTime::TimeZone->new( name => 'local' );
             $HAS_LOCAL_TZ = 1;
         };
@@ -8306,82 +8448,6 @@ sub _set_get_datetime : lvalue
     }, @_ ) );
 }
 PERL
-    # NOTE: _set_get_hash_as_object()
-    _set_get_hash_as_object => <<'PERL',
-# There is no lvalue here on purpose
-sub _set_get_hash_as_object
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    my $field = shift( @_ ) || return( $self->error( "No field provided for _set_get_hash_as_object" ) );
-    my $class;
-    @_ = () if( @_ == 1 && !defined( $_[0] ) );
-    no strict 'refs';
-    if( @_ )
-    {
-        ## No class was provided
-        # if( ref( $_[0] ) eq 'HASH' )
-        if( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' )
-        {
-            my $new_class = $field;
-            $new_class =~ tr/-/_/;
-            $new_class =~ s/\_{2,}/_/g;
-            $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-            $class = ( ref( $self ) || $self ) . "\::${new_class}";
-        }
-        elsif( ref( $_[0] ) )
-        {
-            return( $self->error( "Class name in _set_get_hash_as_object helper method cannot be a reference. Received: \"", overload::StrVal( $_[0] // 'undef' ), "\"." ) );
-        }
-        else
-        {
-            $class = shift( @_ );
-        }
-    }
-    else
-    {
-        my $new_class = $field;
-        $new_class =~ tr/-/_/;
-        $new_class =~ s/\_{2,}/_/g;
-        $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
-        $class = ( ref( $self ) || $self ) . "\::${new_class}";
-    }
-    # my $class = shift( @_ );
-    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    unless( Class::Load::is_class_loaded( $class ) )
-    {
-        my $perl = <<EOT;
-package $class;
-BEGIN
-{
-    use strict;
-    use warnings::register;
-    use Module::Generic;
-    use parent qw( Module::Generic::Dynamic );
-};
-
-1;
-
-EOT
-        local $@;
-        my $rc = eval( $perl );
-        die( "Unable to dynamically create module \"$class\" for field \"$field\" based on our own class \"", ( ref( $self ) || $self ), "\": $@" ) if( $@ );
-    }
-    
-    if( @_ )
-    {
-        my $hash = shift( @_ );
-        my $o = $self->__instantiate_object( $field, $class, $hash );
-        $data->{ $field } = $o;
-    }
-    
-    if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
-    {
-        my $o = $data->{ $field } = $self->__instantiate_object( $field, $class, $data->{ $field } );
-    }
-    return( $data->{ $field } );
-}
-PERL
     };
 }
 
@@ -8823,7 +8889,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.32.5
+    v0.32.8
 
 =head1 DESCRIPTION
 
@@ -9545,6 +9611,68 @@ By default it enables the following L<JSON> object properties:
 
 =back
 
+Additional supported options are as follows, including any of the L<JSON> supported options:
+
+=over 4
+
+=item * C<allow_blessed>
+
+Boolean. When enabled, this will not return an error when it encounters a blessed reference that L<JSON> cannot convert otherwise. Instead, a JSON C<null> value is encoded instead of the object.
+
+=item * C<allow_nonref>
+
+Boolean. When enabled, this will convert a non-reference into its corresponding string, number or null L<JSON> value. Default is enabled.
+
+=item * C<allow_tags>
+
+Boolean. When enabled, upon encountering a blessed object, this will check for the availability of the C<FREEZE> method on the object's class. If found, it will be used to serialise the object into a nonstandard tagged L<JSON> value (that L<JSON> decoders cannot decode). 
+
+=item * C<allow_unknown>
+
+Boolean. When enabled, this will not return an error when L<JSON> encounters values it cannot represent in JSON (for example, filehandles) but instead will encode a L<JSON> "null" value.
+
+=item * C<ascii>
+
+Boolean. When enabled, will not generate characters outside the code range 0..127 (which is ASCII).
+
+=item * C<canonical> or C<ordered>
+
+Boolean value. If true, the JSON data will be ordered. Note that it will be slower, especially on a large set of data.
+
+=item * C<convert_blessed>
+
+Boolean. When enabled, upon encountering a blessed object, L<JSON> will check for the availability of the C<TO_JSON> method on the object's class. If found, it will be called in scalar context and the resulting scalar will be encoded instead of the object.
+
+=item * C<indent>
+
+Boolean. When enabled, this will use a multiline format as output, putting every array member or object/hash key-value pair into its own line, indenting them properly.
+
+=item * C<latin1>
+
+Boolean. When enabled, this will encode the resulting L<JSON> text as latin1 (or iso-8859-1),
+
+=item * C<max_depth>
+
+Integer. This sets the maximum nesting level (default 512) accepted while encoding or decoding. When the limit is reached, this will return an error.
+
+=item * C<pretty>
+
+Boolean value. If true, the JSON data will be generated in a human readable format. Note that this will take considerably more space.
+
+=item * C<space_after>
+
+Boolean. When enabled, this will add an extra optional space after the ":" separating keys from values.
+
+=item * C<space_before>
+
+Boolean. When enabled, this will add an extra optional space before the ":" separating keys from values.
+
+=item * C<utf8>
+
+Boolean. This option is ignored, because the JSON data are saved to file using UTF-8 and double encoding would produce mojibake.
+
+=back
+
 =head2 new_null
 
 Returns a null value based on the expectations of the caller and thus without breaking the caller's call flow.
@@ -10189,6 +10317,17 @@ Provided with some value, possibly, undefined, and this returns true if it is a 
 =head2 _is_hash
 
 Same as L</"_is_array">, but for hash reference.
+
+You can pass also the additional argument C<strict>, in which case, this will apply only to non-objects.
+
+For example:
+
+    my $hash = {};
+    say $this->_is_hash( $hash ); # true
+    my $obj = Foo::Bar->new;
+    say $this->_is_hash( $obj ); # true
+    # but...
+    say $this->_is_hash( $obj => 'strict' ); # false
 
 =head2 _is_integer
 

@@ -1,8 +1,5 @@
 package Data::Format::Pretty::Console;
 
-our $DATE = '2021-08-08'; # DATE
-our $VERSION = '0.391'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -13,6 +10,11 @@ use Scalar::Util qw(blessed);
 use Text::ANSITable;
 use YAML::Any;
 use JSON::MaybeXS;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-08-07'; # DATE
+our $DIST = 'Data-Format-Pretty-Console'; # DIST
+our $VERSION = '0.392'; # VERSION
 
 my $json = JSON::MaybeXS->new->allow_nonref;
 
@@ -33,7 +35,7 @@ sub format_pretty {
 sub new {
     my ($class, $opts) = @_;
     $opts //= {};
-    $opts->{interactive} //= $ENV{INTERACTIVE} // (-t STDOUT);
+    $opts->{interactive} //= $ENV{INTERACTIVE} // (-t STDOUT); ## no critic: InputOutput::ProhibitInteractiveTest
     $opts->{table_column_orders} //= $json->decode(
         $ENV{FORMAT_PRETTY_TABLE_COLUMN_ORDERS})
         if defined($ENV{FORMAT_PRETTY_TABLE_COLUMN_ORDERS});
@@ -191,7 +193,7 @@ sub _render_table {
             my $match = 1;
             my @tcols = @{ $t->{cols} };
             for my $scol (keys %$tcf) {
-                do { $match = 0; last } unless $scol ~~ @tcols;
+                do { $match = 0; last } unless grep { $_ eq $scol } @tcols;
             }
             if ($match) {
                 $colfmts = $tcf;
@@ -207,7 +209,7 @@ sub _render_table {
             my $match = 1;
             my @tcols = @{ $t->{cols} };
             for my $scol (keys %$tct) {
-                do { $match = 0; last } unless $scol ~~ @tcols;
+                do { $match = 0; last } unless grep { $_ eq $scol } @tcols;
             }
             if ($match) {
                 $coltypes = $tct;
@@ -443,8 +445,8 @@ sub _order_table_columns {
         for my $co (@$tco) {
             die "table_column_orders elements must all be arrayrefs"
                 unless ref($co) eq 'ARRAY';
-            for (@$co) {
-                next CO unless $_ ~~ @$cols;
+            for my $c (@$co) {
+                next CO unless grep { $_ eq $c } @$cols;
             }
 
             $found++;
@@ -485,7 +487,7 @@ Data::Format::Pretty::Console - Pretty-print data structure for console output
 
 =head1 VERSION
 
-This document describes version 0.391 of Data::Format::Pretty::Console (from Perl distribution Data-Format-Pretty-Console), released on 2021-08-08.
+This document describes version 0.392 of Data::Format::Pretty::Console (from Perl distribution Data-Format-Pretty-Console), released on 2023-08-07.
 
 =head1 SYNOPSIS
 
@@ -703,14 +705,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Data-Forma
 
 Source repository is at L<https://github.com/perlancar/perl-Data-Format-Pretty-Console>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Console>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Modules used for formatting: L<Text::ANSITable>, L<YAML>.
@@ -725,13 +719,39 @@ perlancar <perlancar@cpan.org>
 
 =for stopwords Steven Haryanto
 
-Steven Haryanto <sharyanto@cpan.org>
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar@cpan.org.
+This software is copyright (c) 2023, 2021, 2017, 2016, 2015, 2014, 2013, 2012, 2011, 2010 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Console>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

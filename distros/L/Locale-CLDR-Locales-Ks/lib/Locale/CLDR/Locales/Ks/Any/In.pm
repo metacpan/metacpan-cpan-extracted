@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ks::Any::In - Package for language Kashmiri
 
 package Locale::CLDR::Locales::Ks::Any::In;
 # This file auto generated from Data\common\main\ks_IN.xml
-#	on Fri 13 Oct  9:24:49 am GMT
+#	on Sat  4 Nov  6:11:03 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

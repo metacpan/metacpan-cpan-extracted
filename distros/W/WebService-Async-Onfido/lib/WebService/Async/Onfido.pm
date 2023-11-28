@@ -5,7 +5,7 @@ package WebService::Async::Onfido;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(IO::Async::Notifier);
 
@@ -1019,6 +1019,52 @@ sub report_list {
             }
         })->retain;
     return $src;
+}
+
+=head2 download_check
+
+Gets the PDF report for a given L<WebService::Async::Onfido::Check>.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<check_id> - the L<WebService::Async::Onfido::Check/id> for the check to query
+
+=back
+
+Returns a PDF file blob
+
+=cut
+
+sub download_check {
+    my ($self, %args) = @_;
+    return $self->rate_limiting->then(
+        sub {
+            my $uri = $self->endpoint('check_download', %args);
+            $self->hook(
+                'on_api_hit',
+                {
+                    GET => $uri,
+                });
+            $self->ua->do_request(
+                uri    => $uri,
+                method => 'GET',
+                $self->auth_headers,
+            );
+        }
+    )->then(
+        sub {
+            try {
+                my ($res) = @_;
+                my $data = $res->content;
+                return Future->done($data);
+            } catch {
+                my ($err) = $@;
+                $log->errorf('Failed - %s', $err);
+                return Future->fail($err);
+            }
+        });
 }
 
 =head2 download_photo

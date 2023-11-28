@@ -6,7 +6,7 @@ use warnings;
 use Class::Utils qw(set_params_pub);
 use Unicode::Block::Item;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -78,14 +78,15 @@ Unicode::Block - Class for unicode block manipulation.
 =head1 SYNOPSIS
 
  use Unicode::Block;
+
  my $obj = Unicode::Block->new(%parameters);
  my $item = $obj->next;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = Unicode::Block->new(%parameters);
 
 Constructor.
 
@@ -93,28 +94,34 @@ Constructor.
 
 =item * C<char_from>
 
- Character from.
- Default value is '0000'.
+Character from.
+
+Default value is '0000'.
 
 =item * C<char_to>
 
- Character to.
- Default value is '007f'.
+Character to.
+
+Default value is '007f'.
 
 =item * C<title>
 
- Title of block.
- Default value is undef.
+Title of block.
+
+Default value is undef.
 
 =back
 
-=item C<next()>
+Returns instance of object.
 
- Get next character.
- Returns Unicode::Block::Item object for character, if character exists.
- Returns undef, if character doesn't exist.
+=head2 C<next>
 
-=back
+ my $item = $obj->next;
+
+Get next character.
+
+Returns Unicode::Block::Item object for character, if character exists.
+Returns undef, if character doesn't exist.
 
 =head1 ERRORS
 
@@ -124,11 +131,13 @@ Constructor.
 
 =head1 EXAMPLE
 
+=for comment filename=print_ascii_block.pl
+
  use strict;
  use warnings;
 
- use Encode qw(encode_utf8);
  use Unicode::Block;
+ use Unicode::UTF8 qw(encode_utf8);
 
  # Object.
  my $obj = Unicode::Block->new;
@@ -189,11 +198,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2017 Michal Josef Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '3.5.0';
+$Git::Hooks::VERSION = '3.6.0';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -294,7 +294,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 3.5.0
+version 3.6.0
 
 =head1 SYNOPSIS
 

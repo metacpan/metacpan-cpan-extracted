@@ -1,4 +1,4 @@
-# AsposeCellsCloud::Object::CellsColor
+# AsposeCellsCloud::Object::CellsColor 
 
 ## Load the model package
 ```perl
@@ -8,12 +8,14 @@ use AsposeCellsCloud::Object::CellsColor;
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**color** | [**Color**](Color.md) |  | [optional] 
-**type** | **string** |  | [optional] 
-**theme_color** | [**ThemeColor**](ThemeColor.md) |  | [optional] 
-**is_shape_color** | **boolean** |  | [optional] 
-**color_index** | **int** |  | [optional] 
+**Color** | **Color** | Gets and sets the RGB color.  |
+**ColorIndex** | **int** | Gets and sets the color index in the color palette. Only applies of indexed color.  |
+**IsShapeColor** | **boolean** | Gets and set the color which should apply to cell or shape.  |
+**tint** | **double** | Set the tint of the shape color |
+**Argb** | **int** | Gets and sets the color from a 32-bit ARGB value.  |
+**ThemeColor** | **ThemeColor** | Gets the theme color. Only applies for theme color type.  |
+**Type** | **string** | The color type.  |
+**Transparency** | **double** | Gets and sets transparency as a value from 0.0 (opaque) through 1.0 (clear).  |  
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
-
 

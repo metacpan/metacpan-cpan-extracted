@@ -4,7 +4,7 @@
       "Zane C. Bowers-Hadley <vvelox@vvelox.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -33,9 +33,6 @@
       "runtime" : {
          "requires" : {
             "Config::Tiny" : "2.28",
-            "Crypt::Digest::MD5" : "0",
-            "Crypt::Digest::SHA1" : "0",
-            "Crypt::Digest::SHA256" : "0",
             "DBI" : "0",
             "File::Copy" : "0",
             "File::Find::Rule" : "0",
@@ -75,6 +72,6 @@
          "web" : "https://github.com/LilithSec/CAPE-Utils"
       }
    },
-   "version" : "v2.7.0",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v2.8.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

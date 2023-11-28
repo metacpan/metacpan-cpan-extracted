@@ -1,3 +1,9 @@
+0.392   2023-08-07  Released-By: PERLANCAR; Urgency: medium
+
+        - Remove usage of smartmatch to avoid deprecation warning in perl
+          5.38+.
+
+
 0.391   2021-08-08  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq version Text::ANSITable to 0.601+ to fix missing

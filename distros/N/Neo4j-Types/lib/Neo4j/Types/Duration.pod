@@ -1,0 +1,98 @@
+# PODNAME: Neo4j::Types::Duration
+# ABSTRACT: Represents a Neo4j temporal duration value
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Types::Duration - Represents a Neo4j temporal duration value
+
+=head1 VERSION
+
+version 2.00
+
+=head1 SYNOPSIS
+
+ $months      = $duration->months;
+ $days        = $duration->days;
+ $seconds     = $duration->seconds;
+ $nanoseconds = $duration->nanoseconds;
+
+=head1 DESCRIPTION
+
+Represents a temporal duration value in Neo4j.
+Includes months, days, seconds, and nanoseconds components,
+which are all expressed as integer numbers.
+The length of the duration is defined by the combination
+of these four components.
+
+Duration values may be returned from a Neo4j database server.
+Generic Duration values may also be created locally.
+See L<Neo4j::Types::Generic/"Duration">.
+
+I<Supported in Neo4j S<version 3.4> and above.>
+
+=head1 METHODS
+
+L<Neo4j::Types::Duration> specifies the following methods.
+
+=head2 days
+
+ $days = $duration->days;
+
+Return the size of the "days" component of this duration.
+
+=head2 months
+
+ $months = $duration->months;
+
+Return the size of the "months" component of this duration.
+
+=head2 nanoseconds
+
+ $nanoseconds = $duration->nanoseconds;
+
+Return the size of the "nanoseconds" component of this duration.
+
+=head2 seconds
+
+ $seconds = $duration->seconds;
+
+Return the size of the "seconds" component of this duration.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Neo4j::Types>
+
+=item * L<Neo4j::Types::Generic/"Duration">
+
+=item * L<Neo4j::Types::ImplementorNotes/"Duration">
+
+=item * L<Neo4j::Bolt::Duration>
+
+=item * L<Neo4j::Driver::Types>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

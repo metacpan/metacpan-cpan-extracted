@@ -12,7 +12,7 @@ use LWP::UserAgent;
 use Menlo::Index::MetaCPAN;
 use URI::cpan;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -127,6 +127,8 @@ App::CPAN::Get - Base class for cpan-get script.
 
 Constructor.
 
+Returns instance of object.
+
 =head2 C<run>
 
  my $exit_code = $app->run;
@@ -149,6 +151,8 @@ Returns 1 for error, 0 for success.
          Value 'uri' doesn't exist.
 
 =head1 EXAMPLE
+
+=for comment filename=download_app_pod_example.pl
 
  use strict;
  use warnings;
@@ -188,12 +192,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2022 Michal Josef Špaček
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

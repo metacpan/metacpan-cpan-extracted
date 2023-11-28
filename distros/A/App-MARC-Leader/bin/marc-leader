@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::MARC::Leader;
+
+our $VERSION = 0.02;
+
+# Run.
+exit App::MARC::Leader->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+marc-leader - Script to decode MARC leader from file or string.
+
+=head1 SYNOPSIS
+
+ marc-leader [-a] [-d] [-f marc_xml_file] [-h] [--version] [leader_string]
+
+=head1 DESCRIPTION
+
+It supports MARC XML files now.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-a>
+
+Print with ANSI colors.
+Or use C<NO_COLOR>/C<COLOR> env variables.
+
+=item * C<-d>
+
+Don't print description.
+
+=item * C<-f marc_xml_file>
+
+MARC XML file name to decode of leader
+
+=item * C<-h>
+
+Print help.
+
+=item * C<--version>
+
+Print version of script.
+
+=item * C<leader_string>
+
+MARC leader string to decode.
+
+=back
+
+=head1 EXAMPLE
+
+ marc-leader -f __MARC.xml__
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-MARC-Leader>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2023 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.02
+
+=cut

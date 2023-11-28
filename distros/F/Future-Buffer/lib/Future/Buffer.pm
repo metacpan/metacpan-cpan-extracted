@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2023 -- leonerd@leonerd.org.uk
 
-package Future::Buffer 0.04;
+package Future::Buffer 0.05;
 
 use v5.14;
 use warnings;
@@ -115,30 +115,34 @@ sub new
 sub _fill
 {
    my $self = shift;
-   return $self->{fill_f} //= do {
-      weaken( my $weakself = $self );
-      my $fill = $self->{fill};
 
-      # Arm the fill loop
-      $fill->() # TODO: give it a size hint?
-         ->on_done( sub {
-            $weakself or return;
+   return $self->{fill_f} if $self->{fill_f};
 
-            undef $self->{fill_f};
+   my $fill = $self->{fill};
 
-            if( @_ ) {
-               my ( $data ) = @_;
-               $weakself->{data} .= $data;
-            }
-            else {
-               $weakself->{at_eof} = 1;
-            }
+   # Arm the fill loop
+   my $f = $self->{fill_f} = $fill->(); # TODO: give it a size hint?
 
-            $weakself->_invoke_pending;
+   no warnings $^V ge v5.28 ? 'shadow' : 'misc';
+   weaken( my $self = $self );
 
-            $weakself->_fill if @{ $self->{pending} };
-         });
-   };
+   $f->on_done( sub {
+      $self or return;
+
+      undef $self->{fill_f};
+
+      if( @_ ) {
+         my ( $data ) = @_;
+         $self->{data} .= $data;
+      }
+      else {
+         $self->{at_eof} = 1;
+      }
+
+      $self->_invoke_pending;
+
+      $self->_fill if @{ $self->{pending} };
+   });
 }
 
 sub _new_read_future

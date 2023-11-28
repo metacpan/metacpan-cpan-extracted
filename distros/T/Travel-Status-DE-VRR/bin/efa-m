@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '1.22';
+our $VERSION = '1.23';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -82,6 +82,7 @@ for my $efield (@edata_pre) {
 	elsif ( $efield eq 'b' ) { $edata{route_before} = 1; $full_routes = 1 }
 	elsif ( $efield eq 'f' ) { $edata{fullroute}    = 1; $full_routes = 1 }
 	elsif ( $efield eq 'r' ) { $edata{route}        = 1; $full_routes = 1 }
+	elsif ( $efield eq 'm' ) { $edata{messages}     = 1 }
 	else                     { $edata{$efield}      = 1 }
 }
 if ($filter_via) {
@@ -145,6 +146,14 @@ sub show_version {
 	exit 0;
 }
 
+sub format_delay {
+	my ( $delay, $len ) = @_;
+	if ( $delay and $len ) {
+		return sprintf( "(%+${len}d)", $delay );
+	}
+	return q{};
+}
+
 sub format_route {
 	my (@route) = @_;
 
@@ -193,7 +202,7 @@ sub display_result {
 
 	for my $line (@lines) {
 
-		if ( length( $line->[5] ) ) {
+		if ( $edata{messages} and length( $line->[5] ) ) {
 			$line->[5] =~ tr{\n\x0d}{ }s;
 			chomp $line->[5];
 			print "\n";
@@ -243,6 +252,17 @@ sub show_lines {
 sub show_results {
 	my @output;
 
+	my $delay_len = 0;
+	my $delay_fmt = 0;
+	for my $d ( $efa->results ) {
+		if ( $d->delay ) {
+			$delay_len = max( $delay_len, length( $d->delay ) + 1 );
+		}
+	}
+	if ($delay_len) {
+		$delay_fmt = $delay_len + 3;
+	}
+
 	for my $d ( $efa->results ) {
 
 		my @output_line;
@@ -250,7 +270,7 @@ sub show_results {
 		my $dtime    = (
 			$relative_times
 			? sprintf( '%2d min', $d->countdown )
-			: $d->sched_time
+			: $d->time
 		);
 
 		if ( $d->platform_db ) {
@@ -276,7 +296,7 @@ sub show_results {
 				next;
 			}
 			else {
-				$dtime .= ' CANCELED';
+				$dtime = '--:--';
 			}
 		}
 		elsif ($track_via) {
@@ -284,16 +304,16 @@ sub show_results {
 			$dtime .= ' → ' . $via->arr_time;
 		}
 		if ( $d->delay ) {
-			if ($relative_times) {
-				$dtime .= ' (+' . $d->delay . ')';
-			}
-			else {
-				$dtime .= ' +' . $d->delay;
-			}
+			$dtime .= ' ' . format_delay( $d->delay, $delay_len );
+		}
+
+		my $line = $d->line;
+		if ( length($line) > 10 and $d->train_type and $d->train_no ) {
+			$line = $d->train_type . ' ' . $d->train_no;
 		}
 
 		@output_line
-		  = ( $dtime, $platform, $d->line, q{}, $d->destination, $d->info );
+		  = ( $dtime, $platform, $line, q{}, $d->destination, $d->info );
 
 		if ( $edata{route} ) {
 			$output_line[3]
@@ -392,7 +412,7 @@ B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
 
 =head1 VERSION
 
-version 1.22
+version 1.23
 
 =head1 DESCRIPTION
 
@@ -508,6 +528,12 @@ after the requested station.
 Show up to three stops between the requested station and the departure's
 destination. B<efa-m> tries to display the three most important stops,
 however these are heuristically determined and may not be optimal.
+
+=item m / messages
+
+Show free-text messages associated with individual departures. These can
+include generic information such is bicycle transportation options or Wi-Fi
+availability, delay reasons, and more.
 
 =back
 

@@ -1,6 +1,6 @@
 package Text::VisualPrintf;
 
-our $VERSION = "4.01";
+our $VERSION = "4.03";
 
 use v5.14;
 use warnings;
@@ -18,19 +18,20 @@ sub vsprintf { &sprintf(@_) }
 use Text::VisualWidth::PP;
 our $IS_TARGET = qr/[\e\b\P{ASCII}]/;
 our $VISUAL_WIDTH = \&Text::VisualWidth::PP::width;
+our $REORDER //= 0;
 
 sub sprintf {
     my($format, @args) = @_;
     my $conceal = Text::Conceal->new(
-	except => $format,
-	test   => $IS_TARGET,
-	length => $VISUAL_WIDTH,
-	max    => int @args,
-	);
-    $conceal->encode(@args) if $conceal;
-    my $s = CORE::sprintf $format, @args;
-    $conceal->decode($s)    if $conceal;
-    $s;
+	except    => $format,
+	test      => $IS_TARGET,
+	length    => $VISUAL_WIDTH,
+	max       => int @args,
+	ordered   => ! $REORDER,
+	duplicate => !!$REORDER,
+    ) || goto &CORE::sprintf;
+    ($conceal->decode(CORE::sprintf($format,
+				    $conceal->encode(@args))))[0];
 }
 
 sub printf {
@@ -60,12 +61,16 @@ Text::VisualPrintf - printf family functions to handle Non-ASCII characters
 
 =head1 VERSION
 
-Version 4.01
+Version 4.03
 
 =head1 DESCRIPTION
 
-Text::VisualPrintf is a almost-printf-compatible library with a
-capability of handling multi-byte wide characters properly.
+B<Text::VisualPrintf> is a almost-printf-compatible library with a
+capability of handling:
+
+    - Multi-byte wide characters
+    - Combining characters
+    - Backspaces
 
 When the given string is truncated by the maximum precision, space
 character is padded if the wide character does not fit to the remained
@@ -95,38 +100,33 @@ to work with FILEHANDLE and printf.
 
 =over 4
 
-=item $VISUAL_WIDTH
+=item $REORDER
 
-Hold a function reference to calculate visual width of given string.
-Default function is C<Text::VisualWidth::PP::width>.
+The original C<printf> function has the ability to specify the
+arguments to be targeted by the position specifier, but by default
+this module assumes that the arguments will appear in the given order,
+so you will not get the expected result. If you wish to use it, set
+the package variable C<$REORDER> to 1.
 
-=item $IS_TARGET
-
-Hold a regexp object of funciton reference to test if the given string
-is subject of replacement.  Default is C<qr/[\e\b\P{ASCII}]/>, and
-test if the string include C<ESCAPE> or C<BACKSPACE> or non-ASCII
-characters.
+By doing so, the order in which arguments appear can be changed and
+the same argument can be processed even if it appears more than once.
 
 =back
 
 =head1 IMPLEMENTATION NOTES
 
 Strings in the LIST which contains wide-width character are replaced
-before formatting, and recovered after the process.
-
-Unique replacement string contains combinations of two ASCII
-characters not found in the format string and all parameters.  If two
-characters are not available, function behaves just like a standard
-one.
+before formatting, and recovered after the process.  Replacement is
+implemented in the L<Text::Conceal> module.
 
 =head1 SEE ALSO
 
 L<Text::VisualPrintf>, L<Text::VisualPrintf::IO>,
-L<https://github.com/kaz-utashiro/Text-VisualPrintf>
+L<https://github.com/tecolicom/Text-VisualPrintf>
 
-L<Text::Conceal>, L<https://github.com/kaz-utashiro/Text-Conceal>
+L<Text::Conceal>, L<https://github.com/tecolicom/Text-Conceal>
 
-L<Text::ANSI::Printf>, L<https://github.com/kaz-utashiro/Text-ANSI-Printf>
+L<Text::ANSI::Printf>, L<https://github.com/tecolicom/Text-ANSI-Printf>
 
 =head1 AUTHOR
 
@@ -134,7 +134,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2011-2020 Kazumasa Utashiro.
+Copyright 2011-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

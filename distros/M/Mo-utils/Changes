@@ -1,3 +1,8 @@
+0.20 2023-11-12T12:29:40+01:00
+ - Add check_angle().
+ - Fix error sentence for check_number() in doc.
+ - Remove obsolete argument in check_number() in tests.
+
 0.19 2023-08-21T19:30:10+02:00
  - Fix check_array_required(). It's required.
  - Regen README file.

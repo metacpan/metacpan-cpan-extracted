@@ -1,10 +1,11 @@
 #
 # Building Makefile for Embperl
 #
-# (C) 1997-2005 G.Richter (richter at embperl dot org) / ECOS
+#   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
-# $Id: Makefile.PL 1578070 2014-03-16 13:50:40Z richter $
-#
+
 
 
 use ExtUtils::MakeMaker;
@@ -99,6 +100,13 @@ $EP2 = -f "epcmd2.c" ;
 			win32filetext   => 'ApacheModuleActions.dll or mod_actions.so',
 		      },
 
+      'mod_unixd.c'  => {
+                        name        => 'unixd_module',
+                        path        => ['$apache_src/modules/standard/mod_unixd.so', '$EPBINDIR/modules/mod_unixd.so', '$apache_src/mod_unixd.so'],
+                        win32path   => ['$apache_src/modules/standard/apachemoduleunixd.dll', '$EPBINDIR/modules/apachemoduleunixd.dll', '$EPBINDIR/modules/mod_unixd.so'],
+                        file        => ['mod_unixd.so','apachemoduleunixd.dll'],
+                        win32filetext   => 'ApacheModuleUnixd.dll or mod_unixd.so',
+                      }
 
     ) ;
 
@@ -113,12 +121,12 @@ sub MY::test_via_harness
 	my ($txt) = shift -> MM::test_via_harness (@_) ;
 	$txt =~ s/PERL_DL_NONLAZY=1/PERL_DL_NONLAZY=0/ ;
 	if ($win32)
+        {
+        if (!($txt =~ s/\$\(FULLPERL\)/SET PATH=\$\(PATH\)\;$EPENVPATH\n\t\$\(FULLPERL\)/ ))
             {
-            if (!($txt =~ s/\$\(FULLPERL\)/SET PATH=\$\(PATH\)\;$EPENVPATH\n\t\$\(FULLPERL\)/ ))
-                {
-                $txt =~ s/\$\(FULLPERLRUN\)/SET PATH=\$\(PATH\)\;$EPENVPATH\n\t\$\(FULLPERLRUN\)/ 
-                }
+            $txt =~ s/\$\(FULLPERLRUN\)/SET PATH=\$\(PATH\)\;$EPENVPATH\n\t\$\(FULLPERLRUN\)/ 
             }
+        }
 	return $txt ;
 	}
 
@@ -127,12 +135,12 @@ sub MY::test_via_script
 	my ($txt) = shift -> MM::test_via_script (@_) ;
 	$txt =~ s/PERL_DL_NONLAZY=1/PERL_DL_NONLAZY=0/ ;
 	if ($win32)
+        {
+        if (!($txt =~ s/\$\(FULLPERL\)/SET PATH=\$\(PATH\)\;$EPENVPATH\n\t\$\(FULLPERL\)/ ))
             {
-            if (!($txt =~ s/\$\(FULLPERL\)/SET PATH=\$\(PATH\)\;$EPENVPATH\n\t\$\(FULLPERL\)/ ))
-                {
-                $txt =~ s/\$\(FULLPERLRUN\)/SET PATH=\$\(PATH\)\;$EPENVPATH\n\t\$\(FULLPERLRUN\)/ 
-                }
+            $txt =~ s/\$\(FULLPERLRUN\)/SET PATH=\$\(PATH\)\;$EPENVPATH\n\t\$\(FULLPERLRUN\)/ 
             }
+        }
 	$txt =~ s/\$\(TEST_FILE\)/\$(TEST_FILE) \$(TESTARGS)/g ;
 
 	return $txt ;
@@ -177,18 +185,17 @@ stop : pure_all
 } ;
 	$txt =~ s/\tPERL_DL_NONLAZY=0 /\tSET PATH=\$\(PATH\)\;$EPENVPATH\n\t/g if ($win32) ;
         
-        $txt =~ s/\@cd/\n#\t\@cd/ ;  # remove tests for subdirs
-        $txt =~ s/\$\(NOECHO\) cd/\n#\t\$\(NOECHO\) cd/ ;  # remove tests for subdirs
+    $txt =~ s/\@cd/\n#\t\@cd/ ;  # remove tests for subdirs
+    $txt =~ s/\$\(NOECHO\) cd/\n#\t\$\(NOECHO\) cd/ ;  # remove tests for subdirs
 
-        $txt =~ s/(\$\(NOECHO\) \$\(ABSPERLRUN\)  \-e \'chdir)/\n#$1/ ; # remove tests for subdirs
-        $txt =~ s/-e/\n# -e/g ; # remove tests for subdirs
+    $txt =~ s/(\$\(NOECHO\) \$\(ABSPERLRUN\)  \-e \'chdir)/\n#$1/ ; # remove tests for subdirs
+    $txt =~ s/-e/\n# -e/g ; # remove tests for subdirs
 
 
 	$txt =~ s/\r\n/\n/g ;  # make doesn't like \r\n!
 
-        
-        return $txt ;
-        }
+    return $txt ;
+    }
 
 
 
@@ -213,47 +220,47 @@ sub MY::dist_test
 	{
 	my $self = shift ;
         
-        my $txt = $self -> MM::dist_test (@_) ;
+    my $txt = $self -> MM::dist_test (@_) ;
 	$txt =~ s/-I\$\(PERL_ARCHLIB\) -I\$\(PERL_LIB\)// ;
 	$txt =~ s/\$\(PERL\)/\$\(PERLDT\)/ ;
 	$txt =~ s/\$\(ABSPERLRUN\)/\$\(PERLDT\)/ ;
 	
-        $main::perlbinpath = $self -> {FULLPERL} ;
-        
-        return $txt ;
+    $main::perlbinpath = $self -> {FULLPERL} ;
+    
+    return $txt ;
 	}
 	
 sub MY::dynamic 
 	{
 	my $self = shift ;
         
-        my $txt = $self -> MM::dynamic (@_) ;
+    my $txt = $self -> MM::dynamic (@_) ;
 
-        $txt .= "\tcd crypto && \$(MAKE) SSL_BASE=$sslbase\n" if ($epc_enable) ;
-        
-        return $txt ;
+    $txt .= "\tcd crypto && \$(MAKE) SSL_BASE=$sslbase\n" if ($epc_enable) ;
+    
+    return $txt ;
 	}
 
 sub MY::c_o
 	{
 	my $self = shift ;
         
-        my $txt = $self -> MM::c_o (@_) ;
-        my $opt = $win32?'Fo':'o ' ;
+    my $txt = $self -> MM::c_o (@_) ;
+    my $opt = $win32?'Fo':'o ' ;
 
-        $txt =~ s/\$\*/-$opt\$*\$(OBJ_EXT) \$*/g ;
-        my @txt = split (/\n/, $txt) ;
-        my $cpp = 0 ;
-        foreach (@txt)
+    $txt =~ s/\$\*/-$opt\$*\$(OBJ_EXT) \$*/g ;
+    my @txt = split (/\n/, $txt) ;
+    my $cpp = 0 ;
+    foreach (@txt)
+        {
+        if (/\$\*\.cpp/)
             {
-            if (/\$\*\.cpp/)
-                {
-                s/\$\(CCCMD\)/\$(CPPCMD) \$(CPPFLAGS)/ ;
-                }
+            s/\$\(CCCMD\)/\$(CPPCMD) \$(CPPFLAGS)/ ;
             }
-        $txt = join ("\n", @txt) ;
+        }
+    $txt = join ("\n", @txt) ;
 
-        return $txt ;
+    return $txt ;
 	}
 
 
@@ -262,23 +269,23 @@ sub MY::cflags
 	{
 	my $self = shift ;
         
-        my $txt = $self -> MM::cflags (@_) ;
+    my $txt = $self -> MM::cflags (@_) ;
 
-        if ($mp2cfg)
-            { # with Apache 2, make sure we have the same defines as mod_perl
-            $txt =~ s/-O\d//g if ($ccdebug =~ /-O\d/) ;
-            $txt =~ /CCFLAGS\s*=(.*?)\n/s ;
-	    my $flags = $mp2cfg->{MODPERL_CCOPTS} || $1 ;
-            $txt =~ s/CCFLAGS\s*=(.*?)\n/CCFLAGS = $ccdebug $flags $addcflags\n/s ;
-            }
-        else
-            {
-            $txt =~ s/-O\d//g if ($ccdebug =~ /-O\d/) ;
-	    $txt =~ s/CCFLAGS\s*=/CCFLAGS = $ccdebug $addcflags/ ;
-            }
+    if ($mp2cfg)
+        { # with Apache 2, make sure we have the same defines as mod_perl
+        $txt =~ s/-O\d//g if ($ccdebug =~ /-O\d/) ;
+        $txt =~ /CCFLAGS\s*=(.*?)\n/s ;
+    my $flags = $mp2cfg->{MODPERL_CCOPTS} || $1 ;
+        $txt =~ s/CCFLAGS\s*=(.*?)\n/CCFLAGS = $ccdebug $flags $addcflags\n/s ;
+        }
+    else
+        {
+        $txt =~ s/-O\d//g if ($ccdebug =~ /-O\d/) ;
+        $txt =~ s/CCFLAGS\s*=/CCFLAGS = $ccdebug $addcflags/ ;
+        }
 
-        
-        return $txt ;
+    
+    return $txt ;
 	}
 
 $MY::cccmd_seen = 0 ;
@@ -286,72 +293,71 @@ sub MY::const_cccmd
 	{
 	my $self = shift ;
         
-        my $txt = $self -> MM::const_cccmd (@_) ;
-        return $txt if ($MY::cccmd_seen++) ;
+    my $txt = $self -> MM::const_cccmd (@_) ;
+    return $txt if ($MY::cccmd_seen++) ;
 
 	my $txt2 = $txt ;
-        $txt2 =~ s/\$\(CC\)/\$(CPP)/ ;
-        $txt2 =~ s/CCCMD/CPPCMD/ ;
+    $txt2 =~ s/\$\(CC\)/\$(CPP)/ ;
+    $txt2 =~ s/CCCMD/CPPCMD/ ;
 
-        return "$txt\n\n$txt2"  ;
+    return "$txt\n\n$txt2"  ;
 	}
 
 
 	
- sub MY::post_initialize
+sub MY::post_initialize
+    {
+    my $self = shift ;
+
+    # move docs to the right place
+        
+    my $pm = $self -> {PM} ;
+    my $k ;
+    my $v ;
+    while (($k, $v) = each (%$pm))
         {
-        my $self = shift ;
-
-        # move docs to the right place
-         
-        my $pm = $self -> {PM} ;
-        my $k ;
-        my $v ;
-        while (($k, $v) = each (%$pm))
+        if (($k =~ /\.pod$/) && !($k =~ /^Embperl/) )
             {
-            if (($k =~ /\.pod$/) && !($k =~ /^Embperl/) )
-                {
-                $v =~ s#^(.*/)(.*?)\.pod$#$1Embperl/$2.pod# ;
-                $pm -> {$k} = $v ;
-                }
+            $v =~ s#^(.*/)(.*?)\.pod$#$1Embperl/$2.pod# ;
+            $pm -> {$k} = $v ;
             }
-                                 
-        my $man = $self -> {MAN3PODS} ;
-        while (($k, $v) = each (%$man))
+        }
+                                
+    my $man = $self -> {MAN3PODS} ;
+    while (($k, $v) = each (%$man))
+        {
+        if ($v !~ /Embperl/)
             {
-     if ($v !~ /Embperl/)
-         {
-         $v =~ s,/([^/]+)$,/Embperl::$1, ;
-         $man -> {$k} = $v ;
-         }
-     }
+            $v =~ s,/([^/]+)$,/Embperl::$1, ;
+            $man -> {$k} = $v ;
+            }
+        }
 
- foreach my $hash (qw(MAN3PODS PM))
-     {
-     foreach (keys %{$self->{$hash}})
-         {
-         delete $self->{$hash}{$_}
-         if /^(INSTALL|NEWS|Changes)|\.pl$/ ;
-         }
-     }
- 
+    foreach my $hash (qw(MAN3PODS PM))
+        {
+        foreach (keys %{$self->{$hash}})
+            {
+            delete $self->{$hash}{$_}
+            if /^(INSTALL|NEWS|Changes)|\.pl$/ ;
+            }
+        }
 
-       $self -> MM::post_initialize (@_) ;
-       }
+    $self -> MM::post_initialize (@_) ;
+    }
 
 
- sub MY::post_constants
-       {
-       my $self = shift ;
+sub MY::post_constants
+    {
+    my $self = shift ;
 
 
-       my $txt = $self -> MM::post_constants (@_) ;
+    my $txt = $self -> MM::post_constants (@_) ;
 
-       $txt .= "\n# Change name of dynamic lib, in case we need two of them (with and w/o Apache support)\nINST_DYNAMIC = \$(INST_ARCHAUTODIR)\\\$(DLBASE).NoApache.\$(DLEXT)\n" if ($EPNOAPACHELIB) ;
+    $txt .= "\n# Change name of dynamic lib, in case we need two of them (with and w/o Apache support)\nINST_DYNAMIC = \$(INST_ARCHAUTODIR)\\\$(DLBASE).NoApache.\$(DLEXT)\n" if ($EPNOAPACHELIB) ;
 
-       return $txt ;
+    return $txt ;
 
-       }
+    }
 
 ## ----------------------------------------------------------------------------
 
@@ -362,7 +368,7 @@ sub GetString
 	printf ("%s [%s]", $prompt, $default) ;
 	chomp ($_ = <STDIN>) ;
 	s/\s+$//;
-        if (!/^\s*$/)
+    if (!/^\s*$/)
 	    {return $_ ;}
 	else
     	{
@@ -370,7 +376,6 @@ sub GetString
 	        {return $default ;}
 	    else
             { return "" ; }
-    
         }
     }
 
@@ -394,10 +399,8 @@ sub GetYesNo
 ## ----------------------------------------------------------------------------
 
 sub search_config
-
     {
     my ($key, $path) = @_ ;
-
 
     open CFGFH, $path or return undef ;
 
@@ -414,7 +417,6 @@ sub search_config
 
 
 sub cnvpath
-
     {
     my $path = shift ;
     
@@ -580,17 +582,17 @@ if (!$apache && $apache_src eq '')
         print "Found mod_perl 2.0\n" ;
         }
     else
-	{
+        {
         eval 'use Apache2::BuildConfig' ;
 
         if ($@ eq '')
             { 
-	    $mp2Apache2 = 1 ;
+            $mp2Apache2 = 1 ;
             $mp2cfg = Apache2::BuildConfig -> new ;
             $apache_src = $mp2cfg -> {MP_AP_PREFIX} || $mp2cfg -> {ap_includedir} ;
             print "Found mod_perl 2.0\n" ;
-	    }
-	else
+            }
+        else
             {
             eval 'use Apache::MyConfig' ;
 
@@ -602,7 +604,7 @@ if (!$apache && $apache_src eq '')
                 {
                 $apache_src = '' ;
                 }
-	    }
+            }
         }
     }
 elsif ($apache_src ne '' && -X "$apache_src/bin/httpd")
@@ -610,7 +612,7 @@ elsif ($apache_src ne '' && -X "$apache_src/bin/httpd")
     my @vers = start ("\"$apache_src/bin/httpd\" -v") ;
     
     if ($vers[0] =~ m#/2#)
-	{
+        {
         # check for mod_perl 2.0
         eval 'use Apache2; use Apache::BuildConfig' ;
 
@@ -618,23 +620,23 @@ elsif ($apache_src ne '' && -X "$apache_src/bin/httpd")
             { 
             $mp2cfg = Apache::BuildConfig -> new ;
             print "Found mod_perl 2.0\n" ;
-	    }
+	        }
         else
-	    {
+	        {
             eval 'use Apache2::BuildConfig' ;
 
             if ($@ eq '')
                 { 
-	        $mp2Apache2 = 1 ;
+	            $mp2Apache2 = 1 ;
                 $mp2cfg = Apache2::BuildConfig -> new ;
                 print "Found mod_perl 2.0\n" ;
+	            }
 	        }
-	    }
         }
     }
 
 
-eval 'do "test/conf/config.pl"' ;
+eval 'do "./test/conf/config.pl"' ;
 
 
 if (!$apache && $apache_src eq '')
@@ -652,13 +654,13 @@ $apache = GetYesNo ("Build with support for Apache mod_perl?", 'y') if (!$apache
 if ($apache && $apache_src ne '')
     {
     if ($apache_src =~ /^(.*?)\/$/)
-   	{ $apache_src = $1 ; } 
+   	    { $apache_src = $1 ; } 
 
     if ($apache_src =~ /^(.*?)\/main$/)
-   	{ $apache_src = $1 ; } 
+   	    { $apache_src = $1 ; } 
 
     if ($apache_src =~ /^(.*?)\/include$/)
-   	{ $apache_src = $1 ; } 
+   	    { $apache_src = $1 ; } 
 
     if (-e "$apache_src/httpd.h" || -e "$apache_src/main/httpd.h" || -e "$apache_src/include/httpd.h")
 	    {
@@ -676,27 +678,27 @@ while ($apache && !$b)
 		      <$base\\apache*\\apache*\\include>,
 		      <./src>)
        {
-	print "Look at $src_dir\n" ;
-	
-	if (-e "$src_dir/httpd.h" || -e "$src_dir/main/httpd.h" || -e "$src_dir/include/httpd.h")
-		{
-		$b = GetYesNo ("Use $src_dir as Apache source", 'y') ;
-		if ($b)
-			{
-			$apache_src = $src_dir ;
-			last ;
-			}
-		}
-	}		
+        print "Look at $src_dir\n" ;
+        
+        if (-e "$src_dir/httpd.h" || -e "$src_dir/main/httpd.h" || -e "$src_dir/include/httpd.h")
+            {
+            $b = GetYesNo ("Use $src_dir as Apache source", 'y') ;
+            if ($b)
+                {
+                $apache_src = $src_dir ;
+                last ;
+                }
+            }
+        }		
 
     if ($apache_src =~ /^(.*?)\/$/)
-   	{ $apache_src = $1 ; } 
+   	    { $apache_src = $1 ; } 
 
     if ($apache_src =~ /^(.*?)\/main$/)
-   	{ $apache_src = $1 ; } 
+   	    { $apache_src = $1 ; } 
 
     if ($apache_src =~ /^(.*?)\/include$/)
-   	{ $apache_src = $1 ; } 
+   	    { $apache_src = $1 ; } 
 
 
     if (!$b)
@@ -737,10 +739,9 @@ if ($b && $apache && $apache_src ne '')
          {
          $inc_dir = "$ENV{APACHE_HDR}" ;
          }
-        
 
     if ($win32)
-	{ 
+	    { 
         $i = "-I. -I\"$inc_dir\" -I\"$apache_src/regex\" -I\"$apache_src/os/win32\"" ;
         
         foreach (
@@ -780,15 +781,15 @@ if ($b && $apache && $apache_src ne '')
 
         }
     else
-	{
+	    {
         $i = "-I$inc_dir -I$apache_src/regex -I$apache_src/os/unix" ; 
         $o = '' ;
         }
 
     if ($mp2cfg && !-f "$inc_dir/apr.h")
-	{
-	$i .= " -I$mp2cfg->{apr_includedir}" ;
-	}
+        {
+        $i .= " -I$mp2cfg->{apr_includedir}" ;
+        }
 
     $d .= ' -DAPACHE' ;
     $d .= ' -DAPACHE2' if ($mp2cfg) ;
@@ -802,7 +803,6 @@ else
         print "\nYou have already build Embperl with support for Apache mod_perl\n" ;
         $EPNOAPACHELIB = GetYesNo ("Do you want to build a separate dynamic library for use without Apache?", 'y') ;
         }
-
 
     print "Will build without mod_perl support\n" ;
     $i = '' ;
@@ -828,13 +828,13 @@ EOF
     close DEFH;
 
     if ($ENV{APACHE_PERL_DLL})
-	{
-	$mpdll = $ENV{APACHE_PERL_DLL} ;
-	}
+        {
+        $mpdll = $ENV{APACHE_PERL_DLL} ;
+        }
     elsif ($EPMODPERL =~ /^LoadModule perl_module (.*?)$/)
-	{
-	$mpdll = $1 ;
-	}
+        {
+        $mpdll = $1 ;
+        }
     }
 
 #
@@ -870,21 +870,21 @@ if ($b && $apache)
         $EPHTTPD = "$apache_src/httpsd" if (!-e $EPHTTPD && -e "$apache_src/httpsd") ;
         $EPHTTPD = "$apache_src/bin/httpd" if (!-e $EPHTTPD && -e "$apache_src/bin/httpd") ;
 
-	if (!-e $EPHTTPD && $mp2cfg)
-	    {
-	    my $sbindir = `$mp2cfg->{MP_APXS} -q SBINDIR` ;
-	    chomp ($sbindir) ;
-	    $EPHTTPD = "$sbindir/httpd" ;
-	    $EPHTTPD = "$sbindir/httpd2" if (-e "$sbindir/httpd2") ;
-	    $EPHTTPD = "$sbindir/apache2" if (-e "$sbindir/apache2") ;
-	    }
-        
+        if (!-e $EPHTTPD && $mp2cfg)
+            {
+            my $sbindir = `$mp2cfg->{MP_APXS} -q SBINDIR` ;
+            chomp ($sbindir) ;
+            $EPHTTPD = "$sbindir/httpd" ;
+            $EPHTTPD = "$sbindir/httpd2" if (-e "$sbindir/httpd2") ;
+            $EPHTTPD = "$sbindir/apache2" if (-e "$sbindir/apache2") ;
+            }
+            
         if (!-e $EPHTTPD)
             {
             $EPHTTPD = GetString ("Enter path and file to start as httpd", "$EPHTTPD") ;
             }
 	
-	$EPMODPERL="" ;
+	    $EPMODPERL="" ;
         }
     else
         {
@@ -928,116 +928,113 @@ if ($b && $apache)
     
     $addmodpath = $mp2cfg?$mp2cfg -> {MODPERL_AP_LIBEXECDIR}:'' ;
     if ($addmodpath && $mpm)
-	{
-	# openSuSE has some modules in special directory for MPM
-	$mpm =~ /Server MPM:\s+(.+)$/ ;
-	$addmodpath2 = $addmodpath . '-' . lc($1) ;
-	} 	
+        {
+        # openSuSE has some modules in special directory for MPM
+        $mpm =~ /Server MPM:\s+(.+)$/ ;
+        $addmodpath2 = $addmodpath . '-' . lc($1) ;
+        } 	
 
     delete $neededmodules{'prefork.c'} if (!$mp2cfg) ;
 
     while (($mod, $opt) = each %neededmodules)
-	{
-	if (!grep (/$mod/, @modules))
-	    { # module not linked statically
-	    $paths = $win32?$opt->{win32path}:$opt->{path} ;
-	    $modfile = $win32?$opt->{win32file}:$opt->{file}[0] ;
-	    $modfiletext = ($win32?$opt->{win32filetext}:$opt->{filetext}) || $modfile ;
-	    $found = 2 ;
-	    searchmod:
+        {
+        if (!grep (/$mod/, @modules))
+            { # module not linked statically
+            $paths = $win32?$opt->{win32path}:$opt->{path} ;
+            $modfile = $win32?$opt->{win32file}:$opt->{file}[0] ;
+            $modfiletext = ($win32?$opt->{win32filetext}:$opt->{filetext}) || $modfile ;
+            $found = 2 ;
+            searchmod:
             while ($found == 2)
-		{
-		$found = 0 ;
-		if ($addmodpath)
-		    {
+                {
+                $found = 0 ;
+                if ($addmodpath)
+                    {
                     foreach $modfile (@{$opt->{file}})
                         {
-		        $path = cnvpath ("$addmodpath/$modfile") ;
-		        #print "path = $_ -> $path\n" ;
-		        if (-f $path)
-			    { ## module found
-	    		    $EPMODPERL .= "\r\nLoadModule ". ($mp2cfg?($opt->{name2} || $opt->{name}):$opt->{name}) . " \"$path\"" ;
-			    print " + Load dynamic module $mod\n   ($path)\n" ;
-			    $found = 1 ;
-			    last searchmod ;
-			    }
-		        }
+                        $path = cnvpath ("$addmodpath/$modfile") ;
+                        #print "path = $_ -> $path\n" ;
+                        if (-f $path)
+                            { ## module found
+                                $EPMODPERL .= "\r\nLoadModule ". ($mp2cfg?($opt->{name2} || $opt->{name}):$opt->{name}) . " \"$path\"" ;
+                            print " + Load dynamic module $mod\n   ($path)\n" ;
+                            $found = 1 ;
+                            last searchmod ;
+                            }
+                        }
                     }
-		if ($addmodpath2)
-		    {
+                if ($addmodpath2)
+                    {
                     foreach $modfile (@{$opt->{file}})
                         {
-		        $path = cnvpath ("$addmodpath2/$modfile") ;
-		        #print "path = $_ -> $path\n" ;
-		        if (-f $path)
-			    { ## module fould
-	    		    $EPMODPERL .= "\r\nLoadModule ". ($mp2cfg?($opt->{name2} || $opt->{name}):$opt->{name}) . " \"$path\"" ;
-			    print " + Load dynamic module $mod\n   ($path)\n" ;
-			    $found = 1 ;
-			    last searchmod ;
-			    }
-		        }
+                        $path = cnvpath ("$addmodpath2/$modfile") ;
+                        #print "path = $_ -> $path\n" ;
+                        if (-f $path)
+                            { ## module fould
+                                $EPMODPERL .= "\r\nLoadModule ". ($mp2cfg?($opt->{name2} || $opt->{name}):$opt->{name}) . " \"$path\"" ;
+                            print " + Load dynamic module $mod\n   ($path)\n" ;
+                            $found = 1 ;
+                            last searchmod ;
+                            }
+                        }
                     }
-		foreach (@$paths)
-		    {
-		    $path = cnvpath (eval "\"$_\"") ;
-		    #print "path = $_ -> $path\n" ;
-		    if (-f $path)
-			{ ## module fould
-	    		$EPMODPERL .= "\r\nLoadModule $opt->{name} \"$path\"" ;
-			print " + Load dynamic module $mod\n   ($path)\n" ;
-			$found = 1 ;
-			last ;
-			}
-		    }
+                foreach (@$paths)
+                    {
+                    $path = cnvpath (eval "\"$_\"") ;
+                    #print "path = $_ -> $path\n" ;
+                    if (-f $path)
+                        { ## module fould
+                            $EPMODPERL .= "\r\nLoadModule $opt->{name} \"$path\"" ;
+                        print " + Load dynamic module $mod\n   ($path)\n" ;
+                        $found = 1 ;
+                        last ;
+                        }
+                    }
                 if (!$found && $loadmodules)
                     {		
                     if ($loadmodules =~ /LoadModule $opt->{name} \"(.*?)\"$/)
                         {
                         $path = $1 ;
-		        if (-f $path)
-			    { ## module fould
-	    		    $EPMODPERL .= "\r\nLoadModule $opt->{name} \"$path\"" ;
-			    print " + Load dynamic module $mod\n   ($path)\n" ;
-			    $found = 1 ;
-			    last ;
-			    }
+                        if (-f $path)
+                            { ## module fould
+                                $EPMODPERL .= "\r\nLoadModule $opt->{name} \"$path\"" ;
+                            print " + Load dynamic module $mod\n   ($path)\n" ;
+                            $found = 1 ;
+                            last ;
+                            }
                         }
                     }                            
                 
                 if (!$found && !$opt -> {optional})
-		    {
-		    my $w32msg = '' ;
-		    $w32msg = "\nPlease enter full path including the drive letter!! " if ($win32) ;
-		    $addmodpath = GetString ("Library for $mod not found, please enter path to $modfiletext $w32msg", "") ;
-		    $found = 2 ;
-		    }
-		}			    
-	    }
-	}
-
-
-		    
+                    {
+                    my $w32msg = '' ;
+                    $w32msg = "\nPlease enter full path including the drive letter!! " if ($win32) ;
+                    $addmodpath = GetString ("Library for $mod not found, please enter path to $modfiletext $w32msg", "") ;
+                    $found = 2 ;
+                    }
+                }			    
+            }
+        }
 
     $use_dso = 0 ;
     if (!$win32 && ($EPMODPERL =~ /perl_module/))
-	{
+    	{
         print " + mod_perl was build with USE_DSO\n" ;
-	$use_dso = 1 ;
+	    $use_dso = 1 ;
         }
 
     if ($mp2cfg)
         {
-	if ($mp2Apache2)
-	    {
+        if ($mp2Apache2)
+            {
             require Apache2::Build ;
             $dynlib->{'OTHERLDFLAGS'} = Apache2::Build->new->otherldflags  ;
-	    }
-	else
-	    {
+            }
+        else
+            {
             require Apache::Build ;
             $dynlib->{'OTHERLDFLAGS'} = Apache::Build->new->otherldflags  ;
-	    }
+            }
         }
     else
         {
@@ -1064,24 +1061,22 @@ if ($b && $apache)
         $EPSSLDISABLE = $mp2cfg?0:!start_errcode ("\"$EPHTTPD\" -t -f $EPPATH/test/conf/ssldisable.conf") ;
         }
 
-
-
     if ($EPSTRONGHOLD)
         {
         my $conf = "$apache_src/../conf/httpd.conf";
         if(-e $conf) 
             {
-	    open FH, $conf;
-	    while(<FH>)
-                {
-	        if(/^StrongholdKey/)
+            open FH, $conf;
+            while(<FH>)
+                    {
+                if(/^StrongholdKey/)
                     {
                     chomp ;
-		    $EPSTRONGHOLDKEY = $_;
-		    last;
-	            }
-	        }
-	    close FH;
+                    $EPSTRONGHOLDKEY = $_;
+                    last;
+                    }
+                }
+            close FH;
             }
         }
     else
@@ -1164,14 +1159,14 @@ if ($b && $apache)
         }
         
     if (my $CGIVer = CheckModule ("CGI", "-> File Upload will not work without CGI.pm installed"))
-	{
+        {
         $CGIVer =~ /(\d+)\.(\d+)/ ;
-	if ($1 < 2 || ($1 == 2 && $2 < 43))
-	    {
-	    print "-> File Upload will not work with CGI.pm < 2.43, please upgrade!\n" ;
-	    }
+        if ($1 < 2 || ($1 == 2 && $2 < 43))
+            {
+            print "-> File Upload will not work with CGI.pm < 2.43, please upgrade!\n" ;
+            }
 
-	} ;
+        } ;
 
     ### write out test configuration file ###
 
@@ -1207,9 +1202,6 @@ if ($b && $apache)
         {
         print FH "\$EPNULL='/dev/null';\n" ;
         }
-
-
-
     }
 else
     {
@@ -1286,7 +1278,6 @@ if ($win32)
     
     $d .= ' -D_WINDOWS ';
     $d .= ' -DMULTIPLICITY' if ($Config{usemultiplicity}) ;
-
     }
 
 $d .= ' -DEP2' if ($EP2) ;
@@ -1313,7 +1304,7 @@ if ($EP2)
     foreach my $makepl (@makefiles)
         {
         #print "Exec driver/$makepl\n" ;
-        my $result = do "driver/$makepl" ;
+        my $result = do "./driver/$makepl" ;
         if ($@)
             {
             print $@ ;
@@ -1340,9 +1331,7 @@ if ($EP2)
                 }           
             }
         }
-
     }
-
 
 close FH ;
 
@@ -1397,6 +1386,30 @@ $o .= $sublibs ;
 
 $libs =~ s/-lz//g ;
 
+# 06/06/23 Marcus Doemling: Must undo the flag "-Wl,-z,now" from the
+# OTHERLDFLAGS, CCDLFLAGS, LDDLFLAGS and LDFLAGS.
+#
+# See: man ld => -z => keyword "now":
+#
+# "When generating an executable or shared library, mark it to tell the
+#  dynamic linker to resolve all symbols when the program is started,
+#  or when the shared library is loaded by dlopen, instead of deferring
+#  function call resolution to the point when the function is first
+#  called".
+#
+# This flag is undone by appanding the flag "-Wl,-z,lazy" to the end
+# of all flag lists that use the offending flag. Later flags override
+# earlier ones.
+#
+# The "-z now" linker flag would prevent Embperl to be usable outside
+# of mod_perl since it would force the linker to resolve the mod_perl
+# symbols even though they would not be used when running outside of
+# mod_perl.
+
+$lazyflag = ' -Wl,-z,lazy';
+
+$dynlib->{'OTHERLDFLAGS'} .= $lazyflag;
+
 WriteMakefile(
     'NAME'	   => 'Embperl',
     'VERSION_FROM' => 'Embperl.pm', 		# finds $VERSION
@@ -1413,6 +1426,9 @@ WriteMakefile(
     'realclean'    => { FILES => 'embpmsgid.pl embpexec.pl embpexec.bat embpcgi.pl embpcgi.test.pl embpcgi.bat epocgi.pl epocgi.bat epocgi.test.pl embpfastcgi.pl embpfastcgi.test.pl test/conf/config.pl xs/mmargs.pl' },
     'dist'         => { COMPRESS => 'gzip', SUFFIX => 'gz'},
     'dynamic_lib'  => $dynlib,
+    'CCDLFLAGS'    => $Config{ccdlflags}.$lazyflag,
+    'LDDLFLAGS'    => $Config{lddlflags}.$lazyflag,
+    'LDFLAGS'      => $Config{ldflags}.$lazyflag,
     'PREREQ_PM'    => { 'File::Spec' => 0.8 },
     'ABSTRACT'     => 'Embed Perl code in HTML documents',
     'AUTHOR'       => 'Gerald Richter <richter at embperl dot org>',
@@ -1451,6 +1467,11 @@ foreach $f (@bins)
 		    #else
 		    #	{
                     	s/^\#\!.*?perl.*?\s(.*?)/#!$perlbinpath $1/ ;
+                    	# For some reason $perlbinpath contains double
+                    	# quotes which Apache doesn't like at all for
+                    	# CGI script interpreters. So remove them
+                    	# again.
+                    	s/^\#\!"(.*?)"/#!$1/;
 		    #	}
 		    s/^.*?perl.*?\s-x/$perlbinpath -x/ ;
                     }

@@ -1,12 +1,55 @@
---- #YAML:1.0
-name:                Time-Out
-version:             0.11
-abstract:            ~
-license:             ~
-author:              ~
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
+---
+abstract: 'Easily timeout long running operations'
+author:
+  - 'Sven Willenbuecher <sven.willenbuecher@gmx.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  IO::Handle: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Needs: '0'
+configure_requires:
+  App::cpanminus: '1.7046'
+  Config: '0'
+  ExtUtils::MakeMaker::CPANfile: '0.09'
+  File::Spec: '0'
+  lib: '0'
+  strict: '0'
+  subs: '0'
+  warnings: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.143240'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Time-Out
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Time::Out:
+    file: lib/Time/Out.pm
+    version: '0.24'
+  Time::Out::Exception:
+    file: lib/Time/Out/Exception.pm
+    version: '0.24'
+  Time::Out::ParamConstraints:
+    file: lib/Time/Out/ParamConstraints.pm
+    version: '0.24'
+recommends:
+  Time::HiRes: '1.9726'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  overload: '0'
+  perl: '5.008000'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/XSven/Time-Out/issues
+  repository: git://github.com/XSven/Time-Out.git
+version: '0.24'

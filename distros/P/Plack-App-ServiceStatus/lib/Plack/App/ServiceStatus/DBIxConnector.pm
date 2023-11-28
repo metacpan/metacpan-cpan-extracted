@@ -2,7 +2,7 @@ package Plack::App::ServiceStatus::DBIxConnector;
 
 # ABSTRACT: Check DBIx::Connector connection
 
-our $VERSION = '0.911'; # VERSION
+our $VERSION = '0.912'; # VERSION
 
 use 5.018;
 use strict;
@@ -41,7 +41,7 @@ Plack::App::ServiceStatus::DBIxConnector - Check DBIx::Connector connection
 
 =head1 VERSION
 
-version 0.911
+version 0.912
 
 =head1 SYNOPSIS
 

@@ -62,17 +62,17 @@ requires:
   Sub::Install: '0'
   Term::ANSIColor: '0'
   XML::LibXML: '2.0202'
-  base: '0'
   constant: '0'
   feature: '0'
   open: '0'
+  parent: '0'
   perl: v5.20.0
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/marcbradshaw/mail-bimi/issues
   repository: git://github.com/marcbradshaw/mail-bimi.git
-version: '3.20230913'
+version: '3.20231123'
 x_contributors:
   - 'Marc Bradshaw <marc@fastmailteam.com>'
 x_generated_by_perl: v5.34.0

@@ -1,0 +1,14 @@
+Revision history for PGObject-util-LogRep-TestDecoding
+
+0.1.4   12 November 2023
+        No changes, just fixing a broken upload
+
+0.1.3   12 November 2023
+        Fixed Operation not showing up in output
+
+0.1.2   12 November 2023
+        Fixed bug of parsing identifiers wrong if they had underscores.
+
+0.1.1   12 November 2023
+        First version, released on an unsuspecting world.
+

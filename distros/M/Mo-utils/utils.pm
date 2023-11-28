@@ -9,11 +9,28 @@ use List::Util qw(none);
 use Readonly;
 use Scalar::Util qw(blessed);
 
-Readonly::Array our @EXPORT_OK => qw(check_array check_array_object check_array_required
-	check_bool check_code check_isa check_length check_number check_number_of_items
-	check_regexp check_required check_string_begin check_strings);
+Readonly::Array our @EXPORT_OK => qw(check_angle check_array check_array_object
+	check_array_required check_bool check_code check_isa check_length
+	check_number check_number_of_items check_regexp check_required
+	check_string_begin check_strings);
 
-our $VERSION = 0.19;
+our $VERSION = 0.20;
+
+sub check_angle {
+	my ($self, $key) = @_;
+
+	_check_key($self, $key) && return;
+
+	check_number($self, $key);
+
+	if ($self->{$key} < 0 || $self->{$key} > 360) {
+		err "Parameter '".$key."' must be a number between 0 and 360.",
+			'Value', $self->{$key},
+		;
+	}
+
+	return;
+}
 
 sub check_array {
 	my ($self, $key) = @_;
@@ -258,10 +275,12 @@ Mo::utils - Mo utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils qw(check_array check_array_object check_array_required check_bool
-         check_code check_isa check_length check_number check_number_of_items
-         check_regexp check_required check_string_begin check_strings);
+ use Mo::utils qw(check_angle check_array check_array_object check_array_required
+         check_bool check_code check_isa check_length check_number
+         check_number_of_items check_regexp check_required check_string_begin
+         check_strings);
 
+ check_angle($self, $key);
  check_array($self, $key);
  check_array_object($self, $key, $class, $class_name);
  check_array_required($self, $key);
@@ -281,6 +300,16 @@ Mo::utils - Mo utilities.
 Mo utilities for checking of data objects.
 
 =head1 SUBROUTINES
+
+=head2 C<check_angle>
+
+ check_angle($self, $key);
+
+Check parameter defined by C<$key> which is number between 0 and 360.
+
+Put error if check isn't ok.
+
+Returns undef.
 
 =head2 C<check_array>
 
@@ -421,6 +450,13 @@ Returns undef.
 
 =head1 ERRORS
 
+ check_angle():
+         From check_number():
+                 Parameter '%s' must be a number.
+                         Value: %s
+         Parameter '%s' must be a number between 0 and 360.
+                 Value: %s
+
  check_array():
          Parameter '%s' must be a array.
                  Value: %s
@@ -457,7 +493,7 @@ Returns undef.
                  Value: %s
 
  check_number():
-         Parameter '%s' must a number.
+         Parameter '%s' must be a number.
                  Value: %s
 
  check_number_of_items():
@@ -487,6 +523,49 @@ Returns undef.
 
 =head1 EXAMPLE1
 
+=for comment filename=check_angle_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils qw(check_angle);
+
+ my $self = {
+         'key' => 10.1,
+ };
+ check_angle($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head1 EXAMPLE2
+
+=for comment filename=check_angle_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils qw(check_angle);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 400,
+ };
+ check_angle($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [..utils.pm:?] Parameter 'key' must be a number between 0 and 360.
+
+=head1 EXAMPLE3
+
 =for comment filename=check_array_ok.pl
 
  use strict;
@@ -505,7 +584,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE2
+=head1 EXAMPLE4
 
 =for comment filename=check_array_fail.pl
 
@@ -528,7 +607,7 @@ Returns undef.
  # Output like:
  # #Error [..utils.pm:?] Parameter 'key' must be a array.
 
-=head1 EXAMPLE3
+=head1 EXAMPLE5
 
 =for comment filename=check_array_object_ok.pl
 
@@ -551,7 +630,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE4
+=head1 EXAMPLE6
 
 =for comment filename=check_array_object_fail.pl
 
@@ -576,7 +655,7 @@ Returns undef.
  # Output like:
  # #Error [..utils.pm:?] Value isn't 'Test::MockObject' object.
 
-=head1 EXAMPLE5
+=head1 EXAMPLE7
 
 =for comment filename=check_array_required_ok.pl
 
@@ -596,7 +675,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE6
+=head1 EXAMPLE8
 
 =for comment filename=check_array_required_fail.pl
 
@@ -619,7 +698,7 @@ Returns undef.
  # Output like:
  # #Error [..utils.pm:?] Parameter 'key' with array must have at least one item.
 
-=head1 EXAMPLE7
+=head1 EXAMPLE9
 
 =for comment filename=check_bool_ok.pl
 
@@ -640,7 +719,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE8
+=head1 EXAMPLE10
 
 =for comment filename=check_bool_fail.pl
 
@@ -663,7 +742,7 @@ Returns undef.
  # Output like:
  # #Error [..utils.pm:?] Parameter 'key' must be a bool (0/1).
 
-=head1 EXAMPLE9
+=head1 EXAMPLE11
 
 =for comment filename=check_code_ok.pl
 
@@ -684,7 +763,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE10
+=head1 EXAMPLE12
 
 =for comment filename=check_code_fail.pl
 
@@ -707,7 +786,7 @@ Returns undef.
  # Output like:
  # #Error [..utils.pm:?] Parameter 'key' must be a code.
 
-=head1 EXAMPLE11
+=head1 EXAMPLE13
 
 =for comment filename=check_isa_ok.pl
 
@@ -728,7 +807,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE12
+=head1 EXAMPLE14
 
 =for comment filename=check_isa_fail.pl
 
@@ -750,7 +829,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a 'Test::MockObject' object.
 
-=head1 EXAMPLE13
+=head1 EXAMPLE15
 
 =for comment filename=check_length_ok.pl
 
@@ -772,7 +851,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE14
+=head1 EXAMPLE16
 
 =for comment filename=check_length_fail.pl
 
@@ -794,7 +873,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' has length greater than '2'.
 
-=head1 EXAMPLE15
+=head1 EXAMPLE17
 
 =for comment filename=check_number_ok.pl
 
@@ -814,7 +893,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE16
+=head1 EXAMPLE18
 
 =for comment filename=check_number_fail.pl
 
@@ -836,7 +915,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must be a number.
 
-=head1 EXAMPLE17
+=head1 EXAMPLE19
 
 =for comment filename=check_number_of_items_ok.pl
 
@@ -881,7 +960,7 @@ Returns undef.
  # Output like:
  # ok
 
-=head1 EXAMPLE18
+=head1 EXAMPLE20
 
 =for comment filename=check_number_of_items_fail.pl
 
@@ -926,7 +1005,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Test for Item 'value1' has multiple values.
 
-=head1 EXAMPLE19
+=head1 EXAMPLE21
 
 =for comment filename=check_regexp_ok.pl
 
@@ -946,7 +1025,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE20
+=head1 EXAMPLE22
 
 =for comment filename=check_regexp_fail.pl
 
@@ -969,7 +1048,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' does not match the specified regular expression.
 
-=head1 EXAMPLE21
+=head1 EXAMPLE23
 
 =for comment filename=check_required_ok.pl
 
@@ -989,7 +1068,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE22
+=head1 EXAMPLE24
 
 =for comment filename=check_required_fail.pl
 
@@ -1012,8 +1091,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' is required.
 
-
-=head1 EXAMPLE23
+=head1 EXAMPLE25
 
 =for comment filename=check_string_begin_ok.pl
 
@@ -1033,7 +1111,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE24
+=head1 EXAMPLE26
 
 =for comment filename=check_string_begin_fail.pl
 
@@ -1056,7 +1134,7 @@ Returns undef.
  # Output like:
  # #Error [...utils.pm:?] Parameter 'key' must begin with defined string base.
 
-=head1 EXAMPLE25
+=head1 EXAMPLE27
 
 =for comment filename=check_strings_ok.pl
 
@@ -1076,7 +1154,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE26
+=head1 EXAMPLE28
 
 =for comment filename=check_strings_fail.pl
 
@@ -1143,6 +1221,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.19
+0.20
 
 =cut

@@ -8,7 +8,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(process_module_name_and_version);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Code from Menlo::CLI::Compat
 sub process_module_name_and_version {
@@ -60,6 +60,8 @@ Returns array with module name and module version range strings.
 
 =head1 EXAMPLE
 
+=for comment filename=process_module_name_and_version.pl
+
  use strict;
  use warnings;
 
@@ -105,12 +107,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021-2022 Michal Josef Špaček
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

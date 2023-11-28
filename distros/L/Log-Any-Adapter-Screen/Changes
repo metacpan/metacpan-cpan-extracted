@@ -1,31 +1,42 @@
-0.140   2018-12-22 (PERLANCAR)
+0.141   2023-11-21  Released-By: PERLANCAR; Urgency: medium
+
+        - Support parameter log_level (thanks Mikko Koivunalho).
+
+          Log::Any adapters use parameter *log_level* instead of *min_level*. If
+          both are present *min_level* takes precedence.
+
+        - Mark distribution as up for adoption since I'm no longer using
+          Log::Any.
+
+
+0.140   2018-12-22  Released-By: PERLANCAR
 
 	- Observe NO_COLOR.
 
 
-0.13    2016-10-04 (PERLANCAR)
+0.13    2016-10-04  Released-By: PERLANCAR
 
 	- Observe COLOR environment to explicitly enable/disable color.
 
 
-0.12    2016-03-04 (PERLANCAR)
+0.12    2016-03-04  Released-By: PERLANCAR
 
 	- [Bugfix] Fix logic mistake which causes LOG_LEVEL=trace to not
 	  work because level=0 [RT#112665].
 
 
-0.11    2016-01-02 (PERLANCAR)
+0.11    2016-01-02  Released-By: PERLANCAR
 
 	- [opt] Reduce startup overhead by 4-5ms (16.8ms to 12ms) in normal
 	  cases by delay-loading Term::ANSIColor and Time::HiRes.
 
 
-0.10    2015-12-31 (PERLANCAR)
+0.10    2015-12-31  Released-By: PERLANCAR
 
 	- Add option: default_level to allow configuring default level.
 
 
-0.09    2015-06-19 (PERLANCAR)
+0.09    2015-06-19  Released-By: PERLANCAR
 
         - Rename module/dist from Log-Any-Adapter-ScreenColoredLevel to
           Log-Any-Adapter-Screen. The old name has roots/ties in Log::Log4perl
@@ -33,7 +44,7 @@
           important anymore.
 
 
-0.08    2015-06-18 (PERLANCAR)
+0.08    2015-06-18  Released-By: PERLANCAR
 
 	- Add default formatter that can prefix elapsed time (and other
 	  stuffs in the future) depending on LOG_PREFIX.
@@ -41,12 +52,12 @@
 	- [doc] Note about Log::Any proxy object.
 
 
-0.07    2015-01-28 (PERLANCAR)
+0.07    2015-01-28  Released-By: PERLANCAR
 
 	- Refactor so it's easier to patch by Progress::Any::Output::Term*.
 
 
-0.06    2015-01-22 (PERLANCAR)
+0.06    2015-01-22  Released-By: PERLANCAR
 
         - No functional changes.
 
@@ -54,7 +65,7 @@
           readable, like in Log::Any::App.
 
 
-0.05    2014-02-28 (SHARYANTO)
+0.05    2014-02-28  Released-By: SHARYANTO
 
         - No functional changes.
 
@@ -62,27 +73,27 @@
           the now-excluded-from-CPAN-index Log::Any::Adapter::Util.
 
 
-0.04    2012-11-08 (SHARYANTO)
+0.04    2012-11-08  Released-By: SHARYANTO
 
         - Avoid undef in Term::ANSIColor::color() by avoiding to hit it if color
           is "" (only happens if script is run under global warning [-w]) [RT
           #80685].
 
 
-0.03    2011-05-16 (SHARYANTO)
+0.03    2011-05-16  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Add 'formatter' parameter.
 
 
-0.02    2011-05-14 (SHARYANTO)
+0.02    2011-05-14  Released-By: SHARYANTO
 
         [ENHANCEMENTS]
 
         - Don't add newline again if message already ends with it.
 
 
-0.01    2011-05-14 (SHARYANTO)
+0.01    2011-05-14  Released-By: SHARYANTO
 
         - First release.

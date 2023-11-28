@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Alien::Meson",
   "PREREQ_PM" => {
     "Alien::Base" => "0.038",
+    "Alien::Build::Util" => 0,
     "Path::Tiny" => 0,
     "base" => 0,
     "strict" => 0,
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Alien::Diag" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.06",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "Alien::Base" => "0.038",
   "Alien::Build" => "0.32",
   "Alien::Build::MM" => "0.32",
+  "Alien::Build::Util" => 0,
   "Data::Dumper" => 0,
   "ExtUtils::MakeMaker" => "6.52",
   "File::Spec" => 0,

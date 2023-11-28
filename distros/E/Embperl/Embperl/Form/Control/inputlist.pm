@@ -2,7 +2,8 @@
 ###################################################################################
 #
 #   Embperl - Copyright (c) 1997-2008 Gerald Richter / ecos gmbh  www.ecos.de
-#   Embperl - Copyright (c) 2008-2014 Gerald Richter
+#   Embperl - Copyright (c) 2008-2015 Gerald Richter
+#   Embperl - Copyright (c) 2015-2023 actevy.io
 #
 #   You may distribute under the terms of either the GNU General Public
 #   License or the Artistic License, as specified in the Perl README file.
@@ -33,22 +34,20 @@ __EMBPERL__
 #   show_control - output the control
 #]
 
-[$ sub show_control ($self) 
+[$ sub show_control ($self, $req) 
 
 my $class     = $self -> {class} ;
-my $opts      = $self -> {options} ;
-my $vals      = $self -> {values} ;
+my $fields     = $self -> {fields} ;
 my $sep       = $self -> {separator} || $self -> {seperator};
-my $sizes     = $self -> {sizes} ;
-$sizes        ||= [];
 $sep          ||= ' ';
-$opts         ||= $vals;
 my            $i = 0;
-$]
-[$ while ($i < @$vals) $][-$size = $sizes->[$i] ; $size ||=  $self->{size} -]
-<input type="text"  class="cBase cControl [+ $class +]"  name="[+ $vals->[$i]+]" id="[+ $vals->[$i]+]"
+$]&nbsp;
+[$ while ($i < @$fields) $][-
+$size  = $fields->[$i]{size} ; $size ||=  $self->{size} ;
+$style = $fields->[$i]{textstyle} ; $style ||=  $self->{textstyle} ;
+-]<span class="ef-control-inputlist-text" style="[+ $style +]">[+ $self -> form -> convert_label ($self, $fields->[$i]{name}, undef, $req) +]</span> <input type="text" name="[+ $fields->[$i]{name} +]" [+ do { local $escmode = 0 ; $self -> get_std_control_attr($req) } +]
 [$if $size $]size="[+ $size +]" maxlength="[+$size+]" [$endif$]
-[+ do { local $escmode = 0 ; $self -> {eventattrs} } +]>[+ ($i +1) < @$vals?$sep:'' +]
+[+ do { local $escmode = 0 ; $self -> {eventattrs} } +]>[+ ($i +1) < @$fields?$sep:'' +]
 [- $i++ -]
 [$endwhile$]
 [$endsub$]

@@ -1,4 +1,12 @@
-0.06    2017-08-10 (PERLANCAR)
+0.070   2023-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix exit status (thanks Lukas Mai / MAUKE).
+
+          `exit` has higher precedence than `?:`, so `exit $found ? 0 : 1`
+          parses as `(exit $found) ? 0 : 1`, which is not what was intended.
+
+
+0.06    2017-08-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -6,7 +14,7 @@
 	  in built version.
 
 
-0.05    2015-09-10 (PERLANCAR)
+0.05    2015-09-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -14,13 +22,13 @@
 	  list is not a single contiguous block).
 
 
-0.04    2015-09-10 (PERLANCAR)
+0.04    2015-09-10  Released-By: PERLANCAR
 
 	- [Bugfix] Show all string matches, don't exit after the first
 	  match.
 
 
-0.03    2015-09-10 (PERLANCAR)
+0.03    2015-09-10  Released-By: PERLANCAR
 
         - Rename dist/script from App-errnos to App-errno.
 
@@ -34,13 +42,13 @@
         - Listing errnos becomes 'errno --list' (or -l).
 
 
-0.02    2015-09-10 (PERLANCAR)
+0.02    2015-09-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Add sample output in script's POD.
 
 
-0.01    2015-09-10 (PERLANCAR)
+0.01    2015-09-10  Released-By: PERLANCAR
 
         - First release.

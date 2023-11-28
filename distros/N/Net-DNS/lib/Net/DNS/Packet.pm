@@ -3,7 +3,7 @@ package Net::DNS::Packet;
 use strict;
 use warnings;
 
-our $VERSION = (qw$Id: Packet.pm 1925 2023-05-31 11:58:59Z willem $)[2];
+our $VERSION = (qw$Id: Packet.pm 1947 2023-11-23 09:40:45Z willem $)[2];
 
 
 =head1 NAME
@@ -398,9 +398,10 @@ sub string {
 
 	my $header = $self->header;
 	my $opcode = $header->opcode;
+	my $packet = $header->qr ? 'Response' : 'Query';
 	my $server = $self->{replyfrom};
 	my $length = $self->{replysize};
-	my $origin = $server ? ";; Response received from $server ($length octets)\n" : "";
+	my $origin = $server ? ";; $packet received from [$server] $length octets\n" : "";
 	my @record = ( "$origin;; HEADER SECTION", $header->string );
 
 	if ( $opcode eq 'DSO' ) {

@@ -1,0 +1,100 @@
+{
+   "abstract" : "Find available localization / localisation / translation services.",
+   "author" : [
+      "Richard Bairwell <rbairwell@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Locale-MaybeMaketext",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ],
+      "file" : [
+         "t/MaybeMaketextIntegrationTest.pm",
+         "t/MaybeMaketextTestdata.pm",
+         "xt/FindPerlFiles.pm"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "autodie" : "0",
+            "perl" : "v5.20.0"
+         },
+         "suggests" : {
+            "Cpanel::CPAN::Locale::Maketext::Utils" : "0",
+            "Locale::Maketext" : "0",
+            "Locale::Maketext::Utils" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Cpanel::CPAN::Locale::Maketext::Utils" : "0"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "DateTime" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Locale::Maketext" : "0",
+            "Locale::Maketext::Utils" : "0",
+            "Pod::Checker" : "0",
+            "Pod::Coverage" : "0",
+            "Test2::Formatter::TAP" : "0",
+            "Test2::Plugin::BailOnFail" : "0",
+            "Test2::Plugin::ExitSummary" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Compare" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test2::Tools::Target" : "0",
+            "Test2::V0" : "0",
+            "Test::CPANfile" : "0.08",
+            "Test::EOL" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Locale-MaybeMaketext@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Locale-MaybeMaketext"
+      },
+      "homepage" : "https://github.com/bairwell/Locale-MaybeMaketext",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bairwell/Locale-MaybeMaketext.git",
+         "web" : "https://github.com/bairwell/Locale-MaybeMaketext"
+      }
+   },
+   "version" : "1.233180",
+   "x_authority" : "cpan:RBAIRWELL",
+   "x_generated_by_perl" : "v5.26.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

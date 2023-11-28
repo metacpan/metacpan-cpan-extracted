@@ -78,4 +78,5 @@ t/v2_json.t
 t/v2_multischema.t
 t/v2_Oracle.t
 t/v2_result_as.t
+t/v3_Oracle12c.t
 xt/pod.t

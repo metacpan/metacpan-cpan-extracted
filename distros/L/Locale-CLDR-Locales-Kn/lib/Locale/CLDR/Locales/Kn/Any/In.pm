@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Kn::Any::In - Package for language Kannada
 
 package Locale::CLDR::Locales::Kn::Any::In;
 # This file auto generated from Data\common\main\kn_IN.xml
-#	on Fri 13 Oct  9:24:10 am GMT
+#	on Sat  4 Nov  6:10:24 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.2');
+our $VERSION = version->declare('v0.34.3');
 
 use v5.10.1;
 use mro 'c3';

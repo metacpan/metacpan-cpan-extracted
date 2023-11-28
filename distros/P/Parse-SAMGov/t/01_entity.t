@@ -4,12 +4,12 @@ use_ok('Parse::SAMGov::Entity');
 
 my $e = new_ok('Parse::SAMGov::Entity');
 can_ok(
-    $e, qw( DUNS DUNSplus4 CAGE DODAAC
+    $e, qw( UEI DUNS DUNSplus4 CAGE DODAAC EEFTI
       regn_purpose regn_date expiry_date
       lastupdate_date activation_date
-      name dba_name company_division division_no
+      name dba_name company_division division_no dnb_open_data
       physical_address start_date fiscalyear_date
-      url entity_structure incorporation_state
+      url entity_structure entity_structure_descriptions incorporation_state
       incorporation_country biztype
       NAICS SBA PSC creditcard
       correspondence_type mailing_address
@@ -17,6 +17,7 @@ can_ok(
       is_private disaster_response
       POC_gov POC_gov_alt POC_pastperf
       POC_pastperf_alt POC_elec POC_elec_alt
+      load load_v1 load_v2
       )
 );
 isa_ok($e->regn_date('20160101'), 'DateTime');

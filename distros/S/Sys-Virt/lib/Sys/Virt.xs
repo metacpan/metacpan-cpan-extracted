@@ -1501,6 +1501,48 @@ _network_event_generic_callback(virConnectPtr con,
 
 
 static int
+_network_event_metadata_change_callback(virConnectPtr con,
+                                        virNetworkPtr net,
+                                        int type,
+                                        const char *nsuri,
+                                        void *opaque)
+{
+    AV *data = opaque;
+    SV **self;
+    SV **cb;
+    SV *netref;
+    dSP;
+
+    self = av_fetch(data, 0, 0);
+    cb = av_fetch(data, 1, 0);
+
+    SvREFCNT_inc(*self);
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(*self);
+    netref = sv_newmortal();
+    sv_setref_pv(netref, "Sys::Virt::Network", (void*)net);
+    virNetworkRef(net);
+    XPUSHs(netref);
+    XPUSHs(sv_2mortal(newSViv(type)));
+    XPUSHs(sv_2mortal(newSVpv(nsuri, 0)));
+    PUTBACK;
+
+    call_sv(*cb, G_DISCARD);
+
+    FREETMPS;
+    LEAVE;
+
+    SvREFCNT_dec(*self);
+
+    return 0;
+}
+
+
+static int
 _storage_pool_event_generic_callback(virConnectPtr con,
                                      virStoragePoolPtr pool,
                                      void *opaque)
@@ -4130,6 +4172,9 @@ network_event_register_any(conref, netref, eventID, cb)
     switch (eventID) {
     case VIR_NETWORK_EVENT_ID_LIFECYCLE:
         callback = VIR_NETWORK_EVENT_CALLBACK(_network_event_lifecycle_callback);
+        break;
+    case VIR_NETWORK_EVENT_ID_METADATA_CHANGE:
+        callback = VIR_NETWORK_EVENT_CALLBACK(_network_event_metadata_change_callback);
         break;
     default:
         callback = VIR_NETWORK_EVENT_CALLBACK(_network_event_generic_callback);
@@ -10655,6 +10700,7 @@ BOOT:
     REGISTER_CONSTANT(VIR_CONNECT_LIST_NETWORKS_TRANSIENT, LIST_TRANSIENT);
 
     REGISTER_CONSTANT(VIR_NETWORK_EVENT_ID_LIFECYCLE, EVENT_ID_LIFECYCLE);
+    REGISTER_CONSTANT(VIR_NETWORK_EVENT_ID_METADATA_CHANGE, EVENT_ID_METADATA_CHANGE);
 
     REGISTER_CONSTANT(VIR_NETWORK_EVENT_DEFINED, EVENT_DEFINED);
     REGISTER_CONSTANT(VIR_NETWORK_EVENT_UNDEFINED, EVENT_UNDEFINED);

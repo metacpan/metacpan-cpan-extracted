@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0814';
+our $VERSION = '0.0817';
 
 use Moo;
 use strictures 2;
@@ -13,12 +13,6 @@ use List::Util qw(min);
 use namespace::clean;
 
 use constant TICKS => 96;
-
-
-has durations => (
-    is      => 'ro',
-    default => sub { return \%MIDI::Simple::Length },
-);
 
 
 has size => (
@@ -126,6 +120,13 @@ has verbose => (
     default => sub { return 0 },
 );
 
+# hash reference of duration lengths (keyed by duration name)
+# Default: \%MIDI::Simple::Length
+has _durations => (
+    is      => 'ro',
+    default => sub { return \%MIDI::Simple::Length },
+);
+
 
 sub motif {
     my ($self) = @_;
@@ -190,6 +191,7 @@ sub motif {
 
 sub motifs {
     my ($self, $n) = @_;
+    $n ||= 1;
     my @motifs = map { $self->motif } 1 .. $n;
     return @motifs;
 }
@@ -211,7 +213,7 @@ sub _duration {
         $dura = $1;
     }
     else {
-        $dura = $self->durations->{$name};
+        $dura = $self->_durations->{$name};
     }
 
     return $dura;
@@ -231,7 +233,7 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0814
+version 0.0817
 
 =head1 SYNOPSIS
 
@@ -255,8 +257,8 @@ version 0.0814
     groups => [   1, 1, 3   ],
   );
 
-  my $motif  = $mdp->motif;  # list-ref of pool members
-  my @motifs = $mdp->motifs; # list of motifs
+  my $motif  = $mdp->motif;     # list-ref of pool members
+  my @motifs = $mdp->motifs(4); # list of motifs
 
 =head1 DESCRIPTION
 
@@ -276,14 +278,6 @@ L<Music::Duration::Partition::Tutorial::Quickstart> and
 L<Music::Duration::Partition::Tutorial::Advanced>.
 
 =head1 ATTRIBUTES
-
-=head2 durations
-
-  $durations = $mdp->durations;
-
-A hash reference of duration lengths (keyed by duration name).
-
-Default: C<\%MIDI::Simple::Length>
 
 =head2 size
 
@@ -379,9 +373,12 @@ application, in a loop until the B<size> is met.
 
 =head2 motifs
 
+  @motifs = $mdp->motifs;
   @motifs = $mdp->motifs($n);
 
 Return B<n> motifs.
+
+Default: C<n=1>
 
 =head2 add_to_score
 

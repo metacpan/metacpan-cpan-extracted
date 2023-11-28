@@ -12,9 +12,9 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-24'; # DATE
+our $DATE = '2023-11-23'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.928'; # VERSION
+our $VERSION = '1.929'; # VERSION
 
 # TODO: this class can actually be a role instead of base class for pericmd &
 # pericmd-lite.
@@ -884,7 +884,7 @@ sub get_subcommand_data {
     return undef unless $scs;
 
     if (ref($scs) eq 'CODE') {
-        return $scs->($self, name=>$name);
+        return $scs->($self, name=>$name, in_completion=>$r->{in_completion});
     } else {
         return $scs->{$name};
     }
@@ -898,7 +898,7 @@ sub list_subcommands {
     my $res;
     if ($scs) {
         if (ref($scs) eq 'CODE') {
-            $scs = $scs->($self);
+            $scs = $scs->($self, in_completion=>$r->{in_completion});
             die [500, "BUG: Subcommands code didn't return a hashref"]
                 unless ref($scs) eq 'HASH';
         }
@@ -1987,7 +1987,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.928 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-11-24.
+This document describes version 1.929 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2023-11-23.
 
 =head1 DESCRIPTION
 
@@ -3113,7 +3113,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

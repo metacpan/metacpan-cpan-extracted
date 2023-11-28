@@ -1,0 +1,181 @@
+# PODNAME: Neo4j::Types::DateTime
+# ABSTRACT: Represents a Neo4j temporal instant value
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Neo4j::Types::DateTime - Represents a Neo4j temporal instant value
+
+=head1 VERSION
+
+version 2.00
+
+=head1 SYNOPSIS
+
+ $days = $dt->days;
+ $seconds = $dt->seconds;
+ $nanoseconds = $dt->nanoseconds;
+ 
+ $epoch = $days * 86400 + $seconds;
+ $epoch = $dt->epoch;
+ $epoch_hires = $epoch + $nanoseconds / 1e9;
+ 
+ $tz_name = $dt->tz_name;    # like Europe/Paris
+ $seconds = $dt->tz_offset;  # like 3600
+ 
+ $neo4j_type = $dt->type;    # like ZONED DATETIME
+
+=head1 DESCRIPTION
+
+Represents a temporal instant value in Neo4j. Potentially includes
+date, time, and timezone components.
+
+Neo4j offers the following temporal instant types:
+
+=over
+
+=item * C<DATE>
+
+=item * C<LOCAL TIME> E<8211> no time zone information
+
+=item * C<ZONED TIME> E<8211> has a time zone offset in seconds
+
+=item * C<LOCAL DATETIME> E<8211> no time zone information
+
+=item * C<ZONED DATETIME> E<8211> has a time zone offset in seconds,
+or a time zone name from the IANA Olson database
+
+=back
+
+This interface is designed to closely match the semantics of the
+Neo4j temporal types. For actually working with dates and times
+in Perl, the modules recommended by L<Task::Kensho::Dates> are
+better suited in most cases. The conversion is easiest using
+the Epoch value:
+
+ $dt = Neo4j::Types::Generic::DateTime->new( ... );
+ $epoch_hires = $dt->epoch + $dt->nanoseconds / 1e9;
+ 
+ $datetime = DateTime->from_epoch( epoch => $epoch_hires );
+ $moment   = Time::Moment->from_epoch( $epoch_hires );
+ $piece    = Time::Piece->new( $dt->epoch );
+
+DateTime values may be returned from a Neo4j database server.
+Generic DateTime values may also be created locally.
+See L<Neo4j::Types::Generic/"DateTime">.
+
+I<Supported in Neo4j S<version 3.4> and above.>
+
+=head1 METHODS
+
+L<Neo4j::Types::DateTime> specifies the following methods.
+
+=head2 days
+
+ $days = $dt->days;
+
+Return the number of full days since the Unix epoch.
+For C<* TIME> values, return C<undef>.
+
+For the day identified by C<$days>, the
+L<Julian Date|https://en.wikipedia.org/wiki/Julian_date>
+is exactly C<$days + 2440587.5>.
+
+=head2 epoch
+
+ $seconds = $dt->epoch;
+
+Return the full seconds since the Unix epoch, ignoring
+leap seconds. Values of the type C<TIME> are interpreted
+as referring to S<1 January 1970>.
+
+=head2 nanoseconds
+
+ $nanoseconds = $dt->nanoseconds;
+
+Return the nanoseconds since the start of the second identified
+by C<seconds()>. For C<DATE> values, return C<undef>.
+
+=head2 seconds
+
+ $seconds = $dt->seconds;
+
+Return the seconds since the start of the day.
+For C<DATE> values, return C<undef>.
+
+=head2 type
+
+ $neo4j_type = $dt->type;
+
+Return the Neo4j type name for this value as a string.
+One of C<DATE>, C<LOCAL TIME>, C<ZONED TIME>,
+C<LOCAL DATETIME>, C<ZONED DATETIME>.
+
+=head2 tz_name
+
+ $tz_name = $dt->tz_name;
+
+Return the name of the time zone to be used for display purposes.
+The name refers to the IANA Olson time zone database.
+For example, the time zone name for California would be
+C<America/Los_Angeles>.
+For C<DATE> values and C<LOCAL *> values, return C<undef>.
+
+For a display time zone defined by standard offset only, this
+method will return a zone name in the C<Etc> area. Note that
+such zone names follow the POSIX sign convention, which uses
+a positive sign west of Greenwich. This is the inverse of the
+S<ISO convention> usually used for time zone offsets.
+
+=head2 tz_offset
+
+ $seconds = $dt->tz_offset;
+
+Return the number of seconds to be added to the time for display
+purposes. A positive sign is used east of Greenwich.
+For example, for standard time in California, the offset
+from UTC would be -28800 seconds.
+For C<DATE> values and C<LOCAL *> values, return C<undef>.
+
+To define a display time zone, it is sufficient for either the
+time zone name or a numerical time offset to be available.
+If this method returns C<undef>, you need to use C<tz_name()>
+instead.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Neo4j::Types>
+
+=item * L<Neo4j::Types::Generic/"DateTime">
+
+=item * L<Neo4j::Types::ImplementorNotes/"DateTime">
+
+=item * L<Neo4j::Bolt::DateTime>
+
+=item * L<Neo4j::Driver::Types>
+
+=back
+
+=head1 AUTHOR
+
+Arne Johannessen <ajnn@cpan.org>
+
+If you contact me by email, please make sure you include the word
+"Perl" in your subject header to help beat the spam filters.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
+
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.
+
+=cut

@@ -1,3 +1,21 @@
+0.04 2023-11-22T16:55:02+01:00
+ - Add Error::Pure::ANSIColor dist.
+ - Add Error::Pure::Output::ANSIColor dist.
+ - Fix Makefile.PL fails with no '.' in @INC.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Update Error::Pure to 0.31 version.
+ - Update Error::Pure::Always to 0.07 version.
+ - Update Error::Pure::HTTP to 0.15 version.
+ - Update Error::Pure::JSON to 0.08 version.
+ - Update Error::Pure::NoDie to 0.05 version.
+ - Update Error::Pure::Output::JSON to 0.11 version.
+ - Update Error::Pure::Output::Text to 0.24 version.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.03 2015-10-30T08:49:55+01:00
  - Add Error::Pure::HTTP::JSON::Advance to SEE ALSO section in doc.
  - Add Error::Pure::JSON::Advance to SEE ALSO section in doc.

@@ -1,66 +1,5 @@
 /* Styling for the post entry page */
 
-
-/* The small navigation bar */
-
-.hero-banner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: height 0.3s ease;
-    background-color: #2D2D2D;
-
-    position: sticky;
-    top: 0;
-    z-index: 1000; 
-}
-
-.hero-banner-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 10px 20px; /* side padding */
-}
-
-.site-title {
-	font-family: "Roboto", "Open Sans", sans-serif;
-    font-size: 1.5em;
-	color: #999;
-    font-weight: normal;
-}
-
-/* Navigation elements */
-
-nav {
-    display: flex;
-    gap: 1em;
-	font-family: "Roboto", "Open Sans", sans-serif;
-}
-
-nav a {
-    text-decoration: none;
-	color: #B0B0B0;
-    padding: 0.5em 1em;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-nav a:hover {
-    color: #2D2D2D; /* Dark background color for text on hover */
-    background-color: #FFA500; /* Orange color on hover */
-}
-
-/* Small version of the site's logo */
-
-.avatar-logo {
-	margin-top: 5px;
-    width: 50px;
-    border-radius: 50%;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* End of Hero Banner */
-
 /* START single page post-header style */
 .post-header {
     display: flex;
@@ -102,10 +41,11 @@ nav a:hover {
     width: 100%; /* Ensure it takes the full width of the container */
 }
 
-.post-title {
+.header-content .post-title {
     font-size: 3.5em;
     margin-bottom: 20px; /* Can adjust this for spacing, if needed */
 	margin-top: 80px;
+    padding: 1rem;
 
 	text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7); /* Subtle text outline for depth */
     text-align: center;
@@ -178,7 +118,6 @@ ul.post-meta {
 .post-header.no-featured-image .post-title {
     color: #333;
     text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.7); /* Subtle text outline for depth */
-    padding: 20px 0; /* Padding for visual space */
 }
 
 /* Adjust the meta background and text color for light theme */
@@ -207,8 +146,6 @@ ul.post-meta {
 .post-header.no-featured-image .post-meta li.clickable a:hover {
     color: #333; 
 }
-
-
 
 /* Tags and Meta Data of the Page */
 
@@ -262,6 +199,16 @@ ul.post-meta {
   padding: 0 20px;
 }
 
+.container article {
+    padding: 2rem;
+    padding-top: 0;
+}
+
+.container article h1 {
+    text-align: left;
+    font-size: 1.8rem;
+}
+
 /* Cover image */
 
 .cover-image-container {
@@ -280,11 +227,53 @@ ul.post-meta {
     object-position: center;     /* Center the image within the container */
 }
 
+.container.with-background-image h1.header-naked-title {
+    padding-top: 4.5rem;
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7); /* Subtle text outline for depth */
+    color: var(--liteblog-dark-bg-title-color); 
+    font-size: 3rem;
+}
 
+/* Background Image and Full Screen mode */
+.container.with-background-image {
+    margin: 0;
+    max-width: 100%;
+    margin: auto;
+
+    color: #fff;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    padding-bottom: 4rem;
+}
+
+.post-header.no-featured-image.with-background-image {
+    background-color: rgba(0, 0, 0, 0.5);
+    
+}
+.post-header.no-featured-image.with-background-image ul.post-meta {
+    display: none;
+}
+
+.container.with-background-image article {
+    max-width: 800px;
+    margin: auto;
+    padding-top: 1rem;
+    margin-top: 0;
+
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Soft shadow for depth */
+    margin-bottom: 2rem;
+
+    background-color: rgba(255, 255, 255, 0.8); /* a semi transparent white */
+    color: #444;
+
+    margin-bottom: 0;
+}
 
 /* Titles */
 h1 {
-  font-family: "Roboto", "Open Sans", sans-serif;
   font-weight: bold;
   font-size: 2.5em;
   color: #444;
@@ -293,12 +282,11 @@ h1 {
 }
 
 h2, h3, h4 {
-  font-family: "Roboto", "Open Sans", sans-serif;
+  font-family: var(--liteblog-title-family);
 }
 
 /* Article Content */
 article p, li, blockquote {
-    font-family: 'Merriweather', source-serif-pro, Georgia, Cambria, "Times New Roman", Times, serif;
     line-height: 1.6;
     font-size: 17px;
     color: #333; /* A soft black */
@@ -343,6 +331,15 @@ article blockquote {
 
     #mobile-header {
         display: flex;
+    }
+
+    .header-content .post-title,
+    .post-header.no-featured-image .post-title {
+        font-size: 2.5em;
+    }
+
+    ul.post-meta {
+        margin-top: 10px;
     }
 
     article {
@@ -404,3 +401,4 @@ article blockquote {
         padding: 0 !important;
     }
 }
+

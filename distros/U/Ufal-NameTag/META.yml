@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4232, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,36 +17,36 @@ name: Ufal-NameTag
 provides:
   Ufal::NameTag:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::Forms:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::Ints:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::NamedEntities:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::NamedEntity:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::Ner:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::TokenRange:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::TokenRanges:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::Tokenizer:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTag::Version:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
+    version: v1.2.1.1
   Ufal::NameTagc:
     file: lib/Ufal/NameTag.pm
-    version: v1.2.0.1
-version: v1.2.0.1
+    version: v1.2.1.1
+version: v1.2.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
