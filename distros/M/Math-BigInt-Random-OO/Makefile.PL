@@ -1,4 +1,4 @@
-#!perl
+# -*- mode: perl -*-
 
 use strict;
 use warnings;
@@ -12,7 +12,6 @@ WriteMakefile
    VERSION_FROM         => 'lib/Math/BigInt/Random/OO.pm',
    ABSTRACT_FROM        => 'lib/Math/BigInt/Random/OO.pm',
    AUTHOR               => 'Peter John Acklam <pjacklam@gmail.com>',
-   MIN_PERL_VERSION     => 5.006,
 
    # A hash of modules that are required to run Makefile.PL itself, but not to
    # run the distribution.
@@ -28,14 +27,15 @@ WriteMakefile
    # A hash of modules that are needed to run the module.
 
    'PREREQ_PM'          => {
-                            'Math::BigInt'        => 1.80,
+                            'Math::BigInt'        => 1.999814,
+                            'Carp'                => 1.22,
                            },
 
    # A hash of modules that are needed to test the module but not run or build
    # it.
 
    'TEST_REQUIRES'      => {
-                            'Test::More'          => 0.82,
+                            'Test::More'          => 0.94,
                            },
 
    'LICENSE'            => 'perl_5',

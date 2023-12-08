@@ -20,8 +20,7 @@ requires 'Config::Utils' => 0.03;
 requires 'Error::Pure' => 0.16;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Config-Dot';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Config-Dot/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Config-Dot';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Config-Dot';
 test_requires 'English' => 0;
@@ -29,7 +28,7 @@ test_requires 'Error::Pure::Utils' => 0.16;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.09';
+version '0.10';
 
 # Run.
 WriteAll();

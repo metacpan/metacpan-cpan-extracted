@@ -1,7 +1,7 @@
 ---
 abstract: 'Graph interface to the Map::Tube.'
 author:
-  - 'Michal Spacek <skim@cpan.org>'
+  - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
   English: 0
   Error::Pure::Utils: 0.22
@@ -15,7 +15,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.21'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,12 +31,12 @@ requires:
   Class::Utils: 0.06
   Error::Pure: 0.22
   Graph: 0.9702
-  List::MoreUtils: 0
+  List::Util: 1.33
   Scalar::Util: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Map-Tube-Graph
-  homepage: https://github.com/tupinek/Map-Tube-Graph
+  bugtracker: https://github.com/michal-josef-spacek/Map-Tube-Graph/issues
+  homepage: https://github.com/michal-josef-spacek/Map-Tube-Graph
   license: http://opensource.org/licenses/artistic-license-2.0.php
-  repository: git://github.com/tupinek/Map-Tube-Graph
-version: '0.05'
+  repository: git://github.com/michal-josef-spacek/Map-Tube-Graph
+version: '0.06'

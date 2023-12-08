@@ -1,7 +1,7 @@
 package OpenTelemetry::Integration::LWP::UserAgent;
 # ABSTRACT: OpenTelemetry integration for LWP::UserAgent
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use strict;
 use warnings;
@@ -104,6 +104,12 @@ sub install ( $class, %config ) {
                 # handle's write_body method
                 $length ? ( 'http.request.body.size' => $length ) : (),
             },
+        );
+
+        OpenTelemetry->propagator->inject(
+            $request,
+            undef,
+            sub { shift->header(@_) },
         );
 
         dynamically OpenTelemetry::Context->current

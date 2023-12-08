@@ -6,7 +6,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use SemVer;
 use Safe::Isa;
@@ -54,7 +54,7 @@ Image::DS9::Util - Various useful things
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =for Pod::Coverage parse_version
 

@@ -4,7 +4,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::ByteStream;
 use Mojo::JSON qw(encode_json decode_json);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 my @HX_RESWAPS = (qw[
     innerHTML
@@ -176,6 +176,10 @@ sub _res_trigger {
 
     if (ref $trigger eq 'HASH') {
         $trigger = encode_json($trigger);
+    }
+
+    if (ref $trigger eq 'ARRAY') {
+        $trigger = join ', ', @{$trigger};
     }
 
     my $header = $trigger_header->{$type} || 'HX-Trigger';
@@ -418,6 +422,13 @@ If you wish to invoke multiple events, you can simply add additional keys to the
         event1 => 'A message',
         event2 => 'Another message'
     );
+  }
+  
+You may also trigger multiple events with no additional details by sending event
+names in ARRAY:
+
+  if ($c->is_htmx_request) {
+    $c->htmx->res->trigger(['event1', 'event2']);
   }
 
 Based on C<HX-Trigger> header.

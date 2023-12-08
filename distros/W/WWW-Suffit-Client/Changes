@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.02 Fri 01 Dec 2023 10:46:08 MSK
+    * Added the apierr method to main client module
+
 1.01 Fri 22 Sep 2023 18:42:48 MSK
     * Added the pubkey method to V1 module
 

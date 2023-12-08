@@ -1,0 +1,31 @@
+Changes
+lib/Config/INI/RefVars.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-can.t
+t/02-data/empty_file.ini
+t/02-data/only_comments.ini
+t/02-data/only_spaces.ini
+t/02-data/simple_content.ini
+t/02-simple.t
+t/03-assign.t
+t/03-data/basic.ini
+t/03-data/basic_spaces.ini
+t/04-ref_vars.t
+t/05-ref_sec_vars.t
+t/06-tocopy.t
+t/07-separator.t
+t/08-autovars.t
+t/08-data/mix.ini
+t/09-args.t
+t/10-arg_error.t
+t/11-ini_error.t
+t/99-data/dummy.ini
+t/99-examples.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

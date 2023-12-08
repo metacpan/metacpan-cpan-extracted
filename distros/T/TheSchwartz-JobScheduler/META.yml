@@ -1,0 +1,54 @@
+---
+abstract: 'Lightweight TheSchwartz job dispatcher'
+author:
+  - 'Mikko Koivunalho <mikkoi@cpan.org>'
+build_requires:
+  DBI: '0'
+  Data::Dumper: '0'
+  Database::ManagedHandle: '0'
+  Database::Temp: '0'
+  File::Spec: '0'
+  FindBin: '1.51'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::V0: '0'
+  Test::Database::Temp: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.014'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - theschwartz
+  - jobscheduler
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: TheSchwartz-JobScheduler
+recommends:
+  Database::ManagedHandle: '0'
+requires:
+  Carp: '0'
+  English: '0'
+  Log::Any: '0'
+  Log::Any::Adapter::Util: '0'
+  Module::Load: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=TheSchwartz-JobScheduler
+  homepage: https://metacpan.org/release/TheSchwartz-JobScheduler
+  repository: https://github.com/mikkoi/TheSchwartz-JobScheduler.git
+version: '0.001'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

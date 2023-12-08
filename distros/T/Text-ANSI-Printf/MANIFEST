@@ -15,6 +15,7 @@ t/02_export.t
 t/03_shorten.t
 t/04_backspace.t
 t/05_reorder.t
+t/06_fallback.t
 t/ansiprintf/00_compile.t
 t/ansiprintf/02_exec.t
 t/ansiprintf/Util.pm

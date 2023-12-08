@@ -1,0 +1,37 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form method="post" action="UserRights.html" id="ModifyUserRights" name="ModifyUserRights">
+  <input type="hidden" class="hidden" name="id" value="<% $form_attribute->id %>" />
+
+  <& /Admin/Elements/EditRights, Context => $form_attribute, Principals => \@principals &>
+  <div class="form-row">
+    <div class="col-12">
+      <& /Elements/Submit, Label => loc('Save Changes') &>
+    </div>
+  </div>
+</form>
+
+<%INIT>
+
+Abort("No form id found") unless $id;
+
+my $form_attribute = RT::Attribute->new($session{'CurrentUser'});
+my ($ok, $msg) = $form_attribute->Load($id);
+
+unless ( $ok ) {
+    Abort("Unable to load form with id $id");
+}
+
+my @results = ProcessACLs( \%ARGS );
+
+my $title = loc('Modify user rights for Form [_1]', $form_attribute->Description);
+
+# Principal collections
+my @principals = GetPrincipalsMap($form_attribute, qw(Users));
+</%INIT>
+
+<%ARGS>
+$id => undef
+</%ARGS>

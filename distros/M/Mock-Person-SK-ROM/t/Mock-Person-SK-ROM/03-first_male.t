@@ -1,10 +1,8 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Mock::Person::SK::ROM qw(first_male);
-use List::MoreUtils qw(any);
+use List::Util 1.33 qw(any);
 use Test::More 'tests' => 3;
 use Test::NoWarnings;
 

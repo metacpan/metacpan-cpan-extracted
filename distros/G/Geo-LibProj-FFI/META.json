@@ -4,7 +4,7 @@
       "Arne Johannessen <ajnn@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -23,7 +23,6 @@
          "requires" : {
             "Test::MinimumVersion" : "0",
             "Test::More" : "0",
-            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41"
          }
       },
@@ -33,8 +32,8 @@
             "Convert::Binary::C" : "0.04",
             "Exporter::Easy" : "0",
             "FFI::C" : "0.08",
-            "FFI::Platypus" : "1.00",
-            "perl" : "5.012"
+            "FFI::Platypus" : "1.50",
+            "perl" : "v5.14.0"
          }
       },
       "test" : {
@@ -44,85 +43,84 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
-            "IPC::Run3" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
-            "Test::Warnings" : "0"
+            "Test::Warnings" : "0.010"
          }
       }
    },
    "provides" : {
       "Geo::LibProj::FFI" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_COORD" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_ENU" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_GEOD" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_GRID_INFO" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_INFO" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_INIT_INFO" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_LP" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_LPZ" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_LPZT" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_OPK" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_PROJ_INFO" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_UV" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_UVW" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_UVWT" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_XY" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_XYZ" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       },
       "Geo::LibProj::FFI::PJ_XYZT" : {
          "file" : "lib/Geo/LibProj/FFI.pm",
-         "version" : "0.04"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -136,9 +134,9 @@
          "web" : "https://github.com/johannessen/proj-perl-ffi"
       }
    },
-   "version" : "0.04",
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "0.06",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

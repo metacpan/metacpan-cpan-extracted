@@ -1,14 +1,22 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
 
-local $| = 1;                   # disable buffering
+use Test::More tests => 264;
 
 use Math::BigInt::Random::OO;
 
 use Math::BigInt;
 use Math::BigFloat;
+
+my $class = 'Math::BigInt::Random::OO';
+
+my @contexts = ('scalar', 'list');
+
+# Classes (reference types, actually) for the input arguments.
+
+my @refs = ('', 'Math::BigInt', 'Math::BigFloat');
 
 # Values for the 'min' and 'max' parameters to the 'new' method.
 
@@ -26,11 +34,9 @@ my @minmax =
    [ -2,  0 ],
    [ -2,  1 ],
 
-   [ Math::BigInt   -> new(-2), Math::BigInt   -> new(5) ],
-   [ Math::BigFloat -> new(-2), Math::BigFloat -> new(5) ],
-
-   [ Math::BigInt   -> new("-2e20"), Math::BigInt   -> new("5e20") ],
-   [ Math::BigFloat -> new("-2e20"), Math::BigFloat -> new("5e20") ],
+   [ '-2e20', '-2e20' ],
+   [  '5e20',  '5e20' ],
+   [ '-2e20',  '5e20' ],
 
   );
 
@@ -42,121 +48,78 @@ my @genargs = ([ ],
                [3],
              );
 
-# Output context.
+for my $context (@contexts) {
+    for my $ref (@refs) {
+        for (my $i = 0 ; $i <= $#minmax ; ++ $i) {
+            for (my $j = 0 ; $j <= $#genargs ; ++ $j) {
 
-my @context = ('scalar',
-               'list',
-               'void',
-              );
+                # Arguments to new().
 
-my $ntests = @minmax * @genargs * @context;
+                my $min = $minmax[$i][0];
+                my $max = $minmax[$i][1];
 
-my $class = 'Math::BigInt::Random::OO';
+                # Don't use Perl scalars with large absolute values.
 
-print "1..156\n";
+                next if $ref eq '' && (abs($min) > 2147483647 ||
+                                       abs($max) > 2147483647);
 
-my $testno = 0;
+                # Arguments to generate().
 
-for (my $i = 0 ; $i <= $#minmax ; ++ $i) {
-    for (my $j = 0 ; $j <= $#genargs ; ++ $j) {
-        for (my $k = 0 ; $k <= $#context ; ++ $k) {
+                my $genargs = $genargs[$j];
 
-            ++ $testno;
+                # Build a string with the test.
 
-            # Arguments to new().
+                my $test = $context eq 'scalar' ? '$x = ' : '@x = ';
+                $test .= qq|$class -> new("min" => |;
+                $test .= $ref ? qq|$ref -> new("$min")| : $min;
+                $test .= qq|, "max" => |;
+                $test .= $ref ? qq|$ref -> new("$max")| : $max;
+                $test .= ") -> generate(@$genargs)";
 
-            my $min = $minmax[$i][0];
-            my $max = $minmax[$i][1];
+                my ($x, @x);
+                note "\n", $test, "\n\n";
+                eval $test;
+                die "\nThe following code failed to eval():\n\n",
+                  "    ", $test, "\n\n", $@, "\n" if $@;
 
-            # Arguments to generate().
+                if ($context eq 'scalar') {
 
-            my $genargs = $genargs[$j];
+                    subtest $test => sub {
+                        plan tests => 3;
 
-            # Output context.
+                        is(ref($x), "Math::BigInt",
+                           "Output is a 'Math::BigInt'");
+                        cmp_ok($x, ">=", $min,
+                               "Output arg \$x is >= the min value");
+                        cmp_ok($x, "<=", $max,
+                               "Output arg \$ is <= the max value");
+                    };
 
-            my $context = $context[$k];
+                } else {
 
-            # Build a string with the test.
+                    my $n_out_expected = @$genargs ? $genargs->[0] : 1;
+                    subtest $test => sub {
+                        plan tests => 1 + 3 * $n_out_expected;
 
-            my $test = '';
-            $test .= $context eq 'scalar' ? '$x = ' :   # scalar
-                     $context eq 'list'   ? '@x = ' :   # list
-                                            '';         # void
-            $test .= "$class -> new(min => ";
-            $test .= ref($min) ? ref($min) . qq| -> new("$min")| : $min;
-            $test .= ", max => ";
-            $test .= ref($max) ? ref($max) . qq| -> new("$max")| : $max;
-            $test .= ") -> generate(@$genargs)";
+                        # Check number of output argument.
 
-            # Construct the generator.
+                        cmp_ok(scalar(@x), "==", $n_out_expected,
+                               "Number of output arguments");
 
-            my $gen = $class -> new(min => $min,
-                                    max => $max,
-                                   );
+                        # Check each output argument.
 
-            # Generate the random numbers.
+                        for (my $i = 0 ; $i <= $#x ; ++$i) {
+                            is(ref($x[$i]), "Math::BigInt",
+                               "Output argument '\$x[$i]' is a 'Math::BigInt'");
+                            cmp_ok($x[$i], ">=", $min,
+                                   "Output arg '\$x[$i]' is >= the min value");
+                            cmp_ok($x[$i], "<=", $max,
+                                   "Output arg '\$x[$i]' is <= the max value");
+                        }
+                    };
 
-            my @out = ();
-            my $n_out_expected;
-
-            if ($context eq 'scalar') {
-                my $x = $gen -> generate(@$genargs);
-                @out = $x;
-                $n_out_expected = 1;
-            } elsif ($context eq 'list') {
-                @out = $gen -> generate(@$genargs);
-                $n_out_expected = @$genargs ? $genargs->[0] : 1;
-            } elsif ($context eq 'void') {
-                $gen -> generate(@$genargs);
-                $n_out_expected = 0;
-            }
-
-            # Check the number of output arguments.
-
-            unless (@out == $n_out_expected) {
-                print "not ok ", $testno, " - $test\n";
-                print "  wrong number of output arguments\n";
-                print "  actual number .....: ", scalar(@out), "\n";
-                print "  expected number ...: $n_out_expected\n";
-                next;
-            }
-
-            # Check each output argument.
-
-            for my $x (@out) {
-
-                unless (defined $x) {
-                    print "not ok ", $testno, " - $test\n";
-                    print "  output was undefined\n";
-                    next;
-                }
-
-                my $refx = ref $x;
-                unless ($refx eq 'Math::BigInt') {
-                    print "not ok ", $testno, " - $test\n";
-                    print "  output was a ", $refx ? $refx : "Perl scalar",
-                      " not a Math::BigInt\n";
-                    next;
-                }
-
-                unless ($x >= $min) {
-                    print "not ok ", $testno, " - $test\n";
-                    print "  output was smaller than the minimum value\n";
-                    print "  minimum ......: $min\n";
-                    print "  output .......: $x\n";
-                    next;
-                }
-
-                unless ($x <= $max) {
-                    print "not ok ", $testno, " - $test\n";
-                    print "  output was larger than the maximum value\n";
-                    print "  maximum ......: $max\n";
-                    print "  output .......: $x\n";
-                    next;
                 }
             }
-
-            print "ok ", $testno, " - $test\n";
         }
     }
 }

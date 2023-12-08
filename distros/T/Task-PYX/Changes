@@ -1,3 +1,26 @@
+0.10 2023-12-01T15:02:20+01:00
+ - Add SGML::PYX 0.02 version.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Update App::PYX2XML to 0.06 version.
+ - Update Module::Install to 1.21 version.
+ - Update PYX to 0.10 version.
+ - Update PYX::GraphViz to 0.06 version.
+ - Update PYX::Hist to 0.08 version.
+ - Update PYX::SGML::Raw to 0.05 version.
+ - Update PYX::SGML::Tags to 0.10 version.
+ - Update PYX::Sort to 0.05 version.
+ - Update PYX::Stack to 0.06 version.
+ - Update PYX::Utils to 0.07 version.
+ - Update PYX::XMLNorm to 0.05 version.
+ - Update PYX::XMLSchema::List to 0.06 version.
+ - Update SGML::PYX to 0.07 version.
+ - Update Tags::Output::PYX to 0.05 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.09 2016-02-17T12:02:11+01:00
  - Add App::PYX2XML 0.01 version.
  - Add PYX::SGML::Raw 0.01 version.

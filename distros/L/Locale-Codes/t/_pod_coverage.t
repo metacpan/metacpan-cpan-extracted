@@ -6,8 +6,8 @@ use strict;
 BEGIN {
    use Test::More;
    # Don't run tests for installs
-   unless ($ENV{RELEASE_TESTING}) {
-      plan skip_all => 'Author tests not required for installation (set RELEASE_TESTING to test)';
+   unless ($ENV{Locale_Codes_RELEASE_TESTING}) {
+      plan skip_all => 'Author tests not required for installation (set Locale_Codes_RELEASE_TESTING to test)';
    }
 }
 

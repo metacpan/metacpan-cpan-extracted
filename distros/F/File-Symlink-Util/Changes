@@ -1,3 +1,14 @@
+0.005   2023-08-25  Released-By: PERLANCAR; Urgency: low
+
+        - [ux] Add --isnt-rel as alias for --is-abs, fix summary of
+          --is-rel.
+
+
+0.004   2023-08-25  Released-By: PERLANCAR; Urgency: low
+
+        - [ux] Add --is-rel for alias of --no-is-abs.
+
+
 0.003   2023-06-30  Released-By: PERLANCAR; Urgency: medium
 
         - Add Rinci function metadata for check_symlink() so we can create

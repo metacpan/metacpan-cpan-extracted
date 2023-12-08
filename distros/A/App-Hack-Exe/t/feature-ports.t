@@ -29,3 +29,18 @@ my ($errout) = capture_merged {
 like($errout, qr/999,888/,
     'port numbers from constructor should be used'
 );
+
+$he = App::Hack::Exe->new(
+    no_delay => 1,
+    ports => [ qw/ foo bar / ],
+);
+
+($errout) = capture_merged {
+    # Close prompt immediately
+    local *STDIN = gensym();
+    $he->run('localhost');
+};
+
+like($errout, qr/foo,bar/,
+    'port numbers should be arbitrary strings'
+);

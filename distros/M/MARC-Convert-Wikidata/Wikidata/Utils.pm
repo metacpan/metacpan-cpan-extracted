@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_edition_number
 	clean_title);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -59,6 +59,8 @@ sub clean_date {
 		return;
 	}
 
+	my $options_hr = {};
+
 	my $months_hr = {
 		'leden' => '01',
 		decode_utf8('únor') => '02',
@@ -75,6 +77,12 @@ sub clean_date {
 	};
 
 	my $ret_date = $date;
+
+	# Date is circa.
+	if ($ret_date =~ s/^c(.*)$/$1/ms) {
+		$options_hr->{'circa'} = 1;
+	}
+
 	foreach my $month (keys %{$months_hr}) {
 		$ret_date =~ s/^(\d{4})\s*$month\s*(\d+)\.$/$1-$months_hr->{$month}-$2/ms;
 	}
@@ -89,7 +97,7 @@ sub clean_date {
 		$ret_date = undef;
 	}
 
-	return $ret_date;
+	return wantarray ? ($ret_date, $options_hr) : $ret_date;
 }
 
 sub clean_edition_number {
@@ -355,6 +363,8 @@ sub clean_publisher_place {
 		decode_utf8('Jimramově') => 'Jimramov',
 		decode_utf8('Karlových Varech') => 'Karlovy Vary',
 		'Liberci' => 'Liberec',
+		decode_utf8('Litoměřicích') => decode_utf8('Litoměřice'),
+		decode_utf8('Náchodě') => decode_utf8('Náchod'),
 		'Nymburce' => 'Nymburk',
 		'Olomouci' => 'Olomouc',
 		decode_utf8('Ostravě') => 'Ostrava',
@@ -366,6 +376,8 @@ sub clean_publisher_place {
 		decode_utf8('Třebíč na Moravě') => decode_utf8('Třebíč'),
 		decode_utf8('Třebíči') => decode_utf8('Třebíč'),
 		decode_utf8('Třebíči na Moravě') => decode_utf8('Třebíč'),
+		# No place.
+		'S.l.' => 'sine loco',
 	};
 
 	my $ret_publisher_place = $publisher_place;
@@ -386,6 +398,8 @@ sub clean_publisher_place {
 	$ret_publisher_place =~ s/^V\s+([\s\w]+)$/$1/ms;
 	# [Praha]
 	$ret_publisher_place =~ s/^\[(.*?)\]$/$1/ms;
+
+	$ret_publisher_place =~ s/^(.*)\?$/$1/ms;
 
 	return $ret_publisher_place;
 }
@@ -431,6 +445,8 @@ sub clean_series_ordinal {
 	$ret_series_ordinal =~ s/^$c\.\s*//ms;
 	$c = decode_utf8('(č|Č)íslo');
 	$ret_series_ordinal =~ s/^$c\s*//ms;
+	$c = decode_utf8('(Výstava|Výst)');
+	$ret_series_ordinal =~ s/$c\.?\s*//ms;
 
 	$ret_series_ordinal =~ s/^(\d+)\.$/$1/ms;
 
@@ -494,6 +510,7 @@ sub _remove_square_brackets {
 
 	$string =~ s/^\[\s*(.*?)\s*\]$/$1/ms;
 	$string =~ s/^\[\s*([^\]]+)$/$1/ms;
+	$string =~ s/^([^\]]+)\s*\]$/$1/ms;
 
 	return $string;
 }
@@ -516,6 +533,7 @@ MARC::Convert::Wikidata::Utils - Utilities for MARC::Convert::Wikidata.
 
  my $cleaned_cover = clean_cover($cover);
  my $cleaned_date = clean_date($date);
+ my ($cleaned_date, $options_hr) = clean_date($date);
  my $cleaned_edition_number = clean_edition_number($edition_number);
  my $cleaned_number_of_pages = clean_number_of_pages($number_of_pages);
  my $cleaned_oclc = clean_oclc($oclc);
@@ -540,10 +558,12 @@ Returns string or undef.
 =head2 C<clean_date>
 
  my $cleaned_date = clean_date($date);
+ my ($cleaned_date, $options_hr) = clean_date($date);
 
 Clean date in Czech language.
 
-Returns string or undef.
+Returns string or undef in scalar context.
+Returns string or undef of date and hash reference with options in array context.
 
 =head2 C<clean_edition_number>
 
@@ -689,6 +709,26 @@ Returns string or undef.
  # Edition number: Druhé vydání
  # Cleaned edition number: 2
 
+=head1 EXAMPLE4
+
+=for comment filename=clean_number_of_pages.pl
+
+ use strict;
+ use warnings;
+
+ use MARC::Convert::Wikidata::Utils qw(clean_number_of_pages);
+
+ my $number_of_pages = '575 s. ;';
+ my $cleaned_number_of_pages = clean_number_of_pages($number_of_pages);
+
+ # Print out.
+ print "Number of pages: $number_of_pages\n";
+ print "Cleaned number of pages: $cleaned_number_of_pages\n";
+
+ # Output:
+ # Number of pages: 575 s. ;
+ # Cleaned number of pages: 575
+
 =head1 DEPENDENCIES
 
 L<Exporter>,
@@ -715,6 +755,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

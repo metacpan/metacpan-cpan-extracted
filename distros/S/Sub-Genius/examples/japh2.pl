@@ -31,6 +31,7 @@ end
 my $GLOBAL = {};
 
 # Load PRE describing concurrent semantics
+
 my $final_scope = Sub::Genius->new(preplan => $pre )->run_any(
     verbose => $ARGV[0],
     scope => {

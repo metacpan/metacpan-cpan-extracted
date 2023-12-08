@@ -3000,6 +3000,7 @@ country:
   genc-alpha-2: 
     code: 
       A2: Guantanamo Bay Naval Base
+      A3: Entity 6
       AD: Andorra
       AE: United Arab Emirates
       AF: Afghanistan
@@ -3028,7 +3029,7 @@ country:
       BM: Bermuda
       BN: Brunei Darussalam
       BO: Bolivia (Plurinational State of)
-      BQ: Bonaire, Sint Eustatius, and Saba
+      BQ: Caribbean Netherlands
       BR: Brazil
       BS: Bahamas
       BT: Bhutan
@@ -3363,9 +3364,6 @@ country:
       bolivia (plurinational state of): 
         - BO
         - Bolivia (Plurinational State of)
-      bonaire, sint eustatius, and saba: 
-        - BQ
-        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - BA
         - Bosnia and Herzegovina
@@ -3405,6 +3403,9 @@ country:
       canada: 
         - CA
         - Canada
+      caribbean netherlands: 
+        - BQ
+        - Caribbean Netherlands
       cayman islands: 
         - KY
         - Cayman Islands
@@ -3495,6 +3496,9 @@ country:
       el salvador: 
         - SV
         - El Salvador
+      entity 6: 
+        - A3
+        - Entity 6
       equatorial guinea: 
         - GQ
         - Equatorial Guinea
@@ -4110,11 +4114,12 @@ country:
       AUS: Australia
       AUT: Austria
       AX2: Guantanamo Bay Naval Base
+      AX3: Entity 6
       AZE: Azerbaijan
       BDI: Burundi
       BEL: Belgium
       BEN: Benin
-      BES: Bonaire, Sint Eustatius, and Saba
+      BES: Caribbean Netherlands
       BFA: Burkina Faso
       BGD: Bangladesh
       BGR: Bulgaria
@@ -4458,9 +4463,6 @@ country:
       bolivia (plurinational state of): 
         - BOL
         - Bolivia (Plurinational State of)
-      bonaire, sint eustatius, and saba: 
-        - BES
-        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - BIH
         - Bosnia and Herzegovina
@@ -4500,6 +4502,9 @@ country:
       canada: 
         - CAN
         - Canada
+      caribbean netherlands: 
+        - BES
+        - Caribbean Netherlands
       cayman islands: 
         - CYM
         - Cayman Islands
@@ -4590,6 +4595,9 @@ country:
       el salvador: 
         - SLV
         - El Salvador
+      entity 6: 
+        - AX3
+        - Entity 6
       equatorial guinea: 
         - GNQ
         - Equatorial Guinea
@@ -5341,7 +5349,7 @@ country:
       531: Curacao
       533: Aruba
       534: Sint Maarten
-      535: Bonaire, Sint Eustatius, and Saba
+      535: Caribbean Netherlands
       540: New Caledonia
       548: Vanuatu
       554: New Zealand
@@ -5443,6 +5451,7 @@ country:
       906: Coral Sea Islands
       907: Dhekelia
       908: Diego Garcia
+      914: Entity 6
       915: Europa Island
       916: Gaza Strip
       917: Glorioso Islands
@@ -5553,9 +5562,6 @@ country:
       bolivia (plurinational state of): 
         - '068'
         - Bolivia (Plurinational State of)
-      bonaire, sint eustatius, and saba: 
-        - 535
-        - Bonaire, Sint Eustatius, and Saba
       bosnia and herzegovina: 
         - '070'
         - Bosnia and Herzegovina
@@ -5595,6 +5601,9 @@ country:
       canada: 
         - 124
         - Canada
+      caribbean netherlands: 
+        - 535
+        - Caribbean Netherlands
       cayman islands: 
         - 136
         - Cayman Islands
@@ -5685,6 +5694,9 @@ country:
       el salvador: 
         - 222
         - El Salvador
+      entity 6: 
+        - 914
+        - Entity 6
       equatorial guinea: 
         - 226
         - Equatorial Guinea
@@ -46967,6 +46979,7 @@ script:
       Cari: Carian
       Cham: Cham
       Cher: Cherokee
+      Chis: Chisoi
       Chrs: Chorasmian
       Cirt: Cirth
       Copt: Coptic
@@ -46985,6 +46998,7 @@ script:
       Elba: Elbasan
       Elym: Elymaic
       Ethi: Ethiopic
+      Gara: Garay
       Geok: Khutsuri (Asomtavruli and Nuskhuri)
       Geor: Georgian (Mkhedruli and Mtavruli)
       Glag: Glagolitic
@@ -46994,6 +47008,7 @@ script:
       Gran: Grantha
       Grek: Greek
       Gujr: Gujarati
+      Gukh: Gurung Khema
       Guru: Gurmukhi
       Hanb: Han with Bopomofo (alias for Han + Bopomofo)
       Hang: Hangul
@@ -47026,6 +47041,7 @@ script:
       Knda: Kannada
       Kore: Korean (alias for Hangul + Han)
       Kpel: Kpelle
+      Krai: Kirat Rai
       Kthi: Kaithi
       Lana: Tai Tham
       Laoo: Lao
@@ -47070,6 +47086,7 @@ script:
       Nshu: Nushu
       Ogam: Ogham
       Olck: Ol Chiki
+      Onao: Ol Onal
       Orkh: Old Turkic
       Orya: Oriya
       Osge: Osage
@@ -47105,6 +47122,7 @@ script:
       Shrd: Sharada
       Shui: Shuishu
       Sidd: Siddham
+      Sidt: Sidetic
       Sind: Khudawadi
       Sinh: Sinhala
       Sogd: Sogdian
@@ -47125,6 +47143,7 @@ script:
       Taml: Tamil
       Tang: Tangut
       Tavt: Tai Viet
+      Tayo: Tai Yo
       Telu: Telugu
       Teng: Tengwar
       Tfng: Tifinagh
@@ -47134,7 +47153,10 @@ script:
       Tibt: Tibetan
       Tirh: Tirhuta
       Tnsa: Tangsa
+      Todr: Todhri
+      Tols: Tolong Siki
       Toto: Toto
+      Tutg: Tulu-Tigalari
       Ugar: Ugaritic
       Vaii: Vai
       Visp: Visible Speech
@@ -47230,6 +47252,9 @@ script:
       cherokee: 
         - Cher
         - Cherokee
+      chisoi: 
+        - Chis
+        - Chisoi
       chorasmian: 
         - Chrs
         - Chorasmian
@@ -47287,6 +47312,9 @@ script:
       ethiopic: 
         - Ethi
         - Ethiopic
+      garay: 
+        - Gara
+        - Garay
       georgian (mkhedruli and mtavruli): 
         - Geor
         - Georgian (Mkhedruli and Mtavruli)
@@ -47311,6 +47339,9 @@ script:
       gurmukhi: 
         - Guru
         - Gurmukhi
+      gurung khema: 
+        - Gukh
+        - Gurung Khema
       han: 
         - Hani
         - Han
@@ -47404,6 +47435,9 @@ script:
       khutsuri (asomtavruli and nuskhuri): 
         - Geok
         - Khutsuri (Asomtavruli and Nuskhuri)
+      kirat rai: 
+        - Krai
+        - Kirat Rai
       klingon (kli piqad): 
         - Piqd
         - Klingon (KLI pIqaD)
@@ -47551,6 +47585,9 @@ script:
       ol chiki: 
         - Olck
         - Ol Chiki
+      ol onal: 
+        - Onao
+        - Ol Onal
       old hungarian: 
         - Hung
         - Old Hungarian
@@ -47653,6 +47690,9 @@ script:
       siddham: 
         - Sidd
         - Siddham
+      sidetic: 
+        - Sidt
+        - Sidetic
       signwriting: 
         - Sgnw
         - SignWriting
@@ -47713,6 +47753,9 @@ script:
       tai viet: 
         - Tavt
         - Tai Viet
+      tai yo: 
+        - Tayo
+        - Tai Yo
       takri: 
         - Takr
         - Takri
@@ -47746,9 +47789,18 @@ script:
       tirhuta: 
         - Tirh
         - Tirhuta
+      todhri: 
+        - Todr
+        - Todhri
+      tolong siki: 
+        - Tols
+        - Tolong Siki
       toto: 
         - Toto
         - Toto
+      tulu-tigalari: 
+        - Tutg
+        - Tulu-Tigalari
       ugaritic: 
         - Ugar
         - Ugaritic
@@ -47829,12 +47881,14 @@ script:
       159: Nabataean
       160: Arabic
       161: Arabic (Nastaliq variant)
+      164: Garay
       165: N'Ko
       166: Adlam
       167: Hanifi Rohingya
       170: Thaana
       175: Old Turkic, Orkhon Runic
       176: Old Hungarian (Hungarian Runic)
+      180: Sidetic
       192: Yezidi
       200: Greek
       201: Carian
@@ -47855,6 +47909,7 @@ script:
       226: Elbasan
       227: Old Permic
       228: Vithkuqi
+      229: Todhri
       230: Armenian
       239: Caucasian Albanian
       240: Georgian (Mkhedruli and Mtavruli)
@@ -47884,6 +47939,9 @@ script:
       293: Klingon (KLI pIqaD)
       294: Toto
       295: Nag Mundari
+      296: Ol Onal
+      298: Chisoi
+      299: Tolong Siki
       300: Brahmi
       302: Siddham, Siddham, Siddhamatrka
       303: Ranjana
@@ -47919,6 +47977,7 @@ script:
       338: Ahom, Tai Ahom
       339: Zanabazar Square (Zanabazarin Dorboljin Useg, Xewtee Dorboljin Bicig, Horizontal Square Script)
       340: Telugu
+      341: Tulu-Tigalari
       342: Dives Akuru
       343: Grantha
       344: Saurashtra
@@ -47950,6 +48009,9 @@ script:
       371: Hanunoo (Hanunoo)
       372: Buhid
       373: Tagbanwa
+      380: Tai Yo
+      396: Kirat Rai
+      397: Gurung Khema
       398: Sora Sompeng
       399: Lisu (Fraser)
       400: Linear A
@@ -48073,6 +48135,9 @@ script:
       cherokee: 
         - 445
         - Cherokee
+      chisoi: 
+        - 298
+        - Chisoi
       chorasmian: 
         - 109
         - Chorasmian
@@ -48133,6 +48198,9 @@ script:
       ethiopic (geez): 
         - 430
         - Ethiopic (Geez)
+      garay: 
+        - 164
+        - Garay
       georgian (mkhedruli and mtavruli): 
         - 240
         - Georgian (Mkhedruli and Mtavruli)
@@ -48157,6 +48225,9 @@ script:
       gurmukhi: 
         - 310
         - Gurmukhi
+      gurung khema: 
+        - 397
+        - Gurung Khema
       han (hanzi, kanji, hanja): 
         - 500
         - Han (Hanzi, Kanji, Hanja)
@@ -48250,6 +48321,9 @@ script:
       khutsuri (asomtavruli and nuskhuri): 
         - 241
         - Khutsuri (Asomtavruli and Nuskhuri)
+      kirat rai: 
+        - 396
+        - Kirat Rai
       klingon (kli piqad): 
         - 293
         - Klingon (KLI pIqaD)
@@ -48397,6 +48471,9 @@ script:
       ol chiki (ol cemet, ol, santali): 
         - 261
         - Ol Chiki (Ol Cemet, Ol, Santali)
+      ol onal: 
+        - 296
+        - Ol Onal
       old hungarian (hungarian runic): 
         - 176
         - Old Hungarian (Hungarian Runic)
@@ -48499,6 +48576,9 @@ script:
       siddham, siddham, siddhamatrka: 
         - 302
         - Siddham, Siddham, Siddhamatrka
+      sidetic: 
+        - 180
+        - Sidetic
       signwriting: 
         - '095'
         - SignWriting
@@ -48556,6 +48636,9 @@ script:
       tai viet: 
         - 359
         - Tai Viet
+      tai yo: 
+        - 380
+        - Tai Yo
       takri, takri, tankri: 
         - 321
         - Takri, Takri, Tankri
@@ -48589,9 +48672,18 @@ script:
       tirhuta: 
         - 326
         - Tirhuta
+      todhri: 
+        - 229
+        - Todhri
+      tolong siki: 
+        - 299
+        - Tolong Siki
       toto: 
         - 294
         - Toto
+      tulu-tigalari: 
+        - 341
+        - Tulu-Tigalari
       ugaritic: 
         - '040'
         - Ugaritic

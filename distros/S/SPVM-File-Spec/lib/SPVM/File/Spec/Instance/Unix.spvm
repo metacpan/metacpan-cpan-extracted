@@ -6,7 +6,6 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
   use StringList;
   use Cwd;
   use Sys;
-  use Sys::FileTest;
   
   our $RE_canonpath1 : Regex;
   our $RE_canonpath2 : Regex;
@@ -500,7 +499,7 @@ class File::Spec::Instance::Unix extends File::Spec::Instance {
     
     my $tmpdir = (string)undef;
     for my $dir (@$dirlist) {
-      if ($dir && Sys::FileTest->d($dir) && Sys::FileTest->w($dir)){
+      if ($dir && Sys->d($dir) && Sys->w($dir)){
         $tmpdir = $dir;
         last;
       }

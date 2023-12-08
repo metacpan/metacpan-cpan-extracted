@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GraphicsColorNamesUtils/colorcode2name
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-10'; # DATE
-our $DIST = 'App-GraphicsColorNamesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-12-05'; # DATE
+our $DIST = 'App-GraphicsColorNamesUtils'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GraphicsColorNamesUtils/colorcode2name",
@@ -38,15 +38,15 @@ colorcode2name - Convert RGB color code to name
 
 =head1 VERSION
 
-This document describes version 0.005 of colorcode2name (from Perl distribution App-GraphicsColorNamesUtils), released on 2020-06-10.
+This document describes version 0.008 of colorcode2name (from Perl distribution App-GraphicsColorNamesUtils), released on 2023-12-05.
 
 =head1 SYNOPSIS
 
-Usage:
+B<colorcode2name> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
- % colorcode2name [--approx] [--format=name] [--json] [--(no)naked-res]
-     [--no-approx] [--noapprox] [--page-result[=program]]
-     [--view-result[=program]] <code>
+B<colorcode2name> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<colorcode2name> [B<L<--approx|/"--approx">>|B<L<--no-approx|/"--approx">>|B<L<--noapprox|/"--approx">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<code|/"--code=s*">>E<gt>
 
 =head1 OPTIONS
 
@@ -62,6 +62,11 @@ When a name with exact code is not found, find the several closest ones.
 
 =item B<--code>=I<s>*
 
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
+
 =back
 
 =head2 Output options
@@ -75,6 +80,12 @@ Choose output format, e.g. json, text.
 Default value:
 
  undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
 
 =item B<--json>
 
@@ -90,24 +101,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -167,6 +187,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Graphi
 
 Source repository is at L<https://github.com/perlancar/perl-App-GraphicsColorNamesUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GraphicsColorNamesUtils>
@@ -174,16 +223,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -1,0 +1,14 @@
+= GitHub Actions Report =
+::notice file=t/fixtures/tests/with-enhanced-yaml,line=1,title=More details::See the full report in: %WORKFLOW_URL%
+::error file=t/fixtures/tests/with-enhanced-yaml,line=11,title=1 failed test::Failed test%0A--- CAPTURED CONTEXT ---%0Agot: '1'%0Aexpected: '0'%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/with-enhanced-yaml,line=13,title=1 failed test::Failed test 'equality [not pass]'%0A--- CAPTURED CONTEXT ---%0Agot: '1'%0Aexpected: '0'%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/with-enhanced-yaml,line=24,title=1 failed test::Failed test 'L1: equality [not pass]'%0A--- CAPTURED CONTEXT ---%0Agot: '1'%0Aexpected: '0'%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/with-enhanced-yaml,line=30,title=1 failed test::Failed test 'L1: lives ok [not pass]'%0A--- CAPTURED CONTEXT ---%0Adied: L1: with a message%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/with-enhanced-yaml,line=31,title=1 failed test::Failed test 'L1: lives ok [not pass]'%0A--- CAPTURED CONTEXT ---%0Adied: L1: with a message and a newline%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/with-enhanced-yaml,line=32,title=1 failed test::Failed test 'L1: one level'
+::error file=t/fixtures/tests/with-enhanced-yaml,line=41,title=1 failed test::Failed test 'L2: equality [not pass]'%0A--- CAPTURED CONTEXT ---%0Agot: '1'%0Aexpected: '0'%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/with-enhanced-yaml,line=44,title=1 failed test::Failed test 'L2: lives ok [not pass]'%0A--- CAPTURED CONTEXT ---%0Adied: L2: with a message%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/with-enhanced-yaml,line=45,title=1 failed test::Failed test 'L2: lives ok [not pass]'%0A--- CAPTURED CONTEXT ---%0Adied: L2: with a message and a newline%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/with-enhanced-yaml,line=46,title=1 failed test::Failed test 'L2.1: another level deep'
+::error file=t/fixtures/tests/with-enhanced-yaml,line=47,title=1 failed test::Failed test 'L2: one level'
+::error file=t/fixtures/tests/with-enhanced-yaml,line=51,title=2 failed tests::Failed test 'L0: equality [not pass]'%0A--- CAPTURED CONTEXT ---%0Agot: 'a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here'%0Aexpected: 'a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here--'%0A---  END OF CONTEXT  ---%0A%0AFailed test

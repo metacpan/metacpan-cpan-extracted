@@ -8,9 +8,9 @@ require App::lcpan;
 use Hash::Subset 'hash_subset';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-19'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.071'; # VERSION
+our $VERSION = '1.073'; # VERSION
 
 our %SPEC;
 
@@ -82,7 +82,7 @@ App::lcpan::Cmd::author_rdeps - Find distributions that use one of author's modu
 
 =head1 VERSION
 
-This document describes version 1.071 of App::lcpan::Cmd::author_rdeps (from Perl distribution App-lcpan), released on 2022-09-19.
+This document describes version 1.073 of App::lcpan::Cmd::author_rdeps (from Perl distribution App-lcpan), released on 2023-07-09.
 
 =head1 FUNCTIONS
 
@@ -115,6 +115,8 @@ Include only records that are added since the last N index updates.
 
 =item * B<author>* => I<str>
 
+(No description)
+
 =item * B<cpan> => I<dirname>
 
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
@@ -132,7 +134,11 @@ using the C<index_name>.
 
 =item * B<phase> => I<str> (default: "ALL")
 
+(No description)
+
 =item * B<rel> => I<str> (default: "ALL")
+
+(No description)
 
 =item * B<update_db_schema> => I<bool> (default: 1)
 
@@ -173,7 +179,11 @@ off.
 
 =item * B<user_authors> => I<array[str]>
 
+(No description)
+
 =item * B<user_authors_arent> => I<array[str]>
+
+(No description)
 
 
 =back
@@ -221,7 +231,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

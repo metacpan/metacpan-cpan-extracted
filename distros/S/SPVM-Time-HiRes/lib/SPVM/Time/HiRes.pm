@@ -1,6 +1,6 @@
 package SPVM::Time::HiRes;
 
-our $VERSION = '0.002';
+our $VERSION = "0.004";
 
 1;
 
@@ -78,6 +78,18 @@ Exceptions:
 
 The exceptions thrown by the L<nanosleep|SPVM::Sys::Time/"nanosleep"> method in the Sys::Time class could be thrown.
 
+=head2 ualarm
+
+  static method ualarm : int ($usecs : int, $interval : int = 0);
+
+Alarm after microseconds $usecs with or without the microseconds interval $interval.
+
+See the L<ualarm|SPVM::Sys::Signal/"ualarm"> method in the Sys::Time class in detail.
+
+Exceptions:
+
+The exceptions thrown by the L<ualarm|SPVM::Sys::Signal/"ualarm"> method in the Sys::Signal class could be thrown.
+
 =head2 tv_interval
 
 C<static method tv_interval : double ($a : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval>, $b : L<Sys::Time::Timeval|SPVM::Sys::Time::Timeval> = undef);>
@@ -148,6 +160,12 @@ Exceptions:
 
 The exceptions thrown by the L<clock_gettime|SPVM::Sys::Time/"clock_gettime"> method in the Sys::Time class could be thrown.
 
+=head2 clock_gettime_timespec
+
+C<static method clock_gettime_timespec : Sys::Time::Timespec ($clk_id : int);>
+
+Same as L</"clock_gettime">, but returns a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
+
 =head2 clock_getres
 
 C<static method clock_getres : double ($clk_id : int)>
@@ -161,6 +179,12 @@ See the L<clock_getres|SPVM::Sys::Time/"clock_getres"> method in the Sys::Time c
 Exceptions:
 
 The exceptions thrown by the L<clock_getres|SPVM::Sys::Time/"clock_getres"> method in the Sys::Time class could be thrown.
+
+=head2 clock_getres_timespec
+
+C<static method clock_getres_timespec : L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> ($clk_id : int);>
+
+Same as L</"clock_getres">, but returns a L<Sys::Time::Timespec|SPVM::Sys::Time::Timespec> object.
 
 =head2 clock_nanosleep
 
@@ -188,13 +212,27 @@ Exceptions:
 
 The exceptions thrown by the L<clock|SPVM::Sys::Time/"clock"> method in the Sys::Time class could be thrown.
 
+=head1 Modules
+
+=over 2
+
+=item * L<Time::HiRes::ItimervalFloat|SPVM::Time::HiRes::ItimervalFloat>
+
+=back
+
 =head1 See Also
 
 =over 2
 
-=item * L<Time::HiRes::Util|SPVM::Time::HiRes::Util>
+=item * L<Sys::Time|SPVM::Sys::Time>
 
-=item * L<Time::HiRes::ItimervalFloat|SPVM::Time::HiRes::ItimervalFloat>
+=item * L<Sys::Time::Util|SPVM::Sys::Time::Util>
+
+=item * L<Sys::Process|SPVM::Sys::Process>
+
+=item * L<Sys::Signal|SPVM::Sys::Signal>
+
+=item * L<Sys|SPVM::Sys>
 
 =back
 

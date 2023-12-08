@@ -1,0 +1,66 @@
+Revision history for Perl extension TAP::Formatter::GitHubActions.
+
+0.3.4  Wed 06 Dec 2023 22:33:55
+	- Added issue tracker to pod metadata.
+	- Adjusted Test2::Formatter::YAMLEnhancedTAP from build requires to
+	  runtime suggests.
+
+0.3.3  Tue 05 Dec 2023 10:42:29
+	- New release 🎉 packed with tests & a nifty feature!
+
+	- Workflow summaries!
+
+	Due to a limitation on GitHub there can only be 10 annotations displayed
+	in any given workflow run. No matter how many error annotations your
+	run raises, only the first 10 will be visible.
+
+	Nevertheless, there's a Workflow Summary provided that doesn't suffer
+	from this limitation. It'll be always linked as a notice at the
+	beginning of every file containing a failing error.
+
+	- Refactored much of the logic to use aggregation based on TAP test number,
+	  it greatly simplified the code and made it much more testable.
+
+	-- Happy prove-ing with GitHub Actions!
+
+0.3.0_8  Mon 04 Dec 2023 17:58:41
+	- Incluiding more unittests.
+
+0.3.0_5  Mon 04 Dec 2023 17:58:41
+	- Splitting code around and making things more intelligible.
+
+0.3.0_4  Fri 01 Dec 2023 23:41:57
+	- Moved Test2::Formatter::YAMLEnhancedTAP to it's own module.
+
+0.3.0_2  Fri 01 Dec 2023 14:49:58
+	- Cleaned-up output for the happy-path (no output on all ok).
+
+0.3.0_1  Thu Nov 30 20:48:05 2023
+	- Rewrite a couple of bits & regexes to add support for YAML output provided
+	  by `Test2::Formatter::YAMLEnhancedTAP`.
+
+	  Context lines should be tidier now since there's a somewhat "generalized" way of storing the parsed output.
+
+0.2.6  Wed 29. Nov 19:38:51 2023
+	- Cleanup unused code TAP::Formatter::GitHubActions::Session.
+
+0.2.5  Wed 29. Nov 18:23:33 2023
+	- Avoid capturing `# Subtest` lines into the context.
+
+0.2.4  Wed 29. Nov 17:43:05 2023
+	- Remove IO::Scalar dependency.
+	- Add GitHub Workflow & perltidy rules.
+	- Feeding more info in Makefile.PL
+
+0.2.3  Wed Nov 29 08:17:36 2023
+	- Align perl versions through the module. Using 5.016 everywhere.
+
+0.2.2  Fri Nov 28 23:08:15 2023
+	- Added usage instructions to the pod.
+
+0.2.1  Fri Nov 28 23:08:15 2023
+	- Fixed the versioning a bit. It should be SemVer now.
+
+0.01  Fri Nov 24 21:31:57 2023
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n TAP::Formatter::GitHubActions

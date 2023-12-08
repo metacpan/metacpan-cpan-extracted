@@ -64,7 +64,8 @@ WriteMakefile(
     NAME              => 'IO::FD',
     VERSION_FROM      => 'lib/IO/FD.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {
-      "constant::more"=>"v0.3.0"
+      "constant::more"=>"v0.3.0",
+      "Export::These"=>"v0.2.1"
     }, 
     ABSTRACT_FROM     => 'lib/IO/FD.pod', # retrieve abstract from module
     AUTHOR            => 'Ruben Westerberg <drclaw@mac.com>',

@@ -1,0 +1,12 @@
+Changes
+lib/Pod/Markdown/Githubert.pm
+Makefile.PL
+Makefile_PL_settings.plx
+Makefile_PL_settings_maint.plx
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/basic.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from Pod::Markdown::Githubert POD (added by maint/eumm-fixup.pl)

@@ -7,7 +7,7 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 require constant;
 
@@ -114,7 +114,7 @@ Image::DS9::Constants::V0 - predefined constants
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 

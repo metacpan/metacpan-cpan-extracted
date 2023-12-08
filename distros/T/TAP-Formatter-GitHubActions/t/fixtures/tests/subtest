@@ -1,0 +1,34 @@
+print <<DUMMY_TEST;
+1..2
+# Subtest: a subtest
+    not ok 1
+
+    #   Failed test at t/02-singleton.t line 19.
+    # died: lol at subtest at t/02-singleton.t line 19.
+    not ok 2 - failure name
+
+    #   Failed test 'failure name'
+    #   at t/02-singleton.t line 20.
+    # died: lol at subtest with name at t/02-singleton.t line 20.
+    not ok 3
+
+    #   Failed test at t/02-singleton.t line 21.
+    #          got: '1'
+    #     expected: '2'
+    not ok 4 - failure name 2
+
+    #   Failed test 'failure name 2'
+    #   at t/02-singleton.t line 22.
+    #          got: '3'
+    #     expected: '4'
+    1..4
+    # Looks like you failed 4 tests of 4.
+not ok 1 - a subtest
+
+#   Failed test 'a subtest'
+#   at t/02-singleton.t line 23.
+ok 2 - no (unexpected) warnings (via done_testing)
+# Looks like you failed 1 test of 2.
+DUMMY_TEST
+;
+exit 1

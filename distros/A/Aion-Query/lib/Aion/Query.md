@@ -4,7 +4,7 @@ Aion::Query - functional interface for accessing database mysql and mariadb
 
 # VERSION
 
-0.0.2
+0.0.3
 
 # SYNOPSIS
 
@@ -63,7 +63,7 @@ The second problem is placing unicode characters into single-byte encodings, whi
 
 ## query ($query, %params)
 
-It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params and .
+It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params.
 
 ```perl
 query "SELECT * FROM author WHERE name=:name", name => 'Pushkin A.S.' # --> [{id=>1, name=>"Pushkin A.S."}]
@@ -75,7 +75,7 @@ Returns last insert id.
 
 ```perl
 query "INSERT INTO author (name) VALUES (:name)", name => "Alice"  # -> 1
-#LAST_INSERT_ID  # -> 3
+LAST_INSERT_ID  # -> 3
 ```
 
 ## quote ($scalar)
@@ -119,7 +119,31 @@ quote {name => 'A.S.', id => 12}   # => id = 12, name = 'A.S.'
 Replace the parameters in `$query`. Parameters quotes by the `quote`.
 
 ```perl
-query_prepare "INSERT author SET name = :name", name => "Alice"  # => INSERT author SET name = 'Alice'
+query_prepare "INSERT author SET name IN (:name)", name => ["Alice", 1, 1.0]  # => INSERT author SET name IN ('Alice', 1, 1.0)
+
+query_prepare ":x :^x :.x :~x", x => "10"  # => '10' 10 10.0 '10'
+
+my $query = query_prepare "SELECT *
+FROM author
+    words*>> JOIN word:_
+WHERE 1
+    name>> AND name like :name
+",
+    name => "%Alice%",
+    words => [1, 2, 3],
+;
+
+my $res = << 'END';
+SELECT *
+FROM author
+    JOIN word1
+    JOIN word2
+    JOIN word3
+WHERE 1
+    AND name like '%Alice%'
+END
+
+$query # -> $res
 ```
 
 ## query_do ($query)

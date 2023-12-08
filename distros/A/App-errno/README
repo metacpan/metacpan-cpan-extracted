@@ -2,7 +2,7 @@ NAME
     App::errno - List/show errno
 
 VERSION
-    This document describes version 0.070 of App::errno (from Perl
+    This document describes version 0.071 of App::errno (from Perl
     distribution App-errno), released on 2023-11-23.
 
 DESCRIPTION
@@ -16,6 +16,8 @@ SOURCE
     Source repository is at <https://github.com/perlancar/perl-App-errno>.
 
 SEE ALSO
+    Errno.pm
+
     errno
 
     $! (a.k.a. $ERRNO a.k.a. $OS_ERROR) in "perldata"

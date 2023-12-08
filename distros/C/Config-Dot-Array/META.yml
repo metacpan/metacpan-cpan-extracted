@@ -31,8 +31,8 @@ requires:
   Readonly: 0
   perl: 5.6.0
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Dot-Array
+  bugtracker: https://github.com/michal-josef-spacek/Config-Dot-Array/issues
   homepage: https://github.com/michal-josef-spacek/Config-Dot-Array
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Config-Dot-Array
-version: '0.07'
+version: '0.08'

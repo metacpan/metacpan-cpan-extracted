@@ -8,13 +8,13 @@ Locale::CLDR::Locales::So::Any::Dj - Package for language Somali
 
 package Locale::CLDR::Locales::So::Any::Dj;
 # This file auto generated from Data\common\main\so_DJ.xml
-#	on Sat  4 Nov  6:23:52 pm GMT
+#	on Tue  5 Dec  1:31:43 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

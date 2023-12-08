@@ -3,9 +3,11 @@ NAME
 
 SYNOPSIS
      use Person::ID::CZ::RC;
+
      my $obj = Person::ID::CZ::RC->new(%params);
      my $alternate = $obj->alternate;
      my $checksum = $obj->checksum;
+     my $day = $obj->day;
      my $error = $obj->error;
      my $is_valid = $obj->is_valid;
      my $month = $obj->month;
@@ -15,53 +17,88 @@ SYNOPSIS
      my $year = $obj->year;
 
 METHODS
-    "new(%params)"
-             Constructor.
+  "new"
+     my $obj = Person::ID::CZ::RC->new(%params);
 
-            *       "rc"
+    Constructor.
 
-                     Input Czech RC identification.
-                     It is required.
+    *       "rc"
 
-    "alternate()"
-             Get flag, that means alternate RC identification.
-             Returns 0/1.
+            Input Czech RC identification.
 
-    "checksum()"
-             Get checksum.
-             Returns string with one number character or '-'.
+            It is required.
 
-    "day()"
-             Get day of birth.
-             Returns string with day.
+    Returns instance of object.
 
-    "error()"
-             Get error.
-             Returns error string or undef.
+  "alternate"
+     my $alternate = $obj->alternate;
 
-    "is_valid()"
-             Get flag, that means validity of rc identification.
-             Returns 0/1.
+    Get flag, that means alternate RC identification.
 
-    "month()"
-             Get month of birth.
-             Returns string with month.
+    Returns 0/1.
 
-    "rc()"
-             Get rc identification.
-             Returns string with rc identification.
+  "checksum"
+     my $checksum = $obj->checksum;
 
-    "serial()"
-             Get serial part of rc identification.
-             Returns string with three numbers.
+    Get checksum.
 
-    "sex()"
-             Get flag, that means sex of person.
-             Returns male/female string.
+    Returns string with one number character or '-'.
 
-    "year()"
-             Get year of birth.
-             Returns string with year.
+  "day"
+     my $day = $obj->day;
+
+    Get day of birth.
+
+    Returns string with day.
+
+  "error"
+     my $error = $obj->error;
+
+    Get error.
+
+    Returns error string or undef.
+
+  "is_valid"
+     my $is_valid = $obj->is_valid;
+
+    Get flag, that means validity of rc identification.
+
+    Returns 0/1.
+
+  "month"
+     my $month = $obj->month;
+
+    Get month of birth.
+
+    Returns string with month.
+
+  "rc"
+     my $rc = $obj->rc;
+
+    Get rc identification.
+
+    Returns string with rc identification.
+
+  "serial"
+     my $serial = $obj->serial;
+
+    Get serial part of rc identification.
+
+    Returns string with three numbers.
+
+  "sex"
+     my $sex = $obj->sex;
+
+    Get flag, that means sex of person.
+
+    Returns male/female string.
+
+  "year"
+     my $year = $obj->year;
+
+    Get year of birth.
+
+    Returns string with year.
 
 ERRORS
      new():
@@ -70,11 +107,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Person::ID::CZ::RC;
 
      # Object.
@@ -110,11 +145,9 @@ EXAMPLE1
      # Error: -
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Person::ID::CZ::RC;
 
      # Object.
@@ -150,11 +183,9 @@ EXAMPLE2
      # Error: Date isn't valid.
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Person::ID::CZ::RC;
 
      # Object.
@@ -190,11 +221,9 @@ EXAMPLE3
      # Error: Checksum isn't valid.
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Person::ID::CZ::RC;
 
      # Object.
@@ -230,11 +259,9 @@ EXAMPLE4
      # Error: Format of rc identification hasn't checksum.
 
 EXAMPLE5
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Person::ID::CZ::RC;
 
      # Object.
@@ -286,17 +313,18 @@ SEE ALSO
         Module for validating and generating a Swedish personnummer.
 
 REPOSITORY
-    <https://github.com/tupinek/Person::ID::CZ::RC>
+    <https://github.com/michal-josef-spacek/Person::ID::CZ::RC>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2013-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

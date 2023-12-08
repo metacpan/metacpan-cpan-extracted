@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '1.23';
+our $VERSION = '2.00';
 
 use parent 'Travel::Status::DE::EFA';
 
@@ -35,14 +35,15 @@ Travel::Status::DE::VRR - unofficial VRR departure monitor.
     for my $d ($status->results) {
         printf(
             "%s %d %-5s %s\n",
-            $d->time, $d->platform, $d->line, $d->destination
+            $d->datetime->strftime('%H:%M'),
+            $d->platform, $d->line, $d->destination
         );
     }
 
 
 =head1 VERSION
 
-version 1.23
+version 2.00
 
 =head1 DESCRIPTION
 
@@ -94,7 +95,7 @@ efa-m(1), Travel::Status::DE::EFA(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2013-2015 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2013-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

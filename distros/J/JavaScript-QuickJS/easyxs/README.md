@@ -66,6 +66,7 @@ The result is returned.
 
 Like `exs_call_sv_scalar()` but traps exceptions. If one happens,
 NULL is returned, and `*error_svp` will contain the error SV.
+(This SV is a **copy** of Perl’s `$@` and so **must be freed**.)
 
 ### `void exs_call_sv_void_trapped(SV* callback, SV** args, SV** error_svp)`
 

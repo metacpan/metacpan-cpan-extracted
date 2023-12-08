@@ -30,35 +30,31 @@ L<IO::Handle|SPVM::IO::Handle>.
 
 =head1 Fields
 
-=head2 timeout
+=head2 Domain
 
-  has timeout : protected ro int;
+  has Domain : protected int;
 
-=head2 sockdomain
+=head2 Type
 
-  has sockdomain : protected ro int;
+  has Type : protected int;
 
-=head2 socktype
+=head2 Proto
 
-  has socktype : protected ro int;
+  has Proto : protected ro int;
 
-=head2 protocol
+=head2 Timeout
 
-  has protocol : protected ro int;
+  has Timeout : protected double;
 
 =head2 peername
 
-  has peername : protected ro Sys::Socket::Sockaddr;
+  has peername : protected Sys::Socket::Sockaddr;
 
 See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
-=head2 fd
+=head2 Listen
 
-  has fd : protected int;
-
-=head2 listen_backlog
-
-  has listen_backlog : protected int;
+  has Listen : protected int;
 
 =head1 Class Methods
 
@@ -66,17 +62,21 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
   static method new : IO::Socket ($options : object[] = undef);
 
+The socket is set to non-blocking mode.
+
 =head3 new Options
 
 =over 2
-
-=item * Timeout : Int
 
 =item * Domain : Int
 
 =item * Type : Int
 
+=item * Proto : Int
+
 =item * Blocking : Int
+
+=item * Timeout : Double
 
 =item * Listen : Int
 
@@ -86,9 +86,37 @@ See also L<SPVM::Sys::Socket::Constant>.
 
 =head1 Instance Methods
 
-=head2 new_instance
+=head2 sockdomain
 
-  method new_instance : IO::Socket ($options : object[] = undef);
+  method sockdomain : int ();
+
+Gets the L</"Domain"> field.
+
+=head2 socktype
+
+  method socktype : int ();
+
+Gets the L</"Type"> field.
+
+=head2 protocol
+
+  method protocol : int ();
+
+Gets the L</"Proto"> field.
+
+=head2 timeout
+
+  method timeout : double ();
+
+Gets the L</"Timeout"> field.
+
+=head2 new_from_instance
+
+  method new_from_instance : IO::Socket ($options : object[] = undef);
+
+=head2 peername
+
+  method peername : Sys::Socket::Sockaddr ();
 
 =head2 DESTROY
 
@@ -100,17 +128,17 @@ See also L<SPVM::Sys::Socket::Constant>.
 
 =head2 connect
 
-  method connect : int ($address : Sys::Socket::Sockaddr);
+  method connect : void ($address : Sys::Socket::Sockaddr);
 
 See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 recv
 
-  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0);
+  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $buf_offset : int = 0);
 
 =head2 send
 
-  method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef);
+  method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef, $length : int = -1, $buf_offset : int = 0);
 
 See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
@@ -122,17 +150,13 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
   method fileno : int (); return $self->{fd}; }
 
-=head2 opened
-
-  method opened : int ();
-
 =head2 listen
 
-  method listen : int ($queue : int = 5);
+  method listen : void ($queue : int = 5);
 
 =head2 bind
 
-  method bind : int ($address : Sys::Socket::Sockaddr);
+  method bind : void ($address : Sys::Socket::Sockaddr);
 
 See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
@@ -144,19 +168,19 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 shutdown
 
-  method shutdown : int ($sockfd : int, $how : int);
+  method shutdown : void ($sockfd : int, $how : int);
 
 =head2 atmark
 
   method atmark : int ();
 
+=head2 sockopt
+
+  method sockopt : int ($level : int, $optname : int);
+
 =head2 setsockopt
 
-  method setsockopt : int ($level : int, $optname : int, $optval : int);
-
-=head2 getsockopt
-
-  method getsockopt : int ($level : int, $optname : int);
+  method setsockopt : void ($level : int, $optname : int, $optval : object of string|Int)
 
 =head2 connected
 
@@ -166,7 +190,7 @@ See also L<Sys::Socket::Sockaddr|SPVM::Sys::Socket::Sockaddr>.
 
 =head2 socket
 
-  method socket : int ($domain : int, $type : int, $protocol : int = 0);
+  method socket : void ($domain : int, $type : int, $protocol : int = 0);
 
 =head2 socketpair
 

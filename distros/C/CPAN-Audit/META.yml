@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/briandfoy/cpan-audit/issues
   homepage: https://github.com/briandfoy/cpan-audit
   repository: https://github.com/briandfoy/cpan-audit
-version: '20230826.001'
+version: '20231129.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

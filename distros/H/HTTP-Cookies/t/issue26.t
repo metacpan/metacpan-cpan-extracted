@@ -1,8 +1,8 @@
 use strict;
 use Test::More;
-use HTTP::Cookies;
-use HTTP::Response;
-use HTTP::Request;
+use HTTP::Cookies ();
+use HTTP::Response ();
+use HTTP::Request ();
 
 my $CRLF="\015\012";
 

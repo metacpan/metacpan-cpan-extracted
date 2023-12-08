@@ -13,6 +13,7 @@ Net::API::REST::Endpoint - Endpoint object for Net::APi::REST
         methods => [qw( GET POST )],
         path_info => '/some/extra/path',
         variables => { person_id => 123 },
+        params => { some_data => $some_value },
     );
 
 Then, in the method mapped to the endpoint called from Net::API::REST::handler():
@@ -48,6 +49,8 @@ The route could look something like the following:
                     _handler => $self->curry::user_info,
                     # This is a read-only endpoint, query string will be discarded and no POST or PUT allowed
                     _allowed_methods => [qw( GET )],
+                    # discretionary hash of key-value pairs
+                    _params => { some_data => $some_value },
                     # https://api.example.com/users/123/first_name
                     first_name =>
                     {
@@ -127,9 +130,13 @@ Provided with an HTTP method name, such as C<POST> or C<GET>, and this will retu
 
 Sets or gets the array reference of allowed methods for this endpoint. For example C<GET>, C<POST>, C<PUT>, C<DELETE>
 
+=head2 params
+
+Sets or gets a discretionary hash reference of key-value pairs to be accessed and used in your code.
+
 =head2 path
 
-The path URI for this endpoint. This sets or get an L<URI> object.
+The path URI for this endpoint. This sets or gets an L<URI> object.
 
 =head2 path_info
 
@@ -181,7 +188,7 @@ L<Net::API::REST>, L<Net::API::REST::Request>, L<Net::API::REST::Response>, L<Ne
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright (c) 2018-2021 DEGUEST Pte. Ltd.
+Copyright (c) 2018-2023 DEGUEST Pte. Ltd.
 
 You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.

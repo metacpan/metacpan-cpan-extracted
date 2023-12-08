@@ -7,13 +7,15 @@
 ###############################################################################
 # This script will check windows timezone information.
 
-my $new = 'windows.new';
-require "data.alias.pl";
+my $url = 'https://raw.githubusercontent.com/unicode-org/cldr/main/common/supplemental/windowsZones.xml';
+my $new = 'windowsZones.xml';
+require "./data.alias.pl";
 
 ############################################################################
 # MAIN PROGRAM
 ############################################################################
 
+system("wget $url");
 my %old = %windows_zones;
 my %new = _parse($new);
 
@@ -68,19 +70,17 @@ if (@chg) {
    }
    print "\n";
 }
+unlink $new;
 
 ############################################################################
 ############################################################################
 
-# It's a file of TAB separated lines:
+# Looks for lines of the form:
+#   <mapZone other="<ALIAS>" territory="<ABBREV>" type="<ZONE>"/>
+# and creates
+#   ALIAS => ZONE
 #
-#    ALIAS \t TAG \t ZONE_LIST
-#
-# where ALIAS is the windows time zone name and ZONE_LIST is a space
-# separated list of timezones.
-#
-# ALIAS may appear on multiple lines... use the first, and ZONE_LIST
-# may have multiple zones... use the first.
+# ALIAS may be used mltiple times so only the first is used.
 #
 sub _parse {
    my($file) = @_;
@@ -89,27 +89,39 @@ sub _parse {
    my @lines = `cat $file`;
    chomp(@lines);
 
-   my $n = 0;
    foreach my $line (@lines) {
-      $n++;
-
-      my @f = split(/\t/,$line);
-      if (@f != 3) {
-         warn "ERROR: invalid line: $file[$n]\n" .
-              "       $line\n";
+      if ($line =~ /<mapZone\s+other="(.*?)".*type="(.*?)"/) {
+         my($alias,$zone) = ($1,$2);
+         next  if (exists $ret{$alias});
+         $ret{$alias} = $zone;
       }
-
-      my($alias,$tmp,$zones) = @f;
-      next  if (exists $ret{$alias});
-
-      my @tmp = split(/\s+/,$zones);
-      my $zone = $tmp[0];
-
-      $ret{$alias} = $zone;
    }
 
    return %ret;
 }
+
+# # It's a file of TAB separated lines:
+# #
+# #    ALIAS \t DISPLAY_NAME
+# #
+# # where ALIAS is the windows time zone name and DISPLAY_NAME is how
+# # it is displayed on windows.
+# #
+# sub _parse {
+#    my($file) = @_;
+#    my %ret;
+
+#    my @lines = `cat $file`;
+#    chomp(@lines);
+
+#    foreach my $line (@lines) {
+#       $line           =~ /^(.*?)\t(.*)$/;
+#       my($alias,$val) = ($1,$2);
+#       $ret{$alias}    = $val;
+#    }
+
+#    return %ret;
+# }
 
 # For CLDR 2.0
 # sub _parse {

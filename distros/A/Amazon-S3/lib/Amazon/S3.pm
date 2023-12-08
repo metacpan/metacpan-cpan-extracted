@@ -51,7 +51,7 @@ __PACKAGE__->mk_accessors(
   ),
 );
 
-our $VERSION = '0.64'; ## no critic (RequireInterpolation)
+our $VERSION = '0.65'; ## no critic (RequireInterpolation)
 
 ########################################################################
 sub new {
@@ -788,11 +788,11 @@ sub signer {
   my $creds = $self->credentials ? $self->credentials : $self;
 
   my $signer = Amazon::S3::Signature::V4->new(
-    { access_key_id => $creds->get_aws_access_key_id,
-      secret        => $creds->get_aws_secret_access_key,
-      region        => $self->region || $self->get_default_region,
-      service       => 's3',
-      $self->get_token ? ( security_token => $creds->get_token ) : (),
+    { access_key_id  => $creds->get_aws_access_key_id,
+      secret         => $creds->get_aws_secret_access_key,
+      region         => $self->region || $self->get_default_region,
+      service        => 's3',
+      security_token => $creds->get_token,
     },
   );
 
@@ -1561,7 +1561,7 @@ managing Amazon S3 buckets and keys.
 
 =head1 DESCRIPTION
 
-This documentation refers to version 0.64.
+This documentation refers to version 0.65.
 
 C<Amazon::S3> provides a portable client interface to Amazon Simple
 Storage System (S3).

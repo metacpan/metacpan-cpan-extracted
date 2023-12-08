@@ -118,6 +118,8 @@ xt/author/bblsft-mbi-mbf.t
 xt/author/bblsft-mbi-mbr.t
 xt/author/bbrsft-mbi-mbf.t
 xt/author/bbrsft-mbi-mbr.t
+xt/author/bcos-mbi-upg-mbf.t
+xt/author/bcos-mbi.t
 xt/author/bdec-mbf.t
 xt/author/bdec-mbi.t
 xt/author/bdigitsum-mbi.t
@@ -174,6 +176,9 @@ xt/author/bpow-mbi.t
 xt/author/brsft-mbi.t
 xt/author/bsgn-mbf.t
 xt/author/bsgn-mbi.t
+xt/author/bsin-mbf.t
+xt/author/bsin-mbi-upg-mbf.t
+xt/author/bsin-mbi.t
 xt/author/bsqrt-mbi-mbf.t
 xt/author/bsstr-mbf.t
 xt/author/bsstr-mbi.t

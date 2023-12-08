@@ -1,0 +1,37 @@
+---
+abstract: 'Blowfish Algorithm using OpenSSL'
+author:
+  - 'Vitaly Kramskikh <vkramskih@cpan.org>'
+  - 'Timothy Legge <timlegge@cpan.org>'
+build_requires:
+  Crypt::OpenSSL::Guess: '0.10'
+  MIME::Base64: '0'
+  Test2::V0: '0'
+configure_requires:
+  Crypt::OpenSSL::Guess: '0.10'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Crypt-OpenSSL-Blowfish
+provides:
+  Crypt::OpenSSL::Blowfish:
+    file: lib/Crypt/OpenSSL/Blowfish.pm
+    version: '0.08'
+requires:
+  Carp: '0'
+  DynaLoader: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-OpenSSL-Blowfish
+  homepage: http://search.cpan.org/dist/Crypt-OpenSSL-Blowfish/
+  repository: git://github.com/perl-openssl/perl-Crypt-OpenSSL-Blowfish.git
+version: '0.08'
+x_generated_by_perl: v5.38.0
+x_maintainers:
+  - 'Timothy Legge <timlegge@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

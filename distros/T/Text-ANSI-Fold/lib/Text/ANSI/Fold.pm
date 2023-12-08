@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.2103";
+our $VERSION = "2.2104";
 
 use Data::Dumper;
 $Data::Dumper::Sortkeys = 1;
@@ -276,7 +276,7 @@ sub fold {
 	    { word => $alphanum_re, space => $nonspace_re }
 	    ->{$opt->{boundary} // ''};
 
-    $Text::VisualWidth::PP::EastAsian = $opt->{ambiguous} eq 'wide';
+    local $Text::VisualWidth::PP::EastAsian = $opt->{ambiguous} eq 'wide';
 
     my $folded = '';
     my $eol = '';
@@ -468,7 +468,7 @@ sub fold {
 }
 
 ##
-## Trim off one or more *logical* characters from the top.
+## Trim off one or more *logical* characters from the beginning of a line
 ##
 sub simple_fold {
     my $orig = shift;
@@ -478,16 +478,13 @@ sub simple_fold {
     my($left, $right) = $orig =~ m/^(\X{0,$width}+)(.*)/
 	or croak "$width: unexpected width";
 
-    my $w = vwidth($left);
+    my $w = vwidth $left;
     while ($w > $width) {
-	my $trim = do {
-	    # use POSIX qw(ceil);
-	    # ceil(($w - $width) / 2) || 1;
-	    int(($w - $width) / 2 + 0.5) || 1;
-	};
+	use integer;
+	my $trim = ($w - $width + 1) / 2;
 	$left =~ s/\X \K ( \X{$trim} ) \z//x or last;
 	$right = $1 . $right;
-	$w -= vwidth($1);
+	$w -= vwidth $1;
     }
 
     ($left, $right, $w);
@@ -557,7 +554,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.2103
+Version 2.2104
 
 =head1 SYNOPSIS
 

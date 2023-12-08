@@ -1,7 +1,7 @@
 package Graph::MoreUtils;
 
 # ABSTRACT: Utilities for graphs
-our $VERSION = '0.1.0'; # VERSION
+our $VERSION = '0.2.0'; # VERSION
 
 =head1 NAME
 
@@ -9,7 +9,7 @@ Graph::MoreUtils - utilities for graphs
 
 =head1 SYNOPSIS
 
-    use Graph::MoreUtils qw( SSSR line smooth );
+    use Graph::MoreUtils qw( line );
     use Graph::Undirected;
 
     my $G = Graph::Undirected->new;
@@ -27,11 +27,13 @@ use warnings;
 use parent Exporter::;
 
 use Graph::MoreUtils::Line;
+use Graph::MoreUtils::Replace;
 use Graph::MoreUtils::SSSR;
 use Graph::MoreUtils::Smooth;
 
 our @EXPORT_OK = qw(
     SSSR
+    graph_replace
     line
     smooth
 );
@@ -50,6 +52,15 @@ The default value of C<undef> stands for no limit.
 =cut
 
 sub SSSR { &Graph::MoreUtils::SSSR::SSSR }
+
+=head2 C<graph_replace( $graph, $new, @old )>
+
+Replaces one or more vertices (C<@old>) in the graph with a given one (C<$new>).
+All edges between the replaced vertices are removed and all edges with other vertices become a reconnected to the new one.
+
+=cut
+
+sub graph_replace { &Graph::MoreUtils::Replace::replace }
 
 =head2 C<line( $graph )>
 

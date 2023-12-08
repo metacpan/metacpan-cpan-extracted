@@ -48,7 +48,6 @@ subtest '$x = Math::BigFloat -> new("2") -> bone("+")' => sub {
     cmp_ok($x, "==", 1, '$x == 0');
 };
 
-
 $x = Math::BigFloat -> new("2") -> bone("-");
 subtest '$x = Math::BigFloat -> new("2") -> bone("-")' => sub {
     plan tests => 2;

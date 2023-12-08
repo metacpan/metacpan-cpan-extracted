@@ -1,0 +1,9 @@
+Revision history for Database-Temp
+
+0.002     2023-12-01 22:17:54+01:00 Europe/Berlin
+          * Fix literal octal string
+          * Fix here doc in tests to work with earlier Perls
+          * Add extra dependencies for author tests
+
+0.001     2023-11-28 22:14:04+01:00 Europe/Stockholm
+          * Initial release

@@ -178,5 +178,5 @@ allow = %ENV %INC $|
 [-BuiltinFunctions::ProhibitBooleanGrep]
 
 # need to run tests only under `dzil test`, if this is enabled
-# as the repo versions only have the palceholder for a version.
+# as the repo versions only have the placeholder for a version.
 [-Modules::RequireVersionVar]

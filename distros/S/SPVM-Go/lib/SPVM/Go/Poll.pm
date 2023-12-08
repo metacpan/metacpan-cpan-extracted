@@ -10,7 +10,7 @@ SPVM::Go::Poll - IO Polling
 
 =head1 Description
 
-Go::Poll class of L<SPVM> has methods to poll read/write IO.
+The Go::Poll class in L<SPVM> has methods to poll read/write IO.
 
 =head1 Copyright & License
 

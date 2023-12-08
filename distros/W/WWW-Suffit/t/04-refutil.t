@@ -66,6 +66,41 @@ ok(isnt_void([[[[[{bar=>undef}]]]]]),'[[[[[{bar=>undef}]]]]] - NOT void value');
 ok(isnt_void(qr/./),'qr/./ - NOT void value');
 ok(isnt_void(sub {1}),'sub{1} - NOT void value');
 
+# As
+
+# First value
+{
+    is(as_first([qw/foo bar baz/]), 'foo', 'First value if foo');
+    is(as_first(qw/foo bar baz/), 'foo', 'First value if foo of an list');
+    is(as_first("bar"), 'bar', 'First value if bar of an scalar');
+    is(as_first(undef), undef, 'First value if undef');
+    is(as_first(''), '', 'First value if void');
+}
+
+# Last value
+{
+    is(as_last([qw/foo bar baz/]), 'baz', 'Last value if baz');
+    is(as_last(qw/foo bar baz/), 'baz', 'Last value if baz of an list');
+    is(as_last("bar"), 'bar', 'Last value if bar of an scalar');
+}
+
+# Array ref
+{
+    is_deeply(as_array_ref( "foo" ), ['foo'], 'One scalar');
+    is_deeply(as_array_ref( qw/foo bar baz/ ), ['foo', 'bar', 'baz'], 'Three scalars');
+    is_deeply(as_array_ref(), [], 'No args');
+    is_deeply(as_array_ref(undef), [], 'Undef args');
+    is_deeply(as_array_ref( [undef] ), [undef], 'First arg is undef');
+}
+
+# Hash ref
+{
+    is_deeply(as_hash_ref( {foo => 'one'} ), {foo => 'one'}, 'Simple hash');
+    is_deeply(as_hash_ref( foo => 'one', bar => 2 ), {foo => 'one', bar => 2 }, 'Hash');
+    is_deeply(as_hash_ref(undef), {}, 'Undef args (hash)');
+    is_deeply(as_hash_ref(), {}, 'No args (hash)');
+}
+
 done_testing;
 
 1;

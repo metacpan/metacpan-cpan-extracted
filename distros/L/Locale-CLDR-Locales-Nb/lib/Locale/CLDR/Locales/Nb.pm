@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nb - Package for language Norwegian Bokmål
 
 package Locale::CLDR::Locales::Nb;
 # This file auto generated from Data\common\main\nb.xml
-#	on Sat  4 Nov  6:15:05 pm GMT
+#	on Tue  5 Dec  1:23:00 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

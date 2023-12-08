@@ -6,8 +6,10 @@ use strict;
 use warnings;
 use feature 'signatures';
 
+our $VERSION = "3.0";
+
 # Third-party includes
-use X11::XCB 0.21 ':all';
+use X11::XCB 0.22 ':all';
 use X11::XCB::Connection;
 use Carp;
 use AnyEvent;
@@ -55,7 +57,7 @@ $SIG{CHLD} = "IGNORE";
 my %evt_masks = (x => CONFIG_WINDOW_X, y => CONFIG_WINDOW_Y, w => CONFIG_WINDOW_WIDTH, h => CONFIG_WINDOW_HEIGHT);
 my ($ROOT, $atom_wmstate);
 our $exit_trigger = 0;
-our $VERSION = "2.0";
+my $new_window_event_mask = EVENT_MASK_ENTER_WINDOW | EVENT_MASK_PROPERTY_CHANGE | EVENT_MASK_FOCUS_CHANGE;
 
 ## Define functions
 # Handles any screen change
@@ -136,16 +138,23 @@ sub handle_existing_windows {
     # Set proper window information
     for my $win (values %{ $windows }) {
         $win->{floating} = 1;
-        $X->change_window_attributes($win->{id}, CW_EVENT_MASK, EVENT_MASK_ENTER_WINDOW | EVENT_MASK_PROPERTY_CHANGE);
+        $X->change_window_attributes($win->{id}, CW_EVENT_MASK, $new_window_event_mask);
         $X->change_property(PROP_MODE_REPLACE, $win->{id}, $atom_wmstate, $atom_wmstate, 32, 1, pack L => 1);
 
         my ($x, $y, $w, $h) = $win->query_geometry();
         $y = $cfg->{panel_height} if $y < $cfg->{panel_height};
         my $bw = $cfg->{border_width};
+        my $screen = screen_by_xy($x, $y) || $focus->{screen};
+
+        # Fix window position if they're outside of the visible screen
+        unless ($screen->contains_xy($x, $y)) {
+            $x = $screen->{x} + int(($screen->{w} - $w) / 2);
+            $y = $screen->{y} + int(($screen->{h} - $h) / 2);
+        }
+
         @{ $win }{qw( x y w h )} = ($x, $y, $w, $h);
 
         $win->resize_and_move($x, $y, $w + 2 * $bw, $h + 2 * $bw);
-        my $screen = screen_by_xy($x, $y) || $focus->{screen};
         $screen->win_add($win)
     }
     $_->refresh() for reverse @screens;
@@ -157,7 +166,12 @@ sub hide_window($wid, $delete=undef) {
     return unless $win;
     $win->{_hidden} = 1;
 
-    for my $tag (values %{ $win->{on_tags} // {} }) {
+    for my $tag ($win->tags()) {
+        if ($win->{urgent}) {
+            delete $tag->{urgent_windows}->{$win};
+            $tag->{screen}->{panel}->ws_set_urgent($tag->{idx} + 1, 0) unless keys %{ $tag->{urgent_windows} };
+        }
+
         $tag->win_remove($win);
         if ($win == ($tag->{screen}->{focus} // 0)) {
             $tag->{screen}->{focus} = undef;
@@ -242,13 +256,18 @@ sub FireInTheHole {
     add_event_ignore(CREATE_NOTIFY());
     add_event_ignore(MAP_NOTIFY());
     add_event_ignore(CONFIGURE_NOTIFY());
+    add_event_ignore(FOCUS_OUT());
 
     # Add several important event handlers
     add_event_cb(MAP_REQUEST(), sub($evt) {
         my ($wid, $follow, $win, $screen, $tag, $floating) = ($evt->{window}, 1);
 
         # Ignore windows with no class (hello Google Chrome)
-        my $class = X11::korgwm::Window::_class($wid) // return;
+        my $class = X11::korgwm::Window::_class($wid);
+        unless (defined $class) {
+            my $wmname = X11::korgwm::Window::_title($wid) // return;
+            return unless $cfg->{noclass_whitelist}->{$wmname};
+        }
 
         # Create a window if needed
         $win = $windows->{$wid};
@@ -257,7 +276,7 @@ sub FireInTheHole {
         } else {
             $win = $windows->{$wid} = X11::korgwm::Window->new($wid);
 
-            $X->change_window_attributes($wid, CW_EVENT_MASK, EVENT_MASK_ENTER_WINDOW | EVENT_MASK_PROPERTY_CHANGE);
+            $X->change_window_attributes($wid, CW_EVENT_MASK, $new_window_event_mask);
 
             # Unconditionally set NormalState for any windows, we do not want to correctly process this property
             $X->change_property(PROP_MODE_REPLACE, $wid, $atom_wmstate, $atom_wmstate, 32, 1, pack L => 1);
@@ -267,7 +286,7 @@ sub FireInTheHole {
         }
 
         # Apply rules
-        my $rule = $cfg->{rules}->{$class};
+        my $rule = $cfg->{rules}->{$class // ""};
         if ($rule) {
             # XXX awaiting bugs with idx 0
             defined $rule->{screen} and $screen = $screens[$rule->{screen} - 1] // $screens[0];
@@ -295,6 +314,8 @@ sub FireInTheHole {
         # Set default screen & tag, and fix position
         $screen //= $focus->{screen};
         $tag //= $screen->current_tag();
+
+        # First and simple check and correction
         if ($win->{x} == 0) {
             $win->{x} = $screen->{x} + int(($screen->{w} - $win->{w}) / 2);
             $win->{y} = $screen->{y} + int(($screen->{h} - $win->{h}) / 2);
@@ -302,8 +323,9 @@ sub FireInTheHole {
             $win->{x} += $screen->{x};
         }
 
-        # Place it in proper place
-        $win->show() if $screen->current_tag() == $tag;
+        DEBUG and warn "Mapping $win [$class] (@{ $win }{qw( x y w h )}) screen($screen->{id}) tag($tag->{idx})";
+
+        # Just add win to a proper tag. win->show() will be called from tag->show() during screen->refresh()
         $tag->win_add($win);
 
         if ($win->{transient_for}) {
@@ -315,6 +337,7 @@ sub FireInTheHole {
         }
 
         $win->toggle_floating(1) if $floating;
+        $win->urgency_raise(1) if $rule->{urgent};
 
         if ($follow) {
             $screen->tag_set_active($tag->{idx}, 0);
@@ -337,8 +360,8 @@ sub FireInTheHole {
     });
 
     add_event_cb(UNMAP_NOTIFY(), sub($evt) {
-        # Handle only client unmap requests as we do not call unmap anymore
-        hide_window($evt->{window});
+        # Handle only client unmap requests as we do not call unmap anymore. So we're fine to delete win here as well
+        hide_window($evt->{window}, 1);
     });
 
     add_event_cb(CONFIGURE_REQUEST(), sub($evt) {
@@ -367,28 +390,22 @@ sub FireInTheHole {
 
             # Handle floating windows properly
             if ($win->{floating}) {
-                my ($old_screen, $new_screen);
+                # Prevent ConfigureRequest moving the window out of already assigned screen (if real_* set)
+                # Otherwise: set new_screen using required win geometry if possible, or use currently focused screen.
+                my $new_screen = screen_by_xy(@{ $win }{qw( real_x real_y )}) //
+                    screen_by_xy(@geom{qw( x y )}) // $focus->{screen};
 
-                # Verify that it moved inside the same screen
-                if (defined $win->{real_y} and any { $geom{$_} != ($win->{"real_$_"} // 0) } qw( x y )) {
-                    $old_screen = screen_by_xy(@{ $win }{qw( real_x real_y )});
-                    $new_screen = screen_by_xy(@geom{qw( x y )});
+                # Fix window position if it asked to place it outside of selected screen
+                unless ($new_screen->contains_xy(@geom{qw( x y )})) {
+                    $geom{x} = $new_screen->{x} + int(($new_screen->{w} - $geom{w}) / 2);
+                    $geom{y} = $new_screen->{y} + int(($new_screen->{h} - $geom{h}) / 2);
 
-                    if ($old_screen != $new_screen) {
-                        # Reparent screen
-                        my $always_on = $win->{always_on};
-                        $old_screen->win_remove($win);
-                        $new_screen->win_add($win, $always_on);
-                    } else {
-                        undef $old_screen;
-                    }
+                    # Certainly save new position
+                    @{ $win }{qw( x y )} = @geom{qw( x y )};
                 }
 
                 # For floating we need fixup border
                 $win->resize_and_move($geom{x}, $geom{y}, $geom{w} + 2 * $bw, $geom{h} + 2 * $bw);
-
-                # Update the screens if needed
-                $old_screen->refresh() if $old_screen;
             } else {
                 # If window is tiled or maximized, tell it it's real size
                 @geom{qw( x y w h )} = @{ $win }{qw( real_x real_y real_w real_h )};
@@ -412,6 +429,30 @@ sub FireInTheHole {
         $X->flush();
     });
 
+    # Under certain conditions X11 grants focus to other window generating FocusIn, we'll respect this
+    add_event_cb(FOCUS_IN(), sub($evt) {
+        # Skip grab-initiated events
+        return unless $evt->{mode} == 0;
+
+        # Skip unknown and already focused windows
+        my $win = $windows->{$evt->{event}} or return;
+        return if $focus->{window} == $win;
+
+        # Switch to a proper tag
+        if ($win->{_hidden}) {
+            my @tags = $win->tags();
+            return carp "Do not know how to focus hidden window $win on several tags @tags" if @tags > 1;
+
+            # Silently skip the situation with no tags (likely always_on window), just try to warp pointer there
+            for my $tag (@tags) {
+                $tag->{screen}->tag_set_active($tag->{idx}, 0);
+                $tag->{screen}->refresh();
+            }
+        }
+
+        $win->warp_pointer();
+    });
+
     # This will handle RandR screen change event
     add_event_cb($RANDR_EVENT_BASE, sub($evt) {
         qx($cfg->{randr_cmd});
@@ -420,12 +461,21 @@ sub FireInTheHole {
 
     # X11 Error handler
     add_event_cb(XCB_NONE(), sub($evt) {
+        # https://www.x.org/releases/X11R7.7/doc/xproto/x11protocol.html#Encoding::Errors
         warn sprintf "X11 Error: code=%s seq=%s res=%s %s/%s", @{ $evt }{qw( error_code sequence
             resource_id major_code minor_code )};
     });
 
     # Init our extensions
     $_->() for our @extensions;
+
+    # Execute autostart, if any
+    my $autostart = ref $cfg->{autostart} eq "ARRAY" ? $cfg->{autostart} : [];
+    for my $cmd (@{ $autostart }) {
+        my $cb;
+        eval { $cb = X11::korgwm::Executor::parse($cmd); 1; } or next;
+        ref $cb eq "CODE" and $cb->();
+    }
 
     # Set the initial pointer position, if needed
     if (my $pos = $cfg->{initial_pointer_position}) {
@@ -511,6 +561,10 @@ To make installation process smooth and nice you probably want to install them i
 For Debian GNU/Linux these should be sufficient:
 
     build-essential libcairo-dev libgirepository1.0-dev libglib2.0-dev xcb-proto
+
+And these for Archlinux:
+
+    base-devel cairo glib2 gobject-introspection gtk3 libgirepository xcb-proto
 
 =head1 COPYRIGHT AND LICENSE
 

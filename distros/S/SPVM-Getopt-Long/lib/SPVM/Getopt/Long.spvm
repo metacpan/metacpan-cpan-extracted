@@ -1,0 +1,250 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Getopt::Long {
+  version "0.001";
+  
+  use Array;
+  use Regex;
+  use Fn;
+  use StringList;
+  use Getopt::Long::Spec;
+  
+  static method GetOptionsFromArray : void ($args_ref : string[][], $values_h : Hash, $spec_strings : string[]) {
+    
+    unless ($values_h) {
+      die "\$values_h must be defined.";
+    }
+    
+    my $specs_h = &parse_spec_strings($spec_strings);
+    
+    my $args = $args_ref->[0];
+    my $new_args = &parse_args($args, $values_h, $specs_h);
+    
+    $args_ref->[0] = $new_args;
+  }
+  
+  private static method parse_spec_strings : Hash of Getopt::Long::Spec ($spec_strings : string[]) {
+    
+    my $specs_h = Hash->new;
+    
+    my $spec_strings_length = @$spec_strings;
+    
+    for (my $i = 0; $i < $spec_strings_length; $i++) {
+      my $spec_string = $spec_strings->[$i];
+      
+      my $spec_re = Regex->new("^(\w+(?:\|\w+)*)(?:=([\w]))?$");
+      
+      if (my $match = $spec_re->match($spec_string)) {
+        my $names_str = $match->cap1;
+        my $type_char = $match->cap2;
+        
+        my $names = Fn->split("|", $names_str);
+        
+        if (length $type_char) {
+          unless ($type_char eq "s" || $type_char eq "i" || $type_char eq "f") {
+            die "The type \"$type_char\" is not available.";
+          }
+        }
+        
+        my $spec = Getopt::Long::Spec->new;
+        my $is_primary_name = 1;
+        
+        for my $name (@$names) {
+          $spec->{name} = $name;
+            
+          if ($is_primary_name) {
+            $spec->{primary_name} = $name;
+            
+            $is_primary_name = 0;
+          }
+          else {
+            $spec->{primary_name} = $spec->{primary_name};
+          }
+          
+          my $type = Getopt::Long::Spec->TYPE_BOOL;
+          if ($type_char eq "s") {
+            $type = Getopt::Long::Spec->TYPE_STRING;
+          }
+          elsif ($type_char eq "i") {
+            $type = Getopt::Long::Spec->TYPE_INT;
+          }
+          elsif ($type_char eq "f") {
+            $type = Getopt::Long::Spec->TYPE_DOUBLE;
+          }
+          
+          $spec->{type} = $type;
+          
+          my $found_spec = $specs_h->get($name);
+          
+          if ($found_spec) {
+            die "The option name \"$name\" must be given once.";
+          }
+          
+          $specs_h->set($name => $spec);
+        }
+      }
+      else {
+        die "The option specification \"$spec_string\" is invalid.";
+      }
+    }
+    
+    return $specs_h;
+  }
+  
+  private static method parse_args : string[] ($args : string[], $values_h : Hash, $specs_h : Hash of Getopt::Long::Spec) {
+    
+    my $new_args_list = StringList->new;
+    
+    my $args_length = @$args;
+    
+    my $options_end_index = -1;
+    
+    for (my $args_index = 0; $args_index < $args_length; $args_index++) {
+      my $arg = $args->[$args_index];
+      
+      my $args_number = $args_index + 1;
+      
+      unless ($arg) {
+        die "The ${args_number}th argument must be defined.";
+      }
+      
+      my $option_start_re = Regex->new("^--?");
+      
+      if (my $match = $option_start_re->match($arg)) {
+        if ($arg eq "--") {
+          $options_end_index = $args_index + 1;
+          last;
+        }
+        
+        my $option_re = Regex->new("(--?)(\w+)(?:=([\w\.\-]+))?");
+        
+        if (my $match = $option_re->match($arg)) {
+          
+          my $option_hyphen = $match->cap1;
+          
+          my $option_name = $match->cap2;
+          
+          my $option_value = $match->cap3;
+          
+          my $found_spec = (Getopt::Long::Spec)$specs_h->get($option_name);
+          
+          if ($found_spec) {
+            my $primary_name = $found_spec->{primary_name};
+            
+            if ($found_spec->{type} == Getopt::Long::Spec->TYPE_BOOL) {
+              if (length $option_value) {
+                die "A bool type option \"$option_hyphen$option_name\" cannot have the value.";
+              }
+            }
+            else {
+              unless (length $option_value) {
+                if ($args_index + 1 < $args_length) {
+                  $args_index++;
+                  $option_value = $args->[$args_index];
+                }
+              }
+              
+              unless (length $option_value) {
+                die "The option \"$option_hyphen$option_name\" must have its value. Options other than thg bool type must do.";
+              }
+            }
+            
+            my $value = $values_h->get($primary_name);
+            
+            if ($found_spec->{type} == Getopt::Long::Spec->TYPE_STRING) {
+              if ($value is_type string[]) {
+                my $current_values = (string[])$values_h->get($primary_name);
+                
+                $current_values = Array->merge_string($current_values, [$option_value]);
+                
+                $values_h->set($primary_name, $current_values);
+              }
+              elsif ($value is_type string || !$value) {
+                $values_h->set($primary_name, $option_value);
+              }
+              else {
+                die "The type of the option value which type is string must be the string, string[], or undef type. The option name is \"$option_name\".";
+              }
+            }
+            elsif ($found_spec->{type} == Getopt::Long::Spec->TYPE_BOOL) {
+              my $optiosn_value_int = 1;
+              
+              if ($value is_type int[]) {
+                my $current_values = (int[])$values_h->get($primary_name);
+                
+                $current_values = (int[])Array->merge_int($current_values, [$optiosn_value_int]);
+                
+                $values_h->set($primary_name, $current_values);
+              }
+              elsif ($value is_type Int || !$value) {
+                $values_h->set($primary_name, $optiosn_value_int);
+              }
+              else {
+                die "The type of the option value which type is bool must be the Int, int[], or undef type. The option name is \"$option_name\".";
+              }
+            }
+            elsif ($found_spec->{type} == Getopt::Long::Spec->TYPE_INT) {
+              my $optiosn_value_int = Fn->to_int($option_value);
+              
+              if ($value is_type int[]) {
+                my $current_values = (int[])$values_h->get($primary_name);
+                
+                $current_values = (int[])Array->merge_int($current_values, [$optiosn_value_int]);
+                
+                $values_h->set($primary_name, $current_values);
+              }
+              elsif ($value is_type Int || !$value) {
+                $values_h->set($primary_name, $optiosn_value_int);
+              }
+              else {
+                die "The type of the option value which type is integer must be the Int, int[], or undef type. The option name is \"$option_name\".";
+              }
+            }
+            elsif ($found_spec->{type} == Getopt::Long::Spec->TYPE_DOUBLE) {
+              my $optiosn_value_double = Fn->to_double($option_value);
+              
+              if ($value is_type double[]) {
+                my $current_values = (double[])$values_h->get($primary_name);
+                
+                $current_values = (double[])Array->merge_double($current_values, [$optiosn_value_double]);
+                
+                $values_h->set($primary_name, $current_values);
+              }
+              elsif ($value is_type Double || !$value) {
+                $values_h->set($primary_name, $optiosn_value_double);
+              }
+              else {
+                die "The type of the option value which type is floating point must be Double, double[], or undef type. The option name is \"$option_name\".";
+              }
+            }
+            else {
+              die "Unexpected Error.";
+            }
+          }
+          else {
+            die "The option \"$option_hyphen$option_name\" is not available.";
+          }
+        }
+        else {
+          die "The option \"$arg\" is an invalid format.";
+        }
+      }
+      else {
+        $new_args_list->push($arg);
+      }
+    }
+    
+    if ($options_end_index >= 0) {
+      for (my $args_index = $options_end_index; $args_index < $args_length; $args_index++) {
+        $new_args_list->push($args->[$args_index]);
+      }
+    }
+    
+    my $new_args = $new_args_list->to_array;
+    
+    return $new_args;
+  }
+  
+  # use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+}

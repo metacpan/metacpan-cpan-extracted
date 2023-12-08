@@ -3,7 +3,10 @@
 use ExtUtils::testlib;
 use Test::More ;
 use Test::Log::Log4perl;
+use Test::Memory::Cycle;
 use Tk;
+use Scalar::Util qw/weaken/;
+
 use Config::Model::TkUI;
 use Config::Model 2.137;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
@@ -18,6 +21,7 @@ sub test_all {
     my ($mw, $delay,$test_ref) = @_ ;
     my $test = shift @$test_ref ;
     $test->() ;
+    weaken($mw);
     $mw->after($delay, sub { test_all($mw, $delay,$test_ref) } ) if @$test_ref;
 }
 
@@ -97,6 +101,7 @@ SKIP: {
     $mw->withdraw ;
 
     $cmu = $mw->ConfigModelUI (-instance => $inst ) ;
+    weaken($cmu);
 
     my $delay = 200 ;
 
@@ -246,6 +251,9 @@ SKIP: {
     MainLoop ; # Tk's
 
 }
+
+note("testing memory cycles. Please wait...");
+memory_cycle_ok($model,"memory cycles");
 
 ok(1,"All tests are done");
 

@@ -1,0 +1,12 @@
+Revision history for Perl extension Regexp::CharClasses::Thai.
+
+1.00  Wed Oct 25 21:40:23 2023
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.008003 --compat-version=5.8.3 --version=1.00 -n Regexp::CharClasses::Thai
+
+1.01 Sun Dec 3 21:54 2023
+	- first revision
+	- made adjustments to the tests, removing need for Test::More::UTF8 for proper installation
+	- amended several of the functions: InThaiDualCons, InThaiDualC1, InThaiDualC2
+	- added more commentary in code for clarity
+	- updated POD for accuracy and readability, and corrected some formatting issues

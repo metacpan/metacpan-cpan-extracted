@@ -1,0 +1,33 @@
+NAME
+
+    Pod::Markdown::Githubert - convert POD to Github-flavored Markdown
+
+INSTALLATION
+
+    To download and install this module, use your favorite CPAN client, e.g.
+    "cpan":
+
+        cpan Pod::Markdown::Githubert
+
+    Or "cpanm":
+
+        cpanm Pod::Markdown::Githubert
+
+    To do it manually, run the following commands (after downloading and
+    unpacking the tarball):
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+COPYRIGHT & LICENSE
+
+    Copyright 2023 Lukas Mai.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See <https://dev.perl.org/licenses/> for more information.
+

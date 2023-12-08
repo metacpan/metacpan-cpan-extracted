@@ -12,6 +12,13 @@ use Encode qw( encode decode );
 use X11::XCB ':all';
 use X11::korgwm::Common;
 
+# Simplify object usage
+use Scalar::Util qw( refaddr );
+use overload '""' => sub {sprintf "%s [id:%d]", overload::StrVal($_[0]), $_[0]->{id} // "undef"};
+use overload '==' => sub { (refaddr($_[0]) // 0) == (refaddr($_[1]) // 0) };
+use overload '!=' => sub { (refaddr($_[0]) // 0) != (refaddr($_[1]) // 0) };
+
+# Internal class variables
 our $focus_prev;
 my $sid = 1;
 
@@ -144,7 +151,12 @@ sub focus($self) {
 
     # TODO implement focus for several screens: check current focus, check focus for screens, select random one
     my @focus_screens = $self->screens;
-    croak "Unimplemented focus for multiple screens: @focus_screens" unless @focus_screens == 1;
+
+    # XXX Currently it's not supported, so croak
+    if (@focus_screens != 1) {
+        warn "Bad window: $self tags: " . join " ", map { "$_->{screen}: tag #$_->{idx}" } $self->tags();
+        croak "Unimplemented focus for multiple screens (@focus_screens)" . join " ", map { $_->{id} } @focus_screens;
+    }
 
     my @visible_tags = $self->tags_visible();
     my $tag = $visible_tags[0];
@@ -212,7 +224,6 @@ sub focus($self) {
     my $screen = $self->{always_on} || $tag->{screen};
     $screen->{focus} = $self;
     $screen->{panel}->title($self->title // "");
-    $focus_prev = $focus->{window} unless ($focus->{window} // 0) == $self;
     $focus->{window} = $self;
     $focus->{screen} = $self->{always_on} || $focus_screens[0];
 
@@ -233,8 +244,10 @@ sub update_title($self) {
 }
 
 sub hide($self) {
-    # We do not actually unmap them anymore, just move out of screen
+    # We do not actually unmap them anymore, just move out of screen and mark as '_hidden'.
     $self->{_hidden} = 1;
+
+    # Not using $self->move() to avoid garbage in real_*
     $X->configure_window($self->{id}, CONFIG_WINDOW_X | CONFIG_WINDOW_Y, $self->{sid} * 4096, $visible_max_y * 2);
 
     # Drop panel title
@@ -242,7 +255,6 @@ sub hide($self) {
 
     # Drop focus
     $focus->{window} = undef if $self == ($focus->{window} // 0);
-    $focus_prev = undef if $self == ($focus_prev // 0);
 
     # Execute hooks, see Expose.pm
     $_->($self) for our @hooks_hide;
@@ -250,7 +262,8 @@ sub hide($self) {
 
 sub show($self) {
     # Not using $self->move() to avoid garbage in real_*
-    $X->configure_window($self->{id}, CONFIG_WINDOW_X | CONFIG_WINDOW_Y, @{ $self }{qw( x y )}) if $self->{floating};
+    $X->configure_window($self->{id}, CONFIG_WINDOW_X | CONFIG_WINDOW_Y, @{ $self }{qw( x y )})
+        if $self->{floating} and $self->{_hidden};
 
     # Map anyways as client could've unmapped on their own
     $X->map_window($self->{id});
@@ -424,7 +437,7 @@ sub urgency_set($self, $urgency = 1) {
         $flags &= ~(1 << 8);
     }
 
-    # TODO maybe respect other than flags fields?
+    # TODO maybe respect other fields, not only flags?
     my $hints = X11::XCB::ICCCM::WMHints->new();
     $hints->set_flags($flags);
     $X->X11::XCB::ICCCM::set_wm_hints($self->{id}, $hints);
@@ -442,7 +455,7 @@ sub urgency_clear($self) {
 
 # High-level wrapper
 sub urgency_raise($self, $set_hint = undef) {
-    if ($focus->{window} == $self) {
+    if (($focus->{window} // 0) == $self) {
         return $self->urgency_clear();
     }
 

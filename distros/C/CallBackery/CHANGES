@@ -1,3 +1,27 @@
+0.48.1 2023-12-01 17:32:03 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - use CB_CFG_ as prefix ... this makes more sense than CM_CB
+
+0.48.0 2023-11-29 11:21:50 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ * If the environmeny variable CM_CB_OVERRIDE_... is set, the value
+   from the config file is overridden with the value from the environment.
+
+   Example config file:
+
+   BACKEND:
+    cfg_db: 'dbi:SQLite:dbname=/opt/running/cb.db'
+   LIST:
+    - hello
+    - world
+    
+   Example environment override:
+    
+    export CM_CB_OVERRIDE_BACKEND_CFG_DB='dbi:SQLite:dbname=/tmp/cb.db'
+    export CM_CB_OVERRIDE_LIST_0='goodbye'
+
+ * Fix update comboBox data
+
 0.47.9 2023-10-26 10:05:30 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - better fix, based on https://github.com/qooxdoo/qooxdoo/pull/10632
@@ -81,20 +105,11 @@
 
  - these changes are necessary to make callbackery work with qx8
 
-0.45.0 2023-05-23 12:05:16 +0200 Tobias Oetiker <tobi@oetiker.ch>
-
- -
-
-0.45.0 2023-05-23 12:05:01 +0200 Tobias Oetiker <tobi@oetiker.ch>
-
- -
-=======
 0.45.1 2023-05-08 10:52:48 +0200 Tobias Oetiker <tobi@oetiker.ch>
->>>>>>> 93b1caf4debb55a06a72ad1d38134bb1f4173bf4
 
  - Reload CardList on action response
-
-0.45.0 2023-03-30 09:13:03 +0200 Tobias Oetiker <tobi@oetiker.ch>
+ 
+0.45.0 2023-05-23 12:05:16 +0200 Tobias Oetiker <tobi@oetiker.ch>
 
  - new widget attribute spellcheck which allows to enable
    spellcheckers like languagetool in textareas or normal text widets

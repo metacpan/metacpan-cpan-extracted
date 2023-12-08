@@ -58,7 +58,7 @@ is $stderr, '', 'script (--version) does not output on stderr';
 sub run_script {
     my @args = @_;
     return run_capture(
-        cmd => ['perl', $script, @args],
+        cmd => [$^X, $script, @args],
     );
 }
 
@@ -70,7 +70,7 @@ sub run_capture {
     my $child_err = ($args{combined_io} ? $child_out : gensym());
     my $pid = open3 $args{stdin}, $child_out, $child_err, @cmd;
     waitpid $pid, 0;
-    my $exitcode = $?;
+    my $exitcode = $? >> 8;
 
     local $/; # slurp!
     return (

@@ -1,0 +1,29 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 0fbbc580cd838bdc6c40a6296a0212768b003a58995e4b8816d503ded91e1a3a Changes
+SHA256 258c06d644746f526aa255d1ddcfa8a3cc7bfceb841e7b4ad1f5e8b3c18329c7 LICENSE
+SHA256 27682dbec91e0bdc9aaaa08686d115440ad522d0f83b1af1116a0c739ed2afaa MANIFEST
+SHA256 95ee01307adfdb48bbb70e897b33c323e77f5ab99ff635759654373027877014 META.json
+SHA256 5d085e99fca725f430032b21f1c780cf7a6546dc181797bf5c38f1633b0e7d6c META.yml
+SHA256 033cb83993902a225e4a549bf5a3e47fc0b0f44d4e89bc50572694b9ced03e07 Makefile.PL
+SHA256 3b4d631d777f9dbf0526ad670af4162f0774acea69c1782f3f36b48216c656f3 README.md
+SHA256 00357743f2aaa43c4f6137035713286140921cc0266a80ff2452cb165c2dd51e dist.ini
+SHA256 bd5105f9378f5d17890017d01513004978efbdd829bec38e2bef7b0614ec518b dist.ini~
+SHA256 1718641a4e456599b46b4d3838553414cc106319e0b2c72689f682cf328ef7ac lib/Plack/Middleware/OpenTelemetry.pm
+SHA256 1070bed44085ad3e41da2f740734553412f30c51d29337123463f523cdb113db lib/Plack/Middleware/OpenTelemetry.pm~
+SHA256 18135c80d22d03a465ecfdfa72f991ca60e3503a899846ddefaf7e0d9e807233 t/basic.t
+SHA256 0a109aad8506aa7d2f9db383309cb30a45eb285dffe60bcd20b5d56a187cc606 test

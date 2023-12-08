@@ -1,4 +1,4 @@
-use Test::More skip_all=>"IO::FD::stat is currently broken";
+use Test::More;# skip_all=>"IO::FD::stat is currently broken";
 use IO::FD;
 use File::Basename qw<dirname basename>;
 
@@ -88,7 +88,5 @@ ok symlink($basename, $link), "Create symlink";
         ok !$perl == !$iofd, "Scalar symlink";
 
 }
+
 done_testing;
-
-
-

@@ -1,0 +1,26 @@
+0.005   2023-12-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemes: FamousLogo, FoodColor.
+
+
+0.004   2023-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - [incompatible change] Rename variable NAMES_SUMMARY_TABLE ->
+          NAMES_SUMMARIES_TABLE.
+
+
+0.003   2023-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Add $NAMES_SUMMARY_TABLE.
+
+
+0.002   2023-11-30  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Edit Changes.
+
+
+0.001   2023-11-30  Released-By: PERLANCAR
+
+        - First release.

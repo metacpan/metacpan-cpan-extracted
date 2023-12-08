@@ -1,17 +1,21 @@
+.github/workflows/linux-ubuntu-latest-32bit.yml
+.github/workflows/linux-ubuntu-latest-perl-5.8.9.yml
+.github/workflows/linux-ubuntu-latest.yml
+.github/workflows/macos-latest.yml
+.github/workflows/windows-2019.yml
+.github/workflows/windows-latest.yml
 .gitignore
 Changes
 lib/SPVM/Time/HiRes.pm
 lib/SPVM/Time/HiRes.spvm
 lib/SPVM/Time/HiRes/ItimervalFloat.pm
 lib/SPVM/Time/HiRes/ItimervalFloat.spvm
-lib/SPVM/Time/HiRes/Util.pm
-lib/SPVM/Time/HiRes/Util.spvm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-t/basic.t
 t/lib/SPVM/TestCase/Time/HiRes.spvm
+t/Time-HiRes.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

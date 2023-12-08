@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Person::ID::CZ::RC::Generator;
 use Test::More 'tests' => 8;
 use Test::NoWarnings;

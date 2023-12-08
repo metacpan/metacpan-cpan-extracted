@@ -1,0 +1,111 @@
+				jw, Mon 2. Dez 00:24:27 CET 2013
+
+Implement least surprise:
+ Option -1 should be default. 
+ A new option -r should make it recursive.
+
+				jw, Tue Jun 18 15:09:19 CEST 2013
+
+Feature: support *.phar files. Example: install-pear-nozlib.phar from package php5.
+This example wants write access to /usr/share/php5/PEAR/*
+No idea... (Forget fakeroot. It fakes a root user, not a root filesystem)
+
+				jw, Thu Mar 14 19:51:33 CET 2013
+
+file_unpack2 -L logfile.log .
+would list the logfile within itself. Avoid this!
+
+				jw, Thu Jan 24 11:39:37 CET 2013
+
+According to: https://rt.cpan.org/Ticket/Display.html?id=73670#txn-1039064
+With multipart rar archives we extract the same thing multiple times.
+A test archive can be created with: rar a -v10M test.rar *.webm
+Ideas:
+  - post process the result tree, and see if there are multiple indentical
+    (colliding!) subtrees. That would be quite generic, but not so efficient.
+  - preprocess the input files, so that an ignore list prevents us from
+    touching the other parts again. This would need rar specific code, which I
+    am not so happy about. Maybe call rar in a tv mode first, and learn from there, 
+    all the input filenames used?
+  - run /usr/bin/unrar x -o- -p- -iul -kb -y test.part03.rar
+    *without -n* so that it prints messages while working. The messages look like this:
+       ...         
+       Extracting from test.part04.rar
+       ...         design-patterns-in-ruby-20120426.webm                     34%
+       Extracting from test.part05.rar
+       ...         design-patterns-in-ruby-20120426.webm                     43%
+       Extracting from test.part06.rar
+       ...
+       All OK
+
+    Parse this for qr{^Extracting from (.*)$} and blacklist all filenames found with $1
+    The protocol for mimetype-handlers needs to be extended so that we can safely return 
+    the list of unpacked files.
+
+				jw, Wed May  4 11:58:27 CEST 2011
+
+debug 
+file_unpack2 /space/legaldb_nfs/auto-co/api.opensuse.org/mozilla\:Factory/js%1.8.5%r3/
+this pulls 1.7gb incore. why?
+
+				jw, Mon Mar 28 21:01:45 CEST 2011
+
+lib/ldig/fs.pm had this on its sub get_file_mimetype(): "file -i -b %s"
+# file returns things like:
+# 'text/plain; charset=us-ascii'
+# 'application/x-tar, POSIX'
+# 'text/x-c'
+# we truncate at the , or ;
+#
+# If $fname ends in '|' we assume it is a command like 'gzip -dc file.gz|'
+#
+# vim-7.0-extra.tar.bz2/vim70/csdpmi4b.zip~ldig/BIN/CWSDPMI.DOC
+# is a text file, but file says: application/x-shockwave-flash
+# vim70/runtime/macros/maze/poster: message/news\0118bit
+#
+# FIXME: DELTA rpms have DLT3 magic after unrpm. How do we handle this?
+
+				jw, Wed Dec 15 20:31:41 CET 2010
+
+Browse through this list of formats
+http://legroom.net/software/uniextract#formats
+and see what we can do.
+
+				jw, Wed Nov 24 18:15:15 CET 2010
+
+unshield
+--------
+ try unshield for .cab files that do not extract with cabextract.
+ Those would be Installshield CAB files rather than Microsoft CAB files.
+
+				jw, 2010-09-26 20:21
+
+How to decode Metamail contents?
+================================
+ The firt part is usually html, and thus file -i says text/html
+ ignoring the mime headers.
+ 
+-> file_unpack2 -v -m 
+  shows the multipart; header in the third filed.
+
+ Content-Type: multipart/alternative;
+ Content-Type: multipart/
+ Content-Disposition: attachment; filename=Unknown.jpeg;
+ http://en.wikipedia.org/wiki/MIME
+
+metamail -w -x < saved-mail-body-from-mutt
+## often says says
+# metamail: Incomplete multipart message -- unexpected EOF
+# Cannot handle any part of multipart/alternative message
+
+-> use perl-MIME-tools, this is more flexible.
+
+# when I extract the parts between the boundary string and feed this
+# to metamail one by one, it works well.
+env METAMAIL_TMPDIR=. metamail -d -w jpeg.mm
+ This message contains 'image/jpeg`-format data.
+
+ which is being decoded and written to the file named "./Unknown.jpeg".
+ If you do not want this data, you probably should delete that file.
+ Wrote file ./Unknown.jpeg
+

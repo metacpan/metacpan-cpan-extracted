@@ -9,22 +9,8 @@ my %all_fields = $m->request_args;
 % if ($field =~ /CustomField-(\d+)/) {
 % my $id = $1;
 %$cf->Load($id);
-<div class="form-row">
-  <div class="col-3 label"><%$cf->Name%></div>
-  <div class="col-9 value">
-    <span class="current-value">
-      <% ref ($all_fields{$field}) ? join(', ',@{$all_fields{$field}}) : $all_fields{$field}%>
-    </span>
-  </div>
-</div>
+<& /Elements/LabeledValue, Label => $cf->Name, ValueSpanClass => 'current-value', Value => ref ($all_fields{$field}) ? join(', ',@{$all_fields{$field}}) : $all_fields{$field} &>
 % } elsif (RT::Extension::FormTools::is_core_field($field)) {
-<div class="form-row">
-  <div class="col-3 label"><%$field%></div>
-  <div class="col-9 value">
-    <span class="current-value">
-      <% $all_fields{$field} %>
-    </span>
-  </div>
-</div>
+<& /Elements/LabeledValue, Label => loc("Content"), ValueSpanClass => 'current-value', Value => $all_fields{$field} &>
 %}
 % }

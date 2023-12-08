@@ -1,6 +1,11 @@
 Revision history for Net::DNS::Multicast.
 
 
+**** 1.00  Nov 30, 2023
+
+	Stable version for general consumption.
+
+	
 **** 0.10  Nov 25, 2023
 
 	Code minimisation and general tidy up.

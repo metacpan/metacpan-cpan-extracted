@@ -44,6 +44,7 @@ sub _api_request_p {
 		GET => 'get_req_p',
 		PUT => 'put_req_p',
 		POST => 'post_req_p',
+		DELETE => 'delete_req_p',
 	}->{ uc( $method // '' ) }
 		or die "method $method not suported for api_request_p"
 	;

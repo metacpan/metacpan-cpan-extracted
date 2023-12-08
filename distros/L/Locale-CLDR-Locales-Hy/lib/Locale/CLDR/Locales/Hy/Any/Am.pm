@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Hy::Any::Am - Package for language Armenian
 
 package Locale::CLDR::Locales::Hy::Any::Am;
 # This file auto generated from Data\common\main\hy_AM.xml
-#	on Sat  4 Nov  6:06:57 pm GMT
+#	on Tue  5 Dec  1:14:57 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

@@ -4,7 +4,7 @@ use parent qw(Alien::Base);
 use strict;
 use warnings;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 1;
 
@@ -36,7 +36,7 @@ Alien::DjVuLibre - Find or download and install DjVuLibre.
 
 Some packages insist on using DjVuLibre library.
 
-This package detect system DjvuLibre library or install own.
+This package detect system DjVuLibre library or install own.
 
 =head1 SUBROUTINES/METHODS
 
@@ -47,6 +47,8 @@ All methods are inherited from L<Alien::Base>.
 Not yet.
 
 =head1 EXAMPLE
+
+=for comment filename=alien_djvulibre_variables.pl
 
  use strict;
  use warnings;
@@ -88,12 +90,12 @@ Zakariyya Mughal L<mailto:zaki.mughal@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2022 Michal Josef Špaček
+© 2022-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

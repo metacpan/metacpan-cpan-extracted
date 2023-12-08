@@ -1,0 +1,28 @@
+---
+abstract: 'YAML-enhanced TAP output for your tests'
+author:
+  - 'Jose D. Gomez R. <1josegomezr@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302087'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test2-Formatter-YAMLEnhancedTAP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  TAP::Harness: '3.12'
+  perl: '5.016000'
+resources:
+  bugtracker: https://github.com/josegomezr/Test2-Formatter-YAMLEnhancedTAP/issues
+  repository: https://github.com/josegomezr/Test2-Formatter-YAMLEnhancedTAP.git
+version: v0.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

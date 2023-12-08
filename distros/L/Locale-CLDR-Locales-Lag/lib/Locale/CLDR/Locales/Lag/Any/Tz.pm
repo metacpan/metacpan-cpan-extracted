@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Lag::Any::Tz - Package for language Langi
 
 package Locale::CLDR::Locales::Lag::Any::Tz;
 # This file auto generated from Data\common\main\lag_TZ.xml
-#	on Sat  4 Nov  6:11:29 pm GMT
+#	on Tue  5 Dec  1:19:27 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

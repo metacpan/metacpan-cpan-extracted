@@ -23,7 +23,7 @@ sub run
     my $output_fn;
 
     GetOptions( "output|o=s" => \$output_fn, )
-        or die "errror in cmdline args: $!";
+        or die "error in cmdline args: $!";
 
     if ( !defined($output_fn) )
     {
@@ -31,7 +31,15 @@ sub run
     }
     my $adoc = Pod::AsciiDoctor->new();
     $adoc->parse_from_filehandle( path( shift @ARGV )->openr() );
-    path($output_fn)->spew_utf8( $adoc->adoc() );
+    my $USE_STDOUT = ( $output_fn eq '-' );
+    if ($USE_STDOUT)
+    {
+        print $adoc->adoc();
+    }
+    else
+    {
+        path($output_fn)->spew_utf8( $adoc->adoc() );
+    }
 
     exit(0);
 }
@@ -52,7 +60,7 @@ XML::Grammar::Screenplay::App::FromProto
 
 =head1 VERSION
 
-version 0.102000
+version 0.102001
 
 =head1 VERSION
 

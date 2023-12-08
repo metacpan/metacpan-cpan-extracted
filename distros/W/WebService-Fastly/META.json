@@ -4,7 +4,7 @@
       "Fastly Inc., oss@fastly.com"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Milla version v1.0.22, Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -59,7 +59,7 @@
          "web" : "https://github.com/fastly/fastly-perl"
       }
    },
-   "version" : "5.05",
+   "version" : "6.00",
    "x_generated_by_perl" : "v5.34.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "MIT",

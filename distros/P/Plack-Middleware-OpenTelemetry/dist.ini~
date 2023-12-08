@@ -1,0 +1,38 @@
+name             = Plack-Middleware-OpenTelemetry
+author           = Ask Bjoern Hansen
+license          = MIT
+copyright_holder = Ask Bjoern Hansen
+
+[@Filter]
+bundle = @Basic
+remove = Readme
+
+[AutoVersion]
+major = 0
+
+[PkgVersion]
+[PodVersion]
+
+[Prereqs]
+Plack              = 1.0050
+parent             = 0.223
+OpenTelemetry      = 0.018
+OpenTelemetry::SDK = 0.020
+
+[NextRelease]
+format = %v -- %{EEE MMM dd HH:mm:ss VVV yyyy}d
+
+[MetaJSON]
+[MetaResources]
+repository.url    = git://github.com/abh/Plack-Middleware-OpenTelemetry.git
+repository.web    = http://github.com/abh/Plack-Middleware-OpenTelemetry
+repository.type   = git
+
+
+[Signature]
+
+[@Git]
+
+[Repository]
+[Bugtracker]
+web = http://github.com/abh/Plack-Middleware-OpenTelemetry/issues

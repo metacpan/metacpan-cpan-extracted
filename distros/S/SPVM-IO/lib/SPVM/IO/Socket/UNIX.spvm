@@ -1,0 +1,93 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class IO::Socket::UNIX extends IO::Socket {
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::Util;
+  use Array;
+  
+  has Local : string;
+  has Peer : string;
+  
+  static method new : IO::Socket::UNIX ($options : object[] = undef) {
+    
+    my $self = new IO::Socket::UNIX;
+    
+    $self->SUPER::init($options);
+    
+    return $self;
+  }
+  
+  # Instance Methods
+  method new_from_instance : IO::Socket::UNIX ($options : object[] = undef) {
+    return IO::Socket::UNIX->new($options);
+  }
+  
+  method option_names : string[] () {
+    
+    my $option_names = Array->merge_string(
+      $self->SUPER::option_names,
+      [
+        "Local",
+        "Peer",
+      ]
+    );
+    
+    return $option_names;
+  }
+  
+  protected method configure : void ($options : object[] = undef) {
+    
+    my $options_h = Hash->new($options);
+    
+    my $domain = $options_h->delete_or_default_int("Domain", SOCKET->AF_UNIX);
+    
+    my $type = $options_h->delete_or_default_int("Type", SOCKET->SOCK_STREAM);
+    
+    if($options_h->exists("Blocking")) {
+      my $blocking = $options_h->get_int("Blocking");
+      $options_h->delete("Blocking");
+      $self->set_blocking($blocking);
+    }
+    
+    my $protocol = 0;
+    $self->socket($domain, $type, $protocol);
+    
+    my $local = $options_h->delete_or_default_string("Local", undef);
+    
+    if ($local) {
+      my $sockaddr_un_local = Sys::Socket::Util->sockaddr_un($local);
+      $self->bind($sockaddr_un_local);
+    }
+    
+    my $peer = $options_h->delete_or_default_string("Peer", undef);
+    
+    if ($options_h->exists("Listen") && $type != SOCKET->SOCK_DGRAM) {
+      my $listen = $options_h->delete_or_default_int("Listen", 5);
+      $self->listen($listen);
+    }
+    elsif ($peer) {
+      my $sockaddr_un_peer = Sys::Socket::Util->sockaddr_un($peer);
+      $self->connect($sockaddr_un_peer);
+    }
+    
+    $options_h->delete("Listen");
+    
+  }
+  
+  method hostpath : string () {
+    my $sock_sockaddr_un = (Sys::Socket::Sockaddr::Un)$self->sockname;
+    
+    my $hostpath = $sock_sockaddr_un->sun_path;
+    
+    return $hostpath;
+  }
+  
+  method peerpath : string () {
+    my $peer_sockaddr_un = (Sys::Socket::Sockaddr::Un)$self->peername;
+    
+    my $peerpath = $peer_sockaddr_un->sun_path;
+    
+    return $peerpath;
+  }
+}

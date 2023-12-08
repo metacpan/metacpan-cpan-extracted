@@ -1,5 +1,8 @@
 Revision history for Syntax-Construct
 
+1.034   2023-11-30
+        - Perl 5.38.2 released
+
 1.033   2023-07-05
         - Perl 5.38.0 released
 

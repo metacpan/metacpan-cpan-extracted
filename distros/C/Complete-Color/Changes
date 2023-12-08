@@ -1,0 +1,16 @@
+0.003   2023-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add completion summary for color name: RGB code + summary
+          from module (scheme name).
+
+
+0.002   2023-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: complete_color_rgb24_hexcode().
+
+        - [ux] Add completion summary.
+
+
+0.001   2023-11-30  Released-By: PERLANCAR
+
+        - First release.

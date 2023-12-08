@@ -3,7 +3,7 @@ package Database::Async::Engine::PostgreSQL::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '1.002'; # VERSION
+our $VERSION = '1.003'; # VERSION
 
 =head1 NAME
 
@@ -112,6 +112,8 @@ sub create_type {
                                 is_builtin => $_->type->is_builtin,
                             },
                             nullable => $_->nullable,
+                            default => $_->default,
+                            attributes => $_->attributes,
                         }
                     } $type->fields)
             ]) : ())
@@ -136,7 +138,7 @@ create domain "[% type.schema %]"."[% type.name %]" as [% type.basis %]
 [%  CASE 'composite' -%]
 create type "[% type.schema %]"."[% type.name %]" as (
 [% FOREACH field IN type.fields -%]
-    "[% field.name %]" [% IF field.type.schema %]"[% field.type.schema.name %]".[% END %][% IF field.type.is_builtin; field.type.name; ELSE %]"[% field.type.name %]"[% END %][% IF !field.nullable %] not null[% END %][% UNLESS loop.last %],[% END %]
+    "[% field.name %]" [% IF field.type.schema %]"[% field.type.schema.name %]".[% END %][% IF field.type.is_builtin; field.type.name; ELSE %]"[% field.type.name %]"[% END %][% IF !field.nullable %] not null[% END %][% IF field.default.size %] default [% field.default %][% END %][% UNLESS loop.last %],[% END %]
 [% END -%]
 )
 [% END -%]
@@ -217,6 +219,8 @@ sub create_table {
                             is_builtin => $_->type->is_builtin,
                         },
                         nullable => $_->nullable,
+                        attributes => $_->attributes,
+                        default => $_->default,
                     }
                 } $tbl->fields)
             ]
@@ -230,7 +234,7 @@ sub create_table {
 [% END -%]
 create [% IF table.temporary %]temporary [% END %][% IF table.unlogged %]unlogged [% END %]table if not exists "[% table.schema %]"."[% table.name %]" (
 [% FOREACH field IN table.fields -%]
-    "[% field.name %]" [% IF field.type.schema.defined %]"[% field.type.schema %]".[% END %][% IF field.type.is_builtin; field.type.name; ELSE %]"[% field.type.name %]"[% END %][% IF !field.nullable %] not null[% END %][% IF table.primary_keys.size > 0 || !loop.last %],[% END %]
+    "[% field.name %]" [% IF field.type.schema.defined %]"[% field.type.schema %]".[% END %][% IF field.type.is_builtin; field.type.name; ELSE %]"[% field.type.name %]"[% END %][% IF field.attributes.size %] [% field.attributes %][% END %][% IF !field.nullable %] not null[% END %][% IF field.default.size %] default [% field.default %][% END %][% IF table.primary_keys.size > 0 || !loop.last %],[% END %]
 [% END -%]
 [% IF table.primary_keys.size -%]
     primary key ([% FOR pk IN table.primary_keys %]"[% pk %]"[% UNLESS loop.last %], [% END %][% END %])

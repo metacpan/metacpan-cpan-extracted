@@ -3,7 +3,7 @@ use 5.22.0;
 no strict; no warnings; no diagnostics;
 use common::sense;
 
-our $VERSION = "0.0.2";
+our $VERSION = "0.0.3";
 
 use Aion::Format qw//;
 use Aion::Format::Json qw//;
@@ -149,14 +149,6 @@ sub LAST_INSERT_ID() {
 	$base->last_insert_id
 }
 
-# Преобразует в строку
-sub _to_str($) {
-	local($_) = @_;
-	s/[\\']/\\$&/g;
-	s/^(.*)\z/'$1'/s;
-	$_
-}
-
 # Преобразует в бинарную строку принятую в MYSQL
 sub _to_hex_str($) {
 	my ($s) = @_;
@@ -201,21 +193,67 @@ sub quote(;$) {
 		):
 	!utf8::is_utf8($k)? (
 		$k =~ /[^\t\n -~]/a ? _to_hex_str($k): #$base->quote($k, DBI::SQL_BINARY):
-			_to_str($k)
+			Aion::Format::to_str($k)
 	):
-	_to_str(_recode_cp1251($k))
+	Aion::Format::to_str(_recode_cp1251($k))
 }
 
-sub query_prepare (@) {
-	my ($query, %param) = @_;
+sub _set_type {
+	my ($type, $x) = @_;
+	if(ref $x eq "ARRAY") {
+		[map _set_type($type, $_), @$x]
+	}
+	elsif(ref $x eq "HASH") {
+		+{ map ($_ => _set_type($type, $type->{$_})), keys %$x }
+	}
+	elsif(ref $type eq "SCALAR") {
+		\_set_type($type, $$x);
+	}
+	elsif($type eq "^") {
+		int $x
+	}
+	elsif($type eq "~") {
+		"$x"
+	}
+	elsif($type eq ".") {
+		$x+1.e-100
+	}
+	else {
+		die "_set_type($type): type does not exist"
+	}
+}
 
-	$query =~ s!^[ \t]*(\w+)>>(.*\n?)!$param{$1}? $2: ""!mge;
-	#$query =~ s!^[ \t]*(\w+)\*>(.*\n?)!$param{$1}? join("", map {  } @{$param{$1}}): ""!mge;
-	$query =~ s!:([a-z_]\w*)! exists $param{$1}? quote($param{$1}): die "The :$1 parameter was not passed."!ige;
+sub _set_params {
+	my ($query, $param) = @_;
 
+	$query =~ s!:([~\.^])?([a-z_]\w*)!
+		exists $param->{$2}? do {
+			my $x = $param->{$2};
+			defined $1 ? quote _set_type($1, $x): quote $x
+		}: die "The :$1 parameter was not passed."!ige;
 	$query
 }
 
+# Делает подстановки
+sub query_prepare (@) {
+	my ($query, %param) = @_;
+
+	$query =~ s!
+		^(?<sep>[\ \t]*) (?<if>\w+)>> [\ \t]* (?<code>.*)
+		| ^(?<sep>[\ \t]*) (?<for>\w+)\*>> [\ \t]* (?<code>.*)
+		| (?<param> : [~\.^]? [a-z_]\w*)
+	!
+		exists $+{if}? ($param{$+{if}}? $+{sep} . _set_params($+{code}, \%param): ""):
+		exists $+{for}? do {
+			my ($sep, $param, $code) = @+{qw/sep for code/};
+			join "\n", map { local $param{'_'} = $_; _set_params("$sep$code", \%param) } @{$param{$param}}
+		}:
+		_set_params($+{param}, \%param)
+	!imgex;
+	$query
+}
+
+# Выполняет sql-запрос
 sub query_do($;$) {
 	my ($query, $columns) = @_;
 	sql_debug query => $query;
@@ -268,6 +306,7 @@ sub query(@) {
 	wantarray && ref $ref? @$ref: $ref;
 }
 
+# Возвращает sth
 sub query_sth(@) {
 	my ($query, %kw) = @_;
 	$query = query_prepare($query, %kw) if @_>1;
@@ -617,7 +656,7 @@ Aion::Query - functional interface for accessing database mysql and mariadb
 
 =head1 VERSION
 
-0.0.2
+0.0.3
 
 =head1 SYNOPSIS
 
@@ -675,7 +714,7 @@ The second problem is placing unicode characters into single-byte encodings, whi
 
 =head2 query ($query, %params)
 
-It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params and .
+It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params.
 
 	query "SELECT * FROM author WHERE name=:name", name => 'Pushkin A.S.' # --> [{id=>1, name=>"Pushkin A.S."}]
 
@@ -684,7 +723,7 @@ It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params and .
 Returns last insert id.
 
 	query "INSERT INTO author (name) VALUES (:name)", name => "Alice"  # -> 1
-	#LAST_INSERT_ID  # -> 3
+	LAST_INSERT_ID  # -> 3
 
 =head2 quote ($scalar)
 
@@ -724,7 +763,31 @@ Quoted scalar for SQL-query.
 
 Replace the parameters in C<$query>. Parameters quotes by the C<quote>.
 
-	query_prepare "INSERT author SET name = :name", name => "Alice"  # => INSERT author SET name = 'Alice'
+	query_prepare "INSERT author SET name IN (:name)", name => ["Alice", 1, 1.0]  # => INSERT author SET name IN ('Alice', 1, 1.0)
+	
+	query_prepare ":x :^x :.x :~x", x => "10"  # => '10' 10 10.0 '10'
+	
+	my $query = query_prepare "SELECT *
+	FROM author
+	    words*>> JOIN word:_
+	WHERE 1
+	    name>> AND name like :name
+	",
+	    name => "%Alice%",
+	    words => [1, 2, 3],
+	;
+	
+	my $res = << 'END';
+	SELECT *
+	FROM author
+	    JOIN word1
+	    JOIN word2
+	    JOIN word3
+	WHERE 1
+	    AND name like '%Alice%'
+	END
+	
+	$query # -> $res
 
 =head2 query_do ($query)
 

@@ -13,6 +13,10 @@ use Test::Lib;
 use My::Util;
 use Data::Dump 'pp';
 
+skip_all(
+    'DSS Servers are flaky; set environment variable TEST_IMAGE_DS9_DSS_T to non-zero to run them' )
+  unless $ENV{TEST_IMAGE_DS9_DSS_T};
+
 my $ds9 = start_up();
 clear( $ds9 );
 

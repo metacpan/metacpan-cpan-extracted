@@ -1,3 +1,9 @@
+0.03 2023-12-04T12:29:09+01:00
+ - Add 'debug' parameter with print of text before change.
+ - Add support for changing year of in pod item, which is verbatim.
+ - Fix parsing and test for it.
+ - Update Module::Install to 1.21 version.
+
 0.02 2023-01-23T18:37:50+01:00
  - Add SEE ALSO section to doc.
  - Use String::UpdateYears helper.

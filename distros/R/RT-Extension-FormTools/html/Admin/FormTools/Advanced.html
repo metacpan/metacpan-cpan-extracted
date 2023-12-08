@@ -1,0 +1,119 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<form action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Advanced.html" name="ModifyFormToolsAdvanced" method="post" enctype="multipart/form-data" class="mx-auto max-width-md">
+  <input type="hidden" class="hidden" name="id" value="<% $id %>" />
+  <&| /Elements/LabeledValue, Label => loc('Name') &>
+    <input name="Description" class="form-control" value="<% $ARGS{Description} // $form_attribute->Description %>"/>
+  </&>
+  <&| /Elements/LabeledValue, Label => loc('Content') &>
+    <textarea class="form-control" rows="30" name="Content"><% $ARGS{Content} || $encoded_content %></textarea>
+  </&>
+
+  <div class="form-row invalid-json hidden">
+    <div class="offset-3 col-9">
+      <div class="alert alert-danger mb-0"><&|/l&>Invalid JSON</&></div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-12">
+      <& /Elements/Submit, Label => loc('Save Changes'), Name => 'Update' &>
+    </div>
+  </div>
+
+</form>
+
+<script type="text/javascript">
+jQuery('form[name=ModifyFormToolsAdvanced] :input[name=Content]').bind('input propertychange', function() {
+    var form = jQuery(this).closest('form');
+    var validate_json = function (str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    };
+    if ( validate_json(jQuery(this).val()) ) {
+        form.find('input[type=submit]').prop('disabled', false);
+        form.find('.invalid-json').addClass('hidden');
+    }
+    else {
+        form.find('input[type=submit]').prop('disabled', true);
+        form.find('.invalid-json').removeClass('hidden');
+    }
+});
+</script>
+
+<%INIT>
+Abort("No form id found") unless $id;
+
+my $form_attribute = RT::Attribute->new($session{'CurrentUser'});
+my ($ok, $msg) = $form_attribute->Load($id);
+
+unless ( $ok ) {
+    Abort("Unable to load form with id $id");
+}
+
+my $content = $form_attribute->Content;
+my $encoded_content = JSON::to_json($content, { canonical => 1, pretty => 1 } );
+
+my ($title, @results);
+$title = loc("Modify form [_1]", $form_attribute->Description);
+
+if ( $Update ) {
+    Abort( loc('Permission Denied') )
+        unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
+
+    if ( $ARGS{Description} ) {
+
+        if ( $ARGS{Description} ne $form_attribute->Description ) {
+            my $attr = RT::Attribute->new( RT->SystemUser );
+            my ($ret) = $attr->LoadByCols( Name => 'FormTools Form', Description => $ARGS{Description} );
+            if ($ret) {
+                push @results, loc( 'Name [_1] already exists', $ARGS{Description} );
+            }
+            else {
+                my ( $ret, $msg ) = $form_attribute->SetDescription( $ARGS{Description} );
+                if ($ret) {
+                    push @results, loc('Updated name');
+                }
+                else {
+                    push @results, loc( "Couldn't update name: [_1]", $msg );
+                }
+            }
+        }
+    }
+    else {
+        push @results, loc('Missing Name');
+    }
+
+    my $new_content = eval { JSON::from_json( $ARGS{Content} ) };
+    if ( $@ ) {
+        push @results, loc( "Couldn't decode JSON" );
+    }
+    # because of different line endings, $encoded_content and submitted
+    # $ARGS{Content} could differ even user doesn't change any thing.
+    elsif ( $form_attribute->_SerializeContent($new_content) ne $form_attribute->_SerializeContent($content) ) {
+        my ( $ret, $msg ) = $form_attribute->SetContent($new_content);
+        if ($ret) {
+            push @results, loc('Updated content');
+        }
+        else {
+            push @results, loc( "Couldn't update content: [_1]", $msg );
+        }
+    }
+
+    MaybeRedirectForResults(
+        Actions   => \@results,
+        Path      => '/Admin/FormTools/Advanced.html',
+        Arguments => { id => $id, Content => $ARGS{Content} },
+    );
+}
+</%INIT>
+<%ARGS>
+$id     => undef
+$Update => undef
+</%ARGS>

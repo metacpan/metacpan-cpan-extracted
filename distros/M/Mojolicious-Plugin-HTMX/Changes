@@ -1,5 +1,8 @@
 Revision history for Perl extension Mojolicious::Plugin::HTMX.
 
+1.02 2023-12-07
+    - Added support for list of events (ARRAY) in HX-Trigger header (htmx 1.9.4)
+
 1.01 2023-09-17
     - Added support for HX-Reselect header (htmx 1.9.3)
       (#1 PR)

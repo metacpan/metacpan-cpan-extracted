@@ -4,19 +4,19 @@ use base qw(Exporter);
 use strict;
 use warnings;
 
+use Alien::DjVuLibre;
 use Error::Pure qw(err);
-use File::Which qw(which);
+use File::Spec::Functions qw(catfile);
 
 Readonly::Array our @EXPORT_OK => qw(detect_djvu_chunk detect_djvu_file);
 
-our $VERSION = 0.03;
+our $VERSION = 0.05;
 
 sub detect_djvu_chunk {
 	my ($file, $chunk_name) = @_;
 
-	# TODO Rewrite to better method.
-	my $djvudump = which('djvudump');
-	if (! $djvudump) {
+	my $djvudump = catfile(Alien::DjVuLibre->bin_dir, 'djvudump');
+	if (! -e $djvudump) {
 		err "Program 'djvudump' doesn't exists.";
 	}
 
@@ -101,6 +101,8 @@ Returns 1/0.
 
 =head1 EXAMPLE1
 
+=for comment filename=detect_djvu_file_on_djvu.pl
+
  use strict;
  use warnings;
 
@@ -131,9 +133,11 @@ Returns 1/0.
  }
 
  # Output like:
- # File '%s' isn't DjVu file.
+ # File '%s' is DjVu file.
 
 =head1 EXAMPLE2
+
+=for comment filename=detect_djvu_file.pl
 
  use strict;
  use warnings;
@@ -162,9 +166,10 @@ Returns 1/0.
 
 =head1 DEPENDENCIES
 
+L<Alien::DjVuLibre>,
 L<Error::Pure>,
 L<Exporter>,
-L<File::Which>.
+L<File::Spec::Functions>.
 
 =head1 SEE ALSO
 
@@ -193,12 +198,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2021 Michal Josef Špaček
+© 2021-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.05
 
 =cut

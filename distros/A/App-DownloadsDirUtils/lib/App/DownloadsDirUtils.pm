@@ -6,14 +6,14 @@ use warnings;
 use Log::ger;
 
 use Exporter 'import';
-use App::FileSortUtils;
+use File::Util::Sort;
 use Perinci::Object;
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-16'; # DATE
+our $DATE = '2023-12-08'; # DATE
 our $DIST = 'App-DownloadsDirUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -58,7 +58,7 @@ excluding partial downloads (`*.part` files).
 
 MARKDOWN
         output_name => __PACKAGE__ . "::${which}_download",
-        base_name   => "App::FileSortUtils::$which",
+        base_name   => "File::Util::Sort::$which",
         modify_args => {
             dirs => sub {
                 my $arg_spec = shift;
@@ -74,7 +74,7 @@ MARKDOWN
             my %args = @_;
             $args{dirs} //= scalar list_downloads_dirs();
             $args{exclude_filename_pattern} //= qr/\.part\z/;
-            &{"App::FileSortUtils::$which"}(%args);
+            &{"File::Util::Sort::$which"}(%args);
         },
     );
     die "Can't generate ${which}_download(): $res->[0] - $res->[1]"
@@ -84,7 +84,7 @@ MARKDOWN
         summary => "Move the $which file(s) from the downloads directories to current directory",
         description => <<"MARKDOWN",
 
-This is a thin wrapper for the <prog:${which}_download> utility; the wrapper
+This is a thin wrapper for the <prog:${which}-download> utility; the wrapper
 moves the files to current directory. It hopes to be a convenient helper to
 organize your downloads.
 
@@ -95,6 +95,14 @@ MARKDOWN
             to_dir => {
                 schema => 'dirname*',
                 default => '.',
+            },
+            overwrite => {
+                schema => 'true*',
+                cmdline_aliases => {O=>{}},
+            },
+            as => {
+                summary => 'Rename file',
+                schema => 'pathname::unix::basename*',
             },
         },
         modify_meta => sub {
@@ -118,12 +126,15 @@ MARKDOWN
             my $i = 0;
             for my $file (@{ $res->[2] }) {
                 $i++;
-                if ($args{-dry_run}) {
-                    log_info "DRY-RUN: [%d/%d] Moving %s to %s ...", $i, scalar(@{ $res->[2] }), $file, $to_dir;
+                my $targetpath = $to_dir . '/' . ($args{as} // $file);
+                if (-e $targetpath && !$args{overwrite}) {
+                    $envres->add_result(409, "File already exist '$targetpath', please choose another name or specify -O to overwrite", {item_id=>$file});
+                } elsif ($args{-dry_run}) {
+                    log_info "DRY-RUN: [%d/%d] Moving %s to %s ...", $i, scalar(@{ $res->[2] }), $file, $targetpath;
                     $envres->add_result(200, "OK (dry-run)", {item_id=>$file});
                 } else {
-                    log_info "[%d/%d] Moving %s to %s ...", $i, scalar(@{ $res->[2] }), $file, $to_dir;
-                    my $ok = File::Copy::Recursive::rmove($file, $to_dir);
+                    log_info "[%d/%d] Moving %s to %s ...", $i, scalar(@{ $res->[2] }), $file, $targetpath;
+                    my $ok = File::Copy::Recursive::rmove($file, $targetpath);
                     if ($ok) {
                         $envres->add_result(200, "OK", {item_id=>$file});
                     } else {
@@ -153,7 +164,7 @@ App::DownloadsDirUtils - Utilities related to downloads directories
 
 =head1 VERSION
 
-This document describes version 0.003 of App::DownloadsDirUtils (from Perl distribution App-DownloadsDirUtils), released on 2023-11-16.
+This document describes version 0.006 of App::DownloadsDirUtils (from Perl distribution App-DownloadsDirUtils), released on 2023-12-08.
 
 =head1 DESCRIPTION
 
@@ -455,7 +466,7 @@ Usage:
 
 Move the foremost file(s) from the downloads directories to current directory.
 
-This is a thin wrapper for the L<foremost_download> utility; the wrapper
+This is a thin wrapper for the L<foremost-download> utility; the wrapper
 moves the files to current directory. It hopes to be a convenient helper to
 organize your downloads.
 
@@ -471,6 +482,10 @@ Arguments ('*' denotes required arguments):
 =item * B<all> => I<true>
 
 Do not ignore entries starting with .
+
+=item * B<as> => I<pathname::unix::basename>
+
+Rename file.
 
 =item * B<detail> => I<true>
 
@@ -506,6 +521,10 @@ will be returned because are they both rank #1.
 =item * B<num_results> => I<uint>
 
 Number of results to return.
+
+=item * B<overwrite> => I<true>
+
+(No description)
 
 =item * B<recursive> => I<true>
 
@@ -553,7 +572,7 @@ Usage:
 
 Move the hindmost file(s) from the downloads directories to current directory.
 
-This is a thin wrapper for the L<hindmost_download> utility; the wrapper
+This is a thin wrapper for the L<hindmost-download> utility; the wrapper
 moves the files to current directory. It hopes to be a convenient helper to
 organize your downloads.
 
@@ -569,6 +588,10 @@ Arguments ('*' denotes required arguments):
 =item * B<all> => I<true>
 
 Do not ignore entries starting with .
+
+=item * B<as> => I<pathname::unix::basename>
+
+Rename file.
 
 =item * B<detail> => I<true>
 
@@ -604,6 +627,10 @@ will be returned because are they both rank #1.
 =item * B<num_results> => I<uint>
 
 Number of results to return.
+
+=item * B<overwrite> => I<true>
+
+(No description)
 
 =item * B<recursive> => I<true>
 
@@ -651,7 +678,7 @@ Usage:
 
 Move the largest file(s) from the downloads directories to current directory.
 
-This is a thin wrapper for the L<largest_download> utility; the wrapper
+This is a thin wrapper for the L<largest-download> utility; the wrapper
 moves the files to current directory. It hopes to be a convenient helper to
 organize your downloads.
 
@@ -667,6 +694,10 @@ Arguments ('*' denotes required arguments):
 =item * B<all> => I<true>
 
 Do not ignore entries starting with .
+
+=item * B<as> => I<pathname::unix::basename>
+
+Rename file.
 
 =item * B<detail> => I<true>
 
@@ -698,6 +729,10 @@ will be returned because are they both rank #1.
 =item * B<num_results> => I<uint>
 
 Number of results to return.
+
+=item * B<overwrite> => I<true>
+
+(No description)
 
 =item * B<recursive> => I<true>
 
@@ -745,7 +780,7 @@ Usage:
 
 Move the newest file(s) from the downloads directories to current directory.
 
-This is a thin wrapper for the L<newest_download> utility; the wrapper
+This is a thin wrapper for the L<newest-download> utility; the wrapper
 moves the files to current directory. It hopes to be a convenient helper to
 organize your downloads.
 
@@ -761,6 +796,10 @@ Arguments ('*' denotes required arguments):
 =item * B<all> => I<true>
 
 Do not ignore entries starting with .
+
+=item * B<as> => I<pathname::unix::basename>
+
+Rename file.
 
 =item * B<detail> => I<true>
 
@@ -792,6 +831,10 @@ will be returned because are they both rank #1.
 =item * B<num_results> => I<uint>
 
 Number of results to return.
+
+=item * B<overwrite> => I<true>
+
+(No description)
 
 =item * B<recursive> => I<true>
 
@@ -839,7 +882,7 @@ Usage:
 
 Move the oldest file(s) from the downloads directories to current directory.
 
-This is a thin wrapper for the L<oldest_download> utility; the wrapper
+This is a thin wrapper for the L<oldest-download> utility; the wrapper
 moves the files to current directory. It hopes to be a convenient helper to
 organize your downloads.
 
@@ -855,6 +898,10 @@ Arguments ('*' denotes required arguments):
 =item * B<all> => I<true>
 
 Do not ignore entries starting with .
+
+=item * B<as> => I<pathname::unix::basename>
+
+Rename file.
 
 =item * B<detail> => I<true>
 
@@ -886,6 +933,10 @@ will be returned because are they both rank #1.
 =item * B<num_results> => I<uint>
 
 Number of results to return.
+
+=item * B<overwrite> => I<true>
+
+(No description)
 
 =item * B<recursive> => I<true>
 
@@ -933,7 +984,7 @@ Usage:
 
 Move the smallest file(s) from the downloads directories to current directory.
 
-This is a thin wrapper for the L<smallest_download> utility; the wrapper
+This is a thin wrapper for the L<smallest-download> utility; the wrapper
 moves the files to current directory. It hopes to be a convenient helper to
 organize your downloads.
 
@@ -949,6 +1000,10 @@ Arguments ('*' denotes required arguments):
 =item * B<all> => I<true>
 
 Do not ignore entries starting with .
+
+=item * B<as> => I<pathname::unix::basename>
+
+Rename file.
 
 =item * B<detail> => I<true>
 
@@ -980,6 +1035,10 @@ will be returned because are they both rank #1.
 =item * B<num_results> => I<uint>
 
 Number of results to return.
+
+=item * B<overwrite> => I<true>
+
+(No description)
 
 =item * B<recursive> => I<true>
 

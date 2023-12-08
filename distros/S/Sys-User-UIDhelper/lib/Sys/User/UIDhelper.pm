@@ -5,30 +5,27 @@ use strict;
 
 =head1 NAME
 
-Sys::User::UIDhelper - Helps for locating free UIDs.
+Sys::User::UIDhelper - Helps for locating free UIDs using getpwuid.
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.1.0
 
 =cut
 
-our $VERSION = '0.0.1';
-
+our $VERSION = '0.1.0';
 
 =head1 SYNOPSIS
 
-This finds a 
-
     use Sys::User::UIDhelper;
 
-    #implements it with the default values
+    # invokes it with the default values
     my $foo = Sys::User::UIDhelper->new();
 
-    #sets the min to 0 and the max to 4000
-    my $foo = Sys::User::UIDhelper->new({max=>'0', min=>'4000'});
+    # sets the min to 2000 and the max to 4000
+    my $foo = Sys::User::UIDhelper->new(min=>2000, max=>4000);
 
-    #finds the first free one
+    # finds the first free one
     my $first = $foo->firstfree();
     if(defined($first)){
         print $first."\n";
@@ -36,7 +33,7 @@ This finds a
         print "not found\n";
     }
 
-    #finds the first last one
+    # finds the last free one
     my $last = $foo->lastfree();
     if(defined($last)){
         print $last."\n";
@@ -45,118 +42,121 @@ This finds a
     }
 
 
-=head1 EXPORT
-
-
-=head1 FUNCTIONS
+=head1 METHODS
 
 =head2 new
 
-This initiates the module. It accepts one arguement, a hash. Please See below
-for accepted values.
+This initiates the module. The following args are accepted.
 
-=head3 min
+    - min :: The UID to start with.
+        - Default :: 1000
 
-The minimum UID.
+    - max :: The last UID in the range to check for.
+        - Default :: 131068
 
-=head3 max
+The following is a example showing showing a new instance being created
+that will start at 2000 and search up to 4000.
 
-The maximum UID.
+    my $foo = Sys::User::UIDhelper->new(min=>2000, max=>4000);
+
+If any of the args are non-integers or min is greater than max, it will error.
 
 =cut
 
 sub new {
-	my %args;
-	if(defined($_[1])){
-		%args= %{$_[1]};
-	};
+	my ( $blank, %args ) = @_;
 
-	my $self={error=>undef, set=>undef};
+	if ( !defined( $args{max} ) ) {
+		$args{max} = 131068;
+	}
+	# this is choosen as on most systems 1000 is the general base for new
+	if ( !defined( $args{min} ) ) {
+		$args{min} = 1000;
+	}
+
+	# max sure the values we got passed are sane
+	if ( $args{min} >= $args{max} ) {
+		die( 'min, ' . $args{min} . ', is equal to or greater than max, ' . $args{max} . ',' );
+	} elsif ( $args{min} !~ /^[0-9]+$/ ) {
+		die( 'min, "' . $args{min} . '", is not numeric' );
+	} elsif ( $args{max} !~ /^[0-9]+$/ ) {
+		die( 'min, "' . $args{max} . '", is not numeric' );
+	}
+
+	my $self = {
+		max => $args{max},
+		min => $args{min},
+	};
 	bless $self;
 
-	#set default max
-	#this number is based on FreeBSD
-	$self->{max}=32767;
-	if (defined($args{max})) {
-		$self->{max}=$args{max};
-	}
-
-	#this is choosen as on most systems 1000 is the general base for
-	#new users
-	$self->{min}=1000;
-	if (defined($args{min})) {
-		$self->{min}=$args{min};
-	}
-
 	return $self;
-}
+} ## end sub new
 
-=head2 firstfree
+=head2 first_free
 
 This finds the first free UID. If it returns undef, no free ones were found.
 
 =cut
 
-sub firstfree {
-	my $self=$_[0];
-	
-	my $int=$self->{min};
-	while ( $int <= $self->{max}) {
-		if (!getpwuid($int)) {
-			return $int
+sub first_free {
+	my $self = $_[0];
+
+	my $int = $self->{min};
+	while ( $int <= $self->{max} ) {
+		if ( !getpwuid($int) ) {
+			return $int;
 		}
 
 		$int++;
 	}
 
 	return undef;
+} ## end sub first_free
+
+=head2 firstfree
+
+An alias of firstfree to remain compatible with v. 0.0.1.
+
+=cut
+
+sub firstfree {
+	return $_[0]->first_free;
 }
 
-=head2 lastfree
+=head2 last_free
 
 This finds the first last UID. If it returns undef, no free ones were found.
 
 =cut
 
-sub lastfree {
-	my $self=$_[0];
+sub last_free {
+	my $self = $_[0];
 
-	my $int=$self->{max};
-	while ( $int >= $self->{min}) {
-		if (!getpwuid($int)) {
-			return $int
+	my $int = $self->{max};
+	while ( $int >= $self->{min} ) {
+		if ( !getpwuid($int) ) {
+			return $int;
 		}
 
 		$int--;
 	}
 
 	return undef;
+} ## end sub last_free
+
+=head2 lastfree
+
+An alias of lastfree to remain compatible with v. 0.0.1.
+
+=cut
+
+sub lastfree {
+	return $_[0]->last_free;
 }
-
-#=head2 errorBlank
-#
-#A internal function user for clearing an error.
-#
-#=cut
-#
-#blanks the error flags
-#sub errorBlank{
-#	my $self=$_[0];
-#
-#	#error handling
-#	$self->{error}=undef;
-#	$self->{errorString}="";
-#
-#	return 1;
-#};
-
-=head1 Todo
-
-Implement various backends for system, LDAP, and passwd.
 
 =head1 AUTHOR
 
-Zane C. Bowers, C<< <vvelox at vvelox.net> >>
+Zane C. Bowers-Hadley, C<< <vvelox at vvelox.net> >>
 
 =head1 BUGS
 
@@ -182,17 +182,9 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Sys-User-UIDhelper>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Sys-User-UIDhelper>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Sys-User-UIDhelper>
-
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Sys-User-UIDhelper>
+L<https://metacpan.org/pod/Sys::User::UIDhelper>
 
 =back
 
@@ -202,7 +194,7 @@ L<http://search.cpan.org/dist/Sys-User-UIDhelper>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Zane C. Bowers, all rights reserved.
+Copyright 2023 Zane C. Bowers-Hadley, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
@@ -210,4 +202,4 @@ under the same terms as Perl itself.
 
 =cut
 
-1; # End of Sys::User::UIDhelper
+1;    # End of Sys::User::UIDhelper

@@ -16,6 +16,7 @@ logger_format: '[%P] %U %L %m'
 include_paths:  []
 template_paths: []
 site_local_files: false
+database: {}
 external_databases: []
 tenant_databases: []
 
@@ -126,21 +127,22 @@ sidebar_defaults:
     c_name:         { label: 'Name', default: checked, idx: 7 }
     c_tags:         { label: 'Tags', default: null, idx: 8 }
     c_speed_admin:  { label: 'Speed (configured)', default: null, idx: 9 }
-    c_speed:        { label: 'Speed (running)', default: null, idx: 10 }
-    c_duplex_admin: { label: 'Duplex (configured)', default: null, idx: 11 }
-    c_duplex:       { label: 'Duplex (running)', default: null, idx: 12 }
-    c_error:        { label: 'Error Message', default: null, idx: 13 }
-    c_mac:          { label: 'Port MAC', default: null, idx: 14 }
-    c_mtu:          { label: 'MTU', default: null, idx: 15 }
-    c_pvid:         { label: 'Native VLAN', default: checked, idx: 16 }
-    c_vmember:      { label: 'VLAN Membership', default: checked, idx: 17 }
-    c_power:        { label: 'PoE', default: null, idx: 18 }
-    c_ssid:         { label: 'SSID', default: null, idx: 19 }
-    c_nac_summary:  { label: 'NAC/802.1X Status', default: null, idx: 20 }
-    c_nodes:        { label: 'Connected Nodes', default: null, idx: 21 }
-    c_neighbors:    { label: 'Connected Devices', default: checked, idx: 22 }
-    c_stp:          { label: 'Spanning Tree', default: null, idx: 23 }
-    c_up:           { label: 'Up/Down Status', default: null, idx: 24 }
+    c_links:        { label: 'External Links', default: checked, idx: 10 }
+    c_speed:        { label: 'Speed (running)', default: null, idx: 11 }
+    c_duplex_admin: { label: 'Duplex (configured)', default: null, idx: 12 }
+    c_duplex:       { label: 'Duplex (running)', default: null, idx: 13 }
+    c_error:        { label: 'Error Message', default: null, idx: 14 }
+    c_mac:          { label: 'Port MAC', default: null, idx: 15 }
+    c_mtu:          { label: 'MTU', default: null, idx: 16 }
+    c_pvid:         { label: 'Native VLAN', default: checked, idx: 17 }
+    c_vmember:      { label: 'VLAN Membership', default: checked, idx: 18 }
+    c_power:        { label: 'PoE', default: null, idx: 19 }
+    c_ssid:         { label: 'SSID', default: null, idx: 20 }
+    c_nac_summary:  { label: 'NAC/802.1X Status', default: null, idx: 21 }
+    c_nodes:        { label: 'Connected Nodes', default: null, idx: 22 }
+    c_neighbors:    { label: 'Connected Devices', default: checked, idx: 23 }
+    c_stp:          { label: 'Spanning Tree', default: null, idx: 24 }
+    c_up:           { label: 'Up/Down Status', default: null, idx: 25 }
     mac_format:     { default: IEEE }
     n_inventory:    { label: 'Remote Inventory', default: checked, idx: 0 }
     n_detailed_inventory: { label: 'Remote Advertisement', default: null, idx: 1 }
@@ -171,17 +173,17 @@ sidebar_defaults:
     age_num:      { default: 3 }
     age_unit:     { default: months }
 device_port_col_idx_left: 8
-device_port_col_idx_mid: 20
-device_port_col_idx_right: 24
+device_port_col_idx_mid: 21
+device_port_col_idx_right: 25
 jobqueue_refresh: 5
 safe_password_store: true
 reports: []
 system_reports:
   - tag: portserrordisabled
-    label: 'Error Disabled Ports'
+    label: 'Blocked - Error-Disabled'
     category: Port
     columns:
-      - { ip: Device }
+      - { ip: Device, _searchable: true }
       - { dns: DNS }
       - { port: Port }
       - { name: Description }
@@ -242,6 +244,136 @@ system_reports:
         FROM device
         WHERE creation > (LOCALTIMESTAMP - COALESCE(NULLIF(?,''), '2 months')::interval)
         ORDER BY creation DESC
+  - tag: portswithmostvlans
+    category: Port
+    label: 'Ports with the most VLANs'
+    columns:
+      - { ip: 'Device IP', _searchable: true }
+      - { port: 'Port' }
+      - { vlans: 'VLAN Count' }
+    bind_params: ['threshold']
+    query: |
+      SELECT ip, port, count(vlan) AS vlans
+        FROM device_port_vlan
+        GROUP BY ip, port
+        HAVING count(vlan) > COALESCE(NULLIF(?,''), '1') ::integer
+        ORDER BY vlans DESC, ip ASC, port ASC
+  - tag: duplicateprivatenetworks
+    category: IP
+    label: 'Duplicate Private Networks'
+    columns:
+      - { subnet: 'Subnet', _searchable: true }
+      - { count: 'Instances' }
+      - { seen: 'Where Seen', _searchable: true }
+    query: |
+      SELECT subnet, count(subnet), array_agg(host(alias)::text || ' on ' || host(ip)::text) AS seen
+        FROM device_ip
+        WHERE ip <> alias
+          AND (masklen(subnet) <> 32 AND masklen(subnet) <> 128)
+          AND (subnet << '10.0.0.0/8'
+          OR subnet << '172.16.0.0/12'
+          OR subnet << '192.168.0.0/16'
+          OR subnet << '100.64.0.0/10'
+          OR subnet << 'fd00::/8')
+        GROUP BY subnet
+        HAVING count(subnet) > 1
+        ORDER BY subnet
+  - tag: vlansonlyuplinks
+    category: VLAN
+    label: 'VLANs Only On Uplinks'
+    columns:
+      - { ip: 'Device IP', _searchable: true }
+      - { vlans: 'VLAN List' }
+    bind_params: ['chunk_size']
+    query: |
+      SELECT ip, array_agg(vlans) AS vlans FROM (
+        SELECT ip, array_to_string(array_agg(vlan), ', ') AS vlans, (x / COALESCE(NULLIF(?,''), '20') ::integer) AS chunk FROM (
+          SELECT *, (row_number() over (partition by ip)) AS x FROM (
+
+            SELECT DISTINCT ip, vlan
+              FROM device_port_vlan dpv
+              WHERE native IS false
+                AND vlan <> 1
+                AND (
+                  SELECT count(*) FROM device_port_vlan dpv2
+                    WHERE dpv2.ip = dpv.ip
+                     AND dpv2.vlan = dpv.vlan
+                     AND native IS true
+                ) = 0
+            ORDER BY ip, vlan)
+
+        ) GROUP BY ip, chunk
+      ) GROUP BY ip ORDER BY ip
+  - tag: vlansneverconfigured
+    category: VLAN
+    label: 'VLANs Known but Not Configured'
+    columns:
+      - { ip: 'Device IP', _searchable: true }
+      - { vlans: 'VLAN List' }
+    bind_params: ['chunk_size']
+    query: |
+      SELECT ip, array_agg(vlans) AS vlans FROM (
+        SELECT ip, array_to_string(array_agg(vlan), ', ') AS vlans, (x / COALESCE(NULLIF(?,''), '20') ::integer) AS chunk FROM (
+          SELECT *, (row_number() over (partition by ip)) AS x FROM (
+
+            SELECT DISTINCT ip, vlan
+              FROM device_vlan dv
+              WHERE vlan <> 1
+                AND NOT EXISTS (
+                SELECT FROM device_port_vlan dpv
+                  WHERE dpv.ip = dv.ip
+                    AND dpv.vlan = dv.vlan
+                )
+                AND vlan NOT IN (1002, 1003, 1004, 1005)
+              ORDER BY ip, vlan)
+
+        ) GROUP BY ip, chunk
+      ) GROUP BY ip ORDER BY ip
+  - tag: vlansunused
+    category: VLAN
+    label: 'VLANs No Longer Used'
+    columns:
+      - { ip: 'Device IP', _searchable: true }
+      - { vlans: 'VLAN List' }
+    bind_params: ['chunk_size', 'free']
+    query: |
+      SELECT ip, array_agg(vlans) AS vlans FROM (
+        SELECT ip, array_to_string(array_agg(vlan), ', ') AS vlans, (x / COALESCE(NULLIF(?,''), '20') ::integer) AS chunk FROM (
+          SELECT *, (row_number() over (partition by ip)) AS x FROM (
+
+            SELECT DISTINCT ip, vlan
+              FROM device_port_vlan dpv
+              WHERE dpv.native IS false
+                AND dpv.vlan <> 1
+                AND (
+                  SELECT count(*) FROM device_port_vlan dpv2
+                    LEFT JOIN device_port dp USING (ip, port)
+                    LEFT JOIN device d USING (ip)
+                    WHERE dpv2.ip = dpv.ip
+                      AND dpv2.vlan = dpv.vlan
+                      AND native IS true
+                      AND (
+                        dp.up_admin = 'up'
+                        OR age( LOCALTIMESTAMP,
+                                to_timestamp( extract( epoch FROM d.last_discover ) - ( d.uptime - dp.lastchange ) /100 ) ::timestamp )
+                          < COALESCE(NULLIF(?,''), '3 months') ::interval
+                      )
+                ) = 0
+              ORDER BY dpv.ip, dpv.vlan)
+
+        ) GROUP BY ip, chunk
+      ) GROUP BY ip ORDER BY ip
+  - tag: devicevlancount
+    category: VLAN
+    label: 'VLAN Count per Device'
+    columns:
+      - { ip: 'Device IP', _searchable: true }
+      - { vlans: 'VLAN Count' }
+    query: |
+      SELECT ip, count(vlan) AS vlans
+        FROM device_vlan
+        GROUP BY ip
+        ORDER BY vlans DESC
 table_pagesize: 10
 table_showrecordsmenu:
   - [10, 25, 50, 100, '-1']

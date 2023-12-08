@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Sub::Genius::Util ();
 use Getopt::Long      ();
-use Util::H2O qw/h2o/;
+use Util::H2O::More qw/ddd h2o/;
 
 my $VERSION = 1.1;
 
@@ -12,8 +12,6 @@ use constant {
     EXIT_SUCCESS => 0,
     EXIT_ERROR   => 1,
 };
-
-require Data::Dumper;
 
 # maybe switch to App::Cmd later for sub commands,
 # but it's options processing is super tard
@@ -116,16 +114,17 @@ sub run_init {
     h2o $opts;
 
     # no %opts checking here, relying on exceptions from Sub::Genius::Util
-    if ( grep { /$opts->x}/ } (qw/once any all/) ) {
+    my $x = $opts->x;
+    if ( grep { /$x/ } (qw/once any all/) ) {
         print Sub::Genius::Util->subs2perl( q{preplan} => $opts->p, q{prefile} => $opts->f, q{with-run} => $opts->x );
     }
-    elsif ( grep { /$opts->x/ } (qw/nodeps/) ) {
+    elsif ( grep { /$x/ } (qw/nodeps/) ) {
 
         # options validation is done in S::G::Util
         # this method unrolls the preplan into series of sequentially
         # consistent subroutine calls, eliminating the need for Sub::Genius
         # as a dependency in the final code
-        print Sub::Genius::Util->plan2nodeps( preplan => $opts->p, prefile => $opts->f, cachedir => $opts->d );
+        print Sub::Genius::Util->plan2nodeps( preplan => $opts->p, prefile => $opts->f );
     }
     return EXIT_SUCCESS;
 }

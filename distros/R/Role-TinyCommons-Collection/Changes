@@ -1,3 +1,10 @@
+0.009   2023-08-26  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] roles
+          Collection::PickItems::{RandomPos,RandomSeekLines}: forgot to mix
+          in Collection::PickItems.
+
+
 0.008   2021-05-20  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         [Incompatible changes]

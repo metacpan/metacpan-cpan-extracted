@@ -1,6 +1,24 @@
 Revision history for Perl extension App-LXC-Container
 
-0.36 2023-11-27T08:44:17Z
+0.40 2023-12-05T08:52:47Z
+
+0.40 2023-12-05T08:51:59Z
+
+    - removed all temporary diagnostics
+    - fix for wrong debugging output on some smokers
+
+0.39 2023-12-04T07:37:37Z
+
+    - added diagnostic for 'debugging level' problem on some smokers
+
+0.38 2023-11-30T08:10:24Z
+
+    - fix for symbolic link errors in 06-update.t
+    - hopefully fixed last 'dpkg-query' problem on some smokers (another pattern)
+
+0.37 2023-11-29T08:26:04Z
+
+    - fixed 'dpkg-query' problem on some smokers (different SO pattern of libc)
 
 0.36 2023-11-27T08:43:43Z
 

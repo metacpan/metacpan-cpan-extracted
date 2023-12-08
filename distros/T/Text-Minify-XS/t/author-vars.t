@@ -14,4 +14,6 @@ use Test2::V0;
 
 eval "use Test::Vars";
 
+plan skip_all => "Test::Vars not installed" if $@;
+
 all_vars_ok();

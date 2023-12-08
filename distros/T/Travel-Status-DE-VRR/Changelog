@@ -1,3 +1,20 @@
+Travel::Status::DE::VRR 2.00 - Sun Dec 03 2023
+
+    * New dependency: DateTime
+    * Result: Add datetime, sched_datetime, rt_datetime accessors.
+    * Result: Remove date, time, sched_date, sched_time accessors.
+      Use datetime->strftime('%H:%M') etc. instead. (BREAKING CHANGE)
+    * Stop: Add arr, dep accessors.
+    * Stop: Remove arr_date, arr_time, dep_date, dep_time accessors.
+      Use arr->strftime('%d.%m.%Y') etc. instead. (BREAKING CHANGE)
+    * efa-m: Remove --track-via option, its behaviour is now included in --via
+      (BREAKING CHANGE)
+
+Travel::Status::DE::VRR 1.24 - Sat Dec 02 2023
+
+    * EFA: Fix full_route creating route elements with invalid data
+    * efa-m: Fix -v / -V (as a consequence of the fix above)
+
 Travel::Status::DE::VRR 1.23 - Fri Nov 24 2023
 
     * efa-m: Do not show free-text messages by default. Use the newly

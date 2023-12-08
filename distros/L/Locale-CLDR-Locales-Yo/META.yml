@@ -22,19 +22,19 @@ name: Locale-CLDR-Locales-Yo
 provides:
   Locale::CLDR::Locales::Yo:
     file: lib/Locale/CLDR/Locales/Yo.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Locales::Yo::Any:
     file: lib/Locale/CLDR/Locales/Yo/Any.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Locales::Yo::Any::Bj:
     file: lib/Locale/CLDR/Locales/Yo/Any/Bj.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Locales::Yo::Any::Ng:
     file: lib/Locale/CLDR/Locales/Yo/Any/Ng.pm
-    version: v0.34.3
+    version: v0.34.4
 requires:
   DateTime: '0.72'
-  Locale::CLDR: v0.34.3
+  Locale::CLDR: v0.34.4
   Moo: '2'
   MooX::ClassAttribute: '0.011'
   Type::Tiny: '0'
@@ -44,5 +44,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.3
+version: v0.34.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,5 +1,9 @@
 Revision history for Perl extension Unix::Mknod.
 
+0.05  Tue Nov 21 21:19:03 CST 2023
+	- Update Copyright for 2023
+        - Fix compilation on linux thanks to Bruno Diaz brunodiazbriere at gmail
+
 0.04  Sat Dec 22 22:26:48 CST 2007
 	- Update Copyright for 2008
 	- Ignore make test running as non-root, for cpan compilance.

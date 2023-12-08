@@ -1,5 +1,8 @@
 Revision history for Perl module Net::API::REST
 
+v1.2.0 2023-12-04T15:41:23+0900
+    - Added the '_params' property in endpoints definitions accessible as the method 'params' in Net::API::Rest::Endpoint
+
 v1.1.0 2023-11-19T09:03:58+0900
     - Improved code
 

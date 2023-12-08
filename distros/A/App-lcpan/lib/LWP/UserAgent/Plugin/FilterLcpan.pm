@@ -3,15 +3,14 @@ package LWP::UserAgent::Plugin::FilterLcpan;
 use 5.010001;
 use strict;
 use warnings;
-use experimental 'smartmatch';
 use Log::ger;
 
 use HTTP::Response;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-19'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.071'; # VERSION
+our $VERSION = '1.073'; # VERSION
 
 sub before_mirror {
     my ($self, $r) = @_;
@@ -21,7 +20,7 @@ sub before_mirror {
     if ($r->{config}{include_author}) {
         my $ary = ref $r->{config}{include_author} eq 'ARRAY' ?
             $r->{config}{include_author} : [split /;/, $r->{config}{include_author}];
-        if ($url =~ m!authors/id/./../(.+)/! && !($1 ~~ @$ary)) {
+        if ($url =~ m!authors/id/./../(.+)/! && !(grep { $_ eq $1 } @$ary)) {
             say "mirror($url, $filename): author not included, skipping"
                 if $r->{config}{verbose};
             return HTTP::Response->new(304);
@@ -30,7 +29,7 @@ sub before_mirror {
     if ($r->{config}{exclude_author}) {
         my $ary = ref $r->{config}{exclude_author} eq 'ARRAY' ?
             $r->{config}{exclude_author} : [split /;/, $r->{config}{exclude_author}];
-        if ($url =~ m!authors/id/./../(.+)/! && ($1 ~~ @$ary)) {
+        if ($url =~ m!authors/id/./../(.+)/! && (grep { $_ eq $1 } @$ary)) {
             say "mirror($url, $filename): author included, skipping"
                 if $r->{config}{verbose};
             return HTTP::Response->new(304);
@@ -75,7 +74,7 @@ LWP::UserAgent::Plugin::FilterLcpan - Filter mirror() based on some criteria
 
 =head1 VERSION
 
-This document describes version 1.071 of LWP::UserAgent::Plugin::FilterLcpan (from Perl distribution App-lcpan), released on 2022-09-19.
+This document describes version 1.073 of LWP::UserAgent::Plugin::FilterLcpan (from Perl distribution App-lcpan), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -141,7 +140,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

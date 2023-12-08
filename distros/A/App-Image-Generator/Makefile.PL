@@ -24,17 +24,17 @@ requires 'Image::Random' => 0.06;
 requires 'Image::Select' => 0.03;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=App-Image-Generator';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-Image-Generator/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Image-Generator';
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Image-Generator';
+test_requires 'English' => 0;
 test_requires 'File::Object' => 0;
 test_requires 'File::Spec::Functions' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

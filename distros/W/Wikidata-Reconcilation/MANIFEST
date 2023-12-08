@@ -21,5 +21,6 @@ SIGNATURE
 t/Wikidata-Reconcilation/01-use.t
 t/Wikidata-Reconcilation/02-version.t
 t/Wikidata-Reconcilation/03-new.t
+t/Wikidata-Reconcilation/04-reconcile.t
 xt/Wikidata-Reconcilation/01-pod_coverage.t
 xt/Wikidata-Reconcilation/02-pod.t

@@ -37,7 +37,7 @@ package URI::gemini {
 }
 
 package Net::Gemini;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 use strict;
 use warnings;
 use Digest::SHA 'sha256_hex';

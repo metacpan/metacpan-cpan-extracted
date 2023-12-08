@@ -11,9 +11,9 @@ use Exporter;
 use List::Util qw(first);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-19'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.071'; # VERSION
+our $VERSION = '1.073'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -3331,6 +3331,9 @@ sub _complete_ns {
     my $cmdline = $args{cmdline} or return undef;
     my $r = $args{r};
 
+    # allow writing Mod::SubMod as Mod/SubMod
+    my $uses_slash = $word =~ s!/!::!g ? 1:0;
+
     # force read config file, because by default it is turned off when in
     # completion
     $r->{read_config} = 1;
@@ -3347,21 +3350,24 @@ sub _complete_ns {
     }
 
     my $sth = $dbh->prepare(
-        "SELECT name FROM namespace WHERE name LIKE ? ORDER BY name");
+        "SELECT ns.name name, m.abstract FROM namespace ns LEFT JOIN module m ON ns.name=m.name WHERE ns.name LIKE ? ORDER BY ns.name");
     $sth->execute($word . '%');
 
     # XXX follow Complete::Common::OPT_CI
 
     my @res;
-    while (my ($ns) = $sth->fetchrow_array) {
+    while (my ($ns, $abstract) = $sth->fetchrow_array) {
         # only complete one level deeper at a time
         if ($ns =~ /:\z/) {
             next unless $ns =~ /\A\Q$word\E:*\w+\z/i;
         } else {
             next unless $ns =~ /\A\Q$word\E\w*(::\w+)?\z/i;
         }
-        push @res, $ns;
+        push @res, {word=>$ns, (defined($abstract) ? (summary=>$abstract) : ())};
     }
+
+    # convert back to slash if user originally typed with slash
+    if ($uses_slash) { for (@res) { $_->{word} =~ s!::!/!g } }
 
     \@res;
 };
@@ -3553,6 +3559,9 @@ sub _complete_content_package_or_script {
     my $cmdline = $args{cmdline} or return undef;
     my $r = $args{r};
 
+    # allow writing Mod::SubMod as Mod/SubMod
+    my $uses_slash = $word =~ s!/!::!g ? 1:0;
+
     # force read config file, because by default it is turned off when in
     # completion
     $r->{read_config} = 1;
@@ -3603,6 +3612,9 @@ sub _complete_content_package_or_script {
             push @res, $script;
         }
     }
+
+    # convert back to slash if user originally typed with slash
+    if ($uses_slash) { for (@res) { s!::!/!g } }
 
     \@res;
 };
@@ -4390,7 +4402,7 @@ sub _get_prereqs {
     log_trace("Finding dependencies for file ID(s) %s (level=%i) ...", $file_ids, $level);
     return [200, "OK", []] unless @$file_ids;
 
-    my @where = ("dp.file_id IN (".join(",", @$file_ids).")");
+    my @where  = ("dp.file_id IN (".join(",", @$file_ids).")");
     my @bind  = ();
 
     if ($filters->{authors}) {
@@ -4455,6 +4467,10 @@ ORDER BY module".($level > 1 ? " DESC" : ""));
 
         next if !$filters->{include_indexed}   && ( defined $row->{author} || $row->{module} eq 'perl');
         next if !$filters->{include_unindexed} && (!defined $row->{author} && $row->{module} ne 'perl');
+
+        if ($filters->{exclude_deps} && grep { $row->{module} eq $_ } @{ $filters->{exclude_deps} }) {
+            next;
+        }
 
         $row->{is_core} = $row->{module} eq 'perl' ||
             Module::CoreList::More->is_still_core($row->{module}, undef, version->parse($plver)->numify);
@@ -4826,6 +4842,13 @@ _
         %argspec0opt_dists_with_optional_vers,
         %argspecopt_mods,
         %deps_args,
+        exclude_deps => {
+            summary => 'Exclude some dependencies from being shown',
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'exclude_dep',
+            schema => ['array*', of=>'perl::modname*', min_len=>1],
+            element_completion => \&_complete_mod,
+        },
     },
     args_rels => {
         req_one => ['modules', 'dists'],
@@ -4899,6 +4922,7 @@ sub deps {
         include_noncore => $include_noncore,
         include_indexed => $include_indexed,
         include_unindexed => $include_unindexed,
+        exclude_deps => $args{exclude_deps},
         authors => $args{authors},
         authors_arent => $args{authors_arent},
         added_since => $args{added_since},
@@ -5190,7 +5214,7 @@ App::lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.071 of App::lcpan (from Perl distribution App-lcpan), released on 2022-09-19.
+This document describes version 1.073 of App::lcpan (from Perl distribution App-lcpan), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -5247,6 +5271,8 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<index_name> => I<filename> (default: "index.db")
 
 Filename of index.
@@ -5265,6 +5291,8 @@ When there are more than one query, perform OR instead of AND logic.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+(No description)
 
 =item * B<random> => I<true>
 
@@ -5422,6 +5450,10 @@ Distribution names (with optional version suffix, e.g. Foo-Bar@1.23).
 
 Allow showing multiple modules for different dists.
 
+=item * B<exclude_deps> => I<array[perl::modname]>
+
+Exclude some dependencies from being shown.
+
 =item * B<flatten> => I<bool>
 
 Instead of showing tree-like information, flatten it.
@@ -5487,13 +5519,19 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules> => I<array[perl::modname]>
 
-=item * B<perl_version> => I<str> (default: "v5.34.0")
+(No description)
+
+=item * B<perl_version> => I<str> (default: "v5.38.0")
 
 Set base Perl version for determining core modules.
 
 =item * B<phase> => I<str> (default: "runtime")
 
+(No description)
+
 =item * B<rel> => I<str> (default: "requires")
+
+(No description)
 
 =item * B<update_db_schema> => I<bool> (default: 1)
 
@@ -5620,15 +5658,27 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<has_buildpl> => I<bool>
+
+(No description)
 
 =item * B<has_makefilepl> => I<bool>
 
+(No description)
+
 =item * B<has_metajson> => I<bool>
+
+(No description)
 
 =item * B<has_metayml> => I<bool>
 
+(No description)
+
 =item * B<has_multiple_rels> => I<bool>
+
+(No description)
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
@@ -5641,6 +5691,8 @@ using the C<index_name>.
 
 =item * B<latest> => I<bool>
 
+(No description)
+
 =item * B<or> => I<bool>
 
 When there are more than one query, perform OR instead of AND logic.
@@ -5651,11 +5703,15 @@ Search query.
 
 =item * B<query_type> => I<str> (default: "any")
 
+(No description)
+
 =item * B<random> => I<true>
 
 Random sort.
 
 =item * B<rel_mtime_newer_than> => I<date>
+
+(No description)
 
 =item * B<result_limit> => I<uint>
 
@@ -5846,6 +5902,8 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<dist> => I<perl::distname>
 
 Filter by distribution.
@@ -5869,6 +5927,8 @@ using the C<index_name>.
 
 =item * B<latest> => I<bool>
 
+(No description)
+
 =item * B<namespaces> => I<array[perl::modname]>
 
 Select modules belonging to certain namespace(s).
@@ -5877,7 +5937,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.34.0")
+=item * B<perl_version> => I<str> (default: "v5.38.0")
 
 Set base Perl version for determining core modules.
 
@@ -5886,6 +5946,8 @@ Set base Perl version for determining core modules.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+(No description)
 
 =item * B<random> => I<true>
 
@@ -6006,7 +6068,11 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<from_level> => I<int>
+
+(No description)
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
@@ -6019,6 +6085,8 @@ using the C<index_name>.
 
 =item * B<level> => I<int>
 
+(No description)
+
 =item * B<or> => I<bool>
 
 When there are more than one query, perform OR instead of AND logic.
@@ -6029,9 +6097,15 @@ Search query.
 
 =item * B<query_type> => I<str> (default: "any")
 
+(No description)
+
 =item * B<sort> => I<str> (default: "name")
 
+(No description)
+
 =item * B<to_level> => I<int>
+
+(No description)
 
 =item * B<update_db_schema> => I<bool> (default: 1)
 
@@ -6136,6 +6210,8 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<dist> => I<perl::distname>
 
 Filter by distribution.
@@ -6159,6 +6235,8 @@ using the C<index_name>.
 
 =item * B<latest> => I<bool>
 
+(No description)
+
 =item * B<namespaces> => I<array[perl::modname]>
 
 Select modules belonging to certain namespace(s).
@@ -6167,7 +6245,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.34.0")
+=item * B<perl_version> => I<str> (default: "v5.38.0")
 
 Set base Perl version for determining core modules.
 
@@ -6176,6 +6254,8 @@ Set base Perl version for determining core modules.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+(No description)
 
 =item * B<random> => I<true>
 
@@ -6351,9 +6431,15 @@ Recurse for a number of levels (-1 means unlimited).
 
 =item * B<modules> => I<array[perl::modname]>
 
+(No description)
+
 =item * B<phase> => I<str> (default: "ALL")
 
+(No description)
+
 =item * B<rel> => I<str> (default: "ALL")
+
+(No description)
 
 =item * B<update_db_schema> => I<bool> (default: 1)
 
@@ -6465,15 +6551,27 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<full_path> => I<bool>
+
+(No description)
 
 =item * B<has_buildpl> => I<bool>
 
+(No description)
+
 =item * B<has_makefilepl> => I<bool>
+
+(No description)
 
 =item * B<has_metajson> => I<bool>
 
+(No description)
+
 =item * B<has_metayml> => I<bool>
+
+(No description)
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
@@ -6486,7 +6584,11 @@ using the C<index_name>.
 
 =item * B<latest> => I<bool>
 
+(No description)
+
 =item * B<no_path> => I<bool>
+
+(No description)
 
 =item * B<or> => I<bool>
 
@@ -6497,6 +6599,8 @@ When there are more than one query, perform OR instead of AND logic.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+(No description)
 
 =item * B<random> => I<true>
 
@@ -6511,6 +6615,8 @@ Only return a certain number of records.
 Only return starting from the n'th record.
 
 =item * B<sort> => I<array[str]> (default: ["name"])
+
+(No description)
 
 =item * B<update_db_schema> => I<bool> (default: 1)
 
@@ -6774,9 +6880,15 @@ Number of retry attempts on failed HTTP request.
 
 =item * B<skip_file_indexing_pass_1> => I<bool>
 
+(No description)
+
 =item * B<skip_file_indexing_pass_2> => I<bool>
 
+(No description)
+
 =item * B<skip_file_indexing_pass_3> => I<bool>
+
+(No description)
 
 =item * B<skip_index_file_patterns> => I<array[re]>
 
@@ -6917,7 +7029,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -14,12 +14,12 @@ use URI ();
 
 Getopt::Long::Configure('bundling');
 
-my $Allow_Verified;      # allow verified certificates
+my $Allow_Verified;    # allow verified certificates
 my $Be_Quiet;
-my $Force_Update;        # clobber known_hosts?
-my $Hosts_Dirty;         # do we need to update known_hosts?
-my $Known_Hosts;         # hashref, from/to JSON
-my $Show_Status;         # log various things to stderr
+my $Force_Update;      # clobber known_hosts?
+my $Hosts_Dirty;       # do we need to update known_hosts?
+my $Known_Hosts;       # hashref, from/to JSON
+my $Show_Status;       # log various things to stderr
 
 die "gmitool: command [args ..]\n" unless @ARGV;
 
@@ -95,12 +95,12 @@ sub get {
         }
     } else {
         my $cache_dir;
-        if (length $ENV{GMITOOL_HOSTS} ) {
-            $cache_dir = (splitpath($ENV{GMITOOL_HOSTS}))[1];
+        if ( length $ENV{GMITOOL_HOSTS} ) {
+            $cache_dir        = ( splitpath( $ENV{GMITOOL_HOSTS} ) )[1];
             $known_hosts_file = $ENV{GMITOOL_HOSTS};
         } else {
             die "gmitool: HOME is not set" unless defined $ENV{HOME};
-            $cache_dir = catdir( $ENV{HOME}, qw{.cache gmitool} );
+            $cache_dir        = catdir( $ENV{HOME}, qw{.cache gmitool} );
             $known_hosts_file = catfile( $cache_dir, 'known_hosts' );
         }
         make_path($cache_dir);
@@ -122,7 +122,7 @@ sub get {
         unveil( $ENV{SSL_CERT_DIR},  'r' ) if exists $ENV{SSL_CERT_DIR};
         unveil( $ENV{SSL_CERT_FILE}, 'r' ) if exists $ENV{SSL_CERT_FILE};
         unveil(qw{/etc/ssl r});
-        for my $dir (@INC) { unveil($dir, 'r') }
+        for my $dir      (@INC)     { unveil( $dir, 'r' ) }
         for my $pathperm (@unveils) { unveil(@$pathperm) }
         unveil();
     }
@@ -161,11 +161,11 @@ sub get {
         die "gmitool: error: $e\n";
     } elsif ( $code == 3 ) {
         die "gmitool: too many redirects ($redirects) " . $gem->meta . "\n"
-          if ++$redirects >= 5; # amfora also uses 5 max redirects
+          if ++$redirects >= 5;    # amfora also uses 5 max redirects
         my $new = $gem->meta;
         $resource = URI->new_abs( $new, $gem->{_uri} );
         warn "REDIRECT " . $resource . "\n" if $Show_Status;
-        sleep 1;    # don't be too quick about a loop
+        sleep 1;                   # don't be too quick about a loop
         goto REQUEST;
     } elsif ( $code == 4 ) {
         die 'gmitool: temporary-failure '
@@ -215,11 +215,15 @@ sub is_encoded {
 # extracts links in text/gemini input
 sub link {
     my ($args) = @_;
-    GetOptionsFromArray( $args, 'base|b=s' => \my $base ) or exit 64;
-    $base = '.' unless defined $base;
+    GetOptionsFromArray(
+        $args,
+        'base|b=s'   => \my $base,
+        'relative|r' => \my $relative,
+    ) or exit 64;
     while ( my $line = readline ) {
         if ( $line =~ m/^=>\s*(\S+)/ ) {
-            my $u = URI->new_abs( $1, $base );
+            my $u = defined $base ? URI->new_abs( $1, $base ) : URI->new($1);
+            next if $relative and defined $u->scheme;
             print $u->canonical, "\n";
         }
     }
@@ -267,7 +271,8 @@ sub verify_ssl {
     if ( !exists $Known_Hosts->{$key} ) {
         ( $Known_Hosts->{$key}, $Hosts_Dirty ) = ( $new, 1 );
     } elsif ($Force_Update) {
-        unless ( $Be_Quiet or $Known_Hosts->{$key}{digest} eq $param->{digest} ) {
+        unless ( $Be_Quiet
+            or $Known_Hosts->{$key}{digest} eq $param->{digest} ) {
             verify_warn( $key, $Known_Hosts->{$key}, $new, \@fields );
         }
         # merge new over old in the event there are unknown keys that
@@ -388,7 +393,8 @@ Custom connect timeout, 30 seconds by default.
 =head2 link
 
 Extracts link from text/gemini input, and qualifies any relative links
-if the C<-b> option is given.
+if the C<-b> I<base-url> option is given. Only shows relative links if
+the C<-r> option is given.
 
 =head1 ENVIRONMENT
 

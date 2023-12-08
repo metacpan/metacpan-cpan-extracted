@@ -8,7 +8,6 @@ use lib "$FindBin::Bin/lib";
 # :squash-remove-end:
 
 require Chicken::Ipsum;
-use Carp qw/ croak /;
 
 if (($ARGV[0] // '') eq '--help') {
     print HELP_MESSAGE();

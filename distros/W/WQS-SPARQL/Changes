@@ -1,2 +1,7 @@
+0.02 2023-11-29T01:32:59+01:00
+ - Add tests for constructor.
+ - Add verbose mode.
+ - Fix constructor parameters in doc.
+
 0.01 2023-05-26T14:44:39+02:00
  - First version.

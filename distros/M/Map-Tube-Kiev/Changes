@@ -1,3 +1,21 @@
+0.06 2023-12-06T22:12:28+01:00
+ - Add EXAMPLE5 section to doc.
+ - Add constructed lines to XML file.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix image name.
+ - Implement station order.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite XML map to new version with line IDs.
+ - Rewrite doc to use of =head2.
+ - Update Map::Tube dependency to 3.62.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.05 2015-10-16T11:34:21+02:00
  - Improve description for get_lines() in doc.
  - Update to Map::Tube 3.06.

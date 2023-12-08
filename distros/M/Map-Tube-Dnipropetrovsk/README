@@ -24,48 +24,83 @@ DESCRIPTION
     <https://en.wikipedia.org/wiki/Dnipropetrovsk_Metro>.
 
 METHODS
-    "new()"
-             Constructor.
+  "new"
+     my $obj = Map::Tube::Dnipropetrovsk->new;
 
-    "get_all_routes($from, $to)" [EXPERIMENTAL]
-             Get all routes from station to station.
-             Returns reference to array with Map::Tube::Route objects.
+    Constructor.
 
-    "get_line_by_id($line_id)"
-             Get line object defined by id.
-             Returns Map::Tube::Line object.
+    Returns instance of object.
 
-    "get_line_by_name($line_name)"
-             Get line object defined by name.
-             Returns Map::Tube::Line object.
+  "get_all_routes" [EXPERIMENTAL]
+     my $routes_ar = $obj->get_all_routes($from, $to);
 
-    "get_lines()"
-             Get lines in metro map.
-             Returns reference to unsorted array with Map::Tube::Line objects.
+    Get all routes from station to station.
 
-    "get_node_by_id($station_id)"
-             Get station node by id.
-             Returns Map::Tube::Node object.
+    Returns reference to array with Map::Tube::Route objects.
 
-    "get_node_by_name($station_name)"
-             Get station node by name.
-             Returns Map::Tube::Node object.
+  "get_line_by_id"
+     my $line = $obj->get_line_by_id($line_id);
 
-    "get_shortest_route($from, $to)"
-             Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
-             Returns Map::Tube::Route object.
+    Get line object defined by id.
 
-    "get_stations($line)"
-             Get list of stations for concrete metro line.
-             Returns reference to array with Map::Tube::Node objects.
+    Returns Map::Tube::Line object.
 
-    "name()"
-             Get metro name.
-             Returns string with metro name.
+  "get_line_by_name"
+     my $line = $obj->get_line_by_name($line_name);
 
-    "xml()"
-             Get XML specification of Dnipropetrovsk metro.
-             Returns string with XML.
+    Get line object defined by name.
+
+    Returns Map::Tube::Line object.
+
+  "get_lines"
+     my $lines_ar = $obj->get_lines;
+
+    Get lines in metro map.
+
+    Returns reference to unsorted array with Map::Tube::Line objects.
+
+  "get_node_by_id"
+     my $station = $obj->get_node_by_id($station_id);
+
+    Get station node by id.
+
+    Returns Map::Tube::Node object.
+
+  "get_node_by_name"
+     my $station = $obj->get_node_by_name($station_name);
+
+    Get station node by name.
+
+    Returns Map::Tube::Node object.
+
+  "get_shortest_route"
+     my $route = $obj->get_shortest_route($from, $to);
+
+    Get shortest route between $from and $to node names. Node names in $from
+    and $to are case insensitive.
+
+    Returns Map::Tube::Route object.
+
+  "get_stations"
+     my $stations_ar = $obj->get_stations($line);
+
+    Get list of stations for concrete metro line.
+
+    Returns reference to array with Map::Tube::Node objects.
+
+  "name"
+     my $metro_name = $obj->name;
+
+    Get metro name.
+
+    Returns string with metro name.
+
+  "xml"
+     my $xml_file = $obj->xml;
+
+    Get XML specification of Dnipropetrovsk metro.
+
+    Returns string with XML.
 
 EXAMPLE1
      use strict;
@@ -78,13 +113,13 @@ EXAMPLE1
      my $obj = Map::Tube::Dnipropetrovsk->new;
 
      # Get route.
-     my $route = $obj->get_shortest_route(decode_utf8('Комунарівська'), decode_utf8('Металургів'));
+     my $route = $obj->get_shortest_route(decode_utf8('Покровська'), decode_utf8('Металургів'));
 
      # Print out type.
      print "Route: ".encode_utf8($route)."\n";
 
      # Output:
-     # Route: Комунарівська (Центрально-Заводська лінія), Проспект Свободи (Центрально-Заводська лінія), Заводська (Центрально-Заводська лінія), Металургів (Центрально-Заводська лінія)
+     # Route: Покровська (Центрально-Заводська лінія), Проспект Свободи (Центрально-Заводська лінія), Заводська (Центрально-Заводська лінія), Металургів (Центрально-Заводська лінія)
 
 EXAMPLE2
      use strict;
@@ -179,7 +214,7 @@ EXAMPLE5
      # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
 
      # Output with 'Центрально-Заводська лінія' argument.
-     # Комунарівська
+     # Покровська
      # Проспект Свободи
      # Заводська
      # Металургів
@@ -208,10 +243,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2020 Michal Josef Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

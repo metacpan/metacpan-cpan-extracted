@@ -1,5 +1,10 @@
 Revision history for OpenTelemetry-SDK
 
+0.021     2023-12-03 14:46:29+00:00 Europe/London
+
+    * Clarify meaning of OTEL_BSP_EXPORT_TIMEOUT in POD
+    * Minor correction in Resource POD
+
 0.020     2023-11-26 16:18:52+00:00 Europe/London
 
     * Switch Metrics::Any client to strict mode, to allow for automatic

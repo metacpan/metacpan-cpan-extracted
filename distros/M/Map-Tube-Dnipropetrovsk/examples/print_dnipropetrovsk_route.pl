@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Encode qw(decode_utf8 encode_utf8);
+use Map::Tube::Dnipropetrovsk;
+
+# Object.
+my $obj = Map::Tube::Dnipropetrovsk->new;
+
+# Get route.
+my $route = $obj->get_shortest_route(decode_utf8('Покровська'), decode_utf8('Металургів'));
+
+# Print out type.
+print "Route: ".encode_utf8($route)."\n";
+
+# Output:
+# Route: Покровська (Центрально-Заводська лінія), Проспект Свободи (Центрально-Заводська лінія), Заводська (Центрально-Заводська лінія), Металургів (Центрально-Заводська лінія)

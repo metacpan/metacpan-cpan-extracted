@@ -10,7 +10,7 @@ SPVM::Go::Select - Go select Statement
 
 =head1 Description
 
-Go::Select class of L<SPVM> has methods to select a readable/writable channel.
+The Go::Select class in L<SPVM> has methods to select a readable/writable channel.
 
 =head1 Usage
 

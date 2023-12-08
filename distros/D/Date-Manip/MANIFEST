@@ -3,6 +3,7 @@ examples/dm_date
 examples/dm_zdump
 examples/README.examples
 INSTALL
+internal/#windows.compare#
 internal/benchmarks/dateset3.txt
 internal/benchmarks/dateset3_notz.txt
 internal/benchmarks/dm5dm6_ex3
@@ -33,7 +34,6 @@ internal/TODO
 internal/TODO.7
 internal/translate
 internal/tzdata
-internal/tztab
 internal/unicode
 internal/windows.compare
 lib/Date/Manip.pm

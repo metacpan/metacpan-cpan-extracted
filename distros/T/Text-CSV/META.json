@@ -32,13 +32,12 @@
       },
       "runtime" : {
          "recommends" : {
-            "Text::CSV_XS" : "1.51"
+            "Text::CSV_XS" : "1.53"
          },
          "requires" : {
             "IO::Handle" : "0",
             "Test::Harness" : "0",
-            "Test::More" : "0.71",
-            "Text::CSV_XS" : "1.51",
+            "Test::More" : "0.92",
             "perl" : "5.006001"
          }
       }
@@ -55,6 +54,6 @@
          "url" : "https://github.com/makamaka/Text-CSV"
       }
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

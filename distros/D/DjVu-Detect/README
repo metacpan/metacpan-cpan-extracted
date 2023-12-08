@@ -68,7 +68,7 @@ EXAMPLE1
      }
 
      # Output like:
-     # File '%s' isn't DjVu file.
+     # File '%s' is DjVu file.
 
 EXAMPLE2
      use strict;
@@ -97,7 +97,7 @@ EXAMPLE2
      # Usage: __SCRIPT__ file
 
 DEPENDENCIES
-    Error::Pure, Exporter, File::Which.
+    Alien::DjVuLibre, Error::Pure, Exporter, File::Spec::Functions.
 
 SEE ALSO
     File::Find::Rule::DjVu
@@ -118,10 +118,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2021 Michal Josef Špaček
+    © 2021-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.05
 

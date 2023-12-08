@@ -14,4 +14,9 @@ sub import
    XSLoader::load( $_[0], $XS::Parse::Keyword::VERSION );
 }
 
+sub unimport
+{
+   die "testcase cannot be unimported";
+}
+
 0x55AA;

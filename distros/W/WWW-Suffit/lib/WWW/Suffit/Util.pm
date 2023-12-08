@@ -8,10 +8,6 @@ use utf8;
 
 WWW::Suffit::Util - The Suffit utilities
 
-=head1 VERSION
-
-Version 1.02
-
 =head1 SYNOPSIS
 
     use WWW::Suffit::Util;
@@ -177,25 +173,24 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use vars qw/ $VERSION @EXPORT_OK @EXPORT /;
-$VERSION = '1.02';
+our $VERSION = '1.03';
 
 use Carp;
 use Term::ANSIColor qw/colored/;
 use POSIX qw/ ceil strftime /;
 use Digest::MD5;
 
-use Mojo::Util qw/ trim /;
+use Mojo::Util qw/ trim monkey_patch /;
 use Mojo::JSON qw/ decode_json encode_json /;
 use Mojo::File qw/ path /;
 
 use WWW::Suffit::Const qw/ IS_TTY DATE_FORMAT DATETIME_FORMAT /;
 
 use base qw/Exporter/;
-@EXPORT = (qw/
+our @EXPORT = (qw/
         parse_expire parse_time_offset
     /);
-@EXPORT_OK = (qw/
+our @EXPORT_OK = (qw/
         fbytes fdate fdatetime fduration human2bytes
         dformat
         md5sum
@@ -214,6 +209,9 @@ use constant HUMAN_SUFFIXES => {
     'Z' => 70, 'ZB' => 70, 'ZIB' => 70,
     'Y' => 80, 'YB' => 80, 'YIB' => 80,
 };
+
+# Patches
+monkey_patch 'Mojo::File', spew => sub { goto &Mojo::File::spurt } unless Mojo::File->can('spew');
 
 sub fbytes {
     my $n = int(shift);
@@ -314,7 +312,7 @@ sub json_save {
     croak("No data (perl struct) specified") unless ref $data eq 'ARRAY' || ref $data eq 'HASH';
 
     # my $bytes = encode_json {foo => [1, 2], bar => 'hello!', baz => \1};
-    my $path = path($file)->spurt( encode_json($data) );
+    my $path = path($file)->spew( encode_json($data) ); # spurt
     return $path;
 }
 sub json_load {

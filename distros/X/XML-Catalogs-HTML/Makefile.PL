@@ -3,7 +3,10 @@
 use strict;
 use warnings;
 
-use ExtUtils::MakeMaker qw( WriteMakefile );
+use ExtUtils::MakeMaker     qw( WriteMakefile );
+use File::ShareDir::Install qw( install_share );
+
+install_share module => ( 'XML::Catalogs::HTML', 'share/html' );
 
 WriteMakefile(
    NAME           => 'XML::Catalogs::HTML',
@@ -22,32 +25,33 @@ WriteMakefile(
       prereqs => {
          configure => {
             requires => {
-               'ExtUtils::MakeMaker' => 6.52,
+               'ExtUtils::MakeMaker'  => 6.52,
+               'File::Share::Install' => 0,
             },
          },
          runtime => {
             requires => {
-               'parent'              => 0,
-               'strict'              => 0,
-               'XML::Catalogs'       => 0,
-               'version'             => 0,
-               'warnings'            => 0,
+               'parent'               => 0,
+               'strict'               => 0,
+               'XML::Catalogs'        => 0,
+               'version'              => 0,
+               'warnings'             => 0,
             },
             # recommends => { },
             # suggests => { },
          },
          test => {
             requires => {
-               'Test::More'          => 0,
+               'Test::More'           => 0,
             },
             recommends => {
-               'Test::Pod'           => 1.22,
+               'Test::Pod'            => 1.22,
             },
          },
          develop => {
             requires => {
-               'Pod::Coverage'       => 0.18,
-               'Test::Pod::Coverage' => 1.08,
+               'Pod::Coverage'        => 0.18,
+               'Test::Pod::Coverage'  => 1.08,
             },
          },
       },
@@ -66,3 +70,8 @@ WriteMakefile(
       },
    },
 );
+
+
+package MY;
+
+use File::ShareDir::Install qw( postamble );

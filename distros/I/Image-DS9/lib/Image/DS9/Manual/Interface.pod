@@ -14,7 +14,7 @@ Image::DS9::Manual::Interface - Image::DS9 Interface
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 DOCUMENTATION
 

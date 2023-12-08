@@ -1,4 +1,4 @@
-package Chicken::Ipsum 1.000000;
+package Chicken::Ipsum 1.000001;
 use 5.012;
 use warnings;
 
@@ -39,7 +39,7 @@ cawing and other chicken-y noises.
 =cut
 
 use Carp qw/ croak /;
-use List::Util qw/ sample /;
+use List::Util 1.54 qw/ sample /;
 
 use constant WORDS => [qw/
 	puk

@@ -1,4 +1,4 @@
-Unix-Mknod version 0.04
+Unix-Mknod version 0.05
 =======================
 
 This module allows access to the device routines major()/minor()/makedev()
@@ -48,7 +48,7 @@ This module does not require any other modules or libraries.
 
 COPYRIGHT AND LICENCE
 
-Copyright (c) 2005-2008 University of Illinois Board of Trustees
+Copyright (c) 2005-2023 University of Illinois Board of Trustees
 All rights reserved.
 
 Developed by: Campus Information Technologies and Educational Services,

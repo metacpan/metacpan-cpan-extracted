@@ -44,7 +44,7 @@ static inline void S_debug_sv_summary(pTHX_ const SV *sv)
     case SVt_PVCV: type = "PVCV"; break;
     default: {
       char buf[16];
-      sprintf(buf, "(%d)", SvTYPE(sv));
+      snprintf(buf, sizeof(buf), "(%d)", SvTYPE(sv));
       type = buf;
       break;
     }

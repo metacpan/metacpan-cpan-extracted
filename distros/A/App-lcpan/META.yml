@@ -16,7 +16,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,301 +25,301 @@ name: App-lcpan
 provides:
   App::lcpan:
     file: lib/App/lcpan.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author:
     file: lib/App/lcpan/Cmd/author.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_deps:
     file: lib/App/lcpan/Cmd/author_deps.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_deps_by_dependent_count:
     file: lib/App/lcpan/Cmd/author_deps_by_dependent_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_dists:
     file: lib/App/lcpan/Cmd/author_dists.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_mods:
     file: lib/App/lcpan/Cmd/author_mods.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_mods_by_other_author_rdep_count:
     file: lib/App/lcpan/Cmd/author_mods_by_other_author_rdep_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_mods_by_rdep_count:
     file: lib/App/lcpan/Cmd/author_mods_by_rdep_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_rdeps:
     file: lib/App/lcpan/Cmd/author_rdeps.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_rels:
     file: lib/App/lcpan/Cmd/author_rels.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::author_scripts:
     file: lib/App/lcpan/Cmd/author_scripts.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::authors:
     file: lib/App/lcpan/Cmd/authors.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::authors_by_dist_count:
     file: lib/App/lcpan/Cmd/authors_by_dist_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::authors_by_filesize:
     file: lib/App/lcpan/Cmd/authors_by_filesize.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::authors_by_mod_count:
     file: lib/App/lcpan/Cmd/authors_by_mod_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::authors_by_mod_mention_count:
     file: lib/App/lcpan/Cmd/authors_by_mod_mention_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::authors_by_rdep_count:
     file: lib/App/lcpan/Cmd/authors_by_rdep_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::authors_by_rel_count:
     file: lib/App/lcpan/Cmd/authors_by_rel_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::authors_by_script_count:
     file: lib/App/lcpan/Cmd/authors_by_script_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::changes:
     file: lib/App/lcpan/Cmd/changes.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::contents:
     file: lib/App/lcpan/Cmd/contents.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::copy_mod:
     file: lib/App/lcpan/Cmd/copy_mod.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::copy_rel:
     file: lib/App/lcpan/Cmd/copy_rel.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::copy_script:
     file: lib/App/lcpan/Cmd/copy_script.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::db_path:
     file: lib/App/lcpan/Cmd/db_path.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::delete_old_data:
     file: lib/App/lcpan/Cmd/delete_old_data.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::delete_rel:
     file: lib/App/lcpan/Cmd/delete_rel.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::deps:
     file: lib/App/lcpan/Cmd/deps.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::deps_by_dependent_count:
     file: lib/App/lcpan/Cmd/deps_by_dependent_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dist:
     file: lib/App/lcpan/Cmd/dist.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dist2author:
     file: lib/App/lcpan/Cmd/dist2author.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dist2rel:
     file: lib/App/lcpan/Cmd/dist2rel.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dist_contents:
     file: lib/App/lcpan/Cmd/dist_contents.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dist_meta:
     file: lib/App/lcpan/Cmd/dist_meta.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dist_mods:
     file: lib/App/lcpan/Cmd/dist_mods.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dist_rdeps:
     file: lib/App/lcpan/Cmd/dist_rdeps.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dist_scripts:
     file: lib/App/lcpan/Cmd/dist_scripts.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dists:
     file: lib/App/lcpan/Cmd/dists.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dists_by_dep_count:
     file: lib/App/lcpan/Cmd/dists_by_dep_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dists_by_mod_count:
     file: lib/App/lcpan/Cmd/dists_by_mod_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::dists_by_script_count:
     file: lib/App/lcpan/Cmd/dists_by_script_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::doc:
     file: lib/App/lcpan/Cmd/doc.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::extract_dist:
     file: lib/App/lcpan/Cmd/extract_dist.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::extract_mod:
     file: lib/App/lcpan/Cmd/extract_mod.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::extract_rel:
     file: lib/App/lcpan/Cmd/extract_rel.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::extract_script:
     file: lib/App/lcpan/Cmd/extract_script.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::heaviest_dists:
     file: lib/App/lcpan/Cmd/heaviest_dists.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::inject:
     file: lib/App/lcpan/Cmd/inject.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::log:
     file: lib/App/lcpan/Cmd/log.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mentions:
     file: lib/App/lcpan/Cmd/mentions.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mentions_by_mod:
     file: lib/App/lcpan/Cmd/mentions_by_mod.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mentions_by_script:
     file: lib/App/lcpan/Cmd/mentions_by_script.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mentions_for_all_mods:
     file: lib/App/lcpan/Cmd/mentions_for_all_mods.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mentions_for_mod:
     file: lib/App/lcpan/Cmd/mentions_for_mod.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mentions_for_script:
     file: lib/App/lcpan/Cmd/mentions_for_script.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mod:
     file: lib/App/lcpan/Cmd/mod.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mod2author:
     file: lib/App/lcpan/Cmd/mod2author.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mod2dist:
     file: lib/App/lcpan/Cmd/mod2dist.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mod2rel:
     file: lib/App/lcpan/Cmd/mod2rel.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mod_contents:
     file: lib/App/lcpan/Cmd/mod_contents.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mods:
     file: lib/App/lcpan/Cmd/mods.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mods_by_mention_count:
     file: lib/App/lcpan/Cmd/mods_by_mention_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mods_by_rdep_author_count:
     file: lib/App/lcpan/Cmd/mods_by_rdep_author_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mods_by_rdep_count:
     file: lib/App/lcpan/Cmd/mods_by_rdep_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::mods_from_same_dist:
     file: lib/App/lcpan/Cmd/mods_from_same_dist.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::module:
     file: lib/App/lcpan/Cmd/module.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::modules:
     file: lib/App/lcpan/Cmd/modules.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::most_depended_mods:
     file: lib/App/lcpan/Cmd/most_depended_mods.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::most_mentioned_mods:
     file: lib/App/lcpan/Cmd/most_mentioned_mods.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::most_mentioned_scripts:
     file: lib/App/lcpan/Cmd/most_mentioned_scripts.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::namespaces:
     file: lib/App/lcpan/Cmd/namespaces.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::rdeps:
     file: lib/App/lcpan/Cmd/rdeps.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::rdeps_scripts:
     file: lib/App/lcpan/Cmd/rdeps_scripts.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::rel:
     file: lib/App/lcpan/Cmd/rel.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::related_authors:
     file: lib/App/lcpan/Cmd/related_authors.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::related_mods:
     file: lib/App/lcpan/Cmd/related_mods.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::release:
     file: lib/App/lcpan/Cmd/release.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::releases:
     file: lib/App/lcpan/Cmd/releases.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::rels:
     file: lib/App/lcpan/Cmd/rels.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::reset:
     file: lib/App/lcpan/Cmd/reset.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::script:
     file: lib/App/lcpan/Cmd/script.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::script2author:
     file: lib/App/lcpan/Cmd/script2author.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::script2dist:
     file: lib/App/lcpan/Cmd/script2dist.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::script2mod:
     file: lib/App/lcpan/Cmd/script2mod.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::script2rel:
     file: lib/App/lcpan/Cmd/script2rel.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::scripts:
     file: lib/App/lcpan/Cmd/scripts.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::scripts_by_mention_count:
     file: lib/App/lcpan/Cmd/scripts_by_mention_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::scripts_from_same_dist:
     file: lib/App/lcpan/Cmd/scripts_from_same_dist.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::src:
     file: lib/App/lcpan/Cmd/src.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::stats:
     file: lib/App/lcpan/Cmd/stats.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::stats_last_index_time:
     file: lib/App/lcpan/Cmd/stats_last_index_time.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::subnames_by_count:
     file: lib/App/lcpan/Cmd/subnames_by_count.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::subs:
     file: lib/App/lcpan/Cmd/subs.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::update:
     file: lib/App/lcpan/Cmd/update.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::whatsnew:
     file: lib/App/lcpan/Cmd/whatsnew.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::Cmd::x_mentions_for_mod:
     file: lib/App/lcpan/Cmd/x_mentions_for_mod.pm
-    version: '1.071'
+    version: '1.073'
   App::lcpan::PodParser:
     file: lib/App/lcpan/PodParser.pm
-    version: '1.071'
+    version: '1.073'
   End::PrintBytesIn:
     file: lib/End/PrintBytesIn.pm
-    version: '1.071'
+    version: '1.073'
   LWP::UserAgent::Plugin::FilterLcpan:
     file: lib/LWP/UserAgent/Plugin/FilterLcpan.pm
-    version: '1.071'
+    version: '1.073'
 recommends:
   App::lcpan::Bootstrap: '0'
 requires:
@@ -333,7 +333,7 @@ requires:
   Clone::Util: '0.03'
   Compiler::Lexer: '0'
   Complete::File: '0.440'
-  Complete::Util: '0.608'
+  Complete::Util: '0.616'
   DBD::SQLite: '0'
   DBI: '0'
   DBIx::UpdateTable::FromHoH: '0.002'
@@ -344,12 +344,12 @@ requires:
   Data::Sah::Coerce::perl::To_date::From_str::iso8601: '0'
   Data::Sah::Coerce::perl::To_date::From_str::natural: '0'
   Data::Sah::Coerce::perl::To_str::From_str::normalize_perl_distname: '0'
-  Data::Sah::Compiler::perl::TH::array: '0.911'
-  Data::Sah::Compiler::perl::TH::bool: '0.911'
-  Data::Sah::Compiler::perl::TH::date: '0.911'
-  Data::Sah::Compiler::perl::TH::int: '0.911'
-  Data::Sah::Compiler::perl::TH::re: '0.911'
-  Data::Sah::Compiler::perl::TH::str: '0.911'
+  Data::Sah::Compiler::perl::TH::array: '0.914'
+  Data::Sah::Compiler::perl::TH::bool: '0.914'
+  Data::Sah::Compiler::perl::TH::date: '0.914'
+  Data::Sah::Compiler::perl::TH::int: '0.914'
+  Data::Sah::Compiler::perl::TH::re: '0.914'
+  Data::Sah::Compiler::perl::TH::str: '0.914'
   Data::Sah::Filter::perl::Path::expand_tilde: '0'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes: '0'
@@ -386,7 +386,7 @@ requires:
   POSIX: '0'
   Parse::CPAN::Meta: '0'
   Perinci::CmdLine::Any: '0.13'
-  Perinci::CmdLine::Util::Config: '1.724'
+  Perinci::CmdLine::Util::Config: '1.725'
   Perinci::CmdLineX::CommonOptions::SelfUpgrade: '0.003'
   Perinci::Object: '0.311'
   Perinci::Result::Format::Lite: '0.286'
@@ -406,7 +406,6 @@ requires:
   Sah::Schema::uint: '0'
   Text::Table::Org: '0.031'
   Version::Util: '0.731'
-  experimental: '0'
   parent: '0'
   perl: '5.010001'
   strict: '0'
@@ -415,10 +414,10 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-lcpan
   homepage: https://metacpan.org/release/App-lcpan
   repository: git://github.com/perlancar/perl-App-lcpan.git
-version: '1.071'
+version: '1.073'
 x_Dist_Zilla:
   perl:
-    version: '5.034000'
+    version: '5.038000'
   plugins:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
@@ -436,66 +435,66 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Author::PERLANCAR/@Filter/GatherDir'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Author::PERLANCAR/@Filter/PruneCruft'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::PERLANCAR/@Filter/ManifestSkip'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Author::PERLANCAR/@Filter/MetaYAML'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Author::PERLANCAR/@Filter/License'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::PERLANCAR/@Filter/PodCoverageTests'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::PERLANCAR/@Filter/PodSyntaxTests'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Author::PERLANCAR/@Filter/ExtraTests'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/@Filter/ExecDir'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Author::PERLANCAR/@Filter/ShareDir'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Author::PERLANCAR/@Filter/MakeMaker'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Author::PERLANCAR/@Filter/Manifest'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Author::PERLANCAR/@Filter/ConfirmRelease'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::PERLANCAR/ExecDir script'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.606'
+      version: '0.608'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -553,15 +552,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::IfBuilt
       name: '@Author::PERLANCAR/IfBuilt'
-      version: '0.02'
+      version: '0.03'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Author::PERLANCAR/MetaJSON'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::PERLANCAR/MetaConfig'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -570,13 +569,13 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.024'
+              version: '6.030'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
-          inherit_missing: '1'
-          inherit_version: '1'
-          meta_noindex: '1'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
         Dist::Zilla::Role::ModuleMetadata:
           Module::Metadata: '1.000037'
           version: '0.006'
@@ -589,7 +588,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::OurDate
       name: '@Author::PERLANCAR/OurDate'
-      version: '0.03'
+      version: '0.040'
     -
       class: Dist::Zilla::Plugin::OurDist
       name: '@Author::PERLANCAR/OurDist'
@@ -604,60 +603,60 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::PodWeaver:
           finder:
             - ':InstallModules'
-            - ':ExecFiles'
+            - ':PerlExecFiles'
           plugins:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Name
               name: '@Author::PERLANCAR/Name'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Version
               name: '@Author::PERLANCAR/Version'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/prelude'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Author::PERLANCAR/Leftovers'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Region
               name: '@Author::PERLANCAR/postlude'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Completion::GetoptLongComplete
               name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
@@ -685,7 +684,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Authors
               name: '@Author::PERLANCAR/Authors'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@Author::PERLANCAR/Contributors'
@@ -697,11 +696,11 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.784'
+              version: '0.786'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -713,17 +712,17 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Author::PERLANCAR/SingleEncoding'
-              version: '4.017'
+              version: '4.019'
             -
               class: Pod::Weaver::Plugin::PERLANCAR::SortSections
               name: '@Author::PERLANCAR/PERLANCAR::SortSections'
               version: '0.082'
       name: '@Author::PERLANCAR/PodWeaver'
-      version: '4.008'
+      version: '4.010'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Author::PERLANCAR/PruneFiles'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Author::PERLANCAR/Pod2Readme'
@@ -748,7 +747,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       config:
         Dist::Zilla::Plugin::Test::Compile:
-          bail_out_on_fail: '0'
+          bail_out_on_fail: 0
           fail_on_warning: author
           fake_home: 0
           filename: t/00-compile.t
@@ -799,7 +798,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Prereqs::CheckCircular
       name: '@Author::PERLANCAR/Prereqs::CheckCircular'
-      version: '0.006'
+      version: '0.007'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN::WWWPAUSESimple
       name: '@Author::PERLANCAR/UploadToCPAN::WWWPAUSESimple'
@@ -811,7 +810,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -819,7 +818,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -827,7 +826,7 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: RuntimeRecommends
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -835,61 +834,61 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.024'
+      version: '6.030'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Author::PERLANCAR/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.024'
+      version: '6.030'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
-      is_trial: '0'
-    version: '6.024'
+      is_trial: 0
+    version: '6.030'
 x_authority: cpan:PERLANCAR
 x_contributors:
   - 'Norbert Csongradi <norbert@csongradi.hu>'
   - 'Steven Haryanto <stevenharyanto@gmail.com>'
-x_generated_by_perl: v5.34.0
-x_serialization_backend: 'YAML::Tiny version 1.73'
+x_generated_by_perl: v5.38.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

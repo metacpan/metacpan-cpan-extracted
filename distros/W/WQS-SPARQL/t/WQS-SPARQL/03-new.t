@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 3;
+use Test::More 'tests' => 5;
 use Test::NoWarnings;
 use WQS::SPARQL;
 
@@ -19,4 +19,21 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'lwp_user_agent' must be a 'LWP::UserAgent' instance.\n",
 	"Parameter 'lwp_user_agent' must be a 'LWP::UserAgent' instance.");
+clean();
+
+# Test.
+eval {
+	WQS::SPARQL->new(
+		'something' => 'value',
+	);
+};
+is($EVAL_ERROR, "Unknown parameter 'something'.\n",
+	'Bad \'something\' parameter.');
+clean();
+
+# Test.
+eval {
+	WQS::SPARQL->new('');
+};
+is($EVAL_ERROR, "Unknown parameter ''.\n", 'Bad \'\' parameter.');
 clean();

@@ -47,7 +47,7 @@
    "provides" : {
       "App::errno" : {
          "file" : "lib/App/errno.pm",
-         "version" : "0.070"
+         "version" : "0.071"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "https://github.com/perlancar/perl-App-errno"
       }
    },
-   "version" : "0.070",
+   "version" : "0.071",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

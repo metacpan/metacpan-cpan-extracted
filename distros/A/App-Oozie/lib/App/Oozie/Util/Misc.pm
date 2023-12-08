@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent qw( Exporter );
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 our @EXPORT_OK = qw(
     remove_newline
@@ -52,7 +52,7 @@ App::Oozie::Util::Misc
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

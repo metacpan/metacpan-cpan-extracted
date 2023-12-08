@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.2104 2023-11-29T08:59:32Z
+
+    - Localize $Text::VisualWidth::PP::EastAsian.
+
 2.2103 2023-11-28T00:23:14Z
 
     - Validate given width is an integer.

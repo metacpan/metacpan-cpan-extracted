@@ -1,0 +1,28 @@
+<div id="formtools-icon-<% $FormID %>" class="">
+% if ($form_icon) {
+<img
+    class="d-block mx-auto",
+    width="100px", height="100px",
+    src="<% RT->Config->Get('WebPath') %>/NoAuth/Helpers/FormLogo/<% $form_icon->Id %>"
+    alt="<%$ARGS{'LogoAltText'}%>" />
+% }
+</div>
+<%init>
+
+my ($form_icon, $msg) = RT::Extension::FormTools::LoadFormIcon( $session{'CurrentUser'}, $FormID );
+
+if ( $form_icon ) {
+    my $content = $form_icon->Content;
+    undef $form_icon
+        unless ref $content eq 'HASH'
+           and defined $content->{'data'};
+}
+else {
+    RT->Logger->error("Unable to load logo for form id $FormID");
+}
+
+</%init>
+<%args>
+$LogoAltText => ''
+$FormID => undef
+</%args>

@@ -19,8 +19,9 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-    ExtUtils::MakeMaker   (For installation only)
-    Test::More            (For testing only)
+    ExtUtils::MakeMaker      (For installation only)
+    File::ShareDir::Install  (For installation only)
+    Test::More               (For testing only)
     parent
     strict
     XML::Catalogs

@@ -2,14 +2,25 @@ package Mail::STS::SSKV;
 
 use Moose::Role;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 # ABSTRACT: role for semicolon-separated key/value pairs
 
 requires 'fields';
 
 sub new_from_string {
   my ($class, $string) = @_;
-  my %kv = map { split(/=/,$_,2) } split(/\s*;\s*/, $string);
+  my @assignments = split(/\s*;\s*/, $string);
+  my %kv;
+  foreach my $assignment (@assignments) {
+    if ($assignment !~ /=/) {
+      next;
+    }
+    my ($key, $value) = split(/=/, $assignment, 2);
+    $kv{$key} = $value;
+  }
+  if (! keys(%kv)) {
+    return;
+  }
   return $class->new(%kv);
 }
 
@@ -34,7 +45,7 @@ Mail::STS::SSKV - role for semicolon-separated key/value pairs
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

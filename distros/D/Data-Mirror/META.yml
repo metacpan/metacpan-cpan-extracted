@@ -1,0 +1,43 @@
+---
+abstract: 'a simple way to efficiently retrieve data from the World Wide Web.'
+author:
+  - 'Gavin Brown <gavin.brown@fastmail.uk>'
+build_requires:
+  Devel::Confess: '0'
+  Test: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Mirror
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::stat: '0'
+  HTTP::Date: '0'
+  IO::File: '0'
+  JSON::XS: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
+  POSIX: '0'
+  Text::CSV_XS: '0'
+  XML::LibXML: '0'
+  YAML::XS: '0'
+  base: '0'
+  open: '0'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+version: '0.02'
+x_generated_by_perl: v5.30.3
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -8,8 +8,7 @@ use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-# Version.
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 
 # Get XML.
 has xml => (
@@ -56,65 +55,75 @@ For more information about Bucharest Map, click L<here|https://en.wikipedia.org/
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+Constructor.
 
- Constructor.
+Returns instance of object.
 
-=item C<get_all_routes($from, $to)> [EXPERIMENTAL]
+=head2 C<get_all_routes> [EXPERIMENTAL]
 
- Get all routes from station to station.
- Returns reference to array with Map::Tube::Route objects.
+Get all routes from station to station.
 
-=item C<get_line_by_id($line_id)>
+Returns reference to array with L<Map::Tube::Route> objects.
 
- Get line object defined by id.
- Returns Map::Tube::Line object.
+=head2 C<get_line_by_id>
 
-=item C<get_line_by_name($line_name)>
+Get line object defined by id.
 
- Get line object defined by name.
- Returns Map::Tube::Line object.
+Returns L<Map::Tube::Line> object.
 
-=item C<get_lines()>
+=head2 C<get_line_by_name>
 
- Get lines in metro map.
- Returns reference to unsorted array with Map::Tube::Line objects.
+Get line object defined by name.
 
-=item C<get_node_by_id($station_id)>
+Returns L<Map::Tube::Line> object.
 
- Get station node by id.
- Returns Map::Tube::Node object.
+=head2 C<get_lines>
 
-=item C<get_node_by_name($station_name)>
+Get lines in metro map.
 
- Get station node by name.
- Returns Map::Tube::Node object.
+Returns reference to unsorted array with L<Map::Tube::Line> objects.
 
-=item C<get_shortest_route($from, $to)>
+=head2 C<get_node_by_id>
 
- Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
- Returns Map::Tube::Route object.
+Get station node by id.
 
-=item C<get_stations($line)>
+Returns L<Map::Tube::Node> object.
 
- Get list of stations for concrete metro line.
- Returns reference to array with Map::Tube::Node objects.
+=head2 C<get_node_by_name>
 
-=item C<name()>
+Get station node by name.
 
- Get metro name.
- Returns string with metro name.
+Returns L<Map::Tube::Node> object.
 
-=item C<xml()>
+=head2 C<get_shortest_route>
 
- Get XML specification of Bucharest metro.
- Returns string with XML.
+Get shortest route between C<$from> and C<$to> node names. Node names in C<$from> and C<$to> are case insensitive.
 
-=back
+Returns Map::Tube::Route object.
+
+=head2 C<get_stations>
+
+Get list of stations for concrete metro line.
+
+Returns reference to array with L<Map::Tube::Node> objects.
+
+=head2 C<name>
+
+Get metro name.
+
+Returns string with metro name.
+
+=head2 C<xml>
+
+Get XML specification of Bucharest metro.
+
+Returns string with XML.
 
 =head1 EXAMPLE1
+
+=for comment filename=print_bucharest_route.pl
 
  use strict;
  use warnings;
@@ -136,6 +145,8 @@ For more information about Bucharest Map, click L<here|https://en.wikipedia.org/
 
 =head1 EXAMPLE2
 
+=for comment filename=print_bucharest_def_xml_file.pl
+
  use strict;
  use utf8;
  use warnings;
@@ -155,6 +166,8 @@ For more information about Bucharest Map, click L<here|https://en.wikipedia.org/
  # XML file: .*/bucharest-map.xml
 
 =head1 EXAMPLE3
+
+=for comment filename=print_bucharest_image.pl
 
  use strict;
  use warnings;
@@ -184,13 +197,15 @@ For more information about Bucharest Map, click L<here|https://en.wikipedia.org/
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Bucharest/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Bucharest/master/images/ex3.png" alt="Metroul din București" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Bucharest/master/images/Bucharest.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Bucharest/master/images/Bucharest.png" alt="Metroul din București" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
+
+=for comment filename=print_bucharest_lines.pl
 
  use strict;
  use warnings;
@@ -214,6 +229,8 @@ For more information about Bucharest Map, click L<here|https://en.wikipedia.org/
  # Linia M4
 
 =head1 EXAMPLE5
+
+=for comment filename=print_bucharest_line_stations.pl
 
  use strict;
  use warnings;
@@ -288,12 +305,14 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2020 Michal Josef Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.10
+0.11
 
 =cut

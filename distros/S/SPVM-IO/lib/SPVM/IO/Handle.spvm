@@ -14,10 +14,9 @@ class IO::Handle {
   use Sys::OS;
   
   # Fields
+  has fd : protected int;
   has autoflush : rw byte;
-  has input_line_number : ro int;
-  has opened : ro protected int;
-  has blocking_flag : rw protected int;
+  has nonblocking : protected int;
   
   # Class Methods
   static method new : IO::Handle ($options : object[]) {
@@ -30,124 +29,121 @@ class IO::Handle {
   
   # Instance Methods
   method init : void ($options : object[] = undef) {
-    my $options_h = Hash->new($options);
     
-    # Blocking option
-    my $blocking_flag = $options_h->delete_or_default_int("Blocking", 1);
-    $self->{blocking_flag} = $blocking_flag;
+    $self->{fd} = -1;
     
-    for my $key (@{$options_h->keys}) {
-      die "The \"$key\" option is not available";
-    }
   }
   
-  method close : int () { die "Not implemented"; }
-
-  method eof : int () { die "Not implemented"; }
-
-  method fileno : int () { die "Not implemented"; }
-
-  method getc : int () { die "Not implemented"; }
-
-  method print : int ($string : string) { die "Not implemented"; }
-
-  method say : int ($string : string) {
-    my $status1 = $self->print($string);
-    my $status2 = $self->print("\n");
-    my $status = $status1 || $status2;
+  method opened : int () {
+    my $opened = $self->fileno >= 0;
     
-    return $status;
+    return $opened;
   }
-
-  method printf : int ($format : string, $args : object[]) {
+  
+  method fileno : int () {
+    return $self->{fd};
+  }
+  
+  method blocking : int () {
+    return !$self->{nonblocking};
+  }
+  
+  method print : void ($string : string) {
+    $self->write($string);
+  }
+  
+  method printf : void ($format : string, $args : object[]) {
     my $formated_string = Format->sprintf($format, $args);
-    return $self->print($formated_string);
+    $self->print($formated_string);
   }
-
-  method clearerr : void () { die "Not implemented"; }
   
-  method error : int () { die "Not implemented"; }
-
-  method flush : int () { die "Not implemented"; }
-
-  method ungetc : int ($c : int) { die "Not implemented"; }
-
-  method printflush : int ($string : string) {
-    my $old_autoflush = $self->autoflush;
-    
-    # Restores the autoflush field at the end of the scope.
-    my $handle = $self;
-    my $scope_guard = Scope::Guard->new([has handle : IO::Handle = $handle, has old_autoflush : int = $old_autoflush] method : void () {
-      my $handle = $self->{handle};
-      my $old_autoflush = $self->{old_autoflush};
-      
-      $handle->set_autoflush($old_autoflush);
-    });
-    
-    $self->set_autoflush(1);
+  method say : void ($string : string) {
     $self->print($string);
-  }
-
-  method truncate : int ($legnth : long) {
-    my $fileno = $self->fileno;
-    
-    return Sys::IO->ftruncate($fileno, $legnth);
+    $self->print("\n");
   }
   
   method ioctl : int ($request : int, $request_arg : object of byte[]|short[]|int[]|long[]|float[]|double[]|object = undef) {
-    my $fileno = $self->fileno;
+    my $fd = $self->fileno;
     
-    return Sys->ioctl($fileno, $request, $request_arg);
-  }
-
-  method sync : int () {
-    my $fileno = $self->fileno;
+    my $ioctl_ret =  Sys->ioctl($fd, $request, $request_arg);
     
-    return Sys::IO->fsync($fileno);
-  }
-
-  method stat : int ($stat : Sys::IO::Stat) {
-    my $fileno = $self->fileno;
-    
-    return Sys::IO::Stat->fstat($fileno, $stat);
-  }
-
-  method getline : string () { die "Not implemented"; }
-
-  method getlines : string () { die "Not implemented"; }
-
-  method fcntl : int ($command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef) {
-    my $fileno = $self->fileno;
-    
-    return Sys::IO->fcntl($fileno, $command, $command_arg);
+    return $ioctl_ret;
   }
   
-  method blocking : void ($blocking : int) {
-    unless ($blocking >= 0) {
-      die "The $blocking must be greater than or equal to 0";
-    }
+  method fcntl : int ($command : int, $command_arg : object of Int|Sys::IO::Flock|object = undef) {
+    my $fd = $self->fileno;
     
-    my $fileno = $self->fileno;
+    my $fcntl_ret = Sys->fcntl($fd, $command, $command_arg);
     
-    if (Sys::OS->is_windows) {
-      my $flags = [(int)!$blocking];
-      $self->ioctl(IOCTL->FIONBIO, $flags);
-    }
-    else {
-      my $newmode = 0;
-      if ($blocking == 0) {
-        $newmode &= ~IO->O_NDELAY;
-        $newmode |= IO->O_NONBLOCK;
+    return $fcntl_ret;
+  }
+  
+  method set_blocking : void ($blocking : int) {
+    
+    my $current_blocking = !$self->{nonblocking};
+    
+    unless (!!$blocking == $current_blocking) {
+      
+      my $fd = $self->fileno;
+      
+      if (Sys::OS->is_windows) {
+        my $flags = [(int)!$blocking];
+        $self->ioctl(IOCTL->FIONBIO, $flags);
       }
       else {
-        $newmode &= ~(IO->O_NDELAY|IO->O_NONBLOCK);
+        my $newmode = $self->fcntl(IO->F_GETFL);
+        
+        if ($blocking == 0) {
+          $newmode &= ~IO->O_NDELAY;
+          $newmode |= IO->O_NONBLOCK;
+        }
+        else {
+          $newmode &= ~(IO->O_NDELAY|IO->O_NONBLOCK);
+        }
+        
+        $self->fcntl(IO->F_SETFL, $newmode);
       }
       
-      $self->fcntl(IO->F_SETFL, $newmode);
+      $self->{nonblocking} = !$blocking;
     }
   }
   
-  method write : int ($string : string, $length : int = -1, $offset : int = 0) { die "Not implemented"; }
+  method syswrite : int ($string : string, $length : int = -1, $offset : int = 0) {
+    my $fd = $self->fileno;
+    
+    my $write_length = Sys->syswrite($fd, $string, $length, $offset);
+  }
   
-  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) { die "Not implemented"; }
+  method sysread : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
+    my $fd = $self->fileno;
+    
+    return Sys->sysread($fd, $string, $length, $offset);
+  }
+  
+  method truncate : void ($legnth : long) {
+    my $fd = $self->fileno;
+    
+    Sys::IO->ftruncate($fd, $legnth);
+  }
+  
+  method stat : Sys::IO::Stat () {
+    my $fd = $self->fileno;
+    
+    my $stat = Sys->fstat($fd);
+    
+    return $stat;
+  }
+  
+  method sync : void () {
+    my $fd = $self->fileno;
+    
+    Sys::IO->fsync($fd);
+  }
+  
+  method close : void () { die "Not implemented."; }
+  
+  method write : int ($string : string, $length : int = -1, $offset : int = 0) { die "Not implemented."; }
+  
+  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) { die "Not implemented."; }
+  
 }

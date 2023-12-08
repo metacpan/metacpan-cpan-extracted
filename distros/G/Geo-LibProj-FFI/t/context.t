@@ -5,12 +5,13 @@ use lib 'lib';
 
 use Test::More;
 use Test::Exception;
-use Test::Warnings;
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 # Threading contexts
 # https://proj.org/development/reference/functions.html#threading-contexts
 
-plan tests => 3 + 1;
+plan tests => 3 + $no_warnings;
 
 use Geo::LibProj::FFI qw( :all );
 

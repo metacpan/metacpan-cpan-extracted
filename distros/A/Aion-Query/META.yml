@@ -26,11 +26,11 @@ no_index:
 provides:
   Aion::Query:
     file: lib/Aion/Query.pm
-    version: v0.0.2
+    version: v0.0.3
   Aion::Query::Transaction:
     file: lib/Aion/Query.pm
 requires:
-  Aion::Format: v0.0.2
+  Aion::Format: v0.0.3
   DBD::SQLite: '1.74'
   common::sense: '0'
   config: '1.3'
@@ -39,10 +39,10 @@ resources:
   bugtracker: https://github.com/darviarush/perl-aion-query/issues
   homepage: https://github.com/darviarush/perl-aion-query
   repository: https://github.com/darviarush/perl-aion-query.git
-version: 0.0.2
+version: 0.0.3
 x_authority: cpan:DART
 x_contributors:
   - 'Yaroslav O. Kosmina <dart@cpan.org>'
   - 'Yaroslav O. Kosmina <darviarush@mail.ru>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
-x_static_install: 1
+x_static_install: 0

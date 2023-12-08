@@ -1,5 +1,8 @@
 Revision history for Net-Fortinet-FortiManager
 
+0.004000  2023-12-04 18:16:30+01:00 Europe/Vienna
+    - add wildcard FQDN object support
+
 0.003001  2022-02-08 14:53:25+01:00 Europe/Vienna
     - make install_policy_package parameters optional
     - install_policy_package returns the task id

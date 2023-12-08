@@ -47,6 +47,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-File-Glob"
       }
    },
-   "version" : "0.020001",
+   "version" : "0.020002",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

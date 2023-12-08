@@ -1,5 +1,11 @@
 Revision history for Image-DS9
 
+v1.0.1    2023-12-05 00:22:26-05:00 America/New_York
+
+  [ENHANCEMENT]
+
+    * crop command is now supported.
+
 v1.0.0    2023-09-02 20:14:04-04:00 America/New_York
 
   [API BREAKAGE]

@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::BlockActions;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use Net::Async::Slack::EventType;
 

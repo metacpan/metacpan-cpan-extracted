@@ -1,3 +1,12 @@
+0.11 2023-12-08T14:29:09+01:00
+ - Fix image name in doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite doc to use of =head2.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.10 2020-01-12T00:11:37+01:00
  - Update Module::Install to 1.19 version.
  - Update copyright years to 2020.

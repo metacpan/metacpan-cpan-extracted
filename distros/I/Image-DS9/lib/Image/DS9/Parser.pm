@@ -7,7 +7,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 our @CARP_NOT = qw( Image::DS9::Command );
 
@@ -376,7 +376,7 @@ Image::DS9::Parser - Parser driver
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =for Pod::Coverate chk_attr
 dump_attr_chk

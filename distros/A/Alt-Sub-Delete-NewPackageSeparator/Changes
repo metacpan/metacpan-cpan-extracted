@@ -1,0 +1,8 @@
+1.000022  2023-12-04  Released-By: PERLANCAR; Urgency: medium
+
+          - Remove usage of Alt::Base (no longer on CPAN).
+
+
+1.000021  2023-12-01  Released-By: PERLANCAR
+
+          - First release.

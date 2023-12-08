@@ -6,36 +6,15 @@ package SPVM::Go::Schedule;
 
 =head1 Name
 
-SPVM::Go::Schedule - Short Description
+SPVM::Go::Schedule - Scheduling Goroutines
 
 =head1 Description
 
-Go::Schedule class of L<SPVM> has methods for someting.
+The Go::Schedule class in L<SPVM> has methods to schedule goroutines.
 
 =head1 Usage
 
   use Go::Schedule;
-
-=head1 Fields
-
-
-
-=head1 Class Methods
-
-
-
-=head1 Instance Methods
-
-
-
-
-=head1 Repository
-
-
-
-=head1 Author
-
-Yuki Kimoto C<kimoto.yuki@gmail.com>
 
 =head1 Copyright & License
 

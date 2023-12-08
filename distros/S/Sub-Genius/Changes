@@ -96,3 +96,8 @@ Changes for Sub::Genius
 
 0.314004     2021-06-29 14:30:52-03:14 America/New_York
              - fixed dist.ini for working meta, Makefile.PL
+
+0.314005     2023-12-07 14:30:52-03:14 America/New_York
+             - fixed stubby bugs discovered during 2023 Perl Advent
+             - fixed issue with stubby generation in Sub::Genius::Util
+             - cleaned up dist.ini

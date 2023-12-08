@@ -82,6 +82,11 @@ has package => (
   isa => 'Str',
 );
 
+has api_path => (
+  is  => 'rw',
+  isa => 'Str',
+);
+
 =head1 SUBROUTINES/METHODS
 
 =head2 binarylist - fetch list of binary buildresults
@@ -93,16 +98,16 @@ has package => (
 sub binarylist {
   my ($self) = @_;
 
-  my $api_path = '/build/'
+  $self->api_path('/build/'
     . join
         q{/},
         $self->project,
         $self->repository,
         $self->arch,
         $self->package,
-  ;
+  );
 
-  my $binarylist = $self->request(GET=>$api_path);
+  my $binarylist = $self->request(GET=>$self->api_path);
 
   my $dtd = Net::OBS::Client::DTD->new()->binarylist();
 
@@ -120,7 +125,7 @@ sub fileinfo {
 
   # /build/OBS:Server:Unstable/images/x86_64/OBS-Appliance-qcow2/obs-server.x86_64-2.5.51-Build6.4.qcow2?view=fileinfo
   #
-  my $api_path = '/build/'
+  $self->api_path('/build/'
     . join
         q{/},
           $self->project,
@@ -128,10 +133,10 @@ sub fileinfo {
           $self->arch,
           $self->package,
           $binary,
-  ;
-  $api_path .= '?view=fileinfo';
+    . '?view=fileinfo'
+  );
 
-  my $binarylist = $self->request(GET=>$api_path);
+  my $binarylist = $self->request(GET=>$self->api_path);
 
   my $dtd = Net::OBS::Client::DTD->new()->fileinfo();
 

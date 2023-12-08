@@ -1,0 +1,17 @@
+<%init>
+my $icon_id = $m->dhandler_arg;
+
+my $form_icon = RT::Attribute->new( RT->SystemUser );
+my ($ok, $msg) = $form_icon->Load($icon_id);
+
+if ( $ok ) {
+    RT::Interface::Web::StaticFileHeaders();
+    my $content = $form_icon->Content;
+    $r->content_type( $content->{type} );
+    $m->out( $content->{data} );
+}
+else {
+    # 404
+    return $m->decline;
+}
+</%init>

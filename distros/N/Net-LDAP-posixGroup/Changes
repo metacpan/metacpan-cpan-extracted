@@ -1,5 +1,10 @@
 Revision history for Net-LDAP-posixGroup
 
+1.0.0	2022-12-08/3:15
+		 - now uses Error::Helper
+		 - will die on all errors
+		 - now checks to make sure that the DN for the base DN is valid
+
 0.0.2	2011-07-01/04:20
 		-Add missing dependency in Makefile.PL.
 

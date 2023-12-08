@@ -1,0 +1,65 @@
+0.05 2023-12-05
+
+ - Fix CPAN RT #81931 and #132452. Now, no more than 8 bits are used from each
+   call to rand().
+
+ - Minor improvements to documentation.
+
+ - Use Test::More to get more informative output if/when tests fail.
+
+0.04 2020-04-28
+
+ - Fix CPAN RT #81931 (thanks to DANAJ).
+
+ - New MANIFEST.SKIP file based on the template in the ExtUtils-Manifest
+   distribution.
+
+ - Add more test files and update existing test files.
+
+ - Add MANIFEST.SKIP file.
+
+ - Format CHANGES according to CPAN::Changes::Spec.
+
+ - Miscellaneous "cosmetic" changes.
+
+0.03  2010-02-20
+
+ - OO.pm: Catch the case when a parameter is undef.
+
+ - Makefile.PL: Changed required version of Perl to 5.008.
+
+ - README: Clean up the file.
+
+ - OO.pm: POD is now ASCII. The podlators aren't ready for UTF-8.
+
+ - OO.pm: Corrected URL for 'CPAN Testers PASS Matrix' and removed
+   links to AnnoCPAN (http://annocpan.org).
+
+ - OO.pm: Cleaned up and extended comments in the NOTES section.
+
+ - OO.pm: Added missing POD escapes, E<...>.
+
+ - OO.pm: Explicitly set POD encoding with '=encoding utf8'.
+
+ - OO.pm, README: Incremented version number.
+
+0.02 2010-02-19
+
+ - 12-length-base.t: Rewritten so it doesn't use the 'subtest'
+   function, which was introduced in Test::More 0.94.
+
+ - *.t: Better comments in the code.
+
+ - *.t: Using UTF-8 in all files.
+
+ - OO.pm: Removed unused package global variable $base.
+
+ - OO.pm: Corrected e-mail address, updated web links, and included
+   a few more web links in the BUGS and SUPPORT sections of the POD.
+
+ - OO.pm, README: Incremented version number.
+
+0.01 2010-01-21
+
+ - Original version; created by h2xs 1.23 with options
+       -AX --skip-exporter --use-new-tests -n Math::BigInt::Random::OO

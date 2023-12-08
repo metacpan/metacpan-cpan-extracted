@@ -1,3 +1,13 @@
+1.379 2023-12-03
+
+  Bug fixes:
+    * Show filtered elements in nodes as well.
+
+1.378 2023-12-02
+
+  Bug fixes:
+    * TkUI: Fix memory cycles (Debian #1057007)
+
 1.377 2023-11-18
 
   Main UI changes:

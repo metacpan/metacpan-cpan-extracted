@@ -2,28 +2,27 @@ NAME
     App::FileTestUtils - More CLIs for file testing
 
 VERSION
-    This document describes version 0.003 of App::FileTestUtils (from Perl
-    distribution App-FileTestUtils), released on 2021-10-13.
+    This document describes version 0.005 of App::FileTestUtils (from Perl
+    distribution App-FileTestUtils), released on 2023-11-30.
 
 DESCRIPTION
     This distributions provides the following command-line utilities which
     are related to file testing:
 
-    *   dir-empty
-
-    *   dir-has-dot-files
-
-    *   dir-has-dot-subdirs
-
-    *   dir-has-files
-
-    *   dir-has-non-dot-files
-
-    *   dir-has-non-dot-subdirs
-
-    *   dir-has-subdirs
-
-    *   dir-not-empty
+    1. dir-empty
+    2. dir-has-dot-files
+    3. dir-has-dot-subdirs
+    4. dir-has-files
+    5. dir-has-non-dot-files
+    6. dir-has-non-dot-subdirs
+    7. dir-has-subdirs
+    8. dir-not-empty
+    9. dir-only-has-dot-files
+    10. dir-only-has-dot-subdirs
+    11. dir-only-has-files
+    12. dir-only-has-non-dot-files
+    13. dir-only-has-non-dot-subdirs
+    14. dir-only-has-subdirs
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -36,7 +35,7 @@ SOURCE
 SEE ALSO
     The file testing operators in perlfunc, e.g. "-s", "-x", "-r", etc.
 
-    File::MoreUtil
+    File::Util::Test
 
 AUTHOR
     perlancar <perlancar@cpan.org>
@@ -52,13 +51,13 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2019 by perlancar
+    This software is copyright (c) 2023, 2021, 2019 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under

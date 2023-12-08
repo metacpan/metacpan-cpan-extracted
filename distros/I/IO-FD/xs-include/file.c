@@ -155,7 +155,7 @@ ioctl(fd, request, arg)
 
 	CODE:
 		RETVAL=&PL_sv_undef;
-
+    //NOTE: Remember to add 1 to no error return
 	OUTPUT:
 		RETVAL
 
@@ -186,8 +186,8 @@ stat(target)
 			
 			len=SvCUR(target);
 			Newx(path, len+1, char); 	//Allocate plus null
-			Copy(SvPV_nolen(target), path, len, char);	//Copy
-			*(path+len)='\0';	//set null	
+			Copy(SvPVbyte_nolen(target), path, len, char);	//Copy
+			path[len]='\0';	//set null	
 			switch(ix){
 				case 1:
 					ret=stat(path, &buf);

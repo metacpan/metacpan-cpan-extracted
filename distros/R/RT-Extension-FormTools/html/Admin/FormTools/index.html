@@ -1,0 +1,138 @@
+<& /Admin/Elements/Header, Title => loc("Admin FormTools") &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<&| /Widgets/TitleBox, title => '', class => 'container formtools-admin-select' &>
+<form method="post" action="<% RT->Config->Get('WebPath') %>/Admin/FormTools/index.html">
+  <table class="table collection collection-as-table" cellspacing="0">
+    <tbody>
+      <tr class="collection-as-table">
+        <th class="collection-as-table"><&|/l&>Name</&></th>
+        <th class="collection-as-table"><&|/l&>Creates Tickets in Queue</&></th>
+        <th class="collection-as-table"><&|/l&>Enabled</&></th>
+      </tr>
+% my $i = 0;
+% for my $form_ref ( @forms ) {
+
+      <tr class="<% $i % 2 ? 'oddline' : 'evenline' %>">
+        <td class="collection-as-table"><a href="<% RT->Config->Get('WebURL') %>Admin/FormTools/Modify.html?id=<% $form_ref->{'id'} %>"><% $form_ref->{'name'} %></a></td>
+        <td class="collection-as-table"><% $form_ref->{'queue_name'} %></td>
+        <td class="collection-as-table">
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input checkbox" id="enable-form-<% $form_ref->{'id'} %>" name="enable-form-<% $form_ref->{'id'} %>" value="1" <% $form_ref->{disabled} ? '' : 'checked="checked"' %> />
+            <label class="custom-control-label" for="enable-form-<% $form_ref->{'id'} %>"></label>
+          </div>
+        </td>
+      </tr>
+%    ++$i;
+% }
+    </tbody>
+  </table>
+  <div class="form-row align-items-center">
+    <div class="col-12">
+      <div class="custom-control custom-checkbox text-right">
+        <input type="checkbox" class="custom-control-input checkbox" id="FindDisabledForms" name="FindDisabledForms" value="1" <% $FindDisabledForms ? 'checked="checked"': '' |n%> />
+        <label class="custom-control-label" for="FindDisabledForms"><&|/l&>Include disabled forms in listing.</&></label>
+      </div>
+    </div>
+  </div>
+  <div class="form-row align-items-center">
+    <div class="col-12">
+      <div class="text-right">
+        <input type="submit" name="Submit" class="form-control btn btn-primary" value="<&|/l&>Update</&>" />
+      </div>
+    </div>
+  </div>
+</form>
+</&>
+<%init>
+my @results;
+
+my $forms = RT::Attributes->new( $session{'CurrentUser'} );
+$forms->Limit( FIELD => 'Name', VALUE => 'FormTools Form' );
+
+my @unsorted_forms;
+
+if ( $Submit ) {
+    while ( my $form = $forms->Next ) {
+        my $id = $form->Id;
+        my $content = $form->Content;
+        my $name = $form->Description;
+
+        my $changed;
+        if ( $ARGS{"enable-form-$id"} ) {
+            if ( $content->{disabled} ) {
+                $content->{disabled} = 0;
+                $changed = 1;
+            }
+        }
+        else {
+            if ( !$content->{disabled} ) {
+                $content->{disabled} = 1;
+                $changed = 1;
+            }
+        }
+
+        if ( $changed ) {
+            my ( $ret, $msg ) = $form->SetContent($content);
+            if ($ret) {
+                if ( $content->{disabled} ) {
+                    push @results, loc('Disabled [_1]', $name);
+                }
+                else {
+                    push @results, loc('Enabled [_1]', $name);
+                }
+            }
+            else {
+                if ( $content->{disabled} ) {
+                    push @results, loc( "Couldn't disable [_1]: [_2]", $name, $msg );
+                }
+                else {
+                    push @results, loc( "Couldn't enable [_1]: [_2]", $name, $msg );
+                }
+            }
+        }
+    }
+}
+
+
+if ( @results ) {
+    MaybeRedirectForResults(
+        Actions   => \@results,
+        Path      => '/Admin/FormTools/index.html',
+        Arguments => { FindDisabledForms => $FindDisabledForms },
+    );
+}
+
+while ( my $form = $forms->Next ) {
+    my $form_ref = $form->Content;
+    next if !$FindDisabledForms && $form_ref->{disabled};
+
+    $form_ref->{'name'} = $form->Description;
+    $form_ref->{'id'} = $form->Id;
+
+    my $queue = RT::Queue->new( $session{'CurrentUser'} );
+    my ($ok, $msg) = $queue->Load($form_ref->{'queue'});
+    if ( $ok ) {
+        $form_ref->{'queue_name'} = $queue->Name;
+    }
+    else {
+        RT->Logger->error("FormTools unable to load queue " . $form_ref->{'queue'} . " $msg");
+    }
+
+    push @unsorted_forms, $form_ref;
+}
+
+my @forms = sort { $a->{'name'} cmp $b->{'name'} } @unsorted_forms;
+
+$m->callback(
+    CallbackName     => 'Initial',
+    FormsRef         => \@forms,
+    ARGSRef          => \%ARGS
+);
+
+</%init>
+<%args>
+$Submit            => undef
+$FindDisabledForms => undef
+</%args>

@@ -1,0 +1,35 @@
+<&|/Widgets/TitleBox, title => '', class => 'container formtools-form-list ml-auto mr-auto' &>
+% my $item_number = 1;
+% while ( my $form_attribute = $forms->Next ) {
+%    next unless $form_attribute->CurrentUserCanSee;
+%    my $form = $form_attribute->Content;
+%    next if $form->{disabled};
+
+% if ( $item_number != 1 ) {
+<hr />
+% }
+<div class="row mt-3 mb-3">
+  <div class="col-4">
+    <a href="<% RT->Config->Get('WebPath') %><% $SelfServicePath %>/Forms/<% $form_attribute->Description %>">
+      <% $m->scomp('/Elements/Forms/ShowFormGraphic', FormObj => $form_attribute, ItemNumber => $item_number) |n %>
+    </a>
+  </div>
+  <div class="col my-auto ml-2 mr-2 formtools-form-text">
+    <% $form->{'form-description'} |n %>
+  </div>
+</div>
+% $item_number++;
+% }
+</&>
+<%init>
+my $forms = RT::Attributes->new( $session{CurrentUser} );
+$forms->Limit( FIELD => 'Name', VALUE => 'FormTools Form' );
+
+my $SelfServicePath = '/SelfService';
+
+if ( $session{'CurrentUser'}->Privileged ) {
+    $SelfServicePath = '';
+}
+</%init>
+<%args>
+</%args>

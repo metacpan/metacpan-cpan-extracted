@@ -1,0 +1,93 @@
+This is monotone.info, produced by makeinfo version 4.13 from
+monotone.texi.
+
+INFO-DIR-SECTION Programming
+START-INFO-DIR-ENTRY
+* monotone: (monotone).         Monotone version control system
+END-INFO-DIR-ENTRY
+
+
+Indirect:
+monotone.info-1: 212
+monotone.info-2: 273326
+monotone.info-3: 515421
+
+Tag Table:
+(Indirect)
+Node: Top212
+Node: Concepts1654
+Node: Versions of files2461
+Ref: Versions of files-Footnote-18719
+Node: Versions of trees8912
+Node: Historical records13841
+Node: Certificates20029
+Node: Storage and workflow23992
+Node: Forks and merges31699
+Node: Branches34468
+Node: Tutorial42169
+Node: Creating a Database45167
+Node: Generating Keys47009
+Node: Starting a New Project52072
+Node: Adding Files53643
+Node: Committing Work58290
+Node: Basic Network Service61950
+Node: Synchronising Databases64893
+Node: Making Changes67098
+Node: Dealing with a Fork73243
+Node: Branching and Merging80956
+Node: Network Service Revisited86291
+Node: Advanced Uses98983
+Node: Other Transports100872
+Node: Selectors103668
+Node: Restrictions116068
+Node: Scripting121201
+Node: Inodeprints122467
+Node: Merge Conflicts124460
+Node: Workspace Collisions138077
+Node: Quality Assurance142984
+Node: Vars145836
+Node: Reserved Files149966
+Node: Reserved Certs154969
+Node: Naming Conventions158687
+Node: File Attributes160033
+Node: Merging162569
+Node: Migrating and Dumping164233
+Node: Importing from CVS166284
+Node: Exporting to GIT167930
+Node: Using packets171935
+Node: Bisecting176973
+Node: CVS Phrasebook180437
+Node: Command Reference187482
+Node: Tree189233
+Node: Conflicts197978
+Node: Workspace202632
+Node: Network225316
+Node: Informative231674
+Node: Key and Cert Trust250533
+Node: Certificate256043
+Node: Packet I/O257607
+Node: Database259801
+Node: Automation273326
+Node: RCS393181
+Node: GIT394418
+Node: Lua Reference399437
+Node: Hooks401958
+Ref: Netsync Transport Hooks423121
+Ref: Trust Evaluation Hooks428053
+Ref: merge3434982
+Ref: get_preferred_merge3_command436340
+Node: Additional Lua Functions444772
+Node: Implementation Differences453462
+Node: Special Topics454728
+Node: Internationalization455511
+Node: Hash Integrity463447
+Node: Rebuilding ancestry470298
+Ref: Rebuilding ancestry-Footnote-1476622
+Node: Mark-Merge476901
+Node: Regexps505781
+Node: Regexp Summary506461
+Node: Regexp Details515421
+Node: Default hooks594821
+Node: General Index643993
+
+End Tag Table

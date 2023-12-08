@@ -22,10 +22,10 @@ name: Net-Gemini
 provides:
   Net::Gemini:
     file: lib/Net/Gemini.pm
-    version: '0.08'
+    version: '0.09'
   Net::Gemini::Server:
     file: lib/Net/Gemini/Server.pm
-    version: '0.08'
+    version: '0.09'
   URI::gemini:
     file: lib/Net/Gemini.pm
 requires:
@@ -44,5 +44,5 @@ requires:
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://thrig.me/src/Net-Gemini.git
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

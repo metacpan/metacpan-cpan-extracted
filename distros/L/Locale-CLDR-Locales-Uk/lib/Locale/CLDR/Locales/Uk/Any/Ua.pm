@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Uk::Any::Ua - Package for language Ukrainian
 
 package Locale::CLDR::Locales::Uk::Any::Ua;
 # This file auto generated from Data\common\main\uk_UA.xml
-#	on Sat  4 Nov  6:29:10 pm GMT
+#	on Tue  5 Dec  1:36:59 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

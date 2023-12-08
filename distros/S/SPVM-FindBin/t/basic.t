@@ -8,6 +8,10 @@ BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use Cwd;
 
+use SPVM 'Fn';
+
+use SPVM::FindBin;
+
 use SPVM 'FindBin';
 
 use SPVM 'TestCase::FindBin';
@@ -28,5 +32,10 @@ is(SPVM::FindBin->Bin, "$FindBin::Bin");
 is(SPVM::FindBin->Script, "$FindBin::Script");
 is(SPVM::FindBin->RealBin, "$FindBin::RealBin");
 is(SPVM::FindBin->RealScript, "$FindBin::RealScript");
+
+# Version
+{
+  is($SPVM::FindBin::VERSION, SPVM::Fn->get_version_string('FindBin'));
+}
 
 done_testing;

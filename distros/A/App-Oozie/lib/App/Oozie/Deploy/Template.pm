@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use namespace::autoclean -except => [qw/_options_data _options_config/];
 
@@ -16,6 +16,7 @@ use App::Oozie::Constants qw(
     LAST_ELEM
     TEMPLATE_DEFINE_VAR
 );
+use App::Oozie::Deploy::Template::ttree;
 
 use Config::Properties;
 use Data::Dumper ();
@@ -27,7 +28,6 @@ use File::Path qw(
 use File::Spec;
 use File::Temp ();
 use Hash::Flatten ();
-use IPC::Cmd ();
 use Moo;
 use MooX::Options;
 use Ref::Util qw(
@@ -243,7 +243,7 @@ sub compile {
         }
     }
 
-    my($ok, $err, $full_buf, $stdout_buff, $stderr_buff) = $self->_ttree_cli( @command );
+    my($ok, $err, $full_buf, $stdout_buff, $stderr_buff) = $self->_ttree_obj( @command );
 
     # ttree doesn't return an error status when it encounters an error, so just
     # look at the output
@@ -298,7 +298,16 @@ sub compile {
 sub _ttree_obj {
     my $self = shift;
     my @command = @_;
-    require App::Oozie::Deploy::Template::ttree;
+
+    my $compiler = 'App::Oozie::Deploy::Template::ttree';
+
+    if ( $self->verbose ) {
+        $self->logger->debug(
+            sprintf 'ttree compiler %s version %s',
+                    $compiler,
+                    $compiler->VERSION // '[undef]',
+        );
+    }
 
     my( $ok, $err, $full_buf, $stdout_buff, $stderr_buff );
 
@@ -316,7 +325,7 @@ sub _ttree_obj {
     };
 
     eval {
-        my $ttree = App::Oozie::Deploy::Template::ttree->new( $logger );
+        my $ttree = $compiler->new( $logger );
         $ttree->run( @command );
         $ok = 1;
         1;
@@ -327,21 +336,14 @@ sub _ttree_obj {
 
     $full_buf = [ @{ $stdout_buff }, @{ $stderr_buff } ];
 
+    if ( $self->verbose ) {
+        $self->logger->debug(
+            sprintf 'ttree output: %s',
+                    join EMPTY_STRING, @{ $full_buf },
+        );
+    }
+
     return ( $ok, $err, $full_buf, $stdout_buff, $stderr_buff );
-}
-
-sub _ttree_cli {
-    my $self = shift;
-    my @command = @_;
-
-    unshift @command, 'ttree';
-
-    my( $ok, $err, $full_buf, $stdout_buff, $stderr_buff ) = IPC::Cmd::run(
-        command => \@command,
-        verbose => $self->verbose,
-        timeout => $self->timeout,
-    );
-    return $ok, $err, $full_buf, $stdout_buff, $stderr_buff;
 }
 
 sub _probe_readme {
@@ -594,7 +596,7 @@ App::Oozie::Deploy::Template
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,105 @@
+NAME
+    Complete::Color - Completion routines related to colors
+
+VERSION
+    This document describes version 0.003 of Complete::Color (from Perl
+    distribution Complete-Color), released on 2023-12-01.
+
+FUNCTIONS
+  complete_color_name
+    Usage:
+
+     complete_color_name(%args) -> array
+
+    Complete from color names.
+
+    Currently color names are taken from "Graphics::ColorNamesLite::*"
+    modules.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   lang => *str*
+
+        (No description)
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+  complete_color_rgb24_hexcode
+    Usage:
+
+     complete_color_rgb24_hexcode(%args) -> array
+
+    Complete from color names.
+
+    Currently color names are taken from "Graphics::ColorNamesLite::*"
+    modules.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   case => *str* (default: "lower")
+
+        (No description)
+
+    *   lang => *str*
+
+        (No description)
+
+    *   word* => *str* (default: "")
+
+        Word to complete.
+
+    Return value: (array)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Complete-Color>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Complete-Color>.
+
+SEE ALSO
+    Complete
+
+    Other "Complete::*" modules.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Color>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

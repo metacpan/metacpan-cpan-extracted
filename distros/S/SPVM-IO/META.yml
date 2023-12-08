@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  SPVM: '0.986'
+  SPVM: '0.989040'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -18,10 +18,11 @@ no_index:
     - t
     - inc
 requires:
-  SPVM: '0.986'
+  SPVM: '0.989040'
+  SPVM::Go: '0.005'
   SPVM::Math: '0.11'
-  SPVM::Sys: '0.482'
+  SPVM::Sys: '0.510'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-IO.git
-version: '0.204003'
+version: '0.211002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

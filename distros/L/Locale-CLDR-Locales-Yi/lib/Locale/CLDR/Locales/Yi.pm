@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Yi - Package for language Yiddish
 
 package Locale::CLDR::Locales::Yi;
 # This file auto generated from Data\common\main\yi.xml
-#	on Sat  4 Nov  6:30:17 pm GMT
+#	on Tue  5 Dec  1:38:07 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

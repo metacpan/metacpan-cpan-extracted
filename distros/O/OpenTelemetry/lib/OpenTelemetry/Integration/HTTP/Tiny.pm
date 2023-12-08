@@ -1,7 +1,7 @@
 package OpenTelemetry::Integration::HTTP::Tiny;
 # ABSTRACT: OpenTelemetry integration for HTTP::Tiny
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use strict;
 use warnings;
@@ -107,6 +107,10 @@ sub install ( $class, %config ) {
                     : (),
             },
         );
+
+        OpenTelemetry->propagator->inject( \my %carrier );
+        $options->{headers} = { %{ $options->{headers} // {} }, %carrier }
+            if %carrier;
 
         dynamically OpenTelemetry::Context->current
             = OpenTelemetry::Trace->context_with_span($span);

@@ -1,3 +1,25 @@
+0.47 2023-12-08T17:00:11+01:00
+ - Add Map::Tube::API 0.05 version.
+ - Add Map::Tube::Server 0.01 version.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Rename LICENSE to LICENSE.artistic_2.
+ - Update Map::Tube to 3.68 version.
+ - Update Map::Tube::CLI to 0.67 version.
+ - Update Map::Tube::Cookbook to 0.08 version.
+ - Update Map::Tube::Exception to 3.21 version.
+ - Update Map::Tube::Graph to 0.06 version.
+ - Update Map::Tube::GraphViz to 0.07 version.
+ - Update Map::Tube::Plugin::Formatter to 0.17 version.
+ - Update Map::Tube::Plugin::Graph to 0.42 version.
+ - Update Module::Install to 1.21 version.
+ - Update Test::Map::Tube to 0.57 version.
+ - Update Task::Map::Tube::Metro to 0.13 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.46 2016-06-27T11:37:25+02:00
  - Update Map::Tube to 3.15 version.
  - Update Map::Tube::CLI to 0.18 version.

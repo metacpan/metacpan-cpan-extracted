@@ -1,3 +1,17 @@
+0.004 2023-11-30
+  [Requrement Changes]
+    * Require SPVM::Sys 0.504.
+  [Incompatible Changes]
+    * Remove Time::HiRes::Util. This utilities are moved to Sys::Time::Util.
+  [New Features]
+    * Add the clock_getrtime_timespec method to the Time::HiRes class.
+    * Add the clock_getres_timespec method to the Time::HiRes class.
+    
+0.003 2023-11-27
+  [Bug Fix]
+    * Fix many floating seconds bugs.
+  [Test Improvement]
+    * Fix and add many tests.
 0.002 2023-11-27
   [Incompatible Changes]
     * Implement the time method in the Time::HiRes class.

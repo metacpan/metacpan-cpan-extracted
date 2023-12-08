@@ -1,0 +1,31 @@
+<div class="formtools-form-graphic w-50 mt-2 mb-2 ml-auto mr-auto">
+% if ( $has_icon ) {
+<& /Elements/Forms/ShowFormIcon, FormID => $FormObj->Id &>
+% } else {
+  <div class="formtools-form-graphic-box border border-primary rounded pt-4 pb-4">
+    <p class="text-center formtools-form-graphic-text pl-1 pr-1">
+      <% $FormObj->Description %>
+    </p>
+  </div>
+% }
+</div>
+<%init>
+
+unless ( $FormObj and $FormObj->Id ) {
+    RT->Logger->error("No valid form attribute object passed");
+    return;
+}
+
+my $has_icon = 0;
+my $form_icon = RT::Attribute->new( RT->SystemUser );
+my ($ok, $msg) = $form_icon->LoadByCols( ObjectType => 'RT::Attribute', ObjectId => $FormObj->Id );
+
+if ( $ok and $form_icon->Id ) {
+    $has_icon = 1;
+}
+
+</%init>
+<%args>
+$FormObj
+$ItemNumber => 1
+</%args>

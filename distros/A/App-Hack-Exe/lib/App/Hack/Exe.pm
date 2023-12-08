@@ -1,6 +1,27 @@
-package App::Hack::Exe 0.000001;
+package App::Hack::Exe 0.000002;
 use 5.012;
 use warnings;
+
+=head1 NAME
+
+App::Hack::Exe - An animated terminal app that pretends to hack a website, just
+like in the movies
+
+=head1 SYNOPSIS
+
+    require App::Hack::Exe;
+
+    my $he = App::Hack::Exe->new;
+
+    # Run the script
+    $he->run('yahoo.com');
+
+=head1 DESCRIPTION
+
+This is a flashy animated script that simulates a "hacking program", as often
+seen in movies.
+
+=cut
 
 use constant {
     DEFAULTS => {
@@ -45,7 +66,8 @@ EOD
     RECALL_CURSOR => "\e\x{38}",
 };
 
-use Socket qw/
+use Carp qw/ croak /;
+use Socket 1.95 qw/
     AF_INET
     AF_INET6
     NI_NUMERICHOST
@@ -63,6 +85,47 @@ use fields qw/
     ports
     proxies
 /;
+
+=head1 CONSTRUCTOR
+
+=head2 C<new()>
+
+    my $he = App::Hack::Exe->new( %options )
+
+This method constructs a new L<App::Hack::Exe> object and returns it. Key/value
+pair arguments may be provided to set up the initial state. The following
+options are recognized:
+
+   KEY              DEFAULT
+   -----------      -----------
+   get_ipv4         1
+   get_ipv6         1
+   no_delay         0
+   ports            [143, 993, 587, 456, 25, 587, 993, 80]
+   proxies          [qw/ BEL AUS JAP CHI NOR FIN UKR /]
+
+=over
+
+=item get_ipv4, get_ipv6 (int)
+
+Print out this number of IPv4 and IPv6 addresses for the host name,
+respectively.
+
+=item no_delay (bool)
+
+Print out all text at once, instead of simulating delays (e.g. network lag).
+
+=item ports (arrayref)
+
+Set the port numbers for the simulation. Ports are arbitrary strings.
+
+=item proxies (arrayref)
+
+Set the proxy names for the simulation. Proxy names are arbitrary strings.
+
+=back
+
+=cut
 
 sub new {
     my ($class, %args) = @_;
@@ -225,10 +288,18 @@ sub _w00tw00t {
     return;
 }
 
+=head1 METHODS
+
+=head2 C<run( $hostname )>
+
+Run the simulation.
+
+=cut
+
 sub run {
     my ($self, $hostname) = @_;
     unless ($hostname) {
-        say STDERR 'No targets specified.';
+        croak('No targets specified.');
     }
     local $| = 1;
     print _colored_demon();
@@ -244,4 +315,28 @@ sub run {
     return;
 }
 
+=head1 AUTHOR
+
+Dan Church (h3xx<attyzatzat>gmx<dottydot>com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2023 Dan Church.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 AVAILABILITY
+
+The latest version of this library is likely to be available from CPAN as well
+as:
+
+L<https://codeberg.org/h3xx/perl-App-Hack-Exe>>
+
+=head1 THANKS
+
+Thanks to janbrennen's L<original
+idea|https://github.com/janbrennen/rice/blob/master/hack.exe.c>.
+
+=cut
 1;

@@ -10,7 +10,7 @@ SPVM::Go::Sync::WaitGroup - Go WaitGroup
 
 =head1 Description
 
-Go::Sync::WaitGroup class of L<SPVM> has methods to manipulate waiting count.
+The Go::Sync::WaitGroup class in L<SPVM> has methods to manipulate waiting count.
 
 =head1 Usage
 

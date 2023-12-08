@@ -9,10 +9,6 @@ use utf8;
 
 WWW::Suffit::Client::V1 - The Suffit API client library for V1 methods
 
-=head1 VERSION
-
-Version 1.01
-
 =head1 SYNOPSIS
 
     use WWW::Suffit::Client::V1;
@@ -85,7 +81,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use parent qw/ WWW::Suffit::Client /;
 

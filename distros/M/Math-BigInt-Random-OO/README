@@ -26,7 +26,7 @@ perldoc command.
 
 COPYRIGHT AND LICENCE
 
-Copyright 2010 by Peter John Acklam <pjacklam@cpan.org>
+Copyright 2010,2020,2023 by Peter John Acklam <pjacklam@gmail.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

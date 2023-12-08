@@ -9,10 +9,6 @@ use feature ':5.16';
 
 WWW::Suffit::Const - The Suffit constants
 
-=head1 VERSION
-
-Version 1.01
-
 =head1 SYNOPSIS
 
     use WWW::Suffit::Const;
@@ -92,8 +88,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use vars qw/$VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS/;
-$VERSION = '1.01';
+our $VERSION = '1.02';
 
 use base qw/Exporter/;
 
@@ -154,7 +149,7 @@ use constant {
 };
 
 # Named groups of exports
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
     'GENERAL' => [qw/
         IS_TTY IS_ROOT
         DEFAULT_URL
@@ -191,12 +186,12 @@ use constant {
 
 # Items to export into callers namespace by default
 # (move infrequently used names to @EXPORT_OK below)
-@EXPORT = (
+our @EXPORT = (
         @{$EXPORT_TAGS{GENERAL}},
     );
 
 # Other items we are prepared to export if requested
-@EXPORT_OK = (
+our @EXPORT_OK = (
         map {@{$_}} values %EXPORT_TAGS
     );
 

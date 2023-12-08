@@ -1,0 +1,237 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Dancer2::Plugin::OpenTelemetry - Use OpenTelemetry in your Dancer2 app
+
+=head1 SYNOPSIS
+
+    use Dancer2;
+    use Dancer2::Plugin::OpenTelemetry;
+
+    # Or via config, probably in your config file
+    BEGIN {
+        set plugins => {
+            OpenTelemetry => {
+                tracer => {
+                    # Tracer parameters, see below
+                },
+            },
+        };
+    }
+
+    # Will generate a span named
+    # GET /static/url
+    get '/static/url' => sub { 'OK' };
+
+    # Will use placeholders for reduced span cardinality
+    # POST /url/with/:placeholder
+    post '/url/with/:placeholder' => sub { 'OK' }
+
+    # Use it also with async actions!
+    get '/async' => sub {
+        delayed {
+            flush;
+            content 'Hello ';
+            content 'World';
+            done;
+        }
+    };
+
+    # Errors will be correctly captured in the span
+    get '/error' => sub {
+        die 'oops';
+    };
+
+    dance;
+
+=head1 DESCRIPTION
+
+This plugin allows a L<Dancer2> application to automatically generate
+telemetry data using the L<OpenTelemetry> API. The plugin will add a "before"
+hook and "after" L<hook|Dancer2::Manual/HOOKS> to capture telemetry data about
+handled requests in a L<OpenTelemetry::Trace::Span> object. Errors will be
+captured via an "on_route_exception" hook, which will set the span status
+accordingly.
+
+During the "before" hook, a L<server|OpenTelemetry::Constants/SPAN_KIND_SERVER>
+L<span|OpenTelemetry::Tracer::Span> will be created and injected into the
+current L<context|OpenTelemetry::Context>, together with any propagation data
+retrieved from the incoming request headers by the currently installed
+L<propagator|OpenTelemetry/propagator>.
+
+The value of the C<tracer> parameter set in the plugin configuration will be
+used to obtain a L<tracer|OpenTelemetry::Trace::Tracer> via
+L<OpenTelemetry::Trace::TracerProvider/tracer>. Setting this is optional. If
+no value is set, the name will be read from the
+L<"OTEL_SERVICE_NAME"|OpenTelemetry::SDK/OTEL_SERVICE_NAME> environment
+variable. If this variable is also not set, it will default to "dancer2".
+The name is the only parameter that has a default: all other values will be
+left unspecified.
+
+The name of the generated span will be derived from the current request
+method, and the "spec_route" of the request's
+L<route|Dancer2::Core::Request/route>, as in C<GET /foo/:bar>, to reduce the
+span cardinality.
+
+The span will be created with the following attributes, which will therefore
+be available for any
+L<sampling decision|OpenTelemetry::SDK::Trace::Sampler>.
+
+=over
+
+=item C<http.request.method>
+
+Set to the L<request method|Dancer2::Core::Request/method>. It will be the
+same value that was concatenated to the route in the span's name.
+
+=item C<network.protocol.version>
+
+Set to the version number of the
+L<request protocol|Dancer2::Core::Request/protocol>.
+
+=item C<url.path>
+
+Set to the path of the request URL. This will be the raw path, without using
+any placeholders. It will not include the query string.
+
+=item C<url.scheme>
+
+Set to the scheme of the request URL.
+
+=item C<http.route>
+
+Set to the "spec_route" of the request's L<route|Dancer2::Core::Request/route>.
+This will use placeholders, and will be the same value that was concatenated
+to the method in the span's name.
+
+=item C<client.address>
+
+Set to the L<request's address|Dancer2::Core::Request/address>.
+
+=item C<server.address>
+
+Set to the host portion of the C<host> value in the leftmost entry in the
+C<Forwarded> header, falling back to the value of the C<X-Forwarded-Proto>
+header, or to the value of the C<Host> header if no other is set. The host
+portion is the part before an optional port number.
+
+See the
+L<semantic conventions entry for this attribute|https://opentelemetry.io/docs/specs/semconv/http/http-spans/#setting-serveraddress-and-serverport-attributes>
+for more details on this logic.
+
+If no value could be determined, this attribute will not be present.
+
+=item C<server.port>
+
+Set to the port number in the C<host> value in the leftmost entry in the
+C<Forwarded> header, falling back to the value of the C<X-Forwarded-Proto>
+header, or to the value of the C<Host> header if no other is set.
+
+See the
+L<semantic conventions entry for this attribute|https://opentelemetry.io/docs/specs/semconv/http/http-spans/#setting-serveraddress-and-serverport-attributes>
+for more details on this logic.
+
+The port number in these is optional. If none is set, or none could be
+determined, this attribute will not be present.
+
+=item C<user_agent.original>
+
+Set to the value of the L<user agent header|Dancer2::Core::Request/agent>.
+If not set, this attribute will not be present.
+
+=item C<url.query>
+
+Set to the query of the L<request URL|Dancer2::Core::Request/uri>, if present.
+If the URL had no query parameters, this attribute will not be present.
+
+=back
+
+The attributes described below will be set in the span once the action is
+completed, but will not be available for the sampler.
+
+=over
+
+=item C<error.type>
+
+If an error is encountered during the execution of the action, this attribute
+will be set to the package name of the error (as reported by
+L<"ref"|https://perldoc.perl.org/functions/ref>), or the value C<string> if
+the error is not blessed into any package.
+
+If there were no errors, this attribute will not be present.
+
+=item C<http.response.status_code>
+
+Set to the L<status code of the response|Dancer2::Core::Response/status>. If
+an error was encountered while handling the request, this will be set to
+C<500>.
+
+=back
+
+The span will be unconditionally L<ended|OpenTelemetry::Trace::Span/end> after
+the request has been handled, and the
+L<status will be set|OpenTelemetry::Trace::Span/set_status> to either an
+L<OK status|OpenTelemetry::Constants/SPAN_STATUS_OK> if no errors were found,
+or to an L<error status|OpenTelemetry::Constants/SPAN_STATUS_ERROR> otherwise.
+In the latter case, an error description will also be set if possible.
+
+=head2 Internal redirects
+
+Dancer2 supports the use of keywords to internally forward a request from
+one handler to another, or to pass from one handler to another. In this case,
+this plugin will only execute for the I<first> matching route. The following
+handlers will continue to be executed as expected, but the plugin will ignore
+them.
+
+This is done on the assumption that the requests that are of interest from a
+telemetry point of view are those that come from outside the application.
+
+Users for which this is undesirable are free to create new spans for those
+routes that this plugin would otherwise ignore.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Dancer2>
+
+=item L<Dancer2::Plugin>
+
+=item L<OpenTelemetry>
+
+=item L<OpenTelemetry::Context>
+
+=item L<OpenTelemetry::Constants>
+
+=item L<OpenTelemetry::Trace::Span>
+
+=item L<OpenTelemetry::Trace::Tracer>
+
+=item L<OpenTelemetry::Trace::TracerProvider>
+
+=back
+
+=head2 Integrations with other web frameworks
+
+=over
+
+=item L<Plack::Middleware::OpenTelemetry>
+
+A lower-level, Plack-based implementation of the same idea behind this plugin.
+Because it executes outside the scope of Dancer2, it will not have access to
+the routes with placeholders at span-creation time, but it's worth a look.
+
+=item L<Mojolicious::Plugin::OpenTelemetry>
+
+A similar version of this plugin, but integrating with the L<Mojolicious> web
+framework.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

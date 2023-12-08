@@ -6,11 +6,12 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '1.23';
+our $VERSION = '2.00';
 
 Travel::Status::DE::EFA::Result->mk_ro_accessors(
-	qw(countdown date delay destination is_cancelled info key line lineref
-	  mot occupancy operator platform platform_db platform_name sched_date sched_time time train_type train_name train_no type)
+	qw(countdown datetime delay destination is_cancelled info key line lineref
+	  mot occupancy operator platform platform_db platform_name rt_datetime
+	  sched_datetime train_type train_name train_no type)
 );
 
 my @mot_mapping = qw{
@@ -30,6 +31,8 @@ sub new {
 	else {
 		$ref->{is_cancelled} = 0;
 	}
+
+	$ref->{datetime} = $ref->{rt_datetime} // $ref->{sched_datetime};
 
 	return bless( $ref, $obj );
 }
@@ -126,14 +129,14 @@ departure received by Travel::Status::DE::EFA
     for my $departure ($status->results) {
         printf(
             "At %s: %s to %s from platform %d\n",
-            $departure->time, $departure->line, $departure->destination,
-            $departure->platform
+            $departure->datetime->strftime('%H:%M'), $departure->line,
+            $departure->destination, $departure->platform
         );
     }
 
 =head1 VERSION
 
-version 1.23
+version 2.00
 
 =head1 DESCRIPTION
 
@@ -145,20 +148,19 @@ line number and destination.
 
 =head2 ACCESSORS
 
-"Actual" in the description means that the delay (if available) is already
-included in the calculation, "Scheduled" means it isn't.
-
 =over
 
 =item $departure->countdown
 
-Actual time in minutes from now until the tram/bus/train will depart.
+Time in minutes from now until the tram/bus/train will depart, including
+realtime data if available.
 
 If delay information is available, it is already included.
 
-=item $departure->date
+=item $departure->datetime
 
-Actual departure date (DD.MM.YYYY).
+DateTime(3pm) object for departure date and time.  Realtime data if available,
+schedule data otherwise.
 
 =item $departure->delay
 
@@ -242,17 +244,14 @@ Each station is a Travel::Status::DE::EFA::Stop(3pm) object.
 List of stations the vehicle will pass after this stop.
 Each station is a Travel::Status::DE::EFA::Stop(3pm) object.
 
-=item $departure->sched_date
+=item $departure->rt_datetime
 
-Scheduled departure date (DD.MM.YYYY).
+DateTime(3pm) object holding the departure date and time according to
+realtime data. Undef if unknown / unavailable.
 
-=item $departure->sched_time
+=item $departure->sched_datetime
 
-Scheduled departure time (HH:MM).
-
-=item $departure->time
-
-Actual departure time (HH:MM).
+DateTime(3pm) object holding the scheduled departure date and time.
 
 =item $departure->train_type
 
@@ -342,7 +341,7 @@ Travel::Status::DE::EFA(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2011-2015 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

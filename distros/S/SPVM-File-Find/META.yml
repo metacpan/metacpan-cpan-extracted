@@ -22,8 +22,8 @@ requires:
   SPVM::File::Basename: '0.02'
   SPVM::File::Spec: '0.05'
   SPVM::Regex: '0.19'
-  SPVM::Sys: '0.43'
+  SPVM::Sys: '0.509'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-File-Find.git
-version: '0.021001'
+version: '0.021002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

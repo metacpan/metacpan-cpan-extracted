@@ -1,0 +1,18 @@
+Revision history for Perl extension Test2::Formatter::YAMLEnhancedTAP.
+
+0.0.5  Thu 07 Dec 2023 13:42:49
+	- Force "Test::More" version to the minimal supported '1.302087'.
+  - Added more verbosity to failing tests.
+
+0.0.4  Fri 01 Dec 2023 23:44:06
+	- Fixed build errors, including fixtures in manifest.
+
+0.0.2  Fri 01 Dec 2023 23:24:40
+	- Fix release status.
+	- Version bump.
+
+0.0.1  Fri Dec  1 19:16:41 2023
+	- Initial version, decoupled from TAP::Formatter::GitHubActions.
+
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n Test2::Formatter::YAMLEnhancedTAP

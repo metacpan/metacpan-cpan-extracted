@@ -1,0 +1,11 @@
+severity = 1
+verbose = 8
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | DESCRIPTION | SUBROUTINES/METHODS | AUTHOR
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if for until
+
+[-Documentation::RequirePodAtEnd]
+

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use MARC::Convert::Wikidata::Utils qw(clean_date);
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
@@ -30,3 +30,15 @@ is($ret, '2020-01-3', encode_utf8("Date '$input_date' after cleanup."));
 $input_date = undef;
 $ret = clean_date($input_date);
 is($ret, undef, encode_utf8("Undefined date after cleanup."));
+
+# Test.
+$input_date = 'c2002';
+($ret, my $options_hr) = clean_date($input_date);
+is($ret, 2002, encode_utf8("Date '$input_date' after cleanup."));
+is_deeply(
+	$options_hr,
+	{
+		'circa' => 1,
+	},
+	"Date '$input_date' has option 'circa'."
+);

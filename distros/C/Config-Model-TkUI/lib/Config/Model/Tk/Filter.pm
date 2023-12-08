@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::Filter 1.377;
+package Config::Model::Tk::Filter 1.379;
 
 use 5.10.1;
 use strict;
@@ -115,10 +115,8 @@ sub apply_filter {
         my $node_loc = $node->location;
         my $elt_filter = $data_ref->{filter};
 
-        # check if filter is active on any element. If yes, not
-        # matching elements are hidden
-        my $filter_active = scalar grep {_get_filter_action($_,$elt_filter,'show','hide','') eq 'show'} @element_list;
         my $all_elt_action = $show_only_custom ? 'hide' : '';
+        my $default_action = (length($elt_filter) > 3) ? 'hide' : '';
 
         foreach my $elt ( @element_list ) {
             my $filter_action = _get_filter_action($elt,$elt_filter,'show','hide','');
@@ -128,7 +126,7 @@ sub apply_filter {
             $data_ref->{actions} //= {};
             my $elt_action;
 
-            if ($filter_active) {
+            if ($filter_action eq 'show') {
                 my $inner_ref = {
                     actions => $data_ref->{actions},
                     # stop filter propagation when current element is
@@ -143,7 +141,7 @@ sub apply_filter {
             } else {
                 my $inner_ref = { actions => $data_ref->{actions}, filter => $data_ref->{filter} };
                 $scanner->scan_element($inner_ref, $node,$elt);
-                $elt_action = $inner_ref->{return};
+                $elt_action = $data_ref->{actions}{$loc} = $inner_ref->{return} || $default_action;
                 $logger->trace("node '$loc' elt $elt filter is not active '$elt_action'");
             }
 

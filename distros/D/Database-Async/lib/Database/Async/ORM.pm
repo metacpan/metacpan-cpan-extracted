@@ -3,7 +3,7 @@ package Database::Async::ORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =head1 NAME
 
@@ -133,7 +133,7 @@ async sub apply_database_changes {
     my @out;
     for my $action (@actions) {
         if($action->isa('Database::Async::ORM::Table')) {
-            $log->tracef('Create table %s', $action->name);
+            $log->tracef('Table definition for %s', $action->name);
             my ($sql, @bind) = $ddl->table_info($action);
             my %map = (
                 schema => $action->schema->name,
@@ -345,9 +345,11 @@ sub load_from {
                         $type = $schema->type_by_name($type);
                     }
                     push @fields, Database::Async::ORM::Field->new(
-                        type => $type,
-                        name => $field_details->{name},
-                        nullable => 1,
+                        type       => $type,
+                        name       => $field_details->{name},
+                        attributes => $field_details->{attributes},
+                        nullable   => 1,
+                        default    => $field_details->{default},
                     )
                 }
                 my $type = Database::Async::ORM::Type->new(
@@ -484,7 +486,7 @@ sub populate_table {
             defined_in => $table_details->{defined_in},
             table      => $table,
             type       => $type,
-            %{$field_details}{grep { exists $field_details->{$_} } qw(name description nullable)}
+            %{$field_details}{grep { exists $field_details->{$_} } qw(name description nullable default attributes)}
         );
         $log->tracef('Add field %s as %s with type %s', $field->name, $field_details, $field->type);
         push $table->{fields}->@*, $field;

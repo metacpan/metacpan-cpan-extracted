@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikidata::Reconcilation;
 
 # Test.
-is($Wikidata::Reconcilation::VERSION, 0.03, 'Version.');
+is($Wikidata::Reconcilation::VERSION, 0.04, 'Version.');

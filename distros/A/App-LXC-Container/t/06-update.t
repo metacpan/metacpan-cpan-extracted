@@ -978,7 +978,10 @@ SKIP:{
 	my $conf_dir = CONF_ROOT . '/' . $network . '/';
 	foreach (qw(bin lib lib32 lib64 libx32 sbin))
 	{
-	    ok(-l $conf_dir . $_,  'got link /' . $_ . ' in ' . $network);
+	SKIP:{
+		-l '/' . $_  or  skip "/$_ not symbolic link on $os", 1;
+		ok(-l $conf_dir . $_,  'got link /' . $_ . ' in ' . $network);
+	    }
 	}
 	foreach (qw(root tmp var var/log),
 		 map { $tmp_sub . '/' . $_ } qw(usr usr/bin))

@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use Exporter::Shiny '_grammar';
 
@@ -309,7 +309,145 @@ my %Grammar = tokenize(
 
     #------------------------------------------------------
 
-    crop => TODO,
+    crop => [
+
+        [
+            ['match'],
+            {
+                args =>
+                  [ ENUM( SKY_COORD_SYSTEMS, FRAME_COORD_SYSTEMS, \'SKY_COORD_SYSTEMS | FRAME_COORD_SYSTEMS' ) ],
+                query => QNONE,
+            },
+        ],
+
+        [ ['lock'], { args => [COORDSYS] }, { args => ['none'], query => QNONE }, ],
+
+        [ [ ENUM( 'open', 'close' ) ], { query => QNONE } ],
+
+        [ ['reset'], { query => QNONE }, ],
+
+        [
+            ['3d'],
+            { args => [ FLOAT( '<x>' ), FLOAT( '<y>' ) ] },
+            { args => [ FLOAT( '<x>' ), FLOAT( '<y>' ), COORDSYS ], query => QNONE, },
+        ],
+
+        [
+            [],
+
+            # set
+            {
+                args  => [ COORD_RA( '<ra>' ), COORD_DEC( '<dec>' ), FLOAT( '<width>' ), FLOAT( '<height>' ) ],
+                query => QNONE,
+            },
+
+            {
+                args => [
+                    COORD_RA( '<ra>' ),
+                    COORD_DEC( '<dec>' ),
+                    FLOAT( '<width>' ),
+                    FLOAT( '<height>' ),
+                    ENUM( \'WCS', 'wcs', WCS ),
+                    SKYFRAME
+                ],
+                query => QNONE,
+            },
+
+            {
+                args => [
+                    COORD_RA( '<ra>' ),
+                    COORD_DEC( '<dec>' ),
+                    FLOAT( '<width>' ),
+                    FLOAT( '<height>' ),
+                    ENUM( \'WCS', 'wcs', WCS ),
+                    ANGLE_UNIT
+                ],
+                query => QNONE,
+            },
+
+            {
+                args => [
+                    COORD_RA( '<ra>' ),
+                    COORD_DEC( '<dec>' ),
+                    FLOAT( '<width>' ),
+                    FLOAT( '<height>' ),
+                    ENUM( \'WCS', 'wcs', WCS ),
+                    SKYFRAME,
+                    ANGLE_UNIT
+                ],
+                query => QNONE,
+            },
+
+            {
+                args => [
+                    COORD_RA( '<ra>' ),
+                    COORD_DEC( '<dec>' ),
+                    FLOAT( '<width>' ),
+                    FLOAT( '<height>' ),
+                    SKYFRAME,
+                    ANGLE_UNIT
+                ],
+                query => QNONE,
+            },
+
+            {
+                args => [
+                    COORD_RA( '<ra>' ),
+                    COORD_DEC( '<dec>' ),
+                    FLOAT( '<width>' ),
+                    FLOAT( '<height>' ),
+                    COORDSYS_NON_WCS
+                ],
+                query => QNONE,
+            },
+
+            {
+                args => [
+                    COORD_RA( '<ra>' ),
+                    COORD_DEC( '<dec>' ),
+                    FLOAT( '<width>' ),
+                    FLOAT( '<height>' ),
+                    COORDSYS_NON_WCS,
+                    SKYFORMAT
+                ],
+                query => QNONE,
+            },
+
+
+            # get
+            {
+                args  => [ ENUM( \'WCS', 'wcs', WCS ), SKYFRAME,        SKYFORMAT,          ANGLE_UNIT ],
+                rvals => [ STRING( '<x>' ),            STRING( '<y>' ), FLOAT( '<width>' ), FLOAT( '<height>' ), ],
+                query => QARGS,
+            },
+
+            {
+                args  => [ SKYFRAME, SKYFORMAT, ANGLE_UNIT ],
+                rvals => [ STRING( '<x>' ), STRING( '<y>' ), FLOAT( '<width>' ), FLOAT( '<height>' ), ],
+                query => QARGS,
+            },
+
+            {
+                args  => [ SKYFRAME, SKYFORMAT ],
+                rvals => [ STRING( '<x>' ), STRING( '<y>' ), FLOAT( '<width>' ), FLOAT( '<height>' ), ],
+                query => QARGS,
+            },
+
+            {
+                args  => [SKYFRAME],
+                rvals => [ FLOAT( '<x>' ), FLOAT( '<y>' ), FLOAT( '<width>' ), FLOAT( '<height>' ), ],
+                query => QARGS,
+            },
+
+            {
+                rvals => [ FLOAT( '<x>' ), FLOAT( '<y>' ), FLOAT( '<width>' ), FLOAT( '<height>' ), ],
+                query => QONLY,
+            },
+
+        ],
+
+    ],
+
 
     #------------------------------------------------------
 
@@ -1924,7 +2062,7 @@ Image::DS9::Grammar::V8_5 - Grammar definitions
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SUPPORT
 

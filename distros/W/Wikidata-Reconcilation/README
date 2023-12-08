@@ -121,7 +121,7 @@ EXAMPLE
      # - Q27954834: 1
 
 DEPENDENCIES
-    Class::Utils, Error::Pure, LWP::UserAgent, Unicode::UTF8, WQS::SPARQL,
+    Class::Utils, Error::Pure, LWP::UserAgent, WQS::SPARQL,
     WQS::SPARQL::Result.
 
 SEE ALSO
@@ -142,5 +142,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

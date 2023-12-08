@@ -1,0 +1,25 @@
+Changes
+Makefile.PL
+MANIFEST
+README.md
+lib/TAP/Formatter/GitHubActions.pm
+lib/TAP/Formatter/GitHubActions/ErrorGroup.pm
+lib/TAP/Formatter/GitHubActions/ErrorAggregate.pm
+lib/TAP/Formatter/GitHubActions/Error.pm
+lib/TAP/Formatter/GitHubActions/Utils.pm
+t/02-tap-f-gha-error-group.t
+t/01-tap-f-gha-error.t
+t/fixtures/tests/all-ok
+t/fixtures/tests/top-level
+t/fixtures/tests/subtest
+t/fixtures/tests/all-mixed
+t/fixtures/tests/with-enhanced-yaml
+t/fixtures/output/all-ok
+t/fixtures/output/top-level
+t/fixtures/output/subtest
+t/fixtures/output/all-mixed
+t/fixtures/output/with-enhanced-yaml
+t/03-tap-f-gha-error-aggregate.t
+t/TAP-Formatter-GitHubActions.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

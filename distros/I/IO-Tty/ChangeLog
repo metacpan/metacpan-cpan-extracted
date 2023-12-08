@@ -1,3 +1,6 @@
+1.18 2023-11-27 Todd Rinaldo <toddr@cpan.org>
+    * #35 - Address Freebsd build issue: Make function checks more robust within shared lib
+
 1.17 2022-11-11 Todd Rinaldo <toddr@cpan.org>
     * Switch changelog entries to metacpan friendly format
     * #29 - Fix printf format conversion specifiers in croak to support size_t on all platforms

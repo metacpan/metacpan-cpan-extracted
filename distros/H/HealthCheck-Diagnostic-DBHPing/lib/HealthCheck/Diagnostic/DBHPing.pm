@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic::DBHPing;
 
 # ABSTRACT: Ping a database handle to check its health
 use version;
-our $VERSION = 'v1.2.4'; # VERSION
+our $VERSION = 'v1.2.5'; # VERSION
 
 use 5.010;
 use strict;
@@ -68,7 +68,7 @@ HealthCheck::Diagnostic::DBHPing - Ping a database handle to check its health
 
 =head1 VERSION
 
-version v1.2.4
+version v1.2.5
 
 =head1 SYNOPSIS
 
@@ -111,7 +111,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2020 by Grant Street Group.
+This software is Copyright (c) 2018 - 2023 by Grant Street Group.
 
 This is free software, licensed under:
 

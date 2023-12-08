@@ -7,9 +7,9 @@ use warnings;
 require App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-19'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.071'; # VERSION
+our $VERSION = '1.073'; # VERSION
 
 our %SPEC;
 
@@ -88,7 +88,7 @@ App::lcpan::Cmd::script2rel - Get release(s) of script(s)
 
 =head1 VERSION
 
-This document describes version 1.071 of App::lcpan::Cmd::script2rel (from Perl distribution App-lcpan), released on 2022-09-19.
+This document describes version 1.073 of App::lcpan::Cmd::script2rel (from Perl distribution App-lcpan), released on 2023-07-09.
 
 =head1 FUNCTIONS
 
@@ -109,6 +109,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<all> => I<bool>
 
+(No description)
+
 =item * B<cpan> => I<dirname>
 
 Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
@@ -116,6 +118,8 @@ Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 Defaults to C<~/cpan>.
 
 =item * B<full_path> => I<bool>
+
+(No description)
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
@@ -127,6 +131,8 @@ C<./index.db> or C</home/ujang/lcpan.db> then the index will be located solely
 using the C<index_name>.
 
 =item * B<scripts>* => I<array[filename::unix]>
+
+(No description)
 
 =item * B<update_db_schema> => I<bool> (default: 1)
 
@@ -199,7 +205,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

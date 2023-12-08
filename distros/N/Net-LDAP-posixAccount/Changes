@@ -1,5 +1,9 @@
 Revision history for Net-LDAP-posixAccount
 
+1.0.0	2023-12-05/09:15
+		 - Now requires Error::Helper 2.0.0 or newer
+		 - various cleanups
+
 0.0.2	2009-10-21/00:50
 	-Assorted cleanups that had long since been forgotten about that are finally being published.
 

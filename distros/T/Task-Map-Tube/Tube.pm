@@ -1,11 +1,9 @@
 package Task::Map::Tube;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.46;
+our $VERSION = 0.47;
 
 1;
 
@@ -83,22 +81,24 @@ Interface to test Map::Tube (map data).
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Task-Map-Tube>
+L<https://github.com/michal-josef-spacek/Task-Map-Tube>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2016 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.46
+0.47
 
 =cut

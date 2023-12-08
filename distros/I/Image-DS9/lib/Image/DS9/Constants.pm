@@ -8,7 +8,7 @@ use warnings;
 
 require Image::DS9::Constants::V0;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 sub import {
     goto &Image::DS9::Constants::V0::import;
@@ -39,7 +39,7 @@ Image::DS9::Constants - predefined constants
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 

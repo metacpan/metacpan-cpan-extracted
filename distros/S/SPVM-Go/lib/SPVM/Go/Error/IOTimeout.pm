@@ -10,7 +10,7 @@ SPVM::Go::Error::IOTimeout - Short Description
 
 =head1 Description
 
-The Go::Error::IOTimeout class of L<SPVM> has methods to do someting.
+The Go::Error::IOTimeout class in L<SPVM> has methods to do someting.
 
 =head1 Usage
 

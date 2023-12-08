@@ -1,32 +1,37 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
 
-local $| = 1;                   # disable buffering
+use Test::More;
 
-print "1..1\n";
-
-# The following is from the Module::Signature manual page.
-
-if (! $ENV{TEST_SIGNATURE}) {
-    print "ok 1 # skip Set the environment variable",
-      " TEST_SIGNATURE to enable this test\n";
+if (!$ENV{TEST_SIGNATURE}) {
+    plan skip_all =>
+      "Set the environment variable TEST_SIGNATURE to enable this test.";
 }
-elsif (! -s 'SIGNATURE') {
-    print "ok 1 # skip No signature file found\n";
+elsif (!eval { require Module::Signature; 1 }) {
+    plan skip_all =>
+      "Next time around, consider installing Module::Signature, ".
+      "so you can verify the integrity of this distribution.";
 }
-elsif (! eval { require Module::Signature; 1 }) {
-    print "ok 1 # skip ",
-      "Next time around, consider install Module::Signature, ",
-        "so you can verify the integrity of this distribution.\n";
+elsif (!-e 'SIGNATURE') {
+    plan skip_all => "SIGNATURE not found";
 }
-elsif (! eval { require Socket; Socket::inet_aton('pgp.mit.edu') }) {
-    print "ok 1 # skip ",
-      "Cannot connect to the keyserver\n";
+elsif (!-s 'SIGNATURE') {
+    plan skip_all => "SIGNATURE file empty";
+}
+elsif (!eval { require Socket; Socket::inet_aton('pool.sks-keyservers.net') }) {
+    plan skip_all => "Cannot connect to the keyserver to check module ".
+                     "signature";
 }
 else {
-    (Module::Signature::verify() == Module::Signature::SIGNATURE_OK())
-      or print "not ";
-    print "ok 1 # Valid signature\n";
+    plan tests => 1;
+}
+
+my $ret = Module::Signature::verify();
+SKIP: {
+    skip "Module::Signature cannot verify", 1
+      if $ret eq Module::Signature::CANNOT_VERIFY();
+
+    cmp_ok $ret, '==', Module::Signature::SIGNATURE_OK(), "Valid signature";
 }

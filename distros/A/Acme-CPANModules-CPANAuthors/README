@@ -1,0 +1,444 @@
+NAME
+    Acme::CPANModules::CPANAuthors - List of Acme::CPANAUthors::* modules
+
+VERSION
+    This document describes version 0.001 of Acme::CPANModules::CPANAuthors
+    (from Perl distribution Acme-CPANModules-CPANAuthors), released on
+    2023-11-28.
+
+DESCRIPTION
+    This list tries to catalog and categorize all the existing
+    Acme::CPANAuthors::* modules.
+
+  Geographical
+    *   Acme::CPANAuthors::Australian
+
+    *   Acme::CPANAuthors::Austrian
+
+    *   Acme::CPANAuthors::Belarusian
+
+    *   Acme::CPANAuthors::Brazilian
+
+    *   Acme::CPANAuthors::British
+
+    *   Acme::CPANAuthors::British::Companies
+
+    *   Acme::CPANAuthors::Canadian
+
+    *   Acme::CPANAuthors::Catalonian
+
+    *   Acme::CPANAuthors::Chinese
+
+    *   Acme::CPANAuthors::Czech
+
+    *   Acme::CPANAuthors::Danish
+
+    *   Acme::CPANAuthors::Dutch
+
+    *   Acme::CPANAuthors::EU - alias for ::European
+
+    *   Acme::CPANAuthors::European
+
+    *   Acme::CPANAuthors::French
+
+    *   Acme::CPANAuthors::German
+
+    *   Acme::CPANAuthors::Icelandic
+
+    *   Acme::CPANAuthors::India
+
+    *   Acme::CPANAuthors::Indonesian
+
+    *   Acme::CPANAuthors::Israeli
+
+    *   Acme::CPANAuthors::Japanese
+
+    *   Acme::CPANAuthors::Korean
+
+    *   Acme::CPANAuthors::Malaysian
+
+    *   Acme::CPANAuthors::Norwegian
+
+    *   Acme::CPANAuthors::Polish
+
+    *   Acme::CPANAuthors::Portuguese
+
+    *   Acme::CPANAuthors::Russian
+
+    *   Acme::CPANAuthors::Slovak
+
+    *   Acme::CPANAuthors::Spanish
+
+    *   Acme::CPANAuthors::Swedish
+
+    *   Acme::CPANAuthors::Taiwanese
+
+    *   Acme::CPANAuthors::Turkish
+
+  CPAN-related
+    *   Acme::CPANAuthors::BackPAN::OneHundred
+
+    *   Acme::CPANAuthors::CPAN::MostScripts
+
+    *   Acme::CPANAuthors::CPAN::OneHundred
+
+    *   Acme::CPANAuthors::CPAN::Streaks::DailyDistributions
+
+    *   Acme::CPANAuthors::CPAN::Streaks::DailyNewDistributions
+
+    *   Acme::CPANAuthors::CPAN::Streaks::DailyReleases
+
+    *   Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions
+
+    *   Acme::CPANAuthors::CPAN::Streaks::WeeklyNewDistributions
+
+    *   Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases
+
+    *   Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions
+
+    *   Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions
+
+    *   Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases
+
+    *   Acme::CPANAuthors::CPAN::TopDepended
+
+    *   Acme::CPANAuthors::CPAN::TopDepended::ByOthers
+
+    *   Acme::CPANAuthors::CPANTS::FiveOrMore
+
+  Perl-related
+    *   Acme::CPANAuthors::Pumpkings
+
+  Module-related
+    *   Acme::CPANAuthors::AnyEvent
+
+    *   Acme::CPANAuthors::DualLife - authors of dual-life core modules
+        (modules that are included in perl distribution as well as get
+        released separately)
+
+    *   Acme::CPANAuthors::MetaSyntactic
+
+    *   Acme::CPANAuthors::POE
+
+    *   Acme::CPANAuthors::ToBeLike
+
+  (Non-CPAN) project-related
+    *   Acme::CPANAuthors::DebianDev
+
+  Service-related
+    *   Acme::CPANAuthors::GitHub - authors with github repositories
+
+  Deceased authors
+    *   Acme::CPANAuthors::InMemoriam
+
+  Defunct
+    *   Acme::CPANAuthors::CodeRepos - authors using
+        L<https://coderepos.org/>, a now-defunct service
+
+  Others
+    *   Acme::CPANAuthors::GeekHouse - authors who have visited The Geek
+        House ever
+
+    *   Acme::CPANAuthors::MBTI - authors by MBTI types
+
+    *   Acme::CPANAuthors::MBTI::INTP - authors with "INTP" personality type
+
+    *   Acme::CPANAuthors::Misanthrope - authors who see into your soul with
+        perfect clarity
+
+    *   Acme::CPANAuthors::Nonhuman
+
+    *   Acme::CPANAuthors::Not
+
+    *   Acme::CPANAuthors::You::re_using
+
+  *Not* lists of authors
+    *   Acme::CPANAuthors::Factory - a utility module
+
+    *   Acme::CPANAuthors::Register
+
+    *   Acme::CPANAuthors::Utils
+
+    *   Acme::CPANAuthors::Utils::Authors
+
+    *   Acme::CPANAuthors::Utils::CPANIndex
+
+    *   Acme::CPANAuthors::Utils::Kwalitee
+
+    *   Acme::CPANAuthors::Utils::Packages
+
+ACME::CPANMODULES ENTRIES
+    Acme::CPANAuthors::Australian
+        Author: TOBYINK <https://metacpan.org/author/TOBYINK>
+
+    Acme::CPANAuthors::Austrian
+        Author: GORTAN <https://metacpan.org/author/GORTAN>
+
+    Acme::CPANAuthors::Belarusian
+        Author: SROMANOV <https://metacpan.org/author/SROMANOV>
+
+    Acme::CPANAuthors::Brazilian
+        Author: GARU <https://metacpan.org/author/GARU>
+
+    Acme::CPANAuthors::British
+        Author: BARBIE <https://metacpan.org/author/BARBIE>
+
+    Acme::CPANAuthors::British::Companies
+        Author: BARBIE <https://metacpan.org/author/BARBIE>
+
+    Acme::CPANAuthors::Canadian
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+    Acme::CPANAuthors::Catalonian
+        Author: ALEXM <https://metacpan.org/author/ALEXM>
+
+    Acme::CPANAuthors::Chinese
+        Author: FAYLAND <https://metacpan.org/author/FAYLAND>
+
+    Acme::CPANAuthors::Czech
+        Author: SKIM <https://metacpan.org/author/SKIM>
+
+    Acme::CPANAuthors::Danish
+        Author: KAARE <https://metacpan.org/author/KAARE>
+
+    Acme::CPANAuthors::Dutch
+        Author: ABIGAIL <https://metacpan.org/author/ABIGAIL>
+
+    Acme::CPANAuthors::EU
+        Author: ABIGAIL <https://metacpan.org/author/ABIGAIL>
+
+    Acme::CPANAuthors::European
+        Author: ABIGAIL <https://metacpan.org/author/ABIGAIL>
+
+    Acme::CPANAuthors::French
+        Author: SAPER <https://metacpan.org/author/SAPER>
+
+    Acme::CPANAuthors::German
+        Author: RBO <https://metacpan.org/author/RBO>
+
+    Acme::CPANAuthors::Icelandic
+        Author: HINRIK <https://metacpan.org/author/HINRIK>
+
+    Acme::CPANAuthors::India
+        Author: SHANTANU <https://metacpan.org/author/SHANTANU>
+
+    Acme::CPANAuthors::Indonesian
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::Israeli
+        Author: SHLOMIF <https://metacpan.org/author/SHLOMIF>
+
+    Acme::CPANAuthors::Japanese
+        Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
+
+    Acme::CPANAuthors::Korean
+        Author: JEEN <https://metacpan.org/author/JEEN>
+
+    Acme::CPANAuthors::Malaysian
+        Author: KIANMENG <https://metacpan.org/author/KIANMENG>
+
+    Acme::CPANAuthors::Norwegian
+        Author: SHARIFULN <https://metacpan.org/author/SHARIFULN>
+
+    Acme::CPANAuthors::Polish
+        Author: BRTASTIC <https://metacpan.org/author/BRTASTIC>
+
+    Acme::CPANAuthors::Portuguese
+        Author: BRACETA <https://metacpan.org/author/BRACETA>
+
+    Acme::CPANAuthors::Russian
+        Author: SHARIFULN <https://metacpan.org/author/SHARIFULN>
+
+    Acme::CPANAuthors::Slovak
+        Author: SKIM <https://metacpan.org/author/SKIM>
+
+    Acme::CPANAuthors::Spanish
+        Author: ALEXM <https://metacpan.org/author/ALEXM>
+
+    Acme::CPANAuthors::Swedish
+        Author: WOLDRICH <https://metacpan.org/author/WOLDRICH>
+
+    Acme::CPANAuthors::Taiwanese
+        Author: GUGOD <https://metacpan.org/author/GUGOD>
+
+    Acme::CPANAuthors::Turkish
+        Author: BURAK <https://metacpan.org/author/BURAK>
+
+    Acme::CPANAuthors::BackPAN::OneHundred
+        Author: BARBIE <https://metacpan.org/author/BARBIE>
+
+    Acme::CPANAuthors::CPAN::MostScripts
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::OneHundred
+        Author: BARBIE <https://metacpan.org/author/BARBIE>
+
+    Acme::CPANAuthors::CPAN::Streaks::DailyDistributions
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::Streaks::DailyNewDistributions
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::Streaks::DailyReleases
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::Streaks::WeeklyDistributions
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::Streaks::WeeklyNewDistributions
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::Streaks::WeeklyReleases
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::Streaks::MonthlyDistributions
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::Streaks::MonthlyNewDistributions
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::Streaks::MonthlyReleases
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::TopDepended
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPAN::TopDepended::ByOthers
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    Acme::CPANAuthors::CPANTS::FiveOrMore
+        Author: ABIGAIL <https://metacpan.org/author/ABIGAIL>
+
+    Acme::CPANAuthors::Pumpkings
+        Author: ABIGAIL <https://metacpan.org/author/ABIGAIL>
+
+    Acme::CPANAuthors::AnyEvent
+        Author: MONS <https://metacpan.org/author/MONS>
+
+    Acme::CPANAuthors::DualLife
+        Author: BINGOS <https://metacpan.org/author/BINGOS>
+
+    Acme::CPANAuthors::MetaSyntactic
+        Author: BOOK <https://metacpan.org/author/BOOK>
+
+    Acme::CPANAuthors::POE
+        Author: BINGOS <https://metacpan.org/author/BINGOS>
+
+    Acme::CPANAuthors::ToBeLike
+        Author: BINGOS <https://metacpan.org/author/BINGOS>
+
+    Acme::CPANAuthors::DebianDev
+        Author: BOOK <https://metacpan.org/author/BOOK>
+
+    Acme::CPANAuthors::GitHub
+        Author: GRAY <https://metacpan.org/author/GRAY>
+
+    Acme::CPANAuthors::InMemoriam
+        Author: BARBIE <https://metacpan.org/author/BARBIE>
+
+    Acme::CPANAuthors::CodeRepos
+        Author: ISHIGAKI <https://metacpan.org/author/ISHIGAKI>
+
+    Acme::CPANAuthors::GeekHouse
+        Author: KENTARO <https://metacpan.org/author/KENTARO>
+
+    Acme::CPANAuthors::MBTI
+        Author: KENTNL <https://metacpan.org/author/KENTNL>
+
+    Acme::CPANAuthors::MBTI::INTP
+        Author: KENTNL <https://metacpan.org/author/KENTNL>
+
+    Acme::CPANAuthors::Misanthrope
+        Author: ASHLEY <https://metacpan.org/author/ASHLEY>
+
+    Acme::CPANAuthors::Nonhuman
+        Author: ETHER <https://metacpan.org/author/ETHER>
+
+    Acme::CPANAuthors::Not
+        Author: SFINK <https://metacpan.org/author/SFINK>
+
+    Acme::CPANAuthors::You::re_using
+        Author: VPIT <https://metacpan.org/author/VPIT>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n CPANAuthors
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries CPANAuthors | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=CPANAuthors -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::CPANAuthors -E'say $_->{module} for @{ $Acme::CPANModules::CPANAuthors::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-CPANAuthors>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-CPANAuthors>.
+
+SEE ALSO
+    Acme::CPANAuthors itself lists many of the existing Acme::CPANAuthors::*
+    modules though not updated as often.
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-CPAN
+    Authors>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

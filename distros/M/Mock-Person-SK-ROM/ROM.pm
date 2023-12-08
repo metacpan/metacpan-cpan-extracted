@@ -1,13 +1,11 @@
 package Mock::Person::SK::ROM;
 
-# Pragmas.
 use base qw(Exporter);
 use strict;
 use utf8;
 use warnings;
 
-# Modules.
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Readonly;
 
 # Constants.
@@ -19,8 +17,7 @@ Readonly::Array our @EXPORT_OK => qw(first_male first_female middle_female
 # Variables.
 our $TYPE = 'two';
 
-# Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # First and middle male names.
 our @first_male = our @middle_male = qw(
@@ -373,7 +370,7 @@ __END__
 
 =encoding UTF-8
 
-=cut
+=cut 
 
 =head1 NAME
 
@@ -383,6 +380,7 @@ Mock::Person::SK::ROM - Generate random sets of Romani names.
 
  use Mock::Person::SK::ROM qw(first_male first_female last_male last_female
          middle_male middle_female name name_female name_male);
+
  my $first_male = first_male();
  my $first_female = first_female();
  my $last_male = last_male();
@@ -416,47 +414,78 @@ L<cs.wikipedia.org - female names|http://cs.wikipedia.org/wiki/Seznam_nej%C4%8Da
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<first_male>
 
-=item B<first_male()>
+ my $first_male = first_male();
 
-Returns random first name of male person.
+Get random first name of male person.
 
-=item B<first_female()>
+Returns string.
 
-Returns random first name of female person.
+=head2 C<first_female>
 
-=item B<last_male()>
+ my $first_female = first_female();
 
-Returns random last name of male person.
+Get random first name of female person.
 
-=item B<last_female()>
+Returns string.
 
-Returns random last name of female person.
+=head2 C<last_male>
 
-=item B<middle_male()>
+ my $last_male = last_male();
 
-Returns random middle name of male person.
+Get random last name of male person.
 
-=item B<middle_female()>
+Returns string.
 
-Returns random middle name of female person.
+=head2 C<last_female>
 
-=item B<name([$sex])>
+ my $last_female = last_female();
 
-Recieves scalar with sex of the person ('male' or 'female') and returns
-scalar with generated name.
-Default value of $sex variable is undef, that means random name.
+Get random last name of female person.
 
-=item B<name_male()>
+Returns string.
 
-Returns random male name.
+=head2 C<middle_male>
 
-=item B<name_female()>
+ my $middle_male = middle_male();
 
-Returns random female name.
+Get random middle name of male person.
 
-=back
+Returns string.
+
+=head2 C<middle_female>
+
+ my $middle_female = middle_female();
+
+Get random middle name of female person.
+
+Returns string.
+
+=head2 C<name>
+
+ my $name = name($sex);
+
+Get name defined with sex of the person ('male' or 'female').
+Default value of C<$sex> variable is undef, that means random name.
+
+Returns string.
+
+=head2 C<name_female>
+
+ my $female_name = name_female();
+
+Get random female name.
+
+Returns string.
+
+=head2 C<name_male>
+
+ my $male_name = name_male();
+
+Get random male name.
+
+Returns string.
 
 =head1 VARIABLES
 
@@ -464,19 +493,21 @@ Returns random female name.
 
 =item B<TYPE>
 
- Name type.
- Possible values are: 'two', 'three'.
- Default value is 'two'.
+Name type.
+
+Possible values are: 'two', 'three'.
+
+Default value is 'two'.
 
 =back
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=random_name.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::SK::ROM qw(name);
 
@@ -488,11 +519,11 @@ Returns random female name.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=list_last_male_names.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Encode qw(encode_utf8);
  use Mock::Person::SK::ROM;
 
@@ -728,6 +759,7 @@ Returns random female name.
 =head1 DEPENDENCIES
 
 L<Exporter>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -742,21 +774,22 @@ Install the Mock::Person modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Mock-Person-SK-ROM>
+L<https://github.com/michal-josef-spacek/Mock-Person-SK-ROM>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2023
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

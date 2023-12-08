@@ -1,46 +1,44 @@
-Geo::LibProj::FFI
+Geo::LibProj::FFI 0.06
 
-This module is a foreign function interface to the PROJ
-<https://proj.org/> coordinate transformation library. Please see the
-PROJ library's C function reference
+This module is a foreign function interface to the PROJ <https://proj.org/>
+coordinate transformation / projection library. Please see the PROJ
+library's C function reference
 <https://proj.org/development/reference/functions.html> for further
-documentation. You should be able to use those C functions as if they
-were Perl.
+documentation. You should be able to use those C functions as if they were
+Perl.
 
-This module is functional, but incomplete.
+More information about this software:
+https://metacpan.org/dist/Geo-LibProj-FFI
+
 
 INSTALLATION
 
-This is a Perl module distribution. It should be installed with whichever
-tool you use to manage your installation of Perl, e.g. any of
+The recommended way to install this Perl module distribution is directly
+from CPAN with whichever tool you use to manage your installation of Perl.
+For example:
 
-  cpanm .
-  cpan  .
-  cpanp -i .
+  cpanm Geo::LibProj::FFI
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
-Should you wish to install this module manually, the procedure is
+If you already have downloaded the distribution, you can alternatively
+point your tool directly at the archive file or the directory:
+
+  cpanm Geo-LibProj-FFI-0.06.tar.gz
+
+You can also install the module manually by following these steps:
 
   perl Makefile.PL
   make
   make test
   make install
 
-API LICENSE
+See https://www.cpan.org/modules/INSTALL.html for general information
+on installing CPAN modules.
 
-The API this module gives access to is the "proj.h" API, which is
-available under the terms of the Expat MIT license.
-
- Copyright (c) 2016, 2017, Thomas Knudsen / SDFE
- Copyright (c) 2018, Even Rouault
-
-The API designers didn't write this Perl module, and the module author
-didn't design the API.
 
 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2021 by Arne Johannessen.
+This software is Copyright (c) 2021-2023 by Arne Johannessen.
 
-This is free software, licensed under:
-
-  The Artistic License 2.0 (GPL Compatible)
+This is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License 2.0 or (at your option) the same terms
+as the Perl 5 programming language system itself.

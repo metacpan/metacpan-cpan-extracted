@@ -47,7 +47,7 @@
             "POSIX" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0",
-            "X11::XCB" : "0.21",
+            "X11::XCB" : "0.22",
             "YAML::Tiny" : "0"
          }
       },
@@ -71,7 +71,7 @@
          "web" : "https://github.com/zhmylove/korgwm"
       }
    },
-   "version" : "2.0",
+   "version" : "3.0",
    "x_authority" : "cpan:ZHMYLOVE",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.07"

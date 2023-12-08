@@ -1,4 +1,7 @@
+bin/rt-insert-formtools-config
+bin/rt-insert-formtools-config.in
 Changes
+etc/sample_form.json
 ex/RT-Example-FormTools/etc/initialdata
 ex/RT-Example-FormTools/html/Example/autohandler
 ex/RT-Example-FormTools/html/Example/confirm
@@ -7,12 +10,30 @@ ex/RT-Example-FormTools/html/Example/submit
 ex/RT-Example-FormTools/html/Example/user_info
 ex/RT-Example-FormTools/lib/RT/Example/FormTools.pm
 ex/RT-Example-FormTools/Makefile.PL
+html/Admin/Elements/FormToolsHelp
+html/Admin/FormTools/Advanced.html
+html/Admin/FormTools/Create.html
+html/Admin/FormTools/Describe.html
+html/Admin/FormTools/GroupRights.html
+html/Admin/FormTools/index.html
+html/Admin/FormTools/Modify.html
+html/Admin/FormTools/UserRights.html
 html/Callbacks/FormTools/Elements/Header/Head
+html/Callbacks/FormTools/Elements/Tabs/Privileged
+html/Callbacks/FormTools/Elements/Tabs/SelfService
+html/Elements/Forms/ListForms
+html/Elements/Forms/ShowFormGraphic
+html/Elements/Forms/ShowFormIcon
+html/Forms.html
+html/Forms/dhandler
 html/FormTools/Field
 html/FormTools/Form
 html/FormTools/Next
 html/FormTools/ShowChoices
+html/NoAuth/Helpers/FormLogo/dhandler
 html/NoAuth/js/form_tools.js
+html/SelfService/Forms.html
+html/SelfService/Forms/dhandler
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
@@ -23,12 +44,17 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/RTx.pm
 inc/Module/Install/RTx/Runtime.pm
+inc/Module/Install/Substitute.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/YAML/Tiny.pm
 lib/RT/Extension/FormTools.pm
+lib/RT/Interface/Web_Vendor.pm
 Makefile.PL
 MANIFEST			This list of files
 META.yml
+patches/Support-custom-labels-for-ValidateCustomFields.patch
 README
+static/css/rt-extension-formtools.css
+static/js/rt-extension-formtools.js
 SIGNATURE                                Public-key signature (added by MakeMaker)

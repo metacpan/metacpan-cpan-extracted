@@ -1,0 +1,8 @@
+Revision history for Database-ManagedHandle
+
+0.002     2023-12-01 22:43:40+01:00 Europe/Berlin
+        * Fix here docs to work with older Perls
+        * Add MooX::Singleton to runtime dependencies
+
+0.001     2023-11-28 22:15:55+01:00 Europe/Stockholm
+        * Initial version

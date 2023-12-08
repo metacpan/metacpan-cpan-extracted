@@ -22,8 +22,7 @@ requires 'Config::Utils' => 0.03;
 requires 'Error::Pure' => 0.09;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Config-Dot-Array';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Config-Dot-Array/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Config-Dot-Array';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Config-Dot-Array';
 test_requires 'English' => 0;
@@ -31,7 +30,7 @@ test_requires 'Error::Pure::Utils' => 0.08;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.07';
+version '0.08';
 
 # Run.
 WriteAll();

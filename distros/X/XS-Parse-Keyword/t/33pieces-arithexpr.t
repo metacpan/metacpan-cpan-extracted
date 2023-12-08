@@ -35,4 +35,13 @@ my $ret;
    is( $ret, "(x)y", 'arithexpr treats (PARENS) as entire expression' );
 }
 
+# optional arithexpr
+{
+   my $ret1 = piecearithexpr_opt "term";
+   my $ret2 = piecearithexpr_opt;
+
+   is( $ret1, "(term)", 'optional arithexpr with value' );
+   is( $ret2, undef,    'optional arithexpr empty' );
+}
+
 done_testing;

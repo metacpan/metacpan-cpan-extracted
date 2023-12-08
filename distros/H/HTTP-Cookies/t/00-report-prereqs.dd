@@ -37,7 +37,6 @@ do { my $x = {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
                                    'HTTP::Response' => '0',
-                                   'Test' => '0',
                                    'Test::More' => '0',
                                    'URI' => '0',
                                    'warnings' => '0'

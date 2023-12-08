@@ -36,6 +36,14 @@ C<static method new : L<Time::HiRes::ItimervalFloat|SPVM::Time::HiRes::Itimerval
 
 Creates a new L<Time::HiRes::ItimervalFloat|SPVM::Time::HiRes::ItimervalFloat> object and returns it.
 
+=head1 See Also
+
+=over 2
+
+=item * L<Time::HiRes|SPVM::Time::HiRes>
+
+=back
+
 =head1 Copyright & License
 
 Copyright (c) 2023 Yuki Kimoto

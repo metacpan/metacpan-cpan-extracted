@@ -8,10 +8,13 @@
     <line id="M4" name="Linia M4" color="green"/>
   </lines>
   <stations>
+    <station id="KALVIN-TER" name="Kálvin tér" line="M3:12,M4:7" link="M3-11,M3-13,M4-06,M4-08"/>
+    <station id="DEAK-FERENC-TER" name="Deák Ferenc tér" line="M1:2,M2:5,M3:10" link="M1-01,M1-03,M2-04,M2-06,M3-09,M3-11"/>
+    <station id="KELETI-PALYAUDVAR" name="Keleti pályaudvar" line="M2:8,M4:10" link="M2-07,M2-09,M4-09"/>
+
     <!-- https://hu.wikipedia.org/wiki/M1-es_metróvonal -->
-    <station id="M1-01" name="Vörösmarty tér" line="M1:1" link="M1-02"/>
-    <station id="M1-02" name="Deák Ferenc tér" line="M1:2" link="M1-01,M1-03,M2-05,M3-10"/>
-    <station id="M1-03" name="Bajcsy-Zsilinszky út" line="M1:3" link="M1-02,M1-04"/>
+    <station id="M1-01" name="Vörösmarty tér" line="M1:1" link="DEAK-FERENC-TER"/>
+    <station id="M1-03" name="Bajcsy-Zsilinszky út" line="M1:3" link="DEAK-FERENC-TER,M1-04"/>
     <station id="M1-04" name="Opera" line="M1:4" link="M1-03,M1-05"/>
     <station id="M1-05" name="Oktogon" line="M1:5" link="M1-04,M1-06"/>
     <station id="M1-06" name="Vörösmarty utca" line="M1:6" link="M1-05,M1-07"/>
@@ -25,12 +28,10 @@
     <station id="M2-01" name="Déli pályaudvar" line="M2:1" link="M2-02"/>
     <station id="M2-02" name="Széll Kálmán tér" line="M2:2" link="M2-01,M2-03"/>
     <station id="M2-03" name="Batthyány tér" line="M2:3" link="M2-02,M2-04"/>
-    <station id="M2-04" name="Kossuth Lajos tér" line="M2:4" link="M2-03,M2-05"/>
-    <station id="M2-05" name="Deák Ferenc tér" line="M2:5" link="M1-02,M2-04,M2-06,M3-10"/>
-    <station id="M2-06" name="Astoria" line="M2:6" link="M2-05,M2-07"/>
-    <station id="M2-07" name="Blaha Lujza tér" line="M2:7" link="M2-06,M2-08"/>
-    <station id="M2-08" name="Keleti pályaudvar" line="M2:8" link="M2-07,M2-09,M4-10"/>
-    <station id="M2-09" name="Puskás Ferenc Stadion" line="M2:9" link="M2-08,M2-10"/>
+    <station id="M2-04" name="Kossuth Lajos tér" line="M2:4" link="M2-03,DEAK-FERENC-TER"/>
+    <station id="M2-06" name="Astoria" line="M2:6" link="DEAK-FERENC-TER,M2-07"/>
+    <station id="M2-07" name="Blaha Lujza tér" line="M2:7" link="M2-06,KELETI-PALYAUDVAR"/>
+    <station id="M2-09" name="Puskás Ferenc Stadion" line="M2:9" link="KELETI-PALYAUDVAR,M2-10"/>
     <station id="M2-10" name="Pillangó utca" line="M2:10" link="M2-09,M2-11"/>
     <station id="M2-11" name="Örs vezér tere" line="M2:11" link="M2-10"/>
 
@@ -43,11 +44,9 @@
     <station id="M3-06" name="Dózsa György út" line="M3:6" link="M3-05,M3-07"/>
     <station id="M3-07" name="Lehel tér" line="M3:7" link="M3-06,M3-08"/>
     <station id="M3-08" name="Nyugati pályaudvar" line="M3:8" link="M3-07,M3-09"/>
-    <station id="M3-09" name="Arany János utca" line="M3:9" link="M3-08,M3-10"/>
-    <station id="M3-10" name="Deák Ferenc tér" line="M3:10" link="M1-02,M2-05,M3-09,M3-11"/>
-    <station id="M3-11" name="Ferenciek tere" line="M3:11" link="M3-10,M3-12"/>
-    <station id="M3-12" name="Kálvin tér" line="M3:12" link="M3-11,M3-13,M4-07"/>
-    <station id="M3-13" name="Corvin-negyed" line="M3:13" link="M3-12,M3-14"/>
+    <station id="M3-09" name="Arany János utca" line="M3:9" link="M3-08,DEAK-FERENC-TER"/>
+    <station id="M3-11" name="Ferenciek tere" line="M3:11" link="DEAK-FERENC-TER,KALVIN-TER"/>
+    <station id="M3-13" name="Corvin-negyed" line="M3:13" link="KALVIN-TER,M3-14"/>
     <station id="M3-14" name="Klinikák" line="M3:14" link="M3-13,M3-15"/>
     <station id="M3-15" name="Nagyvárad tér" line="M3:15" link="M3-14,M3-16"/>
     <station id="M3-16" name="Népliget" line="M3:16" link="M3-15,M3-17"/>
@@ -62,10 +61,8 @@
     <station id="M4-03" name="Újbuda-központ" line="M4:3" link="M4-02,M4-04"/>
     <station id="M4-04" name="Móricz Zsigmond körtér" line="M4:4" link="M4-03,M4-05"/>
     <station id="M4-05" name="Szent Gellért tér" line="M4:5" link="M4-04,M4-06"/>
-    <station id="M4-06" name="Fővám tér" line="M4:6" link="M4-05,M4-07"/>
-    <station id="M4-07" name="Kálvin tér" line="M4:7" link="M3-12,M4-06,M4-08"/>
-    <station id="M4-08" name="Rákóczi tér" line="M4:8" link="M4-07,M4-09"/>
-    <station id="M4-09" name="II. János Pál pápa tér" line="M4:9" link="M4-08,M4-10"/>
-    <station id="M4-10" name="Keleti pályaudvar" line="M4:10" link="M2-08,M4-09"/>
+    <station id="M4-06" name="Fővám tér" line="M4:6" link="M4-05,KALVIN-TER"/>
+    <station id="M4-08" name="Rákóczi tér" line="M4:8" link="KALVIN-TER,M4-09"/>
+    <station id="M4-09" name="II. János Pál pápa tér" line="M4:9" link="M4-08,KELETI-PALYAUDVAR"/>
   </stations>
 </tube>

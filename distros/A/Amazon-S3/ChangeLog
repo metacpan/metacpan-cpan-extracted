@@ -1,3 +1,10 @@
+Tue Nov 28 17:42:44 2023  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.65]:
+	* src/main/perl/lib/Amazon/S3.pm.in
+	(signer)
+	- get token from creds object always
+
 Thu Jul 20 07:47:36 2023  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.64 - get_location_constraint() ]:

@@ -1,5 +1,9 @@
 Revision history for Perl extension Smart-Args-TypeTiny
 
+0.14 2023-12-01T12:49:54Z
+
+    - add no_check_rule function (#5 @kfly8++)
+
 0.13 2022-08-16T19:28:32Z
 
     - fix failing test with Type::Tiny >= 1.016005

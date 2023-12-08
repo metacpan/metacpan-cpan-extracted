@@ -3,7 +3,7 @@ Locale::Codes::Country_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Tue Aug 29 10:58:49 EDT 2023
+#    Generated on: Fri Dec  1 15:30:07 EST 2023
 
 use strict;
 require 5.006;
@@ -11,9 +11,9 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.76';
+$VERSION='3.77';
 
-$Locale::Codes::Data{'country'}{'id'} = '0278';
+$Locale::Codes::Data{'country'}{'id'} = '0279';
 
 $Locale::Codes::Data{'country'}{'id2names'} = {
    q(0001) => [
@@ -102,7 +102,7 @@ $Locale::Codes::Data{'country'}{'id2names'} = {
       ],
    q(0027) => [
       q(Bonaire, Sint Eustatius and Saba),
-      q(Bonaire, Sint Eustatius, and Saba),
+      q(Caribbean Netherlands),
       ],
    q(0028) => [
       q(Bosnia and Herzegovina),
@@ -1017,63 +1017,66 @@ $Locale::Codes::Data{'country'}{'id2names'} = {
       q(Diego Garcia),
       ],
    q(0258) => [
-      q(Europa Island),
+      q(Entity 6),
       ],
    q(0259) => [
-      q(Gaza Strip),
+      q(Europa Island),
       ],
    q(0260) => [
-      q(Glorioso Islands),
+      q(Gaza Strip),
       ],
    q(0261) => [
-      q(Guantanamo Bay Naval Base),
+      q(Glorioso Islands),
       ],
    q(0262) => [
-      q(Howland Island),
+      q(Guantanamo Bay Naval Base),
       ],
    q(0263) => [
-      q(Jan Mayen),
+      q(Howland Island),
       ],
    q(0264) => [
-      q(Jarvis Island),
+      q(Jan Mayen),
       ],
    q(0265) => [
-      q(Johnston Atoll),
+      q(Jarvis Island),
       ],
    q(0266) => [
-      q(Juan de Nova Island),
+      q(Johnston Atoll),
       ],
    q(0267) => [
-      q(Kingman Reef),
+      q(Juan de Nova Island),
       ],
    q(0268) => [
-      q(Kosovo),
+      q(Kingman Reef),
       ],
    q(0269) => [
-      q(Midway Islands),
+      q(Kosovo),
       ],
    q(0270) => [
-      q(Navassa Island),
+      q(Midway Islands),
       ],
    q(0271) => [
-      q(Palmyra Atoll),
+      q(Navassa Island),
       ],
    q(0272) => [
-      q(Paracel Islands),
+      q(Palmyra Atoll),
       ],
    q(0273) => [
-      q(Spratly Islands),
+      q(Paracel Islands),
       ],
    q(0274) => [
-      q(Svalbard),
+      q(Spratly Islands),
       ],
    q(0275) => [
-      q(Tromelin Island),
+      q(Svalbard),
       ],
    q(0276) => [
-      q(Wake Island),
+      q(Tromelin Island),
       ],
    q(0277) => [
+      q(Wake Island),
+      ],
+   q(0278) => [
       q(West Bank),
       ],
 };
@@ -1223,10 +1226,6 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0027),
       q(0),
       ],
-   q(bonaire, sint eustatius, and saba) => [
-      q(0027),
-      q(1),
-      ],
    q(bosnia and herzegovina) => [
       q(0028),
       q(0),
@@ -1298,6 +1297,10 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
    q(canada) => [
       q(0040),
       q(0),
+      ],
+   q(caribbean netherlands) => [
+      q(0027),
+      q(1),
       ],
    q(cayman islands) => [
       q(0041),
@@ -1547,6 +1550,10 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0066),
       q(0),
       ],
+   q(entity 6) => [
+      q(0258),
+      q(0),
+      ],
    q(equatorial guinea) => [
       q(0067),
       q(0),
@@ -1568,7 +1575,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(europa island) => [
-      q(0258),
+      q(0259),
       q(0),
       ],
    q(faeroe islands) => [
@@ -1656,7 +1663,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(2),
       ],
    q(gaza strip) => [
-      q(0259),
+      q(0260),
       q(0),
       ],
    q(georgia) => [
@@ -1676,7 +1683,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(glorioso islands) => [
-      q(0260),
+      q(0261),
       q(0),
       ],
    q(great britain) => [
@@ -1704,7 +1711,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(guantanamo bay naval base) => [
-      q(0261),
+      q(0262),
       q(0),
       ],
    q(guatemala) => [
@@ -1776,7 +1783,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(3),
       ],
    q(howland island) => [
-      q(0262),
+      q(0263),
       q(0),
       ],
    q(hungary) => [
@@ -1844,7 +1851,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(jan mayen) => [
-      q(0263),
+      q(0264),
       q(0),
       ],
    q(japan) => [
@@ -1852,7 +1859,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(jarvis island) => [
-      q(0264),
+      q(0265),
       q(0),
       ],
    q(jersey) => [
@@ -1860,7 +1867,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(johnston atoll) => [
-      q(0265),
+      q(0266),
       q(0),
       ],
    q(jordan) => [
@@ -1868,7 +1875,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(juan de nova island) => [
-      q(0266),
+      q(0267),
       q(0),
       ],
    q(kazakhstan) => [
@@ -1888,7 +1895,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(kingman reef) => [
-      q(0267),
+      q(0268),
       q(0),
       ],
    q(kiribati) => [
@@ -1936,7 +1943,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(kosovo) => [
-      q(0268),
+      q(0269),
       q(0),
       ],
    q(kuwait) => [
@@ -2088,7 +2095,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(4),
       ],
    q(midway islands) => [
-      q(0269),
+      q(0270),
       q(0),
       ],
    q(moldova) => [
@@ -2148,7 +2155,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(navassa island) => [
-      q(0270),
+      q(0271),
       q(0),
       ],
    q(nepal) => [
@@ -2244,7 +2251,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(palmyra atoll) => [
-      q(0271),
+      q(0272),
       q(0),
       ],
    q(panama) => [
@@ -2256,7 +2263,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(paracel islands) => [
-      q(0272),
+      q(0273),
       q(0),
       ],
    q(paraguay) => [
@@ -2528,7 +2535,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(spratly islands) => [
-      q(0273),
+      q(0274),
       q(0),
       ],
    q(sri lanka) => [
@@ -2556,7 +2563,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(svalbard) => [
-      q(0274),
+      q(0275),
       q(0),
       ],
    q(svalbard and jan mayen) => [
@@ -2856,7 +2863,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(0),
       ],
    q(tromelin island) => [
-      q(0275),
+      q(0276),
       q(0),
       ],
    q(tunisia) => [
@@ -3060,7 +3067,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(3),
       ],
    q(wake island) => [
-      q(0276),
+      q(0277),
       q(0),
       ],
    q(wallis and futuna) => [
@@ -3072,7 +3079,7 @@ $Locale::Codes::Data{'country'}{'alias2id'} = {
       q(1),
       ],
    q(west bank) => [
-      q(0277),
+      q(0278),
       q(0),
       ],
    q(western sahara) => [
@@ -6102,7 +6109,11 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
       },
    q(genc-alpha-2) => {
       q(A2) => [
-         q(0261),
+         q(0262),
+         q(0),
+         ],
+      q(A3) => [
+         q(0258),
          q(0),
          ],
       q(AD) => [
@@ -6854,7 +6865,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          q(0),
          ],
       q(QM) => [
-         q(0269),
+         q(0270),
          q(0),
          ],
       q(QS) => [
@@ -6862,15 +6873,15 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          q(0),
          ],
       q(QU) => [
-         q(0266),
+         q(0267),
          q(0),
          ],
       q(QW) => [
-         q(0276),
+         q(0277),
          q(0),
          ],
       q(QX) => [
-         q(0260),
+         q(0261),
          q(0),
          ],
       q(QZ) => [
@@ -7114,63 +7125,63 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          q(0),
          ],
       q(XE) => [
-         q(0258),
-         q(0),
-         ],
-      q(XG) => [
          q(0259),
          q(0),
          ],
-      q(XH) => [
-         q(0262),
+      q(XG) => [
+         q(0260),
          q(0),
          ],
-      q(XJ) => [
+      q(XH) => [
          q(0263),
          q(0),
          ],
-      q(XK) => [
-         q(0268),
-         q(0),
-         ],
-      q(XL) => [
-         q(0271),
-         q(0),
-         ],
-      q(XM) => [
-         q(0267),
-         q(0),
-         ],
-      q(XP) => [
-         q(0272),
-         q(0),
-         ],
-      q(XQ) => [
+      q(XJ) => [
          q(0264),
          q(0),
          ],
-      q(XR) => [
-         q(0274),
+      q(XK) => [
+         q(0269),
          q(0),
          ],
-      q(XS) => [
+      q(XL) => [
+         q(0272),
+         q(0),
+         ],
+      q(XM) => [
+         q(0268),
+         q(0),
+         ],
+      q(XP) => [
          q(0273),
          q(0),
          ],
-      q(XT) => [
-         q(0275),
-         q(0),
-         ],
-      q(XU) => [
+      q(XQ) => [
          q(0265),
          q(0),
          ],
+      q(XR) => [
+         q(0275),
+         q(0),
+         ],
+      q(XS) => [
+         q(0274),
+         q(0),
+         ],
+      q(XT) => [
+         q(0276),
+         q(0),
+         ],
+      q(XU) => [
+         q(0266),
+         q(0),
+         ],
       q(XV) => [
-         q(0270),
+         q(0271),
          q(0),
          ],
       q(XW) => [
-         q(0277),
+         q(0278),
          q(0),
          ],
       q(YE) => [
@@ -7256,7 +7267,11 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          q(0),
          ],
       q(AX2) => [
-         q(0261),
+         q(0262),
+         q(0),
+         ],
+      q(AX3) => [
+         q(0258),
          q(0),
          ],
       q(AZE) => [
@@ -8188,59 +8203,59 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          q(0),
          ],
       q(XEU) => [
-         q(0258),
-         q(0),
-         ],
-      q(XGL) => [
-         q(0260),
-         q(0),
-         ],
-      q(XGZ) => [
          q(0259),
          q(0),
          ],
+      q(XGL) => [
+         q(0261),
+         q(0),
+         ],
+      q(XGZ) => [
+         q(0260),
+         q(0),
+         ],
       q(XHO) => [
-         q(0262),
-         q(0),
-         ],
-      q(XJA) => [
-         q(0265),
-         q(0),
-         ],
-      q(XJM) => [
          q(0263),
          q(0),
          ],
-      q(XJN) => [
+      q(XJA) => [
          q(0266),
          q(0),
          ],
-      q(XJV) => [
+      q(XJM) => [
          q(0264),
          q(0),
          ],
-      q(XKR) => [
+      q(XJN) => [
          q(0267),
          q(0),
          ],
-      q(XKS) => [
+      q(XJV) => [
+         q(0265),
+         q(0),
+         ],
+      q(XKR) => [
          q(0268),
          q(0),
          ],
-      q(XMW) => [
+      q(XKS) => [
          q(0269),
          q(0),
          ],
-      q(XNV) => [
+      q(XMW) => [
          q(0270),
          q(0),
          ],
-      q(XPL) => [
+      q(XNV) => [
          q(0271),
          q(0),
          ],
-      q(XPR) => [
+      q(XPL) => [
          q(0272),
+         q(0),
+         ],
+      q(XPR) => [
+         q(0273),
          q(0),
          ],
       q(XQZ) => [
@@ -8248,23 +8263,23 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          q(0),
          ],
       q(XSP) => [
-         q(0273),
-         q(0),
-         ],
-      q(XSV) => [
          q(0274),
          q(0),
          ],
-      q(XTR) => [
+      q(XSV) => [
          q(0275),
          q(0),
          ],
+      q(XTR) => [
+         q(0276),
+         q(0),
+         ],
       q(XWB) => [
-         q(0277),
+         q(0278),
          q(0),
          ],
       q(XWK) => [
-         q(0276),
+         q(0277),
          q(0),
          ],
       q(XXD) => [
@@ -9274,7 +9289,7 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          q(0),
          ],
       q(901) => [
-         q(0268),
+         q(0269),
          q(0),
          ],
       q(902) => [
@@ -9305,80 +9320,84 @@ $Locale::Codes::Data{'country'}{'code2id'} = {
          q(0257),
          q(0),
          ],
-      q(915) => [
+      q(914) => [
          q(0258),
          q(0),
          ],
-      q(916) => [
+      q(915) => [
          q(0259),
          q(0),
          ],
-      q(917) => [
+      q(916) => [
          q(0260),
          q(0),
          ],
-      q(918) => [
+      q(917) => [
          q(0261),
          q(0),
          ],
-      q(919) => [
+      q(918) => [
          q(0262),
          q(0),
          ],
-      q(920) => [
+      q(919) => [
          q(0263),
          q(0),
          ],
-      q(921) => [
+      q(920) => [
          q(0264),
          q(0),
          ],
-      q(922) => [
+      q(921) => [
          q(0265),
          q(0),
          ],
-      q(923) => [
+      q(922) => [
          q(0266),
          q(0),
          ],
-      q(924) => [
+      q(923) => [
          q(0267),
          q(0),
          ],
-      q(925) => [
-         q(0269),
+      q(924) => [
+         q(0268),
          q(0),
          ],
-      q(926) => [
+      q(925) => [
          q(0270),
          q(0),
          ],
-      q(927) => [
+      q(926) => [
          q(0271),
          q(0),
          ],
-      q(928) => [
+      q(927) => [
          q(0272),
          q(0),
          ],
-      q(929) => [
+      q(928) => [
          q(0273),
          q(0),
          ],
-      q(930) => [
+      q(929) => [
          q(0274),
          q(0),
          ],
-      q(931) => [
+      q(930) => [
          q(0275),
          q(0),
          ],
-      q(933) => [
+      q(931) => [
          q(0276),
          q(0),
          ],
-      q(934) => [
+      q(933) => [
          q(0277),
+         q(0),
+         ],
+      q(934) => [
+         q(0278),
          q(0),
          ],
       },
@@ -13378,26 +13397,27 @@ $Locale::Codes::Data{'country'}{'id2code'} = {
       q(0255) => q(XC),
       q(0256) => q(XD),
       q(0257) => q(DG),
-      q(0258) => q(XE),
-      q(0259) => q(XG),
-      q(0260) => q(QX),
-      q(0261) => q(A2),
-      q(0262) => q(XH),
-      q(0263) => q(XJ),
-      q(0264) => q(XQ),
-      q(0265) => q(XU),
-      q(0266) => q(QU),
-      q(0267) => q(XM),
-      q(0268) => q(XK),
-      q(0269) => q(QM),
-      q(0270) => q(XV),
-      q(0271) => q(XL),
-      q(0272) => q(XP),
-      q(0273) => q(XS),
-      q(0274) => q(XR),
-      q(0275) => q(XT),
-      q(0276) => q(QW),
-      q(0277) => q(XW),
+      q(0258) => q(A3),
+      q(0259) => q(XE),
+      q(0260) => q(XG),
+      q(0261) => q(QX),
+      q(0262) => q(A2),
+      q(0263) => q(XH),
+      q(0264) => q(XJ),
+      q(0265) => q(XQ),
+      q(0266) => q(XU),
+      q(0267) => q(QU),
+      q(0268) => q(XM),
+      q(0269) => q(XK),
+      q(0270) => q(QM),
+      q(0271) => q(XV),
+      q(0272) => q(XL),
+      q(0273) => q(XP),
+      q(0274) => q(XS),
+      q(0275) => q(XR),
+      q(0276) => q(XT),
+      q(0277) => q(QW),
+      q(0278) => q(XW),
       },
    q(genc-alpha-3) => {
       q(0001) => q(AFG),
@@ -13653,26 +13673,27 @@ $Locale::Codes::Data{'country'}{'id2code'} = {
       q(0255) => q(XCS),
       q(0256) => q(XXD),
       q(0257) => q(DGA),
-      q(0258) => q(XEU),
-      q(0259) => q(XGZ),
-      q(0260) => q(XGL),
-      q(0261) => q(AX2),
-      q(0262) => q(XHO),
-      q(0263) => q(XJM),
-      q(0264) => q(XJV),
-      q(0265) => q(XJA),
-      q(0266) => q(XJN),
-      q(0267) => q(XKR),
-      q(0268) => q(XKS),
-      q(0269) => q(XMW),
-      q(0270) => q(XNV),
-      q(0271) => q(XPL),
-      q(0272) => q(XPR),
-      q(0273) => q(XSP),
-      q(0274) => q(XSV),
-      q(0275) => q(XTR),
-      q(0276) => q(XWK),
-      q(0277) => q(XWB),
+      q(0258) => q(AX3),
+      q(0259) => q(XEU),
+      q(0260) => q(XGZ),
+      q(0261) => q(XGL),
+      q(0262) => q(AX2),
+      q(0263) => q(XHO),
+      q(0264) => q(XJM),
+      q(0265) => q(XJV),
+      q(0266) => q(XJA),
+      q(0267) => q(XJN),
+      q(0268) => q(XKR),
+      q(0269) => q(XKS),
+      q(0270) => q(XMW),
+      q(0271) => q(XNV),
+      q(0272) => q(XPL),
+      q(0273) => q(XPR),
+      q(0274) => q(XSP),
+      q(0275) => q(XSV),
+      q(0276) => q(XTR),
+      q(0277) => q(XWK),
+      q(0278) => q(XWB),
       },
    q(genc-numeric) => {
       q(0001) => q(004),
@@ -13928,26 +13949,27 @@ $Locale::Codes::Data{'country'}{'id2code'} = {
       q(0255) => q(906),
       q(0256) => q(907),
       q(0257) => q(908),
-      q(0258) => q(915),
-      q(0259) => q(916),
-      q(0260) => q(917),
-      q(0261) => q(918),
-      q(0262) => q(919),
-      q(0263) => q(920),
-      q(0264) => q(921),
-      q(0265) => q(922),
-      q(0266) => q(923),
-      q(0267) => q(924),
-      q(0268) => q(901),
-      q(0269) => q(925),
-      q(0270) => q(926),
-      q(0271) => q(927),
-      q(0272) => q(928),
-      q(0273) => q(929),
-      q(0274) => q(930),
-      q(0275) => q(931),
-      q(0276) => q(933),
-      q(0277) => q(934),
+      q(0258) => q(914),
+      q(0259) => q(915),
+      q(0260) => q(916),
+      q(0261) => q(917),
+      q(0262) => q(918),
+      q(0263) => q(919),
+      q(0264) => q(920),
+      q(0265) => q(921),
+      q(0266) => q(922),
+      q(0267) => q(923),
+      q(0268) => q(924),
+      q(0269) => q(901),
+      q(0270) => q(925),
+      q(0271) => q(926),
+      q(0272) => q(927),
+      q(0273) => q(928),
+      q(0274) => q(929),
+      q(0275) => q(930),
+      q(0276) => q(931),
+      q(0277) => q(933),
+      q(0278) => q(934),
       },
    q(numeric) => {
       q(0001) => q(004),

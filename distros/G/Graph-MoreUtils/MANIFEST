@@ -10,6 +10,7 @@ dist.ini
 lib/Graph/MoreUtils.pm
 lib/Graph/MoreUtils/Line.pm
 lib/Graph/MoreUtils/Line/SelfLoopVertex.pm
+lib/Graph/MoreUtils/Replace.pm
 lib/Graph/MoreUtils/SSSR.pm
 lib/Graph/MoreUtils/Smooth.pm
 lib/Graph/MoreUtils/Smooth/Intermediate.pm

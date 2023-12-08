@@ -1206,6 +1206,7 @@ MYSQL *mysql_dr_connect(
 #else
     client_flag = CLIENT_FOUND_ROWS;
 #endif
+    mysql_library_init(0, NULL, NULL);
     mysql_init(sock);
 
     if (imp_dbh)
@@ -1239,7 +1240,11 @@ MYSQL *mysql_dr_connect(
             PerlIO_printf(DBIc_LOGPIO(imp_xxh),
                           "imp_dbh->mysql_dr_connect: Enabling" \
                           " compression algorithms: %s\n", calg);
+#if MYSQL_VERSION_ID >= 80018
           mysql_options(sock, MYSQL_OPT_COMPRESSION_ALGORITHMS, calg);
+#else
+          mysql_options(sock, MYSQL_OPT_COMPRESS, NULL);
+#endif
         }
         if ((svp = hv_fetch(hv, "mysql_connect_timeout", 21, FALSE))
             &&  *svp  &&  SvTRUE(*svp))
@@ -1435,27 +1440,34 @@ MYSQL *mysql_dr_connect(
 	    if ((svp = hv_fetch(hv, "mysql_ssl_optional", 18, FALSE)) && *svp)
 	      ssl_enforce = !SvTRUE(*svp);
 
-	    if ((svp = hv_fetch(hv, "mysql_ssl_client_key", 20, FALSE)) && *svp)
+	    if ((svp = hv_fetch(hv, "mysql_ssl_client_key", 20, FALSE)) && *svp) {
 	      client_key = SvPV(*svp, lna);
+	      mysql_options(sock, MYSQL_OPT_SSL_KEY, client_key);
+	    }
 
 	    if ((svp = hv_fetch(hv, "mysql_ssl_client_cert", 21, FALSE)) &&
-                *svp)
+                *svp) {
 	      client_cert = SvPV(*svp, lna);
+	      mysql_options(sock, MYSQL_OPT_SSL_CERT, client_cert);
+	    }
 
 	    if ((svp = hv_fetch(hv, "mysql_ssl_ca_file", 17, FALSE)) &&
-		 *svp)
+		 *svp) {
 	      ca_file = SvPV(*svp, lna);
+	      mysql_options(sock, MYSQL_OPT_SSL_CA, ca_file);
+	    }
 
 	    if ((svp = hv_fetch(hv, "mysql_ssl_ca_path", 17, FALSE)) &&
-                *svp)
+                *svp) {
 	      ca_path = SvPV(*svp, lna);
+	      mysql_options(sock, MYSQL_OPT_SSL_CAPATH, ca_path);
+	    }
 
 	    if ((svp = hv_fetch(hv, "mysql_ssl_cipher", 16, FALSE)) &&
-		*svp)
+		*svp) {
 	      cipher = SvPV(*svp, lna);
-
-	    mysql_ssl_set(sock, client_key, client_cert, ca_file,
-			  ca_path, cipher);
+	      mysql_options(sock, MYSQL_OPT_SSL_CIPHER, cipher);
+	    }
 
 	    if (ssl_verify && !(ca_file || ca_path)) {
 	      set_ssl_error(sock, "mysql_ssl_verify_server_cert=1 is not supported without mysql_ssl_ca_file or mysql_ssl_ca_path");
@@ -1859,6 +1871,7 @@ void dbd_db_destroy(SV* dbh, imp_dbh_t* imp_dbh) {
     }
     dbd_db_disconnect(dbh, imp_dbh);
   }
+  mysql_library_end();
   Safefree(imp_dbh->pmysql);
 
   /* Tell DBI, that dbh->destroy must no longer be called */
@@ -2273,6 +2286,11 @@ dbd_st_prepare(
   imp_sth_phb_t *fbind;
   D_imp_xxh(sth);
   D_imp_dbh_from_sth;
+
+  if (!DBIc_ACTIVE(imp_dbh)) {
+    do_error(sth, JW_ERR_NOT_ACTIVE, "Statement not active" ,NULL);
+    return FALSE;
+  }
 
   if (DBIc_TRACE_LEVEL(imp_xxh) >= 2)
     PerlIO_printf(DBIc_LOGPIO(imp_xxh),
@@ -3957,12 +3975,8 @@ dbd_st_FETCH_internal(
         break;
 
       case AV_ATTRIB_IS_AUTO_INCREMENT:
-#if defined(AUTO_INCREMENT_FLAG)
         sv= boolSV(IS_AUTO_INCREMENT(curField->flags));
         break;
-#else
-        croak("AUTO_INCREMENT_FLAG is not supported on this machine");
-#endif
 
       case AV_ATTRIB_IS_KEY:
         sv= boolSV(IS_KEY(curField->flags));
@@ -4427,6 +4441,9 @@ int mysql_db_reconnect(SV* h)
   imp_dbh_t* imp_dbh;
   MYSQL save_socket;
 
+  if (DBIc_DBISTATE(imp_xxh)->debug >= 2)
+    PerlIO_printf(DBIc_LOGPIO(imp_xxh), "reconnecting\n");
+
   if (DBIc_TYPE(imp_xxh) == DBIt_ST)
   {
     imp_dbh = (imp_dbh_t*) DBIc_PARENT_COM(imp_xxh);
@@ -4446,9 +4463,16 @@ int mysql_db_reconnect(SV* h)
   }
 
   if (mysql_errno(imp_dbh->pmysql) != CR_SERVER_GONE_ERROR &&
-          mysql_errno(imp_dbh->pmysql) != CR_SERVER_LOST)
+#ifdef ER_CLIENT_INTERACTION_TIMEOUT /* Added in 8.0.24 */
+          mysql_errno(imp_dbh->pmysql) != ER_CLIENT_INTERACTION_TIMEOUT &&
+#endif
+          mysql_errno(imp_dbh->pmysql) != CR_SERVER_LOST) {
     /* Other error */
+    if (DBIc_DBISTATE(imp_xxh)->debug >= 2)
+      PerlIO_printf(DBIc_LOGPIO(imp_xxh), "Can't reconnect on unexpected error %d\n",
+          mysql_errno(imp_dbh->pmysql));
     return FALSE;
+  }
 
   if (!DBIc_has(imp_dbh, DBIcf_AutoCommit) || !imp_dbh->auto_reconnect)
   {
@@ -4456,6 +4480,8 @@ int mysql_db_reconnect(SV* h)
      * Otherwise we might get an inconsistent transaction
      * state.
      */
+    if (DBIc_DBISTATE(imp_xxh)->debug >= 2)
+      PerlIO_printf(DBIc_LOGPIO(imp_xxh), "Can't reconnect as AutoCommit is turned off\n");
     return FALSE;
   }
 
@@ -4800,6 +4826,22 @@ int mysql_db_async_ready(SV* h)
   }
 }
 
+/* 
+ * this funtion tries to parse numbers from the passed string value 
+ * for emulated prepared statements being bound
+ *   * finds the beginning and end address of the string
+ *   * loops through the string
+ *   * skips past any spaces
+ *   * if it sees a -, ., +, or e, sets a flag
+ *      * if all subsequent values are numbers, is a digit
+ *      * otherwise, a string
+ *   * if any character that's not a digit is found, it's a string
+ *   * if only numbers are found, it's a number
+ *   * `end` is set to the address of the last member in the iteration
+ *   and used in knowing where the value is when building the SQL
+ *   statement
+ *   
+*/
 static int parse_number(char *string, STRLEN len, char **end)
 {
     int seen_neg;
@@ -4807,7 +4849,7 @@ static int parse_number(char *string, STRLEN len, char **end)
     int seen_e;
     int seen_plus;
     int seen_digit;
-    char *cp;
+    char *cp,*str_end;
 
     seen_neg= seen_dec= seen_e= seen_plus= seen_digit= 0;
 
@@ -4816,6 +4858,7 @@ static int parse_number(char *string, STRLEN len, char **end)
     }
 
     cp= string;
+    str_end= string + len-1; 
 
     /* Skip leading whitespace */
     while (*cp && isspace(*cp))
@@ -4823,7 +4866,7 @@ static int parse_number(char *string, STRLEN len, char **end)
 
     for ( ; *cp; cp++)
     {
-      if ('-' == *cp)
+      if (*cp == '-')
       {
         if (seen_neg >= 2)
         {
@@ -4834,27 +4877,35 @@ static int parse_number(char *string, STRLEN len, char **end)
         }
         seen_neg += 1;
       }
-      else if ('.' == *cp)
+      else if (*cp == '.')
       {
-        if (seen_dec)
+        if (seen_dec || cp == str_end)
         {
           /* second '.' */
           break;
         }
         seen_dec= 1;
       }
-      else if ('e' == *cp)
+      else if (*cp == 'e')
       {
-        if (seen_e)
+        /* 
+         * this is the case where the value for example, e2,
+         * which should be a varchar 
+         */
+        if (cp == str_end -1)
+        {
+            break;
+        }
+        if (seen_e || cp == str_end)
         {
           /* second 'e' */
           break;
         }
         seen_e= 1;
       }
-      else if ('+' == *cp)
+      else if (*cp == '+')
       {
-        if (seen_plus)
+        if (seen_plus || cp == str_end)
         {
           /* second '+' */
           break;
@@ -4867,6 +4918,7 @@ static int parse_number(char *string, STRLEN len, char **end)
         /* seen_digit= 1; */
         break;
       }
+      /*printf("else: cp is a digit: %d\n", *cp); */
     }
 
     *end= cp;

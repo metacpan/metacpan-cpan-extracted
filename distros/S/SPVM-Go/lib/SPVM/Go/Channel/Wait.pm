@@ -10,7 +10,7 @@ SPVM::Go::Channel::Wait - Short Description
 
 =head1 Description
 
-Go::Channel::Wait class of L<SPVM> has methods for someting.
+Go::Channel::Wait class in L<SPVM> has methods for someting.
 
 =head1 Usage
 

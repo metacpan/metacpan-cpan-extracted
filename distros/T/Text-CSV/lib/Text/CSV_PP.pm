@@ -12,7 +12,7 @@ use Exporter ();
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
 use Carp;
 
-$VERSION = '2.03';
+$VERSION = '2.04';
 @ISA = qw(Exporter);
 
 sub PV  { 0 }
@@ -2319,6 +2319,8 @@ LOOP:
                 if ($waitingForField) {
                     if (!$spl && $ctx->{comment_str} && $ctx->{tmp} =~ /\A\Q$ctx->{comment_str}/) {
                         $ctx->{used} = $ctx->{size};
+                        $ctx->{fld_idx} = 0;
+                        $seenSomething = 0;
                         next LOOP;
                     }
                     $waitingForField = 0;
@@ -2585,7 +2587,7 @@ RESTART:
                         $c = $self->__get($ctx, $src);
                         if (!defined $c or $ser == 2) {  # EOF
                             $v_ref = undef;
-                            $waitingForField = 0;
+                            $seenSomething = 0;
                             if ($ser == 2) { return undef; }
                             last LOOP;
                         }
@@ -2724,7 +2726,8 @@ RESTART:
                                     $c = $self->__get($ctx, $src);
                                     if (!defined $c) { # EOF
                                         $v_ref = undef;
-                                        $waitingForField = 0;
+                                        $waitingForField = 1;
+                                        $seenSomething = 0;
                                         last LOOP;
                                     }
                                 }
@@ -2816,7 +2819,7 @@ RESTART:
                                     $c = $self->__get($ctx, $src);
                                     if (!defined $c) { # EOL
                                         $v_ref = undef;
-                                        $waitingForField = 0;
+                                        $seenSomething = 0;
                                         last LOOP;
                                     }
                                 }
@@ -2867,6 +2870,8 @@ RESTART:
                 if ($waitingForField) {
                     if (!$spl && $ctx->{comment_str} && $ctx->{tmp} =~ /\A$ctx->{comment_str}/) {
                         $ctx->{used} = $ctx->{size};
+                        $ctx->{fld_idx} = 0;
+                        $seenSomething = 0;
                         next LOOP;
                     }
                     if ($ctx->{allow_whitespace} and $self->__is_whitespace($ctx, $c)) {
@@ -4260,7 +4265,7 @@ This will return a reference to a list of L<getline ($fh)|/getline> results.
 In this call, C<keep_meta_info> is disabled.  If C<$offset> is negative, as
 with C<splice>, only the last  C<abs ($offset)> records of C<$fh> are taken
 into consideration. Parameters C<$offset> and C<$length> are expected to be
-an integers. Non-integer values are interpreted as integer without check.
+integers. Non-integer values are interpreted as integer without check.
 
 Given a CSV file with 10 lines:
 

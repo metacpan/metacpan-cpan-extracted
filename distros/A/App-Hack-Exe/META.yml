@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'An animated terminal app that pretends to hack a website, just like in the movies'
 author:
   - 'Dan Church <h3xx@gmx.com>'
 build_requires:
@@ -25,7 +25,7 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Socket: '0'
+  Socket: '1.95'
   Term::ANSIColor: '0'
   Time::HiRes: '0'
   fields: '0'
@@ -35,5 +35,5 @@ resources:
   bugtracker: https://codeberg.org/h3xx/perl-App-Hack-Exe/issues
   license: https://dev.perl.org/licenses/
   repository: https://codeberg.org/h3xx/perl-App-Hack-Exe.git
-version: '0.000001'
+version: '0.000002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

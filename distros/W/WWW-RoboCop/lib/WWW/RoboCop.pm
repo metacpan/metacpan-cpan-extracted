@@ -3,7 +3,7 @@ use warnings;
 use feature qw( state );
 
 package WWW::RoboCop;
-our $VERSION = '0.000102';
+our $VERSION = '0.000103';
 
 use Moo;
 
@@ -37,10 +37,7 @@ has report_for_url => (
                 ? (
                     redirects => [
                         map {
-                            {
-                                status => $_->code,
-                                uri    => $_->request->uri,
-                            }
+                            { status => $_->code, uri => $_->request->uri, }
                         } $response->redirects
                     ],
                     target_url => $response->request->uri,
@@ -75,28 +72,27 @@ has _history => (
 
 sub _get {
     my $self          = shift;
-    my $url           = shift;
+    my $fetched_url   = shift;
     my $referring_url = shift;
 
-    my $response = $self->ua->get($url);
+    my $response = $self->ua->get($fetched_url);
     my $report   = $self->_log_response( $response, $referring_url );
-    $self->_add_url_to_history( $url, $report );
+    $self->_add_url_to_history( $fetched_url, $report );
 
-    my @links = $self->ua->find_all_links;
+    my @links = map {
+        my $u = URI->new( $_->url_abs );
+        $u->fragment(undef);
+        [ $_, $u ]
+        }
+        grep { $_->url !~ /\A#/ }                           # no named anchors
+        map { @{ $self->ua->$_() } } qw( links images );
 
-    foreach my $link (@links) {
-
-        # this just points back at the same url
-        next if substr( $link->url, 0, 1 ) eq '#';
-
-        my $uri = URI->new( $link->url_abs );
-        $uri->fragment(undef);    # fragments result in duplicate urls
-
+    foreach my $tuple (@links) {
+        my ( $mech_link, $uri ) = @$tuple;
+        next unless $self->_should_follow_link( $mech_link, $fetched_url );
         next if $self->_has_processed_url($uri);
         next unless $uri->can('host');    # no mailto: links
-        next unless $self->_should_follow_link( $link, $url );
-
-        $self->_get( $uri, $url );
+        $self->_get( $uri, $fetched_url );
     }
 }
 
@@ -126,7 +122,7 @@ WWW::RoboCop - Police your URLs!
 
 =head1 VERSION
 
-version 0.000102
+version 0.000103
 
 =head1 SYNOPSIS
 

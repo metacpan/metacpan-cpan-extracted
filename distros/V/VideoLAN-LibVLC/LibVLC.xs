@@ -119,7 +119,7 @@ _inflate_message(vlc, buffer)
 		char *buf;
 	CODE:
 		buf= SvPV(buffer, len);
-		RETVAL= PerlVLC_inflate_message(buffer, len);
+		RETVAL= PerlVLC_inflate_message(buf, len);
 	OUTPUT:
 		RETVAL
 
@@ -536,6 +536,7 @@ new(classname, args)
 	SV *classname
 	SV *args
 	CODE:
+		(void)classname; /* unused, subclasses will have to re-bless if needed */
 		RETVAL= PerlVLC_picture_new_from_hash(args);
 	OUTPUT:
 		RETVAL

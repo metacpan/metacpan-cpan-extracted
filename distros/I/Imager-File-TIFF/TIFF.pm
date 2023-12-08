@@ -4,7 +4,7 @@ use strict;
 use Imager;
 
 BEGIN {
-  our $VERSION = "0.95";
+  our $VERSION = "0.97";
 
   require XSLoader;
   XSLoader::load('Imager::File::TIFF', $VERSION);
@@ -118,9 +118,59 @@ Imager::File::TIFF - read and write TIFF files
   $img->write(file => "foo.tif")
     or die $img->errstr;
 
+  my @codecs = Imager::File::TIFF->codecs;
+
 =head1 DESCRIPTION
 
 Imager's TIFF support is documented in L<Imager::Files>.
+
+=head1 CLASS METHODS
+
+=over
+
+=item Imager::File::TIFF->codecs
+
+Returns a list of hashrefs, each hash contains:
+
+=over
+
+=item *
+
+C<code> - the numeric TIFF defined identifier for this compression
+codec.
+
+=item *
+
+C<name> - the short name traditionally used by Imager::File::TIFF for
+this compression codec.  This may be an empty string if
+Imager::File::TIFF doesn't have a name for this codec.
+
+=item *
+
+C<description> - the C<libtiff> defined name for this codec.  You can
+now supply this name in the C<tiff_compression> tag to select this
+compression.
+
+=back
+
+=item Imager::File::TIFF->builddate
+
+The release date of the version of C<libtiff> Imager::File::TIFF was
+built with.  eg. C<20230609>.
+
+=item Imager::File::TIFF->buildversion
+
+The version number of C<libtiff> Imager::File::TIFF was built with.
+eg. C<4.5.0>.  Only available from C<libtiff> 4.5.0.
+
+=item Imager::File::TIFF->libversion
+
+The version number of C<libtiff> Imager::File::TIFF is running with.
+This should be the same as C<buildversion> at build time, but an
+upgrade to libtiff may result in C<libversion> changing without
+C<buildversion> changing.
+
+=back
 
 =head1 AUTHOR
 
@@ -129,5 +179,7 @@ Tony Cook <tonyc@cpan.org>
 =head1 SEE ALSO
 
 Imager, Imager::Files.
+
+http://www.simplesystems.org/libtiff/
 
 =cut

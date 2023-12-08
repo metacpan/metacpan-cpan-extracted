@@ -27,6 +27,12 @@ L<IO::Handle|SPVM::IO::Handle>.
 
   has stream : Sys::IO::FileStream;
 
+=head2 input_line_number
+
+  has input_line_number : long;
+
+=head1 Class Methods
+
 =head2 new
 
   static method new : IO::File ($file_name : string = undef, $open_mode : string = undef);
@@ -34,6 +40,20 @@ L<IO::Handle|SPVM::IO::Handle>.
 =head2 new_from_fd
 
   static method new_from_fd : IO::Handle ($fd : int, $open_mode : string = undef);
+
+=head1 Instance Methods
+
+=head2 input_line_number
+
+  method input_line_number : long ();
+
+Gets L</"input_line_number> field.
+
+=head2 set_input_line_number
+
+  method set_input_line_number : void ($input_line_number : long);
+
+Sets L</"input_line_number> field.
 
 =head2 open
 
@@ -71,6 +91,8 @@ L<IO::Handle|SPVM::IO::Handle>.
 
   method fileno : int ();
 
+Gets the file descriptor of L</"stream"> field.
+
 =head2 getc
 
   method getc : int ();
@@ -89,7 +111,7 @@ L<IO::Handle|SPVM::IO::Handle>.
 
 =head2 flush
 
-  method flush : int ();
+  method flush : void ();
 
 =head2 ungetc
 
@@ -102,6 +124,38 @@ L<IO::Handle|SPVM::IO::Handle>.
 =head2 read
 
   method read : int ($string : mutable string, $length : int = -1, $offset : int = 0);
+
+=head2 printflush
+
+  method printflush : void ($string : string);
+
+=head2 getline
+
+  method getline : string ();
+
+=head2 getlines
+
+  method getlines : string ();
+
+=head2 ungetc
+
+  method ungetc : int ($c : int);
+
+=head2 clearerr
+
+  method clearerr : void ();
+
+=head2 error
+
+  method error : int ();
+
+=head2 getc
+
+  method getc : int ();
+
+=head2 eof
+
+  method eof : int ();
 
 =head1 See Also
 

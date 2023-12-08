@@ -10,7 +10,7 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
-LICENSE
+LICENSE.artistic_2
 LICENSE.bsd
 Makefile.PL
 MANIFEST			This list of files

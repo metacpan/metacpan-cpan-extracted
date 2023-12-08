@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-02'; # DATE
+our $DATE = '2023-08-25'; # DATE
 our $DIST = 'App-SymlinkUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SymlinkUtils/check_symlink",
@@ -40,7 +40,7 @@ check-symlink - Perform various checks on a symlink
 
 =head1 VERSION
 
-This document describes version 0.002 of check-symlink (from Perl distribution App-SymlinkUtils), released on 2023-07-02.
+This document describes version 0.004 of check-symlink (from Perl distribution App-SymlinkUtils), released on 2023-08-25.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<check-symlink> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, 
 
 B<check-symlink> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<check-symlink> [B<L<--content-matches|/"--content-matches">>|B<L<--no-content-matches|/"--content-matches">>|B<L<--nocontent-matches|/"--content-matches">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--ext-matches|/"--ext-matches">>|B<L<--no-ext-matches|/"--ext-matches">>|B<L<--noext-matches|/"--ext-matches">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--is-abs|/"--is-abs">>|B<L<--isnt-abs|/"--is-abs">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<symlink|/"--symlink=s*">>E<gt> [I<L<target|/"--target=s">>]
+B<check-symlink> [B<L<--content-matches|/"--content-matches">>|B<L<--no-content-matches|/"--content-matches">>|B<L<--nocontent-matches|/"--content-matches">>] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--ext-matches|/"--ext-matches">>|B<L<--no-ext-matches|/"--ext-matches">>|B<L<--noext-matches|/"--ext-matches">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--is-abs|/"--isnt-rel">>|B<L<--is-rel|/"--isnt-rel">>|B<L<--isnt-rel|/"--isnt-rel">>|B<L<--isnt-abs|/"--isnt-rel">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<symlink|/"--symlink=s*">>E<gt> [I<L<target|/"--target=s">>]
 
 =head1 OPTIONS
 
@@ -83,6 +83,18 @@ Whether we should check that symlink target is an absolute path.
 If set to true, then symlink target must be an absolute path. If
 set to false, then symlink target must be a relative path.
 
+
+=item B<--is-rel>
+
+Alias for --isnt-abs.
+
+See C<--is-abs>.
+
+=item B<--isnt-rel>
+
+Alias for --is-abs.
+
+See C<--is-abs>.
 
 =item B<--symlink>=I<s>*
 

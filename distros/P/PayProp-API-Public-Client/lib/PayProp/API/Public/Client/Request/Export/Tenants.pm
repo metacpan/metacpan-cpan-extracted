@@ -20,7 +20,10 @@ has '+url' => (
 
 
 sub list_p {
-	my ( $self, $params ) = @_;
+	my ( $self, $args ) = @_;
+
+	$args //= {};
+	my $params = $args->{params};
 
 	return $self
 		->api_request_p({
@@ -127,26 +130,6 @@ sub _build_address {
 	return $Address;
 }
 
-sub _query_params {
-	my ( $self ) = @_;
-
-	return [
-		qw/
-			rows
-			page
-			search_by
-			external_id
-			property_id
-			is_archived
-			customer_id
-			search_value
-			customer_reference
-			modified_from_time
-			modified_from_timezone
-		/
-	];
-}
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -188,11 +171,22 @@ An abstraction of the API endpoint receiving the request(s). It is dependant on 
 
 =head1 METHODS
 
-=head2 list_p(\%query_params)
+=head2 list_p(\%args)
 
 Issues a C<HTTP GET> request to PayProp API C</export/tenants> endpoint. It takes an optional C<HASHREF> of query parameters.
 
 See L</"QUERY PARAMETERS"> for a list of available parameters.
+
+	$tenants_export
+		->list_p({ params => {...} })
+		->then( sub {
+			my ( \@tenants ) = @_;
+			...;
+		} )
+		->wait
+	;
+
+Returns a list of L<PayProp::API::Public::Client::Response::Export::Tenant> objects on success or L<PayProp::API::Public::Client::Exception::Response> on error.
 
 
 =head1 QUERY PARAMETERS
@@ -203,7 +197,7 @@ B<integer>
 Restrict rows returned.
 
 	$tenants_export
-		->list_p({ rows => 1 })
+		->list_p({ params => { rows => 1 } })
 		->then( sub {
 			my ( \@tenants ) = @_;
 			...;
@@ -219,7 +213,7 @@ B<integer>
 Return given page number.
 
 	$tenants_export
-		->list_p({ page => 1 })
+		->list_p({ params => { page => 1 } })
 		->then( sub {
 			my ( \@tenants ) = @_;
 			...;
@@ -239,8 +233,10 @@ To be used with L</"search_value">.
 	$tenants_export
 		->list_p(
 			{
-				search_by => ['first_name', 'business_name'],
-				search_value => 'Mike',
+				params => {
+					search_value => 'Mike',
+					search_by => ['first_name', 'business_name'],
+				},
 			}
 		)
 		-->then( sub {
@@ -260,8 +256,10 @@ To be used with L</"search_by">.
 	$tenants_export
 		->list_p(
 			{
-				search_by => [...],
-				search_value => 'Mike',
+				params => {
+					search_by => [...],
+					search_value => 'Mike',
+				},
 			}
 		)
 		->then( sub {
@@ -279,7 +277,7 @@ B<string> C<E<lt>= 32 characters>
 External ID of tenant.
 
 	$tenants_export
-		->list_p({ external_id => 'ABCD1234' })
+		->list_p({ params => { external_id => 'ABCD1234' } })
 		->then( sub {
 			my ( \@tenants ) = @_;
 			...;
@@ -295,7 +293,7 @@ B<string> C<E<lt>= 50 characters>
 External ID of property.
 
 	$tenants_export
-		->list_p({ property_id => 'ABCD1234' })
+		->list_p({ params => { property_id => 'ABCD1234' } })
 		->then( sub {
 			my ( \@tenants ) = @_;
 			...;
@@ -311,7 +309,7 @@ B<boolean>
 Return only tenants that have been archived. Defaults to C<false>.
 
 	$tenants_export
-		->list_p({ is_archived => true })
+		->list_p({ params => { is_archived => true } })
 		->then( sub {
 			my ( \@tenants ) = @_;
 			...;
@@ -327,7 +325,7 @@ B<string> C<E<lt>= 50 characters>
 Lookup entities based on C<customer_id>.
 
 	$tenants_export
-		->list_p({ customer_id => 'ABC123' })
+		->list_p({ params => { customer_id => 'ABC123' } })
 		->then( sub {
 			my ( \@tenants ) = @_;
 			...;
@@ -343,7 +341,7 @@ B<string> C<E<lt>= 50 characters>
 Customer reference of tenant.
 
 	$tenants_export
-		->list_p({ customer_reference => 'ABC123' })
+		->list_p({ params => { customer_reference => 'ABC123' } })
 		->then( sub {
 			my ( \@tenants ) = @_;
 			...;

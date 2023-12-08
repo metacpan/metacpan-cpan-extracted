@@ -28,9 +28,7 @@ my @ret = sort map { $_->id } $map->get_node_by_name(
 is_deeply(
 	\@ret,
 	[
-		'M1-02',
-		'M2-05',
-		'M3-10',
+		'DEAK-FERENC-TER',
 	],
 	"Get all nodes for 'Deák Ferenc tér'.",
 );

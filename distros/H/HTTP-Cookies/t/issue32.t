@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 
-use HTTP::Cookies;
-use HTTP::Request;
-use HTTP::Response;
+use HTTP::Cookies ();
+use HTTP::Request ();
+use HTTP::Response ();
 
 my $nextyear = 1901+(gmtime())[5];
 

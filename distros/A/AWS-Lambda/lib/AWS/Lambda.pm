@@ -7,7 +7,7 @@ use AWS::Lambda::AL;
 use AWS::Lambda::AL2;
 use AWS::Lambda::AL2023;
 
-our $VERSION = "0.4.0";
+our $VERSION = "0.4.1";
 
 # the context of Lambda Function
 our $context;
@@ -295,6 +295,8 @@ The following modules are pre-installed for convenience.
 =item L<IO::Socket::SSL>
 
 =item L<Mozilla::CA>
+
+=item L<local::lib>
 
 =back
 

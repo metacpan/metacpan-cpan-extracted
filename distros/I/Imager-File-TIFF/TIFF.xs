@@ -139,15 +139,43 @@ i_writetiff_multi_wiol_faxable(ig, fine, ...)
       OUTPUT:
         RETVAL
 
-const char *
-i_tiff_libversion()
-
 bool
 i_tiff_has_compression(name)
 	const char *name
 
 SV *
 i_tiff_ieeefp()
+
+MODULE = Imager::File::TIFF  PACKAGE = Imager::File::TIFF  PREFIX = i_tiff_
+
+const char *
+i_tiff_builddate(...)
+  C_ARGS:
+
+const char *
+i_tiff_buildversion(...)
+  C_ARGS:
+
+const char *
+i_tiff_libversion(...)
+  C_ARGS:
+
+void
+i_tiff_codecs(class)
+    PPCODE:
+      size_t count;
+      i_tiff_codec *codecs = i_tiff_get_codecs(&count);
+      EXTEND(SP, count);
+      for (int i = 0; i < count; ++i) {
+        i_tiff_codec *codec = codecs + i;
+        HV *hv = newHV();
+        hv_stores(hv, "description", newSVpvn(codec->description, strlen(codec->description)));
+        hv_stores(hv, "name",        newSVpv(codec->name, 0));
+        hv_stores(hv, "code",        newSViv(codec->code));
+        SV *rv = newRV_noinc((SV*)hv);
+        PUSHs(sv_2mortal(rv));
+      }
+      myfree(codecs);
 
 BOOT:
 	PERL_INITIALIZE_IMAGER_CALLBACKS;

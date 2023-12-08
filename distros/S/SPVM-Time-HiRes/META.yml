@@ -6,7 +6,6 @@ build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
   SPVM: '0.989063'
-  SPVM::Sys: '0.502'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: mit
@@ -20,7 +19,8 @@ no_index:
     - inc
 requires:
   SPVM: '0.989063'
+  SPVM::Sys: '0.504'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-Time-HiRes.git
-version: '0.002'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

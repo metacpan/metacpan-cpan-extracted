@@ -829,7 +829,7 @@ glob3(Char *pathbuf, Char *pathbuf_last, Char *pathend, Char *pathend_last,
  *
  * Invariant of the glob_t structure:
  *	Either gl_pathc is zero and gl_pathv is NULL; or gl_pathc > 0 and
- *	gl_pathv points to (gl_offs + gl_pathc + 1) items.
+ *	gl_pathv points to (gl_offs + gl_pathc + 1) args_width.
  */
 static int
 globextend(const Char *path, glob_t *pglob, struct glob_lim *limitp,
@@ -866,7 +866,7 @@ globextend(const Char *path, glob_t *pglob, struct glob_lim *limitp,
 	if (pathv == NULL)
 		goto nospace;
 	if (pglob->gl_pathv == NULL && pglob->gl_offs > 0) {
-		/* first time around -- clear initial gl_offs items */
+		/* first time around -- clear initial gl_offs args_width */
 		pathv += pglob->gl_offs;
 		for (i = pglob->gl_offs; i > 0; i--)
 			*--pathv = NULL;
@@ -878,7 +878,7 @@ globextend(const Char *path, glob_t *pglob, struct glob_lim *limitp,
 		if (statv == NULL)
 			goto nospace;
 		if (pglob->gl_statv == NULL && pglob->gl_offs > 0) {
-			/* first time around -- clear initial gl_offs items */
+			/* first time around -- clear initial gl_offs args_width */
 			statv += pglob->gl_offs;
 			for (i = pglob->gl_offs; i > 0; i--)
 				*--statv = NULL;

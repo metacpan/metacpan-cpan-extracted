@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Fr::Any::Fr - Package for language French
 
 package Locale::CLDR::Locales::Fr::Any::Fr;
 # This file auto generated from Data\common\main\fr_FR.xml
-#	on Sat  4 Nov  6:03:20 pm GMT
+#	on Tue  5 Dec  1:11:22 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

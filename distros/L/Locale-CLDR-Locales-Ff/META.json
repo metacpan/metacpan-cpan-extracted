@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.34.3",
+            "Locale::CLDR" : "v0.34.4",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,59 +46,59 @@
    "provides" : {
       "Locale::CLDR::Locales::Ff" : {
          "file" : "lib/Locale/CLDR/Locales/Ff.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Bf" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Bf.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Cm" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Cm.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Gh" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Gh.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Gm" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Gm.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Gn" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Gn.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Gw" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Gw.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Lr" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Lr.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Mr" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Mr.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Ne" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Ne.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Ng" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Ng.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Sl" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Sl.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Ff::Latn::Sn" : {
          "file" : "lib/Locale/CLDR/Locales/Ff/Latn/Sn.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       }
    },
    "release_status" : "stable",
@@ -111,6 +111,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.34.3",
+   "version" : "v0.34.4",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

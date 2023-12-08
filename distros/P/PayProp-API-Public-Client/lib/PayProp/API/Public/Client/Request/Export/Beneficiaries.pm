@@ -20,7 +20,10 @@ has '+url' => (
 
 
 sub list_p {
-	my ( $self, $params ) = @_;
+	my ( $self, $args ) = @_;
+
+	$args //= {};
+	my $params = $args->{params};
 
 	return $self
 		->api_request_p({
@@ -125,28 +128,6 @@ sub _build_address {
 	return $Address;
 }
 
-sub _query_params {
-	my ( $self ) = @_;
-
-	return [
-		qw/
-			rows
-			page
-			owners
-			external_id
-			search_by
-			search_value
-			is_archived
-			customer_id
-			bank_branch_code
-			customer_reference
-			modified_from_time
-			bank_account_number
-			modified_from_timezone
-		/
-	];
-}
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -186,13 +167,13 @@ An abstraction of the API endpoint receiving the request(s). It is dependant on 
 
 =head1 METHODS
 
-=head2 list_p(\%query_params)
+=head2 list_p(\%args)
 
 Issues a C<HTTP GET> request to PayProp API C</export/beneficiaries> endpoint. It takes an optional hashref of query parameters.
 See L</"QUERY PARAMETERS"> for a list of available parameters.
 
 	$beneficiaries_export
-		->list_p({...})
+		->list_p({ params => {...} })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -211,7 +192,7 @@ B<integer>
 Restrict rows returned.
 
 	$beneficiaries_export
-		->list_p({ rows => 1 })
+		->list_p({ params => { rows => 1 } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -227,7 +208,7 @@ B<integer>
 Return given page number.
 
 	$beneficiaries_export
-		->list_p({ page => 1 })
+		->list_p({ params => { page => 1 } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -243,7 +224,7 @@ B<boolean>
 Return only Beneficiaries that are owners.
 
 	$beneficiaries_export
-		->list_p({ owners => true })
+		->list_p({ params => { owners => true } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -263,8 +244,10 @@ To be used with L</"search_value">.
 	$beneficiaries_export
 		->list_p(
 			{
-				search_by => ['first_name', 'business_name'],
-				search_value => 'Mike',
+				params => {
+					search_value => 'Mike',
+					search_by => ['first_name', 'business_name'],
+				},
 			}
 		)
 		->then( sub {
@@ -284,8 +267,10 @@ To be used with L</"search_by">.
 	$beneficiaries_export
 		->list_p(
 			{
-				search_by => [...],
-				search_value => 'Mike',
+				params => {
+					search_by => [...],
+					search_value => 'Mike',
+				},
 			}
 		)
 		->then( sub {
@@ -303,7 +288,7 @@ B<string> C<E<lt>= 32 characters>
 External ID of beneficiary.
 
 	$beneficiaries_export
-		->list_p({ external_id => 'ABCD1234' })
+		->list_p({ params => { external_id => 'ABCD1234' } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -319,7 +304,7 @@ B<string> C<E<lt>= 32 characters /^[a-zA-Z0-9]+$/>
 Filter beneficiaries by bank account number.
 
 	$beneficiaries_export
-		->list_p({ bank_account_number => 'ab123' })
+		->list_p({ params => { bank_account_number => 'ab123' } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -335,7 +320,7 @@ B<string> C<E<lt>= 32 characters /^[a-zA-Z0-9]+$/>
 Filter beneficiaries by bank branch code.
 
 	$beneficiaries_export
-		->list_p({ bank_branch_code => 'ab123' })
+		->list_p({ params => { bank_branch_code => 'ab123' } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -351,7 +336,7 @@ B<boolean>
 Return only beneficiaries that have been archived. Defaults to C<false>.
 
 	$beneficiaries_export
-		->list_p({ is_archived => true })
+		->list_p({ params => { is_archived => true } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -367,7 +352,7 @@ B<string> C<E<lt>= 50 characters>
 Lookup entities based on C<customer_id>.
 
 	$beneficiaries_export
-		->list_p({ customer_id => 'ABC123' })
+		->list_p({ params => { customer_id => 'ABC123' } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;
@@ -383,7 +368,7 @@ B<string> C<E<lt>= 50 characters>
 Customer reference of beneficiary.
 
 	$beneficiaries_export
-		->list_p({ customer_reference => 'ABC123' })
+		->list_p({ params => { customer_reference => 'ABC123' } })
 		->then( sub {
 			my ( \@beneficiaries ) = @_;
 			...;

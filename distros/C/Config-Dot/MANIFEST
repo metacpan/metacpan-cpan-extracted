@@ -1,8 +1,8 @@
 Changes
 Dot.pm
-examples/ex1.pl
-examples/ex2.pl
-examples/ex3.pl
+examples/parse_example.pl
+examples/parse_example_with_callback.pl
+examples/serialize_example.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

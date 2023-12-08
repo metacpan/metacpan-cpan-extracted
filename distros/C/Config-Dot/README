@@ -2,47 +2,71 @@ NAME
     Config::Dot - Module for simple configure file parsing.
 
 SYNOPSIS
+     use Config::Dot;
+
      my $cnf = Config::Dot->new(%params);
      my $struct_hr = $cnf->parse($string);
      $cnf->reset;
      my $serialized = $cnf->serialize;
 
 METHODS
-    "new(%params)"
-             Constructor.
+  "new"
+     my $cnf = Config::Dot->new(%params);
 
-            *       "callback"
+    Constructor.
 
-                     Callback code for adding parameter.
-                     Callback arguments are:
-                     $key_ar - Reference to array with keys.
-                     $value - Key value.
-                     Default is undef.
+    *       "callback"
 
-            *       "config"
+            Callback code for adding parameter.
 
-                     Reference to hash structure with default config data.
-                     This is hash of hashes structure.
-                     Default value is reference to blank hash.
+            Callback arguments are:
 
-            *       "set_conflicts"
+            $key_ar
+                Reference to array with keys.
 
-                     Set conflicts detection as error.
-                     Default value is 1.
+            $value
+                Key value.
 
-    "parse($string_or_array_ref)"
-             Parse string $string_or_array_ref or reference to array $string_or_array_ref.
-             Use $INPUT_RECORD_SEPARATOR variable to split lines.
-             Returns hash structure with configuration.
+            Default is undef.
 
-    "reset()"
-             Reset content in class (config parameter).
-             Returns undef.
+    *       "config"
 
-    "serialize()"
-             Serialize 'config' hash to output.
-             Use $INPUT_RECORD_SEPARATOR variable to join lines.
-             Returns string with serialized configuration.
+            Reference to hash structure with default config data. This is
+            hash of hashes structure.
+
+            Default value is reference to blank hash.
+
+    *       "set_conflicts"
+
+            Set conflicts detection as error.
+
+            Default value is 1.
+
+    Returns instance of object.
+
+  "parse"
+     my $struct_hr = $cnf->parse($string);
+
+    Parse string $string_or_array_ref or reference to array
+    $string_or_array_ref. Use $INPUT_RECORD_SEPARATOR variable to split
+    lines.
+
+    Returns hash structure with configuration.
+
+  "reset"
+     $cnf->reset;
+
+    Reset content in class (config parameter).
+
+    Returns undef.
+
+  "serialize"
+     my $serialized = $cnf->serialize;
+
+    Serialize 'config' hash to output. Use $INPUT_RECORD_SEPARATOR variable
+    to join lines.
+
+    Returns string with serialized configuration.
 
 PARAMETER_FILE
      # Comment.
@@ -117,7 +141,7 @@ EXAMPLE2
      print $c->serialize."\n";
 
      # Output:
-     # key1=subkey1.value1
+     # key1.subkey1=value1
      # key2=value2
 
 EXAMPLE3
@@ -174,9 +198,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2011-2020 Michal Josef Špaček
-     BSD 2-Clause License
+    © 2011-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

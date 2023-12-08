@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::Bot;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 =head1 DESCRIPTION
 

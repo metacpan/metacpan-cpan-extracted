@@ -1,6 +1,13 @@
 
 Revision history for Net-Async-Slack
 
+0.014     2023-12-04 23:27:45+08:00 Asia/Singapore
+    [Bugs fixed]
+
+    - ->join_channel was passing "name" instead of "channel"
+    - ->files_upload was not submitting valid file data to Slack, attempts to call it would
+    throw an exception instead
+
 0.013     2023-09-21 06:42:57+08:00 Asia/Singapore
     [New features]
 

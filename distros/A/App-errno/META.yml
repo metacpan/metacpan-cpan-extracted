@@ -19,7 +19,7 @@ name: App-errno
 provides:
   App::errno:
     file: lib/App/errno.pm
-    version: '0.070'
+    version: '0.071'
 requires:
   Errno: '0'
   Getopt::Long::EvenLess: '0.111'
@@ -29,7 +29,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-errno
   homepage: https://metacpan.org/release/App-errno
   repository: git://github.com/perlancar/perl-App-errno.git
-version: '0.070'
+version: '0.071'
 x_Dist_Zilla:
   perl:
     version: '5.038000'

@@ -10,8 +10,9 @@ use JSON::XS;
 use LWP::UserAgent;
 use URI;
 use URI::QueryParam;
+use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -31,6 +32,9 @@ sub new {
 
 	# SPARQL endpoint.
 	$self->{'sparql_endpoint'} = '/bigdata/namespace/wdq/sparql';
+
+	# Verbose mode.
+	$self->{'verbose'} = 0;
 
 	# Process parameters.
 	set_params($self, @params);
@@ -53,6 +57,10 @@ sub new {
 
 sub query {
 	my ($self, $query) = @_;
+
+	if ($self->{'verbose'}) {
+		print encode_utf8($query)."\n";
+	}
 
 	my $uri = URI->new($self->{'_api_uri'});
 	$uri->query_param_append('format' => 'json');
@@ -99,7 +107,7 @@ WQS::SPARQL - Simple SPARQL query for Wikidata Query Service.
 
  use WQS::SPARQL;
 
- my $obj = WQS::SPARQL->new;
+ my $obj = WQS::SPARQL->new(%params);
  my $ret_hr = $obj->query($sparql);
  my $count = $obj->query_count($sparql_count);
 
@@ -107,9 +115,44 @@ WQS::SPARQL - Simple SPARQL query for Wikidata Query Service.
 
 =head2 C<new>
 
- my $obj = WQS::SPARQL->new;
+ my $obj = WQS::SPARQL->new(%params);
 
 Constructor.
+
+=over
+
+=item * C<agent>
+
+User agent.
+
+Default value is 'WQS::SPARQL (__VERSION__)'.
+
+=item * C<lwp_user_agent>
+
+LWP::UserAgent object.
+
+Default value is instance of L<LWP::UserAgent> with constructor 'agent'
+parameter.
+
+=item * C<query_site>
+
+Query site.
+
+Default value is 'query.wikidata.org'.
+
+=item * C<sparql_endpoint>
+
+SPARQL endpoint.
+
+Default value is '/bigdata/namespace/wdq/sparql'.
+
+=item * C<verbose>
+
+Verbose mode.
+
+Default value is 0.
+
+=back
 
 Returns instance of class.
 
@@ -215,7 +258,8 @@ L<HTTP::Request>,
 L<JSON::XS>,
 L<LWP::UserAgent>,
 L<URI>,
-L<URI::QueryParam>.
+L<URI::QueryParam>,
+L<Unicode::UTF8>.
 
 =head1 SEE ALSO
 
@@ -245,6 +289,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

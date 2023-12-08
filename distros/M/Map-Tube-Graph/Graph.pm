@@ -1,19 +1,16 @@
 package Map::Tube::Graph;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
 use Graph;
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Scalar::Util qw(blessed);
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -172,11 +169,9 @@ Map::Tube::Graph - Graph output for Map::Tube.
 
 =head1 EXAMPLE
 
- # Pragmas.
  use strict;
  use warnings;
 
- # Modules.
  use English;
  use Error::Pure qw(err);
  use Map::Tube::Graph;
@@ -226,7 +221,7 @@ L<Class::Utils>,
 L<English>,
 L<Error::Pure>,
 L<Graph>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Scalar::Util>.
 
 L<UNIVERSAL::DOES> if doesn't exists in Perl.
@@ -259,22 +254,24 @@ Install the Map::Tube modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Graph>
+L<https://github.com/michal-josef-spacek/Map-Tube-Graph>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

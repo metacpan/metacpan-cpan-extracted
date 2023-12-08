@@ -2,6 +2,11 @@ Revision history for Pod-AsciiDoctor
 
 NOT USED - Please use github http://github.com/benignbala/pod-asciidoctor
 
+0.102001    2023-12-06
+
+    - bin/pod2asciidoctor : fix "-o -"
+    - try to fix bullets-lists
+
 0.102000    2023-10-06
 
     - add bin/pod2asciidoctor

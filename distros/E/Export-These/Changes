@@ -1,4 +1,11 @@
 Revision history for Perl extension Export::These.
+v0.2.1 2023-12-03
+  [fixes]
+    - now using an empty string or undef value will prevent
+      default importing of symbols, but let ref/config processing
+      operate instead of die
+    - updated pod to document the fix/change of behaviour
+
 v0.2.0 2023-10-29
   [features]
     - add $EXPORT_PASS variable for user control over what symbols are

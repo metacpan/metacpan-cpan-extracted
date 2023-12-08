@@ -1,55 +1,39 @@
-==================================================
-Changes from 2019-04-02 00:00:00 +0000 to present.
-==================================================
+Changelog for HealthCheck-Diagnostic-DBHPing
 
--------------------------------------------
-version v1.2.4 at 2020-04-01 18:24:52 +0000
--------------------------------------------
+v1.2.5 2023-12-04T19:24:29
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #4: Patch - SM-4514 - Make strict an author test (Andrew
+   Hewus Fresh)
+ - Pull in updated Makefile from upstream (Andrew Hewus Fresh)
+ - Make strict.t an author test (Andrew Hewus Fresh)
 
-  Change: c7fb962caf22610b11e55c742252bb11a7ce2505
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-04-01 14:24:36 +0000
+v1.2.4 2020-04-01T18:24:36
+ - Update README (Andrew Hewus Fresh)
+ - This should be the correct incantation (Andrew Hewus Fresh)
 
-    Update README 
+v1.2.3 2020-03-25T18:41:57
+ - Convert to Dist::Zilla::PluginBundle::Author::GSG (Andrew Hewus Fresh)
 
-  Change: 5f55b3dfdd5c49d2c633dd70773ba0e75645312a
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-27 11:57:05 +0000
+v1.2.2 2019-11-07T20:30:31
+ - Create distribution files (Andrew Hewus Fresh)
+ - Convert to Bitbucket workflow (Andrew Hewus Fresh)
+ - Remove gitc metadata (Andrew Hewus Fresh)
+ - Merge remote-tracking branch 'origin/stage' into prod (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
+ - Merge remote-tracking branch 'origin/master' into test (Andrew Fresh)
 
-    This should be the correct incantation 
+v1.2.1.0 2019-01-24T15:54:45
+ - No changes found
 
--------------------------------------------
-version v1.2.3 at 2020-03-25 18:41:57 +0000
--------------------------------------------
+v1.2.0.0 2018-11-02T17:38:39
+ - Merge remote-tracking branch 'origin/stage' into prod (Brendan Byrd)
 
-  Change: 385f608766fd8b8b918e954546c02151ead23ac7
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2020-03-23 14:33:44 +0000
+v1.1.0.0 2018-08-20T17:21:03
+ - Merge remote-tracking branch 'origin/stage' into prod (Andrew Fresh)
 
-    Convert to Dist::Zilla::PluginBundle::Author::GSG 
+v1.0.0 2018-08-20T17:20:46
+ - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
 
--------------------------------------------
-version v1.2.2 at 2019-11-07 20:30:31 +0000
--------------------------------------------
-
-  Change: 885a0a15e6dce023c149f3ea83ee65b772faf6b8
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:35:31 +0000
-
-    Create distribution files 
-
-  Change: 5eeaf7d8a8a3ed632eeefd31b331344ea3b72847
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:23:34 +0000
-
-    Convert to Bitbucket workflow 
-
-  Change: c3ee02080271fa28bcdc4584351b0d65d206482e
-  Author: Andrew Hewus Fresh <andrew.fresh@grantstreet.com>
-  Date : 2019-10-18 14:23:33 +0000
-
-    Remove gitc metadata 
-
-=================================================
-Plus 16 releases after 2019-04-02 00:00:00 +0000.
-=================================================
+v0.0.0 2019-01-24T15:54:45
+ - SM-1680 Using Test::Strict (Caroline Roig-Irwin)
+ - Merge remote-tracking branch 'origin/master' into test (Brendan Byrd)

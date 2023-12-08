@@ -15,11 +15,15 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
+        'strict'   => '0',
+        'warnings' => '0',
     },
     PREREQ_PM => {
-        'version' => '0.77',
-        'autodie' => '0',
-        'Carp'    => '0'
+        'version'  => '0.77',
+        'autodie'  => '0',
+        'Carp'     => '0',
+        'strict'   => '0',
+        'warnings' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Text-Table-Read-RelationOn-Tiny-*' },

@@ -13,5 +13,6 @@ t/90_simple_integration.t
 t/91_form_data.t
 t/92_tag_processing.t
 t/93_error_handling.t
+t/94_headers.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -549,6 +549,7 @@ sub new {
     my ( $class, $version ) = @_;
 
     $version = '1.16' if $version eq '1.16.1';
+    $version = '2.7' if $version eq '2.7.1';
 
     defined( my $vers_idx = $index{$version} )
       or croak( "Unsupported GSL version!!! : $version" );
@@ -579,7 +580,7 @@ sub versions {
     ( undef, my $cur_ver ) = @_;
 
     return @versions unless defined $cur_ver;
-
+    $cur_ver = '2.7' if $cur_ver eq '2.7.1';
     defined( my $idx = $index{$cur_ver} )
       or croak( "unsupported version: $cur_ver" );
 

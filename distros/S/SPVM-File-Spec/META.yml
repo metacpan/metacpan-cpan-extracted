@@ -20,7 +20,7 @@ no_index:
 requires:
   SPVM: '0.989002'
   SPVM::Regex: '0.241002'
-  SPVM::Sys: '0.481'
+  SPVM::Sys: '0.508'
 resources: {}
-version: '0.081002'
+version: '0.081003'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

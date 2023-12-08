@@ -1,0 +1,84 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+### after:     use lib qw(@RT_LIB_PATH@);
+use lib '/opt/rt5/local/lib /opt/rt5/lib';
+
+use RT::Interface::CLI  qw(Init);
+
+use JSON;
+use Getopt::Long;
+
+my %OPT = (
+    'form-name' => 1,
+);
+
+Init(
+    \%OPT,
+    "help|h",
+    "form-name=s",
+);
+
+Pod::Usage::pod2usage({verbose => 1}) if $OPT{help};
+Pod::Usage::pod2usage() unless @ARGV == 1;
+
+unless ( $OPT{'form-name'} ) {
+    die "form-name is required to name the new form";
+}
+
+my ($filename) = @ARGV;
+die "Not a file: $filename\n" unless -f $filename;
+die "Cannot read file: $filename\n" unless -r $filename;
+
+open(my $fh, "<", $filename)
+    or die "Can't read $filename: $!";
+
+my $json_input = do {local $/; <$fh>} if $fh;
+my $formtools_hash = decode_json($json_input);
+
+my $form = RT::Attribute->new( RT->SystemUser );
+my ( $ok, $msg ) = $form->Create(
+    Name    => 'FormTools Form',
+    Description => $OPT{'form-name'},
+    Object => RT->System,
+    Content => $formtools_hash,
+);
+
+if ( $ok ) {
+    print "Form \"" . $OPT{'form-name'} . "\" created.\n";
+}
+else {
+    print "Error: $msg\n";
+}
+
+__END__
+
+=head1 NAME
+
+rt-insert-formtools-config - Process a JSON FormTools configuration
+file and insert it into the RT database.
+
+=head1 SYNOPSIS
+
+    rt-insert-formtools-config --form-name="Form One" formtools-config.json
+
+=head1 DESCRIPTION
+
+This script accepts a file containing a JSON structure to define
+a set of FormTools forms. It will insert this configuration into
+the RT database.
+
+=head1 OPTIONS
+
+=over
+
+=item C<--form-name>
+
+The name of the form to be created.
+
+=back
+
+=cut

@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 a59de57bb520e7e175bae45688aecb7f8b0a355921a578b327f1eda9b24d8c70 Blowfish.xs
+SHA256 4aab947ad7a46e5fcbf68561ed544e45d46e383b5d124cac7a1db556fb153d99 Changes
+SHA256 8553ad6e3f3984af2d9c0c1901e88ef2379a026678c071133951cfe5671d077f LICENSE
+SHA256 2276926d7538f03b0680236757a4b7abaf19f1cf83d438ce4e04edd0b43f9468 MANIFEST
+SHA256 2a0679c5c66aba3a9733ff2d0644b4794db792e684f9f16b7c8e7d19f58274b6 META.json
+SHA256 769f661777a0e3275f34b3a2e858355e40e6622f1b5c6d984c6462ceaacb41c9 META.yml
+SHA256 a9fab73fad6d6565a44c44d4bfee81f610baaa3aca92646c5ae2d6a4e374dd8d Makefile.PL
+SHA256 f59afcdcd32e26a59cc5f5679458d4066fa3fceab07b4bcc5b3670806194368b README
+SHA256 a8a6566bb6f97a8c90c568fa7e2e6965ba65fbe32074045514ff2c13c20dbc9b cpanfile
+SHA256 e30940ce9c12f6456901fd8bbeb87765a9e3c124c3d94fe76923bffb9d68c407 dist.ini
+SHA256 d7352efddc2d0211ba4afbbaf92dccac556a8aed64f4f2dbfb7164fc6419a342 hexdump.xs
+SHA256 277c560c6e7bf35c136932538876c86cd7a9c7c220334110c09079f4c8ce4d5a lib/Crypt/OpenSSL/Blowfish.pm
+SHA256 e15b7664f5665dae838e2492e4eebf4615722a6002cbec1188ecc8fdd395a82e maint/Makefile_header.PL
+SHA256 ad599ba07ccba9ef867a7399bb3ef7c83faf7a6350d3dc90f1377c99bebdd72e ppport.h
+SHA256 962f9cd8c9e0026b72ee197357cda3e8b4cafbf0cd08dd0f7f1de80b0facdd2d t/00-openssl-info.t
+SHA256 6d5988f9a83a94f7f29cceda2bc62ce97ca0277306e3067a7d2af0f5711e7b0b t/author-pod-spell.t
+SHA256 305c657c6b73f10767a0ea286b8a73d693940f4cbb8b6a0a4d34e2b5a1c04635 t/author-pod-syntax.t
+SHA256 bdc0a8ea028f767675db10b0089603f78a010c75a67ac6ca43d6a46d7895de81 t/blowfish.t
+SHA256 79bdff72c1aed63a4d25f55383e08fcf008a07824cfea1cc7bcb2d23296c1a41 t/openssl.t
+SHA256 c79f02d04a1db8a985e36276558117f21c35c660ebfafc59353679c0cb983e94 t/release-meta-json.t
+SHA256 4e3c3cbb7d3fc9bdbf69a98a27ed5de938e81aeed0d88b5d83a5381138f9751f t/upgrade.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEMguXHBCUSzAt6mNu1fh7LgYGpfkFAmVlWXsACgkQ1fh7LgYG
+pfnuBRAAg+h6T6X+pk/RiKLbDrSRXR/MEcOgPHrZrm/x1QcSEyqlp7l0+dAWSRzh
+MnatSpg5KJJK774lebun9e6qOLkQxFwFMjSs38PCk3X+HjRoI3z39N8ejDDOVpTr
+GqF82Crzux/rgpfUPqp86DMspv1U8wLy8mYBYKk5XPl9HDi/mdQnZswdp/Gk4mRs
+Y6dGQ6wiKLynUplQ2GItKo8U7Z6U07+drGleq07ETYPGTQvRfww+uVMYu1JSLg2U
+hNIWc4RuwxoSUPiJXs9rCvca+z8oi8cgoaCajlkPoQQ239B3bE08kR9aABZYqUa7
+kZCi88jNAvJyMsvEup+Eyy3sxVjNJbmsPnSZJ6L4UbMZKG9iU1WxSXbH7S+fFpOQ
+p5g0rzL1ZKNMpnP4RswUmYkF0iHJme8TT6MBxcdSzibbITffNUGn15vMr5x4+Dn/
+dq1YLo8FzUq3leDFuRQEUDEpHt2nWNhAP2KDQuZmHv89puUlJSyJCFc6qYJn8EBh
+udkQUmeFNUlNegL3bP+ypnukUxEVyMIllXSQQyVLe8yMRtCsJy3QjKW7tsaYHNbZ
+U1KAu/6MWAxnIxj2r1zutPPivXq6pZyuyX58qZVE+mwFrX2EQmo5bf2WTpjy8ICa
+FA/EatpslN8U3yNH5oZ9FH/rDc6g4O0w+z/CFH1rbooie0nf/UI=
+=msdp
+-----END PGP SIGNATURE-----

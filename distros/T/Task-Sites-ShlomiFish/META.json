@@ -4,7 +4,7 @@
       "Shlomi Fish <shlomif@iglu.org.il>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "bundle",
       "shlomif",
@@ -52,6 +52,7 @@
             "File::Spec::Functions" : "0",
             "File::Which" : "0",
             "Games::Solitaire::Verify::Base" : "0",
+            "HTML::Acronyms" : "0",
             "HTML::Links::Localize" : "0",
             "HTML::Selector::XPath" : "0",
             "HTML::T5" : "0",
@@ -66,7 +67,11 @@
             "MIME::Types" : "0",
             "Moose" : "0",
             "Parallel::ForkManager" : "0",
+            "Parallel::Map::Segmented" : "0",
+            "Proc::ProcessTable" : "0",
+            "QuadPres" : "0",
             "SVG" : "0",
+            "Set::CSS" : "0",
             "Spork::Shlomify" : "0.0200",
             "String::ShellQuote" : "0",
             "Task::Latemp" : "0",
@@ -79,6 +84,7 @@
             "Test::TrailingSpace" : "0",
             "Text::Hunspell" : "0",
             "Text::VimColor" : "0",
+            "URI::Find" : "0",
             "XML::Amazon" : "0",
             "XML::Feed" : "0",
             "XML::Grammar::Fiction" : "v0.7.0",
@@ -104,7 +110,7 @@
    "provides" : {
       "Task::Sites::ShlomiFish" : {
          "file" : "lib/Task/Sites/ShlomiFish.pm",
-         "version" : "0.0214"
+         "version" : "0.0215"
       }
    },
    "release_status" : "stable",
@@ -117,6 +123,6 @@
          "url" : "https://github.com/thewml/latemp"
       }
    },
-   "version" : "0.0214",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.0215",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

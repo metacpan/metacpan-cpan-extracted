@@ -2,8 +2,8 @@ NAME
     App::SymlinkUtils - CLI utilities related to symbolic links (symlinks)
 
 VERSION
-    This document describes version 0.002 of App::SymlinkUtils (from Perl
-    distribution App-SymlinkUtils), released on 2023-07-02.
+    This document describes version 0.004 of App::SymlinkUtils (from Perl
+    distribution App-SymlinkUtils), released on 2023-08-25.
 
 DESCRIPTION
     This distribution includes several utilities related to symlinks:

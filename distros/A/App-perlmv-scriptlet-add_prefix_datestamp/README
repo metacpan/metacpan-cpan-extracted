@@ -3,9 +3,9 @@ NAME
     (YYYYMMDD-) to filenames, using files' modification time as date
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     App::perlmv::scriptlet::add_prefix_datestamp (from Perl distribution
-    App-perlmv-scriptlet-add_prefix_datestamp), released on 2023-07-15.
+    App-perlmv-scriptlet-add_prefix_datestamp), released on 2023-08-25.
 
 SYNOPSIS
     With filenames:
@@ -44,6 +44,9 @@ SCRIPTLET ARGUMENTS
   avoid_duplicate_prefix
     Avoid adding prefix when filename already has prefix that looks like
     datestamp (1xxxxxxx- to 2xxxxxxx).
+
+  date
+    Use this date instead of file's modification time.
 
   prefix_format
     Specify datestamp format, in the form of strftime() template.

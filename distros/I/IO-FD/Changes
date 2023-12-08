@@ -1,8 +1,17 @@
 Revision history for Perl extension IO::FD.
+v0.3.5 2023-12-03
+  [fixes]
+    - Update documentation with explicit defined testing on return values as
+      the major differences to core Perl routines of same names.
+
+v0.3.4 2023-12-03
+  [fixes]
+    - Attempted fix stat and lstat. Passing tests on 64 systems.
+
 v0.3.3 2023-11-12
   [fixes]
     - Fixed logic error in return value of send/sendto binding.
-    - Fixed error checking on uninitialized result code
+    - Fixed error checking on uninitialized result code of send/sendto
     - Fixed link to github using https
     - Fixed failing test on linux due to unknown bare word
 

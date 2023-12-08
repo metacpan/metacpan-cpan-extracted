@@ -12,13 +12,15 @@ class Go::Schedule {
   use List;
   use Go::Schedule::Task;
   use Sys::Time;
-  use Sys::Time::Timeval;
   use Sys::Time::Timespec;
   use Go::Poll;
   use Thread::ID;
   use Thread::ThisThread;
   use Go::Error::IOTimeout;
   use Error::System;
+  use Time::HiRes;
+  use Sys::Time::Util;
+  use Sys::Time::Constant as TIME;
   
   has coroutines : List of Go::Coroutine;
   
@@ -46,53 +48,21 @@ class Go::Schedule {
     return $self;
   }
   
-  private static method create_deadline_base : Sys::Time::Timespec () {
-    my $now_tv = Sys::Time::Timeval->new;
+  private static method clock_gettime : Sys::Time::Timespec () {
+    my $now_ts = (Sys::Time::Timespec)undef;
     
-    Sys::Time->gettimeofday($now_tv, undef);
+    eval { $now_ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC); }
     
-    my $deadline_base_sec = $now_tv->tv_sec;
-    
-    my $deadline_base_nsec = 1000 * $now_tv->tv_usec;
-    
-    my $deadline_base = Sys::Time::Timespec->new;
-    
-    $deadline_base->set_tv_sec($deadline_base_sec);
-    
-    $deadline_base->set_tv_nsec($deadline_base_nsec);
-    
-    return $deadline_base;
-  }
-  
-  private static method create_deadline : Sys::Time::Timespec ($deadline_base : Sys::Time::Timespec, $after : double) {
-    my $now_tv = Sys::Time::Timeval->new;
-    
-    Sys::Time->gettimeofday($now_tv, undef);
-    
-    my $now_sec = $deadline_base->tv_sec;
-    
-    my $now_nsec = $deadline_base->tv_nsec;
-    
-    my $after_sec = (int)$after;
-    
-    my $after_nsec = (int)(($after - $after_sec) * 1_000_000_000);
-    
-    my $deadline_sec = $now_sec + $after_sec;
-    
-    my $deadline_nsec = $now_nsec + $after_nsec;
-    
-    if ($deadline_nsec >= 1_000_000_000) {
-      $deadline_sec += 1;
-      $deadline_nsec -= 1_000_000_000;
+    if ($@) {
+      if (eval_error_id is_error Error::System) {
+        $now_ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_REALTIME);
+      }
+      else {
+        die eval_error_id, $@;
+      }
     }
     
-    my $deadline = Sys::Time::Timespec->new;
-    
-    $deadline->set_tv_sec($deadline_sec);
-    
-    $deadline->set_tv_nsec($deadline_nsec);
-    
-    return $deadline;
+    return $now_ts;
   }
   
   private static method is_over_deadline : int ($deadline_base : Sys::Time::Timespec, $after : double) {
@@ -101,16 +71,16 @@ class Go::Schedule {
       die "\$deadline_base must be defined.";
     }
     
-    my $deadline = Go::Schedule->create_deadline($deadline_base, $after);
+    my $after_ts = Sys::Time::Util->float_seconds_to_timespec($after);
     
-    my $now_tv = Sys::Time::Timeval->new;
+    my $deadline = Sys::Time::Util->add_timespec($deadline_base, $after_ts);
+    
+    my $now_ts = &clock_gettime;
     
     my $is_over_deadline = 0;
     
-    Sys::Time->gettimeofday($now_tv, undef);
-    
-    my $now_sec = $now_tv->tv_sec;
-    my $now_nsec = 1000 * $now_tv->tv_usec;
+    my $now_sec = $now_ts->tv_sec;
+    my $now_nsec = $now_ts->tv_nsec;
     
     my $deadline_sec = $deadline->tv_sec;
     my $deadline_nsec = $deadline->tv_nsec;
@@ -180,7 +150,7 @@ class Go::Schedule {
         # IO timeout
         if ($timeout > 0) {
           
-          $current_coroutine->{deadline_base_io_timeout} = &create_deadline_base;
+          $current_coroutine->{deadline_base_io_timeout} = &clock_gettime;
           $current_coroutine->{io_timeout} = $timeout;
         }
       }
@@ -189,7 +159,7 @@ class Go::Schedule {
         
         # Timer
         if ($after > 0) {
-          $current_coroutine->{deadline_base_timer} = &create_deadline_base;
+          $current_coroutine->{deadline_base_timer} = &clock_gettime;
           $current_coroutine->{after} = $after;
         }
       }

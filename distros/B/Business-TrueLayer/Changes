@@ -1,0 +1,14 @@
+Revision history for Business-TrueLayer
+
+0.02     2023-12-08
+        - auth_host moves to Request, and Authenticator only uses host internally
+        - Refactor api_post() and api_get() to use _ua_request()
+        - Move the post in _authenticate() to _ua_request() in the Request class
+        - Paranoid error handling with clear reporting in _authenticate
+        - Improve tests for Business::TrueLayer::Request prior to refactoring
+        - Use Test::Warnings in all tests
+        - Pass ->payment_host into ::Payment object
+        - Add Changes and README.pod
+
+0.01     2023-11-29
+        - First release

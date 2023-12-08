@@ -6,22 +6,38 @@ use warnings FATAL => 'all';
 use Test::More;
 use Pod::AsciiDoctor ();
 
-my $adoc = Pod::AsciiDoctor->new();
-$adoc->parse_from_file("t/data/pod.pm");
+{
+    my $adoc = Pod::AsciiDoctor->new();
+    $adoc->parse_from_file("t/data/pod.pm");
 
-# Test C<...>
-ok(
-    $adoc->adoc() =~ /`\$x >> 3` or even `\$y >> 5`/,
-    "Converted C<<< \$x >> 3 >>> or even C<<<< \$y >> 5 >>>>."
-);
+    # Test C<...>
+    like(
+        $adoc->adoc(),
+        qr/`\$x >> 3` or even `\$y >> 5`/,
+        "Converted C<<< \$x >> 3 >>> or even C<<<< \$y >> 5 >>>>.",
+    );
 
-# Test B<...>
-ok( $adoc->adoc() =~ /\*test\*/ );
+    # Test B<...>
+    like( $adoc->adoc(), qr/\*test\*/, "bold markup", );
 
-# Test I<...>
-ok( $adoc->adoc() =~ /_grand_/ );
+    # Test I<...>
+    like( $adoc->adoc(), qr/_grand_/, "italics markup", );
 
-# Test L<text|http://...>
-ok( $adoc->adoc() =~ /reference \[Asciidoctor User Manual\]/ );
+    # Test L<text|http://...>
+    like(
+        $adoc->adoc(),
+        qr/reference \[Asciidoctor User Manual\]/,
+        "hyperlink markup",
+    );
 
+}
+
+{
+    my $adoc = Pod::AsciiDoctor->new();
+    $adoc->parse_from_file("t/data/bullets_list.pod");
+    my $text = $adoc->adoc();
+
+    # Test C<...>
+    like( $text, qr/^\* +First$/ms, "Rendering bullets_list (<ul>)", );
+}
 done_testing();

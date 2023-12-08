@@ -9,36 +9,6 @@ It's also available in case someone ever chooses to fork the
 module (though I hope that won't be necessary).
 
 #########################################################################
-Update the windows zones.  Useful information in determining timezone
-mapping may be obtained at:
-
-   http://support.microsoft.com/kb/914387
-
-Go to:
-
-   http://unicode.org/repos/cldr-tmp/trunk/diff/supplemental/zone_tzid.html
-
-and copy the contents of the 'Mapping for: windows' table into a file 'windows.new'
-and run the script:
-
-   windows.compare
-
-Currently, ignore the addition:
-   "UTC"                             => "Etc/GMT",
-
-and the suggestions:
-   "Argentina Standard Time"         => "America/Buenos_Aires",
-   "GTB Standard Time"               => "Europe/Bucharest",
-   "India Standard Time"             => "Asia/Calcutta",
-   "Nepal Standard Time"             => "Asia/Katmandu",
-   "US Eastern Standard Time"        => "America/Indianapolis",
-
-Make sure that new and changed zones refer to valid Olsen time zones. Make
-the changes in data.alias.pl .
-
-Then remove windows.new .
-
-#########################################################################
 Get the newest tzdata package.
 
 The tzdata/tzcode archives are obtained from
@@ -136,6 +106,13 @@ NOTE 4: If you see an error:
 removed the key/value pair in data.alias.pl
 
 #########################################################################
+Update the windows zones.
+
+(cd internal; ./windows.compare)
+
+Make the changes in data.alias.pl .
+
+#########################################################################
 Clean up stuff that shouldn't be in the manifest
 
 In internal/benchmarks directory
@@ -166,7 +143,7 @@ Update the copyright
      sed -e "s,\(Copyright (c) ....\)\-.... \(Sullivan Beck\),\1-$y \2," $i > z
      mv z $i
    done
-   chmod +x internal/tzdata internal/gen_dm5abbrevs examples/dm_* internal/langpod
+   chmod +x internal/tzdata internal/gen_dm5abbrevs examples/dm_* internal/langpod internal/windows.compare
 
 #########################################################################
 Switch the system timezone to America/Central and run the tests.

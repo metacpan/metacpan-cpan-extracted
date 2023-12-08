@@ -1,0 +1,23 @@
+=encoding utf8
+
+=head1 NAME
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=over 4
+
+=item * First
+
+=item * Second
+
+=back
+
+=head1 METHODS
+
+=head2
+
+=head2
+
+=cut

@@ -15,6 +15,12 @@ METHODS
 
     Constructor.
 
+    *       "debug"
+
+            Debug mode.
+
+            Default value is 0.
+
     *       "pod_file"
 
             POD or Perl module file to process.
@@ -131,5 +137,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

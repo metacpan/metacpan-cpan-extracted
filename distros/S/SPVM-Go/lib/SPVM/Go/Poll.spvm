@@ -101,9 +101,9 @@ class Go::Poll {
   
   private static method check_io_timeout : int ($deadline_base : Sys::Time::Timespec, $timeout : double) {
     
-    my $deadline_now = Go::Schedule->create_deadline_base;
+    my $deadline_now = Go::Schedule->clock_gettime;
     
-    my $interval = ($deadline_now->tv_sec - $deadline_base->tv_sec) + (($deadline_now->tv_nsec - $deadline_base->tv_nsec) / 1_000_000_000);
+    my $interval = Sys::Time::Util->timespec_interval($deadline_base, $deadline_now);
     
     my $timeout_occur = $timeout - $interval < 0;
     

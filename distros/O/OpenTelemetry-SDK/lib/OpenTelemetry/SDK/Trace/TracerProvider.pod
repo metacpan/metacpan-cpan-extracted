@@ -28,7 +28,7 @@ telemetry data that can be sent to external collectors and processed.
 
 =head2 new
 
-    $provider = OpenTelemetry::Trace::TracerProvider->new
+    $provider = OpenTelemetry::SDK::Trace::TracerProvider->new(
         sampler      => $sampler,           # optional
         id_generator => $generator_package, # optional
         span_limits  => $limits,            # optional

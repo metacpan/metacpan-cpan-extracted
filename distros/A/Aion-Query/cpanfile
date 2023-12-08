@@ -14,4 +14,4 @@ requires 'config', '1.3';
 requires 'common::sense', '0';
 requires 'DBD::SQLite', '1.74';
 
-requires 'Aion::Format', '0.0.2';
+requires 'Aion::Format', '0.0.3';

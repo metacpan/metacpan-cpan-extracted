@@ -37,7 +37,7 @@
             "IO::Select" : "1.17",
             "IO::Socket" : "1.3",
             "IO::Socket::IP" : "0.38",
-            "Net::DNS" : "1.38",
+            "Net::DNS" : "1.41",
             "Socket" : "2.025",
             "perl" : "5.008009"
          }
@@ -48,12 +48,11 @@
             "File::Find" : "1.13",
             "File::Spec" : "3.29",
             "IO::File" : "1.14",
-            "Test::Builder" : "0.8",
             "Test::More" : "0.8"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.10",
+   "version" : "1.00",
    "x_serialization_backend" : "JSON::PP version 2.27200"
 }

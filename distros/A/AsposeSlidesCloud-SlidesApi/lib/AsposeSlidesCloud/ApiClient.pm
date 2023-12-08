@@ -380,7 +380,10 @@ sub deserialize
         return \@_values;
     } elsif ($class eq 'DateTime') {
         return DateTime->from_epoch(epoch => str2time($data));
-    } elsif (grep /^$class$/, ('string', 'int', 'float', 'bool', 'object', 'File')) {
+    } elsif (grep /^$class$/, ('string')) {
+        $data =~ s/^"(.*)"$/$1/;
+        return $data;
+    } elsif (grep /^$class$/, ('int', 'float', 'bool', 'object', 'File')) {
         return $data;
     } else { # model
         $class = AsposeSlidesCloud::ClassRegistry->get_class_name($class, $data);

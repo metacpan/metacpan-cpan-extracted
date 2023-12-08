@@ -4,9 +4,6 @@ use strict;
 use warnings;
 use feature 'state';
 
-use FindBin qw/$Bin/;
-use lib qq{$Bin/../lib};
-
 use Sub::Genius ();
 
 #
@@ -34,6 +31,7 @@ my $sq = Sub::Genius->new(preplan => $pre );
 my $GLOBAL = {};
 
 # 'compile' PRE
+
 $sq->init_plan;
 
 # run loop-ish
@@ -120,7 +118,7 @@ sub P {
 
 sub end {
     my $scope = shift;
-    state $persist = {};                                                    # gives subroutine memory, also 'private'
+    state $persist = {};                                      # gives subroutine memory, also 'private'
     my $private = {};                                                       # reset after each call
     printf( "%s\n", join( q{ }, @{ $scope->{contrib} } ) );
     return;

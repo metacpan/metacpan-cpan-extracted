@@ -1,5 +1,12 @@
 Revision history for Sys-Group-GIDhelper
 
+0.1.0	2023-12-04/02:00
+		- massive doc cleanup
+		- add in error checking for min/max when calling new
+		- bump max default to something larger, 131068
+		- firstfree -> first_free, firstfree is now a alias
+		- lastfree -> lastfree, lastfree is now a alias
+
 0.0.2	2009-09-02/11:30
 		-Properly set the minimum instead of always using the default.
 

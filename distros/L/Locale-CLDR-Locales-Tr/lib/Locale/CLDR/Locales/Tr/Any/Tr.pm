@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Tr::Any::Tr - Package for language Turkish
 
 package Locale::CLDR::Locales::Tr::Any::Tr;
 # This file auto generated from Data\common\main\tr_TR.xml
-#	on Sat  4 Nov  6:28:35 pm GMT
+#	on Tue  5 Dec  1:36:24 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

@@ -12,6 +12,7 @@ my @files = (
     't/00-compile.t',
     't/00-load.t',
     't/01-conversion.t',
+    't/data/bullets_list.pod',
     't/data/pod.pm'
 );
 

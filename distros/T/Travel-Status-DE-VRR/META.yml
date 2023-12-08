@@ -1,7 +1,7 @@
 ---
 abstract: 'unofficial VRR departure monitor.'
 author:
-  - 'Copyright (C) 2013-2015 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>'
+  - 'Copyright (C) 2013-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>'
 build_requires:
   File::Slurp: '0'
   Test::More: '0'
@@ -18,22 +18,23 @@ name: Travel-Status-DE-VRR
 provides:
   Travel::Status::DE::EFA:
     file: lib/Travel/Status/DE/EFA.pm
-    version: '1.23'
+    version: '2.00'
   Travel::Status::DE::EFA::Line:
     file: lib/Travel/Status/DE/EFA/Line.pm
-    version: '1.23'
+    version: '2.00'
   Travel::Status::DE::EFA::Result:
     file: lib/Travel/Status/DE/EFA/Result.pm
-    version: '1.23'
+    version: '2.00'
   Travel::Status::DE::EFA::Stop:
     file: lib/Travel/Status/DE/EFA/Stop.pm
-    version: '1.23'
+    version: '2.00'
   Travel::Status::DE::VRR:
     file: lib/Travel/Status/DE/VRR.pm
-    version: '1.23'
+    version: '2.00'
 requires:
   Carp: '0'
   Class::Accessor: '0'
+  DateTime: '0'
   Getopt::Long: '0'
   LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
@@ -43,5 +44,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-VRR
-version: '1.23'
+version: '2.00'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

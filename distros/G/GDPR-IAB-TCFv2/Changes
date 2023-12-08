@@ -1,0 +1,34 @@
+0.07
+  - add check for publisher restrictions
+  - validate if string is a valid base64 url encoded string
+
+0.06
+  - add special features as constants
+  - add purpose ids as constants
+  - add missing methods on pod documentation
+  - on list context methods created and last_updated should return epoch in seconds + nanoseconds
+
+0.051
+  - remove dependency List::MoreUtils
+  - make sure the code will work on perl 5.8
+  - make sure the code will work on 32 bits
+  - make sure the code will work on newer versions of perl where MIME::Base64 supports base64 url format
+  - change version schema
+  - some small refactors
+  - doc fixes
+
+0.05
+  - almost the same as v0.051
+
+v0.0.4
+  - fix issue with pack Q on 32 bits environment 
+  - fix issue with missing dependency
+
+v0.0.3
+  - complete basic development
+
+v0.0.2
+  - add first pod
+
+v0.0.1
+  - initial version, incomplete

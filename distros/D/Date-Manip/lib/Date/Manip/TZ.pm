@@ -26,7 +26,7 @@ use Data::Dumper;
 use Carp;
 
 our $VERSION;
-$VERSION='6.92';
+$VERSION='6.93';
 END { undef $VERSION; }
 
 # To get rid of a 'used only once' warnings.
@@ -1584,7 +1584,9 @@ sub _convert {
    if (ref($date)) {
       @date = @$date;
    } else {
-      @date = @{ $dmb->split('date',$date) };
+      my $split = $dmb->split('date',$date);
+      return (4)  if (! defined $split);
+      @date = @$split;
       $date = [@date];
    }
 

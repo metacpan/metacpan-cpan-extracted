@@ -2,6 +2,7 @@ Changes
 examples/clean_cover.pl
 examples/clean_date.pl
 examples/clean_edition_number.pl
+examples/clean_number_of_pages.pl
 examples/marc_to_wikidata_print.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
@@ -31,6 +32,7 @@ t/data/cnb000576456.mrc
 t/data/cnb000641953.mrc
 t/data/cnb000750997.mrc
 t/data/cnb000754547.mrc
+t/data/cnb000974260.mrc
 t/data/cnb001002340.mrc
 t/data/cnb001042253.mrc
 t/data/cnb001657758.mrc

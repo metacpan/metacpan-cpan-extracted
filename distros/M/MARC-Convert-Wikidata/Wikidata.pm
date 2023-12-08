@@ -12,7 +12,7 @@ use MARC::Convert::Wikidata::Transform;
 use MARC::Leader;
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -508,6 +508,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

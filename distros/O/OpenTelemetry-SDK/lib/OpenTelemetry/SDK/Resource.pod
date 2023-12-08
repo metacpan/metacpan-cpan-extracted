@@ -14,7 +14,7 @@ OpenTelemetry::SDK::Resource - Represents the entity producing OpenTelemetry dat
     );
 
     # Merge resources into new ones
-    my $new $resource->merge($other);
+    my $new = $resource->merge($other);
 
 =head1 DESCRIPTION
 
@@ -41,10 +41,10 @@ that is in use.
 
 Apart from this automatic detection, resource attributes will be read from
 those provided to the constructor (see below) and from the
-L<OpenTelemetry::SDK/OTEL_RESOURCE_ATTRIBUTES> environment variable.
-Attributes provided via this variable take precedence over those automatically
-detected, and those provided to the constructor take precedence over any
-other.
+L<"OTEL_RESOURCE_ATTRIBUTES"|OpenTelemetry::SDK/OTEL_RESOURCE_ATTRIBUTES>
+environment variable. Attributes provided via this variable take precedence
+over those automatically detected, and those provided to the constructor
+take precedence over any other.
 
 The value of this environment variable will consist of a list of key/value
 pairs which are expected to be represented in a format matching that of the

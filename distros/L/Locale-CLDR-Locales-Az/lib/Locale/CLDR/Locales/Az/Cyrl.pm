@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Az::Cyrl - Package for language Azerbaijani
 
 package Locale::CLDR::Locales::Az::Cyrl;
 # This file auto generated from Data\common\main\az_Cyrl.xml
-#	on Sat  4 Nov  5:53:27 pm GMT
+#	on Tue  5 Dec  1:01:37 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

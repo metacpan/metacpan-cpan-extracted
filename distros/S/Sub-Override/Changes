@@ -1,4 +1,5 @@
-Revision history for Perl extension Sub::Override.
+0.10  Wed Nov 22 2023
+      Add a 'wrap' routine that allows you to call the original sub.
 
 0.09  Wed Jan 16 2013
       Switch from Test::Exception to Test::Fatal.

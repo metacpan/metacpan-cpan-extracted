@@ -14,11 +14,10 @@ $Data{'language'}{'link'} =
 ################################################################################
 
 $Data{'language'}{'iso2'}{'orig'}{'name'} = {
-   "Bokm\x{e5}l, Norwegian"           => 'Bokmal, Norwegian',
-   "Norwegian Bokm\x{e5}l"            => 'Norwegian Bokmal',
-   "Proven\x{e7}al"                   => 'Provencal',
-   "Proven\x{e7}al, Old (to 1500)"    => 'Provencal, Old (to 1500)',
-   "Volap\x{fc}k"                     => 'Volapuk',
+   "Bokmål, Norwegian"               => 'Bokmal, Norwegian',
+   "Norwegian Bokmål"                => 'Norwegian Bokmal',
+   "Provençal, Old (to 1500)"       => 'Provencal, Old (to 1500)',
+   "Volapük"                        => 'Volapuk',
 };
 
 $Data{'language'}{'iso2'}{'ignore'} = {

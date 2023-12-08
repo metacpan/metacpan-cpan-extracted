@@ -1,0 +1,49 @@
+{
+   "abstract" : "Plack middleware to setup OpenTelemetry tracing",
+   "author" : [
+      "Ask Bjoern Hansen"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Middleware-OpenTelemetry",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Feature::Compat::Try" : "0",
+            "OpenTelemetry" : "0.018",
+            "OpenTelemetry::SDK" : "0.020",
+            "Plack" : "1.0050",
+            "Syntax::Keyword::Dynamically" : "0",
+            "parent" : "0.223"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/abh/Plack-Middleware-OpenTelemetry/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/abh/Plack-Middleware-OpenTelemetry.git",
+         "web" : "https://github.com/abh/Plack-Middleware-OpenTelemetry"
+      }
+   },
+   "version" : "0.233360",
+   "x_generated_by_perl" : "v5.38.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
+   "x_spdx_expression" : "MIT"
+}
+

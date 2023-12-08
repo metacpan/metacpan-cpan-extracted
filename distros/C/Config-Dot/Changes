@@ -1,3 +1,15 @@
+0.10 2023-12-08T11:30:30+01:00
+ - Fix EXAMPLE2 in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite doc to use of =head2.
+ - Rewrite example in doc from Dumpvalue to Data::Printer.
+ - Update COPYRIGHT year.
+ - Update LICENSE AND COPYRIGHT section in doc.
+ - Update Module::Install to 1.19 version.
+ - Update SYNOPSIS section in doc.
+
 0.09 2020-01-11T23:37:55+01:00
  - Change my github username.
  - Improve test cover of 03-new.t.

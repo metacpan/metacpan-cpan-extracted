@@ -11,14 +11,14 @@ Quick and dirty …
         [ "The", "last", "value", "is", "returned." ];
     > );
 
-… or, something a bit fancier:
+… or load ES6 modules:
 
-    my $js = JavaScript::QuickJS->new()->std()->helpers();
+    my $js = JavaScript::QuickJS->new()->helpers();
 
     $js->eval_module( q/
-        import * as std from 'std';
+        import * as coolStuff from 'cool/stuff';
 
-        for (const [key, value] of Object.entries(std.getenviron())) {
+        for (const [key, value] of Object.entries(coolStuff)) {
             console.log(key, value);
         }
     / );
@@ -68,18 +68,21 @@ Returns _OBJ_.
 
 ## $obj = _OBJ_->std()
 
-Enables (but does _not_ import) QuickJS’s `std` module.
-See ["SYNOPSIS"](#synopsis) above for example usage.
+Enables QuickJS’s `std` module and creates a global of the same name
+that’s usable from both script and module modes.
+
+This resembles `qjs`’s `--std` flag except that it _only_ enables
+`std`, not `os`.
 
 Returns _OBJ_.
 
 ## $obj = _OBJ_->os()
 
-Like `std()` but for QuickJS’s `os` module.
+Like `std()` but enables QuickJS’s `os` module instead of `std`.
 
 ## $VALUE = _OBJ_->eval( $JS\_CODE )
 
-Comparable to running `qjs -e '...'`. Returns $JS\_CODE’s last value;
+Like running `qjs -e '...'`. Returns $JS\_CODE’s last value;
 see below for details on type conversions from JavaScript to Perl.
 
 Untrapped exceptions in JavaScript will be rethrown as Perl exceptions.
@@ -272,9 +275,15 @@ V8 versions.
 - [JavaScript](https://metacpan.org/pod/JavaScript) and [JavaScript::Lite](https://metacpan.org/pod/JavaScript%3A%3ALite) expose Mozilla’s
 [SpiderMonkey](https://spidermonkey.dev/) engine to Perl.
 
+# TODO
+
+Upstream QuickJS seems to lack active maintenance. It may be advantageous
+to switch to one of its forks (like
+[quickjs-ng](https://github.com/quickjs-ng/quickjs)).
+
 # LICENSE & COPYRIGHT
 
-This library is copyright 2022 Gasper Software Consulting.
+This library is copyright 2023 Gasper Software Consulting.
 
 This library is licensed under the same terms as Perl itself.
 See [perlartistic](https://metacpan.org/pod/perlartistic).

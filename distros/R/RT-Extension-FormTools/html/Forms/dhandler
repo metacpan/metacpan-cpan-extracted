@@ -1,0 +1,345 @@
+<&|/FormTools/Form, next => $base_path . $form_name . '/' . $form_config->{'formtools-pages'}{$page}{'next'},
+    next_for_validation => $base_path . $form_name . '/' . $page,
+    results_ref => \@results,
+    self_service => $SelfService,
+    include_tabs => 1,
+    form_config => $form_config,
+&>
+
+<%perl>
+# Build the current page here dyamically from config
+
+my $button_label = loc('Next');
+foreach my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
+    if ( $element->{type} eq 'raw_html' ) {
+        $m->out( $element->{html} );
+    }
+    elsif ( $element->{type} eq 'hidden' ) {
+        $m->out('<input type="hidden" class="hidden" name="' . $element->{'input-name'}
+            . '" value="' . $element->{'input-value'} . '"  />');
+    }
+    elsif ( $element->{type} eq 'component' ) {
+        $m->comp('/FormTools/' . $element->{comp_name}, %{$element->{arguments}});
+    }
+
+    if ( $element->{type} eq 'hidden'
+         and $element->{'input-name'} eq 'create_ticket' ) {
+
+        # This is the page that will submit, so change the button label
+        $button_label = loc('Submit');
+    }
+}
+</%perl>
+
+% if ( $form_config->{'formtools-pages'}{$page}{'next'} ) {
+ <& /FormTools/Next, Label => $button_label, Back => $show_back, Name => 'Submit' &>
+% }
+
+
+<script type="text/javascript">
+jQuery(function () {
+    jQuery('[data-validation]').each(function () {
+        const elem = jQuery(this);
+        if ( elem.find('.selectize-input').length ) {
+            elem.find(':input:first').change(function () {
+                if ( jQuery(this).val() ) {
+                    elem.find('.selectize-input').removeClass('required invalid');
+                    elem.find(':input:visible').attr('required', false);
+                }
+                else {
+                    elem.find('.selectize-input').addClass('required invalid');
+                    elem.find(':input:visible').attr('required', true);
+                }
+            }).change();
+        }
+        else if ( elem.find('textarea.richtext').length ) {
+            const textarea = elem.find('textarea.richtext');
+            const form = elem.closest('form');
+            form.on('submit', function(e) {
+                const editor = CKEDITOR.instances[textarea.attr('id')];
+                if ( editor.getData() ) {
+                    return;
+                }
+                else {
+                    editor.focus();
+                    elem.get(0).scrollIntoView();
+                    e.preventDefault();
+                    form.removeClass('rt-form-submitted');
+                }
+            });
+        }
+        else {
+            elem.find(':input:visible').attr('required', true);
+
+            if ( elem.find('select.selectpicker').length ) {
+                elem.find('select.selectpicker option[value=""]').remove();
+                if ( !elem.find('select.selectpicker option[selected]').length ) {
+                    elem.find('select.selectpicker').val(null); // Do not automatically select the first valid option
+                }
+                elem.find('select.selectpicker').attr('required', true).selectpicker('refresh');
+            }
+            else if ( elem.find('input[type=radio]').length ) {
+                elem.find('input[type=radio][value=""]').closest('div.custom-control').remove();
+            }
+        }
+
+    });
+
+    jQuery('[data-dependent-name]:not([data-validation])').each(function () {
+        const dependent_name = jQuery(this).attr('data-dependent-name');
+        const values = JSON.parse(jQuery(this).attr('data-dependent-values'));
+        const target = jQuery(this);
+        const syncValidation = function(source) {
+            if ( source.target ) {
+                source = jQuery(source.target);
+            }
+
+            let source_values = [];
+            const name = source.attr('name');
+            if ( source.is(':checkbox') || source.is(':radio') ) {
+                jQuery(':input[name="' + name +'"]:checked').each( function () {
+                    source_values.push(source.val());
+                });
+            }
+            else {
+                jQuery(':input[name="' + name +'"]').each(function () {
+                    const val = jQuery(this).val();
+                    if ( Array.isArray(val) ) {
+                        source_values.push(...val);
+                    }
+                    else {
+                        source_values.push(val);
+                    }
+                });
+            }
+            let matched;
+            for ( let source_value of source_values ) {
+                if ( values.includes(source_value) ) {
+                    matched = true;
+                }
+            }
+
+            // Toggle "(No value)" on show to catch all cases including page re-rendering after clicking "Back"
+            if ( target.find('select.selectpicker').length ) {
+                target.find('select.selectpicker').on('show.bs.select', function() {
+                    if ( jQuery(this).hasClass('required') ) {
+                        jQuery(this).parent().find('.dropdown-menu li.disabled').addClass('hidden');
+                    }
+                    else {
+                        jQuery(this).parent().find('.dropdown-menu li').removeClass('hidden');
+                    }
+                });
+            }
+
+            if ( matched ) {
+                if ( target.find('select.selectpicker').length ) {
+                    target.find('select.selectpicker option[value=""]').attr('selected', false).attr('disabled', true);
+                    target.find('select.selectpicker').addClass('required').selectpicker('refresh');
+                }
+                else if ( target.find('input[type=radio]').length ) {
+                    target.find('input[type=radio][value=""]').prop('checked', false).attr('disabled', true);
+                }
+                target.find(':input:visible').attr('required', true);
+                target.find('.cfhints.required').removeClass('hidden');
+            }
+            else {
+                if ( target.find('select.selectpicker').length ) {
+                    target.find('select.selectpicker option[value=""]').attr('disabled', false);
+                    target.find('select.selectpicker').removeClass('required').selectpicker('refresh');
+                }
+                else if ( target.find('input[type=radio]').length ) {
+                    target.find('input[type=radio][value=""]').attr('disabled', false);
+                }
+                target.find(':input:visible').attr('required', false);
+                target.find('.cfhints.required').addClass('hidden');
+            }
+        };
+        jQuery(':input[type!=hidden][name="' + dependent_name +'"]').change(syncValidation).change();
+
+        // Handle the case where dependent input is on previous pages
+        if ( jQuery(':input[type=hidden][name="' + dependent_name +'"]').length ) {
+            syncValidation(jQuery(':input[type=hidden][name="' + dependent_name +'"]'));
+        }
+    });
+
+    jQuery(':input[name=Back]').click(function() {
+        const form = jQuery(this).closest('form');
+        form.find(':input[required]').attr('required', false);
+    });
+});
+</script>
+
+</&>
+<%init>
+
+my $path = $m->dhandler_arg;
+my ($form_name, $page_name);
+
+if ( $path =~ /^([\w\s]+)\/([-\w]+)$/ ) {
+    $form_name = $1;
+    $page_name = $2;
+}
+else {
+    $form_name = $path;
+}
+
+# Limit to names to letters, numbers, underscore, spaces
+unless ( $form_name =~ /^[\w\s]+$/ ) {
+    RT->Logger->error("FormTools called with invalid form name: $form_name");
+    Abort('Invalid form name');
+}
+
+if ( $page_name ) {
+    unless ( $page_name =~ /^[-\w]+$/ ) {
+        RT->Logger->error("FormTools called with invalid page name: $page_name");
+        Abort('Invalid page name');
+    }
+}
+
+# Load FormTools configration and look for a configured
+# form with the provided name.
+my $form_attribute = RT::Attribute->new( $session{CurrentUser} );
+$form_attribute->LoadByCols( Name => 'FormTools Form', Description => $form_name );
+my $form_config;
+
+if ( $form_attribute->Id ) {
+    Abort( loc("Permission Denied") ) unless $form_attribute->CurrentUserCanSee;
+    $form_config = $form_attribute->Content;
+}
+else {
+    # We didn't find a form, so show a not found page
+    Abort('Form not found');
+}
+
+no warnings 'redefine';
+my $orig_current_user_has_right = RT::CustomField->can('CurrentUserHasRight');
+local *RT::CustomField::CurrentUserHasRight = sub {
+    my $self  = shift;
+    my $right = shift;
+    return 1 if $right =~ /SeeCustomField|SetInitialCustomField/;
+    return $orig_current_user_has_right->( $self, $right );
+};
+
+my $page;
+
+if ( $page_name ) {
+    $page = $page_name;
+}
+else {
+    $page = $form_config->{'formtools-start-page'};
+}
+
+my $queue_obj = RT::Queue->new( $session{CurrentUser} );
+my ($ok, $msg) = $queue_obj->Load( $form_config->{'queue'} );
+
+unless ( $ok ) {
+    RT->Logger->error('FormTools unable to load queue: ' . $form_config->{'queue'});
+    Abort('Unable to load form, invalid queue');
+}
+
+Abort('Permission Denied') unless $queue_obj->CurrentUserHasRight('CreateTicket');
+
+$m->notes( queue => $queue_obj );
+$m->notes( page_title => $form_config->{'formtools-pages'}{$page}{'name'} );
+
+my $base_path = '/Forms/';
+$base_path = '/SelfService' . $base_path if $SelfService;
+
+if ( not $ARGS{'validation_ok'} ) {
+    # If validation is enabled and it didn't pass, don't create
+    $create_ticket = 0;
+}
+
+my @form_pages
+    = sort { ( $form_config->{'formtools-pages'}{$a}{sort_order} || 0 ) <=> ( $form_config->{'formtools-pages'}{$b}{sort_order} || 0 ) }
+    keys %{ $form_config->{'formtools-pages'} };
+
+my $show_back = 0;
+my $index = 0;
+my $back_page;
+
+foreach my $page_index ( @form_pages ) {
+    if ( $page_index eq $page ) {
+        $back_page = $form_pages[$index - 1];
+        last;
+    }
+    $index++;
+}
+
+# Don't show the back button on the first page
+$show_back = 1 if $index > 0;
+
+# Did the user click Back?
+if ( $ARGS{Back} and $ARGS{Back} eq 'Back' ) {
+    # Avoid trying to go back again
+    delete $ARGS{Back};
+
+    # Don't create a ticket when going back
+    delete $ARGS{'create_ticket'} if $ARGS{'create_ticket'};
+    $create_ticket = 0;
+
+    $_form_tools_next = '';
+    delete $ARGS{'_form_tools_next'} if $ARGS{'_form_tools_next'};
+
+    my ($status, @msg) = $m->comp(
+        '/Elements/ValidateCustomFields',
+        CustomFields    => $queue_obj->TicketCustomFields,
+        ARGSRef         => \%ARGS,
+    );
+
+    if ( !$status ) {
+        my %invalid_fields;
+        for my $note ( keys %{ $m->notes } ) {
+            if ( $note =~ /^InvalidField-(\d+)/ ) {
+                $invalid_fields{$1} = 1;
+            }
+        }
+
+        for my $field ( keys %ARGS ) {
+            if ( $field =~ /^Object-RT::Ticket--CustomField-(\d+)-/ ) {
+                delete $ARGS{$field} if $invalid_fields{$1};
+            }
+        }
+    }
+
+    # Redirect to the previous page
+    MaybeRedirectForResults(
+        Path      => $base_path . $form_name . '/' . $back_page,
+        Arguments => \%ARGS,
+        Force     => 1,
+    );
+}
+
+# Try to create a ticket if we're on the last page and
+# "create_ticket" is submitted as an arg from the second-to-last
+# page.
+
+my ($ticket_obj, @results);
+if ( $create_ticket ) {
+
+    $m->callback( CallbackName => 'BeforeCreate', ARGSRef => \%ARGS, results => \@results,
+                  FormName => $form_name, PageName => $page );
+
+    # We override Abort elsewhere so we'll get $ticket_obj here even if
+    # the current user has no rights to see the newly created ticket.
+
+    # We deliberately don't pass along @results because the work
+    # behind the scenes is "magic" and we don't want the form user to
+    # see any details, like ticket ids or queues, if they are not supposed
+    # to see them.
+
+    ($ticket_obj) = CreateTicket(
+        Subject => 'Ticket created from FormTools form ' . $form_name,
+        Queue   => $queue_obj->Id,
+        Status => 'new',
+        Requestors => $session{'CurrentUser'}->EmailAddress,
+        %ARGS,
+    );
+}
+
+</%init>
+<%args>
+$_form_tools_next => undef
+$create_ticket => undef
+$SelfService => 0
+</%args>

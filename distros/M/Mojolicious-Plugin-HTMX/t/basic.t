@@ -146,9 +146,16 @@ subtest 'Response: HX-Trigger' => sub {
         $c->rendered(200);
     };
 
+    get '/hx_trigger_3' => sub {
+        my $c = shift;
+        $c->htmx->res->trigger(['event1', 'event2']);
+        $c->rendered(200);
+    };
+
     $t->get_ok('/hx_trigger_1')->status_is(200)->header_exists('HX-Trigger');
     $t->get_ok('/hx_trigger_2')->status_is(200)->header_exists('HX-Trigger');
     $t->get_ok('/hx_trigger_2')->status_is(200)->header_like('HX-Trigger', qr/value/);
+    $t->get_ok('/hx_trigger_3')->status_is(200)->header_like('HX-Trigger', qr/event(1|2)/);
 
 };
 

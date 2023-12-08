@@ -1,5 +1,5 @@
 package Business::PagOnline {
-    #use SOAP::Lite +trace => 'all';
+    #use SOAP::Lite +trace => [qw/all -objects/];
     use SOAP::Lite;
     use Digest::SHA qw/hmac_sha256 hmac_sha256_hex hmac_sha256_base64/;
     use Moo;
@@ -8,7 +8,7 @@ package Business::PagOnline {
     use version;
     use v5.36;
 
-    our $VERSION = qv("v0.1.1");
+    our $VERSION = qv("v0.2.0");
 
     has soapclient => (
         is => 'ro',
@@ -23,6 +23,7 @@ package Business::PagOnline {
         #$self->soapclient->serializer->readable(1);
         #$self->soapclient->envprefix('soapenv');  # As per example
         $self->soapclient->proxy($args->{url});
+        $self->soapclient->ns('http://services.api.web.cg.igfs.apps.netsw.it/', 'ser');
     }
 
     sub payment_init {
@@ -61,15 +62,17 @@ package Business::PagOnline {
         for my $sk(keys %reqargs) {
             next if $sk eq 'kSig';  # This is used to calculate signature but MUST NOT BE SENT or we'll get 500 Error
             my $sd = SOAP::Data->new(name => $sk, value => $reqargs{$sk});
-            # $sd->type('');  # As per example
+            # $sd->type('');  # As per example
             push @soapdata, $sd;
         }
 
-        #die Data::Dump::dump(\@soapdata);
-        my $res = $self->soapclient->call('init',
-            SOAP::Data->new(name => 'request', value => \@soapdata)
+        # die Data::Dump::dump(\@soapdata);
+        my $sd_req = SOAP::Data->new(name => 'request', value => \@soapdata);
+        # $sd_req->type('');
+        my $res = $self->soapclient->call('ser:Init',
+            $sd_req
         )->result;
-        #die  Data::Dump::dump($res);
+        # die  Data::Dump::dump($res);
         confess Data::Dump::dump($res) if $res->{error} ne 'false';
 
         return $res;
@@ -98,7 +101,7 @@ package Business::PagOnline {
             push @soapdata, $sd;
         }
 
-        my $res = $self->soapclient->call('verify',
+        my $res = $self->soapclient->call('ser:Verify',
             SOAP::Data->new(name => 'request', value => \@soapdata)
         )->result;
 

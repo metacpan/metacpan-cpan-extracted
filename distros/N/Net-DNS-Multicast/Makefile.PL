@@ -29,13 +29,12 @@ my %metadata = (
 		'File::Find'	      => 1.13,
 		'File::Spec'	      => 3.29,
 		'IO::File'	      => 1.14,
-		'Test::Builder'	      => 0.80,
 		'Test::More'	      => 0.80,
 		} );
 
 
 my %prerequisite = (
-	'Net::DNS'	 => 1.38,
+	'Net::DNS'	 => 1.41,
 	'Exporter'	 => 5.63,
 	'IO::Select'	 => 1.17,
 	'IO::Socket'	 => 1.30,

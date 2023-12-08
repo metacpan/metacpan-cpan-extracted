@@ -9,10 +9,6 @@ use utf8;
 
 WWW::Suffit::Client - The Suffit API client library
 
-=head1 VERSION
-
-Version 1.01
-
 =head1 SYNOPSIS
 
     use WWW::Suffit::Client;
@@ -37,6 +33,17 @@ Version 1.01
 =head1 DESCRIPTION
 
 This library provides methods for access to Suffit API servers
+
+=head1 METHODS
+
+List of extended API methods
+
+=head2 apierr
+
+    die $client->apierr;
+
+This method returns the value of the "/message" API parameter or a client error if no message found.
+Otherwise, this method returns a string containing an HTTP error message
 
 =head1 API METHODS
 
@@ -101,13 +108,18 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use parent qw/ WWW::Suffit::UserAgent /;
 
 use WWW::Suffit::Const qw/ :MIME /;
 
 ## SUFFIT API COMMON METHODS
+
+sub apierr {
+    my $self = shift;
+    return $self->res->json("/message") || $self->error || $self->res->message
+};
 
 sub api_check {
     my $self = shift;

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent qw( Exporter );
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 use File::Spec::Functions qw(
     catdir
@@ -93,7 +93,7 @@ App::Oozie::Util::Plugin
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

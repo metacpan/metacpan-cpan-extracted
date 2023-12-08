@@ -3,7 +3,7 @@ package Export::These;
 use strict;
 use warnings;
 
-our $VERSION="v0.2.0";
+our $VERSION="v0.2.1";
 
 sub import {
   my $package=shift;
@@ -99,7 +99,11 @@ sub import {
     for(\@_ ? \@_ : \@\$ref_export){
       my \@syms;
       if(ref){
-        # If not a simple scalar don't process here, but don error also
+        # If not a simple scalar don't process here, but don't error
+        next;
+      }
+      elsif(!\$_){
+        # an empty name or undef value can be used to prevent default imports
         next;
       }
       elsif(/^:/){
@@ -169,8 +173,6 @@ sub import {
     else {
       \@args=\@_;
     }
-
-
 
     $exporter->_self_export(\$target, \@args);
     
@@ -311,24 +313,35 @@ routines, injecting the dependency, instead of the consumer hard coding it.
   
 =head2 Importing a module which uses this module
 
-Importing is achieved just like normal.
+Importing is like normal:
 
     require My::Module;
     My::Moudle->import;
 
     use My::Moudle qw<:tag_name name2 ...>;
 
-However, from B<v0.2.0> importing of a module can also take a reference value
-as a key without error. This allows passing non names as configuration data for
-the module to use:
+However, from B<v0.2.1> modules exporting with L<Export::These> can also take
+reference values as a key without error. This allows passing non names as
+configuration data for the module to use:
 
     eg
 
+      # Config module and export named symbols
       use My::Module {prefork=>1, workers=>10}, "symname1", ":group1",['more', 'config'];
+
+      # Config module and export default symbols
+      use My::Module {prefork=>1, workers=>10};
+
+      # Config module only. No symbol export
+      use My::Module {prefork=>1, workers=>10}, undef;
 
 In this hypothetical example, the My::Module uses the hash and array ref as
 configuration internally, and the normal scalars as the symbols/tag groups to
-export
+export. In the last case the undef value forces no importing of default symbols
+when using a reference value.
+
+
+
 
 =head2 Specifying Symbols to Export
 

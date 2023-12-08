@@ -1,19 +1,11 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
 
-local $| = 1;                   # disable buffering
-
 use Test::More tests => 4;
 
 use Math::BigInt::Random::OO;
-
-#can_ok('Math::BigInt::Random::OO', 'new');
-#my $generator = Math::BigInt::Random::OO -> new(min => 0,
-#                                                max => 1,
-#                                               );
-#isa_ok($generator, 'Math::BigInt::Random::OO');
 
 # Create constructor objects with various arguments.
 

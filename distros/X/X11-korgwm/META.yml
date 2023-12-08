@@ -34,13 +34,13 @@ requires:
   POSIX: '0'
   Scalar::Util: '0'
   Storable: '0'
-  X11::XCB: '0.21'
+  X11::XCB: '0.22'
   YAML::Tiny: '0'
 resources:
   bugtracker: https://github.com/zhmylove/korgwm/issues
   license: https://mit-license.org/
   repository: https://github.com/zhmylove/korgwm.git
-version: '2.0'
+version: '3.0'
 x_authority: cpan:ZHMYLOVE
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

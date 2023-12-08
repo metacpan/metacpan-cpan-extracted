@@ -2,6 +2,7 @@ bin/efa-m
 Build.PL
 Changelog
 COPYING
+cpanfile
 Dockerfile
 lib/Travel/Status/DE/EFA.pm
 lib/Travel/Status/DE/EFA/Line.pm

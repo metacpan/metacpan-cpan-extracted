@@ -45,18 +45,20 @@ SEE ALSO
         Interface to test Map::Tube (map data).
 
 REPOSITORY
-    <https://github.com/tupinek/Task-Map-Tube>
+    <https://github.com/michal-josef-spacek/Task-Map-Tube>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2016 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.46
+    0.47
 

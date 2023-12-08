@@ -58,6 +58,7 @@ my %firewall_address;
 my %firewall_address_group;
 my %firewall_ipv6_address;
 my %firewall_ipv6_address_group;
+my %firewall_wildcard_fqdn;
 my %firewall_service;
 my %firewall_service_group;
 my %policy_package;
@@ -83,6 +84,10 @@ END {
     for (keys %firewall_ipv6_address) {
         say "\t$_";
         $fortimanager->delete_firewall_ipv6_address($_);
+    }
+    for (keys %firewall_wildcard_fqdn) {
+        say "\t$_";
+        $fortimanager->delete_firewall_wildcard_fqdn($_);
     }
     for (keys %firewall_service_group) {
         say "\t$_";
@@ -415,6 +420,35 @@ subtest_buffered 'IPv6 address groups' => sub {
     ok($fortimanager->delete_firewall_ipv6_address_group('grp_v6_test1'),
         'delete_firewall_ipv6_address_group ok');
     delete $firewall_ipv6_address_group{grp_v6_test1};
+};
+
+
+subtest_buffered 'wildcard FQDN objects' => sub {
+    is($fortimanager->list_firewall_wildcard_fqdns,
+        bag {
+            all_items hash {
+                field 'name'            => D();
+                field 'wildcard-fqdn'   => D();
+
+                etc();
+            };
+
+            end();
+        },
+        'list_firewall_wildcard_fqdns ok');
+
+    ok($fortimanager->create_firewall_wildcard_fqdn('wildcard.example.org', {
+        'wildcard-fqdn' => '*.example.org',
+    }), 'create_firewall_wildcard_fqdn ok');
+    $firewall_wildcard_fqdn{'wildcard.example.org'} = 1;
+
+    ok($fortimanager->update_firewall_wildcard_fqdn('wildcard.example.org', {
+        'wildcard-fqdn' => '*.example.com',
+    }), 'update_firewall_wildcard_fqdn ok');
+
+    ok($fortimanager->delete_firewall_wildcard_fqdn('wildcard.example.org'),
+        'delete_firewall_wildcard_fqdn ok');
+    delete $firewall_wildcard_fqdn{'wildcard.example.org'};
 };
 
 subtest_buffered 'service objects' => sub {

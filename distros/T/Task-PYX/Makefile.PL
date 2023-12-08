@@ -1,13 +1,12 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use inc::Module::Install;
 
 # Definition.
 abstract 'Install the PYX modules.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.08;
 author_requires 'Test::More' => 0;
@@ -18,29 +17,29 @@ license 'bsd';
 name 'Task-PYX';
 readme_from 'PYX.pm';
 recursive_author_tests('xt');
-requires 'App::PYX2XML' => 0.01;
-requires 'PYX' => 0.04;
-requires 'PYX::GraphViz' => 0.04;
-requires 'PYX::Hist' => 0.03;
-requires 'PYX::SGML::Raw' => 0.02;
-requires 'PYX::SGML::Tags' => 0.01;
-requires 'PYX::Sort' => 0.03;
-requires 'PYX::Stack' => 0.04;
-requires 'PYX::Utils' => 0.04;
-requires 'PYX::XMLNorm' => 0.04;
-requires 'PYX::XMLSchema::List' => 0.04;
-requires 'Tags::Output::PYX' => 0.03;
+requires 'App::PYX2XML' => 0.06;
+requires 'PYX' => 0.10;
+requires 'PYX::GraphViz' => 0.06;
+requires 'PYX::Hist' => 0.08;
+requires 'PYX::SGML::Raw' => 0.05;
+requires 'PYX::SGML::Tags' => 0.10;
+requires 'PYX::Sort' => 0.05;
+requires 'PYX::Stack' => 0.06;
+requires 'PYX::Utils' => 0.07;
+requires 'PYX::XMLNorm' => 0.05;
+requires 'PYX::XMLSchema::List' => 0.06;
+requires 'SGML::PYX' => 0.07;
+requires 'Tags::Output::PYX' => 0.05;
 requires 'XML::MinWriter' => 0.08;
 requires 'XML::PYX' => 0.07;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Task-PYX';
-resources 'homepage' => 'https://github.com/tupinek/Task-PYX';
-resources 'repository' => 'git://github.com/tupinek/Task-PYX';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Task-PYX/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Task-PYX';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Task-PYX';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.09';
+version '0.10';
 
 # Run.
 WriteAll();

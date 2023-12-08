@@ -1,6 +1,13 @@
 Changelog for HealthCheck-Diagnostic-DBHCheck
 
-v1.0.0 2023-01-31T18:03:48
+v1.0.1 2023-12-04T19:22:33
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #7: Patch - SM-4514 - Make strict an author test (Andrew
+   Hewus Fresh)
+ - Update Makefile from upstream (Andrew Hewus Fresh)
+ - Make strict.t an author test (Andrew Hewus Fresh)
+
+v1.0.0 2023-01-31T18:03:35
  - Update README and LICENSE (Andrew Hewus Fresh)
  - Pull in Makefile updates from PluginBundle (Andrew Hewus Fresh)
  - Fix POD syntax (Andrew Hewus Fresh)

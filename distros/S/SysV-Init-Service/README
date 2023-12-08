@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use SysV::Init::Service;
+
      my $obj = SysV::Init::Service->new(%parameters);
      my @commands = $obj->commands;
      my $name = $obj->name;
@@ -11,42 +12,63 @@ SYNOPSIS
      my $exit_code = $obj->stop;
 
 METHODS
-    "new(%parameters)"
-            Constructor.
+  "new"
+     my $obj = SysV::Init::Service->new(%parameters);
 
-            *       "service"
+    Constructor.
 
-                     Service.
-                     Default value is undef.
-                     It is required.
+    *       "service"
 
-            *       "service_dir"
+            Service.
 
-                     Service directory.
-                     Default value is '/etc/init.d'.
+            Default value is undef.
 
-    "commands()"
-             Get service commands.
-             Be avare, command might not print any information to stdout in some
-             configuration (rewrited /etc/lsb-base-logging.sh routines to blank code for
-             quiet output).
-             Returns array of possible commands alphabetically sorted.
+            It is required.
 
-    "name()"
-             Get service name.
-             Returns string with service name.
+    *       "service_dir"
 
-    "start()"
-             Run service start command.
-             Returns exit code.
+            Service directory.
 
-    "status()"
-             Run service status command and return exit code.
-             Returns exit code.
+            Default value is '/etc/init.d'.
 
-    "stop()"
-             Run service stop command.
-             Returns exit code.
+  "commands"
+     my @commands = $obj->commands;
+
+    Get service commands.
+
+    Be avare, command might not print any information to stdout in some
+    configuration (rewrited /etc/lsb-base-logging.sh routines to blank code
+    for quiet output).
+
+    Returns array of possible commands alphabetically sorted.
+
+  "name"
+     my $name = $obj->name;
+
+    Get service name.
+
+    Returns string with service name.
+
+  "start"
+     my $exit_code = $obj->start;
+
+    Run service start command.
+
+    Returns exit code.
+
+  "status"
+     my $exit_code = $obj->status;
+
+    Run service status command and return exit code.
+
+    Returns exit code.
+
+  "stop"
+     my $exit_code = $obj->stop;
+
+    Run service stop command.
+
+    Returns exit code.
 
 ERRORS
      new():
@@ -87,11 +109,9 @@ THEORY
      4 - Unable to determine status (pidfile doesn't exist).
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use File::Spec::Functions qw(catfile);
      use File::Temp qw(tempfile tempdir);
      use IO::Barf qw(barf);
@@ -142,17 +162,18 @@ SEE ALSO
         run a System V init script
 
 REPOSITORY
-    <https://github.com/tupinek/SysV-Init-Service>
+    <https://github.com/michal-josef-spacek/SysV-Init-Service>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2013-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2013-2023 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

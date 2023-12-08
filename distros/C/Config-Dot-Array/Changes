@@ -1,3 +1,7 @@
+0.08 2023-12-06T12:21:56+01:00
+ - Move bugtracker to github.
+ - Regen README file.
+
 0.07 2023-11-22T23:23:03+01:00
  - Improve LICENSE AND COPYRIGHT section in doc.
  - Improve SYNOPSIS section in doc.

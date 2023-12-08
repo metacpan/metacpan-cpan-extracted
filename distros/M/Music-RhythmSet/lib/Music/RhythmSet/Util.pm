@@ -4,7 +4,7 @@
 # of beats, and etc
 
 package Music::RhythmSet::Util;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use 5.24.0;
 use warnings;
@@ -15,7 +15,7 @@ use constant { NOTE_ON => 1, NOTE_OFF => 0 };
 
 use parent qw(Exporter);
 our @EXPORT_OK =
-  qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count pattern_from rand_onsets score_fourfour score_stddev upsize write_midi);
+  qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count pattern_from rand_onsets score_fourfour score_stddev upsize write_midi write_tracks);
 
 sub beatstring {
     my ($bpat) = @_;
@@ -191,7 +191,8 @@ sub upsize {
       and ref $bpat eq 'ARRAY'
       and $bpat->@*;
     my $len = $bpat->@*;
-    croak "new length must be greater than pattern length" if $newlen <= $len;
+    croak "new length must be greater than pattern length"
+      if $newlen <= $len;
     my $mul = int( $newlen / $len );
     my @pat = (NOTE_OFF) x $newlen;
     for my $i ( 0 .. $bpat->$#* ) {
@@ -211,11 +212,32 @@ sub write_midi {
     MIDI::Opus->new(
         {   format => $param{format},
             ticks  => $param{ticks},
-            tracks => ref $track eq 'ARRAY' ? $track : [$track]
+            tracks => ref $track eq 'ARRAY' ? $track : [$track],
         }
     )->write_to_file($file);
 
     return;    # copy "write_to_file" interface
+}
+
+# some DAW merge the tracks of a file into a single instrument, so one
+# may instead need to have individual files to import
+sub write_tracks {
+    my ( $template, $track, %param ) = @_;
+
+    $param{format} //= 1;
+    $param{i}      //= 1;
+    $param{ticks}  //= 96;
+
+    for my $t ( ref $track eq 'ARRAY' ? @$track : $track ) {
+        MIDI::Opus->new(
+            {   format => $param{format},
+                ticks  => $param{ticks},
+                tracks => [$t],
+            }
+        )->write_to_file( sprintf $template, $param{i}++ );
+    }
+
+    return;
 }
 
 1;
@@ -350,6 +372,13 @@ Returns a new pattern.
 A small wrapper around L<MIDI::Opus> that writes a MIDI track (or
 tracks) to a file. The optional I<params> may include I<format> and
 I<ticks> (see the MIDI specification).
+
+=item B<write_tracks> I<template> I<track> [ I<params> ]
+
+As B<write_midi> except that the individual track(s) are written to
+individual files. The I<template> should contain a C<sprintf> format
+that among other things contains a C<%d> for the track number. The I<i>
+parameter can be used to set the starting track number, C<1> by default.
 
 =back
 

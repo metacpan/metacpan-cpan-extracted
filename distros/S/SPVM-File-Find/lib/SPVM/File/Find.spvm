@@ -2,7 +2,7 @@
 # MIT License
 
 class File::Find {
-  version "0.021001";
+  version "0.021002";
   
   use StringList;
   use File::Spec;
@@ -83,7 +83,7 @@ class File::Find {
       }
       
       my $next_dir_name = "$dir_name/$file_base_name";
-      if (Sys::FileTest->d($next_dir_name)) {
+      if (Sys->d($next_dir_name)) {
         &_find_dir($cb, $next_dir_name, $follow, $found_files_h);
       }
       else {
@@ -96,7 +96,7 @@ class File::Find {
     
     if ($follow) {
       while (1) {
-        my $is_symlink = Sys::FileTest->l($path);
+        my $is_symlink = Sys->l($path);
         
         unless ($is_symlink) {
           last;
@@ -114,7 +114,7 @@ class File::Find {
           die "The $path is encountered a second time";
         }
         
-        my $link = Sys::IO->readlinkp($path);
+        my $link = Sys->readlink($path);
         
         if (Sys::OS->is_windows) {
           Fn->replace_chars((mutable string)$link, '\\', '/');
@@ -133,7 +133,7 @@ class File::Find {
       }
     }
     else {
-      unless (Sys::FileTest->d($path)) {
+      unless (Sys->d($path)) {
         $path = undef;
       }
     }

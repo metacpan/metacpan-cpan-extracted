@@ -2,8 +2,8 @@ NAME
     File::Symlink::Util - Utilities related to symbolic links
 
 VERSION
-    This document describes version 0.003 of File::Symlink::Util (from Perl
-    distribution File-Symlink-Util), released on 2023-06-30.
+    This document describes version 0.005 of File::Symlink::Util (from Perl
+    distribution File-Symlink-Util), released on 2023-08-25.
 
 SYNOPSIS
      use File::Symlink::Util qw(
@@ -41,7 +41,7 @@ FUNCTIONS
      symlink_rel($dest_path, $link_path);
 
     Create a relative path symlink. Basically perform
-    "File::Spec->abs2rel($dest_path)" before "symlink()".
+    "File::Spec->abs2rel($dest_path)" before symlink().
 
   symlink_abs
     Usage:
@@ -49,7 +49,7 @@ FUNCTIONS
      symlink_rel($dest_path, $link_path);
 
     Create an absolute path symlink. Basically perform
-    "File::Spec->rel2abs($dest_path)" before "symlink()".
+    "File::Spec->rel2abs($dest_path)" before symlink().
 
   adjust_rel_symlink
     Usage:

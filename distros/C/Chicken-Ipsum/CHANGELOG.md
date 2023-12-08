@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2023-12-07
+
+### Fixed
+- Fix `List::Util` version issue in test (#1)
+- Add necessary runtime version check for `List::Util`
+
 ## [1.0.0] - 2023-08-25
 
 ### Added
@@ -49,7 +55,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.1] - 2023-08-10
 Initial published version
 
-[Unreleased]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v1.0.0...HEAD
+[Unreleased]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v1.0.1...HEAD
+[1.0.1]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v1.0.0...v1.0.1
 [1.0.0]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v0.03...v1.0.0
 [0.03]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v0.0.2...v0.03
 [0.0.2]: https://codeberg.org/h3xx/perl-Chicken-Ipsum/compare/v0.0.1...v0.0.2

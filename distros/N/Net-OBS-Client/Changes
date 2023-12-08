@@ -1,5 +1,21 @@
 Revision history for Net-OBS-Client
 
+0.1.1 2023-11-30
+
+    * added Net::OBS::SigAuth to MANIFEST
+    * cleanup MANIFEST, removed:
+      * t/02-Net_OBS_Client_Package.t
+      * t/03-Net_OBS_Client_Project.t
+      * t/01-Net_OBS_Client_BuildResults.t
+
+
+0.1.0 2023-11-30
+
+    * [feature] Implemented HTTP Signature Authentication
+    * [improvement] Print warning if NET_OBS_CLIENT_DEBUG is set
+      but LWP::ConsoleLogger::Easy not found
+    * [improvement] Set value of NET_OBS_CLIENT_DEBUG in loglevel for "debug_ua"
+
 0.0.8 2021-01-19
 
     * fix conflicts
@@ -14,7 +30,7 @@ Revision history for Net-OBS-Client
     * LWP::ConsoleLogger::Easy no longer mandatory if NET_OBS_CLIENT_DEBUG is set
     * removed obsolete test modules
 
-0.0.6 2021-01-13 
+0.0.6 2021-01-13
 
     * fixed POD for N::O::Client
     * implemented project/package/buildresults method in N::O::Client

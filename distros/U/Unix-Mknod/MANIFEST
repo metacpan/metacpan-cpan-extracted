@@ -7,3 +7,4 @@ t/Unix-Mknod.t
 typemap
 lib/Unix/Mknod.pm
 META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

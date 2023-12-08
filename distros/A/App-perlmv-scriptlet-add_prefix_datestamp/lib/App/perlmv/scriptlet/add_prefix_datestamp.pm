@@ -5,13 +5,27 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-15'; # DATE
+our $DATE = '2023-08-25'; # DATE
 our $DIST = 'App-perlmv-scriptlet-add_prefix_datestamp'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
+
+sub main::_parse_date {
+    my $date = shift;
+    if ($date =~ /^\A(\d{4})-?(\d{2})-?(\d{2})(?:[T ]?(\d{2}):?(\d{2}):?(\d{2}))?\z/) {
+        require Time::Local;
+        return Time::Local::timelocal_posix($6 // 0, $5 // 0, $4 // 0, $3, $2-1, $1 - 1900);
+    } else {
+        die "Can't parse date '$date'";
+    }
+}
 
 our $SCRIPTLET = {
     summary => 'Add datestamp prefix (YYYYMMDD-) to filenames, using files\' modification time as date',
     args => {
+        date => {
+            summary => "Use this date instead of file's modification time",
+            schema => 'date*',
+        },
         avoid_duplicate_prefix => {
             summary => 'Avoid adding prefix when filename already has prefix that looks like datestamp (1xxxxxxx- to 2xxxxxxx)',
             schema => 'bool*',
@@ -56,8 +70,9 @@ _
             return $_;
         }
         my @stat = stat($_);
+        my $time   = defined $ARGS->{date} ? main::_parse_date($ARGS->{date}) : $stat[9];
         my $format = $ARGS->{prefix_format}  // ($ARGS->{with_time} ? '%Y%m%dT%H%M%S-' : '%Y%m%d-');
-        my $prefix = POSIX::strftime($format, localtime($stat[9]));
+        my $prefix = POSIX::strftime($format, localtime($time));
 
         "$prefix$_";
     },
@@ -79,7 +94,7 @@ App::perlmv::scriptlet::add_prefix_datestamp - Add datestamp prefix (YYYYMMDD-) 
 
 =head1 VERSION
 
-This document describes version 0.002 of App::perlmv::scriptlet::add_prefix_datestamp (from Perl distribution App-perlmv-scriptlet-add_prefix_datestamp), released on 2023-07-15.
+This document describes version 0.003 of App::perlmv::scriptlet::add_prefix_datestamp (from Perl distribution App-perlmv-scriptlet-add_prefix_datestamp), released on 2023-08-25.
 
 =head1 SYNOPSIS
 
@@ -119,6 +134,10 @@ Arguments can be passed using the C<-a> (C<--arg>) L<perlmv> option, e.g. C<< -a
 =head2 avoid_duplicate_prefix
 
 Avoid adding prefix when filename already has prefix that looks like datestamp (1xxxxxxx- to 2xxxxxxx). 
+
+=head2 date
+
+Use this date instead of file's modification time. 
 
 =head2 prefix_format
 

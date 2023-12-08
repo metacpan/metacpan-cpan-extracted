@@ -1,0 +1,6 @@
+= GitHub Actions Report =
+::notice file=t/fixtures/tests/top-level,line=1,title=More details::See the full report in: %WORKFLOW_URL%
+::error file=t/fixtures/tests/top-level,line=13,title=1 failed test::Failed test%0A--- CAPTURED CONTEXT ---%0Adied: lol at top level at t/02-singleton.t line 13.%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/top-level,line=14,title=1 failed test::Failed test 'failure name'%0A--- CAPTURED CONTEXT ---%0Adied: lol at top level with name at t/02-singleton.t line 14.%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/top-level,line=15,title=1 failed test::Failed test%0A--- CAPTURED CONTEXT ---%0A       got: '1'%0A  expected: '2'%0A---  END OF CONTEXT  ---
+::error file=t/fixtures/tests/top-level,line=16,title=1 failed test::Failed test 'failure name 2'%0A--- CAPTURED CONTEXT ---%0A       got: '3'%0A  expected: '4'%0A---  END OF CONTEXT  ---

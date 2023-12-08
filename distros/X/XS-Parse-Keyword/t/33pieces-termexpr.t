@@ -48,4 +48,13 @@ my $ret;
    is( $ret, "(Hello, world!)", 'result of pieceprefixedtermexpr_VAR' );
 }
 
+# optional termexpr
+{
+   my $ret1 = piecetermexpr_opt "term";
+   my $ret2 = piecetermexpr_opt;
+
+   is( $ret1, "(term)", 'optional termexpr with value' );
+   is( $ret2, undef,    'optional termexpr empty' );
+}
+
 done_testing;

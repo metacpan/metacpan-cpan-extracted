@@ -5,7 +5,7 @@ use warnings;
 
 use App::Image::Generator;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Run.
 exit App::Image::Generator->new->run;
@@ -118,12 +118,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2022 Michal Josef Špaček
+© 2015-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

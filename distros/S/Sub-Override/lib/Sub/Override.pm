@@ -3,7 +3,7 @@ package Sub::Override;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my $_croak = sub {
     local *__ANON__ = '__ANON__croak';
@@ -73,6 +73,19 @@ sub replace {
     return $self;
 }
 
+sub wrap {
+    my ( $self, $sub_to_replace, $new_sub ) = @_;
+    $sub_to_replace = $self->$_normalize_sub_name($sub_to_replace);
+    $self->$_validate_code_slot($sub_to_replace)->$_validate_sub_ref($new_sub);
+    {
+        no strict 'refs';
+        $self->{$sub_to_replace} ||= *$sub_to_replace{CODE};
+        no warnings 'redefine';
+        *$sub_to_replace = sub { $new_sub->( $self->{$sub_to_replace}, @_ ) };
+    }
+    return $self;
+}
+
 sub restore {
     my ( $self, $name_of_sub ) = @_;
     $name_of_sub = $self->$_normalize_sub_name($name_of_sub);
@@ -110,7 +123,7 @@ Sub::Override - Perl extension for easily overriding subroutines
 
 =head1 VERSION
 
-0.09
+0.10
 
 =head1 SYNOPSIS
 
@@ -129,7 +142,7 @@ Sub::Override - Perl extension for easily overriding subroutines
 =head2 The Problem
 
 Sometimes subroutines need to be overridden.  In fact, your author does this
-constantly for tests.  Particularly when testing, using a Mock Object can be
+frequently for tests.  Particularly when testing, using a Mock Object can be
 overkill when all you want to do is override one tiny, little function.
 
 Overriding a subroutine is often done with syntax similar to the following.
@@ -148,7 +161,7 @@ This has a few problems.
  }
 
 In the above example, not only have we probably misspelled the subroutine name,
-but even if their had been a subroutine with that name, we haven't overridden
+but even if there had been a subroutine with that name, we haven't overridden
 it.  These two bugs can be subtle to detect.
 
 Further, if we're attempting to localize the effect by placing this code in a
@@ -195,10 +208,26 @@ when testing how code behaves with multiple conditions.
   $override->replace('Some::thing', sub { 1 });
   is($object->foo, 'puppies', 'puppies are returned if Some::thing is true');
 
+=head2 Wrapping a subroutine
+
+There may be times when you want to 'conditionally' replace a subroutine - for
+example, to override the original subroutine only if certain args are passed.
+For this you can specify 'wrap' instead of 'replace'. Wrap is identical to
+replace, except the original subroutine is passed as the first arg to your
+new subroutine. You can call the original sub via 'shift->(@_)':
+
+  $override->wrap('Some::sub',
+    sub {
+      my ($old_sub, @args) = @_;
+      return 1 if $args[0];
+      return $old_sub->(@args);
+    }
+  );
+
 =head2 Restoring subroutines
 
 If the object falls out of scope, the original subs are restored.  However, if
-you need to restore a subroutine early, just use the restore method:
+you need to restore a subroutine early, just use the C<restore()> method:
 
   my $override = Sub::Override->new('Some::sub', sub {'new data'});
   # do stuff
@@ -211,7 +240,7 @@ Which is somewhat equivalent to:
     # do stuff
   }
 
-If you have override more than one subroutine with an override object, you
+If you have overridden more than one subroutine with an override object, you
 will have to explicitly name the subroutine you wish to restore:
 
   $override->restore('This::sub');
@@ -240,7 +269,7 @@ current package.
   my $sub = Sub::Override->new;
   my $sub = Sub::Override->new($sub_name, $sub_ref);
 
-Creates a new C<Sub::Override> instance.  Optionally, you may override a 
+Creates a new C<Sub::Override> instance.  Optionally, you may override a
 subroutine while creating a new object.
 
 =head2 replace
@@ -253,7 +282,7 @@ instance, so chaining the method is allowed:
  $sub->replace($sub_name, $sub_body)
      ->replace($another_sub, $another_body);
 
-This method will C<croak> is the subroutine to be replaced does not exist.
+This method will C<croak> if the subroutine to be replaced does not exist.
 
 =head2 override
 
@@ -277,6 +306,29 @@ automatically if the C<Sub::Override> object falls out of scope.
 
 None by default.
 
+=head1 CAVEATS
+
+If you need to override the same sub several times do not create a new
+C<Sub::Override> object, but instead always reuse the existing one and call 
+C<replace> on it. Creating a new object to override the same sub will result
+in weird behavior.
+
+ # Do not do this!
+ my $sub_first = Sub::Override->new( 'Foo:bar' => sub { 'first' } );
+ my $sub_second = Sub::Override->new( 'Foo::bar' => sub { 'second' } );
+
+ # Do not do this either!
+ my $sub = Sub::Override->new( 'Foo::bar' => sub { 'first' } );
+ $sub = Sub::Override->new( 'Foo::bar' => sub { 'second' } );
+ 
+Both of those usages could result in of your subs being lost, depending
+on the order in which you restore them.
+
+Instead, call C<replace> on the existing C<$sub>.
+
+ my $sub = Sub::Override->new( 'Foo::bar' => sub { 'first' } );
+ $sub->replace( 'Foo::bar' => sub { 'second' } );
+
 =head1 BUGS
 
 Probably.  Tell me about 'em.
@@ -286,10 +338,10 @@ Probably.  Tell me about 'em.
 =over 4
 
 =item *
-Hook::LexWrap -- can also override subs, but with different capabilities
+L<Hook::LexWrap> -- can also override subs, but with different capabilities
 
 =item *
-Test::MockObject -- use this if you need to alter an entire class
+L<Test::MockObject> -- use this if you need to alter an entire class
 
 =back
 
@@ -297,15 +349,12 @@ Test::MockObject -- use this if you need to alter an entire class
 
 Curtis "Ovid" Poe, C<< <ovid [at] cpan [dot] org> >>
 
-Reverse the name to email me.
-
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004-2005 by Curtis "Ovid" Poe
+Copyright (C) 2004-2013 by Curtis "Ovid" Poe
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.2 or,
 at your option, any later version of Perl 5 you may have available.
-
 
 =cut

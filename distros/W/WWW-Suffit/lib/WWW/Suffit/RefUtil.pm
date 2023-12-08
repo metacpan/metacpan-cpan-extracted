@@ -8,17 +8,71 @@ use utf8;
 
 WWW::Suffit::RefUtil - Pure Perl Utility functions for checking references and data
 
-=head1 VERSION
-
-Version 1.00
-
 =head1 SYNOPSIS
 
-    use WWW::Suffit::RefUtil qw/ :check /;
+    use WWW::Suffit::RefUtil qw/ :all /;
 
 =head1 DESCRIPTION
 
 Pure Perl Utility functions for checking references and data
+
+=head2 AS
+
+The 'as' functions are introduced by the C<:as> import tag, which check
+the type of passed argument and returns it as required type
+
+=over 4
+
+=item as_array_ref
+
+This method returns the argument as a array reference
+
+    my $arr = as_array_ref( "foo" ); # ['foo']
+    my $arr = as_array_ref( "foo", "bar" ); # ['foo', 'bar']
+    my $arr = as_array_ref( ["foo", "bar"] ); # ['foo', 'bar']
+    my $arr = as_array_ref(); # []
+    my $arr = as_array_ref(undef); # []
+    my $arr = as_array_ref([undef]); # [undef]
+
+=item as_array, as_list
+
+This method returns argument as array-reference (see L</"as_array_ref">) or regular array (list) in list context
+
+    my $arr = as_array( "foo", "bar" ); # ['foo', 'bar']
+    my @arr = as_array( "foo", "bar" ); # ('foo', 'bar')
+
+=item as_first, as_first_val
+
+This method returns the first scalar value from argument(s)
+
+    my $foo = as_first( [qw/foo bar baz/] );
+    my $foo = as_first( qw/foo bar baz/ );
+
+=item as_hash_ref
+
+This method returns the argument as a hash reference
+
+    my $hash = as_hash_ref( {foo => 'one'} ); {foo => 'one'}
+    my $hash = as_hash_ref( foo => 'one', bar => 2 );
+        # {foo => 'one', bar => 2 }
+    my $hash = as_hash_ref(); # {}
+    my $hash = as_hash_ref(undef); # {}
+
+=item as_hash
+
+This method returns argument as hash-reference (see L</"as_hash_ref">) or regular hash in list context
+
+    my $hash = as_hash( "foo", "bar" ); # {'foo' => 'bar'}
+    my %hash = as_hash( "foo", "bar" ); # ('foo', 'bar')
+
+=item as_last, as_last_val, as_latest
+
+This method returns the last scalar value from argument(s)
+
+    my $baz = as_last( [qw/foo bar baz/] );
+    my $baz = as_last( qw/foo bar baz/ );
+
+=back
 
 =head2 CHECK
 
@@ -142,7 +196,7 @@ See C<TODO> file
 
 =head1 SEE ALSO
 
-L<Data::Util::PurePerl>, L<Params::Classify>, L<Ref::Util>, L<CTK::TFVals>
+L<Data::Util::PurePerl>, L<Params::Classify>, L<Ref::Util>, L<CTK::TFVals>, L<CTK::ConfGenUtil>
 
 =head1 AUTHOR
 
@@ -161,11 +215,10 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-use vars qw/ $VERSION @EXPORT_OK @EXPORT %EXPORT_TAGS/;
-$VERSION = '1.00';
+our $VERSION = '1.02';
 
 use base qw/Exporter/;
-@EXPORT = (qw/
+our @EXPORT = (qw/
         is_ref is_undef
         is_scalar_ref is_array_ref is_hash_ref is_code_ref
         is_glob_ref is_regexp_ref is_regex_ref is_rx
@@ -174,13 +227,15 @@ use base qw/Exporter/;
     /);
 
 # Required
-@EXPORT_OK = (qw/
+our @EXPORT_OK = (qw/
         is_void isnt_void
         is_true_flag is_false_flag
+        as_array as_list as_array_ref as_hash as_hash_ref
+        as_first as_first_val as_last as_last_val as_latest
     /, @EXPORT);
 
 # Tags
-%EXPORT_TAGS = (
+our %EXPORT_TAGS = (
         all      => [@EXPORT_OK],
         check    => [@EXPORT],
         void     => [qw/
@@ -188,6 +243,10 @@ use base qw/Exporter/;
         /],
         flag     => [qw/
             is_true_flag is_false_flag
+        /],
+        as       => [qw/
+            as_array as_list as_array_ref as_hash as_hash_ref
+            as_first as_first_val as_last as_last_val as_latest
         /],
     );
 
@@ -252,6 +311,53 @@ sub is_false_flag {
     my $f = shift || return 1;
     return $f =~ /^(off|n|false|disable|0)/i ? 1 : 0;
 }
+
+# As
+sub as_array_ref {
+    return [] unless scalar @_; # if no args
+    return [@_] if scalar(@_) > 1; # if too many args
+    return [] unless defined($_[0]); # if value is undef
+    if (ref($_[0]) eq 'ARRAY') { return $_[0] } # Array
+    elsif (ref($_[0]) eq 'HASH') { return [%{$_[0]}] } # Hash
+    return [$_[0]];
+}
+sub as_array {
+    my $r = as_array_ref(@_);
+    return wantarray ? @$r : $r;
+}
+sub as_list { goto &as_array }
+sub as_hash_ref {
+    return {} unless scalar @_; # if no args passed
+    return {@_} unless scalar(@_) % 2; # if even (not odd) args passed
+    return {} unless defined($_[0]); # if arg is undef
+    if (ref($_[0]) eq 'HASH') { return $_[0] } # Hash
+    return {};
+}
+sub as_hash {
+    my $r = as_hash_ref(@_);
+    return wantarray ? %$r : $r;
+}
+sub as_first {
+    return undef unless defined $_[0];
+    my $r = as_array_ref(@_);
+    return undef unless exists($r->[0]) && defined($r->[0]);
+    my $v = $r->[0];
+    if (!ref($v)) { return $v } # No ref
+    elsif (ref($v) eq 'SCALAR' || ref($v) eq 'REF') { return $$v } # Scalar ref
+    return $v;
+}
+sub as_first_val { goto &as_first }
+sub as_last {
+    return undef unless defined $_[0];
+    my $r = as_array_ref(@_);
+    return undef unless exists($r->[0]) && defined($r->[0]);
+    my $v = $r->[-1];
+    if (!ref($v)) { return $v } # No ref
+    elsif (ref($v) eq 'SCALAR' || ref($v) eq 'REF') { return $$v } # Scalar ref
+    return $v;
+}
+sub as_last_val { goto &as_last }
+sub as_latest { goto &as_last }
 
 1;
 

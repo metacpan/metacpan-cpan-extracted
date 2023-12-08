@@ -9,10 +9,6 @@ use utf8;
 
 WWW::Suffit - The Suffit core library
 
-=head1 VERSION
-
-Version 1.03
-
 =head1 SYNOPSIS
 
     use WWW::Suffit;
@@ -54,7 +50,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.05';
 
 # . . . coming soon . . .
 

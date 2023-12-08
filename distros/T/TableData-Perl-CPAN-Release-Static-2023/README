@@ -3,9 +3,9 @@ NAME
     year 2023
 
 VERSION
-    This document describes version 20231120.0 of
+    This document describes version 20231208.0 of
     TableDataRole::Perl::CPAN::Release::Static::2023 (from Perl distribution
-    TableData-Perl-CPAN-Release-Static-2023), released on 2023-11-20.
+    TableData-Perl-CPAN-Release-Static-2023), released on 2023-12-08.
 
 SYNOPSIS
     To use from Perl code:
@@ -42,7 +42,7 @@ TABLEDATA STATISTICS
      | key         | value |
      +-------------+-------+
      | num_columns | 9     |
-     | num_rows    | 8586  |
+     | num_rows    | 9637  |
      +-------------+-------+
 
     The statistics is available in the %STATS package variable.

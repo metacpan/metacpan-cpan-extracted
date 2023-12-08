@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Zh::Hant - Package for language Chinese
 
 package Locale::CLDR::Locales::Zh::Hant;
 # This file auto generated from Data\common\main\zh_Hant.xml
-#	on Sat  4 Nov  6:32:36 pm GMT
+#	on Tue  5 Dec  1:40:25 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

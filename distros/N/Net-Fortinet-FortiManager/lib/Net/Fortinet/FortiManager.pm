@@ -1,5 +1,5 @@
 package Net::Fortinet::FortiManager;
-$Net::Fortinet::FortiManager::VERSION = '0.003001';
+$Net::Fortinet::FortiManager::VERSION = '0.004000';
 # ABSTRACT: Fortinet FortiManager REST API client library
 
 use 5.024;
@@ -392,6 +392,47 @@ sub delete_firewall_ipv6_address_group ($self, $name) {
 }
 
 
+sub list_firewall_wildcard_fqdns ($self, $params = {}) {
+    $self->exec_method('get', '/pm/config/adom/' . $self->adom .
+        '/obj/firewall/wildcard-fqdn/custom', $params);
+}
+
+
+sub get_firewall_wildcard_fqdn ($self, $name, $params = {}) {
+    $self->exec_method('get', '/pm/config/adom/' . $self->adom .
+        '/obj/firewall/wildcard-fqdn/custom/'. $name, $params);
+}
+
+
+sub create_firewall_wildcard_fqdn ($self, $name, $data) {
+    my $params = {
+        data => [{
+            $data->%*,
+            name => $name,
+        }],
+    };
+    $self->exec_method('add', '/pm/config/adom/' . $self->adom .
+        '/obj/firewall/wildcard-fqdn/custom', $params);
+}
+
+
+sub update_firewall_wildcard_fqdn ($self, $name, $data) {
+    my $params = {
+        data => {
+            $data->%*,
+        },
+    };
+    $self->exec_method('update', '/pm/config/adom/' . $self->adom .
+        '/obj/firewall/wildcard-fqdn/custom/' . $name, $params);
+}
+
+
+sub delete_firewall_wildcard_fqdn ($self, $name) {
+    $self->exec_method('delete', '/pm/config/adom/' . $self->adom .
+        '/obj/firewall/wildcard-fqdn/custom/' . $name);
+}
+
+
 sub list_firewall_services ($self, $params = {}) {
     $self->exec_method('get', '/pm/config/adom/' . $self->adom .
         '/obj/firewall/service/custom', $params);
@@ -649,7 +690,7 @@ Net::Fortinet::FortiManager - Fortinet FortiManager REST API client library
 
 =head1 VERSION
 
-version 0.003001
+version 0.004000
 
 =head1 SYNOPSIS
 
@@ -871,6 +912,40 @@ Throws an exception on error.
 =head2 delete_firewall_ipv6_address_group
 
 Takes a firewall IPv6 address group name.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 list_firewall_wildcard_fqdns
+
+Returns an arrayref of firewall wildcard FQDN objects.
+
+=head2 get_firewall_wildcard_fqdn
+
+Takes a firewall wildcard FQDN name and an optional parameter hashref.
+
+Returns its data as a hashref.
+
+=head2 create_firewall_wildcard_fqdn
+
+Takes a firewall wildcard FQDN name and a hashref of wildcard FQDN config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 update_firewall_wildcard_fqdn
+
+Takes a firewall wildcard FQDN name and a hashref of wildcard FQDN config.
+
+Returns true on success.
+
+Throws an exception on error.
+
+=head2 delete_firewall_wildcard_fqdn
+
+Takes a firewall wildcard FQDN name.
 
 Returns true on success.
 
@@ -1123,7 +1198,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022 by Alexander Hartmaier.
+This software is copyright (c) 2023 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,192 @@
+NAME
+    Acme::CPANModules::WorkingWithPDF - List of modules to work with Excel
+    formats (XLS, XLSX) or other spreadsheet formats like LibreOffice Calc
+    (ODS)
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::WorkingWithPDF (from Perl distribution
+    Acme-CPANModules-WorkingWithPDF), released on 2023-12-04.
+
+DESCRIPTION
+    The following are tools (programs, modules, scripts) to work with PDF
+    (Portable Document Format) files.
+
+    Converting from other formats
+
+    App::pod2pdf
+
+    PDF::FromHTML
+
+    PDF::FromImage
+
+    PDF::Boxer creates PDF from a simple markup language called "boxer".
+
+    Converting to other formats
+
+    Diffing
+
+    diff-pdf-text (from App::DiffPDFText) converts each PDF to text and
+    performs "diff" on the text files.
+
+    Generating
+
+    PDF::Builder
+
+    PDF::Create
+
+    PDF::Cairo
+
+    Passwords
+
+    add-pdf-password (from App::PDFUtils) adds password to PDF.
+
+    remove-pdf-password (from App::PDFUtils) strips password from PDF.
+
+    Searching
+
+    pdfgrep (from App::pdfgrep) converts PDF to text and performs grep on
+    it.
+
+    Transforming
+
+    PDF::API2, PDF::API3
+
+    paperback (from App::paperback) collages smaller pages from original PDF
+    into bigger pages.
+
+    pdfolay (from App::PDF::Overlay) overlays (superimposes) PDF pages to
+    the pages of other PDF.
+
+    <PDF::Collage> also creates collages.
+
+    pdflink (from App::PDF::Link) adds clickable icons in PDF that link to
+    other documents.
+
+ACME::CPANMODULES ENTRIES
+    App::pod2pdf
+        Author: JONALLEN <https://metacpan.org/author/JONALLEN>
+
+    PDF::FromHTML
+        Author: AUDREYT <https://metacpan.org/author/AUDREYT>
+
+    PDF::FromImage
+        Author: TYPESTER <https://metacpan.org/author/TYPESTER>
+
+    PDF::Boxer
+        Author: LECSTOR <https://metacpan.org/author/LECSTOR>
+
+    App::DiffPDFText
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    PDF::Builder
+        Author: PMPERRY <https://metacpan.org/author/PMPERRY>
+
+    PDF::Create
+        Author: MANWAR <https://metacpan.org/author/MANWAR>
+
+    PDF::Cairo
+        Author: JGREELY <https://metacpan.org/author/JGREELY>
+
+    App::PDFUtils
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    App::pdfgrep
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    PDF::API2
+        Author: SSIMMS <https://metacpan.org/author/SSIMMS>
+
+    PDF::API3
+        Author: OTTO <https://metacpan.org/author/OTTO>
+
+    App::paperback
+        Author: MONACCI <https://metacpan.org/author/MONACCI>
+
+    App::PDF::Overlay
+        Author: JV <https://metacpan.org/author/JV>
+
+    App::PDF::Link
+        Author: JV <https://metacpan.org/author/JV>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n WorkingWithPDF
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries WorkingWithPDF | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=WorkingWithPDF -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::WorkingWithPDF -E'say $_->{module} for @{ $Acme::CPANModules::WorkingWithPDF::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-WorkingWithPDF>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-WorkingWithPDF>.
+
+SEE ALSO
+    Acme::CPANModules::WorkingWithDOC
+
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Work
+    ingWithPDF>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

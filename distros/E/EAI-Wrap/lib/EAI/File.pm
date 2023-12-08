@@ -1,4 +1,4 @@
-package EAI::File 1.902;
+package EAI::File 1.904;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import);use Text::CSV();use Data::XLSX::Parser();use Spreadsheet::ParseExcel();use Spreadsheet::WriteExcel();use Excel::Writer::XLSX();use Data::Dumper qw(Dumper);use XML::LibXML();use XML::LibXML::Debugging();
@@ -803,6 +803,8 @@ reads the defined XML file with specified parameters into array of hashes (DB re
  $filenames .. array of filenamea, if explicit (given in case of mget and unpacked zip archives).
 
 returns 0 on error, 1 if OK
+
+For all read<*> functions custom "hooks" can be defined with L<fieldCode|/fieldCode> and L<lineCode|/lineCode> to modify and enhance the standard mapping defined in format_header. To access the final line data the hash %EAI::File::line can be used (specific fields with $EAI::File::line{<target header column>}). if a field is being replaced using a different name from targetheader, the data with the original header name is placed in %EAI::File::templine. You can also access data from the previous line with %EAI::File::previousline and the previous temp line with %EAI::File::previoustempline.
 
 =item writeText ($$)
 

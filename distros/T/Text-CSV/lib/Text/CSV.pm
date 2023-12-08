@@ -8,14 +8,14 @@ use vars qw( $VERSION $DEBUG @ISA @EXPORT_OK %EXPORT_TAGS );
 @ISA = qw( Exporter );
 
 BEGIN {
-    $VERSION = '2.03';
+    $VERSION = '2.04';
     $DEBUG   = 0;
 }
 
 # if use CSV_XS, requires version
 my $Module_XS  = 'Text::CSV_XS';
 my $Module_PP  = 'Text::CSV_PP';
-my $XS_Version = '1.51';
+my $XS_Version = '1.53';
 
 my $Is_Dynamic = 0;
 
@@ -1176,7 +1176,7 @@ This will return a reference to a list of L<getline ($fh)|/getline> results.
 In this call, C<keep_meta_info> is disabled.  If C<$offset> is negative, as
 with C<splice>, only the last  C<abs ($offset)> records of C<$fh> are taken
 into consideration. Parameters C<$offset> and C<$length> are expected to be
-an integers. Non-integer values are interpreted as integer without check.
+integers. Non-integer values are interpreted as integer without check.
 
 Given a CSV file with 10 lines:
 

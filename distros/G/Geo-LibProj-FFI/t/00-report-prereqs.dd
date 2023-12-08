@@ -8,7 +8,6 @@ do { my $x = {
                       'requires' => {
                                       'Test::MinimumVersion' => '0',
                                       'Test::More' => '0',
-                                      'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41'
                                     }
                     },
@@ -18,8 +17,8 @@ do { my $x = {
                                       'Convert::Binary::C' => '0.04',
                                       'Exporter::Easy' => '0',
                                       'FFI::C' => '0.08',
-                                      'FFI::Platypus' => '1.00',
-                                      'perl' => '5.012'
+                                      'FFI::Platypus' => '1.50',
+                                      'perl' => 'v5.14.0'
                                     }
                     },
        'test' => {
@@ -29,10 +28,9 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'IPC::Run3' => '0',
                                    'Test::Exception' => '0',
                                    'Test::More' => '0',
-                                   'Test::Warnings' => '0'
+                                   'Test::Warnings' => '0.010'
                                  }
                  }
      };

@@ -18,11 +18,12 @@ no_index:
     - t
     - inc
 requires:
+  Export::These: v0.2.1
   constant::more: v0.3.0
   perl: '5.036000'
 resources:
   repository: git://github.com/drclaw1394/perl-io-fd.git
-version: v0.3.3
+version: v0.3.5
 x_bugtracker:
   web: https://github.com/drclaw1394/perl-io-fd/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

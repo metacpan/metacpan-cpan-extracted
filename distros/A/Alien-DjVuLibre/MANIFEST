@@ -1,7 +1,7 @@
 alienfile
 Changes
 DjVuLibre.pm
-examples/ex1.pl
+examples/alien_djvulibre_variables.pl
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

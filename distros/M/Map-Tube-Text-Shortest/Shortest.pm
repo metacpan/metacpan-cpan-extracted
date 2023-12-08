@@ -1,10 +1,8 @@
 package Map::Tube::Text::Shortest;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use List::Util qw(reduce);
@@ -15,8 +13,7 @@ use Scalar::Util qw(blessed);
 Readonly::Scalar our $DOUBLE_SPACE => q{  };
 Readonly::Scalar our $EMPTY_STR => q{};
 
-# Version.
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -102,33 +99,39 @@ Map::Tube::Text::Shortest - Shortest route information via Map::Tube object.
 =head1 SYNOPSIS
 
  use Map::Tube::Test::Shortest;
- my $obj = Map::Tube::Text::Shortest->new;
+
+ my $obj = Map::Tube::Text::Shortest->new(%params);
  print $obj->print($from, $to);
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $obj = Map::Tube::Text::Shortest->new(%params);
 
- Constructor.
+Constructor.
 
 =over 8
 
 =item * C<tube>
 
- Map::Tube object.
- Parameter is required.
- Default value is undef.
+Map::Tube object.
+
+Parameter is required.
+
+Default value is undef.
 
 =back
 
-=item print($from, $to)>
+Returns instance of object.
 
- Print shortest route table.
- Returns string with table.
+=head2 C<print>
 
-=back
+ print $obj->print($from, $to);
+
+Print shortest route table.
+
+Returns string with table.
 
 =head1 ERRORS
 
@@ -138,11 +141,11 @@ Map::Tube::Text::Shortest - Shortest route information via Map::Tube object.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=print_shortest.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use English;
  use Encode qw(decode_utf8 encode_utf8);
  use Error::Pure qw(err);
@@ -218,31 +221,38 @@ L<Scalar::Util>.
 
 =head1 SEE ALSO
 
-L<Map::Tube>,
-L<Map::Tube::Graph>,
-L<Map::Tube::GraphViz>,
-L<Map::Tube::Plugin::Graph>,
-L<Map::Tube::Text::Table>,
-L<Task::Map::Tube>.
+=over
+
+=item L<Task::Map::Tube>
+
+Install the Map::Tube modules.
+
+=item L<Task::Map::Tube::Metro>
+
+Install the Map::Tube concrete metro modules.
+
+=back
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Map-Tube-Text-Shortest>
+L<https://github.com/michal-josef-spacek/Map-Tube-Text-Shortest>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

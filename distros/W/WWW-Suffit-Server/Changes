@@ -1,5 +1,8 @@
 # Version/Revision history
 
+1.02 Thu 07 Dec 2023 16:26:19 MSK
+    * All plugins has been relocated to the WWW::Suffit::Plugin namespace
+
 1.01 Sun 26 Nov 2023 17:37:00 MSK
     * Added WWW::Suffit::Server::CommonHelpers
     * Added WWW::Suffit::Server::Syslog

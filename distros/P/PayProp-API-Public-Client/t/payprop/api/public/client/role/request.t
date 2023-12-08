@@ -12,9 +12,6 @@ use Test::Most;
 	use Mouse;
 	with qw/ PayProp::API::Public::Client::Role::Request /;
 
-	sub _path_params { [ qw/ path_param1 path_param2 / ] }
-	sub _query_params { [ qw/ query_param1 query_param2 / ] }
-
 	1;
 }
 
@@ -29,8 +26,10 @@ isa_ok(
 );
 
 can_ok $Request, qw/
+	put_req_p
 	get_req_p
 	post_req_p
+	delete_req_p
 /;
 
 subtest '->_handle_request' => sub {
@@ -53,25 +52,28 @@ subtest '->_build_url' => sub {
 
 	subtest 'query params' => sub {
 
-		is
-			$TestRequest->_build_url({ not_legit => 1, query_param1 => 'value1', query_param2 => 'value2' }),
-			'http://example.com/api/agency/v1.1/some-endpoint?query_param1=value1&query_param2=value2'
-		;
+		my $url = $TestRequest->_build_url({ query_param1 => 'value1', query_param2 => 'value2' });
+
+		like $url, qr{http://example.com/api/agency/v1.1/some-endpoint}, 'base url';
+		like $url, qr{query_param1=value1}, 'query_param1';
+		like $url, qr{query_param2=value2}, 'query_param2';
+
 	};
 
 	subtest 'path params' => sub {
 
+		$TestRequest->ordered_path_params([qw/ fragment1 fragment2 fragment3 /]);
+
 		is
-			$TestRequest->_build_url({
-				not_legit => 1,
-				query_param1 => 'value',
-				path_params => {
-					path_param1 => 'path_param_value1',
-					path_param2 => 'path_param_value2',
-				},
-			}),
-			'http://example.com/api/agency/v1.1/some-endpoint/path_param_value1/path_param_value2?query_param1=value'
+			$TestRequest
+				->_build_url( undef, {
+					fragment1 => 'replaced_fragment_1',
+					fragment2 => 'replaced_fragment_2',
+					fragment3 => 'replaced_fragment_3',
+				}),
+			'http://example.com/api/agency/v1.1/some-endpoint/replaced_fragment_1/replaced_fragment_2/replaced_fragment_3'
 		;
+
 	};
 
 };

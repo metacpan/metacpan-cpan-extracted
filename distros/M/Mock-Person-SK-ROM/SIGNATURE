@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,47 +12,52 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 b90f2159540495c82c61fa062005fcffbd4cdc40 Changes
-SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
-SHA1 d6c1b3fbb44350a21edd814277fa1fd2d0750b10 MANIFEST
-SHA1 78c660a263ea9f08ec9da7e61631a012b76c4a27 META.yml
-SHA1 a79a98aea9aa3a721576a128cd8e59d109199337 Makefile.PL
-SHA1 59c78ac33e5503c905fdd59ac1c561488061f9bb README
-SHA1 d63e032ca180ef9871c5379efe9596f5fb09b625 ROM.pm
-SHA1 0ca671cadcff31f25014f3eba8a33e5e98eafc53 examples/ex1.pl
-SHA1 aa39c28e94537306e39aa51203e689d5a4e1494f examples/ex2.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 b8c9f4a2701ea12e6249b59b441aa70892490bef t/Mock-Person-SK-ROM/01-use.t
-SHA1 23a513cffa923756cf24ca06ff80a2b9eb164483 t/Mock-Person-SK-ROM/02-version.t
-SHA1 3fe02750300f2bc2ea7144fbcab12a6341f805e6 t/Mock-Person-SK-ROM/03-first_male.t
-SHA1 7a264b51c0931e6772d7484cf3e48d0e3c47c6f6 t/Mock-Person-SK-ROM/04-first_female.t
-SHA1 1474f779f52693370c4874c4be1a8abb2601a823 t/Mock-Person-SK-ROM/05-last_male.t
-SHA1 3c0f7d1fedcd897e445af76b8f1e4d501fbad69a t/Mock-Person-SK-ROM/06-last_female.t
-SHA1 b84850375e03e54d98b33332333ac410352a338d t/Mock-Person-SK-ROM/07-middle_male.t
-SHA1 61ce58ba5c2641f4baf9166fd7079da596bea923 t/Mock-Person-SK-ROM/08-middle_female.t
-SHA1 bc86eacc7f4f77597387e0dd520e80dbae8cd4ad t/Mock-Person-SK-ROM/09-name.t
-SHA1 06633b2da720e7efef68364a5af6232141d28d46 xt/Mock-Person-SK-ROM/01-pod_coverage.t
-SHA1 3880e7b7f7357c3a887fea7a4f30505eb621d420 xt/Mock-Person-SK-ROM/02-pod.t
+SHA256 cfeb3889855203369d5c45e33593a130e9744aeaff43eafd4de3be0ff8eaf341 Changes
+SHA256 16e519f1cbc291b44fcc60e62249456c7f5432e29ad17f3ac82faf65b624cff4 LICENSE
+SHA256 1d30c9d23f0d341a79ad4498807d3e1f783288e34c03631dcdc24041a62be838 MANIFEST
+SHA256 ecafcf12cd49e9b59ee6492caecc3601e799c3b9bd329b09167f061cde6ba175 META.yml
+SHA256 98a37a2837ffd56a43cc3b65d1c89c1759bb486fb68ad1f8ec98d9bf3e50471c Makefile.PL
+SHA256 a380f8adfb494e03a752acb5e489f12cb8db4dfe4e0dc17120210c009485fdd6 README
+SHA256 9070740d25f4305d5852d41324301bfa3e6a5db590267ee96f959b6e668907b5 ROM.pm
+SHA256 676e3943af9ef809555ffb54b3a35b8a697964857dbb06cb1310eb29de23e14a examples/list_last_male_names.pl
+SHA256 e4dac94eec5d786fe81da321d5006b5e268e789fbfbab9506391c3a7ff26fff6 examples/random_name.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 addd0ba2d9c802d1400a9e338e7254c8c54a7b57073800976aeab1cceae955d6 t/Mock-Person-SK-ROM/01-use.t
+SHA256 b19ad461149c5518a135a47b5a41543353e32838ad0d80330b6b4599beb7cf20 t/Mock-Person-SK-ROM/02-version.t
+SHA256 6896462ee609dd3ad3894ba964e79b5ecdb9360b1b3668d039a43578345b68a1 t/Mock-Person-SK-ROM/03-first_male.t
+SHA256 fd994ad6905eacb51ad16d4b964696050eaaef6c817d3791f7f3a6be5c113c8c t/Mock-Person-SK-ROM/04-first_female.t
+SHA256 b92f498d6c3a48aa2c121be81dd21a866cc8a602cef8d77772aeb037ea814e59 t/Mock-Person-SK-ROM/05-last_male.t
+SHA256 71ca8e6d4b3cce68e5538fb4f89b4abd38550f844465232c2d0271716a42ede3 t/Mock-Person-SK-ROM/06-last_female.t
+SHA256 b85302541fb86a2bfeec0de27c6e91fd3d555e1ea31265a996b1c6506e4402c1 t/Mock-Person-SK-ROM/07-middle_male.t
+SHA256 5f582ae9820089fd96783205957ec6f4558bf34e428cecc51c06ed19046779ef t/Mock-Person-SK-ROM/08-middle_female.t
+SHA256 f71a8b09bec7c16de47147df7ce2674bc09b16442754f56c353e64ac9c8f3566 t/Mock-Person-SK-ROM/09-name.t
+SHA256 bc986b4335a41ba8b859912b05307e67f508e1b4bb8f11991cb78930b6902a47 xt/Mock-Person-SK-ROM/01-pod_coverage.t
+SHA256 988d52d2a0d75030a0f62faa977429fbe779a617cd1febedbcb041d8dd3182de xt/Mock-Person-SK-ROM/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWL1PIAAoJEJe+XXKaIuTlZd4H/1/FCdKxeYlIljZtcqryx6XI
-OcD5qcvU3vZ+ZVBe3r5PC0eXOS+04vRXHw7oKWTgYRGBvAFy9ZNPP6krDvFuQCKK
-6rYxCikyfLDfD1mVafi1OiZti6gWRaY6e+7HUAxLeUtwvx8jMz/S+MMq+XpmYm2k
-C9/FAziZ3RoV33mGeE6B3o/TaZ+6iB5Z3v6cScU7uaN508+/lB7kdDEwiAnFZKzp
-h5HmpH11U4Nlz9okzc+/t7AvOXaAAk9GNsulbCTQ0xlIqu1QR8g/tHf/eODdP5d1
-GC3BsmFsJgIxOU1D1ZDAS6Shmbd9rE2xpVCLJ515rIkm41CosJEFW251to/lcwE=
-=kjDq
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVvFS4ACgkQojV9Rpe/
+B8sBtg//bsqUo3d2eAtkgYZwbxdAJNpK3xNpt0XNs/nw5uDHbW0khI67V8EBc0i2
+U8uCSVodFwWWHm+creh0YVgEHCYCI5/su74cfkkcWhAUjlMsfwjFFSBgbJsHt2LO
+vcJ0IG+CLBrPAoCiGaUdYmh1xBQ6j4wJEmnC/uyclUKM1JGJd9iNNuUEmX48g0rn
+jJ4Al0bHrjbEvXQ/QdKAhBjDnCFcB6b3z9xrzAPmFqVMUKo/+PkF/U3M/xUS3dM5
+8AwZqL05/4SFqivJNMzndB6s68a/P2toLH+AmE964fnUZdiopB/eKLRyoqEZ+0Bm
+COASLyy+z8LGa4OMjsDR5Sgx4WlsogZME58pTwynn7WUk4AJd/Pv6LpeGtxq1ZMq
+YNz1i7XN3Imfvk2zod9smuUSqziqFhrkg0BwjVztwR6yiuc8njkcRsOUTRQ5BLVL
+kGhjUK6bmqkntCqrrF7h8mj6AgGTKk7B6yOAPjo4t6arTpgULTvxP1jh1w5WObQ5
+qBoW1imiQGirDWnuKrtkPIgcZZ0tZLlyM8BZyKppw1bZJwCJIy6XJd2Q0aYSrWsa
+iFuWfb0rowMeae/8mJDOpHK3uXBwGAxOztMKPex8HPvM9iXSSYp6ESgsAzJ1bPsH
++b2dqNHRo9+SEzsYKWzbS8lwFdLcwKu7h8fvWGoq++x5CmCdHJ8=
+=10TL
 -----END PGP SIGNATURE-----

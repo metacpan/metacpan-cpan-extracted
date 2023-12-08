@@ -30,7 +30,7 @@ int32_t SPVM__File__Glob__glob(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t e = 0;
   if (!(status == 0)) {
     env->die(env, stack, "[System Error]glob failed:%s. The files specified by the \"%s\" pattern can't be get", env->strerror(env, stack, errno, 0), pattern, __func__, FILE_NAME, __LINE__);
-    e = SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+    e = SPVM_NATIVE_C_BASIC_TYPE_ID_ERROR_SYSTEM_CLASS;
   }
   else {
     int32_t paths_length = pglob.gl_pathc;

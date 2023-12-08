@@ -15,7 +15,7 @@ use IO::Handle;
 use Carp;
 
 # ABSTRACT: Media Player
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 
 sub libvlc { shift->{libvlc} }
@@ -274,7 +274,7 @@ VideoLAN::LibVLC::MediaPlayer - Media Player
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -665,7 +665,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Michael Conrad.
+This software is copyright (c) 2023 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

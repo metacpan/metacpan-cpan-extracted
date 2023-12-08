@@ -2,7 +2,7 @@ package Test2::EventFacet::Info;
 use strict;
 use warnings;
 
-our $VERSION = '1.302196';
+our $VERSION = '1.302198';
 
 sub is_list { 1 }
 

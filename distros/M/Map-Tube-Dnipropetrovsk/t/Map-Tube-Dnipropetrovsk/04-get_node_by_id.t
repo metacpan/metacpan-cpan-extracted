@@ -24,4 +24,4 @@ like($EVAL_ERROR, qr{^Map::Tube::get_node_by_id\(\): ERROR: Invalid Station ID \
 
 # Test.
 my $ret = $map->get_node_by_id('1-01');
-is($ret->name, decode_utf8('Комунарівська'), 'Get node for node id.');
+is($ret->name, decode_utf8('Покровська'), 'Get node for node id.');

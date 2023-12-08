@@ -11,6 +11,23 @@ setupConfigMerge();
 
 my $logger = get_logger();
 $logger->info(">>>>>>> starting logcheck, curDate: $curDate, curDateDash: $curDateDash, curhyphenDate: $curhyphenDate, curdotDate: $curdotDate, curTime: $curTime, weekday(curDate):".weekday($curDate).",is_last_day_of_month(curDate):".is_last_day_of_month($curDate));
+my $beginOfDay = timelocal_modern(0,0,0,localtime->mday(), localtime->mon(), localtime->year()+1900);
+my $fileAge = (stat("$execute{homedir}/alreadyProcessedLogErrors.txt"))[9];
+# remove yesterdays doneError information on first run of day
+if (-e "$execute{homedir}/alreadyProcessedLogErrors.txt" and $fileAge < $beginOfDay) {
+	unlink "$execute{homedir}/alreadyProcessedLogErrors.txt" or $logger->error("couldn't remove $execute{homedir}/alreadyProcessedLogErrors.txt: $@");
+}
+
+# read doneError information later for each check
+my %doneError;
+if (-e "$execute{homedir}/alreadyProcessedLogErrors.txt") {
+	open (DONE, "<$execute{homedir}/alreadyProcessedLogErrors.txt") or $logger->error("error opening $execute{homedir}/alreadyProcessedLogErrors.txt: $@");
+	while (<DONE>) {
+		chomp($_);
+		$doneError{$_} = 1;
+	}
+	close DONE;
+}
 
 LOGCHECK:
 foreach my $job (keys %{$config{checkLookup}}) {
@@ -24,6 +41,7 @@ foreach my $job (keys %{$config{checkLookup}}) {
 	my $logFileToCheck = $config{checkLookup}{$job}{logFileToCheck}; # Logfile to be searched
 	my $logRootPath = ($config{checkLookup}{$job}{logRootPath} ne "" ? $config{checkLookup}{$job}{logRootPath} : $config{logRootPath}{""}); # default log root path
 	my $prodEnvironmentInSeparatePath = ($config{checkLookup}{$job}{prodEnvironmentInSeparatePath} ne "" ? $config{checkLookup}{$job}{prodEnvironmentInSeparatePath} : $config{prodEnvironmentInSeparatePath});
+	my $mailsendTo = ($execute{envraw} ? $config{testerrmailaddress} : $config{checkLookup}{$job}{errmailaddress});
 	# amend logfile path with environment, depending on prodEnvironmentInSeparatePath:
 	if ($prodEnvironmentInSeparatePath) {
 		$logFileToCheck = $logRootPath.'/'.$execute{env}.'/'.$logFileToCheck;
@@ -71,6 +89,8 @@ foreach my $job (keys %{$config{checkLookup}}) {
 		}
 	}
 	my $infos = " is missing for job $job:\n";
+	my $lastLogFile = $logFileToCheck;
+	$lastLogFile =~ s/^(.+?[\\\/])([^\\\/]+?)$/$1$curDate\.$2/;
 	if (open (LOGFILE, "<$logFileToCheck")) {
 		# check log file for log check pattern, assumption tab separated!
 		while (<LOGFILE>){
@@ -79,6 +99,13 @@ foreach my $job (keys %{$config{checkLookup}}) {
 			# found, if log check pattern matches and date today, either YYYY/MM/DD or "german" logs using dd.mm.yyyy or log4j using YYYY-MM-DD
 			if (($logline[0] =~ /$curDateDash/ or $logline[0] =~ /$curdotDate/ or $logline[0] =~ /$curhyphenDate/) and $wholeLine =~ /$logcheck/) {
 				$logger->info("logcheck '".$logcheck."' successful, row:".$wholeLine);
+				if ($doneError{$job}) {
+					$infos = "The log starting entry in logfile $logFileToCheck was found now.\njob: <$job>, frequency: ".$freqToCheck.", time to check: ".$timeToCheck;
+					$doneError{$job} = 0;
+					$logger->info("logcheck successful for originally failed '".$job."', sending mail to: '".$mailsendTo);
+					#            sendGeneralMail($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile)
+					EAI::Common::sendGeneralMail("", $mailsendTo,"","","Resolved the starting problem for $job",$infos,'text/plain');
+				}
 				close LOGFILE; next LOGCHECK;
 			}
 		}
@@ -90,14 +117,20 @@ foreach my $job (keys %{$config{checkLookup}}) {
 	close LOGFILE;
 	# send mail for not found log entries
 	# insert $curDate before file name with a dot
-	my $lastLogFile = $logFileToCheck;
-	$lastLogFile =~ s/^(.+?[\\\/])([^\\\/]+?)$/$1$curDate\.$2/;
-	$infos = $infos."\njob: <$job>, frequency: ".$freqToCheck.", time to check: ".$timeToCheck.", log in file file:///".$logFileToCheck." resp. file:///".$lastLogFile;
-	my $mailsendTo = ($execute{envraw} ? $config{testerrmailaddress} : $config{checkLookup}{$job}{errmailaddress});
-	$logger->info("failed logcheck for '".$job."', sending mail to: '".$mailsendTo);
-	EAI::Common::sendGeneralMail("", $mailsendTo,"","","Starting problem detected for $job",$infos,'text/plain');
-	# sendGeneralMail($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile)
+	unless ($doneError{$job}) {
+		$infos = $infos."\njob: <$job>, frequency: ".$freqToCheck.", time to check: ".$timeToCheck.", log in file file:///".$logFileToCheck." resp. file:///".$lastLogFile;
+		$logger->info("failed logcheck for '".$job."', sending mail to: '".$mailsendTo);
+		#            sendGeneralMail($From, $To, $Cc, $Bcc, $Subject, $Data, $Type, $Encoding, $AttachType, $AttachFile)
+		EAI::Common::sendGeneralMail("", $mailsendTo,"","","Starting problem detected for $job",$infos,'text/plain');
+	}
 }
+my $jobErrors = "";
+for (sort keys(%doneError)) {
+	$jobErrors .= "$_\n" if $doneError{$_};
+}
+open (DONE, ">$execute{homedir}/alreadyProcessedLogErrors.txt") or $logger->error("couldn't write to $execute{homedir}/alreadyProcessedLogErrors.txt: $@");
+print DONE $jobErrors;
+close DONE;
 __END__
 =head1 NAME
 

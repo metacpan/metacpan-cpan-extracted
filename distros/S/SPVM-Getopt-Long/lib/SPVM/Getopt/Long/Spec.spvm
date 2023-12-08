@@ -1,0 +1,30 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+class Getopt::Long::Spec {
+  allow Getopt::Long;
+  
+  # Enumerations
+  private enum {
+    TYPE_BOOL,
+    TYPE_STRING,
+    TYPE_INT,
+    TYPE_DOUBLE,
+  }
+  
+  # Fields
+  
+  has name : string;
+  
+  has primary_name : string;
+  
+  has type : int;
+  
+  # Class Methods
+  private static method new : Getopt::Long::Spec () {
+    my $self = new Getopt::Long::Spec;
+    
+    return $self;
+  }
+  
+}

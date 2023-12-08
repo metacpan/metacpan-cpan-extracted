@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 15 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FileTestUtils.pm'
@@ -20,7 +20,13 @@ my @scripts = (
     'script/dir-has-non-dot-files',
     'script/dir-has-non-dot-subdirs',
     'script/dir-has-subdirs',
-    'script/dir-not-empty'
+    'script/dir-not-empty',
+    'script/dir-only-has-dot-files',
+    'script/dir-only-has-dot-subdirs',
+    'script/dir-only-has-files',
+    'script/dir-only-has-non-dot-files',
+    'script/dir-only-has-non-dot-subdirs',
+    'script/dir-only-has-subdirs'
 );
 
 # no fake home requested

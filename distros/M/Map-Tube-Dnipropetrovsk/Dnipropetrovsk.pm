@@ -8,7 +8,7 @@ use File::Share ':all';
 use Moo;
 use namespace::clean;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Get XML.
 has xml => (
@@ -55,65 +55,97 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new()>
+ my $obj = Map::Tube::Dnipropetrovsk->new;
 
- Constructor.
+Constructor.
 
-=item C<get_all_routes($from, $to)> [EXPERIMENTAL]
+Returns instance of object.
 
- Get all routes from station to station.
- Returns reference to array with Map::Tube::Route objects.
+=head2 C<get_all_routes> [EXPERIMENTAL]
 
-=item C<get_line_by_id($line_id)>
+ my $routes_ar = $obj->get_all_routes($from, $to);
 
- Get line object defined by id.
- Returns Map::Tube::Line object.
+Get all routes from station to station.
 
-=item C<get_line_by_name($line_name)>
+Returns reference to array with Map::Tube::Route objects.
 
- Get line object defined by name.
- Returns Map::Tube::Line object.
+=head2 C<get_line_by_id>
 
-=item C<get_lines()>
+ my $line = $obj->get_line_by_id($line_id);
 
- Get lines in metro map.
- Returns reference to unsorted array with Map::Tube::Line objects.
+Get line object defined by id.
 
-=item C<get_node_by_id($station_id)>
+Returns Map::Tube::Line object.
 
- Get station node by id.
- Returns Map::Tube::Node object.
+=head2 C<get_line_by_name>
 
-=item C<get_node_by_name($station_name)>
+ my $line = $obj->get_line_by_name($line_name);
 
- Get station node by name.
- Returns Map::Tube::Node object.
+Get line object defined by name.
 
-=item C<get_shortest_route($from, $to)>
+Returns Map::Tube::Line object.
 
- Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
- Returns Map::Tube::Route object.
+=head2 C<get_lines>
 
-=item C<get_stations($line)>
+ my $lines_ar = $obj->get_lines;
 
- Get list of stations for concrete metro line.
- Returns reference to array with Map::Tube::Node objects.
+Get lines in metro map.
 
-=item C<name()>
+Returns reference to unsorted array with Map::Tube::Line objects.
 
- Get metro name.
- Returns string with metro name.
+=head2 C<get_node_by_id>
 
-=item C<xml()>
+ my $station = $obj->get_node_by_id($station_id);
 
- Get XML specification of Dnipropetrovsk metro.
- Returns string with XML.
+Get station node by id.
 
-=back
+Returns Map::Tube::Node object.
+
+=head2 C<get_node_by_name>
+
+ my $station = $obj->get_node_by_name($station_name);
+
+Get station node by name.
+
+Returns Map::Tube::Node object.
+
+=head2 C<get_shortest_route>
+
+ my $route = $obj->get_shortest_route($from, $to);
+
+Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
+
+Returns Map::Tube::Route object.
+
+=head2 C<get_stations>
+
+ my $stations_ar = $obj->get_stations($line);
+
+Get list of stations for concrete metro line.
+
+Returns reference to array with Map::Tube::Node objects.
+
+=head2 C<name>
+
+ my $metro_name = $obj->name;
+
+Get metro name.
+
+Returns string with metro name.
+
+=head2 C<xml>
+
+ my $xml_file = $obj->xml;
+
+Get XML specification of Dnipropetrovsk metro.
+
+Returns string with XML.
 
 =head1 EXAMPLE1
+
+=for comment filename=print_dnipropetrovsk_route.pl
 
  use strict;
  use warnings;
@@ -125,15 +157,17 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
  my $obj = Map::Tube::Dnipropetrovsk->new;
 
  # Get route.
- my $route = $obj->get_shortest_route(decode_utf8('Комунарівська'), decode_utf8('Металургів'));
+ my $route = $obj->get_shortest_route(decode_utf8('Покровська'), decode_utf8('Металургів'));
 
  # Print out type.
  print "Route: ".encode_utf8($route)."\n";
 
  # Output:
- # Route: Комунарівська (Центрально-Заводська лінія), Проспект Свободи (Центрально-Заводська лінія), Заводська (Центрально-Заводська лінія), Металургів (Центрально-Заводська лінія)
+ # Route: Покровська (Центрально-Заводська лінія), Проспект Свободи (Центрально-Заводська лінія), Заводська (Центрально-Заводська лінія), Металургів (Центрально-Заводська лінія)
 
 =head1 EXAMPLE2
+
+=for comment filename=print_dnipropetrovsk_def_xml_file.pl
 
  use strict;
  use warnings;
@@ -153,6 +187,8 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
  # XML file: .*/dnipropetrovsk-map.xml
 
 =head1 EXAMPLE3
+
+=for comment filename=print_dnipropetrovsk_image.pl
 
  use strict;
  use warnings;
@@ -181,13 +217,15 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
 
 =begin html
 
-<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Dnipropetrovsk/master/images/ex3.png">
-  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Dnipropetrovsk/master/images/ex3.png" alt="Pražské metro" width="300px" height="300px" />
+<a href="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Dnipropetrovsk/master/images/Dnipropetrovsk.png">
+  <img src="https://raw.githubusercontent.com/michal-josef-spacek/Map-Tube-Dnipropetrovsk/master/images/Dnipropetrovsk.png" alt="Дніпровський метрополітен" width="300px" height="300px" />
 </a>
 
 =end html
 
 =head1 EXAMPLE4
+
+=for comment filename=print_dnipropetrovsk_lines.pl
 
  use strict;
  use warnings;
@@ -208,6 +246,8 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
  # Центрально-Заводська лінія
 
 =head1 EXAMPLE5
+
+=for comment filename=print_dnipropetrovsk_line_stations.pl
 
  use strict;
  use warnings;
@@ -238,7 +278,7 @@ For more information about Dnipropetrovsk Map, click L<here|https://en.wikipedia
  # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
 
  # Output with 'Центрально-Заводська лінія' argument.
- # Комунарівська
+ # Покровська
  # Проспект Свободи
  # Заводська
  # Металургів
@@ -282,12 +322,14 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2020 Michal Josef Špaček
- Artistic License
- BSD 2-Clause License
+© 2014-2023 Michal Josef Špaček
+
+Artistic License
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

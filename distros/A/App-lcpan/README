@@ -2,8 +2,8 @@ NAME
     App::lcpan - Manage your local CPAN mirror
 
 VERSION
-    This document describes version 1.071 of App::lcpan (from Perl
-    distribution App-lcpan), released on 2022-09-19.
+    This document describes version 1.073 of App::lcpan (from Perl
+    distribution App-lcpan), released on 2023-07-09.
 
 SYNOPSIS
     See lcpan script.
@@ -52,6 +52,8 @@ FUNCTIONS
 
     *   detail => *bool*
 
+        (No description)
+
     *   index_name => *filename* (default: "index.db")
 
         Filename of index.
@@ -70,6 +72,8 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
+
+        (No description)
 
     *   random => *true*
 
@@ -223,6 +227,10 @@ FUNCTIONS
 
         Allow showing multiple modules for different dists.
 
+    *   exclude_deps => *array[perl::modname]*
+
+        Exclude some dependencies from being shown.
+
     *   flatten => *bool*
 
         Instead of showing tree-like information, flatten it.
@@ -292,13 +300,19 @@ FUNCTIONS
 
     *   modules => *array[perl::modname]*
 
-    *   perl_version => *str* (default: "v5.34.0")
+        (No description)
+
+    *   perl_version => *str* (default: "v5.38.0")
 
         Set base Perl version for determining core modules.
 
     *   phase => *str* (default: "runtime")
 
+        (No description)
+
     *   rel => *str* (default: "requires")
+
+        (No description)
 
     *   update_db_schema => *bool* (default: 1)
 
@@ -420,15 +434,27 @@ FUNCTIONS
 
     *   detail => *bool*
 
+        (No description)
+
     *   has_buildpl => *bool*
+
+        (No description)
 
     *   has_makefilepl => *bool*
 
+        (No description)
+
     *   has_metajson => *bool*
+
+        (No description)
 
     *   has_metayml => *bool*
 
+        (No description)
+
     *   has_multiple_rels => *bool*
+
+        (No description)
 
     *   index_name => *filename* (default: "index.db")
 
@@ -441,6 +467,8 @@ FUNCTIONS
 
     *   latest => *bool*
 
+        (No description)
+
     *   or => *bool*
 
         When there are more than one query, perform OR instead of AND logic.
@@ -451,11 +479,15 @@ FUNCTIONS
 
     *   query_type => *str* (default: "any")
 
+        (No description)
+
     *   random => *true*
 
         Random sort.
 
     *   rel_mtime_newer_than => *date*
+
+        (No description)
 
     *   result_limit => *uint*
 
@@ -640,6 +672,8 @@ FUNCTIONS
 
     *   detail => *bool*
 
+        (No description)
+
     *   dist => *perl::distname*
 
         Filter by distribution.
@@ -663,6 +697,8 @@ FUNCTIONS
 
     *   latest => *bool*
 
+        (No description)
+
     *   namespaces => *array[perl::modname]*
 
         Select modules belonging to certain namespace(s).
@@ -671,7 +707,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.34.0")
+    *   perl_version => *str* (default: "v5.38.0")
 
         Set base Perl version for determining core modules.
 
@@ -680,6 +716,8 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
+
+        (No description)
 
     *   random => *true*
 
@@ -798,7 +836,11 @@ FUNCTIONS
 
     *   detail => *bool*
 
+        (No description)
+
     *   from_level => *int*
+
+        (No description)
 
     *   index_name => *filename* (default: "index.db")
 
@@ -811,6 +853,8 @@ FUNCTIONS
 
     *   level => *int*
 
+        (No description)
+
     *   or => *bool*
 
         When there are more than one query, perform OR instead of AND logic.
@@ -821,9 +865,15 @@ FUNCTIONS
 
     *   query_type => *str* (default: "any")
 
+        (No description)
+
     *   sort => *str* (default: "name")
 
+        (No description)
+
     *   to_level => *int*
+
+        (No description)
 
     *   update_db_schema => *bool* (default: 1)
 
@@ -927,6 +977,8 @@ FUNCTIONS
 
     *   detail => *bool*
 
+        (No description)
+
     *   dist => *perl::distname*
 
         Filter by distribution.
@@ -950,6 +1002,8 @@ FUNCTIONS
 
     *   latest => *bool*
 
+        (No description)
+
     *   namespaces => *array[perl::modname]*
 
         Select modules belonging to certain namespace(s).
@@ -958,7 +1012,7 @@ FUNCTIONS
 
         When there are more than one query, perform OR instead of AND logic.
 
-    *   perl_version => *str* (default: "v5.34.0")
+    *   perl_version => *str* (default: "v5.38.0")
 
         Set base Perl version for determining core modules.
 
@@ -967,6 +1021,8 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
+
+        (No description)
 
     *   random => *true*
 
@@ -1137,9 +1193,15 @@ FUNCTIONS
 
     *   modules => *array[perl::modname]*
 
+        (No description)
+
     *   phase => *str* (default: "ALL")
 
+        (No description)
+
     *   rel => *str* (default: "ALL")
+
+        (No description)
 
     *   update_db_schema => *bool* (default: 1)
 
@@ -1251,15 +1313,27 @@ FUNCTIONS
 
     *   detail => *bool*
 
+        (No description)
+
     *   full_path => *bool*
+
+        (No description)
 
     *   has_buildpl => *bool*
 
+        (No description)
+
     *   has_makefilepl => *bool*
+
+        (No description)
 
     *   has_metajson => *bool*
 
+        (No description)
+
     *   has_metayml => *bool*
+
+        (No description)
 
     *   index_name => *filename* (default: "index.db")
 
@@ -1272,7 +1346,11 @@ FUNCTIONS
 
     *   latest => *bool*
 
+        (No description)
+
     *   no_path => *bool*
+
+        (No description)
 
     *   or => *bool*
 
@@ -1283,6 +1361,8 @@ FUNCTIONS
         Search query.
 
     *   query_type => *str* (default: "any")
+
+        (No description)
 
     *   random => *true*
 
@@ -1297,6 +1377,8 @@ FUNCTIONS
         Only return starting from the n'th record.
 
     *   sort => *array[str]* (default: ["name"])
+
+        (No description)
 
     *   update_db_schema => *bool* (default: 1)
 
@@ -1549,9 +1631,15 @@ FUNCTIONS
 
     *   skip_file_indexing_pass_1 => *bool*
 
+        (No description)
+
     *   skip_file_indexing_pass_2 => *bool*
 
+        (No description)
+
     *   skip_file_indexing_pass_3 => *bool*
+
+        (No description)
 
     *   skip_index_file_patterns => *array[re]*
 
@@ -1676,8 +1764,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016,
-    2015 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017,
+    2016, 2015 by perlancar <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

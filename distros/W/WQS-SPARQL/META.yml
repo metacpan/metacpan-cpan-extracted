@@ -32,10 +32,11 @@ requires:
   LWP::UserAgent: 0
   URI: 0
   URI::QueryParam: 0
+  Unicode::UTF8: 0
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/WQS-SPARQL/issues
   homepage: https://github.com/michal-josef-spacek/WQS-SPARQL
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/WQS-SPARQL
-version: '0.01'
+version: '0.02'

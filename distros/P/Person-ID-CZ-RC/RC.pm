@@ -1,17 +1,14 @@
 package Person::ID::CZ::RC;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use DateTime;
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
 
-# Version.
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -218,9 +215,11 @@ Person::ID::CZ::RC - Perl class for Czech RC identification.
 =head1 SYNOPSIS
 
  use Person::ID::CZ::RC;
+
  my $obj = Person::ID::CZ::RC->new(%params);
  my $alternate = $obj->alternate;
  my $checksum = $obj->checksum;
+ my $day = $obj->day;
  my $error = $obj->error;
  my $is_valid = $obj->is_valid;
  my $month = $obj->month;
@@ -231,72 +230,103 @@ Person::ID::CZ::RC - Perl class for Czech RC identification.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $obj = Person::ID::CZ::RC->new(%params);
 
- Constructor.
+Constructor.
 
 =over 8
 
 =item * C<rc>
 
- Input Czech RC identification.
- It is required.
+Input Czech RC identification.
+
+It is required.
 
 =back
 
-=item C<alternate()>
+Returns instance of object.
 
- Get flag, that means alternate RC identification.
- Returns 0/1.
+=head2 C<alternate>
 
-=item C<checksum()>
+ my $alternate = $obj->alternate;
 
- Get checksum.
- Returns string with one number character or '-'.
+Get flag, that means alternate RC identification.
 
-=item C<day()>
+Returns 0/1.
 
- Get day of birth.
- Returns string with day.
+=head2 C<checksum>
 
-=item C<error()>
+ my $checksum = $obj->checksum;
 
- Get error.
- Returns error string or undef.
+Get checksum.
 
-=item C<is_valid()>
+Returns string with one number character or '-'.
 
- Get flag, that means validity of rc identification.
- Returns 0/1.
+=head2 C<day>
 
-=item C<month()>
+ my $day = $obj->day;
 
- Get month of birth.
- Returns string with month.
+Get day of birth.
 
-=item C<rc()>
+Returns string with day.
 
- Get rc identification.
- Returns string with rc identification.
+=head2 C<error>
 
-=item C<serial()>
+ my $error = $obj->error;
 
- Get serial part of rc identification.
- Returns string with three numbers.
+Get error.
 
-=item C<sex()>
+Returns error string or undef.
 
- Get flag, that means sex of person.
- Returns male/female string.
+=head2 C<is_valid>
 
-=item C<year()>
+ my $is_valid = $obj->is_valid;
 
- Get year of birth.
- Returns string with year.
+Get flag, that means validity of rc identification.
 
-=back
+Returns 0/1.
+
+=head2 C<month>
+
+ my $month = $obj->month;
+
+Get month of birth.
+
+Returns string with month.
+
+=head2 C<rc>
+
+ my $rc = $obj->rc;
+
+Get rc identification.
+
+Returns string with rc identification.
+
+=head2 C<serial>
+
+ my $serial = $obj->serial;
+
+Get serial part of rc identification.
+
+Returns string with three numbers.
+
+=head2 C<sex>
+
+ my $sex = $obj->sex;
+
+Get flag, that means sex of person.
+
+Returns male/female string.
+
+=head2 C<year>
+
+ my $year = $obj->year;
+
+Get year of birth.
+
+Returns string with year.
 
 =head1 ERRORS
 
@@ -307,11 +337,11 @@ Person::ID::CZ::RC - Perl class for Czech RC identification.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=parse_and_print_rc_ok.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Person::ID::CZ::RC;
 
  # Object.
@@ -348,11 +378,11 @@ Person::ID::CZ::RC - Perl class for Czech RC identification.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=parse_and_print_rc_fail_date.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Person::ID::CZ::RC;
 
  # Object.
@@ -389,11 +419,11 @@ Person::ID::CZ::RC - Perl class for Czech RC identification.
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=parse_and_print_rc_fail_bad_checksum.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Person::ID::CZ::RC;
 
  # Object.
@@ -430,11 +460,11 @@ Person::ID::CZ::RC - Perl class for Czech RC identification.
 
 =head1 EXAMPLE4
 
- # Pragmas.
+=for comment filename=parse_and_print_rc_fail_no_checksum.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Person::ID::CZ::RC;
 
  # Object.
@@ -471,11 +501,11 @@ Person::ID::CZ::RC - Perl class for Czech RC identification.
 
 =head1 EXAMPLE5
 
- # Pragmas.
+=for comment filename=parse_and_print_rc_fail_format.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Person::ID::CZ::RC;
 
  # Object.
@@ -541,21 +571,22 @@ Module for validating and generating a Swedish personnummer.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Person::ID::CZ::RC>
+L<https://github.com/michal-josef-spacek/Person::ID::CZ::RC>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2023
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

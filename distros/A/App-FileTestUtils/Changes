@@ -1,3 +1,15 @@
+0.005   2023-11-30  Released-By: PERLANCAR; Urgency: medium
+
+        - Update to new module name (File::MoreUtil -> File::Util::Test).
+
+
+0.004   2023-11-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities:
+          dir-only-has-{files,subdirs,dot-files,non-dot-files,dot-subdirs,n
+          on-dot-subdirs}.
+
+
 0.003   2021-10-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add grep mode (-g) and invert match mode (-v).

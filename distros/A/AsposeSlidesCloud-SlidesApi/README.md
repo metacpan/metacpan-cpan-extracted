@@ -27,6 +27,16 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 **Web:** HTML/HTML5
 **Other:** MPEG4, SWF (export whole presentations)
 
+## Enhancements in Version 23.11
+
+* Added **StartSavePresentation** and **StartConvertAndSave** methods to **SlidesAsyncApi**.
+* Added **StartMerge** and **StartMergeAndSave** methods to **SlidesAsyncApi**.
+* Added **Progress** property to **Operation** class to enable async operation progress tracking.
+
+## Enhancements in Version 23.10
+
+* Added asynchronous API - **SlidesAsyncApi** class with **StartConvert**, **StartDownloadPresentation**, **GetOperationStatus**, **GetOperationResult** methods that allow tracking progress of conversion operations.
+
 ## Enhancements in Version 23.9
 
 * Added **ReplaceImage** and **ReplaceImageOnline** methods that enable replacing images in a presentation.

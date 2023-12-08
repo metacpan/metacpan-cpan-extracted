@@ -9,22 +9,23 @@ class IO::File extends IO::Handle {
   use StringBuffer;
   
   # Fields
-  has stream : private Sys::IO::FileStream;
+  has stream : Sys::IO::FileStream;
+  
+  has input_line_number : long;
   
   # Class methods
-
-  static method new : IO::File ($file_name : string = undef, $open_mode : string = undef) {
+  static method new : IO::File ($file_name : string = undef, $open_mode : object of string|Int = undef, $perm : int = -1) {
     my $self = new IO::File;
     
     $self->init;
     
     if ($file_name) {
-      $self->open($file_name, $open_mode);
+      $self->open($file_name, $open_mode, $perm);
     }
     
     return $self;
   }
-
+  
   static method new_from_fd : IO::Handle ($fd : int, $open_mode : string = undef) {
     my $self = new IO::File;
     
@@ -34,101 +35,63 @@ class IO::File extends IO::Handle {
     
     return $self;
   }
-
-  method open : void ($file_name : string, $open_mode : string) {
-    
-    my $valid_mode = 0;
-    my $real_mode : string;
-    if ($open_mode eq "<") {
-      $valid_mode = 1;
-      $real_mode = "rb";
-    }
-    elsif ($open_mode eq ">") {
-      $valid_mode = 1;
-      $real_mode = "wb";
-    }
-    elsif ($open_mode eq ">>") {
-      $valid_mode = 1;
-      $real_mode = "wa";
-    }
-    elsif ($open_mode eq "+<") {
-      $valid_mode = 1;
-      $real_mode = "r+b";
-    }
-    elsif ($open_mode eq "+>") {
-      $valid_mode = 1;
-      $real_mode = "w+b";
-    }
-    elsif ($open_mode eq "+>>") {
-      $valid_mode = 1;
-      $real_mode = "a+b";
-    }
-    else {
-      $valid_mode = 0;
-    }
-    unless ($valid_mode) {
-      die "Invalid open mode $open_mode";
-    }
-    
-    my $stream = Sys::IO->fopen($file_name, $real_mode);
-    
-    $self->{stream} = $stream;
-  }
-
-  method fdopen : void ($fd : int, $open_mode : string) {
-    
-    my $valid_mode = 0;
-    my $real_mode : string;
-    if ($open_mode eq "<") {
-      $valid_mode = 1;
-      $real_mode = "rb";
-    }
-    elsif ($open_mode eq ">") {
-      $valid_mode = 1;
-      $real_mode = "wb";
-    }
-    elsif ($open_mode eq ">>") {
-      $valid_mode = 1;
-      $real_mode = "wa";
-    }
-    elsif ($open_mode eq "+<") {
-      $valid_mode = 1;
-      $real_mode = "r+b";
-    }
-    elsif ($open_mode eq "+>") {
-      $valid_mode = 1;
-      $real_mode = "w+b";
-    }
-    elsif ($open_mode eq "+>>") {
-      $valid_mode = 1;
-      $real_mode = "a+b";
-    }
-    else {
-      $valid_mode = 0;
-    }
-    unless ($valid_mode) {
-      die "Invalid open mode $open_mode";
-    }
-    
-    my $stream = Sys::IO->fdopen($fd, $real_mode);
-    
-    $self->{stream} = $stream;
-  }
-
+  
+  # Instance Methods
   protected method init : void ($options : object[] = undef) {
     $self->SUPER::init;
   }
   
-  method DESTROY : void () {
-    if ($self->{stream}) {
-      $self->flush;
+  method input_line_number : long () {
+    return $self->{input_line_number};
+  }
+  
+  method set_input_line_number : void ($input_line_number : long) {
+    $self->{input_line_number} = $input_line_number ;
+  }
+  
+  method open : void ($file_name : string, $open_mode : object of string|Int, $perm : int = -1) {
+    
+    my $stream_ref = [(Sys::IO::FileStream)undef];
+    
+    unless ($open_mode) {
+      die "\$open_mode must be defined.";
     }
+    
+    my $stream = [(Sys::IO::FileStream)undef];
+    if ($open_mode is_type string) {
+      Sys->open($stream_ref, (string)$open_mode, $file_name);
+    }
+    elsif ($open_mode is_type Int) {
+      my $fd = -1;
+      if ($perm < 0) {
+        $perm = 0666;
+      }
+      Sys->sysopen(\$fd, $file_name, $open_mode->(Int)->value, $perm);
+      Sys->fdopen($stream, $open_mode->(Int)->value, $fd);
+    }
+    else {
+      die "The type of \$open_mode must be string or Int.";
+    }
+    
+    $self->{stream} = $stream_ref->[0];
+  }
+  
+  method fdopen : void ($fd : int, $open_mode : string) {
+    
+    my $stream_ref = [(Sys::IO::FileStream)undef];
+    
+    Sys->fdopen($stream_ref, $open_mode, $fd);
+    
+    $self->{stream} = $stream_ref->[0];
   }
   
   # Instance methods
   method getline : string () {
     my $stream = $self->{stream};
-    my $line = Sys::IO->readline($stream);
+    my $line = Sys->readline($stream);
+    
+    $self->{input_line_number}++;
+    
     return $line;
   }
   
@@ -154,38 +117,39 @@ class IO::File extends IO::Handle {
     return $string;
   }
   
-  method close : int () {
+  method close : void () {
     my $stream = $self->{stream};
     
-    my $status = Sys::IO->fclose($stream);
+    Sys::IO->fclose($stream);
     
     $self->{stream} = undef;
-    
-    return $status;
-  }
-  
-  method eof : int () {
-    my $stream = $self->{stream};
-    return Sys::IO->feof($stream);
   }
   
   method fileno : int () {
     my $stream = $self->{stream};
-    return Sys::IO->fileno($stream);
+    my $fd = Sys->fileno($stream);
+    return $fd;
   }
   
   method getc : int () {
     my $stream = $self->{stream};
-    return Sys::IO->getc($stream);
+    my $char = Sys->getc($stream);
+    return $char;
   }
   
-  method print : int ($string : string) {
+  method printflush : void ($string : string) {
+    my $old_autoflush = $self->autoflush;
     
-    my $stream = $self->{stream};
+    # Restores the autoflush field at the end of the scope.
+    my $scope_guard = Scope::Guard->new([has handle : IO::Handle = $self, has old_autoflush : int = $old_autoflush] method : void () {
+      my $handle = $self->{handle};
+      my $old_autoflush = $self->{old_autoflush};
+      
+      $handle->set_autoflush($old_autoflush);
+    });
     
-    my $length = length $string;
-    
-    return Sys::IO->fwrite($string, 1, $length, $stream);
+    $self->set_autoflush(1);
+    $self->print($string);
   }
   
   method clearerr : void () {
@@ -195,71 +159,55 @@ class IO::File extends IO::Handle {
     Sys::IO->clearerr($stream);
   }
   
+  method eof : int () {
+    my $stream = $self->{stream};
+    my $is_eof = Sys::IO->feof($stream);
+    
+    return $is_eof;
+  }
+  
   method error : int () {
     my $stream = $self->{stream};
     
-    return Sys::IO->ferror($stream);
+    my $is_error = Sys::IO->ferror($stream);
+    
+    return $is_error;
   }
   
-  method flush : int () {
+  method flush : void () {
     my $stream = $self->{stream};
     
-    return Sys::IO->fflush($stream);
+    Sys::IO->fflush($stream);
   }
   
   method ungetc : int ($c : int) {
     my $stream = $self->{stream};
     
-    return Sys::IO->ungetc($c, $stream);
+    my $c_pushed = Sys::IO->ungetc($c, $stream);
+    
+    return $c_pushed;
   }
   
   method write : int ($string : string, $length : int = -1, $offset : int = 0) {
     
-    unless ($string) {
-      die "The \$string must be defined.";
-    }
-    
-    unless ($offset >= 0) {
-      die "The \$offset must be greater than or equal to 0.";
-    }
-    
-    my $string_length = length $string;
-    
-    if ($length < 0) {
-      $length = $string_length - $offset;
-    }
-    
-    unless ($offset + $length <= $string_length) {
-      die "The \$offset + \$length must be lower than or equal to the length of the \$string.";
-    }
-    
     my $stream = $self->{stream};
     
-    return Sys::IO->fwrite($string, 1, $length, $stream);
+    if ($length < 0) {
+      $length = length $string;
+    }
+    
+    my $write_length = Sys::IO->fwrite($string, 1, $length, $stream);
+    
+    return $write_length;
   }
   
   method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
     
-    unless ($string) {
-      die "The \$string must be defined.";
-    }
-    
-    unless ($offset >= 0) {
-      die "The \$offset must be greater than or equal to 0.";
-    }
-    
-    my $string_length = length $string;
-    
-    if ($length < 0) {
-      $length = $string_length - $offset;
-    }
-    
-    unless ($offset + $length <= $string_length) {
-      die "The \$offset + \$length must be lower than or equal to the length of the \$string.";
-    }
-    
     my $stream = $self->{stream};
     
-    return Sys::IO->fread($string, 1, $length, $stream);
+    my $read_length = Sys->read($stream, $string, $length, $offset);
+    
+    return $read_length;
   }
+  
 }

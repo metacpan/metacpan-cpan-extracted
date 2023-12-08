@@ -5,12 +5,13 @@ use lib 'lib';
 
 use Test::More;
 use Test::Exception;
-use Test::Warnings;
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 # Distances
 # https://proj.org/development/reference/functions.html#distances
 
-plan tests => 4 + 7 + 3;
+plan tests => 4 + 7 + 2 + $no_warnings;
 
 use Geo::LibProj::FFI qw( :all );
 

@@ -9,19 +9,21 @@ class IO::Socket extends IO::Handle {
   use Sys::Socket::Sockaddr::In6;
   use Sys::Socket::Sockaddr::Un;
   use Sys::Socket::In_addr;
-  use IO::Select;
   use Hash;
   use Errno;
-  use Scope::Guard;
+  use Go;
+  use Sys::Socket::Errno;
+  use Fn;
   
   # Fields
-  has timeout : protected ro int;
-  has sockdomain : protected ro int;
-  has socktype : protected ro int;
-  has protocol : protected ro int;
-  has peername : protected ro Sys::Socket::Sockaddr;
-  has fd : protected ro int;
-  has listen_backlog : protected ro int;
+  
+  has Domain : protected int;
+  has Type : protected int;
+  has Proto : protected int;
+  has Blocking : protected int;
+  has Listen : protected int;
+  has Timeout : protected double;
+  has peername : protected Sys::Socket::Sockaddr;
   
   # Class Methods
   static method new : IO::Socket ($options : object[] = undef) {
@@ -34,147 +36,211 @@ class IO::Socket extends IO::Handle {
   }
   
   # Instance Methods
-  method new_instance : IO::Socket ($options : object[] = undef) {
-    {
-      my $self = IO::Socket->new($options);
-      
-      return $self;
-    }
-  }
-  
   method init : void ($options : object[] = undef) {
-
+    
+    Fn->check_option_names($options, $self->option_names);
+    
+    $self->SUPER::init();
+    
     $self->set_autoflush(1);
     
     my $options_h = Hash->new($options);
     
-    # Timeout option
-    my $timeout = $options_h->delete_or_default_int("Timeout", -1);
-    $self->{timeout} = $timeout;
+    my $timeout = $options_h->delete_or_default_double("Timeout", 0.0);
+    $self->{Timeout} = $timeout;
     
-    # Domain option
-    my $sockdomain = $options_h->delete_or_default_int("Domain", -1);
-    $self->{sockdomain} = $sockdomain;
-    unless ($sockdomain >= 0) {
-      die "The \"Domain\" option must be defined";
-    }
+    $self->configure($options_h->to_array);
     
-    # Type option
-    my $socktype = $options_h->delete_or_default_int("Type", -1);
-    $self->{socktype} = $socktype;
-    
-    # Listen option
-    my $listen_backlog = $options_h->delete_or_default_int("Listen", 5);
-    $self->{listen_backlog} = $listen_backlog;
-
-    # Timeout option
-    my $fd = $options_h->delete_or_default_int("fd", -1);
-    $self->{fd} = $fd;
-    
-    my $registered_domain = [SOCKET->AF_INET, SOCKET->AF_INET6, SOCKET->AF_UNIX];
-
-    my $new_options = $options_h->to_array;
-    
-    # Blocking option
-    $self->SUPER::init($new_options);
-    
-    for my $key (@{$options_h->keys}) {
-      die "The \"$key\" option is not available";
-    }
+    $self->set_blocking(0);
   }
-
-  method connect : int ($address : Sys::Socket::Sockaddr) {
-    my $timeout = $self->{timeout};
+  
+  method new_from_instance : IO::Socket ($options : object[] = undef) {
+    my $io_socket = IO::Socket->new($options);
     
-    my $old_blocking_flag = $self->blocking_flag;
-    my $restore_blocking_at_end_of_scope : Scope::Guard = undef;
-    if ($timeout > 0) {
-      my $this = $self;
-      $restore_blocking_at_end_of_scope = Scope::Guard->new([has this : IO::Socket = $this,  has old_blocking_flag : int = $old_blocking_flag] method : void () {
-        my $this = $self->{this};
-        my $old_blocking_flag = $self->{old_blocking_flag};
-        
-        $this->blocking($old_blocking_flag);
-        $this->set_blocking_flag($old_blocking_flag);
-      });
-      
-      $self->blocking(0);
-      $self->{blocking_flag} = 0;
-    }
+    return $io_socket;
+  }
+  
+  method option_names : string[] () {
+    my $option_names = [
+      "Domain",
+      "Type",
+      "Proto",
+      "Blocking",
+      "Listen",
+      "Timeout",
+    ];
+    
+    return $option_names;
+  }
+  
+  method DESTROY : void () {
+    $self->{peername} = undef;
+    $self->close;
+  }
+  
+  protected method configure : void ($options : object[] = undef) { die "Not implemented."; }
+  
+  method socket : void ($domain : int, $type : int, $protocol : int = 0) {
+    
+    my $fd = -1;
+    
+    Sys->socket(\$fd, $domain, $type, $protocol);
+    
+    $self->{fd} = $fd;
+    $self->{Domain} = $domain;
+    $self->{Type} = $type;
+    $self->{Proto} = $protocol;
+  }
+  
+  method socketpair : IO::Socket[] ($domain : int, $type : int, $protocol : int) {
+    my $sock1 = IO::Socket->new;
+    my $sock2 = IO::Socket->new;
+    
+    my $sock1_fd = $sock1->{fd};
+    my $sock2_fd = $sock2->{fd};
+    
+    Sys->socketpair(\$sock1_fd, \$sock2_fd, $domain, $type, $protocol);
+    
+    $sock1->{fd} = $sock1_fd;
+    $sock1->{Type} = $type;
+    $sock1->{Proto} = $protocol;
+    
+    $sock2->{fd} = $sock2_fd;
+    
+    my $pair = [$sock1, $sock2];
+    
+    return $pair;
+  }
+  
+  method connect : void ($sockaddr : Sys::Socket::Sockaddr) {
+    
+    my $timeout = $self->{Timeout};
     
     my $fd = $self->{fd};
     
-    my $connect_status = -1;
-    eval { $connect_status = Sys::Socket->connect($fd, $address, $address->sizeof); };
+    eval { Sys->connect($fd, $sockaddr); }
     
-    my $blocking_flag = $self->blocking_flag;
-    if ($blocking_flag) {
-      if ($@) {
+    if ($@) {
+      my $again = 
+        Sys::Socket::Errno->errno == Sys::Socket::Errno->EWOULDBLOCK
+        || Sys::Socket::Errno->errno == Sys::Socket::Errno->EINPROGRESS
+        || Sys::Socket::Errno->errno == Errno->EINTR
+      ;
+      
+      if ($again) {
+        Go->gosched_io_write($fd, $timeout);
+      }
+      else {
         die $@;
       }
     }
-    else {
-      my $errno = Errno->errno;
-      if ($errno == Errno->EINPROGRESS || $errno == Errno->EWOULDBLOCK) {
-        my $select = IO::Select->new;
-        $select->add($fd);
-        my $can_write = $select->can_write($timeout);
+    
+    $self->{peername} = $sockaddr;
+  }
+  
+  # method blocking - this is implemented in the super class.
+  
+  method close : void () {
+    my $fd = $self->{fd};
+    
+    if ($fd >= 0) {
+      Sys::Socket->close($fd);
+      $self->{fd} = -1;
+      $self->{peername} = undef;
+    }
+  }
+  
+  method bind : void ($sockaddr : Sys::Socket::Sockaddr) {
+    my $fd = $self->{fd};
+    Sys->bind($fd, $sockaddr);
+  }
+  
+  method listen : void ($queue : int = 5) {
+    my $fd = $self->{fd};
+    Sys->listen($fd, $queue);
+  }
+  
+  method accept : IO::Socket ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
+    
+    my $fd = $self->{fd};
+    
+    my $timeout = $self->{Timeout};
+    
+    my $client_fd = -1;
+    my $client_socket_address = (Sys::Socket::Sockaddr)undef;
+    
+    while (1) {
+      eval { $client_socket_address = Sys->accept(\$client_fd, $fd); }
+      
+      if ($@) {
+        my $again = 
+          Sys::Socket::Errno->errno == Sys::Socket::Errno->EWOULDBLOCK
+          || Sys::Socket::Errno->errno == Errno->EINTR
+        ;
         
-        unless ($can_write) {
-          die "connect: timeout";
+        if ($again) {
+          Go->gosched_io_read($fd, $timeout);
         }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
       }
     }
     
-    $self->{peername} = $address;
+    my $options = {
+      Timeout => $timeout,
+      fd => $client_fd,
+      Domain => $self->sockdomain,
+      Type => $self->socktype,
+      Proto => $self->protocol,
+    };
     
-    return $connect_status;
+    my $client = $self->new_from_instance($options);
+    
+    if ($peer_ref) {
+      $peer_ref->[0] = $client_socket_address;
+    }
+    
+    return $client;
   }
-
-  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0) {
+  
+  method sockname : Sys::Socket::Sockaddr () {
     my $fd = $self->{fd};
     
+    my $sockaddr_sock = Sys->getsockname($fd);
+    
+    return $sockaddr_sock;
+  }
+  
+  method peername : Sys::Socket::Sockaddr () {
+    my $fd = $self->{fd};
+    
+    unless ($self->{peername}) {
+      $self->{peername} = Sys->getpeername($fd);
+    }
+    
+    my $sockaddr_peer = $self->{peername};
+    
+    return $sockaddr_peer;
+  }
+  
+  method connected : Sys::Socket::Sockaddr () {
+    my $sockaddr = (Sys::Socket::Sockaddr)undef;
+    eval { $sockaddr = $self->peername; };
+    return $sockaddr;
+  }
+  
+  method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef, $length : int = -1, $buf_offset : int = 0) {
     if ($length < 0) {
       $length = length $buffer;
     }
     
-    my $recv_length = Sys::Socket->recv($fd, $buffer, $length, $flags);
-    
-    return $recv_length;
-  }
-  
-  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
-    
-    unless ($string) {
-      die "The \$string must be defined.";
-    }
-    
-    unless ($offset == 0) {
-      die "The \$offset must be equal to 0.";
-    }
-    
-    my $string_length = length $string;
-    
-    if ($length < 0) {
-      $length = $string_length - $offset;
-    }
-    
-    unless ($offset + $length <= $string_length) {
-      die "The \$offset + \$length must be lower than or equal to the length of the \$string.";
-    }
+    my $timeout = $self->{Timeout};
     
     my $fd = $self->{fd};
-    
-    my $flags = 0;
-    
-    my $recv_length = Sys::Socket->recv($fd, $string, $length, $flags);
-    
-    return $recv_length;
-  }
-  
-  method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef) {
-    my $fd = $self->{fd};
-    
     my $peername = (Sys::Socket::Sockaddr)undef;
     if ($to) {
       $peername = $to;
@@ -187,12 +253,22 @@ class IO::Socket extends IO::Handle {
       die "send: Cannot determine peer address";
     }
     
-    my $send_length = 0;
-    if ($to) {
-      $send_length = Sys::Socket->sendto($fd, $buffer, length $buffer, $flags, $peername, $peername->sizeof);
-    }
-    else {
-      $send_length = Sys::Socket->send($fd, $buffer, length $buffer, $flags);
+    my $send_length = -1;
+    while (1) {
+      
+      eval { $send_length = Sys->send($fd, $buffer, $flags, $to, $length, $buf_offset); }
+      
+      if ($@) {
+        if (Sys::Socket::Errno->errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket::Errno->errno == Errno->EINTR) {
+          Go->gosched_io_write($fd, $timeout);
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
     }
     
     $self->{peername} = $peername;
@@ -200,205 +276,95 @@ class IO::Socket extends IO::Handle {
     return $send_length;
   }
   
-  method write : int ($string : string, $length : int = -1, $offset : int = 0) {
-    
-    unless ($string) {
-      die "The \$string must be defined.";
-    }
-    
-    unless ($offset == 0) {
-      die "The \$offset must be equal to 0.";
-    }
-    
-    my $string_length = length $string;
+  method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $buf_offset : int = 0) {
     
     if ($length < 0) {
-      $length = $string_length - $offset;
+      $length = length $buffer;
     }
     
-    unless ($offset + $length <= $string_length) {
-      die "The \$offset + \$length must be lower than or equal to the length of the \$string.";
-    }
+    my $timeout = $self->{Timeout};
     
     my $fd = $self->{fd};
-    
-    my $flags = 0;
-    
-    my $send_length = Sys::Socket->send($fd, $string, $length, $flags);
-    
-    return $send_length;
-  }
-  
-  method close : int () {
-    my $fd = $self->{fd};
-    
-    my $status = 0;
-    
-    if ($fd >= 0) {
-      $status = Sys::Socket->close($fd);
-      $self->{fd} = -1;
-      $self->{opened} = 0;
+    my $recv_length = -1;
+    while (1) {
+      eval { $recv_length = Sys->recv($fd, $buffer, $length, $flags, $buf_offset); }
+      
+      if ($@) {
+        if (Sys::Socket::Errno->errno == Sys::Socket::Errno->EWOULDBLOCK || Sys::Socket::Errno->errno == Errno->EINTR) {
+          Go->gosched_io_read($fd, $timeout);
+        }
+        else {
+          die $@;
+        }
+      }
+      else {
+        last;
+      }
     }
     
-    return $status;
+    return $recv_length;
   }
   
-  method fileno : int () { return $self->{fd}; }
-  
-  method opened : int () {
-    my $fd = $self->{fd};
-    
-    my $opened = 0;
-    if ($fd >= 0) {
-      $opened = 1;
-    }
-    
-    return $opened;
-  }
-  
-  method DESTROY : void () {
-    $self->{peername} = undef;
-    $self->close;
-  }
-  
-  method listen : int ($queue : int = 5) {
-    my $fd = $self->{fd};
-    my $status = Sys::Socket->listen($fd, $queue);
-    return $status;
-  }
-
-  method bind : int ($address : Sys::Socket::Sockaddr) {
-    my $fd = $self->{fd};
-    my $status = Sys::Socket->bind($fd, $address, $address->sizeof);
-    
-    return $status;
-  }
-  
-  method sockname : Sys::Socket::Sockaddr () {
-    my $fd = $self->{fd};
-    my $sockdomain = $self->{sockdomain};
-    
-    my $addr : Sys::Socket::Sockaddr;
-    if ($sockdomain == SOCKET->AF_INET) {
-      $addr = Sys::Socket::Sockaddr::In->new;
-    }
-    elsif ($sockdomain == SOCKET->AF_INET6) {
-      $addr = Sys::Socket::Sockaddr::In6->new;
-    }
-    elsif ($sockdomain == SOCKET->AF_UNIX) {
-      $addr = Sys::Socket::Sockaddr::Un->new;
-    }
-    else {
-      die "Unsupported domain";
-    }
-    
-    my $addr_len = $addr->sizeof;
-    Sys::Socket->getsockname($fd, $addr, \$addr_len);
-    
-    return $addr;
-  }
-
-  method shutdown : int ($sockfd : int, $how : int) {
+  method shutdown : void ($sockfd : int, $how : int) {
     $self->{peername} = undef;
     my $fd = $self->{fd};
-    my $status = Sys::Socket->shutdown($fd, $how);
-    return $status;
+    Sys->shutdown($fd, $how);
   }
-
-
-  method atmark : int () {
+  
+  method sockopt : string ($level : int, $optname : int) {
     my $fd = $self->{fd};
-    
-    my $status = Sys::Socket->sockatmark($fd);
-    
-    return $status;
-  }
-
-  method setsockopt : int ($level : int, $optname : int, $optval : int) {
-    my $fd = $self->{fd};
-    
-    my $status = Sys::Socket->setsockopt_int($fd, $level, $optname, $optval);
-    
-    return $status;
-  }
-
-  method getsockopt : int ($level : int, $optname : int) {
-    my $fd = $self->{fd};
-    my $optval = 0;
-    Sys::Socket->getsockopt_int($fd, $level, $optname, \$optval);
+    my $optval = Sys->getsockopt($fd, $level, $optname);
     
     return $optval;
   }
-
-  method connected : Sys::Socket::Sockaddr () {
-    my $addr = (Sys::Socket::Sockaddr)undef;
-    eval { $addr = $self->peername; };
-    return $addr;
-  }
-
-  method socket : int ($domain : int, $type : int, $protocol : int = 0) {
-    my $fd = Sys::Socket->socket($domain, $type, $protocol);
+  
+  method setsockopt : void ($level : int, $optname : int, $optval : object of string|Int) {
+    my $fd = $self->{fd};
     
-    $self->{fd} = $fd;
-    $self->{sockdomain} = $domain;
-    $self->{socktype} = $type;
-    $self->{protocol} = $protocol;
-    
-    return $fd;
-  }
-
-  method socketpair : int[] ($domain : int, $type : int, $protocol : int) {
-    my $sock1 = IO::Socket->new;
-    my $sock2 = IO::Socket->new;
-    
-    my $sock1_fd = $sock1->{fd};
-    my $sock2_fd = $sock2->{fd};
-    
-    my $pair = new int[2];
-    Sys::Socket->socketpair($domain, $type, $protocol, $pair);
-    
-    $sock1->{socktype} = $type;
-    $sock1->{protocol} = $protocol;
-     
-    return $pair;
-  }
-
-  method accept : IO::Socket ($peer_ref : Sys::Socket::Sockaddr[] = undef) {
-    my $fd = $self->fd;
-    my $timeout = $self->timeout;
-    
-    if ($timeout > 0) {
-      my $select = IO::Select->new;
-      $select->add($fd);
-      
-      unless ($select->can_read($timeout)) {
-        die "accept: timeout";
-      }
-    }
-
-    my $client_socket_address = $self->sockname->clone;
-    my $client_socket_address_size = $client_socket_address->sizeof;
-    
-    my $client_fd = Sys::Socket->accept($fd, $client_socket_address, \$client_socket_address_size);
-    
-    my $options = {
-      Timeout => $timeout,
-      fd => $client_fd,
-      Domain => $self->sockdomain,
-      Type => $self->socktype,
-      Proto => $self->protocol,
-    };
-    
-    my $client = $self->new_instance($options);
-    
-    if ($peer_ref) {
-      $peer_ref->[0] = $client_socket_address;
-    }
-    
-    return $client;
+    Sys->setsockopt($fd, $level, $optname, $optval);
   }
   
-  method peerport : int () { die "Not implemented."; }
+  method atmark : int () {
+    my $fd = $self->{fd};
+    
+    my $atmark = Sys::Socket->sockatmark($fd);
+    
+    return $atmark;
+  }
   
-  method peerhost : string () { die "Not implemented."; }
+  method timeout : double () {
+    return $self->{Timeout};
+  }
+  
+  method set_timeout : void ($timeout : double) {
+    $self->{Timeout} = $timeout;
+  }
+  
+  method sockdomain : int () {
+    return $self->{Domain};
+  }
+  
+  method socktype : int (){
+    return $self->{Type};
+  }
+  
+  method protocol : int () {
+    return $self->{Proto};
+  }
+  
+  method write : int ($string : string, $length : int = -1, $offset : int = 0) {
+    return $self->send($string, 0, undef, $length, $offset);
+  }
+  
+  method read : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
+    return $self->recv($string, $length, 0, $offset);
+  }
+  
+  method syswrite : int ($string : string, $length : int = -1, $offset : int = 0) {
+    return $self->send($string, 0, undef, $length, $offset);
+  }
+  
+  method sysread : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
+    return $self->recv($string, $length, 0, $offset);
+  }
 }

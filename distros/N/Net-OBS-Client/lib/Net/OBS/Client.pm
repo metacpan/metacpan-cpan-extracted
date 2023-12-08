@@ -8,13 +8,15 @@ use Net::OBS::Client::BuildResults;
 
 with 'Net::OBS::Client::Roles::Client';
 
-our $VERSION = '0.0.8';
+our $VERSION = '0.1.1';
 
 sub project {
   my ($self, @args) = @_;
   return Net::OBS::Client::Project->new(
     apiurl     => $self->apiurl,
     use_oscrc  => $self->use_oscrc,
+    user       => $self->user,
+    pass       => $self->pass,
     repository => $self->repository,
     arch       => $self->arch,
     @args,
@@ -26,6 +28,8 @@ sub package {
   return Net::OBS::Client::Package->new(
     apiurl     => $self->apiurl,
     use_oscrc  => $self->use_oscrc,
+    user       => $self->user,
+    pass       => $self->pass,
     @args,
   );
 }
@@ -35,6 +39,8 @@ sub buildresults {
   return Net::OBS::Client::BuildResults->new(
     apiurl     => $self->apiurl,
     use_oscrc  => $self->use_oscrc,
+    user       => $self->user,
+    pass       => $self->pass,
     @args,
   );
 }

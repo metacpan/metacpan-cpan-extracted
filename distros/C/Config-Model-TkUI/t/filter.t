@@ -1,8 +1,10 @@
 use Test::More ;
+use Test::Differences;
 use Test::Log::Log4perl;
 use Config::Model 2.137;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use YAML::PP qw/LoadFile/;
+use Hash::Merge qw/merge/;
 
 use Config::Model::Tk::Filter qw/apply_filter/;
 
@@ -21,6 +23,20 @@ my @element = (
         type       => 'leaf',
         value_type => 'string',
     },
+);
+
+$model->create_config_class(
+    name    => "TwoStrings",
+    element => [
+        str_a => {
+            type       => 'leaf',
+            value_type  => 'string',
+        },
+        str_b => {
+            type       => 'leaf',
+            value_type  => 'string',
+        },
+    ]
 );
 
 $model->create_config_class(
@@ -79,6 +95,14 @@ $model->create_config_class(
             type       => 'node',
             config_class_name => 'HashAndDefaultCheckList'
         },
+        hnode => {
+            type => 'hash',
+            index_type => 'string',
+            cargo => {
+                type => 'node',
+                config_class_name => 'TwoStrings',
+            }
+        }
     ]
 );
 
@@ -88,6 +112,9 @@ my $test_data = LoadFile('t/filter-test.yml');
 
 foreach my $test (@{$test_data->{tests}}) {
     next if ($args->{filter} and $test->{label} !~ /$args->{filter}/);
+
+    my $output = merge($test->{output}, $test_data->{default_output});
+
     my $inst = $model->instance (
         root_class_name => 'Main',
         instance_name => $inst_name++ ,
@@ -105,7 +132,7 @@ foreach my $test (@{$test_data->{tests}}) {
     YYY $actions if $trace;
     ok(! $actions->{__is_kept},"old entries are deleted");
     ok($$ref eq $actions, "ref is kept through when filtering");
-    is_deeply( $actions, $test->{output}, $test->{label});
+    eq_or_diff( $actions, $output, $test->{label});
 }
 
 done_testing;

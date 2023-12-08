@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Ta::Any::In - Package for language Tamil
 
 package Locale::CLDR::Locales::Ta::Any::In;
 # This file auto generated from Data\common\main\ta_IN.xml
-#	on Sat  4 Nov  6:25:50 pm GMT
+#	on Tue  5 Dec  1:33:41 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

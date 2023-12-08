@@ -4,7 +4,7 @@ package Net::Async::Slack;
 use strict;
 use warnings;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use parent qw(IO::Async::Notifier Net::Async::Slack::Commands);
 
@@ -173,6 +173,63 @@ async sub send_message {
     );
 }
 
+=head2 files_upload
+
+Upload file(s) to a channel or thread.
+
+Supports the following named parameters:
+
+=over 4
+
+=item * channel - who to send the message to, can be a channel ID or C<< #channel >> name, or user ID
+
+=item * text - the message, see L<https://api.slack.com/docs/message-formatting> for details
+
+=item * attachments - more advanced messages, see L<https://api.slack.com/docs/message-attachments>
+
+=item * parse - whether to parse content and convert things like links
+
+=back
+
+and the following named boolean parameters:
+
+=over 4
+
+=item * link_names - convert C<< @user >> and C<< #channel >> to links
+
+=item * unfurl_links - show preview for URLs
+
+=item * unfurl_media - show preview for things that look like media links
+
+=item * as_user - send as user
+
+=item * reply_broadcast - send to all users when replying to a thread
+
+=back
+
+Returns a L<Future>, although the content of the response is subject to change.
+
+=cut
+
+async sub files_upload {
+    my ($self, %args) = @_;
+    die 'You need to pass file name and content' unless length($args{filename} // '') and defined($args{content});
+    my @content;
+    push @content, channels => $args{channel} || die 'need a channel';
+    push @content, initial_comment => $args{text} if defined $args{text};
+    push @content, $_ => $args{$_} for grep exists $args{$_}, qw(filetype thread_ts title);
+    push @content, file => [ undef, $args{filename}, Content => $args{content} ];
+    my ($data) = await $self->http_post(
+        $self->endpoint(
+            'files_upload',
+        ),
+        \@content,
+        content_type => 'form-data',
+    );
+    Future::Exception->throw('send failed', slack => $data) unless $data->{ok};
+    return $data;
+}
+
 =head2 conversations_info
 
 Provide information about a channel.
@@ -266,7 +323,7 @@ sub join_channel {
     die 'You need to pass a channel name' unless $args{channel};
     my @content;
     push @content, token => $self->token;
-    push @content, name => $args{channel};
+    push @content, channel => $args{channel};
     $self->http_post(
         $self->endpoint(
             'conversations_join',

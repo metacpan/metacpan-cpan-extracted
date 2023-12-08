@@ -39,6 +39,7 @@ use DateTime;
 
 use AsposeSlidesCloud::Object::ResourceBase;
 use AsposeSlidesCloud::Object::ResourceUri;
+use AsposeSlidesCloud::Object::SlideShowTransition;
 
 use base ("Class::Accessor", "Class::Data::Inheritable");
 
@@ -127,6 +128,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'slide_show_transition' => {
+    	datatype => 'SlideShowTransition',
+    	base_name => 'SlideShowTransition',
+    	description => 'Specifies if shapes of the master slide should be shown on the slide. True by default.',
+    	format => '',
+    	read_only => '',
+    		},
     'layout_slide' => {
     	datatype => 'ResourceUri',
     	base_name => 'LayoutSlide',
@@ -191,6 +199,7 @@ __PACKAGE__->swagger_types( {
     'width' => 'double',
     'height' => 'double',
     'show_master_shapes' => 'boolean',
+    'slide_show_transition' => 'SlideShowTransition',
     'layout_slide' => 'ResourceUri',
     'shapes' => 'ResourceUri',
     'theme' => 'ResourceUri',
@@ -207,6 +216,7 @@ __PACKAGE__->attribute_map( {
     'width' => 'Width',
     'height' => 'Height',
     'show_master_shapes' => 'ShowMasterShapes',
+    'slide_show_transition' => 'SlideShowTransition',
     'layout_slide' => 'LayoutSlide',
     'shapes' => 'Shapes',
     'theme' => 'Theme',

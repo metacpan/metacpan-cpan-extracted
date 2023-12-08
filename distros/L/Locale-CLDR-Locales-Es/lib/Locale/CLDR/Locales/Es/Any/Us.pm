@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Es::Any::Us - Package for language Spanish
 
 package Locale::CLDR::Locales::Es::Any::Us;
 # This file auto generated from Data\common\main\es_US.xml
-#	on Sat  4 Nov  6:00:42 pm GMT
+#	on Tue  5 Dec  1:08:45 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

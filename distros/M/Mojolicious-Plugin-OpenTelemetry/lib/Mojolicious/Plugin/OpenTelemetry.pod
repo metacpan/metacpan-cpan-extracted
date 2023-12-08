@@ -1,0 +1,226 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Mojolicious::Plugin::OpenTelemetry - Use OpenTelemetry in your Mojolicious app
+
+=head1 SYNOPSIS
+
+    use Mojolicious::Lite -signatures;
+
+    plugin OpenTelemetry => {
+        # Passed to OpenTelemetry::Trace::TracerProvider->tracer
+        tracer => {
+            name    => 'my_app', # defaults to OTEL_SERVICE_NAME or moniker
+            version => '1.234',  # optional
+        },
+    };
+
+    # Will generate a span named
+    # GET /static/url
+    get '/static/url' => sub ( $c, @ ) {
+        $c->render( text => 'OK' );
+    };
+
+    # Will use placeholders for reduced span cardinality
+    # POST /url/with/:placeholder
+    post '/url/with/:placeholder' => sub ( $c, @ ) {
+        $c->render( text => 'OK' );
+    };
+
+    # Use it also with async actions!
+    get '/async' => sub ( $c, @ ) {
+        $c->ua->get_p('https://httpbin.org/delay/1')
+            ->then( sub {
+                $c->render( json => shift->result->json );
+            });
+    };
+
+    # Errors will be correctly captured in the span
+    get '/error' => sub ( $c, @ ) {
+        die 'oops';
+    };
+
+    app->start;
+
+=head1 DESCRIPTION
+
+This plugin allows a L<Mojolicious> application to automatically generate
+telemetry data using the L<OpenTelemetry> API. The plugin will wrap around
+any endpoint actions, and capture telemetry data about it on a
+L<OpenTelemetry::Trace::Span> object.
+
+=head1 METHODS
+
+L<Mojolicious::Plugin::OpenTelemetry> inherits all methods from
+L<Mojolicious::Plugin> and implements the following new ones.
+
+=head2 register
+
+    $plugin->register(
+        Mojolicious->new,
+        {
+            tracer => \%tracer_args,
+        },
+    );
+
+Registers this plugin in a L<Mojolicious> application.
+
+When registered, this plugin will install a wrapper around any endpoint
+action (as described in L<Mojolicious/around_action>). Actions that are not
+endpoints will be unaffected.
+
+Before the action is executed, a
+L<server|OpenTelemetry::Constants/SPAN_KIND_SERVER>
+L<span|OpenTelemetry::Tracer::Span> will be created and injected into the
+current L<context|OpenTelemetry::Context>, together with any propagation data
+retrieved from the incoming request headers by the currently installed
+L<propagator|OpenTelemetry/propagator>.
+
+The value of the C<tracer> parameter passed on registration will be used to
+obtain a L<tracer|OpenTelemetry::Trace::Tracer> via
+L<OpenTelemetry::Trace::TracerProvider/tracer>. Setting this is optional. If
+no value is set, the value wil be read from the
+L<"OTEL_SERVICE_NAME"|OpenTelemetry::SDK/OTEL_SERVICE_NAME> environment
+variable, or from the app's L<moniker|Mojolicious/moniker>, will be used as
+the default name, but all other values will be left unspecified.
+
+The name of the generated span will be derived from the current request
+method, and the stringified L<endpoint|Mojolicious::Routes::Match/endpoint>
+of the matching route, as in C<GET /foo/:bar>, to reduce the span cardinality.
+
+The span will be created with the following attributes, which will therefore
+be available for any
+L<sampling decision|OpenTelemetry::SDK::Trace::Sampler>.
+
+=over
+
+=item C<http.request.method>
+
+Set to the L<request method|Mojo::Message::Request/method>. It will be the
+same value that was concatenated to the route in the span's name.
+
+=item C<network.protocol.version>
+
+Set to the L<request version|Mojo::Message::Request/version>.
+
+=item C<url.path>
+
+Set to the path of the request URL. This will be the raw path, without using
+any placeholders. It will not include the query string.
+
+=item C<url.scheme>
+
+Set to the scheme of the request URL.
+
+=item C<http.route>
+
+Set to the L<stringified endpoint|Mojolicious::Routes::Match/endpoint> of
+the matching route. This will use placeholders, and will be the same value
+that was concatenated to the method in the span's name.
+
+=item C<client.address>
+
+Set to the
+L<remote address of the transaction|Mojo::Transaction/remote_address>. This
+will respect the value set in the C<X-Forwarded-For> header, if any.
+
+=item C<client.port>
+
+Set to the L<remote port of the transaction|Mojo::Transaction/remote_port>.
+
+=item C<server.address>
+
+Set to the host portion of the C<host> value in the leftmost entry in the
+C<Forwarded> header, falling back to the value of the C<X-Forwarded-Proto>
+header, or to the value of the C<Host> header if no other is set. The host
+portion is the part before an optional port number.
+
+See the
+L<semantic conventions entry for this attribute|https://opentelemetry.io/docs/specs/semconv/http/http-spans/#setting-serveraddress-and-serverport-attributes>
+for more details on this logic.
+
+If no value could be determined, this attribute will not be present.
+
+=item C<server.port>
+
+Set to the port number in the C<host> value in the leftmost entry in the
+C<Forwarded> header, falling back to the value of the C<X-Forwarded-Proto>
+header, or to the value of the C<Host> header if no other is set.
+
+See the
+L<semantic conventions entry for this attribute|https://opentelemetry.io/docs/specs/semconv/http/http-spans/#setting-serveraddress-and-serverport-attributes>
+for more details on this logic.
+
+The port number in these is optional. If none is set, or none could be
+determined, this attribute will not be present.
+
+=item C<user_agent.original>
+
+Set to the value of the L<user agent header|Mojo::Headers/user_agent>. If not
+set, this attribute will not be present.
+
+=item C<url.query>
+
+Set to the L<query of the request URL|Mojo::URL/query>, if present. If the URL
+had no query parameters, this attribute will not be present.
+
+=back
+
+The attributes described below will be set in the span once the action is
+completed, but will not be available for the sampler.
+
+=over
+
+=item C<error.type>
+
+If an error is encountered during the execution of the action, this attribute
+will be set to the package name of the error (as reported by
+L<"ref"|https://perldoc.perl.org/functions/ref>), or the value C<string> if
+the error is not blessed into any package.
+
+If there were no errors, this attribute will not be present.
+
+=item C<http.response.status_code>
+
+Set to the L<status code of the response|Mojo::Message::Response/code>. If an
+error was encountered during the execution of the action, this will be set to
+C<500>.
+
+=back
+
+The span will be unconditionally L<ended|OpenTelemetry::Trace::Span/end> after
+the action has completed, and the
+L<status will be set|OpenTelemetry::Trace::Span/set_status> to either an
+L<OK status|OpenTelemetry::Constants/SPAN_STATUS_OK> if no errors were found,
+or to an L<error status|OpenTelemetry::Constants/SPAN_STATUS_ERROR> otherwise.
+In the latter case, an error description will also be set.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Mojolicious>
+
+=item L<Mojolicious::Plugin>
+
+=item L<OpenTelemetry>
+
+=item L<OpenTelemetry::Context>
+
+=item L<OpenTelemetry::Constants>
+
+=item L<OpenTelemetry::Trace::Span>
+
+=item L<OpenTelemetry::Trace::Tracer>
+
+=item L<OpenTelemetry::Trace::TracerProvider>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by José Joaquín Atria.
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.

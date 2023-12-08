@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Agq::Any::Cm - Package for language Aghem
 
 package Locale::CLDR::Locales::Agq::Any::Cm;
 # This file auto generated from Data\common\main\agq_CM.xml
-#	on Sat  4 Nov  5:51:45 pm GMT
+#	on Tue  5 Dec 12:59:59 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

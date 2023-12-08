@@ -1,0 +1,63 @@
+From 33cdfe85441bd338d95eeb7a5d30a293e5e22146 Mon Sep 17 00:00:00 2001
+From: sunnavy <sunnavy@bestpractical.com>
+Date: Mon, 30 Oct 2023 10:56:28 -0400
+Subject: [PATCH] Support custom labels for ValidateCustomFields
+
+This is initially for FormTools, where we support to customize field
+labels, so the validation messages can be consistent with input labels.
+---
+ share/html/Elements/ValidateCustomFields | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/share/html/Elements/ValidateCustomFields b/share/html/Elements/ValidateCustomFields
+index 9655db7ce8..df7c752363 100644
+--- a/share/html/Elements/ValidateCustomFields
++++ b/share/html/Elements/ValidateCustomFields
+@@ -82,9 +82,10 @@ while ( my $CF = $CustomFields->Next ) {
+ 
+     $m->notes(('Field-' . $CF->Id) => $submitted->{Values} // $submitted->{Value});
+ 
++    my $label = $Labels{$CF->Name} || $CF->Name;
+     if ( $invalid ) {
+         $m->notes( 'InvalidField-' . $CF->Id => $invalid_message );
+-        push @res, $CF->Name . ': ' . $invalid_message;
++        push @res, $label . ': ' . $invalid_message;
+         $valid = 0;
+         next;
+     }
+@@ -112,7 +113,7 @@ while ( my $CF = $CustomFields->Next ) {
+             my ($ok, $msg) = $CF->_CanonicalizeValue( $ref );
+             unless ($ok) {
+                 $m->notes( ( 'InvalidField-' . $CF->Id ) => $msg );
+-                push @res, $CF->Name .': '. $msg;
++                push @res, $label . ': ' . $msg;
+                 $valid = 0;
+             }
+         }
+@@ -120,7 +121,7 @@ while ( my $CF = $CustomFields->Next ) {
+         if (!$CF->MatchPattern($value)) {
+             my $msg = $CF->FriendlyPattern;
+             $m->notes( ('InvalidField-' . $CF->Id) => $msg );
+-            push @res, $CF->Name .': '. $msg;
++            push @res, $label . ': ' . $msg;
+             $valid = 0;
+         }
+ 
+@@ -138,7 +139,7 @@ while ( my $CF = $CustomFields->Next ) {
+             while (my $ocfv = $existing->Next) {
+                 my $msg = loc("'[_1]' is not a unique value", $value);
+                 $m->notes( ('InvalidField-' . $CF->Id) => $msg );
+-                push @res, $CF->Name .': '. $msg;
++                push @res, $label . ': ' . $msg;
+                 $valid = 0;
+                 last;
+             }
+@@ -153,4 +154,5 @@ $Object => RT::Ticket->new( $session{'CurrentUser'})
+ $CustomFields
+ $ARGSRef
+ $ValidateUnsubmitted => 0
++%Labels => ()
+ </%ARGS>
+-- 
+2.39.3 (Apple Git-145)
+

@@ -40,7 +40,7 @@ BEGIN {
     $cfg->{panel_hide} = undef;
     $cfg->{randr_cmd} = q(xrandr --output HDMI-A-0 --left-of eDP --auto --output DisplayPort-0 --right-of eDP --auto);
     $cfg->{set_root_color} = 0;
-    $cfg->{title_max_len} = 64;
+    $cfg->{title_max_len} = 128;
     $cfg->{ws_names} = [qw( T W M C 5 6 7 8 9 )];
 
     # Default keyboard layout
@@ -67,11 +67,12 @@ BEGIN {
                 "mod_g"                 => "exec(google-chrome --simulate-outdated-no-au --new-window --incognito)",
                 "mod_shift_g"           => "exec(google-chrome --simulate-outdated-no-au --new-window)",
                 "mod_m"                 => "win_toggle_maximize()",
-                "mod_r"                 => "exec(rofi -show drun)",
+                "mod_r"                 => "exec(xkb-switch -s us; rofi -show drun)",
                 "mod_w"                 => "exec(firefox --new-instance --private-window)",
                 "mod_shift_w"           => "exec(firefox --new-instance)",
                 "mod_="                 => "exec(galculator)",
                 "mod_ctrl_shift_q"      => "exit()",
+                "Print"                 => "exec(flameshot gui)",
                 "XF86MonBrightnessDown" => "exec(light -U 20)",
                 "XF86MonBrightnessUp"   => "exec(light -A 20)",
                 "XF86AudioLowerVolume"  => "exec(pactl set-sink-volume 0 -10%)",
@@ -80,15 +81,23 @@ BEGIN {
     };
 
     $cfg->{rules} = {
-        "mattermost"    => { screen => 2, tag => 4, follow => 0, },
+        "mattermost"    => { screen => 2, tag => 4, follow => 1, },
         "evolution"     => { screen => 1, tag => 3, follow => 0, },
         "galculator"    => { floating => 1 },
         "urxvt-float"   => { floating => 1 },
         "xeyes"         => { floating => 1 },
+        "evolution-alarm-notify" => { floating => 1, urgent => 1 },
     };
 
+    $cfg->{noclass_whitelist} = ["Event Tester"];
+
+    $cfg->{autostart} = ["exec(setxkbmap -layout us,ru -option grp:alt_shift_toggle,compose:ralt)"];
+
     # Read local configs
-    for my $file ("/etc/korgwm/korgwm.conf", "$ENV{HOME}/.korgwmrc", "$ENV{HOME}/.config/korgwm/korgwm.conf") {
+    for my $file (
+        "/etc/korgwm/korgwm.conf", "/usr/local/etc/korgwm/korgwm.conf",
+        "$ENV{HOME}/.korgwmrc", "$ENV{HOME}/.config/korgwm/korgwm.conf"
+    ) {
         next unless -f $file;
         my $rcfg;
         eval { $rcfg = YAML::Tiny->read($file) and $rcfg = $rcfg->[0]; 1; } or do {
@@ -98,6 +107,9 @@ BEGIN {
         # TODO did not implement validation yet to allow users shoot the legs
         %{ $cfg } = (%{ $cfg }, %{ $rcfg });
     }
+
+    # Prepare whitelist of windows which we want to see with unset WM_CLASS
+    $cfg->{noclass_whitelist} = { map { ($_, 1) } @{ $cfg->{noclass_whitelist} } };
 
     # Normalize numeric values
     $_ = hexnum for @{ $cfg }{grep /^color_/, keys %{ $cfg }};

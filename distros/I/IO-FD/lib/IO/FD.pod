@@ -10,7 +10,7 @@ Create and bind a STREAM socket (server):
 	use Socket ":all";
 
 	die "Error creating socket"
-		unless IO::FD::socket(my $listen_fd, AF_INET, SOCK_STREAM, 0);
+		unless defined IO::FD::socket(my $listen_fd, AF_INET, SOCK_STREAM, 0);
 
 	my ($err, @sockaddr)=addrinfo "0.0.0.0", 80, {
 		family=>	AF_INET,
@@ -19,11 +19,11 @@ Create and bind a STREAM socket (server):
 	};
 
 	die "Error binding"
-		unless FD::IO::bind($listen_fd, $sockaddr[0]{addr});	
+		unless defined FD::IO::bind($listen_fd, $sockaddr[0]{addr});	
 
 	
 	die "Error accepting" 
-		unless IO::FD::accept(my $client_fd, $listen_fd);
+		unless defined IO::FD::accept(my $client_fd, $listen_fd);
 	
 	#read and write here
 	
@@ -34,7 +34,7 @@ Create and connect a STREAM socket(client):
 	use Socket ":all";
 
 	die "Error creating socket"
-		unless IO::FD::socket(my $fd, AF_INET,SOCK_STREAM,0);
+		unless defined IO::FD::socket(my $fd, AF_INET,SOCK_STREAM,0);
 
 	my ($err,@sockaddr)=addrinfo "127.0.0.1", 80, {
 		family=>	AF_INET,
@@ -43,7 +43,7 @@ Create and connect a STREAM socket(client):
 	};
 
 	die "Error connecting";
-		unless FD::IO::connect($fd, $sockaddr[0]{addr});
+		unless defined FD::IO::connect($fd, $sockaddr[0]{addr});
 
 	#read and write here
 
@@ -52,7 +52,7 @@ Open a file
 	use IO::FD;
 	use Fcntl;
 	die "could not open file" 
-		unless IO::FD::sysopen(my $fd, "path.txt", O_RDONLY);
+		unless defined IO::FD::sysopen(my $fd, "path.txt", O_RDONLY);
 	
 
 Read/Write/Close an fd
@@ -62,13 +62,13 @@ Read/Write/Close an fd
 	my $fd; #From IO::FD::socket, IO::FD::accept IO::FD::sysopen, POSIX::open
 
 	die "Error writing"
-		unless IO::FD::syswrite $fd, "This is some data"; #Length and optional offset
+		unless defined IO::FD::syswrite $fd, "This is some data"; #Length and optional offset
 
 	die "Error reading"
-		unless IO::FD::sysread $fd, my $buffer, $length); 
+		unless defined IO::FD::sysread $fd, my $buffer, $length); 
 
 	die "Error closing" 
-		unless IO::FD::close $fd;
+		unless defined IO::FD::close $fd;
 
 
 Advanced:
@@ -106,18 +106,18 @@ Actual byte throughput (read/write) is basically unchanged compared to the core
 Perl sysread/syswrite.  Please see the PERFORMANCE section later in this
 document
 
-The supported interfaces mostly resemble the core Perl implementations of similarly
-named functions. 
-
-For example:
+The supported interfaces mostly resemble the core Perl implementations of
+similarly named functions.  The largest difference being you should check for
+defined values for error checks.  For example:
 
 	#Perl:
-	sysopen(my $file_handle, ...);
-	sysread($file_handle, ...);
+	sysopen(my $file_handle, ...) or die $!;
+	sysread($file_handle, ...) or die $!;
 
 	#IO::FD
-	IO::FD::sysopen(my $file_descriptor, ...);
-	IO::FD::sysread($file_descriptor, ...);
+	defined IO::FD::sysopen(my $file_descriptor, ...) or die $!
+	defined IO::FD::sysread($file_descriptor, ...) or die $!;
+
 
 This modules B<IS NOT> intended to be a drop in replacement for core IO
 subroutines in existing code. If you want a 'drop in replacement' please look
@@ -212,8 +212,8 @@ However, the benefits of file handles when working within a network or binary
 file context are not so clear cut. All the nice line ending and encoding
 support doesn't help in these scenarios.
 
-In addition, the OS kernel does a lot of buffering for networking already. Do we
-really need to add more?
+In addition, the OS kernel does a lot of buffering for networking already. Do
+we really need to add more?
 
 So if these features are not being fully utilised for binary/network
 programming, the hypothesis is that opening and accepting operations would be
@@ -223,7 +223,9 @@ faster with file descriptors as less setup is required internally.
 
 Each of the APIs mimic the Perl counterpart, if applicable, as much as
 possible. Unless explicitly mentioned, they should operate like built in
-routines.  Consult perldoc -f FUNCTION for details.
+routines.  Consult perldoc -f FUNCTION for details.  B<The general exception
+however is return values should be explicitly tested for definedness and not
+relying on a 'true' value>
 
 As none of these functions are exported, they must be called with full package
 name.
@@ -242,7 +244,7 @@ name.
 
 =head3 IO::FD::accept4
 
-  my $ok=IO::FD::accept4 $new, $listen, $flags;
+  my $ok=defined IO::FD::accept4 $new, $listen, $flags;
   
   Constants: IO::FD::SOCK_NONBLOCK, IO::FD::SOCK_CLOEXEC
 
@@ -426,15 +428,14 @@ Alias to C<IO::FD::fcntl>
 
 =head3 IO::FD::stat
 
-Likely differences to Perl stat for larger integer values.
-
-TODO: fix this!
+Attempts to replicate string expansion of values for some stat values as
+CORE::stat does. Tests of equality should be done using the C<eq> operator
+(just like CORE::stat results) if your Perl is not 64bit.
 
 =head3 IO::FD::lstat
 
-Likely differences to Perl lstat for larger integer values
+As above.
 
-TODO: fix this!
 
 =head3 IO::FD::pread
 

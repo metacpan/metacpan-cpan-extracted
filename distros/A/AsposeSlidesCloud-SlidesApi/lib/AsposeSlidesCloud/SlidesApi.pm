@@ -26985,7 +26985,7 @@ sub replace_font_online {
 # 
 # @param string $name Document name. (required)
 # @param int $image_index Image index. (required)
-# @param File $image Image data. (optional)
+# @param File $image Image data. (required)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
 # @param string $storage Document storage. (optional)
@@ -27004,7 +27004,7 @@ sub replace_font_online {
     'image' => {
         data_type => 'File',
         description => 'Image data.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -27041,6 +27041,11 @@ sub replace_image {
     # verify the required parameter 'image_index' is set
     unless (exists $args{'image_index'}) {
       croak("Missing the required parameter 'image_index' when calling replace_image");
+    }
+
+    # verify the required parameter 'image' is set
+    unless (exists $args{'image'} && $args{'image'}) {
+      croak("Missing the required parameter 'image' when calling replace_image");
     }
 
     # parse inputs
@@ -27106,7 +27111,7 @@ sub replace_image {
 # 
 # @param File $document Document data. (required)
 # @param int $image_index Image index. (required)
-# @param File $image Image data. (optional)
+# @param File $image Image data. (required)
 # @param string $password Password. (optional)
 {
     my $params = {
@@ -27123,7 +27128,7 @@ sub replace_image {
     'image' => {
         data_type => 'File',
         description => 'Image data.',
-        required => '0',
+        required => '1',
     },
     'password' => {
         data_type => 'string',
@@ -27150,6 +27155,11 @@ sub replace_image_online {
     # verify the required parameter 'image_index' is set
     unless (exists $args{'image_index'}) {
       croak("Missing the required parameter 'image_index' when calling replace_image_online");
+    }
+
+    # verify the required parameter 'image' is set
+    unless (exists $args{'image'} && $args{'image'}) {
+      croak("Missing the required parameter 'image' when calling replace_image_online");
     }
 
     # parse inputs

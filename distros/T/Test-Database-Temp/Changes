@@ -1,0 +1,7 @@
+Revision history for Test-Database-Temp
+
+0.002     2023-12-01 22:37:32+01:00 Europe/Berlin
+          * Fix here doc in tests to work with earlier Perls
+
+0.001     2023-11-28 22:14:52+01:00 Europe/Stockholm
+          * Initial release

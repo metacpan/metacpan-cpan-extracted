@@ -61,9 +61,9 @@ sub reply
         $self->error( "Data provided to send is not an hash ref." );
         return( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
     }
-    my $msg = CORE::exists( $ref->{ 'success' } ) 
+    my $msg = CORE::exists( $ref->{success} ) 
         ? $ref->{ 'success' } 
-        : CORE::exists( $ref->{ 'error' } ) 
+        : CORE::exists( $ref->{error} ) 
             ? $ref->{ 'error' } 
             : undef();
     $r->status( $code );
@@ -173,10 +173,13 @@ This module inherits all of its methods from L<Apache2::API::Request>. Please ch
 
 For its alter ego to manipulate outgoing http response, use the L<Net::API::REST::Response> module.
 
+=for Pod::Coverage reply
+
+=for Pod::Coverage variables
+
 =head1 AUTHOR
 
 Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
-
 
 L<Apache2::API::Request>, L<Apache2::API::Response>, L<Apache2::API>
 

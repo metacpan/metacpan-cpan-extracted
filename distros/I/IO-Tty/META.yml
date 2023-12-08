@@ -21,5 +21,5 @@ resources:
   bugtracker: https://github.com/toddr/IO-Tty/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/toddr/IO-Tty
-version: '1.17'
+version: '1.18'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

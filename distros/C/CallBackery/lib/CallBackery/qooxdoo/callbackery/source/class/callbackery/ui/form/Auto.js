@@ -357,7 +357,6 @@ qx.Class.define("callbackery.ui.form.Auto", {
          */
         setSelectBoxData : function(box, data) {
             let model;
-
             if (data.length == 0) {
                 model = qx.data.marshal.Json.createModel([ {
                     title : '',
@@ -381,7 +380,9 @@ qx.Class.define("callbackery.ui.form.Auto", {
             let oldItem = ctrl.getValue();
             let newItem = null;
             if (oldItem){
-                newItem = lookup[oldItem.getKey()];
+                if (oldItem.getKey) {
+                    newItem = lookup[oldItem.getKey()];
+                }
                 if (!newItem){
                   console.warn(`SelectBox ${box} has no entry for ${oldItem.getKey()} selecting first item.`);
                 }
@@ -389,6 +390,21 @@ qx.Class.define("callbackery.ui.form.Auto", {
             this._settingData++;
             ctrl.setModel(model);
             ctrl.setValue(newItem);
+            this._settingData--;
+        },
+
+
+        /**
+         * set the data in a combobox
+         *
+         * @param box {var} TODOC
+         * @param widget {var} TODOC
+         * @param data {var} TODOC
+         */
+        setComboBoxData : function(box, data) {
+            let ctrl  = this._boxCtrl[box];
+            this._settingData++;
+            ctrl.setModel(qx.data.marshal.Json.createModel(data));
             this._settingData--;
         },
 

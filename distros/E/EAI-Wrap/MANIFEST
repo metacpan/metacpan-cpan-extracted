@@ -3,6 +3,7 @@ checkLogExist.pl
 config/additional/centralLogHandling.config
 config/log.config
 config/site.config
+CONTRIBUTING
 lib/EAI/Common.pm
 lib/EAI/DateUtil.pm
 lib/EAI/DB.pm

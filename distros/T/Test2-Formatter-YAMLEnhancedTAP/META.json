@@ -1,0 +1,58 @@
+{
+   "abstract" : "YAML-enhanced TAP output for your tests",
+   "author" : [
+      "Jose D. Gomez R. <1josegomezr@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Test2-Formatter-YAMLEnhancedTAP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "TAP::Harness" : "3.12",
+            "perl" : "5.016000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.302087"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/josegomezr/Test2-Formatter-YAMLEnhancedTAP/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/josegomezr/Test2-Formatter-YAMLEnhancedTAP.git",
+         "web" : "https://github.com/josegomezr/Test2-Formatter-YAMLEnhancedTAP"
+      }
+   },
+   "version" : "v0.0.5",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

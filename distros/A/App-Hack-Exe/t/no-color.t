@@ -9,6 +9,11 @@ unless (eval {
 }) {
     plan(skip_all => 'Capture::Tiny is not installed.');
 }
+## no critic ( BuiltinFunctions::ProhibitStringyEval )
+# ^ Failed 'use' inside eval{} causes script to exit.
+unless (eval 'use Term::ANSIColor 5.01') {
+    plan(skip_all => 'Term::ANSIColor >= 5.01 is required for NO_COLOR.');
+}
 plan('no_plan');
 use Capture::Tiny 'capture_merged';
 use Symbol qw/ gensym /;

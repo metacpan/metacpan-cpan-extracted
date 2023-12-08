@@ -1,0 +1,2 @@
+% # Shim for SelfService to run the Forms page
+% $m->comp('/Forms/dhandler', SelfService => 1, %ARGS);

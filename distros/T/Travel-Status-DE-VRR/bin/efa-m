@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '1.23';
+our $VERSION = '2.00';
 
 binmode( STDOUT, ':encoding(utf-8)' );
 
@@ -15,12 +15,11 @@ use Travel::Status::DE::EFA;
 
 my $efa_url = 'https://efa.vrr.de/vrr/XSLT_DM_REQUEST';
 my $efa_encoding;
-my ( $date, $time, $input_type, $list_lines, $offset, $relative_times );
-my ($full_routes);
-my ( $filter_via,    $track_via );
-my ( $timeout,       $developer_mode );
-my ( @grep_lines,    @grep_platforms, @grep_mots );
-my ( %edata,         @edata_pre );
+my ( $date,        $time, $input_type, $list_lines, $offset, $relative_times );
+my ( $full_routes, $filter_via );
+my ( $timeout,     $developer_mode );
+my ( @grep_lines,  @grep_platforms, @grep_mots );
+my ( %edata,       @edata_pre );
 my ( $list_services, $service, $discover_and_print, $discover );
 my $efa;
 
@@ -44,7 +43,7 @@ GetOptions(
 	'timeout=i'                     => \$timeout,
 	'u|efa-url=s'                   => \$efa_url,
 	'v|via=s'                       => \$filter_via,
-	'V|track-via=s'                 => sub { $filter_via = $track_via = $_[1] },
+	'V|track-via=s'                 => \$filter_via,
 	'version'                       => \&show_version,
 	'devmode'                       => \$developer_mode,
 
@@ -164,23 +163,35 @@ sub format_route {
 			say 'BUG';
 			next;
 		}
-		if ( not defined $stop->arr_time ) {
-			$output .= sprintf( "        %5s  %40s %s\n",
-				$stop->dep_time, $stop->name, $stop->platform, );
+		if ( defined $stop->arr and defined $stop->dep ) {
+			if ( $stop->arr->epoch == $stop->dep->epoch ) {
+				$output .= sprintf(
+					"    %5s      %40s %s\n",
+					$stop->arr->strftime('%H:%M'),
+					$stop->name, $stop->platform,
+				);
+			}
+			else {
+				$output .= sprintf(
+					"%5s → %5s  %40s %s\n",
+					$stop->arr->strftime('%H:%M'),
+					$stop->dep->strftime('%H:%M'),
+					$stop->name, $stop->platform,
+				);
+			}
 		}
-		elsif ( not defined $stop->dep_time ) {
-			$output .= sprintf( "%5s          %40s %s\n",
-				$stop->arr_time, $stop->name, $stop->platform, );
-		}
-		elsif ( $stop->arr_time eq $stop->dep_time ) {
-			$output .= sprintf( "    %5s      %40s %s\n",
-				$stop->dep_time, $stop->name, $stop->platform, );
-		}
-		else {
+		elsif ( defined $stop->arr ) {
 			$output .= sprintf(
-				"%5s → %5s  %40s %s\n",
-				$stop->arr_time, $stop->dep_time,
-				$stop->name,     $stop->platform,
+				"%5s          %40s %s\n",
+				$stop->arr->strftime('%H:%M'),
+				$stop->name, $stop->platform,
+			);
+		}
+		elsif ( defined $stop->dep ) {
+			$output .= sprintf(
+				"        %5s  %40s %s\n",
+				$stop->dep->strftime('%H:%M'),
+				$stop->name, $stop->platform,
 			);
 		}
 	}
@@ -270,7 +281,7 @@ sub show_results {
 		my $dtime    = (
 			$relative_times
 			? sprintf( '%2d min', $d->countdown )
-			: $d->time
+			: $d->datetime->strftime('%H:%M')
 		);
 
 		if ( $d->platform_db ) {
@@ -299,9 +310,12 @@ sub show_results {
 				$dtime = '--:--';
 			}
 		}
-		elsif ($track_via) {
+		elsif ($filter_via) {
 			my $via = first { $_->name =~ m{$filter_via}io } $d->route_post;
-			$dtime .= ' → ' . $via->arr_time;
+			$dtime
+			  .= ' → '
+			  . $via->arr->clone->add( minutes => $d->delay // 0 )
+			  ->strftime('%H:%M');
 		}
 		if ( $d->delay ) {
 			$dtime .= ' ' . format_delay( $d->delay, $delay_len );
@@ -412,7 +426,7 @@ B<efa-m> [B<-Lr>] [B<-d> I<dd.mm.yyyy>] [B<-t> I<hh:mm>]
 
 =head1 VERSION
 
-version 1.23
+version 2.00
 
 =head1 DESCRIPTION
 
@@ -571,15 +585,10 @@ value to disable it.
 
 =item B<-v>, B<--via> I<station>
 
-Only show trains serving I<station> after the requseted stop. I<station>
-is matched against the "I<city> I<stop>" fields in each line's route.
-Regular expressions are also supported.
-
-=item B<-V>, B<--track-via> I<station>
-
-Lik B<--via>: Only show trains serving I<station> after the requseted stop.
-Also, show the arrival time at I<station> after the departure time at the
-current stop.
+Only show trains serving I<station> after the requseted stop, and show the
+arrival time at I<station> after the departure time at the current stop.
+I<station> is matched against the "I<city> I<stop>" fields in each line's
+route. Regular expressions are also supported.
 
 =item B<--version>
 
@@ -619,9 +628,17 @@ choose the appropriate EFA URL for these by itself. In these cases, you should
 find an appropriate EFA service using the B<-D>/B<--discover> option and then
 use B<-s> I<service> when making requests.
 
+=over
+
+=item * EFA does not provide real-time data for the routes of requested
+departures. Hence, B<--via> estimates the arrival time from scheduled
+departure and departure delay
+
+=back
+
 =head1 AUTHOR
 
-Copyright (C) 2011-2021 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2011-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

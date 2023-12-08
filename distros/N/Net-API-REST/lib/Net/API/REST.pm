@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v1.1.0
+## Version v1.2.0
 ## Copyright(c) 2023 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2023/11/19
+## Modified 2023/12/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -40,7 +40,7 @@ BEGIN
     use Net::API::REST::Request;
     use Net::API::REST::Response;
     use Apache2::API::Status;
-    $VERSION = 'v1.1.0';
+    $VERSION = 'v1.2.0';
 };
 
 use strict;
@@ -61,6 +61,7 @@ sub init
     $self->{api_version}            = 1 if( !length( $self->{api_version} ) );
     $self->{default_methods}        = [qw( GET POST )] unless( $self->{default_methods} );
     $self->{is_allowed}             = {} unless( $self->{is_allowed} && scalar( keys( %{$self->{is_allowed}} ) ) );
+    $self->{supported_content_types} = [] unless( $self->{supported_methods} );
     $self->{supported_methods}      = [qw( DELETE GET HEAD OPTIONS POST PUT )] unless( $self->{supported_methods} );
     $self->{supported_api_versions} = [qw( 1 )] unless( $self->{supported_api_versions} );
     $self->{key}                    = '' unless( length( $self->{key} ) );
@@ -873,6 +874,7 @@ sub route
     my $http_meth = lc( $req->method // '' );
     # Until proven otherwise; If it is set at a certain point of the path, and nowhere after, then the path below inherit its value set before like a toll gate
     my $access = 'public';
+    my $params;
     my $check;
     $check = sub
     {
@@ -932,6 +934,7 @@ sub route
                 # return( $ref->{_handler} ) if( $pos == $#$parts );
                 # return( $check->( $pos + 1, $ref ) );
                 $access = $ref->{_access_control} if( $ref->{_access_control} );
+                $params = $ref->{_params} if( CORE::exists( $ref->{_params} ) && ref( $ref->{_params} ) eq 'HASH' );
                 
                 if( $pos == $#$parts )
                 {
@@ -949,6 +952,7 @@ sub route
                             variables => $vars,
                             access => $access,
                             path => $uri,
+                            ( defined( $params ) ? ( params => $params ) : () ),
                         );
                         return( $ep );
                     }
@@ -990,6 +994,7 @@ sub route
                                 variables => $vars,
                                 access => $access,
                                 path => $uri,
+                                ( defined( $params ) ? ( params => $params ) : () ),
                             );
                         };
                         if( $@ )
@@ -1120,6 +1125,7 @@ sub route
             {
                 $vars->{ $var_name } = $part;
             }
+            $params = $ref->{_params} if( CORE::exists( $ref->{_params} ) && ref( $ref->{_params} ) eq 'HASH' );
             
             # We reached the end, return the handler
             if( $pos == $#$parts )
@@ -1134,6 +1140,7 @@ sub route
                         variables => $vars,
                         access => $access,
                         path => $uri,
+                        ( defined( $params ) ? ( params => $params ) : () ),
                     );
                     $ep->access( $ref->{_access_control} ) if( $ref->{_access_control} );
                     return( $ep );
@@ -1179,6 +1186,7 @@ sub route
                             variables => $vars,
                             access => $access,
                             path => $uri,
+                            ( defined( $params ) ? ( params => $params ) : () ),
                         );
                     };
                     if( $@ )
@@ -1257,6 +1265,10 @@ sub routes
                 {
                     return( "Value provided for _name is empty." ) if( !length( $v ) );
                     return( "Value provided for _name is a reference, but I was expecting a scalar." ) if( ref( $v ) );
+                }
+                elsif( $k eq '_params' )
+                {
+                    return( "Value provided for _params is not an hash reference." ) if( ref( $v ) ne 'HASH' );
                 }
                 elsif( ref( $v ) eq 'CODE' )
                 {
@@ -1420,6 +1432,8 @@ sub is_method_allowed
 }
 
 sub methods { return( shift->_set_get_array_as_object( 'methods', @_ ) ); }
+
+sub params { return( shift->_set_get_hash_as_mix_object( 'params', @_ ) ); }
 
 sub path { return( shift->_set_get_uri( 'path', @_ ) ); }
 
@@ -1586,7 +1600,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v1.1.0
+    v1.2.0
 
 =head1 DESCRIPTION
 
@@ -1883,6 +1897,10 @@ This sets the routes for all the endpoints proposed by the RESTful server
 =head2 supported_api_versions( array reference )
 
 Get or set the list of supported api versions
+
+=head2 supported_content_types
+
+Get or set an array of supported content types, such as C<application/json>, C<text/html> or C<text/plain>
 
 =head2 supported_languages( array reference )
 

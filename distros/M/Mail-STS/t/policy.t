@@ -10,7 +10,7 @@ unless($ENV{'INTERNET_TESTING'}) {
   plan skip_all => 'No remote tests. (to enable set INTERNET_TESTING=1)';
 }
 
-plan tests => 23;
+plan tests => 22;
 
 use_ok('Mail::STS::Policy');
 

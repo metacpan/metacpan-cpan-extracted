@@ -100,25 +100,12 @@ ATTRIBUTES
     See PayProp::API::Public::Client::Request::Entity for available
     attributes.
 
-ATTRIBUTES
+ tags
 
-    PayProp::API::Public::Client implements the following attributes.
+            my $Tags = $Client->tags;
+            my $Promise = $Entity->list_p;
 
- export
-
-            my $Export = $Client->export;
-            my $beneficiaries_export = $Export->beneficiaries;
-
-    See PayProp::API::Public::Client::Request::Export for available
-    attributes.
-
- entity
-
-            my $Entity = $Client->entity;
-            my $payment_entity = $Entity->payment;
-
-    See PayProp::API::Public::Client::Request::Entity for available
-    attributes.
+    See PayProp::API::Public::Client::Request::Tags for available methods.
 
 AUTHOR
 

@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #include "easyxs/easyxs.h"
 
 #include "quickjs/quickjs.h"
@@ -15,6 +17,9 @@
 typedef struct {
     JSContext *ctx;
     pid_t pid;
+    bool added_std;
+    bool added_os;
+    bool added_helpers;
     char* module_base_path;
 } perl_qjs_s;
 
@@ -31,6 +36,7 @@ typedef struct {
     SV** svs;
     U32 svs_count;
     U32 refcount;
+    bool ran_js_std_init_handlers;
     JSValue regexp_jsvalue;
     JSValue date_jsvalue;
 } ctx_opaque_s;
@@ -564,30 +570,38 @@ static JSContext* _create_new_jsctx( pTHX_ JSRuntime *rt ) {
     return ctx;
 }
 
+static SV* _get_exception_from_jsvalue(pTHX_ JSContext* ctx, JSValue jsret) {
+    SV* err;
+
+    JSValue jserr = JS_GetException(ctx);
+    //err = _JSValue_to_SV(aTHX_ ctx, jserr);
+
+    /* Ideal here is to capture all aspects of the error object,
+        including its `name` and members. But for now just give
+        a string.
+
+        JSValue jslen = JS_GetPropertyStr(ctx, jserr, "name");
+        STRLEN namelen;
+        const char* namestr = JS_ToCStringLen(ctx, &namelen, jslen);
+    */
+
+    STRLEN strlen;
+    const char* str = JS_ToCStringLen(ctx, &strlen, jserr);
+
+    err = newSVpvn_flags(str, strlen, SVf_UTF8);
+
+    JS_FreeCString(ctx, str);
+    JS_FreeValue(ctx, jserr);
+
+    return err;
+}
+
 static inline SV* _return_jsvalue_or_croak(pTHX_ JSContext* ctx, JSValue jsret) {
     SV* err;
     SV* RETVAL;
 
     if (JS_IsException(jsret)) {
-        JSValue jserr = JS_GetException(ctx);
-        //err = _JSValue_to_SV(aTHX_ ctx, jserr);
-
-        /* Ideal here is to capture all aspects of the error object,
-            including its `name` and members. But for now just give
-            a string.
-
-            JSValue jslen = JS_GetPropertyStr(ctx, jserr, "name");
-            STRLEN namelen;
-            const char* namestr = JS_ToCStringLen(ctx, &namelen, jslen);
-        */
-
-        STRLEN strlen;
-        const char* str = JS_ToCStringLen(ctx, &strlen, jserr);
-
-        err = newSVpvn_flags(str, strlen, SVf_UTF8);
-
-        JS_FreeCString(ctx, str);
-        JS_FreeValue(ctx, jserr);
+        err = _get_exception_from_jsvalue(aTHX_ ctx, jsret);
         RETVAL = NULL;  // silence uninitialized warning
     }
     else {
@@ -615,9 +629,14 @@ static void _free_jsctx(pTHX_ JSContext* ctx) {
             SvREFCNT_dec(ctxdata->svs[i]);
         }
 
+        if (ctxdata->ran_js_std_init_handlers) {
+            js_std_free_handlers(rt);
+        }
+
         Safefree(ctxdata);
 
         JS_FreeContext(ctx);
+
         JS_FreeRuntime(rt);
     }
 }
@@ -671,7 +690,7 @@ static const char* _FUNCTION_ACCESSORS[] = {
 
 #define FUNC_CALL_INITIAL_ARGS 2
 
-void _svs_to_jsvars(pTHX_ JSContext* jsctx, int32_t params_count, SV** svs, JSValue* jsvars) {
+static void _svs_to_jsvars(pTHX_ JSContext* jsctx, int32_t params_count, SV** svs, JSValue* jsvars) {
     SV* error = NULL;
 
     for (int32_t i=0; i<params_count; i++) {
@@ -689,6 +708,26 @@ void _svs_to_jsvars(pTHX_ JSContext* jsctx, int32_t params_count, SV** svs, JSVa
 
         jsvars[i] = jsval;
     }
+}
+
+static void _import_module_to_global(pTHX_ JSContext* jsctx, const char* modname) {
+    const char* jstemplate = "import * as theModule from '%s';\n"
+        "globalThis.%s = theModule;\n";
+
+    char js[255] = { 0 };
+    snprintf(js, 255, jstemplate, modname, modname);
+
+    JSValue val = JS_Eval(jsctx, js, strlen(js), "<input>", JS_EVAL_TYPE_MODULE);
+    if (JS_IsException(val)) {
+        SV* errsv = _get_exception_from_jsvalue(aTHX_ jsctx, val);
+        if (errsv) {
+            croak_sv(errsv);
+        }
+
+        croak("Got empty exception??");
+    }
+
+    JS_FreeValue(jsctx, val);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -773,13 +812,37 @@ std (SV* self_sv)
 
         switch (ix) {
             case 0:
-                js_init_module_std(pqjs->ctx, "std");
+                if (!pqjs->added_std) {
+                    js_init_module_std(pqjs->ctx, "std");
+                    _import_module_to_global(aTHX_ pqjs->ctx, "std");
+                    pqjs->added_std = true;
+                }
+
                 break;
             case 1:
-                js_init_module_os(pqjs->ctx, "os");
+                if (!pqjs->added_os) {
+                    js_init_module_os(pqjs->ctx, "os");
+                    pqjs->added_os = true;
+
+                    ctx_opaque_s* ctxdata = JS_GetContextOpaque(pqjs->ctx);
+
+                    if (!ctxdata->ran_js_std_init_handlers) {
+                        JSRuntime *rt = JS_GetRuntime(pqjs->ctx);
+                        js_std_init_handlers(rt);
+
+                        ctxdata->ran_js_std_init_handlers = true;
+                    }
+
+                    _import_module_to_global(aTHX_ pqjs->ctx, "os");
+                }
+
                 break;
             case 2:
-                js_std_add_helpers(pqjs->ctx, 0, NULL);
+                if (!pqjs->added_helpers) {
+                    js_std_add_helpers(pqjs->ctx, 0, NULL);
+                    pqjs->added_helpers = true;
+                }
+
                 break;
 
             default:

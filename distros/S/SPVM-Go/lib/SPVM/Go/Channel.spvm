@@ -8,6 +8,7 @@ class Go::Channel {
   
   use Hash;
   use Go::Channel::Wait;
+  use Fn;
   
   # Fields
   has capacity : int;
@@ -25,7 +26,7 @@ class Go::Channel {
   # Class Methods
   private static method new : Go::Channel ($options : object[] = undef) {
     
-    &check_option_names($options, ["capacity", "schedule"]);
+    Fn->check_option_names($options, ["capacity", "schedule"]);
     
     my $options_h = Hash->new($options);
     
@@ -50,26 +51,6 @@ class Go::Channel {
     $self->{write_waits} = List->new(new Go::Channel::Wait[0]);
     
     return $self;
-  }
-  
-  private static method check_option_names : void ($options : object[], $available_option_names : string[]) {
-    
-    unless ($options) {
-      return;
-    }
-    
-    my $available_option_names_h = Hash->new;
-    for my $available_option_name (@$available_option_names) {
-     $available_option_names_h->set_int($available_option_name, 1);
-    }
-    
-    for (my $i = 0; $i < @$options; $i += 2) {
-      my $option_name = (string)$options->[$i];
-      
-      unless ($available_option_names_h->get($option_name)) {
-        die "The \"$option_name\" option is not available.";
-      }
-    }
   }
   
   # Instance Methods

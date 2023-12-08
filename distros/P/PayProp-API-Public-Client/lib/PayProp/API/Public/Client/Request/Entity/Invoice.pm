@@ -17,18 +17,28 @@ has '+url' => (
 );
 
 sub list_p {
-	my ( $self, $params ) = @_;
+	my ( $self, $args ) = @_;
+
+	$args //= {};
+	my $params = $args->{params};
+	my $path_params = $args->{path_params};
+
+	$self->ordered_path_params([qw/ external_id /]);
 
 	return $self
 		->api_request_p({
 			params => $params,
+			path_params => $path_params,
 			handle_response_cb => sub { $self->_get_invoice( @_ ) },
 		})
 	;
 }
 
 sub create_p {
-	my ( $self, $content ) = @_;
+	my ( $self, $args ) = @_;
+
+	$args //= {};
+	my $content = $args->{content};
 
 	return $self
 		->api_request_p({
@@ -41,12 +51,20 @@ sub create_p {
 
 
 sub update_p {
-	my ( $self, $params, $content ) = @_;
+	my ( $self, $args ) = @_;
+
+	$args //= {};
+	my $params = $args->{params};
+	my $content = $args->{content};
+	my $path_params = $args->{path_params};
+
+	$self->ordered_path_params([qw/ external_id /]);
 
 	return $self
 		->api_request_p({
 			method => 'PUT',
 			params => $params,
+			path_params => $path_params,
 			content => { json => $content },
 			handle_response_cb => sub { $self->_get_invoice( @_ ) },
 		})
@@ -79,18 +97,6 @@ sub _get_invoice {
 	return $Invoice;
 }
 
-sub _path_params {
-	my ( $self ) = @_;
-
-	return [qw/ external_id /];
-}
-
-sub _query_params {
-	my ( $self ) = @_;
-
-	return [qw/ is_customer_id /];
-}
-
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -115,14 +121,14 @@ This module is intended to be accessed via instance of C<PayProp::API::Public::C
 
 =head1 METHODS
 
-=head2 list_p(\%params)
+=head2 list_p(\%args)
 
-Issues a C<HTTP GET> request to PayProp API C</entity/invoice> endpoint. It takes an optional C<HASHREF> of parameters.
+Issues a C<HTTP GET> request to PayProp API C</entity/invoice> endpoint. It takes an optional C<HASHREF> of query and path parameters.
 
-See L</"QUERY PARAMETERS"> for a list of expected parameters.
+See L</"QUERY PARAMETERS"> and L</"PATH PARAMETERS"> for a list of expected parameters.
 
 	$Invoice
-		->list_p({ ... })
+		->list_p({ params => {...}, path_params => {...} })
 		->then( sub {
 			my ( $ResponseInvoice ) = @_;
 			...;
@@ -137,14 +143,14 @@ See L</"QUERY PARAMETERS"> for a list of expected parameters.
 Returns L<PayProp::API::Public::Client::Response::Entity::Invoice> on success or L<PayProp::API::Public::Client::Exception::Response> on error.
 
 
-=head2 create_p(\%content)
+=head2 create_p(\%args)
 
 Issues a C<HTTP POST> request to PayProp API C</entity/invoice> endpoint.
 
 See L</"REQUEST BODY FIELDS"> for a list of expected request body fields.
 
 	$Invoice
-		->create_p({ ... })
+		->create_p({ content => {...} })
 		->then( sub {
 			my ( $ResponseInvoice ) = @_;
 			...;
@@ -159,14 +165,14 @@ See L</"REQUEST BODY FIELDS"> for a list of expected request body fields.
 Returns L<PayProp::API::Public::Client::Response::Entity::Invoice> on success or L<PayProp::API::Public::Client::Exception::Response> on error.
 
 
-=head2 update_p(\%params, \%content)
+=head2 update_p(\%args)
 
 Issues a C<HTTP PUT> request to PayProp API C</entity/invoice> endpoint.
 
 See L</"REQUEST BODY FIELDS"> for a list of expected request body fields, L</"QUERY PARAMETERS"> and L</"PATH PARAMETERS"> for a list of expected parameters.
 
 	$Invoice
-		->update_p({ ... })
+		->update_p({ params => {...}, path_params => {...}, content => {...} })
 		->then( sub {
 			my ( $ResponseInvoice ) = @_;
 			...;
@@ -258,7 +264,7 @@ Lookup entity based on given customer ID by overriding route C<external_id>.
 =head2 external_id
 
 B<string> C<[1..32] characters /^[a-zA-Z0-9]+$/>
-External ID of invoice. C<required> for L</"list_p(\%params)"> and L</"update_p(\%params, \%content)">.
+External ID of invoice. C<required> for L</"list_p(\%arsgs)"> and L</"update_p(\%args)">.
 
 =head1 AUTHOR
 

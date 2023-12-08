@@ -3,7 +3,7 @@
 
 class Time::HiRes {
   
-  version "0.002";
+  version "0.004";
   
   use Fn;
   use Sys::Time;
@@ -13,7 +13,7 @@ class Time::HiRes {
   use Sys::Time::Timespec;
   use Sys::Time::Itimerval;
   use Time::HiRes::ItimervalFloat;
-  use Time::HiRes::Util;
+  use Sys::Time::Util;
   
   # Class Methods
   static method gettimeofday : Sys::Time::Timeval () {
@@ -34,13 +34,13 @@ class Time::HiRes {
   
   static method nanosleep : long ($nanoseconds : long) {
     
-    my $nanoseconds_ts = Time::HiRes::Util->nanoseconds_to_timespec($nanoseconds);
+    my $nanoseconds_ts = Sys::Time::Util->nanoseconds_to_timespec($nanoseconds);
     
     my $remain_ts = Sys::Time::Timespec->new;
     
     Sys::Time->nanosleep($nanoseconds_ts, $remain_ts);
     
-    my $remain = Time::HiRes::Util->timespec_to_nanoseconds($remain_ts);
+    my $remain = Sys::Time::Util->timespec_to_nanoseconds($remain_ts);
     
     return $remain;
   }
@@ -58,7 +58,7 @@ class Time::HiRes {
       $b = &gettimeofday;
     }
     
-    my $tv_interval = Time::HiRes::Util->timeval_interval($a, $b);
+    my $tv_interval = Sys::Time::Util->timeval_interval($a, $b);
     
     return $tv_interval;
   }
@@ -67,31 +67,31 @@ class Time::HiRes {
     
     my $tv = &gettimeofday;
     
-    my $float_seconds = (double)Time::HiRes::Util->timeval_to_float_seconds($tv);
+    my $float_seconds = Sys::Time::Util->timeval_to_float_seconds($tv);
     
     return $float_seconds;
   }
   
   static method sleep : double ($float_seconds : double) {
     
-    my $microseconds = (int)Time::HiRes::Util->float_seconds_to_microseconds($float_seconds);
+    my $microseconds = (int)Sys::Time::Util->float_seconds_to_microseconds($float_seconds);
     
     my $slept_time = &usleep($microseconds);
     
-    my $slept_time_float_seconds = (double)Time::HiRes::Util->microseconds_to_float_seconds($slept_time);
+    my $slept_time_float_seconds = Sys::Time::Util->microseconds_to_float_seconds($slept_time);
     
     return $slept_time_float_seconds;
   }
   
   static method alarm : double ($float_seconds : double, $interval_float_seconds : double = 0) {
     
-    my $usecs = (int)Time::HiRes::Util->float_seconds_to_microseconds($float_seconds);
+    my $usecs = (int)Sys::Time::Util->float_seconds_to_microseconds($float_seconds);
     
-    my $interval = (int)Time::HiRes::Util->float_seconds_to_microseconds($interval_float_seconds);
+    my $interval = (int)Sys::Time::Util->float_seconds_to_microseconds($interval_float_seconds);
     
     my $remain_time = &ualarm($usecs, $interval);
     
-    my $remain_time_float_seconds = (double)Time::HiRes::Util->microseconds_to_float_seconds($remain_time);
+    my $remain_time_float_seconds = Sys::Time::Util->microseconds_to_float_seconds($remain_time);
     
     return $remain_time_float_seconds;
   }
@@ -104,11 +104,11 @@ class Time::HiRes {
     
     my $new_itimer = Sys::Time::Itimerval->new;
     
-    my $new_iinter_it_interval = Time::HiRes::Util->float_seconds_to_timeval($new_itimer_float->it_interval);
+    my $new_iinter_it_interval = Sys::Time::Util->float_seconds_to_timeval($new_itimer_float->it_interval);
     
     $new_itimer->set_it_interval($new_iinter_it_interval);
     
-    my $new_iinter_it_value = Time::HiRes::Util->float_seconds_to_timeval($new_itimer_float->it_value);
+    my $new_iinter_it_value = Sys::Time::Util->float_seconds_to_timeval($new_itimer_float->it_value);
     
     $new_itimer->set_it_value($new_iinter_it_value);
     
@@ -116,9 +116,9 @@ class Time::HiRes {
     
     Sys::Time->setitimer($which, $new_itimer, $old_itimer);
     
-    my $old_itimer_it_interval_float = Time::HiRes::Util->timeval_to_float_seconds($old_itimer->it_interval);
+    my $old_itimer_it_interval_float = Sys::Time::Util->timeval_to_float_seconds($old_itimer->it_interval);
     
-    my $old_itimer_it_value_float = Time::HiRes::Util->timeval_to_float_seconds($old_itimer->it_value);
+    my $old_itimer_it_value_float = Sys::Time::Util->timeval_to_float_seconds($old_itimer->it_value);
     
     my $old_itimer_float = Time::HiRes::ItimervalFloat->new;
     
@@ -135,9 +135,9 @@ class Time::HiRes {
     
     Sys::Time->getitimer($which, $itimer);
     
-    my $itimer_it_interval_float = Time::HiRes::Util->timeval_to_float_seconds($itimer->it_interval);
+    my $itimer_it_interval_float = Sys::Time::Util->timeval_to_float_seconds($itimer->it_interval);
     
-    my $itimer_it_value_float = Time::HiRes::Util->timeval_to_float_seconds($itimer->it_value);
+    my $itimer_it_value_float = Sys::Time::Util->timeval_to_float_seconds($itimer->it_value);
     
     my $itimer_float = Time::HiRes::ItimervalFloat->new;
     
@@ -150,41 +150,49 @@ class Time::HiRes {
   
   static method clock_gettime : double ($clk_id : int) {
     
+    my $ts = &clock_gettime_timespec($clk_id);
+    
+    my $time_float_seconds =  Sys::Time::Util->timespec_to_float_seconds($ts);
+    
+    return $time_float_seconds;
+  }
+  
+  static method clock_gettime_timespec : Sys::Time::Timespec ($clk_id : int) {
+    
     my $ts = Sys::Time::Timespec->new;
     
-    my $status = Sys::Time->clock_gettime($clk_id, $ts);
+    Sys::Time->clock_gettime($clk_id, $ts);
     
-    my $ret = -1.0;
-    if ($status == 0) {
-      $ret = Time::HiRes::Util->timespec_to_float_seconds($ts);
-    }
-    
-    return $ret;
+    return $ts;
   }
   
   static method clock_getres : double ($clk_id : int) {
     
+    my $ts = &clock_getres_timespec($clk_id);
+    
+    my $res_float_seconds = Sys::Time::Util->timespec_to_float_seconds($ts);
+    
+    return $res_float_seconds;
+  }
+  
+  static method clock_getres_timespec : Sys::Time::Timespec ($clk_id : int) {
+    
     my $ts = Sys::Time::Timespec->new;
     
-    my $status = Sys::Time->clock_getres($clk_id, $ts);
+    Sys::Time->clock_getres($clk_id, $ts);
     
-    my $ret = -1.0;
-    if ($status == 0) {
-      $ret = Time::HiRes::Util->timespec_to_float_seconds($ts);
-    }
-    
-    return $ret;
+    return $ts;
   }
   
   static method clock_nanosleep : long ($clockid : int, $nanoseconds : long, $flags : int = 0) {
     
-    my $ts = Time::HiRes::Util->nanoseconds_to_timespec($nanoseconds);
+    my $ts = Sys::Time::Util->nanoseconds_to_timespec($nanoseconds);
     
     my $remain_ts = Sys::Time::Timespec->new;
     
     Sys::Time->clock_nanosleep($clockid, $flags, $ts, $remain_ts);
     
-    my $remain_nanoseconds = Time::HiRes::Util->timespec_to_nanoseconds($remain_ts);
+    my $remain_nanoseconds = Sys::Time::Util->timespec_to_nanoseconds($remain_ts);
     
     return $remain_nanoseconds;
   }

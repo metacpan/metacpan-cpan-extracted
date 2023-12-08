@@ -335,3 +335,7 @@ Revision history for Debug-Easy
 
         Muted the initial message if log level is ERROR.  In other words, be
 		silent.
+
+2.11    Nov 27, 2023
+
+        Fixed the eval for loading Data::Dumper::Simple

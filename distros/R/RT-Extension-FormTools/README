@@ -1,12 +1,11 @@
 NAME
-    RT-Extension-FormTools - Help write multi-page ticket creation wizards
+    RT-Extension-FormTools - Create multi-page ticket creation wizards for
+    RT
 
 DESCRIPTION
-    This extension provides scaffolding to make it simpler to create guided
-    multi-page ticket creation wizards. It merely provides useful Mason
-    components to accomplish this task; it does not provide any UI.
-    Administrators may use this extension as a base upon which to write
-    their own forms in Mason.
+    Starting in version 1.00, this extension provides a full UI for RT
+    administrators to create multi-page form wizards to collect information
+    and create a ticket.
 
 RT VERSION
     Works with RT 5.
@@ -27,11 +26,79 @@ INSTALLATION
 
     Restart your webserver
 
-COMPONENTS
+USAGE
+  Creating Forms
+   Modify
+    Once installed and activated, users with the SuperUser or AdminForms
+    right can go to Admin > FormTools > Create to build new forms. Use
+    Select to view a list of existing forms.
+
+    When you initially create a form, you select the queue that the ticket
+    will be created in after a user fills out the form. The selected queue
+    will also determine which custom fields are available in the form
+    builder.
+
+    The Modify page allows you to configure all of the pages for the
+    selected form. The Components bar on the left lists HTML elements, Core
+    RT fields, and all custom fields available to the queue selected for the
+    current form. To build pages in your form, drag elements from the left
+    into the Content area in the FormTools Pages section on the right.
+
+    You can drag elements up and down to arrange content for each page. To
+    configure elements or add text content, click the pencil icon.
+
+    Click the plus (+) to create new pages. To change the order of the
+    pages, click the gearbox and update the sort order.
+
+   Description
+    Your forms will be made available to users on a dedicated Forms page in
+    the RT web UI. Forms can be accessed by privileged users in the main RT
+    interface and by unprivilged users in the self service interface.
+
+    The Description tab allows you to upload an icon and provide text to
+    show on this forms page. Include an icon that represents what the form
+    is intended for and include a description to help users pick the right
+    form for the right task.
+
+   Advanced
+    The advanced page shows the raw JSON representation of the configured
+    pages in your form. We recommend no editing the JSON directly. However,
+    you can copy the content and paste it into another page if you want to
+    migrate a form from development to production. You can also save the
+    JSON to a file and use the rt-insert-formtools-config utility to load it
+    into another RT.
+
+   Rights
+    You can control access to forms by granting the ShowForm right for
+    groups or users. By default, only SuperUsers can see forms, so you need
+    to grant ShowForm to users or groups for them to be visible.
+
+  Using Forms
+    Privileged and unprivileged users can find a list of available forms at
+    Home > Forms. Users need to have the ShowForm right to see forms listed.
+
+    Once the form is filled out, it will create a ticket, so form users also
+    need CreateTicket in the queue where the form will be created. FormTools
+    checks this at the beginning of a form and shows the user a message if
+    they don't have sufficient rights.
+
+Internals
+    In earlier versions, this extension provided code-level Mason templates
+    as helpers to manually code forms. We believe pages created with these
+    earlier versions will continue to work, but it's possible they may stop
+    working at some point as we continue to work on FormTools. If you have
+    older FormTools code, it's safest to run with version 0.60. Going
+    forward, we recommend converting your forms to the new interface using
+    the new UI.
+
+    The documentation below is retained as the components are all still
+    available.
+
+  Mason Components
     See ex/RT-Example-FormTools/ for an example extension written using this
     module.
 
-/FormTools/Form
+   /FormTools/Form
     The top-level component that most elements will call, as a wrapper:
 
         <&|/FormTools/Form, next => "/URI/of/next/page" &>
@@ -43,7 +110,7 @@ COMPONENTS
     decoration (using /Elements/Header). It assumes that the queue will be
     stored in $m-notes('queue')>.
 
-/FormTools/Field
+   /FormTools/Field
     Renders a field in the form. It takes the name of a core field, or CF
     name:
 
@@ -61,36 +128,41 @@ COMPONENTS
 
     Any other argument to name is assumed to be the name of a custom field.
 
-  /FormTools/Next
+   /FormTools/Next
     Renders the "Next page" button.
 
-  /FormTools/ShowChoices
+   /FormTools/ShowChoices
     Shows the values that have already been submitted.
 
-FUNCTIONS
+  Internal Functions
     In addition to the Mason components, this module provides a number of
     functions which may be useful to call from Mason templates.
 
-  is_core_field field_name
+   is_core_field field_name
     Checks if the given field_name is is a field that we consider 'core' to
     RT (subject, AdminCc, etc) rather than something which should be treated
     as a Custom Field.
 
     Naming a Custom Field Subject would cause serious pain with FormTools.
 
-  validate_cf CF, ARGSRef
+   validate_cf CF, ARGSRef
     Takes a given RT::CustomField object and a hashref of query parameters,
     and returns a list of a boolean of if the custom field validates,
     followed by a list of errors.
 
-  email_is_privileged email_address
+   email_is_privileged email_address
     Returns true if the given email address belongs to a privileged user.
 
-  has_value value
+   has_value value
     Returns true if the value is defined and non-empty.
 
+   LoadFormIcon($current_user, $form_id)
+    Loads the form icon attribute associated with the passed form id.
+
+    Returns a tuple of attribute object or false, and a message.
+
 AUTHOR
-    Best Practical Solutions, LLC <modules@bestpractical.com>
+    Best Practical Solutions, LLC
 
 BUGS
     All bugs should be reported via email to
@@ -102,7 +174,7 @@ BUGS
         L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-FormTools>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2014-2022 by Best Practical Solutions
+    This software is Copyright (c) 2014-2023 by Best Practical Solutions
 
     This is free software, licensed under:
 

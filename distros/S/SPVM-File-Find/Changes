@@ -1,6 +1,9 @@
+0.021002 2023-12-05
+  [Requirement Changes]
+    * Require SPVM::Sys 0.509.
 0.021001 2023-05-29
   [Prerequirement Changes]
-    SPVM 0.986+ is required.
+    * SPVM 0.986+ is required.
 0.021 2023-05-23
   [Prerequirement Changes]
     * SPVM 0.981+ is required.

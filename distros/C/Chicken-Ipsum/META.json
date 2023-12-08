@@ -61,6 +61,6 @@
          "web" : "https://codeberg.org/h3xx/perl-Chicken-Ipsum"
       }
    },
-   "version" : "1.000000",
+   "version" : "1.000001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

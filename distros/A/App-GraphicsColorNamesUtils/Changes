@@ -1,3 +1,19 @@
+0.008   2023-12-05  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Correctly convert between integer codes and what rgb_diff()
+          expects (6-digit hexstring).
+
+
+0.007   2023-12-04  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix sprintf() template.
+
+
+0.006   2023-11-30  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add completion to colorname2code.
+
+
 0.005   2020-06-10  Released-By: PERLANCAR; Urgency: medium
 
 	- [cli show-color-swatch] Add option --columns (-c) to show in

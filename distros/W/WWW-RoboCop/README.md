@@ -4,7 +4,7 @@ WWW::RoboCop - Police your URLs!
 
 # VERSION
 
-version 0.000102
+version 0.000103
 
 # SYNOPSIS
 

@@ -1,11 +1,11 @@
 package Locale::CLDR::Locales::Dua::Any;
 
 # This file auto generated
-#	on Sat  4 Nov  5:58:40 pm GMT
+#	on Tue  5 Dec  1:06:46 pm GMT
 
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

@@ -25,7 +25,7 @@ our @EXPORT = qw(
 
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Unix::Mknod', $VERSION);
@@ -113,15 +113,13 @@ L<File::Stat::Bits>, L<Mknod>, L<POSIX>, L<Sys::Mknod>
 
 C<major(9)>, C<minor(9)>, C<mkfifo(1)>, C<mknod(8)>
 
-ftp://ftp-dev.cites.uiuc.edu/pub/Unix-Mknod
-
 =head1 AUTHOR
 
-Jim Pirzyk, E<lt>pirzyk@uiuc.eduE<gt>
+Jim Pirzyk, E<lt>pirzyk@freebsd.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2005-2008 University of Illinois Board of Trustees
+Copyright (c) 2005-2023 University of Illinois Board of Trustees
 All rights reserved.
 
 Developed by: Campus Information Technologies and Educational Services,

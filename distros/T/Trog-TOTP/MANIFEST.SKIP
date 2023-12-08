@@ -1,0 +1,6 @@
+cover_db/*
+.travis.yml
+weaver.ini
+.git/*
+.github/*
+dist.ini

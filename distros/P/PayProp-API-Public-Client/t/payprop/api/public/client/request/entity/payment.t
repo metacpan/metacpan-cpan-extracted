@@ -70,7 +70,7 @@ subtest '->create_p' => sub {
 	};
 
 	$EntityPayment
-		->create_p( $data )
+		->create_p({ content => $data })
 		->then( sub {
 			my ( $Payment ) = @_;
 
@@ -89,7 +89,10 @@ subtest '->update_p' => sub {
 	$Emulator->start;
 
 	$EntityPayment
-		->update_p( { path_params => { external_id => 'MZnW5oLYJ7' } }, { amount => 777 } )
+		->update_p({
+			content => { amount => 777 },
+			path_params => { external_id => 'MZnW5oLYJ7' },
+		})
 		->then( sub {
 			my ( $Payment ) = @_;
 			isa_ok( $Payment, 'PayProp::API::Public::Client::Response::Entity::Payment' );
@@ -99,18 +102,6 @@ subtest '->update_p' => sub {
 
 	$Emulator->stop;
 
-};
-
-
-sub _path_params {
-	my ( $self ) = @_;
-
-	return [qw/ external_id /];
-}
-
-subtest 'params' => sub {
-	cmp_deeply $EntityPayment->_path_params, [qw/ external_id /];
-	cmp_deeply $EntityPayment->_query_params, [qw/ is_customer_id /];
 };
 
 done_testing;

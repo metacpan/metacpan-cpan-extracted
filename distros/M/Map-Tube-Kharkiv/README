@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Kharkiv;
+
      my $obj = Map::Tube::Kharkiv->new;
      my $routes_ar = $obj->get_all_routes($from, $to);
      my $line = $obj->get_line_by_id($line_id);
@@ -23,55 +24,88 @@ DESCRIPTION
     <https://en.wikipedia.org/wiki/Kharkiv_Metro>.
 
 METHODS
-    "new()"
-             Constructor.
+  "new"
+     my $obj = Map::Tube::Kharkiv->new;
 
-    "get_all_routes($from, $to)" [EXPERIMENTAL]
-             Get all routes from station to station.
-             Returns reference to array with Map::Tube::Route objects.
+    Constructor.
 
-    "get_line_by_id($line_id)"
-             Get line object defined by id.
-             Returns Map::Tube::Line object.
+    Returns instance of object.
 
-    "get_line_by_name($line_name)"
-             Get line object defined by name.
-             Returns Map::Tube::Line object.
+  "get_all_routes" [EXPERIMENTAL]
+     my $routes_ar = $obj->get_all_routes($from, $to);
 
-    "get_lines()"
-             Get lines in metro map.
-             Returns reference to unsorted array with Map::Tube::Line objects.
+    Get all routes from station to station.
 
-    "get_node_by_id($station_id)"
-             Get station node by id.
-             Returns Map::Tube::Node object.
+    Returns reference to array with Map::Tube::Route objects.
 
-    "get_node_by_name($station_name)"
-             Get station node by name.
-             Returns Map::Tube::Node object.
+  "get_line_by_id"
+     my $line = $obj->get_line_by_id($line_id);
 
-    "get_shortest_route($from, $to)"
-             Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
-             Returns Map::Tube::Route object.
+    Get line object defined by id.
 
-    "get_stations($line)"
-             Get list of stations for concrete metro line.
-             Returns reference to array with Map::Tube::Node objects.
+    Returns Map::Tube::Line object.
 
-    "name()"
-             Get metro name.
-             Returns string with metro name.
+  "get_line_by_name"
+     my $line = $obj->get_line_by_name($line_name);
 
-    "xml()"
-             Get XML specification of Kharkiv metro.
-             Returns string with XML.
+    Get line object defined by name.
+
+    Returns Map::Tube::Line object.
+
+  "get_lines"
+     my $lines_ar = $obj->get_lines;
+
+    Get lines in metro map.
+
+    Returns reference to unsorted array with Map::Tube::Line objects.
+
+  "get_node_by_id"
+     my $station = $obj->get_node_by_id($station_id);
+
+    Get station node by id.
+
+    Returns Map::Tube::Node object.
+
+  "get_node_by_name"
+     my $station = $obj->get_node_by_name($station_name);
+
+    Get station node by name.
+
+    Returns Map::Tube::Node object.
+
+  "get_shortest_route"
+     my $route = $obj->get_shortest_route($from, $to);
+
+    Get shortest route between $from and $to node names. Node names in $from
+    and $to are case insensitive.
+
+    Returns Map::Tube::Route object.
+
+  "get_stations"
+     my $stations_ar = $obj->get_stations($line);
+
+    Get list of stations for concrete metro line.
+
+    Returns reference to array with Map::Tube::Node objects.
+
+  "name"
+     my $metro_name = $obj->name;
+
+    Get metro name.
+
+    Returns string with metro name.
+
+  "xml"
+     my $xml_file = $obj->xml;
+
+    Get XML specification of Kharkiv metro.
+
+    Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Kharkiv;
 
@@ -88,12 +122,10 @@ EXAMPLE1
      # Route: Спортивна (Холодногірсько-Заводська лінія), Проспект Гагаріна (Холодногірсько-Заводська лінія), Радянська (Холодногірсько-Заводська лінія), Історичний музей (Салтівська лінія), Університет (Салтівська лінія), Пушкінська (Салтівська лінія), Київська (Салтівська лінія)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use utf8;
      use warnings;
 
-     # Modules.
      use Map::Tube::Kharkiv;
 
      # Object.
@@ -109,11 +141,9 @@ EXAMPLE2
      # XML file: .*/kharkiv-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Kharkiv;
@@ -138,11 +168,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 94579 Dec 23 14:15 Kharkiv.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Kharkiv;
 
@@ -161,11 +189,9 @@ EXAMPLE4
      # Холодногірсько-Заводська лінія
 
 EXAMPLE5
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Kharkiv;
 
@@ -215,7 +241,7 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Kharkiv>
+    <https://github.com/michal-josef-spacek/Map-Tube-Kharkiv>
 
 AUTHOR
     Michal Josef Špaček <mailto:skim@cpan.org>
@@ -223,10 +249,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2017 Michal Josef Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

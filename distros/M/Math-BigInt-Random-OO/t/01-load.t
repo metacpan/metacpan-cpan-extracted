@@ -1,9 +1,7 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
-
-local $| = 1;                   # disable buffering
 
 use Test::More tests => 1;
 

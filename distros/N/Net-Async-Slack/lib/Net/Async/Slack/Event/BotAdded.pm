@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::BotAdded;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 use parent qw(Net::Async::Slack::Event::Bot);
 

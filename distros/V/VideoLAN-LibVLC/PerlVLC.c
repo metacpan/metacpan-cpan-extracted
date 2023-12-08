@@ -10,8 +10,10 @@
 
 #include "PerlVLC.h"
 
+#ifndef PERLVLC_TRACE
 /*#define PERLVLC_TRACE(x...) PerlVLC_cb_log_error(x) */
 #define PERLVLC_TRACE(...) ((void)0)
+#endif
 
 static void carp_croak_sv(SV* value) {
         dSP;
@@ -98,7 +100,7 @@ int PerlVLC_instance_mg_free(pTHX_ SV *inst_sv, MAGIC *mg) {
  */
 SV * PerlVLC_wrap_media(libvlc_media_t *media) {
 	PERLVLC_TRACE("PerlVLC_wrap_media(%p)", media);
-    PerlVLC_set_media_mg(
+    return PerlVLC_set_media_mg(
 		sv_bless(newRV_noinc((SV*)newHV()), gv_stashpv("VideoLAN::LibVLC::Media", GV_ADD)),
 		media
 	);
@@ -133,7 +135,6 @@ SV * PerlVLC_wrap_media_player(libvlc_media_player_t *player) {
 /* gets called with the blessed HV goes out of scope */
 int PerlVLC_media_player_mg_free(pTHX_ SV *player_sv, MAGIC* mg) {
 	PerlVLC_player_t *mpinfo= (PerlVLC_player_t*) mg->mg_ptr;
-	libvlc_media_player_t *player;
 	int i;
 	PERLVLC_TRACE("PerlVLC_media_player_mg_free(%p)", mpinfo);
 	if (!mpinfo) return 0;
@@ -236,12 +237,10 @@ void PerlVLC_picture_format_init_from_hv(PerlVLC_picture_format_t *format, HV *h
  */
 PerlVLC_picture_t* PerlVLC_picture_new_from_hash(SV *args) {
 	PerlVLC_picture_t self, *ret;
-	HV *hash, *plane_hash;
+	HV *hash;
 	SV **item, *field;
 	AV *av;
-	int i, pitch, lines;
-	const char *chroma;
-	STRLEN len;
+	int i;
 	memset(&self, 0, sizeof(self));
 	PERLVLC_TRACE("PerlVLC_picture_new_from_hash");
 
@@ -255,13 +254,19 @@ PerlVLC_picture_t* PerlVLC_picture_new_from_hash(SV *args) {
 	PerlVLC_picture_format_init_from_hv(&self.format, hash);
 
 	if ((field= fetch_if_defined(hash, "plane"))) {
-		av= (SvROK(field) && SvTYPE(SvRV(field)) == SVt_PVAV)? (AV*) SvRV(field) : NULL;
-		for (i= 0; av? (i < 3 && i <= av_len(av)) : (i < 1); i++) {
-			if (av) { item= av_fetch(av, i, 0); field= (item && *item && SvOK(*item))? *item : NULL; }
-			if (!field || !SvPOK(SvRV(field)))
-				croak("Invalid %s->[%d]", "plane", i);
+		if (SvROK(field) && SvTYPE(SvRV(field)) == SVt_PVAV) {
+			av= (AV*) SvRV(field);
+			for (i= 0; i < 3 && i <= av_len(av); i++) {
+				item= av_fetch(av, i, 0);
+				if (!item || !*item || !SvROK(*item) || !SvPOK(SvRV(*item)))
+					croak("Invalid plane->[%d], must be a scalar-ref", i);
+				self.plane_buffer_sv[i]= SvRV(*item);
+			}
+		} else {
+			if (!SvROK(field) || !SvPOK(SvRV(field)))
+				croak("Invalid plane, must be a scalar-ref");
 			/* hold a reference to the scalar within the scalar-ref. Don't inc refcnt until below. */
-			self.plane_buffer_sv[i]= SvRV(*item);
+			self.plane_buffer_sv[0]= SvRV(field);
 		}
 	}
 	/* If pitch and lines are not set on plane[0], come up with some defaults.
@@ -389,11 +394,10 @@ typedef struct PerlVLC_Message_ImgFmt {
 } PerlVLC_Message_ImgFmt_t;
 
 SV* PerlVLC_inflate_message(void *buffer, int msglen) {
-	HV *obj, *ret= (HV*) sv_2mortal((SV*) newHV());
-	AV *plane, *pitch, *lines;
+	HV *ret= (HV*) sv_2mortal((SV*) newHV());
+	AV *pitch, *lines;
 	char *pos, *lim;
 	int i;
-	SV *sv;
 	PerlVLC_Message_t *msg= (PerlVLC_Message_t*) buffer;
 	PerlVLC_Message_LogMsg_t *logmsg;
 	PerlVLC_Message_TradePicture_t *picmsg;
@@ -503,7 +507,8 @@ static void PerlVLC_cb_log_error(const char *fmt, ...) {
 void PerlVLC_log_cb(void *opaque, int level, const libvlc_log_t *ctx, const char *fmt, va_list args) {
 	char *pos, *lim;
 	const char *module, *file, *name, *header;
-	int fd, minlev, wrote, line, avail, len;
+	int wrote, len;
+	unsigned line;
 	uintptr_t objid;
 	char buffer[PERLVLC_MSG_BUFFER_SIZE];
 	PerlVLC_Message_LogMsg_t *msg= (PerlVLC_Message_LogMsg_t*) buffer;
@@ -635,8 +640,6 @@ static void* PerlVLC_video_lock_cb(void *opaque, void **planes) {
 static void PerlVLC_video_unlock_cb(void *opaque, void *picture, void * const *planes) {
 	PerlVLC_player_t *mpinfo= (PerlVLC_player_t*) opaque;
 	PerlVLC_Message_TradePicture_t pic_msg;
-	int i;
-	char buf[128];
 	if (!mpinfo) {
 		/* If this happens, it is a bug, and probably going to kil the program.  Warn loudly. */
 		PerlVLC_cb_log_error("BUG: Video unlock callback received NULL opaque pointer");
@@ -659,8 +662,6 @@ static void PerlVLC_video_unlock_cb(void *opaque, void *picture, void * const *p
 static void PerlVLC_video_display_cb(void *opaque, void *picture) {
 	PerlVLC_player_t *mpinfo= (PerlVLC_player_t*) opaque;
 	PerlVLC_Message_TradePicture_t pic_msg;
-	int i;
-	char buf[128];
 	if (!mpinfo) {
 		/* If this happens, it is a bug, and probably going to kil the program.  Warn loudly. */
 		PerlVLC_cb_log_error("BUG: Video unlock callback received NULL opaque pointer");
@@ -758,8 +759,6 @@ static unsigned PerlVLC_video_format_cb(void **opaque_p, char *chroma_p, unsigne
 }
 
 static void PerlVLC_video_cleanup_cb(void *opaque) {
-	int i;
-	char buf[128];
 	/* forward message to user that they may clean up the buffers */
 	PerlVLC_player_t *mpinfo= (PerlVLC_player_t*) opaque;
 	PerlVLC_Message_t msg;

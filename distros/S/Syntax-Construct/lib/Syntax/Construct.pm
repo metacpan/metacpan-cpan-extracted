@@ -4,7 +4,7 @@ use 5.006002;
 use strict;
 use warnings;
 
-our $VERSION = '1.033';
+our $VERSION = '1.034';
 
 my %introduces = do { no warnings 'qw';
                  ( '5.038' => [qw[
@@ -284,7 +284,7 @@ Syntax::Construct - Explicitly state which non-feature constructs are used in th
 
 =head1 VERSION
 
-Version 1.033
+Version 1.034
 
 =head1 SYNOPSIS
 
@@ -908,35 +908,35 @@ L<perl5360delta/Unicode 14.0 is supported>
 
 =head3 unicode15.0
 
-L<perldelta/Unicode 15.0 is supported>
+L<perl5380delta/Unicode 15.0 is supported>
 
 =head3 ^HOOK
 
-L<perldelta/%{^HOOK} API introduced>
+L<perl5380delta/%{^HOOK} API introduced>
 
 Alias: keyword-hook
 
 =head3 signature-default-operator
 
-L<perldelta/Defined-or and logical-or assignment default expressions in signatures>
+L<perl5380delta/Defined-or and logical-or assignment default expressions in signatures>
 
 =head3 INCDIR
 
-L<perldelta/@INC Hook Enhancements and $INC and INCDIR>
+L<perl5380delta/@INC Hook Enhancements and $INC and INCDIR>
 
 =head3 *{}
 
-L<perldelta/Optimistic Eval in Patterns>
+L<perl5380delta/Optimistic Eval in Patterns>
 
 Alias: optimistic-eval
 
 =head3 REG_INF_I32_MAX
 
-L<perldelta/REG_INF has been raised from 65,536 to 2,147,483,647>
+L<perl5380delta/REG_INF has been raised from 65,536 to 2,147,483,647>
 
 =head3 ^LAST_SUCCESSFUL_PATTERN
 
-L<perldelta/New regexp variable ${^LAST_SUCCESSFUL_PATTERN}>
+L<perl5380delta/New regexp variable ${^LAST_SUCCESSFUL_PATTERN}>
 
 =for completeness
 =head2 old

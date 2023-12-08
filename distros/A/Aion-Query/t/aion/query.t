@@ -4,7 +4,7 @@ use common::sense; use open qw/:std :utf8/; use Test::More 0.98; sub _mkpath_ { 
 # 
 # # VERSION
 # 
-# 0.0.2
+# 0.0.3
 # 
 # # SYNOPSIS
 # 
@@ -63,7 +63,7 @@ WHERE 1
 # 
 # ## query ($query, %params)
 # 
-# It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params and .
+# It provide SQL (DCL, DDL, DQL and DML) queries to DBMS with quoting params.
 # 
 done_testing; }; subtest 'query ($query, %params)' => sub { 
 ::is_deeply scalar do {query "SELECT * FROM author WHERE name=:name", name => 'Pushkin A.S.'}, scalar do {[{id=>1, name=>"Pushkin A.S."}]}, 'query "SELECT * FROM author WHERE name=:name", name => \'Pushkin A.S.\' # --> [{id=>1, name=>"Pushkin A.S."}]';
@@ -75,7 +75,8 @@ done_testing; }; subtest 'query ($query, %params)' => sub {
 # 
 done_testing; }; subtest 'LAST_INSERT_ID ()' => sub { 
 ::is scalar do {query "INSERT INTO author (name) VALUES (:name)", name => "Alice"}, scalar do{1}, 'query "INSERT INTO author (name) VALUES (:name)", name => "Alice"  # -> 1';
-#LAST_INSERT_ID  
+::is scalar do {LAST_INSERT_ID}, scalar do{3}, 'LAST_INSERT_ID  # -> 3';
+
 # 
 # ## quote ($scalar)
 # 
@@ -118,7 +119,31 @@ done_testing; }; subtest 'quote ($scalar)' => sub {
 # Replace the parameters in `$query`. Parameters quotes by the `quote`.
 # 
 done_testing; }; subtest 'query_prepare ($query, %param)' => sub { 
-::is scalar do {query_prepare "INSERT author SET name = :name", name => "Alice"}, "INSERT author SET name = 'Alice'", 'query_prepare "INSERT author SET name = :name", name => "Alice"  # => INSERT author SET name = \'Alice\'';
+::is scalar do {query_prepare "INSERT author SET name IN (:name)", name => ["Alice", 1, 1.0]}, "INSERT author SET name IN ('Alice', 1, 1.0)", 'query_prepare "INSERT author SET name IN (:name)", name => ["Alice", 1, 1.0]  # => INSERT author SET name IN (\'Alice\', 1, 1.0)';
+
+::is scalar do {query_prepare ":x :^x :.x :~x", x => "10"}, "'10' 10 10.0 '10'", 'query_prepare ":x :^x :.x :~x", x => "10"  # => \'10\' 10 10.0 \'10\'';
+
+my $query = query_prepare "SELECT *
+FROM author
+    words*>> JOIN word:_
+WHERE 1
+    name>> AND name like :name
+",
+    name => "%Alice%",
+    words => [1, 2, 3],
+;
+
+my $res = << 'END';
+SELECT *
+FROM author
+    JOIN word1
+    JOIN word2
+    JOIN word3
+WHERE 1
+    AND name like '%Alice%'
+END
+
+::is scalar do {$query}, scalar do{$res}, '$query # -> $res';
 
 # 
 # ## query_do ($query)

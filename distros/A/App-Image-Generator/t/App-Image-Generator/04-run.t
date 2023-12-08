@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use App::Image::Generator;
+use English;
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
 use Test::More 'tests' => 2;
@@ -13,6 +14,10 @@ use Test::Output;
 	'-h',
 );
 my $script = abs2rel(File::Object->new->file('04-run.t')->s);
+# XXX Hack for missing abs2rel on Windows.
+if ($OSNAME eq 'MSWin32') {
+	$script =~ s/\\/\//msg;
+}
 my $right_ret = <<"END";
 Usage: $script [-h] [-i input_dir] [-s size] [-v]
 	[--version] output_file

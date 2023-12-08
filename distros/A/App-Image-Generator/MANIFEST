@@ -1,6 +1,6 @@
 bin/image-generator
 Changes
-examples/ex1.pl
+examples/print_help.pl
 Generator.pm
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm

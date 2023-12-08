@@ -88,13 +88,16 @@ t/callback_err.t
 t/callback_invalid_sv.t
 t/date.t
 t/export_ref.t
+t/import_os.t
 t/import_std.t
+t/import_std2.t
 t/js2perl.t
 t/js_func_to_perl.t
 t/jsfunc_memory_handling.t
 t/memory.t
 t/module.t
 t/regexp.t
+t/script_std.t
 t/set_globals.t
 t/strict.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

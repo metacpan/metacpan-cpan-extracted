@@ -5,12 +5,13 @@ use lib 'lib';
 
 use Test::More;
 use Test::Exception;
-use Test::Warnings;
+my $no_warnings;
+use if $no_warnings = $ENV{AUTHOR_TESTING} ? 1 : 0, 'Test::Warnings';
 
 # Coordinate transformation
 # https://proj.org/development/reference/functions.html#coordinate-transformation
 
-plan tests => 2 + 4 + 3;
+plan tests => 2 + 4 + 2 + $no_warnings;
 
 use Geo::LibProj::FFI qw( :all );
 
@@ -25,8 +26,8 @@ lives_and { ok $p = proj_create_crs_to_crs($c, "EPSG:4326", "EPSG:25833", 0) } '
 
 lives_and { ok $a = proj_coord( 79, 12, 0, 0 ) } 'coord';
 lives_and { ok $a = proj_trans( $p, PJ_FWD(), $a ) } 'trans';
-lives_and { like $a->enu->e(), qr/^43612.\./ } 'easting';
-lives_and { like $a->enu->n(), qr/^877161.\./ } 'northing';
+lives_and { like $a->enu_e(), qr/^43612.\./ } 'easting';
+lives_and { like $a->enu_n(), qr/^877161.\./ } 'northing';
 
 
 # proj_trans_generic

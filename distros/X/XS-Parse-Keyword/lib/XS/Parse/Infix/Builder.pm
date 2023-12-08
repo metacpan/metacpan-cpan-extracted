@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix::Builder 0.38;
+package XS::Parse::Infix::Builder 0.39;
 
 use v5.14;
 use warnings;
@@ -46,7 +46,7 @@ require XS::Parse::Infix::Builder_data;
 
 =head2 write_XSParseInfix_h
 
-   XS::Parse::Infix::Builder->write_XSParseInfix_h
+   XS::Parse::Infix::Builder->write_XSParseInfix_h;
 
 Writes the F<XSParseInfix.h> file to the current working directory. To cause
 the compiler to actually find this file, see L</extra_compiler_flags>.
@@ -65,7 +65,7 @@ sub write_XSParseInfix_h
 
 =head2 extra_compiler_flags
 
-   @flags = XS::Parse::Infix::Builder->extra_compiler_flags
+   @flags = XS::Parse::Infix::Builder->extra_compiler_flags;
 
 Returns a list of extra flags that the build scripts should add to the
 compiler invocation. This enables the C compiler to find the
@@ -81,7 +81,7 @@ sub extra_compiler_flags
 
 =head2 extend_module_build
 
-   XS::Parse::Infix::Builder->extend_module_build( $build )
+   XS::Parse::Infix::Builder->extend_module_build( $build );
 
 A convenient shortcut for performing all the tasks necessary to make a
 L<Module::Build>-based distribution use the helper.

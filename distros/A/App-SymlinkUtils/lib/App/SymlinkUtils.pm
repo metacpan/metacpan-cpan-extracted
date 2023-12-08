@@ -8,9 +8,9 @@ use File::Symlink::Util ();
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-02'; # DATE
+our $DATE = '2023-08-25'; # DATE
 our $DIST = 'App-SymlinkUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $res;
 
@@ -82,7 +82,7 @@ App::SymlinkUtils - CLI utilities related to symbolic links (symlinks)
 
 =head1 VERSION
 
-This document describes version 0.002 of App::SymlinkUtils (from Perl distribution App-SymlinkUtils), released on 2023-07-02.
+This document describes version 0.004 of App::SymlinkUtils (from Perl distribution App-SymlinkUtils), released on 2023-08-25.
 
 =head1 DESCRIPTION
 

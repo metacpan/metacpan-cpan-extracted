@@ -18,7 +18,7 @@ Image::DS9::Manual::API.pod - Image::DS9 API Reference
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 DESCRIPTION
 
@@ -332,7 +332,74 @@ I<Not implemented>
 
 =head2 crop
 
-I<Not implemented>
+  $ds9->crop( '3d', <x>:FLOAT, <y>:FLOAT );
+  $ds9->crop( '3d', <x>:FLOAT, <y>:FLOAT, FRAME_COORD_SYSTEMS );
+
+  $ds9->crop( 'close' );
+
+  $ds9->crop( 'lock', 'none' );
+  $ds9->crop( 'lock', FRAME_COORD_SYSTEMS );
+
+  $ds9->crop( 'match', SKY_COORD_SYSTEMS | FRAME_COORD_SYSTEMS:STRING
+    );
+
+  $ds9->crop( 'open' );
+
+  $ds9->crop( 'reset' );
+
+  $ds9->crop( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, <width>:FLOAT, <height>:FLOAT );
+
+  $ds9->crop( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, <width>:FLOAT, <height>:FLOAT,
+    FRAME_COORD_SYSTEMS_NON_WCS );
+
+  $ds9->crop( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, <width>:FLOAT, <height>:FLOAT,
+    FRAME_COORD_SYSTEMS_NON_WCS, ( 'degrees' | 'sexagesimal' ) );
+
+  $ds9->crop( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, <width>:FLOAT, <height>:FLOAT,
+    SKYFRAME, ( 'arcmin' | 'arcsec' | 'degrees' ) );
+
+  $ds9->crop( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, <width>:FLOAT, <height>:FLOAT, WCS, (
+    'arcmin' | 'arcsec' | 'degrees' ) );
+
+  $ds9->crop( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, <width>:FLOAT, <height>:FLOAT, WCS,
+    SKYFRAME );
+
+  $ds9->crop( <ra>:DECIMAL_OR_SEXAGESIMAL,
+    <dec>:DECIMAL_OR_SEXAGESIMAL, <width>:FLOAT, <height>:FLOAT, WCS,
+    SKYFRAME, ( 'arcmin' | 'arcsec' | 'degrees' ) );
+
+  $ds9->crop( SKYFRAME );
+  $ds9->crop( SKYFRAME, ( 'degrees' | 'sexagesimal' ) );
+  $ds9->crop( SKYFRAME, ( 'degrees' | 'sexagesimal' ), ( 'arcmin' |
+    'arcsec' | 'degrees' ) );
+
+  $ds9->crop( WCS, SKYFRAME, ( 'degrees' | 'sexagesimal' ), ( 'arcmin'
+    | 'arcsec' | 'degrees' ) );
+
+  [ <x>:FLOAT, <y>:FLOAT ] = $ds9->crop( '3d' );
+  [ <x>:FLOAT, <y>:FLOAT, <width>:FLOAT, <height>:FLOAT ] = $ds9->crop(
+    SKYFRAME );
+
+  [ <x>:FLOAT, <y>:FLOAT, <width>:FLOAT, <height>:FLOAT ] = $ds9->crop;
+
+  [ <x>:STRING, <y>:STRING, <width>:FLOAT, <height>:FLOAT ] =
+    $ds9->crop( SKYFRAME, ( 'degrees' | 'sexagesimal' ) );
+
+  [ <x>:STRING, <y>:STRING, <width>:FLOAT, <height>:FLOAT ] =
+    $ds9->crop( SKYFRAME, ( 'degrees' | 'sexagesimal' ), ( 'arcmin' |
+    'arcsec' | 'degrees' ) );
+
+  [ <x>:STRING, <y>:STRING, <width>:FLOAT, <height>:FLOAT ] =
+    $ds9->crop( WCS, SKYFRAME, ( 'degrees' | 'sexagesimal' ), (
+    'arcmin' | 'arcsec' | 'degrees' ) );
+
+  [ FRAME_COORD_SYSTEMS ] = $ds9->crop( 'lock' );
 
 =head2 crosshair
 
@@ -1377,7 +1444,7 @@ I<Not implemented>
 =head2 saveimage
 
   $ds9->saveimage( '*.jpeg|*.jpg', INTEGER );
-  $ds9->saveimage( '*.tiff', 'none', 'packbits', 'jpeg', 'deflate' );
+  $ds9->saveimage( '*.tiff', 'deflate', 'none', 'packbits', 'jpeg' );
   $ds9->saveimage( 'eps', <filename>:STRING );
   $ds9->saveimage( 'fits', <filename>:STRING );
   $ds9->saveimage( 'gif', <filename>:STRING );

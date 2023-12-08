@@ -1,0 +1,92 @@
+File-Unpack2
+
+This is a fork of File::Unpack (https://github.com/jnweiger/perl-File-Unpack) for use with
+Cavil (https://github.com/openSUSE/cavil/). It has been started because the original File::Unpack is not being
+maintained anymore.
+
+File::Unpack2 is an aggressive unpacker for archive files. We call it aggressive, 
+because it recursivly descends into any freshly unpacked file, if it appears to be an archive itself.
+It also uncompresses files where needed. The ultimate goal of File::Unpack2 is
+to extract as much readable text (ascii or any other encoding) as possible.
+Most of the currently known archive file formats are supported.
+
+While The following perl modules are considered helpful, although we may run
+perfectly okay, if only a subset of these is available:
+
+ - File::LibMagic, File::MimeInfo::Magic
+   File::LibMagic is preferred, its underlying libmagic is activly maintained.
+    Its database is very large, and it is much faster than File::MimeInfo::Magic
+    Beware, that File::MimeInfo::Magic may derive a mimetype from the suffix, if 
+    nothing else works. 
+ - IO::Uncompress::AnyUncompress	(perl-IO-Compress)
+ - IO::Uncompress::AnyInflate
+  - Compress::Raw::Bzip2
+  - Compress::Raw::Zlib
+ - Archive::Zip
+ - String::ShellQuote
+
+Do not use:
+ - File::MMagic, File::MMagic::XS, File::Type
+   These three are inferior, compared to the other options.
+ - Archive::Tar
+   It is pure perl, so it's a lot slower then your "/bin/tar"
+   IT is heavy on memory, all will be read into memory.
+ - Archive::Zip
+   If you are just going to be extracting zips (and/or other archives) you are
+   recommended to look at using Archive::Extract
+ - "Archive::Extract" 
+   tries first to determine what type of archive you are passing it, by
+   inspecting its suffix. It does not do this by using Mime magic.
+   Maybe this module should use something like "File::Type" to determine the
+   type, rather than blindly trust the suffix.
+   Set $Archive::Extract::PREFER_BIN to 1, which will prefer the use of command
+   line programs and won't consume so much memory. Default: use "Archive::Tar" -.
+
+
+
+
+We also rely on a range of command line utilities to be callable via the shell.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::Unpack2
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=File-Unpack
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/File-Unpack
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/File-Unpack
+
+    Search CPAN
+        http://search.cpan.org/dist/File-Unpack/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2023 Sebastian Riedel
+Copyright (C) 2010-2013 Juergen Weigert
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

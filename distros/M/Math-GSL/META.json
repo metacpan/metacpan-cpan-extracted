@@ -4,7 +4,7 @@
       "Jonathan Leto <jonathan@leto.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "gpl_1"
    ],
@@ -43,7 +43,7 @@
    "provides" : {
       "Math::GSL" : {
          "file" : "lib/Math/GSL.pm",
-         "version" : "0.43"
+         "version" : "0.44"
       },
       "Math::GSL::BLAS" : {
          "file" : "lib/Math/GSL/BLAS.pm",
@@ -1339,6 +1339,6 @@
          "url" : "http://github.com/leto/math--gsl/tree/master"
       }
    },
-   "version" : "0.43",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

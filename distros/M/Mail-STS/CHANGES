@@ -1,75 +1,37 @@
 ==================================================
-Changes from 2018-05-08 00:00:00 +0000 to present.
+Changes from 2022-11-29 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.04 at 2019-05-08 09:27:25 +0000
+version 0.05 at 2023-11-29 13:25:06 +0000
 -----------------------------------------
 
-  Change: 6519b8439ae642ee51b4006cf4bb05418b34d34f
+  Change: 152285742217c756ef5069a3b0fbb75ef4463e94
   Author: Markus Benning <ich@markusbenning.de>
-  Date : 2019-05-08 11:26:13 +0000
+  Date : 2023-11-26 10:30:56 +0000
 
-    Update test to reflect fixed TLSRPT lookup
+    Merge pull request #3 from errror/master
 
-    Now as the TLSRPT lookup works gmail.com also seem to have such a
-    record. 
+    following CNAMEs 
 
-  Change: aba5be5377af0969ca574de9e6bb37850f678a19
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2019-05-08 11:13:06 +0000
+  Change: 895c6d779e544a02ad56f695f623d3578675971d
+  Author: Patrick Cernko <pcernko@mpi-klsb.mpg.de>
+  Date : 2023-10-12 04:32:32 +0000
 
-    Fix TLSRPT record pattern _tcp -> _tls
+    follow CNAMEs when looking up records 
 
-    The TLSRPT record was build by appending _smtp._tcp which was a
-    mistake. Must be _smtp._tls. (RFC8460)
+  Change: 0f52bf59f67e0e931dc633315cf39e91aa4f6fd6
+  Author: Patrick Cernko <pcernko@mpi-klsb.mpg.de>
+  Date : 2023-10-12 03:57:35 +0000
 
-    Thanks to Jeff Forsyth for reporting this. 
+    fixed number of planed tests 
 
------------------------------------------
-version 0.03 at 2018-10-23 08:21:09 +0000
------------------------------------------
+  Change: 63237c0dccef7a1dbdc41aab61c40cc4c410001c
+  Author: Patrick Cernko <pcernko@mpi-klsb.mpg.de>
+  Date : 2023-10-12 03:21:17 +0000
 
-  Change: b9902f0b5541dfd9fcf7983954ef3092e5889641
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-10-23 10:21:09 +0000
+    avoid undef warnings in case no '=' sign found in assignments 
 
-    Merge pull request #1 from manwar/add-missing-prereqs
-
-    Added prereqs Time::Piece and Time::Seconds as suggested by CPANTS. 
-
-  Change: e78f644996069f6d8b51054409cabd8533a30f41
-  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
-  Date : 2018-10-22 18:39:24 +0000
-
-    Added prereqs Time::Piece and Time::Seconds as suggested by CPANTS. 
-
------------------------------------------
-version 0.02 at 2018-10-21 09:07:26 +0000
------------------------------------------
-
-  Change: 33f8691bfa3871258f0b0cc7d6b55016bbc5e7ca
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-10-21 11:07:26 +0000
-
-    Add expiration/update check for policy 
-
------------------------------------------
-version 0.01 at 2018-10-09 17:05:13 +0000
------------------------------------------
-
-  Change: e2b12c956aa1ae8c5dfbc17c8e97330e793933ce
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-10-09 19:05:13 +0000
-
-    Added a first version of the library 
-
-  Change: 31f2a704415071429f51810055cbf39297507898
-  Author: Markus Benning <ich@markusbenning.de>
-  Date : 2018-10-04 09:57:11 +0000
-
-    Initial checkin 
-
-================
-End of releases.
-================
+================================================
+Plus 4 releases after 2022-11-29 00:00:00 +0000.
+================================================

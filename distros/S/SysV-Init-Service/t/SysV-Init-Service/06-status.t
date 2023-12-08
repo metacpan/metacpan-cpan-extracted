@@ -1,8 +1,6 @@
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use File::Object;
 use SysV::Init::Service;
 use Test::More 'tests' => 3;

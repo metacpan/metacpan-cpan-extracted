@@ -1,7 +1,303 @@
 class TestCase::Time::HiRes {
   use Time::HiRes;
-  static method test : int () {
+  use Sys;
+  use Format;
+  use Sys::Signal::Constant as SIGNAL;
+  use Sys::Time::Constant as TIME;
+  
+  static method gettimeofday : int () {
+    
+    my $time_tv = Time::HiRes->gettimeofday;
+    
+    my $tv_sec = $time_tv->tv_sec;
+    
+    my $tv_usec = $time_tv->tv_usec;
+    
+    warn "[Test Output]gettimeofday:tv_sec:$tv_sec";
+    
+    warn "[Test Output]gettimeofday:tv_sec:$tv_usec";
+    
+    unless ($tv_sec > 0) {
+      return 0;
+    }
     
     return 1;
   }
+  
+  static method usleep : int () {
+    
+    my $remain = Time::HiRes->usleep(1_000);
+    
+    unless ($remain == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method nanosleep : int () {
+    
+    my $remain = Time::HiRes->nanosleep(1_000_000);
+    
+    unless ($remain == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method ualarm : int () {
+    
+    if (Sys::OS->is_windows) {
+      eval { Time::HiRes->ualarm(100_000); }
+      unless ($@ && eval_error_id is_error Error::NotSupported) {
+        return 0;
+      }
+    }
+    else {
+      Sys->signal(SIGNAL->SIGALRM, "IGNORE");
+      
+      my $remain = Time::HiRes->ualarm(100_000);
+      
+      unless ($remain == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method tv_interval : int () {
+    
+    {
+      my $tv_a = Time::HiRes->gettimeofday;
+      
+      Time::HiRes->sleep(0.5);
+      
+      my $tv_b = Time::HiRes->gettimeofday;
+      
+      my $interval = Time::HiRes->tv_interval($tv_a, $tv_b);
+      
+      unless ($interval > 0.5 && $interval < 0.6) {
+        return 0;
+      }
+    }
+    
+    {
+      my $tv_a = Time::HiRes->gettimeofday;
+      
+      Time::HiRes->sleep(0.5);
+      
+      my $interval = Time::HiRes->tv_interval($tv_a);
+      
+      unless ($interval > 0.5 && $interval < 0.6) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method time : int () {
+    
+    my $time = Time::HiRes->time;
+    
+    warn "[Test Output]time:return:" . Format->sprintf("%.5f", [(object)$time]);
+    
+    unless ($time > 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method sleep : int () {
+    
+    my $remain = Time::HiRes->sleep(0.1);
+    
+    unless ($remain == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method alarm : int () {
+    
+    if (Sys::OS->is_windows) {
+      eval { Time::HiRes->alarm(0.1); }
+      unless ($@ && eval_error_id is_error Error::NotSupported) {
+        return 0;
+      }
+    }
+    else {
+      Sys->signal(SIGNAL->SIGALRM, "IGNORE");
+      
+      my $remain = Time::HiRes->alarm(0.1);
+      
+      unless ($remain == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method setitimer : int () {
+    
+    if (Sys::OS->is_windows) {
+      eval { Time::HiRes->setitimer(0, undef); }
+      unless ($@ && eval_error_id is_error Error::NotSupported) {
+        return 0;
+      }
+    }
+    else {
+      Sys->signal(SIGNAL->SIGALRM, "IGNORE");
+      
+      my $itimerval_float =  Time::HiRes::ItimervalFloat->new;
+      $itimerval_float->set_it_value(0.5);
+      $itimerval_float->set_it_interval(0.5);
+      
+      my $old_itimerval_float = Time::HiRes->setitimer(TIME->ITIMER_REAL, $itimerval_float);
+      
+      unless ($old_itimerval_float->it_value == 0) {
+        return 0;
+      }
+      
+      unless ($old_itimerval_float->it_interval == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method getitimer : int () {
+    
+     if (Sys::OS->is_windows) {
+      eval { Time::HiRes->getitimer(0); }
+      unless ($@ && eval_error_id is_error Error::NotSupported) {
+        return 0;
+      }
+    }
+    else {
+      my $itimerval_float = Time::HiRes->getitimer(TIME->ITIMER_REAL);
+      
+      warn "[Test Output]getitimer:return:" . dump $itimerval_float;
+      
+      unless ($itimerval_float->it_value > 0) {
+        return 0;
+      }
+      
+      unless ($itimerval_float->it_interval > 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method clock_gettime : int () {
+    
+    my $time = Time::HiRes->clock_gettime(TIME->CLOCK_MONOTONIC);
+    
+    warn "[Test Output]clock_gettime:return:" . Format->sprintf("%.5f", [(object)$time]);
+    
+    unless ($time > 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method clock_gettime_timespec : int () {
+    
+    my $ts = Time::HiRes->clock_gettime_timespec(TIME->CLOCK_MONOTONIC);
+    
+    my $tv_sec = $ts->tv_sec;
+    
+    my $tv_nsec = $ts->tv_nsec;
+    
+    warn "[Test Output]clock_gettime:return:tv_sec:$tv_sec:tv_nsec:$tv_nsec";
+    
+    unless ($tv_sec > 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method clock_getres : int () {
+    
+    my $res = Time::HiRes->clock_getres(TIME->CLOCK_MONOTONIC);
+    
+    warn "[Test Output]clock_getres:return:" . Format->sprintf("%.30f", [(object)$res]);
+    
+    unless ($res > 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method clock_getres_timespec : int () {
+    
+    my $ts = Time::HiRes->clock_getres_timespec(TIME->CLOCK_MONOTONIC);
+    
+    my $tv_sec = $ts->tv_sec;
+    
+    my $tv_nsec = $ts->tv_nsec;
+    
+    warn "[Test Output]clock_getres:return:tv_sec:$tv_sec:tv_nsec:$tv_nsec";
+    
+    unless ($tv_nsec > 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  static method clock_nanosleep : int () {
+    
+    my $not_supported_clock_nanosleep = Sys::OS->defined("__APPLE__") || Sys::OS->defined("__FreeBSD__") || Sys::OS->defined("__OpenBSD__");
+    
+    if ($not_supported_clock_nanosleep) {
+      eval { Time::HiRes->clock_nanosleep(0, 0); }
+      unless ($@ && eval_error_id is_error Error::NotSupported) {
+        return 0;
+      }
+    }
+    else {
+      unless (Sys::OS->is_windows) {
+        my $remain = Time::HiRes->clock_nanosleep(TIME->CLOCK_MONOTONIC, 1_000_000);
+        
+        unless ($remain == 0) {
+          return 0;
+        }
+      }
+      
+      {
+        my $remain = Time::HiRes->clock_nanosleep(TIME->CLOCK_REALTIME, 1_000_000);
+        
+        unless ($remain == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  static method clock : int () {
+    
+    my $cpu_time = Time::HiRes->clock;
+    
+    warn "[Test Output]clock:return:$cpu_time";
+    
+    unless ($cpu_time > 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
 }

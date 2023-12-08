@@ -107,7 +107,7 @@ requires:
 resources:
   bugtracker: https://github.com/Perl-Hadoop/App-Oozie/issues
   repository: git://github.com/Perl-Hadoop/App-Oozie.git
-version: '0.015'
+version: '0.016'
 x_contributors:
   - 'Abdelrahman Elsergani'
   - 'Achyuth Samudrala'

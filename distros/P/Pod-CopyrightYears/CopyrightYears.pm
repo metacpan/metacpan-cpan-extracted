@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use Pod::Abstract;
 use String::UpdateYears qw(update_years);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -16,6 +16,9 @@ sub new {
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# Debug mode.
+	$self->{'debug'} = 0;
 
 	# Pod file to update.
 	$self->{'pod_file'} = undef;
@@ -70,7 +73,8 @@ sub pod {
 	my $pod = $self->{'pod_abstract'}->pod;
 	chomp $pod;
 	my $ret = $pod;
-	if ($pod =~ m/=cut\s+$/ms) {
+	# XXX Fix Abstract
+	if ($pod =~ m/=cut\s+$/s) {
 		$ret = substr $pod, 0, -2;
 		$ret .= "\n";
 	} else {
@@ -85,7 +89,7 @@ sub _iterate_node {
 
 	if (defined $pod_node->children) {
 		foreach my $child ($pod_node->children) {
-			if ($child->type eq ':text') {
+			if ($child->type eq ':text' || $child->type eq ':verbatim') {
 				$self->_change_years($child, $year);
 			} else {
 				$self->_iterate_node($child, $year);
@@ -100,6 +104,10 @@ sub _change_years {
 	my ($self, $pod_node, $year) = @_;
 
 	my $text = $pod_node->pod;
+	if ($self->{'debug'}) {
+		print "Found text to change:\n";
+		print $text."\n";
+	}
 	my $updated = update_years($text, {}, $year);
 	if ($updated) {
 		$pod_node->body($updated);
@@ -138,6 +146,12 @@ Pod::CopyrightYears - Object for copyright years changing in POD.
 Constructor.
 
 =over 8
+
+=item * C<debug>
+
+Debug mode.
+
+Default value is 0.
 
 =item * C<pod_file>
 
@@ -278,6 +292,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

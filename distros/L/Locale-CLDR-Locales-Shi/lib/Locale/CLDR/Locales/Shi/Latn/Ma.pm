@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Shi::Latn::Ma - Package for language Tachelhit
 
 package Locale::CLDR::Locales::Shi::Latn::Ma;
 # This file auto generated from Data\common\main\shi_Latn_MA.xml
-#	on Sat  4 Nov  6:22:38 pm GMT
+#	on Tue  5 Dec  1:30:29 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

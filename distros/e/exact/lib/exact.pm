@@ -5,11 +5,12 @@ use 5.014;
 use strict;
 use warnings;
 use namespace::autoclean;
+use B::Deparse;
 use Import::Into;
 use Sub::Util 'set_subname';
 use Syntax::Keyword::Try;
 
-our $VERSION = '1.23'; # VERSION
+our $VERSION = '1.25'; # VERSION
 
 use feature      ();
 use utf8         ();
@@ -216,7 +217,10 @@ sub _patch_import {
         import => sub {
             my ( $package, @exports ) = @_;
 
-            $original_import->(@_) if ($original_import);
+            if ( $original_import and ref $original_import eq 'CODE' ) {
+                ( my $b_deparsed_sub = B::Deparse->new->coderef2text($original_import) ) =~ s/;//g;
+                $original_import->(@_) if ($b_deparsed_sub);
+            }
 
             if ( $type eq 'force' ) {
                 @exports = @names;
@@ -265,7 +269,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.23
+version 1.25
 
 =for markdown [![test](https://github.com/gryphonshafer/exact/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact)

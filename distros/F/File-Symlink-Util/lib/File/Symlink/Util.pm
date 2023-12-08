@@ -9,9 +9,9 @@ use Exporter 'import';
 use File::Spec;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-06-30'; # DATE
+our $DATE = '2023-08-25'; # DATE
 our $DIST = 'File-Symlink-Util'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 our @EXPORT_OK = qw(
                        symlink_rel
@@ -118,6 +118,10 @@ If set to true, then symlink target must be an absolute path. If
 set to false, then symlink target must be a relative path.
 
 _
+            cmdline_aliases => {
+                is_rel   => {is_flag=>1, summary=>'Alias for --isnt-abs', code=>sub { $_[0]{is_abs} = 0 }},
+                isnt_rel => {is_flag=>1, summary=>'Alias for --is-abs', code=>sub { $_[0]{is_abs} = 1 }},
+            },
         },
         ext_matches => {
             summary => 'Whether extension should match',
@@ -229,7 +233,7 @@ File::Symlink::Util - Utilities related to symbolic links
 
 =head1 VERSION
 
-This document describes version 0.003 of File::Symlink::Util (from Perl distribution File-Symlink-Util), released on 2023-06-30.
+This document describes version 0.005 of File::Symlink::Util (from Perl distribution File-Symlink-Util), released on 2023-08-25.
 
 =head1 SYNOPSIS
 

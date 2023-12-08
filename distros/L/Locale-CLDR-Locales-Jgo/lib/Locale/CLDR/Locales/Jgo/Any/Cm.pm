@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Jgo::Any::Cm - Package for language Ngomba
 
 package Locale::CLDR::Locales::Jgo::Any::Cm;
 # This file auto generated from Data\common\main\jgo_CM.xml
-#	on Sat  4 Nov  6:08:34 pm GMT
+#	on Tue  5 Dec  1:16:33 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

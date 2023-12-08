@@ -396,6 +396,8 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
   }
   bool is_enterleave = !!(piece->type & XPK_TYPEFLAG_ENTERLEAVE);
 
+  U32 optflag = is_optional ? PARSE_OPTIONAL : 0;
+
   U32 type = piece->type & 0xFFFF;
 
   switch(type) {
@@ -533,7 +535,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         if(lex_peek_unichar(0) == ')')
           THISARG.op = newOP(OP_STUB, 0);
         else {
-          THISARG.op = parse_fullexpr(0);
+          THISARG.op = parse_fullexpr(optflag);
           CHECK_PARSEFAIL;
 
           lex_read_space(0);
@@ -544,16 +546,16 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       else {
         switch(type) {
           case XS_PARSE_KEYWORD_ARITHEXPR:
-            THISARG.op = parse_arithexpr(0);
+            THISARG.op = parse_arithexpr(optflag);
             break;
           case XS_PARSE_KEYWORD_TERMEXPR:
-            THISARG.op = parse_termexpr(0);
+            THISARG.op = parse_termexpr(optflag);
             break;
         }
         CHECK_PARSEFAIL;
       }
 
-      if(want)
+      if(want && THISARG.op)
         THISARG.op = op_contextualize(THISARG.op, want);
 
       (*argidx)++;
@@ -565,10 +567,10 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     }
 
     case XS_PARSE_KEYWORD_LISTEXPR:
-      THISARG.op = parse_listexpr(0);
+      THISARG.op = parse_listexpr(optflag);
       CHECK_PARSEFAIL;
 
-      if(want)
+      if(want && THISARG.op)
         THISARG.op = op_contextualize(THISARG.op, want);
 
       (*argidx)++;
@@ -671,7 +673,7 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
     }
 
     case XS_PARSE_KEYWORD_VSTRING:
-      THISARG.sv = lex_scan_version(is_optional ? PARSE_OPTIONAL : 0);
+      THISARG.sv = lex_scan_version(optflag);
       (*argidx)++;
       return;
 

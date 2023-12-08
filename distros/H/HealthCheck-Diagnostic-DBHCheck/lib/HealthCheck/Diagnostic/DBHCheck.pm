@@ -2,7 +2,7 @@ package HealthCheck::Diagnostic::DBHCheck;
 
 # ABSTRACT: Check a database handle to make sure you have read/write access
 use version;
-our $VERSION = 'v1.0.0'; # VERSION
+our $VERSION = 'v1.0.1'; # VERSION
 
 use 5.010;
 use strict;
@@ -192,7 +192,7 @@ HealthCheck::Diagnostic::DBHCheck - Check a database handle to make sure you hav
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 

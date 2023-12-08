@@ -38,7 +38,9 @@ subtest '->list_p' => sub {
 	$Emulator->start;
 
 	$EntityInvoice
-		->list_p({ path_params => { external_id => 'Vv2XlY1ema' } })
+		->list_p({
+			path_params => { external_id => 'Vv2XlY1ema' },
+		})
 		->then( sub {
 			my ( $Invoice ) = @_;
 
@@ -68,7 +70,7 @@ subtest '->create_p' => sub {
 	};
 
 	$EntityInvoice
-		->create_p( $data )
+		->create_p({ content => $data })
 		->then( sub {
 			my ( $Invoice ) = @_;
 
@@ -87,7 +89,10 @@ subtest '->update_p' => sub {
 	$Emulator->start;
 
 	$EntityInvoice
-		->update_p( { path_params => { external_id => 'Vv2XlY1ema' } }, { amount => 777 } )
+		->update_p({
+			content => { amount => 777 },
+			path_params => { external_id => 'Vv2XlY1ema' },
+		})
 		->then( sub {
 			my ( $Invoice ) = @_;
 			isa_ok( $Invoice, 'PayProp::API::Public::Client::Response::Entity::Invoice' );
@@ -97,18 +102,6 @@ subtest '->update_p' => sub {
 
 	$Emulator->stop;
 
-};
-
-
-sub _path_params {
-	my ( $self ) = @_;
-
-	return [qw/ external_id /];
-}
-
-subtest 'params' => sub {
-	cmp_deeply $EntityInvoice->_path_params, [qw/ external_id /];
-	cmp_deeply $EntityInvoice->_query_params, [qw/ is_customer_id /];
 };
 
 done_testing;

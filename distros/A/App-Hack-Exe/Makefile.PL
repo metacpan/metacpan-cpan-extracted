@@ -25,7 +25,7 @@ my %writemakefileargs = (
     )},
     PREREQ_PM => {qw(
         Carp 0
-        Socket 0
+        Socket 1.95
         Term::ANSIColor 0
         Time::HiRes 0
         fields 0

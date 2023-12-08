@@ -1,0 +1,64 @@
+NAME
+    run-command-to-fail - Tool to run command in cycle to check fail.
+
+SYNOPSIS
+     run-command-to-fail [-h] [-l] [-n cycles] [-p preset] [--version]
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "-l"
+
+            List presets.
+
+    *       "-n cycles"
+
+            Number of cycles.
+
+            Default value is 100 cycles.
+
+    *       "-p preset"
+
+            Preset for run.
+
+            Default value is 'perl'.
+
+    *       "--version"
+
+            Print version of script.
+
+ACTUAL PRESETS
+    "blank"
+        Clean preset. User could run anything, what want.
+
+    "perl"
+        Perl preset.
+
+        One argument is required, it's Perl file to run.
+
+    "strace_perl"
+        Perl preset with strace processing.
+
+        One argument is required, it's Perl file to run.
+
+EXAMPLE
+     run-command-to-fail -n 10 -p blank true
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Run-Command-ToFail>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2023 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

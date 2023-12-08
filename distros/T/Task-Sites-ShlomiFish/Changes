@@ -1,5 +1,8 @@
 Revision history for Task-Sites-ShlomiFish:
 
+0.0215  2023-11-29
+        - Add deps
+
 0.0214  2020-10-19
     - Avoid stale POD
         - Inspired by Lady_Aleena.

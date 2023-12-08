@@ -1,3 +1,171 @@
+0.211002 2023-12-07
+  [Prerequirement Changes]
+    * Require SPVM::Sys 0.510.
+0.211001 2023-11-18
+  [Internal Changes]
+    * Do not use Sys->select for the future breaking backword compatible.
+0.211 2023-11-18
+  [Incompatible Changes]
+    * The return types of the following methods becomes void.
+      [IO::Handle]
+        sync
+        print
+        printf
+        say
+        close
+        truncate
+      [IO::File]
+        close
+        flush
+        printflush
+        open
+        fdopen
+      [IO::Socket]
+        close
+        setsockopt
+        connect
+        listen
+        bind
+        shutdown
+        socket
+        
+    * Remove the set_sockopt method from the IO::Socket class.
+    * Remove the getsockopt method from the IO::Socket class.
+    * The type of Timeout field in the IO::Socket becomes double.
+  [Changes]
+    * The write method in the IO::File returns written length.
+0.210 2023-11-18
+  [Prerequirement Changes]
+    * Require SPVM::Go 0.005.
+0.209 2023-11-16
+  [Prerequirement Changes]
+    * Require SPVM::Sys 0.497.
+    * Require SPVM::Go 0.003.
+  [New Features]
+    * Add $lengtht and $buf_offset argument to the send method in the IO::Socket class.
+      
+      method send : int ($buffer : string, $flags : int = 0, $to : Sys::Socket::Sockaddr = undef, $length : int = -1, $buf_offset : int = 0);
+      
+    * Add $buf_offset argument to the recv method in the IO::Socket class.
+      
+      method recv : int ($buffer : mutable string, $length : int = -1, $flags : int = 0, $buf_offset : int = 0);
+      
+  [Internal Changes]
+    * The the read method in the IO::Socket calls revc method.
+    * The the write method in the IO::Socket calls send method.
+    * The the sysread method in the IO::Socket calls revc method.
+    * The the syswrite method in the IO::Socket calls send method.
+  [New Features and Incompatible Changes]
+    * The socket of IO::Socket is set to non-blocking mode.
+    * IO::Socket supports goroutine of Go.
+0.208 2023-09-11
+  [Prerequirement Changes]
+    * Require SPVM::Sys 0.490.
+  [Incompatibe Changes]
+    * The following methods are moved from the IO::File class to the IO::Handle class.
+      
+      method sync : int ();
+      method stat : Sys::IO::Stat ();
+      method truncate : int ($legnth : long);
+    
+    * The sync method in the IO::Handle class is changed. If succedd, returns 1.
+    
+    * The following methods in IO::File class are changed.
+    
+      -  static method new : IO::File ($file_name : string = undef, $open_mode : string = undef);
+      +  static method new : IO::File ($file_name : string = undef, $open_mode : object of string|Int = undef, $perm : int = 0);
+      
+      -  method open : void ($file_name : string, $open_mode : string);
+      +  method open : int ($file_name : string, $open_mode : object of string|Int, $perm : int = 0);
+    
+    * The write method in the IO::Handle return if succedd.
+    
+    * The following methods in the IO::Socket class are changed.
+    
+      +  method sockopt : int ($level : int, $optname : int);
+      
+      +  method set_sockopt : int ($level : int, $optname : int, $optval : int);
+      
+0.207 2023-09-04
+  [Prerequirement Changes]
+    * Require SPVM::Sys 0.486.
+    * Require SPVM 0.989040.
+  [New Features]
+    * The IO::Socket::UNIX class is added.
+  [Changes]
+    * The implementation of fileno method is improved.
+    
+  [Incompatibe Changes]
+    * input_output_number is incremented.
+    * The following fields and methods in the IO::Socket class are added, deleted, or changed.
+      
+      -  has timeout : protected ro int;
+      +  has Timeout : protected int;
+      +  method timeout : int ();
+      
+      -  has sockdomain : protected ro int;
+      +  has Domain : protected int;
+      +  method sockdomain : int ();
+      
+      -  has socktype : protected ro int;
+      +  has Type : protected int;
+      +  method socktype : int ();
+      
+      -  has protocol : protected ro int;
+      +  has Proto : protected ro int;
+      +  method protocol : int ();
+      
+      -  has listen_backlog : protected int;
+      +  has Listen : protected int;
+      
+      -  method peerport : int ();
+      -  method peerhost : string ();
+      
+      -  has peername : protected ro Sys::Socket::Sockaddr;
+      +  has peername : protected Sys::Socket::Sockaddr;
+      +  method peername : Sys::Socket::Sockaddr ();
+    
+    * The following fields and methods in the IO::File class are added, deleted, or changed.
+    
+      + method input_line_number : long ();
+      
+      + method set_input_line_number : void ($input_line_number : long);
+      + method truncate : int ($legnth : long);
+      + method stat : Sys::IO::Stat ();
+      + method sync : int ();
+      - method opened : int ();
+      
+    * The following fields and methods in the IO::Handle class are added, deleted, or changed.
+      
+      -  method blocking : void ($blocking : int);
+      +  method blocking : int ();
+      +  method set_blocking : void ($blocking : int);
+      
+      -  has blocking_flag : rw protected int;
+      +  has nonblocking : protected int;
+      
+      -  has opened : ro protected int;
+      +  method opened : int ();
+      
+      method truncate : int ($legnth : long) throws an exception.
+      
+      method sync : int () throws an exception.
+      
+      -  method stat : int ($stat : Sys::IO::Stat);
+      +  method stat : Sys::IO::Stat ();
+      
+    * fd field in IO::Socket class is moved to IO::Handle class.
+    
+    * write method in IO::Socket class call syswrite method.
+    * read method in IO::Socket class call sysread method.
+    * print method calls write method.
+    
+0.206 2023-09-04
+  [Prerequirement Changes]
+    * SPVM::Sys 0.485 is required.
+0.205 2023-09-04
+  [Prerequirement Changes]
+    * SPVM::Sys 0.484 is required.
 0.204003 2023-08-22
   [Changes]
     * Type comments of the ioctl method in the IO::Handle are changed.

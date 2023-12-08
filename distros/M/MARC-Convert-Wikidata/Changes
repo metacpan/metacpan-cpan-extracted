@@ -1,3 +1,15 @@
+0.07 2023-11-29T01:53:01+01:00
+ - Add $options_hr return value to clean_date(). Implment circa date.
+ - Add Litoměřice to publishing places cleanup.
+ - Add Náchodě to publishing places cleanup.
+ - Add Praha? to publishing places cleanup.
+ - Add Výst. to series ordinal cleanup.
+ - Add Výstava to series ordinal cleanup.
+ - Add example for clean_number_of_pages() to doc.
+ - Add property snak to publishing place to resolve multiple publishers.
+ - Fix cleanup of publisher name with ending ']'.
+ - Implement sine loco.
+
 0.06 2023-11-20T14:16:34+01:00
  - Rewrite to use of MARC::Leader.
 

@@ -171,11 +171,10 @@ For optimization calling subroutine in runtime type check, you can overwrite `ch
 
     {
         no warnings 'redefine';
-        sub Smart::Args::TypeTiny::check_rule {
-            my ($rule, $value, $exists, $name) = @_;
-            return $value;
-        }
+        *Smart::Args::TypeTiny::check_rule = \&Smart::Args::TypeTiny::Check::no_check_rule;
     }
+
+`Smart::Args::TypeTiny::Check::no_check_rule` is a function without type checking and type coerce, but settings such as default and optional work the same as `check_rule`.
 
 # SEE ALSO
 

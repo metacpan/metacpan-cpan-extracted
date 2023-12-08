@@ -66,29 +66,4 @@ subtest '->list_p' => sub {
 
 };
 
-subtest '->_query_params' => sub {
-
-	cmp_deeply
-		$ExportBeneficiaries->_query_params,
-		[
-			qw/
-				rows
-				page
-				owners
-				external_id
-				search_by
-				search_value
-				is_archived
-				customer_id
-				bank_branch_code
-				customer_reference
-				modified_from_time
-				bank_account_number
-				modified_from_timezone
-			/
-		]
-	;
-
-};
-
 done_testing;

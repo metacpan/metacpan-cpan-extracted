@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use IPC::System::Options 'system', -log=>1, -die=>1;
+use List::Util qw(uniq);
+
+our %SPEC;
+
+my @skiplist = (
+    'You::re_using',
+    'EU', # alias
+    'CPAN::Streaks::DailyDistributions',
+    'CPAN::Streaks::DailyNewDistributions',
+    'CPAN::Streaks::DailyReleases',
+    'CPAN::Streaks::WeeklyDistributions',
+    'CPAN::Streaks::WeeklyNewDistributions',
+    'CPAN::Streaks::WeeklyReleases',
+    'CPAN::Streaks::MonthlyDistributions',
+    'CPAN::Streaks::MonthlyNewDistributions',
+    'CPAN::Streaks::MonthlyReleases',
+    'InMostCPANAuthors', # us!
+);
+
+$SPEC{app} = {
+    v => 1.1,
+    args => {
+        update_modules => {
+            schema => 'bool*',
+            default => 1,
+            cmdline_aliases => {
+                U => {is_flag=>1, summary=>'Shortcut for --no-update-modules', code=>sub {$_[0]{update_modules} = 0}},
+            },
+        },
+    },
+};
+sub app {
+    my %args = @_;
+
+  UPDATE_MODULES: {
+        last unless $args{update_modules} // 1;
+        log_info "Installing/updating all Acme::CPANAuthors::* modules ...";
+        system "lcpan mods --namespace Acme::CPANAuthors | lcpanm -n";
+    } # UPDATE_MODULES
+
+    my %all_authors; # key=ac_mod, val=\@authors
+  LIST_AUTHORS: {
+        log_info "Listing all authors from all lists ...";
+
+        require Module::List;
+        my $res = Module::List::list_modules("Acme::CPANAuthors::", {list_modules=>1, recurse=>1});
+        my @modules = sort keys %$res;
+
+        require Acme::CPANAuthors;
+      MOD:
+        for my $mod (@modules) {
+            log_debug "Processing module $mod ...";
+            (my $ac_mod = $mod) =~ s/^Acme::CPANAuthors:://;
+            if (grep { $_ eq $ac_mod } @skiplist) {
+                log_info "Skipped list $ac_mod";
+                next MOD;
+            }
+            my @authors;
+            eval { (my $mod_pm = "$mod.pm") =~ s!::!/!g; require $mod_pm; my %authors = $mod->authors; @authors = sort keys %authors };
+            if ($@) {
+                log_warn "Can't extract authors from list $ac_mod: $@, skipped";
+                next MOD;
+            }
+            $all_authors{$ac_mod} = \@authors;
+        }
+    } # LIST_AUTHORS
+
+    my %author_lists; # key=author, val=[list1, ...]
+  COUNT: {
+        for my $ac_mod (sort keys %all_authors) {
+            for my $author (uniq sort @{ $all_authors{$ac_mod} }) {
+                $author_lists{$author} //= [];
+                push @{ $author_lists{$author} }, $ac_mod;
+            }
+        }
+    } # COUNT
+
+    my @res;
+  RANK: {
+        require List::Rank;
+        my @authors = sort keys %author_lists;
+        my @rankpairs = List::Rank::sortrankby(sub { scalar(@{ $author_lists{$b} }) <=> scalar(@{ $author_lists{$a} }) || $a cmp $b }, @authors);
+
+        while (my ($author, $rank) = splice @rankpairs, 0, 2) {
+            push @res, {
+                author => $author,
+                #rank => $rank,
+                num_lists => scalar(@{ $author_lists{$author} }),
+                lists => join(", ", @{ $author_lists{$author} }),
+            },
+        }
+    } # RANK
+
+
+    [200, "OK", \@res, {'table.fields'=>[qw/author num_lists lists/]}];
+}
+
+use Perinci::CmdLine::Any;
+Perinci::CmdLine::Any->new(
+    url => '/main/app',
+    log => 1,
+)->run;

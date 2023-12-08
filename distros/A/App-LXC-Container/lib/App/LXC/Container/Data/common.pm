@@ -33,7 +33,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.36';
+our $VERSION = '0.40';
 
 use App::LXC::Container::Texts;
 

@@ -1,0 +1,24 @@
+rpm unpacking shpuld create a RPM_META directory containing
+ - unpack normally, then 
+
+ - mkdir .RPM_META or .RPM_META_nnn (lowest number that is available)
+ - a full dump of al headers
+   rpm --querytags | xargs rpm -qp --qf '$NAME = %{$NAME}\n' >> .RPM_META/tags
+ - expose all scripts explicitly
+   rpm --showrc  >> .RPM_META/scripts
+ 
+ - see if filename RPM_META is unused, 
+   make a symlink to the .RPM_META* dir we used above.
+
+implement multipart mime encoded archives. test.mht
+
+file_unpack-0.58 /var/tmp/build-root/home/abuild/rpmbuild/RPMS/noarch/MOPS-1.00-0.noarch.rpm
+  E: (rpm2cpio) 1005 blocks
+  # oops: logf used before prolog??
+  # /var/tmp/build-root/home/abuild/rpmbuild/RPMS/noarch/MOPS-1.00-0.noarch.rpm (application/x-rpm) -> usr
+  usr/bin/MOPS (text/x-shellscript)
+  usr/lib/MOPS/a_plus_b.ass (text/plain)
+  usr/lib/MOPS/bitshift.ass (text/plain)
+  usr/lib/MOPS/mops.cfg (text/plain)
+  Can't locate object method "code" via package "Compress::Raw::Lzma::AloneDecoder" at /usr/lib/perl5/vendor_perl/5.16.0/File/Unpack2.pm line 2369.
+

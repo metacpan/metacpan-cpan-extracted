@@ -9,10 +9,6 @@ use utf8;
 
 WWW::Suffit::Server - The Suffit API server library
 
-=head1 VERSION
-
-Version 1.01
-
 =head1 SYNOPSIS
 
     use WWW::Suffit::Server;
@@ -50,7 +46,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 1;
 

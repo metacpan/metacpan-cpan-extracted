@@ -24,48 +24,61 @@ DESCRIPTION
     <https://en.wikipedia.org/wiki/Bucharest_Metro>.
 
 METHODS
-    "new()"
-             Constructor.
+  "new"
+    Constructor.
 
-    "get_all_routes($from, $to)" [EXPERIMENTAL]
-             Get all routes from station to station.
-             Returns reference to array with Map::Tube::Route objects.
+    Returns instance of object.
 
-    "get_line_by_id($line_id)"
-             Get line object defined by id.
-             Returns Map::Tube::Line object.
+  "get_all_routes" [EXPERIMENTAL]
+    Get all routes from station to station.
 
-    "get_line_by_name($line_name)"
-             Get line object defined by name.
-             Returns Map::Tube::Line object.
+    Returns reference to array with Map::Tube::Route objects.
 
-    "get_lines()"
-             Get lines in metro map.
-             Returns reference to unsorted array with Map::Tube::Line objects.
+  "get_line_by_id"
+    Get line object defined by id.
 
-    "get_node_by_id($station_id)"
-             Get station node by id.
-             Returns Map::Tube::Node object.
+    Returns Map::Tube::Line object.
 
-    "get_node_by_name($station_name)"
-             Get station node by name.
-             Returns Map::Tube::Node object.
+  "get_line_by_name"
+    Get line object defined by name.
 
-    "get_shortest_route($from, $to)"
-             Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
-             Returns Map::Tube::Route object.
+    Returns Map::Tube::Line object.
 
-    "get_stations($line)"
-             Get list of stations for concrete metro line.
-             Returns reference to array with Map::Tube::Node objects.
+  "get_lines"
+    Get lines in metro map.
 
-    "name()"
-             Get metro name.
-             Returns string with metro name.
+    Returns reference to unsorted array with Map::Tube::Line objects.
 
-    "xml()"
-             Get XML specification of Bucharest metro.
-             Returns string with XML.
+  "get_node_by_id"
+    Get station node by id.
+
+    Returns Map::Tube::Node object.
+
+  "get_node_by_name"
+    Get station node by name.
+
+    Returns Map::Tube::Node object.
+
+  "get_shortest_route"
+    Get shortest route between $from and $to node names. Node names in $from
+    and $to are case insensitive.
+
+    Returns Map::Tube::Route object.
+
+  "get_stations"
+    Get list of stations for concrete metro line.
+
+    Returns reference to array with Map::Tube::Node objects.
+
+  "name"
+    Get metro name.
+
+    Returns string with metro name.
+
+  "xml"
+    Get XML specification of Bucharest metro.
+
+    Returns string with XML.
 
 EXAMPLE1
      use strict;
@@ -213,10 +226,12 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2020 Michal Josef Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.10
+    0.11
 

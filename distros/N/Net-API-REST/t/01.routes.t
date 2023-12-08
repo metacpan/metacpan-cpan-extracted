@@ -5,7 +5,7 @@ BEGIN
 	use lib './lib';
 	use URI;
 	use IO::File;
-	use Test::More tests => 3;
+	use Test::More tests => 4;
 };
 
 my $url = shift( @ARGV ) || 'http://localhost/jp/org/stock/1234/board/member/5678';
@@ -24,6 +24,7 @@ elsif( !length( $sub ) )
 is( ref( $sub ), 'Net::API::REST::Endpoint', "Handler is a Net::API::REST::Endpoint object" );
 my $rv = $sub->handler->( 'argv1' );
 is( $rv, 'John Doe', "Checking handler returned value." );
+is( $sub->params->{auth_method} => 'path_info', 'endpoint -> params' );
 exit( 0 );
 
 package MyAPI;
@@ -105,6 +106,8 @@ sub init
 						{
 							_handler => $self->curry::jp_stock,
 							_name => 'org_id',
+							# arbitrary hash of key-value pairs
+							_params => { auth_method => 'path_info' },
 							board =>
 							{
 								_handler => $self->curry::board,

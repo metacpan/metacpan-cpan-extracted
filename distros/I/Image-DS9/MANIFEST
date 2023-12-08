@@ -27,11 +27,13 @@ lib/Image/DS9/Constants/V1.pm
 lib/Image/DS9/Daemon.pm
 lib/Image/DS9/Grammar.pm
 lib/Image/DS9/Grammar/V8_5.pm
+lib/Image/DS9/Grammar/V8_5.pm.orig
 lib/Image/DS9/Manual/API.pod
 lib/Image/DS9/Manual/Connect.pod
 lib/Image/DS9/Manual/Install.pod
 lib/Image/DS9/Manual/Interface.pod
 lib/Image/DS9/PConsts.pm
+lib/Image/DS9/PConsts.pm.orig
 lib/Image/DS9/Parser.pm
 lib/Image/DS9/Util.pm
 mutagen.yml
@@ -77,6 +79,7 @@ t/iis.t
 t/illustrate.t
 t/jpeg.t
 t/lib/My/Util.pm
+t/lib/My/Util.pm.orig
 t/lib/TestServer.pm
 t/lock.t
 t/lower.t

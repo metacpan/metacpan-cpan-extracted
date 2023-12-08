@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Nyn::Any::Ug - Package for language Nyankole
 
 package Locale::CLDR::Locales::Nyn::Any::Ug;
 # This file auto generated from Data\common\main\nyn_UG.xml
-#	on Sat  4 Nov  6:18:54 pm GMT
+#	on Tue  5 Dec  1:26:46 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

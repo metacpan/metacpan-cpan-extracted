@@ -1,3 +1,13 @@
+0.05 2023-12-06T12:11:29+01:00
+ - Fix example in doc.
+ - Regen README, META.yml and MANIFEST files.
+ - Rename example files to better names.
+
+0.04 2023-12-05T14:33:37+01:00
+ - Rewrite to use Alien::DjVuLibre.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.03 2021-11-13T12:35:10+01:00
  - Add link to File::Find::Rule::DjVu in doc.
  - Add two tests.

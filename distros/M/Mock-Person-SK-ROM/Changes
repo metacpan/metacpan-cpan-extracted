@@ -1,3 +1,17 @@
+0.03 2023-12-05T13:18:52+01:00
+ - Fix DEPENDENCIES section in doc.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example names to better names.
+ - Rewrite doc to use of =head2.
+ - Rewrite from List::MoreUtils to List::Util.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.02 2015-10-27T11:36:54+01:00
  - Fix comment (thanks Mohammad S Anwar).
  - Improve LICENSE AND COPYRIGHT section in doc.

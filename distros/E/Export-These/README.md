@@ -118,7 +118,7 @@ routines, injecting the dependency, instead of the consumer hard coding it.
 
 ## Importing a module which uses this module
 
-Importing is achieved just like normal.
+Importing is like normal:
 
 ```perl
 require My::Module;
@@ -127,19 +127,27 @@ My::Moudle->import;
 use My::Moudle qw<:tag_name name2 ...>;
 ```
 
-However, from **v0.2.0** importing of a module can also take a reference value
-as a key without error. This allows passing non names as configuration data for
-the module to use:
+However, from **v0.2.1** modules exporting with [Export::These](https://metacpan.org/pod/Export%3A%3AThese) can also take
+reference values as a key without error. This allows passing non names as
+configuration data for the module to use:
 
 ```perl
 eg
 
+  # Config module and export named symbols
   use My::Module {prefork=>1, workers=>10}, "symname1", ":group1",['more', 'config'];
+
+  # Config module and export default symbols
+  use My::Module {prefork=>1, workers=>10};
+
+  # Config module only. No symbol export
+  use My::Module {prefork=>1, workers=>10}, undef;
 ```
 
 In this hypothetical example, the My::Module uses the hash and array ref as
 configuration internally, and the normal scalars as the symbols/tag groups to
-export
+export. In the last case the undef value forces no importing of default symbols
+when using a reference value.
 
 ## Specifying Symbols to Export
 

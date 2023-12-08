@@ -13,7 +13,7 @@ our @ISA = qw(DynaLoader);
 # SQL_DRIVER_VER is formatted as dd.dd.dddd
 # for version 5.x please switch to 5.00(_00) version numbering
 # keep $VERSION in Bundle/DBD/mysql.pm in sync
-our $VERSION = '5.002';
+our $VERSION = '5.003';
 
 bootstrap DBD::mysql $VERSION;
 
@@ -1526,7 +1526,7 @@ etc) will have the UTF-8 flag turned on if necessary.  This enables
 character semantics on that string.  You will also need to ensure that
 your database / table / column is configured to use UTF8. See for more
 information the chapter on character set support in the MySQL manual:
-L<http://dev.mysql.com/doc/refman/5.7/en/charset.html>
+L<http://dev.mysql.com/doc/refman/8.0/en/charset.html>
 
 Additionally, turning on this flag tells MySQL that incoming data should
 be treated as UTF-8.  This will only take effect if used as part of the
@@ -2097,7 +2097,7 @@ Please report bugs, including all the information needed
 such as DBD::mysql version, MySQL version, OS type/version, etc
 to this link:
 
-L<https://rt.cpan.org/Dist/Display.html?Name=DBD-mysql>
+L<https://github.com/perl5-dbi/DBD-mysql/issues/new/choose>
 
 Note: until recently, MySQL/Sun/Oracle responded to bugs and assisted in
 fixing bugs which many thanks should be given for their help!

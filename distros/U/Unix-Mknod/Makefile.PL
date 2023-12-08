@@ -12,6 +12,6 @@ WriteMakefile(
     VERSION_FROM      => 'lib/Unix/Mknod.pm', # finds $VERSION
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Unix/Mknod.pm', # retrieve abstract from module
-       AUTHOR         => 'Jim Pirzyk <pirzyk@uiuc.edu>') : ()),
+       AUTHOR         => 'Jim Pirzyk <pirzyk@freebsd.org>') : ()),
     DEFINE            => $defines
 );

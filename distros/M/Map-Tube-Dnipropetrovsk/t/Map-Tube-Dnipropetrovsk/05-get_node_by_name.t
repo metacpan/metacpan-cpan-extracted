@@ -23,11 +23,11 @@ like($EVAL_ERROR, qr{^Map::Tube::get_node_by_name\(\): ERROR: Invalid Station Na
 	'Get node for bad node name.');
 
 # Test.
-my @ret = sort map { $_->id } $map->get_node_by_name(decode_utf8('Комунарівська'));
+my @ret = sort map { $_->id } $map->get_node_by_name(decode_utf8('Покровська'));
 is_deeply(
 	\@ret,
 	[
 		'1-01',
 	],
-	"Get all nodes for 'Комунарівська'.",
+	"Get all nodes for 'Покровська'.",
 );

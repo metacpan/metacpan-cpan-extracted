@@ -10,7 +10,7 @@
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-11-23'; # DATE
 our $DIST = 'App-errno'; # DIST
-our $VERSION = '0.070'; # VERSION
+our $VERSION = '0.071'; # VERSION
 
 use Getopt::Long::EvenLess;
 
@@ -91,7 +91,7 @@ errno - List/show errno
 
 =head1 VERSION
 
-This document describes version 0.070 of errno (from Perl distribution App-errno), released on 2023-11-23.
+This document describes version 0.071 of errno (from Perl distribution App-errno), released on 2023-11-23.
 
 =head1 SYNOPSIS
 
@@ -111,7 +111,8 @@ List all known errno's on your system:
 =head1 DESCRIPTION
 
 This script can be used to show the error message of a particular C<errno>, or
-list all available errno's on your system.
+list all available errno's on your system. It is basically a simple CLI for the
+L<Errno>.pm Perl module.
 
 =head1 HOMEPAGE
 

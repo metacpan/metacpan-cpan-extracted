@@ -1,5 +1,13 @@
 Revision history for Perl extension JavaScript::QuickJS:
 
+0.19 Fri 1 Dec 2023
+- BREAKING CHANGE: Enabling std() or os() now creates globals by those names.
+  This matches the “qjs” binary’s behavior.
+- Update to latest quickjs (03cc5ec).
+
+0.18 Wed 29 Nov 2023
+- Fix segfault when importing "os".
+
 0.17 Thu 12 Jan 2023
 - Add Windows support.
 - Fix a leftover debugging artifact.

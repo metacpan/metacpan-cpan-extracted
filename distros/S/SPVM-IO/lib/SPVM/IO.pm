@@ -1,6 +1,6 @@
 package SPVM::IO;
 
-our $VERSION = "0.204003";
+our $VERSION = "0.211002";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::IO - File IO, Socket, Select/Polling.
 
 =head1 Description
 
-C<IO> provide for File IO, Socket, Select/Polling.
+IO class has methods to manipulate File IO, Socket, Select/Polling.
 
 =head1 Modules
 
@@ -23,6 +23,8 @@ C<IO> provide for File IO, Socket, Select/Polling.
 =item * L<IO::Socket|SPVM::IO::Socket>
 
 =item * L<IO::Socket::INET|SPVM::IO::Socket::INET>
+
+=item * L<IO::Socket::UNIX|SPVM::IO::Socket::UNIX>
 
 =item * L<IO::Select|SPVM::IO::Select>
 

@@ -10,7 +10,9 @@ my $NUM_THREADS = 6;
 
 my $preplan = q{
 (
-  step
+  step  # step_id = 0
+  &
+  step  # step_id = 1
   &
   step
   &
@@ -18,9 +20,7 @@ my $preplan = q{
   &
   step
   &
-  step
-  &
-  step
+  step  # step_id = 5
 )
 reduce
 };

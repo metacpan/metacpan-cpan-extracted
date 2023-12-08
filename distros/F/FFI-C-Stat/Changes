@@ -1,4 +1,12 @@
-Revision history for FFI-C-Stat},
+Revision history for FFI-C-Stat
+
+0.03      2023-12-01 11:34:00 -0700
+  - Passing no arguments to new will now return an
+    uninitialized stat object (gh#9, gh#10)
+  - Passing undef to clone will now return a stat
+    object with the memory set to all zeros,
+    previously the behavior was undefined and could
+    crash (gh#10)
 
 0.02      2021-05-31 05:48:05 -0600
   - Work around possible bug in Perl stat function

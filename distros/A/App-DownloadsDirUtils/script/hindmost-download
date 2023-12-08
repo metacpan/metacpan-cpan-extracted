@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-11-16'; # DATE
+our $DATE = '2023-12-08'; # DATE
 our $DIST = 'App-DownloadsDirUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DownloadsDirUtils/hindmost_download",
@@ -39,7 +39,7 @@ hindmost-download - Return the hindmost file(s) in the downloads directories
 
 =head1 VERSION
 
-This document describes version 0.003 of hindmost-download (from Perl distribution App-DownloadsDirUtils), released on 2023-11-16.
+This document describes version 0.006 of hindmost-download (from Perl distribution App-DownloadsDirUtils), released on 2023-12-08.
 
 =head1 SYNOPSIS
 

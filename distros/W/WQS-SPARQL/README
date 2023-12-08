@@ -4,15 +4,46 @@ NAME
 SYNOPSIS
      use WQS::SPARQL;
 
-     my $obj = WQS::SPARQL->new;
+     my $obj = WQS::SPARQL->new(%params);
      my $ret_hr = $obj->query($sparql);
      my $count = $obj->query_count($sparql_count);
 
 METHODS
   "new"
-     my $obj = WQS::SPARQL->new;
+     my $obj = WQS::SPARQL->new(%params);
 
     Constructor.
+
+    *   "agent"
+
+        User agent.
+
+        Default value is 'WQS::SPARQL (__VERSION__)'.
+
+    *   "lwp_user_agent"
+
+        LWP::UserAgent object.
+
+        Default value is instance of LWP::UserAgent with constructor 'agent'
+        parameter.
+
+    *   "query_site"
+
+        Query site.
+
+        Default value is 'query.wikidata.org'.
+
+    *   "sparql_endpoint"
+
+        SPARQL endpoint.
+
+        Default value is '/bigdata/namespace/wdq/sparql'.
+
+    *   "verbose"
+
+        Verbose mode.
+
+        Default value is 0.
 
     Returns instance of class.
 
@@ -107,7 +138,7 @@ EXAMPLE2
 
 DEPENDENCIES
     Class::Utils, Error::Pure. HTTP::Request, JSON::XS, LWP::UserAgent, URI,
-    URI::QueryParam.
+    URI::QueryParam, Unicode::UTF8.
 
 SEE ALSO
     WQS::SPARQL::Query
@@ -127,5 +158,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

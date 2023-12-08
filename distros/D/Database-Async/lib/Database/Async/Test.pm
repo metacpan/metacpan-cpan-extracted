@@ -3,7 +3,7 @@ package Database::Async::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 =head1 NAME
 

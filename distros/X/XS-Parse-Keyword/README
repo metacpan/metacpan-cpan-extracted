@@ -193,6 +193,11 @@ PIECES AND PIECE TYPES
     source text. In this case, the pieces relating to those optional parts
     must support "probing". This ability is also noted below.
 
+    Many of the atomic piece types have a variant which is optional; if the
+    given input does not look like the expected syntax for the piece type
+    then an _OPT-suffixed version of the type will instead yield NULL in
+    its result pointer.
+
     The type of each piece should be one of the following macro values.
 
  XPK_BLOCK
@@ -328,7 +333,7 @@ PIECES AND PIECE TYPES
       to newATTRSUB(). The callback may modify the optree if required and
       return a new one.
 
- XPK_ARITHEXPR
+ XPK_ARITHEXPR. XPK_ARITHEXPR_OPT
 
     atomic, emits op.
 
@@ -337,12 +342,14 @@ PIECES AND PIECE TYPES
     An arithmetic expression is expected, parsed using parse_arithexpr(),
     and passed as an optree in the op field.
 
- XPK_ARITHEXPR_VOIDCTX, XPK_ARITHEXPR_SCALARCTX
+ XPK_ARITHEXPR_VOIDCTX, XPK_ARITHEXPR_OPT
+
+ XPK_ARITHEXPR_SCALARCTX, XPK_ARITHEXPR_SCALARCTX_OPT
 
     Variants of XPK_ARITHEXPR which puts the expression in void or scalar
     context.
 
- XPK_TERMEXPR
+ XPK_TERMEXPR, XPK_TERMEXPR_OPT
 
     atomic, emits op.
 
@@ -351,7 +358,9 @@ PIECES AND PIECE TYPES
     A term expression is expected, parsed using parse_termexpr(), and
     passed as an optree in the op field.
 
- XPK_TERMEXPR_VOIDCTX, XPK_TERMEXPR_SCALARCTX
+ XPK_TERMEXPR_VOIDCTX, XPK_TERMEXPR_VOIDCTX
+
+ XPK_TERMEXPR_SCALARCTX, XPK_TERMEXPR_SCALARCTX_OPT
 
     Variants of XPK_TERMEXPR which puts the expression in void or scalar
     context.
@@ -370,7 +379,7 @@ PIECES AND PIECE TYPES
     overly-complex, subtle, or outright ambiguous grammars, and should be
     avoided.
 
- XPK_LISTEXPR
+ XPK_LISTEXPR, XPK_LISTEXPR_OPT
 
     atomic, emits op.
 
@@ -379,7 +388,7 @@ PIECES AND PIECE TYPES
     A list expression is expected, parsed using parse_listexpr(), and
     passed as an optree in the op field.
 
- XPK_LISTEXPR_LISTCTX
+ XPK_LISTEXPR_LISTCTX, XPK_LISTEXPR_LISTCTX_OPT
 
     Variant of XPK_LISTEXPR which puts the expression in list context.
 
@@ -391,9 +400,6 @@ PIECES AND PIECE TYPES
     a PV in the sv field. An identifier is not permitted to contain a
     double colon (::).
 
-    The _OPT-suffixed version is optional; if no identifier is found then
-    sv is set to NULL.
-
  XPK_PACKAGENAME, XPK_PACKAGENAME_OPT
 
     atomic, can probe, emits sv.
@@ -401,9 +407,6 @@ PIECES AND PIECE TYPES
     A bareword package name is expected, and passed as an SV containing a
     PV in the sv field. A package name is similar to an identifier, except
     it permits double colons in the middle.
-
-    The _OPT-suffixed version is optional; if no package name is found then
-    sv is set to NULL.
 
  XPK_LEXVARNAME
 
@@ -446,9 +449,6 @@ PIECES AND PIECE TYPES
 
     A version string is expected, of the form v1.234 including the leading
     v character. It is passed as a version SV object in the sv field.
-
-    The _OPT-suffixed version is optional; if no version string is found
-    then sv is set to NULL.
 
  XPK_LEXVAR
 

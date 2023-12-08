@@ -112,13 +112,11 @@ is($_, "\n    a\n\tb\n\t    c\n\t\td\n\t\t    e\n\t\t\tf\n\t\t\t    g",
 
 warning_like
 {   debug('X');   }
-{   carped =>
-	qr/^bad debugging level 'X'$re_msg_tail/   },
+{   carped => qr/^bad debugging level 'X'$re_msg_tail/   },
     'bad debugging level causes error';
 warning_like
 {   debug(0, 'debug 0');   }
-{   carped =>
-	qr/^bad debugging level '0'$re_msg_tail/   },
+{   carped => qr/^bad debugging level '0'$re_msg_tail/   },
     'wrong debugging level causes error';
 
 warning_is
@@ -129,9 +127,9 @@ warning_is
 {   debug(1);   }
     undef,
     'switching debugging level does not cause an error';
-warning_is
+warning_like
 {   debug(1, 'debug 1');   }
-    "DEBUG\tdebug 1\n",
+    qr{^DEBUG\s+debug 1$},
     'equal debugging level is recorded (1 <= 1)';
 
 debug(2);

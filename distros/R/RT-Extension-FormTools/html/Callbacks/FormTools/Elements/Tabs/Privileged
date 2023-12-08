@@ -1,0 +1,53 @@
+<%init>
+
+if ( Menu->child('admin')
+    && $session{'CurrentUser'}->HasRight( Object => RT->System, Right => 'AdminForm' ) )
+{
+    my $formtools = Menu->child('admin')->child(
+        formtools => title => loc('FormTools'),
+        path      => '/Admin/FormTools/',
+    );
+
+    $formtools->child( select => title => loc('Select'), path => '/Admin/FormTools/' );
+    $formtools->child( create => title => loc('Create'), path => '/Admin/FormTools/Create.html' );
+}
+
+if ( $m->request_path =~ m{^/Admin/FormTools/} ) {
+    my $page = PageMenu();
+    if ( $HTML::Mason::Commands::m->request_args->{'id'} && $HTML::Mason::Commands::m->request_args->{'id'} =~ /^\d+$/ ) {
+        my $forms = $page->child( forms => title => loc('Form Tools'), path => "/Admin/FormTools/" );
+        $forms->child( select => title => loc('Select'), path => "/Admin/FormTools/index.html" );
+        $forms->child( create => title => loc('Create'), path => "/Admin/FormTools/Create.html" );
+    } else {
+        $page->child( select => title => loc('Select'), path => "/Admin/FormTools/index.html" );
+        $page->child( create => title => loc('Create'), path => "/Admin/FormTools/Create.html" );
+    }
+
+    if ( ( $HTML::Mason::Commands::DECODED_ARGS->{'id'} || '' ) =~ /^(\d+)$/ ) {
+        my $id  = $1;
+        my $form_attribute = RT::Attribute->new($session{'CurrentUser'});
+        my ($ok, $msg) = $form_attribute->Load($id);
+
+        unless ( $ok ) {
+            RT->Logger->error("Unable to load form with id $id");
+        }
+
+        $page->child( modify => title => loc('Modify'), path => "/Admin/FormTools/Modify.html?id=" . $id );
+        $page->child( description => title => loc('Description'), path => "/Admin/FormTools/Describe.html?id=" . $id );
+        $page->child( advanced => title => loc('Advanced'), path => "/Admin/FormTools/Advanced.html?id=" . $id );
+        $page->child( 'group-rights' => title => loc('Group Rights'), path => "/Admin/FormTools/GroupRights.html?id=" . $id );
+        $page->child( 'user-rights' => title => loc('User Rights'), path => "/Admin/FormTools/UserRights.html?id=" . $id );
+    }
+}
+
+# Forms home page for all privileged users
+my $formtools = Menu->child('home')->child(
+    formtools => title => loc('Forms'),
+    path      => '/Forms.html',
+);
+
+</%init>
+<%args>
+$Path
+$Has_Query
+</%args>

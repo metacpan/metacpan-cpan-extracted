@@ -9,7 +9,7 @@ use warnings;
 
 use Module::Runtime 'use_module';
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use IPC::XPA;
 use Safe::Isa;
@@ -530,7 +530,7 @@ Image::DS9 - interface to the DS9 image display and analysis program
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 

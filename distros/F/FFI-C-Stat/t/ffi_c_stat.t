@@ -71,6 +71,15 @@ is(
   'clone a stat',
 );
 
+is(
+  FFI::C::Stat->clone(undef),
+  object {
+    call [ isa => 'FFI::C::Stat' ] => T();
+    call $_ => D() for @props;
+  },
+  'clone undef',
+);
+
 {
   my $other = FFI::C::Stat->new('corpus/xx.txt');
   is(
@@ -121,5 +130,14 @@ if($Config{d_symlink} eq 'define')
 }
 
 unlink 'testlink';
+
+is(
+  FFI::C::Stat->new,
+  object {
+    call [ isa => 'FFI::C::Stat' ] => T();
+    call $_ => D() for @props;
+  },
+  'create uninitalized stat',
+);
 
 done_testing;

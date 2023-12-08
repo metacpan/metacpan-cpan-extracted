@@ -6,7 +6,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 our @CARP_NOT = qw( Image::DS9 );
 
@@ -255,7 +255,7 @@ Image::DS9::Command - Command definitions
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SUPPORT
 

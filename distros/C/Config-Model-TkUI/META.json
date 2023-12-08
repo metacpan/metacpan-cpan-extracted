@@ -71,6 +71,8 @@
          "requires" : {
             "Config::Model::Tester::Setup" : "0",
             "Config::Model::Value" : "0",
+            "Hash::Merge" : "0",
+            "Test::Differences" : "0",
             "Test::Log::Log4perl" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::More" : "0",
@@ -92,7 +94,7 @@
          "web" : "https://github.com/dod38fr/config-model-tk-ui"
       }
    },
-   "version" : "1.377",
+   "version" : "1.379",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "LGPL-2.1"

@@ -1,5 +1,8 @@
 =head1 Math::GSL Changes
 
+=head1 v.044 - December 2023
+    - Added support for GSL 2.7.1 (yewtc)
+
 =head1 v0.43 - July 2021
     - Added support for GSL 2.7 (hakonhagland)
     - Added support for macOS (hakonhagland)

@@ -3,7 +3,7 @@ package CGI::Application::Plugin::OpenTracing;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.104.0';
+our $VERSION = 'v0.104.1';
 
 use syntax 'maybe';
 
@@ -385,17 +385,6 @@ sub _cgi_get_run_method {
 }
 
 
-
-# TODO: extract headers from CGI request
-#
-sub _cgi_get_http_headers {
-    my $cgi_app = shift;
-    
-    return HTTP::Headers->new();
-}
-
-
-
 sub _cgi_get_header_status {
     my $cgi_app = shift;
 
@@ -430,6 +419,13 @@ sub _cgi_get_query_http_method {
 }
 
 
+sub _cgi_get_http_headers {
+    my $cgi_app = shift;
+
+    my $query = $cgi_app->query();
+
+    HTTP::Headers->new(map { s/^HTTP_//r => $query->http($_) } $query->http);
+}
 
 sub _cgi_get_query_http_url {
     my $cgi_app = shift;

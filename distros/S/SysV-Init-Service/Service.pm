@@ -1,18 +1,15 @@
 package SysV::Init::Service;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Capture::Tiny qw(capture);
 use Class::Utils qw(set_params);
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
 use File::Spec::Functions qw(catfile);
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Construct.
 sub new {
@@ -120,6 +117,7 @@ SysV::Init::Service - Class for SysV init service manipulation.
 =head1 SYNOPSIS
 
  use SysV::Init::Service;
+
  my $obj = SysV::Init::Service->new(%parameters);
  my @commands = $obj->commands;
  my $name = $obj->name;
@@ -129,9 +127,9 @@ SysV::Init::Service - Class for SysV init service manipulation.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%parameters)>
+ my $obj = SysV::Init::Service->new(%parameters);
 
 Constructor.
 
@@ -139,46 +137,63 @@ Constructor.
 
 =item * C<service>
 
- Service.
- Default value is undef.
- It is required.
+Service.
+
+Default value is undef.
+
+It is required.
 
 =item * C<service_dir>
 
- Service directory.
- Default value is '/etc/init.d'.
+Service directory.
+
+Default value is '/etc/init.d'.
 
 =back
 
-=item C<commands()>
+=head2 C<commands>
 
- Get service commands.
- Be avare, command might not print any information to stdout in some
- configuration (rewrited /etc/lsb-base-logging.sh routines to blank code for
- quiet output).
- Returns array of possible commands alphabetically sorted.
+ my @commands = $obj->commands;
 
-=item C<name()>
+Get service commands.
 
- Get service name.
- Returns string with service name.
+Be avare, command might not print any information to stdout in some
+configuration (rewrited /etc/lsb-base-logging.sh routines to blank code for
+quiet output).
 
-=item C<start()>
+Returns array of possible commands alphabetically sorted.
 
- Run service start command.
- Returns exit code.
+=head2 C<name>
 
-=item C<status()>
+ my $name = $obj->name;
 
- Run service status command and return exit code.
- Returns exit code.
+Get service name.
 
-=item C<stop()>
+Returns string with service name.
 
- Run service stop command.
- Returns exit code.
+=head2 C<start>
 
-=back
+ my $exit_code = $obj->start;
+
+Run service start command.
+
+Returns exit code.
+
+=head2 C<status>
+
+ my $exit_code = $obj->status;
+
+Run service status command and return exit code.
+
+Returns exit code.
+
+=head2 C<stop>
+
+ my $exit_code = $obj->stop;
+
+Run service stop command.
+
+Returns exit code.
 
 =head1 ERRORS
 
@@ -222,11 +237,11 @@ Constructor.
 
 =head1 EXAMPLE
 
- # Pragmas.
+=for comment filename=create_fake_service_and_print_its_commands.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use File::Spec::Functions qw(catfile);
  use File::Temp qw(tempfile tempdir);
  use IO::Barf qw(barf);
@@ -288,21 +303,22 @@ run a System V init script
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/SysV-Init-Service>
+L<https://github.com/michal-josef-spacek/SysV-Init-Service>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2015 Michal Špaček
- BSD 2-Clause License
+© 2013-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

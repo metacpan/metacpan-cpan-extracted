@@ -1,0 +1,135 @@
+NAME
+    Array::Util::MultiTarget - Apply an operation to multiple arrays
+
+VERSION
+    This document describes version 0.001 of Array::Util::MultiTarget (from
+    Perl distribution Array-Util-MultiTarget), released on 2023-12-03.
+
+SYNOPSIS
+     use Array::Util::MultiTarget qw(
+         mtpop
+         mtpush
+         mtsplice
+         mtremovestr
+         mtremoveallstr
+         mtremovenum
+         mtremoveallnum
+     );
+
+DESCRIPTION
+    This module provides functions to perform operations on multiple arrays
+    at once. Some functions work best for arrays that contain parallel data,
+    as shown in the Synopsis.
+
+FUNCTIONS
+  mtpop
+    Usage:
+
+     @elems = mtpop [\@ary1, \@ary2, ...];
+
+    Pop each array and return the collected popped elements. @elems will
+    contain:
+
+     ($popped_from_ary1, $popped_from_ary2, ...)
+
+  mtpush
+    Usage:
+
+     mtpush [\@ary1, \@ary2, ...], @elems;
+
+    Push @elems to each array.
+
+  mtsplice
+    Usage:
+
+     @spliced = mtsplice [\@ary1, \@ary2, ...], $offset, $length, @list;
+     @spliced = mtsplice [\@ary1, \@ary2, ...], $offset, $length;
+     @spliced = mtsplice [\@ary1, \@ary2, ...], $offset;
+
+    Splice each array and return the collected result from splice().
+    @spliced will contain:
+
+     (\@spliced_elems_from_ary1, \@spliced_elems_from_ary2, ...)
+
+  mtremovestr
+    Usage:
+
+     $offset = mtremovestr [\@ary1, \@ary2, ...], $needle;
+
+    Find the first occurrence of $needle in @ary1 using "eq" operator, then
+    remove it from @ary1 and return the offset where $needle was found.
+    After that, remove the element at the same offset from the rest of the
+    arrays.
+
+    If $needle is not found, will return "undef" and leave the arrays
+    unmodified.
+
+    TODO: add option $minoffset, $maxoffset.
+
+  mtremoveallstr
+    Usage:
+
+     @offsets = mtremoveallstr [\@ary1, \@ary2, ...], $needle;
+
+    Find all occurrences of $needle in @ary1 using "eq" operator, then
+    remove them from @ary1 and return the offsets where $needle were found.
+    After that, remove the elements at the same offsets from the rest of the
+    arrays.
+
+    If $needle is not found, will return empty list and leave the arrays
+    unmodified.
+
+    TODO: add option $minoffset, $maxoffset.
+
+  mtremovenum
+    Like "/mtremovestr" except comparison is done using "==" operator
+    instead of "eq".
+
+  mtremoveallnum
+    Like "/mtremoveallstr" except comparison is done using "==" operator
+    instead of "eq".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Array-Util-MultiTarget>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Array-Util-MultiTarget>.
+
+SEE ALSO
+    List::Util, List::MoreUtils, List::AllUtils
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2023 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Array-Util-MultiTarge
+    t>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

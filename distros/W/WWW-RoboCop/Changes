@@ -1,5 +1,8 @@
 Revision history for WWW-RoboCop
 
+0.000103  2023-11-28 14:26:04Z
+    - Check the image links too. (GH#6) (brian d foy)
+
 0.000102  2022-12-02 18:25:14Z
     - Use File::XDG for cache dir in example script (GH#4) (Olaf Alders)
 

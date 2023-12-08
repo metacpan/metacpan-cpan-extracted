@@ -10,9 +10,9 @@ use Perinci::CmdLine::Any;
 use Perinci::CmdLineX::CommonOptions::SelfUpgrade;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-19'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.071'; # VERSION
+our $VERSION = '1.073'; # VERSION
 
 my $prefix = '/App/lcpan/';
 my $mods = do {
@@ -67,7 +67,7 @@ lcpan - Manage your local CPAN mirror
 
 =head1 VERSION
 
-This document describes version 1.071 of lcpan (from Perl distribution App-lcpan), released on 2022-09-19.
+This document describes version 1.073 of lcpan (from Perl distribution App-lcpan), released on 2023-07-09.
 
 =head1 SYNOPSIS
 
@@ -567,7 +567,7 @@ List distributions ranked by number of included scripts.
 
 =head2 B<doc>
 
-Show POD documentation of module/.pod/script.
+Show POD documentation of module/POD/script.
 
 This command extracts module (.pm)/.pod/script from release tarballs and render
 its POD documentation. Since the documentation is retrieved from the release
@@ -830,6 +830,13 @@ List other modules related to module(s).
 This subcommand lists other modules that might be related to the module(s) you
 specify. This is done by listing modules that tend be mentioned together in POD
 documentation.
+
+The downside of this approach is that the module(s) and the related modules must
+all already be mentioned together in POD documentations. You will not find a
+fresh new module that tries to be an improvement/alternative to an existing
+module, even if that new module mentions the old module a lot, simply because
+the new module has not been mentioned in other modules' PODs. Someone will need
+to create that POD(s) first.
 
 The scoring/ranking still needs to be tuned.
 
@@ -1196,6 +1203,9 @@ suitable default, e.g. the browser, is chosen.
 
 =item B<--author>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -1235,6 +1245,9 @@ Equivalent to --phase ALL --rel ALL.
 See C<--phase>.
 
 =item B<--author>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -1337,7 +1350,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.34.0"
+ "v5.38.0"
 
 =item B<--phase>=I<s>
 
@@ -1387,13 +1400,22 @@ See C<--phase>.
 
 =item B<--author-arg>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--author-isnt>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--author>=I<s@>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -1415,9 +1437,15 @@ Exclude non-core modules.
 
 =item B<--module-author-isnt>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--module-author>=I<s@>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -1435,7 +1463,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.34.0"
+ "v5.38.0"
 
 =item B<--phase>=I<s>
 
@@ -1457,11 +1485,20 @@ Default value:
 
 =item B<--author>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--latest>
+
+(No description)
+
 
 =back
 
@@ -1471,9 +1508,15 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--author>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =back
 
@@ -1483,9 +1526,15 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--author>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =back
 
@@ -1495,9 +1544,15 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--author>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =back
 
@@ -1524,6 +1579,9 @@ Equivalent to --phase ALL --rel ALL.
 See C<--phase>.
 
 =item B<--author>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -1553,9 +1611,15 @@ Include only records that are updated since certain date.
 
 =item B<--user-author-isnt>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--user-author>=I<s@>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -1575,13 +1639,25 @@ See C<--user-author>.
 
 =item B<--author>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--full-path>
 
+(No description)
+
+
 =item B<--latest>
+
+(No description)
+
 
 =item B<--random>
 
@@ -1607,9 +1683,15 @@ Can be specified multiple times.
 
 =item B<--author>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =back
 
@@ -1630,6 +1712,9 @@ Include only records that are added/updated since the last N index updates.
 Include only records that are added/updated since a certain date.
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =item B<--or>
 
@@ -1729,6 +1814,9 @@ Valid values:
 
 =item B<--include-self-mentions>
 
+(No description)
+
+
 =back
 
 =head2 Options for subcommand authors-by-rdep-count
@@ -1743,9 +1831,18 @@ See C<--phase>.
 
 =item B<--exclude-same-author>
 
+(No description)
+
+
 =item B<--phase>=I<s>
 
+(No description)
+
+
 =item B<--rel>=I<s>
+
+(No description)
+
 
 =back
 
@@ -1771,6 +1868,9 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--dist>=I<s>, B<-d>
 
 Filter by distribution.
@@ -1784,6 +1884,9 @@ Filter by file ID.
 When there are more than one query, perform OR instead of AND logic.
 
 =item B<--package>=I<s>
+
+(No description)
+
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -1819,6 +1922,9 @@ Can be specified multiple times.
 
 =item B<--module>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--overwrite>, B<-o>
@@ -1837,6 +1943,9 @@ Whether to overwrite existing file.
 
 =item B<--release>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -1847,11 +1956,17 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--all>, B<-a>
 
+(No description)
+
+
 =item B<--overwrite>, B<-o>
 
 Whether to overwrite existing file.
 
 =item B<--script>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -1866,6 +1981,9 @@ Can also be specified as the 1st command-line argument.
 Whether to delete the release file from the filesystem too.
 
 =item B<--release>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -1935,6 +2053,18 @@ Allow showing multiple modules for different dists.
 
 Exclude core modules.
 
+=item B<--exclude-dep>=I<s@>
+
+Exclude some dependencies from being shown.
+
+Can be specified multiple times.
+
+=item B<--exclude-deps-json>=I<s>
+
+Exclude some dependencies from being shown (JSON-encoded).
+
+See C<--exclude-dep>.
+
 =item B<--exclude-indexed>
 
 Exclude modules that are indexed (listed in 02packages.details.txt.gz).
@@ -1992,6 +2122,9 @@ Default value:
 
 =item B<--module>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--modules-json>=I<s>
@@ -2004,7 +2137,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.34.0"
+ "v5.38.0"
 
 =item B<--phase>=I<s>
 
@@ -2054,9 +2187,15 @@ See C<--phase>.
 
 =item B<--author-isnt>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--author>=I<s@>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -2078,6 +2217,9 @@ Exclude non-core modules.
 
 =item B<--module>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -2094,7 +2236,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.34.0"
+ "v5.38.0"
 
 =item B<--phase>=I<s>
 
@@ -2116,6 +2258,9 @@ Default value:
 
 =item B<--dist>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -2130,7 +2275,13 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--dist>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -2144,6 +2295,9 @@ When there are more than one query, perform OR instead of AND logic.
 
 =item B<--package>=I<s>
 
+(No description)
+
+
 =back
 
 =head2 Options for subcommand dist-meta
@@ -2151,6 +2305,9 @@ When there are more than one query, perform OR instead of AND logic.
 =over
 
 =item B<--dist>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -2162,7 +2319,13 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--dist>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -2179,6 +2342,9 @@ Equivalent to --phase ALL --rel ALL.
 See C<--phase>.
 
 =item B<--dist>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -2215,6 +2381,9 @@ See C<--level>.
 =over
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =item B<--dist>=I<s@>*
 
@@ -2262,9 +2431,15 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--dist>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =item B<--full-path>
+
+(No description)
+
 
 =back
 
@@ -2302,19 +2477,37 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--has-buildpl>
+
+(No description)
+
 
 =item B<--has-makefilepl>
 
+(No description)
+
+
 =item B<--has-metajson>
 
+(No description)
+
+
 =item B<--has-metayml>
+
+(No description)
+
 
 =item B<--has-multiple-rels>
 
 Only list dists having multiple releases indexed.
 
 =item B<--latest>
+
+(No description)
+
 
 =item B<--or>
 
@@ -2351,6 +2544,9 @@ Can be specified multiple times.
 Random sort.
 
 =item B<--rel-mtime-newer-than>=I<s>
+
+(No description)
+
 
 =item B<--result-limit>=I<s>
 
@@ -2428,7 +2624,13 @@ Filter by author.
 
 =item B<--phase>=I<s>
 
+(No description)
+
+
 =item B<--rel>=I<s>
+
+(No description)
+
 
 =item B<-n>=I<s>
 
@@ -2524,6 +2726,9 @@ See C<--format-arg>.
 
 =item B<--dist>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -2533,6 +2738,9 @@ Can also be specified as the 1st command-line argument.
 =over
 
 =item B<--module>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -2544,6 +2752,9 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--release>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -2554,7 +2765,13 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--all>, B<-a>
 
+(No description)
+
+
 =item B<--script>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -2576,7 +2793,13 @@ Filter by author.
 
 =item B<--phase>=I<s>
 
+(No description)
+
+
 =item B<--rel>=I<s>
+
+(No description)
+
 
 =item B<-n>=I<s>
 
@@ -2594,7 +2817,13 @@ Default value:
 
 =item B<--author>=I<s>*, B<-a>
 
+(No description)
+
+
 =item B<--file>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -2673,6 +2902,9 @@ Filter by script name(s) being mentioned (JSON-encoded).
 See C<--mentioned-script>.
 
 =item B<--mentioner-author-isnt>=I<s@>
+
+(No description)
+
 
 Can be specified multiple times.
 
@@ -2808,6 +3040,9 @@ See C<--mentioned-script>.
 
 =item B<--module>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -2910,6 +3145,9 @@ See C<--mentioned-script>.
 
 =item B<--script>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -2976,6 +3214,9 @@ See C<--mentioned-author>.
 
 =item B<--mentioner-author-isnt>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--mentioner-author>=I<s@>
@@ -3019,6 +3260,9 @@ Filter by script(s) that do the mentioning (JSON-encoded).
 See C<--mentioner-script>.
 
 =item B<--module>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -3086,6 +3330,9 @@ See C<--mentioned-author>.
 
 =item B<--mentioner-author-isnt>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--mentioner-author>=I<s@>
@@ -3129,6 +3376,9 @@ Filter by script(s) that do the mentioning (JSON-encoded).
 See C<--mentioner-script>.
 
 =item B<--module>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -3196,6 +3446,9 @@ See C<--mentioned-author>.
 
 =item B<--mentioner-author-isnt>=I<s@>
 
+(No description)
+
+
 Can be specified multiple times.
 
 =item B<--mentioner-author>=I<s@>
@@ -3240,6 +3493,9 @@ See C<--mentioner-script>.
 
 =item B<--script>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -3270,6 +3526,9 @@ Include only records that are updated since certain date.
 
 =item B<--module>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -3284,11 +3543,17 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--file-id>=I<s>
 
 Filter by file ID.
 
 =item B<--module>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -3298,6 +3563,9 @@ When there are more than one query, perform OR instead of AND logic.
 
 =item B<--package>=I<s>
 
+(No description)
+
+
 =back
 
 =head2 Options for subcommand mod2author
@@ -3305,6 +3573,9 @@ When there are more than one query, perform OR instead of AND logic.
 =over
 
 =item B<--module>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -3324,6 +3595,9 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--module>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -3342,7 +3616,13 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--full-path>
 
+(No description)
+
+
 =item B<--module>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -3382,6 +3662,9 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--dist>=I<s>, B<-d>
 
 Filter by distribution.
@@ -3395,6 +3678,9 @@ Exclude core modules.
 Exclude non-core modules.
 
 =item B<--latest>
+
+(No description)
+
 
 =item B<--namespace>=I<s@>, B<-N>
 
@@ -3418,7 +3704,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.34.0"
+ "v5.38.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -3526,6 +3812,9 @@ Valid values:
 
 =item B<--include-self-mentions>
 
+(No description)
+
+
 =item B<-n>=I<s>
 
 Return at most this number of results.
@@ -3544,7 +3833,13 @@ See C<--phase>.
 
 =item B<--phase>=I<s>
 
+(No description)
+
+
 =item B<--rel>=I<s>
+
+(No description)
+
 
 =item B<-n>=I<s>
 
@@ -3562,13 +3857,63 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
-=item B<--author>=I<s>, B<-a>
+=item B<--dist-author-isnt>=I<s@>
 
-Filter by author.
+Do not select dependent distributions published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--dist-author>=I<s@>
+
+Only select dependent distributions published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--dist-authors-arent-json>=I<s>
+
+Do not select dependent distributions published by specified author(s) (JSON-encoded).
+
+See C<--dist-author-isnt>.
+
+=item B<--dist-authors-json>=I<s>
+
+Only select dependent distributions published by specified author(s) (JSON-encoded).
+
+See C<--dist-author>.
+
+=item B<--module-author-isnt>=I<s@>
+
+Do not list depended modules published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--module-author>=I<s@>
+
+Only list depended modules published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--module-authors-arent-json>=I<s>
+
+Do not list depended modules published by specified author(s) (JSON-encoded).
+
+See C<--module-author-isnt>.
+
+=item B<--module-authors-json>=I<s>
+
+Only list depended modules published by specified author(s) (JSON-encoded).
+
+See C<--module-author>.
 
 =item B<--phase>=I<s>
 
+(No description)
+
+
 =item B<--rel>=I<s>
+
+(No description)
+
 
 =item B<-n>=I<s>
 
@@ -3582,9 +3927,18 @@ Return at most this number of results.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--latest>
 
+(No description)
+
+
 =item B<--module>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -3603,6 +3957,9 @@ Can also be specified as the 1st command-line argument and onwards.
 =over
 
 =item B<--module>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -3642,6 +3999,9 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--dist>=I<s>, B<-d>
 
 Filter by distribution.
@@ -3655,6 +4015,9 @@ Exclude core modules.
 Exclude non-core modules.
 
 =item B<--latest>
+
+(No description)
+
 
 =item B<--namespace>=I<s@>, B<-N>
 
@@ -3678,7 +4041,7 @@ Set base Perl version for determining core modules.
 
 Default value:
 
- "v5.34.0"
+ "v5.38.0"
 
 =item B<--query-json>=I<s>, B<-q>
 
@@ -3780,13 +4143,63 @@ Equivalent to --phase ALL --rel ALL.
 
 See C<--phase>.
 
-=item B<--author>=I<s>, B<-a>
+=item B<--dist-author-isnt>=I<s@>
 
-Filter by author.
+Do not select dependent distributions published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--dist-author>=I<s@>
+
+Only select dependent distributions published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--dist-authors-arent-json>=I<s>
+
+Do not select dependent distributions published by specified author(s) (JSON-encoded).
+
+See C<--dist-author-isnt>.
+
+=item B<--dist-authors-json>=I<s>
+
+Only select dependent distributions published by specified author(s) (JSON-encoded).
+
+See C<--dist-author>.
+
+=item B<--module-author-isnt>=I<s@>
+
+Do not list depended modules published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--module-author>=I<s@>
+
+Only list depended modules published by specified author(s).
+
+Can be specified multiple times.
+
+=item B<--module-authors-arent-json>=I<s>
+
+Do not list depended modules published by specified author(s) (JSON-encoded).
+
+See C<--module-author-isnt>.
+
+=item B<--module-authors-json>=I<s>
+
+Only list depended modules published by specified author(s) (JSON-encoded).
+
+See C<--module-author>.
 
 =item B<--phase>=I<s>
 
+(No description)
+
+
 =item B<--rel>=I<s>
+
+(No description)
+
 
 =item B<-n>=I<s>
 
@@ -3814,6 +4227,9 @@ Valid values:
 
 =item B<--include-self-mentions>
 
+(No description)
+
+
 =item B<-n>=I<s>
 
 Return at most this number of results.
@@ -3839,6 +4255,9 @@ Valid values:
  ["content","dist","author"]
 
 =item B<--include-self-mentions>
+
+(No description)
+
 
 =item B<-n>=I<s>
 
@@ -3880,9 +4299,18 @@ Include only records that are added since a certain date.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--from-level>=I<s>
 
+(No description)
+
+
 =item B<--level>=I<s>
+
+(No description)
+
 
 =item B<--or>
 
@@ -3925,6 +4353,9 @@ Valid values:
  ["name","-name","num_modules","-num_modules"]
 
 =item B<--to-level>=I<s>
+
+(No description)
+
 
 =item B<--updated-since-last-index-update>
 
@@ -4057,6 +4488,9 @@ Default value:
 
 =item B<--module>=I<s@>
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -4123,6 +4557,9 @@ Default value:
 
 =item B<--module>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -4159,6 +4596,9 @@ See C<--level>.
 
 =item B<--release>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -4168,6 +4608,9 @@ Can also be specified as the 1st command-line argument.
 =over
 
 =item B<--author>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -4231,6 +4674,9 @@ Default value:
 
 =item B<--module>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -4285,6 +4731,9 @@ Return score-related fields.
 
 =item B<--release>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -4323,19 +4772,43 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--full-path>
+
+(No description)
+
 
 =item B<--has-buildpl>
 
+(No description)
+
+
 =item B<--has-makefilepl>
+
+(No description)
+
 
 =item B<--has-metajson>
 
+(No description)
+
+
 =item B<--has-metayml>
+
+(No description)
+
 
 =item B<--latest>
 
+(No description)
+
+
 =item B<--no-path>
+
+(No description)
+
 
 =item B<--or>
 
@@ -4461,19 +4934,43 @@ Filter by author.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--full-path>
+
+(No description)
+
 
 =item B<--has-buildpl>
 
+(No description)
+
+
 =item B<--has-makefilepl>
+
+(No description)
+
 
 =item B<--has-metajson>
 
+(No description)
+
+
 =item B<--has-metayml>
+
+(No description)
+
 
 =item B<--latest>
 
+(No description)
+
+
 =item B<--no-path>
+
+(No description)
+
 
 =item B<--or>
 
@@ -4571,6 +5068,9 @@ See C<--query-type>.
 
 =item B<--script>=I<s>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument.
 
 =back
@@ -4581,7 +5081,13 @@ Can also be specified as the 1st command-line argument.
 
 =item B<--all>, B<-a>
 
+(No description)
+
+
 =item B<--script>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -4601,7 +5107,13 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--all>, B<-a>
 
+(No description)
+
+
 =item B<--script>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -4621,7 +5133,13 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--all>, B<-a>
 
+(No description)
+
+
 =item B<--script>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -4641,9 +5159,18 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--all>, B<-a>
 
+(No description)
+
+
 =item B<--full-path>
 
+(No description)
+
+
 =item B<--script>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -4666,6 +5193,9 @@ Can also be specified as the 1st command-line argument and onwards.
 Filter by author.
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =item B<--dist>=I<s>, B<-d>
 
@@ -4731,6 +5261,9 @@ Valid values:
 
 =item B<--include-self-mentions>
 
+(No description)
+
+
 =item B<-n>=I<s>
 
 Return at most this number of results.
@@ -4743,9 +5276,18 @@ Return at most this number of results.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--latest>
 
+(No description)
+
+
 =item B<--script>=I<s@>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument and onwards.
 
@@ -4796,6 +5338,9 @@ Filter by author(s) of module (JSON-encoded).
 See C<--author>.
 
 =item B<--detail>, B<-l>
+
+(No description)
+
 
 =item B<--or>
 
@@ -4925,9 +5470,18 @@ Number of retry attempts on failed HTTP request.
 
 =item B<--skip-file-indexing-pass-1>
 
+(No description)
+
+
 =item B<--skip-file-indexing-pass-2>
 
+(No description)
+
+
 =item B<--skip-file-indexing-pass-3>
+
+(No description)
+
 
 =item B<--skip-index-file-pattern>=I<s@>
 
@@ -5020,7 +5574,13 @@ modules.
 
 =item B<--detail>, B<-l>
 
+(No description)
+
+
 =item B<--module>=I<s>*
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -5355,6 +5915,7 @@ List of available configuration parameters:
  added_since_last_n_index_updates (see --added-since-last-n-index-updates)
  dists (see --dist)
  dont_uniquify (see --dont-uniquify)
+ exclude_deps (see --exclude-dep)
  flatten (see --flatten)
  include_core (see --exclude-core)
  include_indexed (see --exclude-indexed)
@@ -5681,7 +6242,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand mods-by-rdep-count
 
- author (see --author)
+ dist_authors (see --dist-author)
+ dist_authors_arent (see --dist-author-isnt)
+ module_authors (see --module-author)
+ module_authors_arent (see --module-author-isnt)
  n (see -n)
  phase (see --phase)
  rel (see --rel)
@@ -5725,7 +6289,10 @@ List of available configuration parameters:
 
 =head2 Configuration for subcommand most-depended-mods
 
- author (see --author)
+ dist_authors (see --dist-author)
+ dist_authors_arent (see --dist-author-isnt)
+ module_authors (see --module-author)
+ module_authors_arent (see --module-author-isnt)
  n (see -n)
  phase (see --phase)
  rel (see --rel)
@@ -6119,7 +6686,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

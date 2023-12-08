@@ -66,27 +66,4 @@ subtest '->list_p' => sub {
 
 };
 
-subtest '->_query_params' => sub {
-
-	cmp_deeply
-		$ExportTenants->_query_params,
-		[
-			qw/
-				rows
-				page
-				search_by
-				external_id
-				property_id
-				is_archived
-				customer_id
-				search_value
-				customer_reference
-				modified_from_time
-				modified_from_timezone
-			/
-		]
-	;
-
-};
-
 done_testing;

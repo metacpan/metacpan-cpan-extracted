@@ -9,10 +9,6 @@ use utf8;
 
 WWW::Suffit::Client::NoAPI - The Suffit API client library for NoAPI methods
 
-=head1 VERSION
-
-Version 1.00
-
 =head1 SYNOPSIS
 
     use WWW::Suffit::Client::NoAPI;
@@ -81,7 +77,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 use parent qw/ WWW::Suffit::Client /;
 

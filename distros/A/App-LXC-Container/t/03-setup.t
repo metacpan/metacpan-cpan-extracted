@@ -801,16 +801,6 @@ sub test_ldd_dummy_object(@)
     App::LXC::Container::Setup::__add_library_packages_internal_code
 	    ($dummy_ui, @_);
 }
-if (-f '/bin/ls')
-{
-    diag(`echo \$PATH`, `ls -l t/mockup`, `file /bin/ls`, `ldd /bin/ls`);
-    my @libs = App::LXC::Container::Data::libraries_used('/bin/ls');
-    diag('LU:', join('|', @libs));
-    foreach (@libs)
-    { diag('PKG("',$_,'"):',App::LXC::Container::Data::package_of($_),'.'); }
-}
-else
-{   diag('/bin/ls is missing!');   }
 stdout_like
 {   test_ldd_dummy_object('/bin/ls');   }
     qr{^ADD2UI\s+libc6(?::amd64|:i386)?$},

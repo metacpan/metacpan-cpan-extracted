@@ -1,8 +1,7 @@
-# Pragmas.
+use lib '.';
 use strict;
 use warnings;
 
-# Modules.
 use English;
 use inc::Module::Install;
 
@@ -13,7 +12,7 @@ if ($OSNAME eq "MSWin32") {
 
 # Definition.
 abstract 'Class for SysV init service manipulation.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'English' => 0;
 author_requires 'File::Object' => 0.07;
 author_requires 'Test::More' => 0;
@@ -31,15 +30,14 @@ requires 'Error::Pure' => 0.15;
 requires 'File::Spec::Functions' => 0;
 requires 'List::MoreUtils' => 0;
 requires 'perl' => '5.6.0';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=SysV-Init-Service';
-resources 'homepage' => 'https://github.com/tupinek/SysV-Init-Service';
-resources 'repository' => 'git://github.com/tupinek/SysV-Init-Service';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/SysV-Init-Service/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/SysV-Init-Service';
+resources 'repository' => 'git://github.com/michal-josef-spacek/SysV-Init-Service';
 test_requires 'File::Object' => 0.07;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.06';
+version '0.07';
 
 # Run.
 WriteAll();

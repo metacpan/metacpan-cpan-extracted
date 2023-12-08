@@ -7,9 +7,9 @@ use warnings;
 require App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-19'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.071'; # VERSION
+our $VERSION = '1.073'; # VERSION
 
 our %SPEC;
 
@@ -31,7 +31,7 @@ App::lcpan::Cmd::modules - List modules/packages
 
 =head1 VERSION
 
-This document describes version 1.071 of App::lcpan::Cmd::modules (from Perl distribution App-lcpan), released on 2022-09-19.
+This document describes version 1.073 of App::lcpan::Cmd::modules (from Perl distribution App-lcpan), released on 2023-07-09.
 
 =head1 FUNCTIONS
 
@@ -86,6 +86,8 @@ Defaults to C<~/cpan>.
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<dist> => I<perl::distname>
 
 Filter by distribution.
@@ -109,6 +111,8 @@ using the C<index_name>.
 
 =item * B<latest> => I<bool>
 
+(No description)
+
 =item * B<namespaces> => I<array[perl::modname]>
 
 Select modules belonging to certain namespace(s).
@@ -117,7 +121,7 @@ Select modules belonging to certain namespace(s).
 
 When there are more than one query, perform OR instead of AND logic.
 
-=item * B<perl_version> => I<str> (default: "v5.34.0")
+=item * B<perl_version> => I<str> (default: "v5.38.0")
 
 Set base Perl version for determining core modules.
 
@@ -126,6 +130,8 @@ Set base Perl version for determining core modules.
 Search query.
 
 =item * B<query_type> => I<str> (default: "any")
+
+(No description)
 
 =item * B<random> => I<true>
 
@@ -230,7 +236,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

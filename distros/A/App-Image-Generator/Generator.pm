@@ -14,7 +14,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar our $EMPTY_STR => q{};
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -150,6 +150,8 @@ Returns exit code.
 
 =head1 EXAMPLE
 
+=for comment filename=print_help.pl
+
  use strict;
  use warnings;
 
@@ -200,12 +202,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2015-2022 Michal Josef Špaček
+© 2015-2023 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

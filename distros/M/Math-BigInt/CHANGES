@@ -1,3 +1,15 @@
+2.002000 2023-12-02
+
+ * Fix bug in Math::BigFloat method bsin(). It can now handle any argument to
+   any precision. Also improve downgrading. This fixes CPAN RT #150590 and the
+   bsin() part of CPAN RT #107604.
+
+ * Fix bug in Math::BigFloat method bexp(). Specifying precision (rather than
+   accuracy) used to give a NaN. Also improve downgrading.
+
+ * Improve upgrading in Math::BigInt methods bsin() and bcos(). They now
+   upgrade only when necessary.
+
 2.001001 2023-11-21
 
  * Fix CPAN RT #150469

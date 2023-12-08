@@ -42,6 +42,7 @@ my $handler = builder {
       default_rate => 5,
       retry_after  => 120,
       file         => $file,
+      cache_config => { init_file => 1, unlink_on_exit => 1 },
       greylist     => \%greylist;
 
     sub {

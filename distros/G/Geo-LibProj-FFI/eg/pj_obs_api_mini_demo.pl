@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Geo::LibProj::FFI qw( :all );
+use Geo::LibProj::FFI 0.05 qw( :all );
 
 
 # Please compare this example code with:
@@ -48,9 +48,9 @@ $a = proj_coord( 12, 55, 0, 0 );
 
 # transform to UTM zone 32, then back to geographical
 $b = proj_trans( $P, PJ_FWD, $a );
-printf "easting: %.3f, northing: %.3f\n", $b->enu->e, $b->enu->n;
+printf "easting: %.3f, northing: %.3f\n", $b->enu_e, $b->enu_n;
 $b = proj_trans( $P, PJ_INV, $b );
-printf "longitude: %g, latitude: %g\n", $b->lp->lam, $b->lp->phi;
+printf "longitude: %g, latitude: %g\n", $b->lp_lam, $b->lp_phi;
 
 # Clean up
 proj_destroy($P);

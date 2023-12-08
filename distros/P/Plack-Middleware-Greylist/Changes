@@ -1,5 +1,78 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.6.0    2023-12-05 11:12:59+00:00 Europe/London
+  [Enhancements]
+  - Added support for IPv6 addresses. (GH#6)
+
+  - Added `cache_config` attribute for finer-control of Cache::FastMmap.
+
+  - The `retry_after` attribute default comes from the `cache_config` `expire_time` setting.
+
+  [Bug Fixes]
+  - Use shared cache when running on a forking server that does not initialise the cache before forking (GH#7).
+
+  [Documentation]
+  - Documented when `retry_after` was added.
+
+  [Tests]
+  - Removed .proverc and moved settings directly into GitHub Actions.
+
+  - Added test for subnet override behaviour.
+
+  [Toolchain]
+  - Removed use of Dist::Zilla::Plugin::Generate::ManifestSkip.
+
+v0.5.6    2023-12-05 09:30:16+00:00 Europe/London (TRIAL RELEASE)
+  [Bug Fixes]
+  - Only check the `file` attribute if no `cache` is defined. (This was introduced in v0.5.5.)
+
+  [Documentation]
+  - Fixed typos and improved documentation of `cache_config`.
+
+  [Tests]
+  - Removed .proverc and moved settings directly into GitHub Actions.
+
+v0.5.5    2023-12-04 22:03:49+00:00 Europe/London (TRIAL RELEASE)
+  [Incompatible Changes]
+  - The `init_file` option was replaced with `cache_config` which is a configuration hash for
+    Cache::FastMmap.
+
+v0.5.4    2023-12-04 15:05:41+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Added `init_file` option to configure whether the cache is re-initialised on starting.
+    It now defaults to false (GH#7).
+
+  - The cache file will also be deleted on exit when `init_file` is false.
+
+  [Documentation]
+  - Documented when `retry_after` was added.
+
+v0.5.3    2023-12-04 14:21:01+00:00 Europe/London (TRIAL RELEASE)
+  [Enhancements]
+  - Change the IP address matching module to Net::IP::LPM, which supports IPv6 (GH#6).
+
+  [Tests]
+  - Added test for subnet override behaviour.
+
+  [Toolchain]
+  - Removed use of Dist::Zilla::Plugin::Generate::ManifestSkip.
+
+v0.5.2    2023-11-29 17:42:29+00:00 Europe/London
+  [Documentation]
+  - Fixed a minor typo.
+
+  [Tests]
+  - Configured tests to play better with GitHub Actions.
+
+  - GitHub Actions will not run tests from before Perl v5.16, even
+    though earlier versions may be supported.
+
+  - Added more author tests.
+
+  - Switched package used for the release manifest.
+
+  - Cleaned up unused prerequisites.
+
 v0.5.1    2023-10-28 09:04:21+01:00 Europe/London
   [Tests]
   - Migrated to Test2.

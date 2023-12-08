@@ -17,9 +17,16 @@ static const char hintkey[] = "t::pieces/permit";
 
 static int build_expr(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
+  OP *expr = arg0->op;
+
+  if(!expr) {
+    *out = newOP(OP_STUB, 0);
+    return KEYWORD_PLUGIN_EXPR;
+  }
+
   /* wrap the result in "("...")" parens so we can unit-test how it parsed */
   *out = newBINOP(OP_CONCAT, 0,
-    newBINOP(OP_CONCAT, 0, newSVOP(OP_CONST, 0, newSVpvs("(")), op_scope(arg0->op)),
+    newBINOP(OP_CONCAT, 0, newSVOP(OP_CONST, 0, newSVpvs("(")), op_scope(expr)),
     newSVOP(OP_CONST, 0, newSVpvs(")")));
   return KEYWORD_PLUGIN_EXPR;
 }
@@ -50,6 +57,11 @@ static int build_anonsub(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookda
 static int build_list(pTHX_ OP **out, XSParseKeywordPiece *arg0, void *hookdata)
 {
   OP *list = arg0->op;
+
+  if(!list) {
+    *out = newOP(OP_STUB, 0);
+    return KEYWORD_PLUGIN_EXPR;
+  }
 
   /* TODO: Consider always doing this? */
   if(list->op_type != OP_LIST)
@@ -244,11 +256,23 @@ static const struct XSParseKeywordHooks hooks_arithexpr = {
   .piece1 = XPK_ARITHEXPR,
   .build1 = &build_expr,
 };
+static const struct XSParseKeywordHooks hooks_arithexpr_opt = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_ARITHEXPR_OPT,
+  .build1 = &build_expr,
+};
 
 static const struct XSParseKeywordHooks hooks_termexpr = {
   .permit_hintkey = hintkey,
 
   .piece1 = XPK_TERMEXPR,
+  .build1 = &build_expr,
+};
+static const struct XSParseKeywordHooks hooks_termexpr_opt = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_TERMEXPR_OPT,
   .build1 = &build_expr,
 };
 
@@ -263,6 +287,12 @@ static const struct XSParseKeywordHooks hooks_listexpr = {
   .permit_hintkey = hintkey,
 
   .piece1 = XPK_LISTEXPR,
+  .build1 = &build_list,
+};
+static const struct XSParseKeywordHooks hooks_listexpr_opt = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_LISTEXPR_OPT,
   .build1 = &build_list,
 };
 
@@ -418,9 +448,12 @@ BOOT:
 
   register_xs_parse_keyword("piecestagedanonsub", &hooks_stagedanonsub, "$VAR");
 
-  register_xs_parse_keyword("piecearithexpr", &hooks_arithexpr, NULL);
-  register_xs_parse_keyword("piecetermexpr", &hooks_termexpr, NULL);
-  register_xs_parse_keyword("piecelistexpr", &hooks_listexpr, NULL);
+  register_xs_parse_keyword("piecearithexpr",     &hooks_arithexpr,     NULL);
+  register_xs_parse_keyword("piecearithexpr_opt", &hooks_arithexpr_opt, NULL);
+  register_xs_parse_keyword("piecetermexpr",      &hooks_termexpr,      NULL);
+  register_xs_parse_keyword("piecetermexpr_opt",  &hooks_termexpr_opt,  NULL);
+  register_xs_parse_keyword("piecelistexpr",      &hooks_listexpr,      NULL);
+  register_xs_parse_keyword("piecelistexpr_opt",  &hooks_listexpr_opt,  NULL);
 
   register_xs_parse_keyword("pieceprefixedtermexpr_VAR", &hooks_prefixedtermexpr_VAR, "$VAR");
 

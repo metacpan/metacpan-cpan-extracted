@@ -5,7 +5,7 @@ use warnings;
 
 use Sub::Genius;
 
-my $NUM_THREADS = 5;
+my $NUM_THREADS = 6;
 
 my $preplan = q{
 (
@@ -24,9 +24,13 @@ my $preplan = q{
 reduce
 };
 
-my $final_scope = Sub::Genius->new( preplan => $preplan )->run_any( scope => { sum => 0.0, num_steps => 1_000_000, pi => undef } );
+my $final_scope = Sub::Genius->new( preplan => $preplan )->run_any( scope => { sum => 0.0, num_steps => 1_000_000, pi => undef });
 
 printf qq{pi = %f\n}, $final_scope->{pi};
+
+#
+# subroutines
+#
 
 sub step0 {
     my $scope   = shift;

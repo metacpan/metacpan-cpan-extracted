@@ -17,12 +17,13 @@ my %WriteMakefileArgs = (
   "NAME" => "Graph::MoreUtils",
   "PREREQ_PM" => {
     "Graph" => 0,
-    "Scalar::Util" => 0
+    "Scalar::Util" => 0,
+    "Set::Object" => 0
   },
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.1.0",
+  "VERSION" => "0.2.0",
   "test" => {
     "TESTS" => "t/*.t t/SSSR/*.t t/line/*.t t/smoothed/*.t"
   }
@@ -32,6 +33,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Graph" => 0,
   "Scalar::Util" => 0,
+  "Set::Object" => 0,
   "Test::More" => 0
 );
 

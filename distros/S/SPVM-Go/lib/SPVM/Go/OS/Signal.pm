@@ -10,7 +10,7 @@ SPVM::Go::OS::Signal - Signal Manipulation
 
 =head1 Description
 
-The Go::OS::Signal class of L<SPVM> has methods to manipulate signals.
+The Go::OS::Signal class in L<SPVM> has methods to manipulate signals.
 
 =head1 Usage
 

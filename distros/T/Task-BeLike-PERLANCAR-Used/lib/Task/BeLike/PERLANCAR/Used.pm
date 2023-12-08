@@ -2,9 +2,9 @@
 package Task::BeLike::PERLANCAR::Used;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-07-31'; # DATE
+our $DATE = '2023-12-01'; # DATE
 our $DIST = 'Task-BeLike-PERLANCAR-Used'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '20231201.1'; # VERSION
 
 1;
 # ABSTRACT: All my modules which I currently use and install on a new perl installation
@@ -21,7 +21,7 @@ Task::BeLike::PERLANCAR::Used - All my modules which I currently use and install
 
 =head1 VERSION
 
-version 0.003
+version 20231201.1
 
 =head1 SYNOPSIS
 
@@ -31,12 +31,15 @@ C<perlbrew install>):
  % cpanm -n App::cpanm::perlancar
  % cpanm-perlancar -n Task::BeLike::PERLANCAR::Used
 
+As of this writing (2023-12-01, version 20231201.0) the whole process takes
+about 135 minutes on my laptop, with some modules failing to install due to
+dependencies.
+
 =head1 TASK CONTENTS
 
 =head2 Included modules
 
-cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm in @INC (you may need to install the Acme::CPANModules::PERLANCAR::Unused module) (@INC entries checked: /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0/x86_64-linux /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0 /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0/x86_64-linux /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/5.38.0) at /home/u1/perl5/perlbrew/perls/perl-5.38.0/lib/site_perl/5.38.0/App/cpanmodules.pm line 148.
-=pkg Acme::CM::Get 0
+=head3 L<Acme::CM::Get> 0
 
 =head3 L<Acme::CPAN::Testers::DevelCheckOS> 0
 
@@ -46,9 +49,13 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::CPANAuthors::CPAN::TopDepended::ByOthers> 0
 
+=head3 L<Acme::CPANAuthors::InMostCPANAuthors> 0
+
 =head3 L<Acme::CPANAuthors::Indonesian> 0
 
-=head3 L<Acme::CPANModules> 0.1.7
+=head3 L<Acme::CPANAuthorsBundle::CPAN::Streaks> 0
+
+=head3 L<Acme::CPANModules> 0.1.12
 
 =head3 L<Acme::CPANModules::API::Dead::Currency> 0
 
@@ -74,6 +81,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::CPANModules::COLOR> 0
 
+=head3 L<Acme::CPANModules::CPANAuthors> 0
+
 =head3 L<Acme::CPANModules::CPANModules> 0
 
 =head3 L<Acme::CPANModules::CPANModules::API> 0
@@ -81,6 +90,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Acme::CPANModules::CalculatingDayOfWeek> 0
 
 =head3 L<Acme::CPANModules::CheckingModuleInstalledLoadable> 0
+
+=head3 L<Acme::CPANModules::Clipboard> 0
 
 =head3 L<Acme::CPANModules::ColorEnv> 0
 
@@ -93,6 +104,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Acme::CPANModules::ConvertingRadix> 0
 
 =head3 L<Acme::CPANModules::ConvertingToRegex> 0
+
+=head3 L<Acme::CPANModules::CountryCodes> 0
 
 =head3 L<Acme::CPANModules::CreatingPaletteOfVisuallyDistinctColors> 0
 
@@ -150,11 +163,15 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::CPANModules::KitchenSinks> 0
 
+=head3 L<Acme::CPANModules::LanguageCodes> 0
+
 =head3 L<Acme::CPANModules::ListsOfWordsAndNames> 0
 
 =head3 L<Acme::CPANModules::LocalCPANIndex> 0
 
 =head3 L<Acme::CPANModules::LocalCPANMirror> 0
+
+=head3 L<Acme::CPANModules::Locale::ID> 0
 
 =head3 L<Acme::CPANModules::MIMETypes> 0
 
@@ -178,11 +195,15 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::CPANModules::NonMooseStyleClassBuilder> 0
 
+=head3 L<Acme::CPANModules::NumberRange> 0
+
 =head3 L<Acme::CPANModules::OneAndTwoDecimalDigitsVersionTrap> 0
 
 =head3 L<Acme::CPANModules::OneLetter> 0
 
 =head3 L<Acme::CPANModules::OneLinerTools> 0
+
+=head3 L<Acme::CPANModules::OrderedHash> 0
 
 =head3 L<Acme::CPANModules::Org> 0
 
@@ -242,6 +263,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::CPANModules::RenamingFiles> 0
 
+=head3 L<Acme::CPANModules::RequireHooks> 0
+
 =head3 L<Acme::CPANModules::Roles> 0
 
 =head3 L<Acme::CPANModules::RsyncWrappers> 0
@@ -250,9 +273,13 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::CPANModules::SQLite> 0
 
+=head3 L<Acme::CPANModules::Sampling> 0
+
 =head3 L<Acme::CPANModules::Set> 0
 
 =head3 L<Acme::CPANModules::ShellCompleters> 0
+
+=head3 L<Acme::CPANModules::SmartMatch> 0
 
 =head3 L<Acme::CPANModules::StructuredDATA> 0
 
@@ -380,6 +407,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::MetaSyntactic::WordList> 0
 
+=head3 L<Acme::MetaSyntactic::always_sunny> 0
+
 =head3 L<Acme::MetaSyntactic::boboiboy> 0
 
 =head3 L<Acme::MetaSyntactic::breaking_bad> 0
@@ -410,6 +439,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::MetaSyntactic::newsradio> 0
 
+=head3 L<Acme::MetaSyntactic::not_going_out> 0
+
 =head3 L<Acme::MetaSyntactic::ozark> 0
 
 =head3 L<Acme::MetaSyntactic::schitts_creek> 0
@@ -418,37 +449,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Acme::MetaSyntactic::unyil> 0
 
-=head3 L<Acme::PERLANCAR::Dummy> 0
-
-=head3 L<Acme::PERLANCAR::Dummy::POD> 0
-
-=head3 L<Acme::PERLANCAR::DumpImportArgs> 0
-
-=head3 L<Acme::PERLANCAR::Prime> 0
-
-=head3 L<Acme::PERLANCAR::Test::Dependency::One> 0
-
-=head3 L<Acme::PERLANCAR::Test::Dependency::Three> 0
-
-=head3 L<Acme::PERLANCAR::Test::Dependency::Two> 0
-
-=head3 L<Acme::PERLANCAR::Test::Images> 0
-
-=head3 L<Acme::PERLANCAR::Test::MetaCPAN::HTML> 0
-
-=head3 L<Acme::PERLANCAR::Test::Misc> 0
-
-=head3 L<Acme::PERLANCAR::Test::SameRelease> 0
-
-=head3 L<Acme::PERLANCAR::Test::Versioning> 0
-
-=head3 L<Acme::Test::LocaleTextDomain> 0
-
-=head3 L<Acme::Test::LocaleTextDomainIfEnv> 0
-
-=head3 L<Acme::Test::LocaleTextDomainUTF8IfEnv> 0
-
-=head3 L<Acme::Test::crypt> 0
+=head3 L<Acme::Thing> 0
 
 =head3 L<Algorithm::Backoff> 0.006
 
@@ -512,7 +513,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<App::BrowserOpenUtils> 0
 
-=head3 L<App::BrowserUtils> 0.018
+=head3 L<App::BrowserUtils> 0.019
 
 =head3 L<App::CLITestUtils> 0
 
@@ -525,6 +526,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<App::CPANMetaUtils> 0
 
 =head3 L<App::CPANModulesUtils> 0
+
+=head3 L<App::CPANStreaks> 0
 
 =head3 L<App::CPANURLUtils> 0
 
@@ -612,6 +615,10 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<App::DistroWatchUtils> 0
 
+=head3 L<App::DownloadsDirUtils> 0
+
+=head3 L<App::DrugUtils> 0
+
 =head3 L<App::DumpChromeHistory> 0.005
 
 =head3 L<App::DumpFirefoxHistory> 0
@@ -626,7 +633,11 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<App::DzilUtils> 0
 
+=head3 L<App::EANUtils> 0
+
 =head3 L<App::ENumberUtils> 0
+
+=head3 L<App::EbookUtils> 0
 
 =head3 L<App::EscapeUtils> 0
 
@@ -650,11 +661,15 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<App::FileDigestCLIs> 0
 
+=head3 L<App::FileFindUtils> 0
+
 =head3 L<App::FileModifyUtils> 0
 
 =head3 L<App::FileRemoveUtils> 0.004
 
 =head3 L<App::FileRenameUtils> 0
+
+=head3 L<App::FileSortUtils> 0.008
 
 =head3 L<App::FileTestUtils> 0
 
@@ -1016,6 +1031,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<App::SubtitleUtils> 0
 
+=head3 L<App::SymlinkUtils> 0
+
 =head3 L<App::SystemdUtils> 0
 
 =head3 L<App::TOMLUtils> 0
@@ -1047,6 +1064,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<App::TouchpadUtils> 0
 
 =head3 L<App::TouchscreenUtils> 0
+
+=head3 L<App::TrashUtils> 0
 
 =head3 L<App::TrimHistories> 0
 
@@ -1362,7 +1381,13 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<App::perlmv> 0.604
 
+=head3 L<App::perlmv::scriptlet::according_to_containing_dir> 0
+
+=head3 L<App::perlmv::scriptlet::add_extension_according_to_mime_type> 0
+
 =head3 L<App::perlmv::scriptlet::add_prefix> 0
+
+=head3 L<App::perlmv::scriptlet::add_prefix_datestamp> 0
 
 =head3 L<App::perlmv::scriptlet::add_suffix> 0
 
@@ -1399,6 +1424,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<App::progpatcher> 0
 
 =head3 L<App::quickabspath> 0
+
+=head3 L<App::randquote> 0
 
 =head3 L<App::rank> 0
 
@@ -1443,6 +1470,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<App::short> 0
 
 =head3 L<App::smtpstatus> 0
+
+=head3 L<App::sort_by_spec> 0
 
 =head3 L<App::sorted> 0
 
@@ -1490,6 +1519,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<App::upf> 0
 
+=head3 L<App::wcgrep> 0
+
 =head3 L<App::wget::retry> 0
 
 =head3 L<App::wordlist> 0.270
@@ -1505,6 +1536,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<AppBase::Grep> 0.010
 
 =head3 L<AppBase::Grep::ColorSchemes::Kuler> 0
+
+=head3 L<AppBase::Sort> 0
 
 =head3 L<AppLib::CreateSelfSignedSSLCert> 0
 
@@ -1740,6 +1773,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Bencher::Scenario::SetOperationModules> 0
 
+=head3 L<Bencher::Scenario::Shell::Startup> 0
+
 =head3 L<Bencher::Scenario::ShellQuote::Any> 0
 
 =head3 L<Bencher::Scenario::ShellQuoteAny> 0
@@ -1886,6 +1921,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Bencher::Scenarios::DataSahVSTypeTiny> 0
 
+=head3 L<Bencher::Scenarios::Date::TimeOfDay> 0
+
 =head3 L<Bencher::Scenarios::DateModules> 0
 
 =head3 L<Bencher::Scenarios::DateTime::Format::Duration::ISO8601> 0
@@ -1904,11 +1941,15 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Bencher::Scenarios::DateTimeOfDay> 0
 
+=head3 L<Bencher::Scenarios::Digest::SHA> 0
+
 =head3 L<Bencher::Scenarios::DigestSHA> 0
 
 =head3 L<Bencher::Scenarios::Examples> 0
 
 =head3 L<Bencher::Scenarios::Exporters> 0
+
+=head3 L<Bencher::Scenarios::File::Flock::Retry> 0
 
 =head3 L<Bencher::Scenarios::FileFlockRetry> 0
 
@@ -1921,6 +1962,10 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Bencher::Scenarios::GetoptLongComplete> 0
 
 =head3 L<Bencher::Scenarios::GetoptLongEvenLess> 0
+
+=head3 L<Bencher::Scenarios::HTTP::Tiny::Patch::Retry> 0
+
+=head3 L<Bencher::Scenarios::HTTP::Tiny::Plugin> 0
 
 =head3 L<Bencher::Scenarios::HTTPTinyPatchRetry> 0
 
@@ -1949,6 +1994,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Bencher::Scenarios::ListingModules> 0
 
 =head3 L<Bencher::Scenarios::LocaleTextDomainIfEnv> 0
+
+=head3 L<Bencher::Scenarios::Log::ger> 0
 
 =head3 L<Bencher::Scenarios::LogAny> 0
 
@@ -2244,6 +2291,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Complete::Chrome> 0
 
+=head3 L<Complete::Color> 0
+
 =head3 L<Complete::Common> 0.22
 
 =head3 L<Complete::Country> 0
@@ -2330,7 +2379,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Complete::Unix> 0.07
 
-=head3 L<Complete::Util> 0.616
+=head3 L<Complete::Util> 0.618
 
 =head3 L<Complete::Vivaldi> 0
 
@@ -2429,6 +2478,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Data::Dump::OneLine> 0
 
 =head3 L<Data::Dump::Options> 0
+
+=head3 L<Data::Dump::Partial> 0
 
 =head3 L<Data::Dump::Patch::Deparse> 0
 
@@ -2644,7 +2695,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Desktop::Detect> 0
 
-=head3 L<Desktop::Open> 0
+=head3 L<Desktop::Open> 0.004
 
 =head3 L<Devel::Caller::Util> 0.042
 
@@ -2739,6 +2790,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Dist::Zilla::Plugin::InsertCodeResult> 0
 
 =head3 L<Dist::Zilla::Plugin::InsertCommandOutput> 0
+
+=head3 L<Dist::Zilla::Plugin::InsertDistFileLink> 0
 
 =head3 L<Dist::Zilla::Plugin::InsertDistImage> 0
 
@@ -2880,7 +2933,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<File::Flock::Retry> 0.631
 
-=head3 L<File::MoreUtil> 0.625
+=head3 L<File::MoreUtil> 0
 
 =head3 L<File::Move::Undoable> 0.08
 
@@ -2902,7 +2955,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<File::SortedSeek::PERLANCAR> 0
 
-=head3 L<File::Symlink::Util> 0.003
+=head3 L<File::Symlink::Util> 0.005
 
 =head3 L<File::Temp::MoreUtils> 0
 
@@ -2914,7 +2967,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<File::Trash::EmptyFiles::Undoable> 0
 
-=head3 L<File::Trash::FreeDesktop> 0.204
+=head3 L<File::Trash::FreeDesktop> 0.207
 
 =head3 L<File::Trash::Undoable> 0.230
 
@@ -2922,7 +2975,15 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<File::Unsaved> 0
 
+=head3 L<File::Util::DirList> 0.002
+
+=head3 L<File::Util::Sort> 0
+
+=head3 L<File::Util::Symlink> 0
+
 =head3 L<File::Util::Tempdir> 0.032
+
+=head3 L<File::Util::Test> 0.631
 
 =head3 L<File::Which::Patch::Hide> 0
 
@@ -2930,7 +2991,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<File::chown> 0
 
-=head3 L<Filename::Archive> 0
+=head3 L<Filename::Archive> 0.032
 
 =head3 L<Filename::Audio> 0.004
 
@@ -3014,8 +3075,6 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Generic::ColorTheme::Kuler> 0
 
-=head3 L<Gepok> 0
-
 =head3 L<Getopt::Long::Any> 0
 
 =head3 L<Getopt::Long::Complete> 0
@@ -3064,7 +3123,11 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Graphics::ColorNamesLite::All> 0
 
+=head3 L<Graphics::ColorNamesLite::EN> 0
+
 =head3 L<Graphics::ColorNamesLite::HTML_ID> 0
+
+=head3 L<Graphics::ColorNamesLite::ID> 0
 
 =head3 L<Graphics::ColorNamesLite::WWW> 0
 
@@ -3232,6 +3295,12 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<List::Util::Uniq> 0.005
 
+=head3 L<List::Util::groupby> 0
+
+=head3 L<List::Util::mapsplice> 0
+
+=head3 L<List::Util::sglice> 0
+
 =head3 L<Locale::ID::GuessGender::FromFirstName> 0
 
 =head3 L<Locale::ID::Locality> 0.120
@@ -3336,8 +3405,6 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Log::ger::Output::FileWriteRotate> 0
 
-=head3 L<Log::ger::Output::Journald> 0
-
 =head3 L<Log::ger::Output::LogAny> 0.003
 
 =head3 L<Log::ger::Output::LogDispatchOutput> 0.003
@@ -3440,7 +3507,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Module::FeaturesUtil::Check> 0.005
 
-=head3 L<Module::FeaturesUtil::Get> 0.004
+=head3 L<Module::FeaturesUtil::Get> 0.006
 
 =head3 L<Module::HideRename> 0
 
@@ -3494,7 +3561,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Nodejs::Util> 0.007
 
-=head3 L<NumSeq::Iter> 0.002
+=head3 L<NumSeq::Iter> 0.006
 
 =head3 L<Number::Closest::NonOO> 0
 
@@ -3504,7 +3571,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Number::Pad> 0
 
-=head3 L<Number::Util::Range> 0.003
+=head3 L<Number::Util::Range> 0.005
 
 =head3 L<Object::Dumb> 0
 
@@ -3842,7 +3909,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Perinci::Sub::To::FishComplete> 0
 
-=head3 L<Perinci::Sub::Util> 0.471
+=head3 L<Perinci::Sub::Util> 0.472
 
 =head3 L<Perinci::Sub::Util::DepModule> 0
 
@@ -3969,6 +4036,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Pod::Weaver::Plugin::perlmv> 0
 
 =head3 L<Pod::Weaver::PluginBundle::Author::PERLANCAR> 0
+
+=head3 L<Pod::Weaver::PluginBundle::Author::PERLANCAR::NoRinci> 0
 
 =head3 L<Pod::Weaver::Role::AddTextToSection> 0.06
 
@@ -4150,6 +4219,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Require::HookChain::source::dzil_build> 0
 
+=head3 L<Require::HookChain::source::lcpan> 0
+
 =head3 L<Require::HookChain::source::metacpan> 0
 
 =head3 L<Require::Util> 0
@@ -4243,6 +4314,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Sah::Schemas::Calendar::Dates> 0
 
 =head3 L<Sah::Schemas::Chrome> 0
+
+=head3 L<Sah::Schemas::Code> 0
 
 =head3 L<Sah::Schemas::Collection> 0
 
@@ -4360,7 +4433,11 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<ScriptX_Util> 0
 
+=head3 L<Seq::Iter> 0
+
 =head3 L<Set::IntSpan::Util> 0
+
+=head3 L<Set::Streak> 0
 
 =head3 L<Setup> 0
 
@@ -4426,6 +4503,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Sort::Sub::by_several> 0
 
+=head3 L<Sort::Sub::by_spec> 0
+
 =head3 L<Sort::Sub::data_struct_by_data_cmp> 0
 
 =head3 L<Sort::Sub::filevercmp> 0
@@ -4433,6 +4512,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Sort::SubBundle::PERLANCAR> 0
 
 =head3 L<Sort::SubList> 0
+
+=head3 L<Spreadsheet::Examples> 0
 
 =head3 L<Spreadsheet::Open> 0
 
@@ -4472,7 +4553,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<String::Util::Match> 0
 
-=head3 L<String::Util::Range> 0
+=head3 L<String::Util::Range> 0.002
 
 =head3 L<String::Wildcard::Bash> 0.044
 
@@ -4498,7 +4579,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<TSV::Examples> 0
 
-=head3 L<TableData> 0.2.0
+=head3 L<TableData> 0.2.5
 
 =head3 L<TableData::Acme::CPANAuthors> 0
 
@@ -4509,6 +4590,10 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<TableData::Locale::US::State> 0
 
 =head3 L<TableData::Perl::CPAN::Release::Static::2022> 0
+
+=head3 L<TableData::Perl::CPAN::Release::Static::2023> 0
+
+=head3 L<TableData::Perl::CPAN::Release::Static::2024> 0
 
 =head3 L<TableData::Quote::JamesFT> 0
 
@@ -4578,7 +4663,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Test::Module::Features> 0
 
-=head3 L<Test::Perinci::CmdLine> 1.480
+=head3 L<Test::Perinci::CmdLine> 1.484
 
 =head3 L<Test::ProveRdeps> 0
 
@@ -4594,7 +4679,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Test::Sah::Filter> 0.005
 
-=head3 L<Test::Sah::Schema> 0.010
+=head3 L<Test::Sah::Schema> 0.016
 
 =head3 L<Test::WithDB> 0.100
 
@@ -4646,7 +4731,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Text::Table::Paragraph> 0
 
-=head3 L<Text::Table::Sprintf> 0.006
+=head3 L<Text::Table::Sprintf> 0.007
 
 =head3 L<Text::Table::TSV> 0
 
@@ -4669,6 +4754,8 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 =head3 L<Text::Wrap::NoStrip> 0.002
 
 =head3 L<Text::sprintfn> 0
+
+=head3 L<TextDoc::Examples> 0
 
 =head3 L<Tie::Array::Expire> 0
 
@@ -4756,7 +4843,7 @@ cpanmodules: ERROR 500: Died: Can't locate Acme/CPANModules/PERLANCAR/Unused.pm 
 
 =head3 L<Version::Monotonic> 0
 
-=head3 L<Version::Util> 0.731
+=head3 L<Version::Util> 0.732
 
 =head3 L<Versioning::Scheme> 0.002
 

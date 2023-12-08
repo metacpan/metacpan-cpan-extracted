@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use Safe::Isa;
 
@@ -44,7 +44,7 @@ Image::DS9::Grammar - Grammar definitions
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SUPPORT
 

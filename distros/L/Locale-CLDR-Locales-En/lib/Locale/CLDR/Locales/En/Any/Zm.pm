@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Zm - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Zm;
 # This file auto generated from Data\common\main\en_ZM.xml
-#	on Sat  4 Nov  6:00:06 pm GMT
+#	on Tue  5 Dec  1:08:11 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

@@ -1,0 +1,109 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Run::Command::ToFail;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::Run::Command::ToFail->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+run-command-to-fail - Tool to run command in cycle to check fail.
+
+=head1 SYNOPSIS
+
+ run-command-to-fail [-h] [-l] [-n cycles] [-p preset] [--version]
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<-l>
+
+List presets.
+
+=item * C<-n cycles>
+
+Number of cycles.
+
+Default value is 100 cycles.
+
+=item * C<-p preset>
+
+Preset for run.
+
+Default value is 'perl'.
+
+=item * C<--version>
+
+Print version of script.
+
+=back
+
+=head1 ACTUAL PRESETS
+
+=over
+
+=item C<blank>
+
+Clean preset. User could run anything, what want.
+
+=item C<perl>
+
+Perl preset.
+
+One argument is required, it's Perl file to run.
+
+=item C<strace_perl>
+
+Perl preset with strace processing.
+
+One argument is required, it's Perl file to run.
+
+=back
+
+=head1 EXAMPLE
+
+ run-command-to-fail -n 10 -p blank true
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Run-Command-ToFail>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2023 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

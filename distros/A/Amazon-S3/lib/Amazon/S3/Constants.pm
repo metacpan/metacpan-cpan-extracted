@@ -7,7 +7,7 @@ use parent qw(Exporter);
 
 use Readonly;
 
-our $VERSION = '0.64'; ## no critic (RequireInterpolation)
+our $VERSION = '0.65'; ## no critic (RequireInterpolation)
 
 # defaults
 Readonly our $AMAZON_HEADER_PREFIX            => 'x-amz-';

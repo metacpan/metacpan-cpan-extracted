@@ -1,0 +1,307 @@
+print <<'DUMMY_TEST';
+ok 1
+not ok 2
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 11
+    test_num: 0
+  emitter: Test::More::is
+  message: "Failed test at t/03-dummy.t line 11."
+  ...
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 11
+    test_num: 0
+  emitter: Test::More::is
+  message: "got: '1'\nexpected: '0'"
+  ...
+
+ok 3 - equality [pass]
+not ok 4 - equality [not pass]
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 13
+    test_num: 0
+  emitter: Test::More::is
+  message: "Failed test 'equality [not pass]'\nat t/03-dummy.t line 13."
+  ...
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 13
+    test_num: 0
+  emitter: Test::More::is
+  message: "got: '1'\nexpected: '0'"
+  ...
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 15
+    test_num: 0
+  emitter: Test::More::diag
+  message: "a top level diag"
+  ...
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 16
+    test_num: 0
+  emitter: Test::More::note
+  message: "a top level note"
+  ...
+
+a message
+ok 5 - lives ok [pass]
+with a message
+ok 6 - lives ok [not pass]
+with a message and a newline
+ok 7 - lives ok [not pass]
+# Subtest: L1: one level
+    ok 1 - L1: equality [pass]
+    not ok 2 - L1: equality [not pass]
+
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 24
+        test_num: 0
+      emitter: Test::More::is
+      message: "Failed test 'L1: equality [not pass]'\nat t/03-dummy.t line 24."
+      ...
+    
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 24
+        test_num: 0
+      emitter: Test::More::is
+      message: "got: '1'\nexpected: '0'"
+      ...
+    
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 26
+        test_num: 0
+      emitter: Test::More::diag
+      message: "L1: a top level diag"
+      ...
+    
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 27
+        test_num: 0
+      emitter: Test::More::note
+      message: "L1: a top level note"
+      ...
+    
+L1: a message
+    ok 3 - L1: lives ok [pass]
+    not ok 4 - L1: lives ok [not pass]
+
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 30
+        test_num: 0
+      emitter: Test::Exception::lives_ok
+      message: "Failed test 'L1: lives ok [not pass]'\nat t/03-dummy.t line 30."
+      ...
+    
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 30
+        test_num: 0
+      emitter: Test::Exception::lives_ok
+      message: "died: L1: with a message"
+      ...
+    
+    not ok 5 - L1: lives ok [not pass]
+
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 31
+        test_num: 0
+      emitter: Test::Exception::lives_ok
+      message: "Failed test 'L1: lives ok [not pass]'\nat t/03-dummy.t line 31."
+      ...
+    
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 31
+        test_num: 0
+      emitter: Test::Exception::lives_ok
+      message: "died: L1: with a message and a newline"
+      ...
+    
+    1..5
+    # Looks like you failed 3 tests of 5.
+not ok 8 - L1: one level
+
+#   Failed test 'L1: one level'
+#   at t/03-dummy.t line 32.
+# Subtest: L2: one level
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 35
+        test_num: 0
+      emitter: Test::More::diag
+      message: "L2: a top level diag"
+      ...
+    
+      ---
+      at:
+        filename: t/03-dummy.t
+        line: 36
+        test_num: 0
+      emitter: Test::More::note
+      message: "L2: a top level note"
+      ...
+    
+    # Subtest: L2.1: another level deep
+          ---
+          at:
+            filename: t/03-dummy.t
+            line: 38
+            test_num: 0
+          emitter: Test::More::diag
+          message: "L2.1: a top level diag"
+          ...
+        
+          ---
+          at:
+            filename: t/03-dummy.t
+            line: 39
+            test_num: 0
+          emitter: Test::More::note
+          message: "L2.1: a top level note"
+          ...
+        
+        ok 1 - L2: equality [pass]
+        not ok 2 - L2: equality [not pass]
+
+          ---
+          at:
+            filename: t/03-dummy.t
+            line: 41
+            test_num: 0
+          emitter: Test::More::is
+          message: "Failed test 'L2: equality [not pass]'\nat t/03-dummy.t line 41."
+          ...
+        
+          ---
+          at:
+            filename: t/03-dummy.t
+            line: 41
+            test_num: 0
+          emitter: Test::More::is
+          message: "got: '1'\nexpected: '0'"
+          ...
+        
+L2: a message
+        ok 3 - L2: lives ok [pass]
+        not ok 4 - L2: lives ok [not pass]
+
+          ---
+          at:
+            filename: t/03-dummy.t
+            line: 44
+            test_num: 0
+          emitter: Test::Exception::lives_ok
+          message: "Failed test 'L2: lives ok [not pass]'\nat t/03-dummy.t line 44."
+          ...
+        
+          ---
+          at:
+            filename: t/03-dummy.t
+            line: 44
+            test_num: 0
+          emitter: Test::Exception::lives_ok
+          message: "died: L2: with a message"
+          ...
+        
+        not ok 5 - L2: lives ok [not pass]
+
+          ---
+          at:
+            filename: t/03-dummy.t
+            line: 45
+            test_num: 0
+          emitter: Test::Exception::lives_ok
+          message: "Failed test 'L2: lives ok [not pass]'\nat t/03-dummy.t line 45."
+          ...
+        
+          ---
+          at:
+            filename: t/03-dummy.t
+            line: 45
+            test_num: 0
+          emitter: Test::Exception::lives_ok
+          message: "died: L2: with a message and a newline"
+          ...
+        
+        1..5
+        # Looks like you failed 3 tests of 5.
+    not ok 1 - L2.1: another level deep
+
+    #   Failed test 'L2.1: another level deep'
+    #   at t/03-dummy.t line 46.
+    1..1
+    # Looks like you failed 1 test of 1.
+not ok 9 - L2: one level
+
+#   Failed test 'L2: one level'
+#   at t/03-dummy.t line 47.
+ok 10 - L0: equality [pass]
+ok 11
+not ok 12 - L0: equality [not pass]
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 51
+    test_num: 0
+  emitter: Test::More::is
+  message: "Failed test 'L0: equality [not pass]'\nat t/03-dummy.t line 51."
+  ...
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 51
+    test_num: 0
+  emitter: Test::More::is
+  message: "got: 'a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here'\nexpected: 'a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here a very long string here--'"
+  ...
+
+not ok 13
+
+  ---
+  at:
+    filename: t/03-dummy.t
+    line: 51
+    test_num: 0
+  emitter: Test::More::ok
+  message: "Failed test at t/03-dummy.t line 51."
+  ...
+
+ok 14 - no (unexpected) warnings (via done_testing)
+1..14
+# Looks like you failed 6 tests of 14.
+DUMMY_TEST
+;
+exit 1

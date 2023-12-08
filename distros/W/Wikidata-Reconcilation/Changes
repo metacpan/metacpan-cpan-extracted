@@ -1,3 +1,8 @@
+0.04 2023-11-29T07:48:28+01:00
+ - Add constructor test.
+ - Add reconcilation test for error.
+ - Rewrite to WQS::SPARQL@0.02.
+
 0.03 2023-06-20T14:20:50+02:00
  - Add helper method _exists_id().
  - Fix dependency name.

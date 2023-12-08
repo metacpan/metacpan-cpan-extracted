@@ -50,6 +50,7 @@
             "Test::LWP::UserAgent" : "0",
             "Test::Most" : "0",
             "Test::NoWarnings" : "0",
+            "TimeZone::TimeZoneDB" : "0",
             "WWW::RT::CPAN" : "0",
             "autodie" : "0"
          }
@@ -58,17 +59,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Weather-Meto@rt.cpan.org",
-         "web" : "https://github.com/nigelhorne/Weather-Meto/issues",
-         "x_url" : "https://github.com/nigelhorne/Weather-Meto/issues"
+         "mailto" : "bug-Weather-Meteo@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Weather-Meteo/issues",
+         "x_url" : "https://github.com/nigelhorne/Weather-Meteo/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/nigelhorne/Weather-Meto.git",
-         "web" : "https://github.com/nigelhorne/Weather-Meto",
-         "x_repository" : "https://github.com/nigelhorne/Weather-Meto"
+         "url" : "git://github.com/nigelhorne/Weather-Meteo.git",
+         "web" : "https://github.com/nigelhorne/Weather-Meteo",
+         "x_repository" : "https://github.com/nigelhorne/Weather-Meteo"
       }
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,7 +2,7 @@
 use strict;
 
 #use Test::More 'no_plan';
-use Test::More tests => 28;
+use Test::More tests => 33;
 use Test::Fatal;
 
 my $CLASS;
@@ -122,7 +122,7 @@ is( Foo::bar(), 'original value',
 
 {
 
-    package Temp;
+    package TempReplace;
     sub foo {23}
     sub bar {42}
 
@@ -133,6 +133,28 @@ is( Foo::bar(), 'original value',
     $override->restore('foo');
     main::is( foo(), 23, '... and we should be able to restore said sub' );
 
-    $override->restore('Temp::bar');
+    $override->restore('TempReplace::bar');
     main::is( bar(), 42, '... even if we use a full qualified sub name' );
+}
+
+can_ok( $override, 'wrap' );
+
+{
+
+    package TempWrap;
+    sub foo {23}
+
+    my $override = $CLASS->new;
+
+    main::ok( $override->wrap( 'foo',
+        sub {
+            my ($orig, @args) = @_;
+            return $args[0] ? 24 : $orig->();
+        }
+    ), '... and we should be able to successfully wrap a subroutine' );
+    main::is( foo(),  23, '... and wrapped sub foo conditionally returns original value' );
+    main::is( foo(1), 24, '... and wrapped sub foo conditionally returns override value' );
+
+    $override->restore('foo');
+    main::is( foo(1), 23, '... and we can restore a wrapped subroutine' );
 }

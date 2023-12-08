@@ -254,10 +254,17 @@ qx.Class.define("callbackery.ui.plugin.Form", {
                 if (!s.key){
                     return;
                 }
-                if (s.widget == 'selectBox' || s.widget == 'comboBox'){
+                if (s.widget == 'selectBox'){
                     if (s.reloadOnFormReset !== false) {
                         this._reconfSelectBoxRunning++;
                         this._form.setSelectBoxData(s.key,s.cfg.structure);
+                        this._reconfSelectBoxRunning--;
+                    }
+                }
+                if (s.widget == 'comboBox'){
+                    if (s.reloadOnFormReset !== false) {
+                        this._reconfSelectBoxRunning++;
+                        this._form.setComboBoxData(s.key, s.cfg.structure);
                         this._reconfSelectBoxRunning--;
                     }
                 }

@@ -12,7 +12,7 @@ use Pod::CopyrightYears;
 use Perl6::Slurp qw(slurp);
 use String::UpdateYears qw(update_years);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -61,9 +61,8 @@ sub run {
 
 	# Dump perl modules in debug mode.
 	if ($self->{'_opts'}->{'d'}) {
-		require Dumpvalue;
-		my $dump = Dumpvalue->new;
-		$dump->dumpValues(\@pm);
+		print "Found files:\n";
+		print map { '- '.$_."\n"; } @pm;
 	}
 
 	# Update years.
@@ -98,9 +97,8 @@ sub run {
 
 		# Dump tools in debug mode.
 		if ($self->{'_opts'}->{'d'}) {
-			require Dumpvalue;
-			my $dump = Dumpvalue->new;
-			$dump->dumpValues(\@bin);
+			print "Found scripts:\n";
+			print map { '- '.$_."\n"; } @bin;
 		}
 
 		# Update years.
@@ -131,6 +129,7 @@ sub _update_pod {
 
 	my @sections = split m/,/, $self->{'_opts'}->{'s'};
 	my $cy = Pod::CopyrightYears->new(
+		$self->{'_opts'}->{'d'} ? ('debug' => 1) : (),
 		'pod_file' => $file,
 		'section_names' => \@sections,
 	);
@@ -237,6 +236,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

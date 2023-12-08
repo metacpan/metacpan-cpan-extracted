@@ -14,7 +14,7 @@ Image::DS9::Manual::Install - Installation and testing of Image::DS9
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 DESCRIPTION
 

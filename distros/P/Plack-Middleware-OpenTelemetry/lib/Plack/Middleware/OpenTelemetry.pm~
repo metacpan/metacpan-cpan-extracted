@@ -1,0 +1,84 @@
+package Plack::Middleware::OpenTelemetry;
+
+# ABSTRACT: Plack middleware to setup OpenTelemetry tracing
+
+use strict;
+use warnings;
+use parent qw(Plack::Middleware);
+use Plack::Util::Accessor qw(tracer);
+use OpenTelemetry::Constants qw( SPAN_KIND_SERVER SPAN_STATUS_ERROR SPAN_STATUS_OK );
+use Syntax::Keyword::Dynamically;
+
+sub prepare_app {
+    my $self = shift;
+
+    unless ($self->tracer) {
+        my $provider = OpenTelemetry->tracer_provider;
+        $provider->tracer(name => 'perl', version => '1.0');
+        $self->tracer($provider->tracer);
+    }
+
+}
+
+sub call {
+    my ($self, $env) = @_;
+
+    my $span;
+    if (my $tracer = $self->tracer) {
+        $tracer->create_span(
+            name       => "request",
+            kind       => SPAN_KIND_SERVER,
+            attributes => {
+                url   => {path    => $env->{PATH_INFO}},
+                plack => {version => $Plack::VERSION},
+            },
+        );
+    }
+    $self->app->($env);
+    $span->end() if $span;
+}
+
+1;
+
+=head1 NAME
+
+Plack::Middleware::OpenTelemetry - Plack middleware to handle X-Forwarded-For headers
+
+=head1 SYNOPSIS
+
+  builder {
+    enable "Plack::Middleware::OpenTelemetry",
+      tracer => OpenTelemetry->tracer_provider->tracer; # default
+  };
+
+=head1 DESCRIPTION
+
+C<Plack::Middleware::OpenTelemetry> will setup an C<OpenTelemetry>
+span for the request.
+
+=head1 PARAMETERS
+
+=over
+
+=item tracer
+
+If not specified a tracer from the default tracer_provider will be used.
+
+=back
+
+=head1 SEE ALSO
+
+L<Plack::Middleware>, L<OpenTelemetry::SDK>
+
+=head1 AUTHOR
+
+Ask Bjørn Hansen <ask@develooper.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023 by Ask Bjørn Hansen.
+
+This is free software; you can redistribute it and/or modify it under
+the MIT software license.
+
+=cut

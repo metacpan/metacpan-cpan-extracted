@@ -34,7 +34,7 @@
       "runtime" : {
          "requires" : {
             "DateTime" : "0.72",
-            "Locale::CLDR" : "v0.34.3",
+            "Locale::CLDR" : "v0.34.4",
             "Moo" : "2",
             "MooX::ClassAttribute" : "0.011",
             "Type::Tiny" : "0",
@@ -46,27 +46,27 @@
    "provides" : {
       "Locale::CLDR::Locales::Sw" : {
          "file" : "lib/Locale/CLDR/Locales/Sw.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Sw::Any" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Sw::Any::Cd" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any/Cd.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Sw::Any::Ke" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any/Ke.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Sw::Any::Tz" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any/Tz.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       },
       "Locale::CLDR::Locales::Sw::Any::Ug" : {
          "file" : "lib/Locale/CLDR/Locales/Sw/Any/Ug.pm",
-         "version" : "v0.34.3"
+         "version" : "v0.34.4"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
          "url" : "https://github.com/ThePilgrim/perlcldr.git"
       }
    },
-   "version" : "v0.34.3",
+   "version" : "v0.34.4",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

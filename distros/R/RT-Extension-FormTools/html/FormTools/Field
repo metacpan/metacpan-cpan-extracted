@@ -1,13 +1,13 @@
 <%args>
 $name
 $label              => undef
+$tooltip            => undef
 $item_labels        => {}
 $render_as          => 'normal'
 $default            => undef
 $cols               => undef
 $rows               => undef
 $empty_allowed      => 1
-$show_validation    => 0
 $show_label         => 1
 $disables           => {}
 $enabled_by         => []
@@ -53,11 +53,13 @@ if ( RT::Extension::FormTools::is_core_field($name) ) {
     unless ( $cf->id ) {
         my $msg = "Could not find a custom field called $name";
         $msg .= " for the queue ".$queue->Name if (defined $queue);
-        die $msg;
+        RT->Logger->error('Could not load custom field:' . $msg);
+        return;
     }
 
     $m->notes( cfs_on_page => [ @{$m->notes('cfs_on_page')||[]}, $cf->id ] );
     $field_label ||= $cf->Name;
+    $tooltip ||= $cf->EntryHint;
 
     if ($ticket) {
         @values = map { $_->Content } @{ $cf->ValuesForObject($ticket)->ItemsArrayRef };
@@ -110,23 +112,78 @@ $default = '' unless defined $default;
     </script>
 % }
 
-% if ($field_type eq 'core' && $name eq 'Content') {
+% if ($field_type eq 'core' && $name eq 'Content' && $render_as ne 'hidden') {
 
+<div
+% if ( $ARGS{validation} ) {
+    data-validation="<% $ARGS{validation} %>"
+% }
+>
 <& /Elements/MessageBox,
     Name => $name,
     ($rows ? (Height => $rows) : ()),
     ($cols ? (Width => $cols) : ()),
     IncludeSignature => 0,
     Default => $default,
+    FullWidth => 1,
 &>
+% if ( $ARGS{validation} ) {
+  <span class="cfhints my-1 d-inline-block required">
+    <% loc('Required') %>
+  </span>
+% }
+</div>
 
 % } else {
 
 % if ($render_as ne 'hidden' && $show_label) { # no label if hidden
-<div class="form-row">
-  <div class="label col-3"><%$field_label%><% $after_label |n %></div>
-  <div class="value col-9">
+
+<&| /Elements/LabeledValue, RawLabel => $m->interp->apply_escapes($field_label, 'h') . $after_label, LabelSpanClass => $tooltip ? 'prev-icon-helper' : '', LabelTooltip => $tooltip &>
+  <div data-name="<% $cf ? $cf->Name : '' %>"
+% if ( $ARGS{validation} ) {
+    data-validation="<% $ARGS{validation} %>"
 % }
+% if ( $ARGS{dependent_validation} && $ARGS{dependent_validation}{enabled} && $ARGS{dependent_validation}{name} ) {
+%   my $dependent_cf = RT::CustomField->new($session{CurrentUser});
+%   $dependent_cf = RT::CustomField->new( $session{'CurrentUser'} );
+%   $dependent_cf->SetContextObject($ticket) if $cf->can('SetContextObject');
+
+%   # try loading CFs for this Queue, followed by Global, followed by any CF of given $name
+%   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => $queue->id ) if (defined $queue);
+%   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => 0 ) unless ( $cf->id );
+%   if ( $dependent_cf ) {
+    data-dependent-name="<% GetCustomFieldInputName( Object => $ticket, CustomField => $dependent_cf ) %>"
+    data-dependent-values="<% JSON($ARGS{dependent_validation}{values} || []) %>"
+%   }
+% }
+  >
+    <& SELF:Value, %ARGS, input_name => $input_name, field_type => $field_type, default => $default, values => \@values, cf => $cf &>
+    <% $after_input |n %>
+  </div>
+</&>
+
+% } else {
+  <& SELF:Value, %ARGS, input_name => $input_name, field_type => $field_type, default => $default, values => \@values, cf => $cf &>
+% }
+
+% }
+
+<%METHOD Value>
+<%ARGS>
+$name
+$render_as          => 'normal'
+$default            => undef
+$cols               => undef
+$rows               => undef
+$empty_allowed      => 1
+$disables           => {}
+$after_input        => ''
+$cf                 => undef
+$queue              => undef
+$field_type         => undef
+$input_name         => undef
+@values             => ()
+</%ARGS>
 
 % if ($field_type eq 'core') {
 
@@ -192,9 +249,13 @@ $default = '' unless defined $default;
             QueueObj => $queue,
             ($default ? (Default => $default) : ())
             &>
-% if ($show_validation && $cf->FriendlyPattern) {
-    <span class="cfhints"><% loc("Input must match [_1]", $cf->FriendlyPattern) %></span>
-%}
+%      if (my $msg = $m->notes('InvalidField-' . $cf->Id)) {
+            <span class="cfinvalidfield my-1 d-inline-block"><% $msg %></span>
+%      } elsif ($cf->FriendlyPattern) {
+            <span class="cfhints my-1 d-inline-block">
+              <% $cf->FriendlyPattern %>
+            </span>
+%      }
 % } elsif ($render_as =~  /^boolean/i)  {
 %       my $value = 'Yes';
 <div class="custom-control custom-checkbox" style="margin-top: 5px">
@@ -246,11 +307,18 @@ $default = '' unless defined $default;
 % }
 
 % } else {
-% die "'$render_as' isn't a valid rendering option for field '$name'";
+% RT->Logger->error("'$render_as' isn't a valid rendering option for field '$name'");
+% return;
 %}
 
 % }
-% if ($render_as ne 'hidden' && $show_label) {
-<% $after_input |n %></div></div>
+
+
+% if (  ( !$cf || !$cf->FriendlyPattern ) && ( $ARGS{validation}
+%    || ( $ARGS{dependent_validation} && $ARGS{dependent_validation}{enabled} && $ARGS{dependent_validation}{name} ) )
+% ) {
+    <span class="cfhints my-1 d-inline-block required">
+      <% loc('Required') %>
+    </span>
 % }
-% }
+</%METHOD>

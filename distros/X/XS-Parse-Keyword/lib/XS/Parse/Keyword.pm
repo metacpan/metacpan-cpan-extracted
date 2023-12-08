@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.38;
+package XS::Parse::Keyword 0.39;
 
 use v5.14;
 use warnings;
@@ -208,6 +208,11 @@ relating some optional part of them is present in the incoming source text. In
 this case, the pieces relating to those optional parts must support "probing".
 This ability is also noted below.
 
+Many of the atomic piece types have a variant which is optional; if the given
+input does not look like the expected syntax for the piece type then an
+C<_OPT>-suffixed version of the type will instead yield C<NULL> in its result
+pointer.
+
 The type of each piece should be one of the following macro values.
 
 =head2 XPK_BLOCK
@@ -349,7 +354,7 @@ new one.
 
 =back
 
-=head2 XPK_ARITHEXPR
+=head2 XPK_ARITHEXPR. XPK_ARITHEXPR_OPT
 
 I<atomic, emits op.>
 
@@ -358,11 +363,13 @@ I<atomic, emits op.>
 An arithmetic expression is expected, parsed using C<parse_arithexpr()>, and
 passed as an optree in the I<op> field.
 
-=head2 XPK_ARITHEXPR_VOIDCTX, XPK_ARITHEXPR_SCALARCTX
+=head2 XPK_ARITHEXPR_VOIDCTX, XPK_ARITHEXPR_OPT
+
+=head2 XPK_ARITHEXPR_SCALARCTX, XPK_ARITHEXPR_SCALARCTX_OPT
 
 Variants of C<XPK_ARITHEXPR> which puts the expression in void or scalar context.
 
-=head2 XPK_TERMEXPR
+=head2 XPK_TERMEXPR, XPK_TERMEXPR_OPT
 
 I<atomic, emits op.>
 
@@ -371,7 +378,9 @@ I<atomic, emits op.>
 A term expression is expected, parsed using C<parse_termexpr()>, and passed as
 an optree in the I<op> field.
 
-=head2 XPK_TERMEXPR_VOIDCTX, XPK_TERMEXPR_SCALARCTX
+=head2 XPK_TERMEXPR_VOIDCTX, XPK_TERMEXPR_VOIDCTX
+
+=head2 XPK_TERMEXPR_SCALARCTX, XPK_TERMEXPR_SCALARCTX_OPT
 
 Variants of C<XPK_TERMEXPR> which puts the expression in void or scalar context.
 
@@ -387,7 +396,7 @@ This is intended just for use of C<XPK_SETUP> pieces as prefixes. Any other
 pieces which actually parse real input are likely to cause overly-complex,
 subtle, or outright ambiguous grammars, and should be avoided.
 
-=head2 XPK_LISTEXPR
+=head2 XPK_LISTEXPR, XPK_LISTEXPR_OPT
 
 I<atomic, emits op.>
 
@@ -396,7 +405,7 @@ I<atomic, emits op.>
 A list expression is expected, parsed using C<parse_listexpr()>, and passed as
 an optree in the I<op> field.
 
-=head2 XPK_LISTEXPR_LISTCTX
+=head2 XPK_LISTEXPR_LISTCTX, XPK_LISTEXPR_LISTCTX_OPT
 
 Variant of C<XPK_LISTEXPR> which puts the expression in list context.
 
@@ -408,9 +417,6 @@ A bareword identifier name is expected, and passed as an SV containing a PV
 in the I<sv> field. An identifier is not permitted to contain a double colon
 (C<::>).
 
-The C<_OPT>-suffixed version is optional; if no identifier is found then I<sv>
-is set to C<NULL>.
-
 =head2 XPK_PACKAGENAME, XPK_PACKAGENAME_OPT
 
 I<atomic, can probe, emits sv.>
@@ -418,9 +424,6 @@ I<atomic, can probe, emits sv.>
 A bareword package name is expected, and passed as an SV containing a PV in
 the I<sv> field. A package name is similar to an identifier, except it permits
 double colons in the middle.
-
-The C<_OPT>-suffixed version is optional; if no package name is found then
-I<sv> is set to C<NULL>.
 
 =head2 XPK_LEXVARNAME
 
@@ -463,9 +466,6 @@ I<atomic, can probe, emits sv.>
 
 A version string is expected, of the form C<v1.234> including the leading C<v>
 character. It is passed as a L<version> SV object in the I<sv> field.
-
-The C<_OPT>-suffixed version is optional; if no version string is found then
-I<sv> is set to C<NULL>.
 
 =head2 XPK_LEXVAR
 

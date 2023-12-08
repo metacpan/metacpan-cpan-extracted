@@ -1,0 +1,106 @@
+{
+   "formtools-pages" : {
+       "submit" : {
+          "content" : [
+             {
+                "html" : "<h1>Account Request</h1>",
+                "type" : "raw_html"
+             },
+             {
+                "type" : "raw_html",
+                "html" : "<h2>Request Submitted</h2>"
+             },
+             {
+                "type" : "raw_html",
+                "html" : "<p>Your request has been submitted.</p>"
+             }
+          ],
+          "name" : "Submit Request",
+          "next" : ""
+       },
+       "page2" : {
+          "name" : "Page Two",
+          "content" : [
+             {
+                "html" : "<h1>Account Request</h1>",
+                "type" : "raw_html"
+             },
+             {
+                "comp_name" : "Field",
+                "arguments" : {
+                   "name" : "Requestors",
+                   "label" : "Requested by",
+                   "default" : "root@localhost"
+                },
+                "type" : "component"
+             },
+             {
+                "arguments" : {
+                   "name" : "Systems"
+                },
+                "type" : "component",
+                "comp_name" : "Field"
+             }
+          ],
+          "next" : "page3"
+       },
+       "page3" : {
+          "content" : [
+             {
+                "type" : "raw_html",
+                "html" : "<h1>Account Request</h1>"
+             },
+             {
+                "type" : "raw_html",
+                "html" : "<h2>Confirm Selections</h2>"
+             },
+             {
+                "type" : "component",
+                "comp_name" : "ShowChoices"
+             },
+             {
+                "type" : "raw_html",
+                "html" : "<hr/>\n<i><b>\n<p>What else should we know as we act on your request?</p>\n<p> Do you have special time constraints?</p>\n</b></i>"
+             },
+             {
+                "comp_name" : "Field",
+                "arguments" : {
+                   "name" : "Content"
+                },
+                "type" : "component"
+             },
+             {
+                "input-value" : "create_ticket",
+                "type" : "hidden",
+                "input-name" : "create_ticket"
+             }
+          ],
+          "name" : "Review Selections",
+          "next" : "submit"
+       },
+       "page1" : {
+          "name" : "Page One",
+          "content" : [
+             {
+                "html" : "<h1>Account Request</h1>",
+                "type" : "raw_html"
+             },
+             {
+                "type" : "raw_html",
+                "html" : "<h2>Enter your preferred username</h2>"
+             },
+             {
+                "comp_name" : "Field",
+                "type" : "component",
+                "arguments" : {
+                   "default" : "preferred username",
+                   "name" : "Username"
+                }
+             }
+          ],
+          "next" : "page2"
+       }
+   },
+   "queue" : 1,
+   "formtools-start-page" : "page1"
+}

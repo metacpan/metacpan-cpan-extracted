@@ -40,6 +40,9 @@ SEE ALSO
     PYX::XMLSchema::List
         Processing PYX data or file and print list of XML schemas.
 
+    SGML::PYX
+        Convertor between SGML and PYX.
+
     Tags::Output::PYX
         Tags output to PYX format.
 
@@ -50,18 +53,20 @@ SEE ALSO
         PYX parser based on XML::Parser.
 
 REPOSITORY
-    <https://github.com/tupinek/Task-PYX>
+    <https://github.com/michal-josef-spacek/Task-PYX>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2015-2016 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2015-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.09
+    0.10
 

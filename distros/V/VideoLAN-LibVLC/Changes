@@ -1,3 +1,8 @@
+Version 0.06 - 2023-11-28
+  - Fixed blatant bugs in the C library that were only working previously
+    under some lucky Undefined Behavior circumstances.
+    This fixes "Bizarre copy of UNKNOWN" that was showing up in unit tests.
+
 Version 0.05 - 2019-11-05
   - Fixed several mistakes in logging callback API and implementation,
     and more documentation fixes.

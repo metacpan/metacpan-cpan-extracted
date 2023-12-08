@@ -1,0 +1,78 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<&| /Widgets/TitleBox, title => '', class => 'container w-75' &>
+<form action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Create.html" name="CreateFormTools" method="post" enctype="multipart/form-data" class="mx-auto max-width-sm">
+  <&| /Elements/LabeledValue, Label => loc('Name') &>
+    <input name="Description" class="form-control" value="<% $ARGS{Description} // '' %>"/>
+  </&>
+
+  <& /Elements/LabeledValue, Label => loc('Queue'), LabelTooltip => loc('Tickets will be created in this queue'),
+                             RawValue => $m->scomp('/Elements/SelectQueue', Name => 'Queue', Default => $ARGS{Queue}) &>
+  <div class="form-row">
+    <div class="col-12">
+      <& /Elements/Submit, Label => loc('Create'), Name => 'Create' &>
+    </div>
+  </div>
+
+</form>
+</&>
+<%INIT>
+Abort( loc('Permission Denied') )
+    unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
+
+my ($title, @results);
+$title = loc('Create form');
+
+if ( $Create ) {
+    push @results, loc('Missing Name') unless $Description;
+    push @results, loc('Missing Queue') unless $Queue;
+
+    if ( $Description && $Queue ) {
+        my $form = RT::Attribute->new( $session{CurrentUser} );
+        my ($ret) = $form->LoadByCols( Name => 'FormTools Form', Description => $Description );
+        if ($ret) {
+            push @results, loc( 'Name [_1] already exists', $Description );
+        }
+
+        my $queue_obj = RT::Queue->new( $session{CurrentUser} );
+        $queue_obj->Load($Queue);
+        if ( !$queue_obj->Id ) {
+            push @results, loc( 'Invalid queue [_1]', $Queue );
+        }
+
+        # It indicates something wrong if @results is not empty
+        if ( !@results ) {
+            my ( $ret, $msg ) = $form->Create(
+                Name        => 'FormTools Form',
+                Description => $ARGS{Description},
+                Object      => RT->System,
+                Content     => { queue => $queue_obj->Name },
+            );
+
+            if ($ret) {
+                MaybeRedirectForResults(
+                    Actions   => [ loc('Created form [_1]', $Description) ],
+                    Path      => '/Admin/FormTools/Modify.html',
+                    Arguments => { id => $form->Id },
+                );
+            }
+            else {
+                push @results, loc( "Couldn't create the form: [_1]", $msg );
+            }
+        }
+    }
+
+    MaybeRedirectForResults(
+        Actions   => \@results,
+        Path      => '/Admin/FormTools/Create.html',
+        Arguments => { Description => $Description, Queue => $Queue },
+    );
+}
+</%INIT>
+<%ARGS>
+$Description => undef
+$Queue       => undef
+$Create      => undef
+</%ARGS>

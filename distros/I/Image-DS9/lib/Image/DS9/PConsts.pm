@@ -12,7 +12,7 @@ use Data::Visitor::Tiny ();
 use Ref::Util qw( is_regexpref is_coderef is_blessed_ref is_ref is_arrayref is_refref is_scalarref);
 use Scalar::Util 'reftype';
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use Types::TypeTiny 'is_StringLike';
 
@@ -21,6 +21,7 @@ use Image::DS9::Util 'is_TODO';
 use Image::DS9::Constants::V1
   'COLORS',
   'FRAME_COORD_SYSTEMS',
+  'FRAME_COORD_SYSTEMS_NON_WCS',
   'SKY_COORD_SYSTEMS',
   'ANGULAR_UNITS',
   'ANGULAR_FORMATS',
@@ -39,6 +40,7 @@ our @EXPORT = qw(
   T_COLOR
   T_COORD
   T_COORDSYS
+  T_COORDSYS_NON_WCS
   T_EPHEMERAL
   T_FALSE
   T_FLOAT
@@ -67,6 +69,7 @@ our @EXPORT = qw(
   BOOL_FALSE
   COLOR
   COORDSYS
+  COORDSYS_NON_WCS
   COORD_DEC
   COORD_RA
   FILENAME
@@ -131,6 +134,7 @@ use enum (
     'COLOR',
     'COORD',
     'COORDSYS',
+    'COORDSYS_NON_WCS',
     'EPHEMERAL',
     'FALSE',
     'FLOAT',
@@ -489,6 +493,8 @@ token COORD_RA  => ( T_COORD, qr/$FLOAT|$SEXAGESIMAL_RA/,  'DECIMAL_OR_SEXAGESIM
 token COORD_DEC => ( T_COORD, qr/$FLOAT|$SEXAGESIMAL_DEC/, 'DECIMAL_OR_SEXAGESIMAL' );
 
 token COORDSYS => ( T_COORDSYS, ENUM( FRAME_COORD_SYSTEMS ), 'FRAME_COORD_SYSTEMS' );
+token COORDSYS_NON_WCS =>
+  ( T_COORDSYS_NON_WCS, ENUM( FRAME_COORD_SYSTEMS_NON_WCS ), 'FRAME_COORD_SYSTEMS_NON_WCS' );
 
 token FLOAT => ( T_FLOAT, $FLOAT, 'FLOAT' );
 token HASH  => ( T_HASH,  sub { 'HASH' eq ref $_[0] } );
@@ -779,7 +785,7 @@ Image::DS9::PConsts - Internal Constants
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SUPPORT
 

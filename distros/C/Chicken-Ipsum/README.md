@@ -13,7 +13,7 @@ Generate random chicken noises.
 
 Often when developing a website or other application, it's important to have
 placeholders for content. This module generates prescribed amounts of clucking,
-cawing and other chicken-y noises.
+cawing, and other chicken-y noises.
 
 ## Usage
 

@@ -1,2 +1,18 @@
+0.02 2023-12-01T12:50:25+01:00
+ - Add constructor tests.
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Fix doc formatting.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example file to better name.
+ - Rewrite SEE ALSO section to new style.
+ - Rewrite doc to use =head2.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+ - Update tests.
+
 0.01 2015-02-22T08:09:51+01:00
  - First version.

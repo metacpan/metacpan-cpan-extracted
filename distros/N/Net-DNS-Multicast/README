@@ -19,7 +19,7 @@ DEPENDENCIES
 
 This module requires the following module and its dependencies:
 
-    Net::DNS 1.38 or later.
+    Net::DNS 1.41 or later.
 
 
 COPYRIGHT

@@ -21,58 +21,58 @@ name: Locale-CLDR
 provides:
   Locale::CLDR:
     file: lib/Locale/CLDR.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::CalendarPreferences:
     file: lib/Locale/CLDR/CalendarPreferences.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Collator:
     file: lib/Locale/CLDR/Collator.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::CollatorBase:
     file: lib/Locale/CLDR/CollatorBase.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Currencies:
     file: lib/Locale/CLDR/Currencies.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::EraBoundries:
     file: lib/Locale/CLDR/EraBoundries.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::LikelySubtags:
     file: lib/Locale/CLDR/LikelySubtags.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Locales::En:
     file: lib/Locale/CLDR/Locales/En.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Locales::En::Any:
     file: lib/Locale/CLDR/Locales/En/Any.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Locales::En::Any::Us:
     file: lib/Locale/CLDR/Locales/En/Any/Us.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Locales::Root:
     file: lib/Locale/CLDR/Locales/Root.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::MeasurementSystem:
     file: lib/Locale/CLDR/MeasurementSystem.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::NumberFormatter:
     file: lib/Locale/CLDR/NumberFormatter.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::NumberingSystems:
     file: lib/Locale/CLDR/NumberingSystems.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::Plurals:
     file: lib/Locale/CLDR/Plurals.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::RegionContainment:
     file: lib/Locale/CLDR/RegionContainment.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::ValidCodes:
     file: lib/Locale/CLDR/ValidCodes.pm
-    version: v0.34.3
+    version: v0.34.4
   Locale::CLDR::WeekData:
     file: lib/Locale/CLDR/WeekData.pm
-    version: v0.34.3
+    version: v0.34.4
 requires:
   Class::Load: '0'
   DateTime: '0.72'
@@ -90,5 +90,5 @@ resources:
   bugtracker: https://github.com/ThePilgrim/perlcldr/issues
   homepage: https://github.com/ThePilgrim/perlcldr
   repository: https://github.com/ThePilgrim/perlcldr.git
-version: v0.34.3
+version: v0.34.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

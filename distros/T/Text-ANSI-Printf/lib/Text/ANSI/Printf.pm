@@ -1,6 +1,6 @@
 package Text::ANSI::Printf;
 
-our $VERSION = "2.05";
+our $VERSION = "2.06";
 
 use v5.14;
 use warnings;
@@ -15,7 +15,7 @@ sub ansi_sprintf { &sprintf(@_) }
 use Text::Conceal;
 use Text::ANSI::Fold::Util qw(ansi_width);
 
-our $REORDER = 0;
+our $REORDER //= 0;
 
 sub sprintf {
     my($format, @args) = @_;
@@ -26,11 +26,9 @@ sub sprintf {
 	length    => \&ansi_width,
 	ordered   => ! $REORDER,
 	duplicate => !!$REORDER,
-	);
-    $conceal->encode(@args) if $conceal;
-    my $s = CORE::sprintf $format, @args;
-    $conceal->decode($s)    if $conceal;
-    $s;
+    ) || goto &CORE::sprintf;
+    ($conceal->decode(CORE::sprintf($format,
+				    $conceal->encode(@args))))[0];
 }
 
 sub printf {
@@ -46,11 +44,11 @@ __END__
 
 =head1 NAME
 
-Text::ANSI::Printf - printf function for string with ANSI sequence
+Text::ANSI::Printf - printf function to print string including ANSI sequence
 
 =head1 VERSION
 
-Version 2.05
+Version 2.06
 
 =head1 SYNOPSIS
 
@@ -167,7 +165,7 @@ L<Term::ANSIColor::Concise>,
 L<https://github.com/tecolicom/Term-ANSIColor-Concise>
 
 L<Text::Conceal>,
-L<https://github.com/kaz-utashiro/Text-Conceal>
+L<https://github.com/tecolicom/Text-Conceal>
 
 L<Text::ANSI::Fold::Util>,
 L<https://github.com/tecolicom/Text-ANSI-Fold-Util>
@@ -189,7 +187,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2020-2023 Kazumasa Utashiro.
+Copyright © 2020-2023 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

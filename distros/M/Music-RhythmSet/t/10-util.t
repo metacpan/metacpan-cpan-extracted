@@ -5,11 +5,11 @@
 use 5.24.0;
 use Test2::V0;
 
-plan(52);
+plan(55);
 
 use MIDI;
 use Music::RhythmSet::Util
-  qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count pattern_from rand_onsets score_fourfour score_stddev upsize write_midi);
+  qw(beatstring compare_onsets duration filter_pattern flatten ocvec onset_count pattern_from rand_onsets score_fourfour score_stddev upsize write_midi write_tracks);
 
 my @playback;
 
@@ -76,8 +76,10 @@ is( score_stddev( [qw/0 1 0 0 0 1 0 0 0 1 0 0 0 1 0 0/] ), 0 );
 # TODO actually check the math on this one but that would probably be
 # testing whatever Statistics::Lite is doing and the results seem good
 # enough for music (noise) production
-is( sprintf( "%.1f", score_stddev( [qw/1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0/] ) ),
-    5.2 );
+is( sprintf( "%.1f",
+        score_stddev( [qw/1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0/] ) ),
+    5.2
+);
 like( dies { score_stddev( [] ) }, qr/no onsets/ );
 
 is( upsize( [ 1, 0, 1, 1 ], 8 ), [ 1, 0, 0, 0, 1, 0, 1, 0 ] );
@@ -144,6 +146,30 @@ domidi(
         );
     }
 );
+
+sub make_track {
+    my $t = MIDI::Track->new;
+    $t->events( [ text_event => 0, "I like big tracks" ] );
+    return $t;
+}
+
+{
+    unlink qw[tra001.midi tra002.midi one99.midi];
+
+    my @tracks = map make_track, 1 .. 2;
+
+    write_tracks( 'tra%03d.midi', \@tracks );
+    ok -f 'tra001.midi';
+    ok -f 'tra002.midi';
+
+    write_tracks(
+        'one%02d.midi', $tracks[0],
+        format => 0,
+        ticks  => 42,
+        i      => 99,
+    );
+    ok -f 'one99.midi';
+}
 
 if ( defined $ENV{AUTHOR_TEST_JMATES_MIDI} ) {
     diag "playback ...";

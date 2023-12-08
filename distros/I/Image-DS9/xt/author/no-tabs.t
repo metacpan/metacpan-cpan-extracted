@@ -61,6 +61,7 @@ my @files = (
     't/illustrate.t',
     't/jpeg.t',
     't/lib/My/Util.pm',
+    't/lib/My/Util.pm.orig',
     't/lib/TestServer.pm',
     't/lock.t',
     't/lower.t',

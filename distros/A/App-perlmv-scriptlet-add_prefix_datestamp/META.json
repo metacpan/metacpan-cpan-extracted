@@ -30,6 +30,7 @@
       "runtime" : {
          "requires" : {
             "POSIX" : "0",
+            "Time::Local" : "1.27",
             "perl" : "5.010001",
             "strict" : "0",
             "vars" : "0",
@@ -48,7 +49,7 @@
    "provides" : {
       "App::perlmv::scriptlet::add_prefix_datestamp" : {
          "file" : "lib/App/perlmv/scriptlet/add_prefix_datestamp.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -63,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-App-perlmv-scriptlet-add_prefix_datestamp"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.038000"

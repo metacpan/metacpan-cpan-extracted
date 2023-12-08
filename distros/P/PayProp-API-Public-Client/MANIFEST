@@ -27,6 +27,7 @@ lib/PayProp/API/Public/Client/Request/Entity/Payment.pm
 lib/PayProp/API/Public/Client/Request/Export.pm
 lib/PayProp/API/Public/Client/Request/Export/Beneficiaries.pm
 lib/PayProp/API/Public/Client/Request/Export/Tenants.pm
+lib/PayProp/API/Public/Client/Request/Tags.pm
 lib/PayProp/API/Public/Client/Response/Entity/Invoice.pm
 lib/PayProp/API/Public/Client/Response/Entity/Payment.pm
 lib/PayProp/API/Public/Client/Response/Export/Beneficiary.pm
@@ -35,6 +36,7 @@ lib/PayProp/API/Public/Client/Response/Export/Beneficiary/Property.pm
 lib/PayProp/API/Public/Client/Response/Export/Tenant.pm
 lib/PayProp/API/Public/Client/Response/Export/Tenant/Address.pm
 lib/PayProp/API/Public/Client/Response/Export/Tenant/Property.pm
+lib/PayProp/API/Public/Client/Response/Tag.pm
 lib/PayProp/API/Public/Client/Role/APIRequest.pm
 lib/PayProp/API/Public/Client/Role/Attribute/APIVersion.pm
 lib/PayProp/API/Public/Client/Role/Attribute/Authorization.pm
@@ -71,6 +73,7 @@ t/payprop/api/public/client/request/entity/payment.t
 t/payprop/api/public/client/request/export.t
 t/payprop/api/public/client/request/export/beneficiaries.t
 t/payprop/api/public/client/request/export/tenants.t
+t/payprop/api/public/client/request/tags.t
 t/payprop/api/public/client/response/entity/invoice.t
 t/payprop/api/public/client/response/entity/payment.t
 t/payprop/api/public/client/response/export/beneficiary.t
@@ -79,6 +82,7 @@ t/payprop/api/public/client/response/export/beneficiary/property.t
 t/payprop/api/public/client/response/export/tenant.t
 t/payprop/api/public/client/response/export/tenant/address.t
 t/payprop/api/public/client/response/export/tenant/property.t
+t/payprop/api/public/client/response/tag.t
 t/payprop/api/public/client/role/apirequest.t
 t/payprop/api/public/client/role/attribute/apiversion.t
 t/payprop/api/public/client/role/attribute/authorization.t

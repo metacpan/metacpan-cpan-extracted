@@ -19,7 +19,7 @@ SYNOPSIS
 DESCRIPTION
     Some packages insist on using DjVuLibre library.
 
-    This package detect system DjvuLibre library or install own.
+    This package detect system DjVuLibre library or install own.
 
 SUBROUTINES/METHODS
     All methods are inherited from Alien::Base.
@@ -60,13 +60,13 @@ AUTHOR
     <http://skim.cz>
 
 CONTRIBUTORS
-    Zakariyya Mughal zaki.mughal@gmail.com
+    Zakariyya Mughal <mailto:zaki.mughal@gmail.com>
 
 LICENSE AND COPYRIGHT
-    © 2022 Michal Josef Špaček
+    © 2022-2023 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

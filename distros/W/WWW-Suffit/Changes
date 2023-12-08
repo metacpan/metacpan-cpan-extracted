@@ -1,5 +1,12 @@
 # Version/Revision history
 
+1.05 Tue 05 Dec 2023 16:32:18 MSK
+    * Added RefUtil 'as' functions
+
+1.04 Thu 30 Nov 2023 07:54:55 MSK
+    * Patch for the 'spurt' method of Mojo::File. Now see Mojo::File::spew method
+    * Added WWW::Suffit::JWT module
+
 1.03 Sun 26 Nov 2023 17:19:10 MSK
     * Added the 'color' utility function
 

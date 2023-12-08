@@ -1,0 +1,46 @@
+---
+abstract: 'A strong bz2/gz/zip/tar/cpio/rpm/deb/cab/lzma/7z/rar/... archive unpacker, based on mime-types'
+author:
+  - 'Sebastian Riedel <sri@cpan.org>'
+build_requires:
+  FindBin: '0'
+  Pod::Coverage: '0.18'
+  Test::CheckManifest: '0.9'
+  Test::More: '0'
+  Test::Pod: '1.22'
+  Test::Pod::Coverage: '1.08'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: File-Unpack2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  BSD::Resource: '0'
+  Carp: '0'
+  Compress::Raw::Bzip2: '0'
+  Compress::Raw::Lzma: '0'
+  Compress::Raw::Zlib: '2.024'
+  Cwd: '0'
+  File::Compare: '0'
+  File::Copy: '0'
+  File::LibMagic: '0'
+  File::MimeInfo::Magic: '0'
+  File::Path: '0'
+  File::Temp: '0'
+  Filesys::Statvfs: '0'
+  Getopt::Long: '0'
+  IPC::Run: '0'
+  JSON: '0'
+  Pod::Usage: '0'
+  String::ShellQuote: '0'
+  Text::Sprintf::Named: '0'
+version: '1.0'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

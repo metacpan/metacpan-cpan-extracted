@@ -21,5 +21,8 @@ README
 SIGNATURE
 t/Curses-UI-Char/01-use.t
 t/Curses-UI-Char/02-version.t
+t/Curses-UI-Char/03-new.t
+t/Curses-UI-Char/04-char.t
+t/data/fakelib/Curses.pm
 xt/Curses-UI-Char/01-pod_coverage.t
 xt/Curses-UI-Char/02-pod.t

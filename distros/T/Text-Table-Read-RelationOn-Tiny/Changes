@@ -1,5 +1,10 @@
 Revision history for Text-Table-Read-RelationOn-Tiny
 
+v2.3.1     2023/10/12
+           Corrected POD.
+           Completed dependency list
+           Corrected version info.
+
 v2.3.0     2023/10/12
            Methods elems(), elem_ids(), tab_elems(), eq_ids(), matrix() now support an
            additional DUP argument allowing to return a ref to a clone.

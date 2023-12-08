@@ -130,7 +130,7 @@ static inline SV** _easyxs_call_sv_list (pTHX_ SV* cb, SV** args) {
     if (SvTRUE(err_tmp)) {                      \
         while (count--) PERL_UNUSED_VAR(POPs);  \
                                                 \
-        *err_p = err_tmp;                       \
+        *err_p = newSVsv(err_tmp);              \
                                                 \
         PUTBACK;                                \
         FREETMPS;                               \

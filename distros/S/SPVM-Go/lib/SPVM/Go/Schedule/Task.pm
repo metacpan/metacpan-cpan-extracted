@@ -6,11 +6,11 @@ package SPVM::Go::Schedule::Task;
 
 =head1 Name
 
-SPVM::Go::Schedule::Task - Short Description
+SPVM::Go::Schedule::Task - Shceduling Task
 
 =head1 Description
 
-Go::Schedule::Task class of L<SPVM> has methods to schedule goroutnies.
+The Go::Schedule::Task class in L<SPVM> has a task to schedule goroutnies.
 
 =head1 Copyright & License
 

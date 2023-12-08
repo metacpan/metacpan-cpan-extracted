@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2023 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.38;
+package XS::Parse::Infix 0.39;
 
 use v5.14;
 use warnings;

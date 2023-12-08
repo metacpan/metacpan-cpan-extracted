@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,7 +53,7 @@
             "Bytes::Random::Secure" : "0",
             "Config::Tiny" : "0",
             "CryptX" : "0",
-            "Database::Async" : "0.016",
+            "Database::Async" : "0.019",
             "Encode" : "0",
             "File::HomeDir" : "0",
             "Future" : "0.46",
@@ -97,11 +97,11 @@
    "provides" : {
       "Database::Async::Engine::PostgreSQL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       },
       "Database::Async::Engine::PostgreSQL::DDL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL/DDL.pm",
-         "version" : "1.002"
+         "version" : "1.003"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL"
       }
    },
-   "version" : "1.002",
+   "version" : "1.003",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Torsten Foertsch <torsten@binary.com>",
@@ -124,8 +124,8 @@
       "maryam-deriv <71321691+maryam-deriv@users.noreply.github.com>",
       "Tom M <tom@audioboundary.com>"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.38.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

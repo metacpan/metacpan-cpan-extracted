@@ -7,7 +7,7 @@ use Type::Registry;
 use Type::Utils;
 
 use Exporter 'import';
-our @EXPORT_OK = qw/check_rule check_type type type_role/;
+our @EXPORT_OK = qw/check_rule no_check_rule check_type type type_role/;
 
 $Carp::CarpInternal{+__PACKAGE__}++;
 
@@ -52,6 +52,34 @@ sub check_rule {
     }
 
     return $value;
+}
+
+# Functions without type checking for better performance
+sub no_check_rule {
+    my ($rule, $value, $exists, $name) = @_;
+
+    if (ref $rule eq 'HASH') {
+        my %check = map { ($_ => undef) } keys %$rule;
+        delete $check{$_} for qw/isa does optional default/;
+        if (%check) {
+            Carp::croak("Malformed rule for '$name' (isa, does, optional, default)");
+        }
+    } else {
+        $rule = {isa => $rule};
+    }
+
+    if ($exists) {
+        return $value;
+    } else {
+        if (exists $rule->{default}) {
+            my $default = $rule->{default};
+            return ref $default eq 'CODE' ? scalar $default->() : $default;
+        } elsif (!$rule->{optional}) {
+            Carp::confess("Required parameter '$name' not passed");
+        } else {
+            return $value;
+        }
+    }
 }
 
 sub check_type {

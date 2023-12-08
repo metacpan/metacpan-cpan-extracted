@@ -18,7 +18,7 @@ use Wikibase::Datatype::Value::Quantity;
 use Wikibase::Datatype::Value::String;
 use Wikibase::Datatype::Value::Time;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -555,7 +555,13 @@ sub wikidata_place_of_publication {
 		return;
 	} else {
 		foreach my $publisher (@{$self->{'transform_object'}->publishers}) {
-			my $place_qid = $self->{'callback_publisher_place'}->($publisher);
+			my $place_qid;
+			# No concrete place.
+			if ($publisher->place eq 'sine loco') {
+				$place_qid = 'Q11254169';
+			} else {
+				$place_qid = $self->{'callback_publisher_place'}->($publisher);
+			}
 			my $publisher_qid = $self->{'callback_publisher_name'}->($publisher, $publication_date);
 			if ($place_qid) {
 				push @places, [$publisher_qid, $place_qid];
@@ -578,7 +584,17 @@ sub wikidata_place_of_publication {
 				),
 				'property' => 'P291',
 			),
-			# TODO property snak with publisher if multiples = 1;
+			$multiple ? (
+				'property_snaks' => [
+					Wikibase::Datatype::Snak->new(
+						'datatype' => 'wikibase-item',
+						'datavalue' => Wikibase::Datatype::Value::Item->new(
+							'value' => $_->[0],
+						),
+						'property' => 'P123',
+					),
+				],
+			) : (),
 		);
 	} @places;
 }

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Transparency & Consent String version 2 parser ",
+   "author" : [
+      "Tiago Peczenyj <tiago.peczenyj+gdpr-iab-tcfv2@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "GDPR-IAB-TCFv2",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/peczenyj/GDPR-IAB-TCFv2/issues"
+      },
+      "homepage" : "https://github.com/peczenyj/GDPR-IAB-TCFv2",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/peczenyj/GDPR-IAB-TCFv2.git",
+         "web" : "https://github.com/peczenyj/GDPR-IAB-TCFv2"
+      }
+   },
+   "version" : "0.07",
+   "x_authority" : "cpan:PACMAN"
+}

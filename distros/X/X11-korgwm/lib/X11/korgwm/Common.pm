@@ -52,7 +52,8 @@ sub init_extension($name, $first_event) {
 
 # Other helpers
 sub screen_by_xy($x, $y) {
-    first { $_->{x} < $x and $_->{x} + $_->{w} > $x and $_->{y} < $y and $_->{y} + $_->{h} > $y } @screens;
+    return unless defined $x and defined $y;
+    first { $_->contains_xy($x, $y) } @screens;
 }
 
 sub hexnum($str = $_) {

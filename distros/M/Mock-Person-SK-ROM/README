@@ -4,6 +4,7 @@ NAME
 SYNOPSIS
      use Mock::Person::SK::ROM qw(first_male first_female last_male last_female
              middle_male middle_female name name_female name_male);
+
      my $first_male = first_male();
      my $first_female = first_female();
      my $last_male = last_male();
@@ -35,47 +36,81 @@ DESCRIPTION
         ch_%C5%BEensk%C3%BDch_jmen_v_%C4%8Cesk%C3%A9_republice>.
 
 SUBROUTINES
-    first_male()
-            Returns random first name of male person.
+  "first_male"
+     my $first_male = first_male();
 
-    first_female()
-            Returns random first name of female person.
+    Get random first name of male person.
 
-    last_male()
-            Returns random last name of male person.
+    Returns string.
 
-    last_female()
-            Returns random last name of female person.
+  "first_female"
+     my $first_female = first_female();
 
-    middle_male()
-            Returns random middle name of male person.
+    Get random first name of female person.
 
-    middle_female()
-            Returns random middle name of female person.
+    Returns string.
 
-    name([$sex])
-            Recieves scalar with sex of the person ('male' or 'female') and
-            returns scalar with generated name. Default value of $sex
-            variable is undef, that means random name.
+  "last_male"
+     my $last_male = last_male();
 
-    name_male()
-            Returns random male name.
+    Get random last name of male person.
 
-    name_female()
-            Returns random female name.
+    Returns string.
+
+  "last_female"
+     my $last_female = last_female();
+
+    Get random last name of female person.
+
+    Returns string.
+
+  "middle_male"
+     my $middle_male = middle_male();
+
+    Get random middle name of male person.
+
+    Returns string.
+
+  "middle_female"
+     my $middle_female = middle_female();
+
+    Get random middle name of female person.
+
+    Returns string.
+
+  "name"
+     my $name = name($sex);
+
+    Get name defined with sex of the person ('male' or 'female'). Default
+    value of $sex variable is undef, that means random name.
+
+    Returns string.
+
+  "name_female"
+     my $female_name = name_female();
+
+    Get random female name.
+
+    Returns string.
+
+  "name_male"
+     my $male_name = name_male();
+
+    Get random male name.
+
+    Returns string.
 
 VARIABLES
-    TYPE
-             Name type.
-             Possible values are: 'two', 'three'.
-             Default value is 'two'.
+    TYPE    Name type.
+
+            Possible values are: 'two', 'three'.
+
+            Default value is 'two'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::SK::ROM qw(name);
 
@@ -86,11 +121,9 @@ EXAMPLE1
      # Kevin Mižigar
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Mock::Person::SK::ROM;
 
@@ -324,24 +357,25 @@ EXAMPLE2
      # Žolták
 
 DEPENDENCIES
-    Exporter, Readonly.
+    Exporter, List::Util, Readonly.
 
 SEE ALSO
     Task::Mock::Person
         Install the Mock::Person modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Mock-Person-SK-ROM>
+    <https://github.com/michal-josef-spacek/Mock-Person-SK-ROM>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2013-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

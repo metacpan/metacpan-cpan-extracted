@@ -12,7 +12,7 @@ use Readonly;
 # Constants.
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 
 # Constructor.
 sub new {
@@ -167,6 +167,8 @@ Config::Dot - Module for simple configure file parsing.
 
 =head1 SYNOPSIS
 
+ use Config::Dot;
+
  my $cnf = Config::Dot->new(%params);
  my $struct_hr = $cnf->parse($string);
  $cnf->reset;
@@ -174,53 +176,76 @@ Config::Dot - Module for simple configure file parsing.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $cnf = Config::Dot->new(%params);
 
- Constructor.
+Constructor.
 
 =over 8
 
 =item * C<callback>
 
- Callback code for adding parameter.
- Callback arguments are:
- $key_ar - Reference to array with keys.
- $value - Key value.
- Default is undef.
+Callback code for adding parameter.
+
+Callback arguments are:
+
+=over
+
+=item C<$key_ar>
+
+Reference to array with keys.
+
+=item C<$value>
+
+Key value.
+
+=back
+
+Default is undef.
 
 =item * C<config>
 
- Reference to hash structure with default config data.
- This is hash of hashes structure.
- Default value is reference to blank hash.
+Reference to hash structure with default config data.
+This is hash of hashes structure.
+
+Default value is reference to blank hash.
 
 =item * C<set_conflicts>
 
- Set conflicts detection as error.
- Default value is 1.
+Set conflicts detection as error.
+
+Default value is 1.
 
 =back
 
-=item C<parse($string_or_array_ref)>
+Returns instance of object.
 
- Parse string $string_or_array_ref or reference to array $string_or_array_ref.
- Use $INPUT_RECORD_SEPARATOR variable to split lines.
- Returns hash structure with configuration.
+=head2 C<parse>
 
-=item C<reset()>
+ my $struct_hr = $cnf->parse($string);
 
- Reset content in class (config parameter).
- Returns undef.
+Parse string C<$string_or_array_ref> or reference to array C<$string_or_array_ref>.
+Use C<$INPUT_RECORD_SEPARATOR> variable to split lines.
 
-=item C<serialize()>
+Returns hash structure with configuration.
 
- Serialize 'config' hash to output.
- Use $INPUT_RECORD_SEPARATOR variable to join lines.
- Returns string with serialized configuration.
+=head2 C<reset>
 
-=back
+ $cnf->reset;
+
+Reset content in class (config parameter).
+
+Returns undef.
+
+=head2 C<serialize>
+
+ my $serialized = $cnf->serialize;
+
+Serialize 'config' hash to output.
+Use C<$INPUT_RECORD_SEPARATOR> variable to join lines.
+
+Returns string with serialized configuration.
 
 =head1 PARAMETER_FILE
 
@@ -254,11 +279,13 @@ Config::Dot - Module for simple configure file parsing.
 
 =head1 EXAMPLE1
 
+=for comment filename=parse_example.pl
+
  use strict;
  use warnings;
 
  use Config::Dot;
- use Dumpvalue;
+ use Data::Printer;
 
  # Object.
  my $struct_hr = Config::Dot->new->parse(<<'END');
@@ -267,18 +294,21 @@ Config::Dot - Module for simple configure file parsing.
  key3.subkey1=value3
  END
 
- # Dump
- my $dump = Dumpvalue->new;
- $dump->dumpValues($struct_hr);
+ # Dump.
+ p $struct_hr;
 
  # Output:
- # 0  HASH(0x84b98a0)
- #    'key1' => 'value1',
- #    'key2' => 'value2',
- #    'key3' => HASH(0x8da3ab0)
- #       'subkey1' => 'value3',
+ # {
+ #     key1   "value1",
+ #     key2   "value2",
+ #     key3   {
+ #         subkey1   "value3"
+ #     }
+ # }
 
 =head1 EXAMPLE2
+
+=for comment filename=serialize_example.pl
 
  use strict;
  use warnings;
@@ -299,16 +329,18 @@ Config::Dot - Module for simple configure file parsing.
  print $c->serialize."\n";
 
  # Output:
- # key1=subkey1.value1
+ # key1.subkey1=value1
  # key2=value2
 
 =head1 EXAMPLE3
+
+=for comment filename=parse_example_with_callback.pl
 
  use strict;
  use warnings;
 
  use Config::Dot;
- use Dumpvalue;
+ use Data::Printer;
 
  # Object.
  my $struct_hr = Config::Dot->new(
@@ -327,16 +359,17 @@ Config::Dot - Module for simple configure file parsing.
  key3.subkey1=value3
  END
 
- # Dump
- my $dump = Dumpvalue->new;
- $dump->dumpValues($struct_hr);
+ # Dump.
+ p $struct_hr;
 
  # Output:
- # 0  HASH(0x84b98a0)
- #    'key1' => 'value1',
- #    'key2' => 'value2',
- #    'key3' => HASH(0x8da3ab0)
- #       'subkey1' => 'FOOBAR',
+ # {
+ #     key1   "value1",
+ #     key2   "value2",
+ #     key3   {
+ #         subkey1   "FOOBAR"
+ #     }
+ # }
 
 =head1 DEPENDENCIES
 
@@ -372,11 +405,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2011-2020 Michal Josef Špaček
- BSD 2-Clause License
+© 2011-2023 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.09
+0.10
 
 =cut

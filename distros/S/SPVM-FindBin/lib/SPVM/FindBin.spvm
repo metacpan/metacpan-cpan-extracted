@@ -1,40 +1,29 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
 class FindBin {
+  
+  version "0.031";
+  
   use Sys;
-  use Sys::IO;
-  use Sys::IO::Stat;
-  use Sys::FileTest;
   use Cwd;
   use File::Spec;
   use File::Basename;
-  use Sys::IO::Constant as IO;
   
   our $Bin : ro string;
   our $Script : ro string;
   our $RealBin : ro string;
   our $RealScript : ro string;
   
-  private static method readlinkp : string ($file : string) {
-    my $stat = Sys::IO::Stat->new;
-    
-    my $status = Sys::IO::Stat->lstat($file, $stat);
-    
-    my $link_text = (string)undef;
-    if ($status == 0) {
-      if (($stat->st_mode & IO->S_IFMT) == IO->S_IFLNK) {
-        my $link_text_length = (int)$stat->st_size;
-        my $link_text = (mutable string)new_string_len $link_text_length;
-        Sys::IO->readlink($file, $link_text, $link_text_length);
-      }
-    }
-    
-    return $link_text;
+  INIT {
+    &init();
   }
   
   static method init : void () {
     
     my $script = CommandInfo->PROGRAM_NAME;
     
-    unless (Sys::FileTest->f($script)) {
+    unless (Sys->f($script)) {
       die "Cannot find current script \"$script\"";
     }
     
@@ -47,11 +36,16 @@ class FindBin {
     $Bin = $fileparse_ret->[1];
     
     while (1) {
-      my $link_text = &readlinkp($script);
       
       my $fileparse_ret = File::Basename->fileparse($script);
       $RealScript = $fileparse_ret->[0];
       $RealBin = $fileparse_ret->[1];
+      
+      unless (Sys->l($script)) {
+        last;
+      }
+      
+      my $link_text = Sys->readlink($script);
       
       unless ($link_text) {
         last;

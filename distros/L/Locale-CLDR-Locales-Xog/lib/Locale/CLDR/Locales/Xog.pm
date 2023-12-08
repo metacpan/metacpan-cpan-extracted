@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Xog - Package for language Soga
 
 package Locale::CLDR::Locales::Xog;
 # This file auto generated from Data\common\main\xog.xml
-#	on Sat  4 Nov  6:30:15 pm GMT
+#	on Tue  5 Dec  1:38:04 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

@@ -23,7 +23,7 @@ use Mojo::DOM;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.76';
+$VERSION='3.77';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -268,18 +268,7 @@ sub do_country {
 #
 # GENC
 #
-# The GENC web page now has you copy/paste into a text file.  The file will
-# contain lines like:
-#
-#  AF AFG 004 AFGHANISTAN     Independent     Exception       Unchanged
-#  QZ XQZ 900 AKROTIRI        Other   Extension       Unchanged
-#
-# Ignore lines that start with [None Assigned]
-#
-# Country names sometimes have space in them, but the next field is one of:
-#   Independent
-#   Other
-#   U.S. Dependency
+# Ignore entries that have no 2-char code.
 #
 
 {
@@ -293,27 +282,40 @@ Go to the following URL:
    $country_genc_url
 Click on:
    'Show 100 entries'
-Select the entire chart (not including the header).  If not all of the
-countries fit on a single page, do it in multiple steps.
+
+Select any part of the table (it is not necessary to select the entire table).
+Then right click and launch the table caputure workshop.  Click on the
+'Edit table data before exporting' icon.  Click on the 'Delete header row'
+button.  Then click on the 'Copy table to clipboard' icon and paste it into
+the file.
+
+Select any part of the table (it is not necessary to select the entire
+table).  Then right click and launch the table caputure workshop.
+Click on the 'Copy table to clipboard' icon and paste it into the
+file.
+
+If there are more entries than will fit on a single table, repeat this
+process but make sure you remove extra header lines.
 );
 
-      $in = _read_file('type'      => 'manual',
+      $in = _read_file('type'      => 'csv',
+                       'manual'    => 1,
                        'inst'      => $inst,
+                       'sep_char'  => "\t",
                        'as_list'   => 1,
+                       'encoding'  => 'UTF-8',
                       );
+      1;
    }
 
    sub _read_country_genc {
       while (@$in) {
-         my $line = shift (@$in);
-         next  if ($line =~ /None Assigned/);
-         next  if ($line =~ /ENTITY \d/);
-
-         if ($line !~ /^(\S\S)\s+(\S\S\S)\s+(\S\S\S)\s+(.*?)\s+(Independent|Other|U.S. Dependency)/) {
-            print "WARNING [genc]: invalid line: $line\n";
-            next;
-         }
-         my($alpha2,$alpha3,$num,$country) = ($1,$2,$3,$4);
+         my $ele     = shift(@$in);
+         my $alpha2  = $$ele{'2-Char Code'};
+         next  if (! $alpha2);
+         my $alpha3  = $$ele{'3-Char Code'};
+         my $num     = $$ele{'Numeric Code'};
+         my $country = $$ele{'Name'};
 
          my($id,$i);
 
@@ -513,9 +515,8 @@ countries fit on a single page, do it in multiple steps.
       my $inst = qq
 (Please download the data manually for ISO 3166 country codes.
 
-Currently, this works best in firefox (not in chrome) with the
-'Absolute Enable Right Click and Copy' extension enabled, with Copy
-enabled.
+Currently, this works in chrome with the Table Capture (georgemike)
+extension enabled.
 
 Go to the following URL:
    $country_iso_url
@@ -523,27 +524,35 @@ Click on:
    'Online Browsing Platform'
    'Officially assigned codes'
    300 results per page
-Select the entire chart (not including the header).  If not all of the
-countries fit on a single page, do it in multiple steps.
+
+Select any part of the table (it is not necessary to select the entire
+table).  Then right click and launch the table caputure workshop.
+Click on the 'Copy table to clipboard' icon and paste it into the
+file.
+
+If there are more entries than will fit on a single table, repeat this
+process but make sure you remove extra header lines.
 );
 
-      $in = _read_file('type'      => 'manual',
-                       'inst'      => $inst,
-                       'as_list'   => 1,
+      $in = _read_file('type'        => 'csv',
+                       'manual'      => 1,
+                       'inst'        => $inst,
+                       'sep_char'    => "\t",
+                       'decode_utf8' => 0,
+                       'as_list'     => 1,
+                       'encoding'    => 'UTF-8',
                       );
+      1;
    }
 
    sub _read_country_iso {
       while (@$in) {
-         my $name   = shift(@$in);
-         shift(@$in);
-         my $alpha2 = lc(shift(@$in));
-         my $alpha3 = lc(shift(@$in));
-         my $num    = shift(@$in);
+         my $ele    = shift(@$in);
+         my $name   = $$ele{'English short name'};
+         my $alpha2 = lc($$ele{'Alpha-2 code'});
+         my $alpha3 = lc($$ele{'Alpha-3 code'});
+         my $num    = $$ele{'Numeric'};
          $name      =~ s/\(the/\(The/;
-         $alpha2    =~ s/^\s*//;
-         $alpha3    =~ s/^\s*//;
-         $num       =~ s/^\s*//;
          return($alpha2,$alpha3,$num,_country_name($name));
       }
       return ();
@@ -1672,7 +1681,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.76';
+\$VERSION='3.77';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 
@@ -1777,12 +1786,14 @@ sub _read_file {
    } elsif ($type eq 'zip') {
       $file2 = "$file.txt";
       $file .= ".zip";
+   } elsif ($type eq 'csv') {
+      $file .= ".csv";
    } else {
       $file .= ".txt";
    }
 
    # Get the file
-   if ($type eq 'manual') {
+   if ($opts{'manual'}) {
       while (! -f $file) {
          my $inst = $opts{'inst'};
          print $inst,"\n";
@@ -1809,13 +1820,11 @@ sub _read_file {
       my $csv = $file;
       $csv    =~ s/.xls/.csv/;
 
-      # New command
       #my $cmd = "xls2csv.py $file > $csv; dos2unix $csv";
       my $cmd = "xls2csv -x $file -c $csv";
 
       system($cmd);
-      @in = `cat $csv`;
-      chomp(@in);
+      @in = _read_file_lines($csv,%opts);
       if ($opts{'head'}) {
          my $head = $opts{'head'};
          while ($in[0] !~ /$head/) {
@@ -1885,6 +1894,19 @@ sub _read_file {
          }
       }
 
+   } elsif ($type eq 'csv') {
+      my %o;
+      foreach my $opt (qw(sep_char decode_utf8)) {
+         if (exists $opts{$opt}) {
+            $o{$opt} = $opts{$opt};
+         }
+      }
+      $o{'decode_utf8'} = 0;
+
+      @in = _read_file_lines($file,%opts);
+      my $in = Text::CSV::Slurp->load(string => join("\n",@in),%o);
+      @in = @$in;
+      $opts{'as_list'} = 1;   # required
 
    } elsif ($type eq 'zip') {
       #
@@ -1897,38 +1919,59 @@ sub _read_file {
          die "ERROR [iso]: zip file changed format\n";
       }
 
-      @in = `cat $file2`;
-
-   } elsif ($opts{'encoding'}) {
-      #
-      # Read an encoded text file
-      #
-      open(my $in,"<:encoding($opts{encoding})",$file);
-      @in = <$in>;
-      close($in);
+      @in = _read_file_lines($file2,%opts);
 
    } else {
       #
       # Read an ASCII text file
       #
-      @in = `cat $file`;
+     @in = _read_file_lines($file,%opts);
    }
+
+   #
+   # Return the contents of the file as a list or a string.
+   #
+
+   if ($opts{'as_list'}) {
+      return \@in;
+   } else {
+      return join(" ",@in);
+   }
+}
+
+# This reads in a file to a list of lines.  It handles all of the
+# encoding issues as well.
+#
+sub _read_file_lines {
+   my($file,%opts) = @_;
+
+   # Read in the file in the correct encoding
+
+   my @in;
+   @in = `cat $file`;
+
+   # my @in;
+   # if ($opts{'encoding'}) {
+   #    open(my $in,"<:encoding($opts{encoding})",$file);
+   #    @in = <$in>;
+   # } else {
+   #    @in = `cat $file`;
+   # }
+
+   # # Convert to UTF-8 if another encoding was used
+
+   # if ($opts{'encoding'}  &&  $opts{'encoding'} ne 'UTF-8') {
+   #    my $in = join("",@in);
+   #    $in    = encode('UTF-8',$in);
+   #    @in = split("\n",$in);
+   # }
+
+   # Get rid of newlines
+
    chomp(@in);
    chop(@in)   if ($opts{'chop'});
 
-   #
-   # If it was encoded, make sure it's in UTF-8
-   #
-
-   if ($opts{'encoding'}  &&  $opts{'encoding'} ne 'UTF-8') {
-      my $in = join("\n",@in);
-      $in    = encode('UTF-8',$in);
-      @in = split("\n",$in);
-   }
-
-   #
    # Strip out some problem strings.
-   #
 
    if ($opts{'html_strip'}  ||  $opts{'html_repl'}) {
       my $in = join("\n",@in);
@@ -1946,16 +1989,7 @@ sub _read_file {
       @in = split("\n",$in);
    }
 
-
-   #
-   # Return the contents of the file as a list or a string.
-   #
-
-   if ($opts{'as_list'}) {
-      return \@in;
-   } else {
-      return join(" ",@in);
-   }
+   return @in;
 }
 
 sub _csv_count_columns {

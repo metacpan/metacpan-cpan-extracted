@@ -2,7 +2,7 @@ package Mail::STS::TLSRPTRecord;
 
 use Moose;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 # ABSTRACT: a TLSRPT record string
 
 has 'fields' => (
@@ -38,7 +38,7 @@ Mail::STS::TLSRPTRecord - a TLSRPT record string
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 AUTHOR
 

@@ -1,3 +1,17 @@
+0.07 2023-12-04T16:28:19+01:00
+ - Update dependency to Map::Tube@3.62.
+
+0.06 2023-12-04T12:54:06+01:00
+ - Fix Makefile.PL use lib '.'.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite doc to use =head2.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update copyright years.
+
 0.05 2017-11-23T08:42:54+01:00
  - Add EXAMPLE5 section to doc.
  - Add test for ok_map_functions().

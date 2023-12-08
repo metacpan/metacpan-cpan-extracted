@@ -99,8 +99,8 @@ See L<OpenTelemetry::SDK::Trace::SpanLimits> for more details.
 
 =item OTEL_BSP_EXPORT_TIMEOUT
 
-Maximum allowed time (in milliseconds) for the batch exporter to export data.
-Default: 30000.
+Maximum allowed time (in milliseconds) for the batch span processor to wait
+before aborting the export process. Default: 30000.
 
 See L<OpenTelemetry::SDK::Trace::Span::Processor::Batch> for more details.
 

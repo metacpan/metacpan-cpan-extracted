@@ -14,5 +14,7 @@ use Test2::V0;
 
 eval "use Test::CPAN::Changes";
 
+plan skip_all => "Test::CPAN::Changes not installed" if $@;
+
 use Text::Minify::XS;
 changes_ok( { version => Text::Minify::XS->VERSION } );

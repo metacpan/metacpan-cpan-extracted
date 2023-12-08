@@ -65,6 +65,13 @@ sub show($self) {
         $self->{max_window}->show();
     } else {
         $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1, 1) if $cfg->{hide_empty_tags};
+
+        # Firstly move
+        $h -= $cfg->{panel_height};
+        $y += $cfg->{panel_height};
+        $self->{layout}->arrange_windows($self->{windows_tiled}, $w, $h, $x, $y);
+
+        # Only then -- show
         for my $win (reverse grep defined,
             @{ $self->{screen}->{always_on} },
             @{ $self->{windows_float} },
@@ -72,9 +79,6 @@ sub show($self) {
             $win->show();
             $win->reset_border() if $win != ($self->{screen}->{focus} // 0);
         }
-        $h -= $cfg->{panel_height};
-        $y += $cfg->{panel_height};
-        $self->{layout}->arrange_windows($self->{windows_tiled}, $w, $h, $x, $y);
 
         # XXX There should be no need to restack windows here.
         # The only case: if the window stack order was changed on another tag. Fix if any bugs found
@@ -100,6 +104,7 @@ sub show($self) {
 
 sub win_add($self, $win) {
     $win->{on_tags}->{$self} = $self;
+
     $self->{urgent_windows}->{$win} = undef if $win->urgency_get();
     $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1);
 
@@ -120,6 +125,9 @@ sub win_remove($self, $win, $norefresh = undef) {
     for my $arr (map { $self->{$_} } qw( windows_float windows_tiled )) {
         splice @{ $arr }, $_, 1 for reverse grep { $arr->[$_] == $win } 0..$#{ $arr };
     }
+
+    # Remove title when removing focused window
+    $self->{screen}->{panel}->title() if $win == $focus->{window};
 
     # Update panel if tag becomes empty
     $self->{screen}->{panel}->ws_set_visible($self->{idx} + 1, 0)

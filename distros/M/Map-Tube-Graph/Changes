@@ -1,3 +1,14 @@
+0.06 2023-11-30T19:05:50+01:00
+ - Fix Makefile.PL for new version of Perl and no default »use lib '.'«.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Remove simple comments.
+ - Rewrite from List::MoreUtils to List::Util.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.05 2015-09-29T10:29:40+02:00
  - Add Map::Tube::Plugin::Graph to SEE ALSO section in doc.
  - Improve SEE ALSO section in doc.

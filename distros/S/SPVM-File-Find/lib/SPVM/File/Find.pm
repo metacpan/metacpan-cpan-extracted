@@ -1,6 +1,6 @@
 package SPVM::File::Find;
 
-our $VERSION = "0.021001";
+our $VERSION = "0.021002";
 
 1;
 

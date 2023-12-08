@@ -1,13 +1,13 @@
 package App::GraphicsColorNamesUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-10'; # DATE
-our $DIST = 'App-GraphicsColorNamesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2023-12-05'; # DATE
+our $DIST = 'App-GraphicsColorNamesUtils'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 our %SPEC;
 
@@ -19,7 +19,7 @@ sub _get_scheme_codes {
     my $res = &{"$mod\::NamesRgbTable"}();
     if (ref $res eq 'HASH') {
         for (keys %$res) {
-            $res->{$_} = sprintf("%06x", $res->{$_});
+            $res->{$_} = sprintf("%06s", $res->{$_});
         }
         return $res;
     } else {
@@ -83,7 +83,7 @@ sub colorcode2name {
             }
             map {
                 # name, code, distance to wanted
-                [$_, $all_codes->{$_}, Color::RGB::Util::rgb_diff($code, $all_codes->{$_}, 'approx1')]
+                [$_, $all_codes->{$_}, do { Color::RGB::Util::rgb_diff($code, sprintf("%06x",$all_codes->{$_}), 'approx1')}]
             } sort keys %$all_codes;
         my @closest = splice @colors_and_diffs, 0, 5;
         return [200, "OK (approx)", [map {+{name=>$_->[0], code=>$_->[1]}} @closest], {
@@ -112,6 +112,11 @@ $SPEC{colorname2code} = {
             schema => 'str*',
             req => 1,
             pos => 0,
+            completion => sub {
+                my %args = @_;
+                require Complete::Color;
+                Complete::Color::complete_color_name(word=>$args{word});
+            },
         },
     },
 };
@@ -256,7 +261,7 @@ App::GraphicsColorNamesUtils - Utilities related to Graphics::ColorNames
 
 =head1 VERSION
 
-This document describes version 0.005 of App::GraphicsColorNamesUtils (from Perl distribution App-GraphicsColorNamesUtils), released on 2020-06-10.
+This document describes version 0.008 of App::GraphicsColorNamesUtils (from Perl distribution App-GraphicsColorNamesUtils), released on 2023-12-05.
 
 =head1 DESCRIPTION
 
@@ -283,7 +288,7 @@ This distributions provides the following command-line utilities:
 
 Usage:
 
- colorcode2name(%args) -> [status, msg, payload, meta]
+ colorcode2name(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert RGB color code to name.
 
@@ -299,17 +304,19 @@ When a name with exact code is not found, find the several closest ones.
 
 =item * B<code>* => I<color::rgb24>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -319,7 +326,7 @@ Return value:  (any)
 
 Usage:
 
- colorname2code(%args) -> [status, msg, payload, meta]
+ colorname2code(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Convert color name to code.
 
@@ -331,17 +338,19 @@ Arguments ('*' denotes required arguments):
 
 =item * B<name>* => I<str>
 
+(No description)
+
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -351,7 +360,7 @@ Return value:  (any)
 
 Usage:
 
- list_color_names(%args) -> [status, msg, payload, meta]
+ list_color_names(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all color names from a Graphics::ColorNames scheme.
 
@@ -363,19 +372,23 @@ Arguments ('*' denotes required arguments):
 
 =item * B<detail> => I<true>
 
+(No description)
+
 =item * B<scheme>* => I<perl::colorscheme::modname>
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -385,7 +398,7 @@ Return value:  (any)
 
 Usage:
 
- list_color_schemes() -> [status, msg, payload, meta]
+ list_color_schemes() -> [$status_code, $reason, $payload, \%result_meta]
 
 List all installed Graphics::ColorNames schemes.
 
@@ -395,12 +408,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -410,7 +423,7 @@ Return value:  (any)
 
 Usage:
 
- show_color_swatch(%args) -> [status, msg, payload, meta]
+ show_color_swatch(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 List all color names from a Graphics::ColorNames scheme as a color swatch.
 
@@ -422,23 +435,31 @@ Arguments ('*' denotes required arguments):
 
 =item * B<columns> => I<posint> (default: 1)
 
+(No description)
+
 =item * B<row_height> => I<posint> (default: 3)
+
+(No description)
 
 =item * B<scheme>* => I<perl::colorscheme::modname>
 
+(No description)
+
 =item * B<table_width> => I<posint> (default: 80)
+
+(No description)
 
 
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -450,6 +471,43 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Graphi
 
 Source repository is at L<https://github.com/perlancar/perl-App-GraphicsColorNamesUtils>.
 
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2023, 2020, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GraphicsColorNamesUtils>
@@ -457,18 +515,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

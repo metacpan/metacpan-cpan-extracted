@@ -6,7 +6,12 @@ extern "C" {
 #include "perl.h"
 #include "XSUB.h"
 #include <unistd.h>
+
+#ifdef linux
+#include <sys/sysmacros.h>
+#else
 #include <sys/types.h>
+#endif
 
 #ifdef HAS_SYSMKDEV
 #include <sys/mkdev.h>

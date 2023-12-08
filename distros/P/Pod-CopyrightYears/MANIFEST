@@ -23,6 +23,8 @@ t/data/Ex1.pm
 t/data/Ex2.pm
 t/data/Ex3.pm
 t/data/Ex4.pm
+t/data/Ex5.pm
+t/data/Ex6.pm
 t/Pod-CopyrightYears/01-use.t
 t/Pod-CopyrightYears/02-version.t
 t/Pod-CopyrightYears/03-new.t

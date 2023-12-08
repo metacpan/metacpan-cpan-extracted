@@ -10,7 +10,7 @@ SPVM::Go::Select::Result - Result of select
 
 =head1 Description
 
-Go::Select::Result class of L<SPVM> has methods to manipulate the result of select.
+The Go::Select::Result class in L<SPVM> has methods to manipulate the result of select.
 
 =head1 Usage
 

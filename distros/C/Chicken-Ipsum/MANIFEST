@@ -16,6 +16,5 @@ t/sentence-bounds.t
 t/sentence.t
 t/unknown-constructor-args.t
 t/words.t
-util/run-dev-tests.sh
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

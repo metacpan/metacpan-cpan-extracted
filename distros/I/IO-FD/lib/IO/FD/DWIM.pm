@@ -3,9 +3,8 @@ use strict;
 use warnings;
 
 use IO::FD;
-use Exporter "import";
+use Export::These  qw<
 
-our %EXPORT_TAGS = ( 'all' => [ qw(
 	socket
 	socketpair
 	shutdown
@@ -40,11 +39,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 
 	readline
 	fileno
-) ] );
+>;
 
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT=@EXPORT_OK;
 
 
 #SOCKETS
@@ -117,6 +113,7 @@ sub syswrite:prototype($$@)
 
 sub stat($) 
 	{ref($_[0]) ? &CORE::stat : &IO::FD::stat; }
+
 sub lstat($) 
 	{ref($_[0]) ? &CORE::lstat : &IO::FD::lstat; }
 

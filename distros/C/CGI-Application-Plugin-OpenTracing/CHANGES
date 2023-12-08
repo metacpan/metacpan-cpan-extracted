@@ -2,7 +2,13 @@ CHANGE LOG
 ==========
 
 
-2023-14-06 - v0.104.0
+2023-11-28 - v0.104.1
+---------------------
+
+Support incoming context extraction from HTTP headers.
+
+
+2023-06-14 - v0.104.0
 ---------------------
 
 Refactor the code to use a `CGI::Application::Plugin::OpenTracing` object

@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2023-11-23'; # DATE
 our $DIST = 'App-errno'; # DIST
-our $VERSION = '0.070'; # VERSION
+our $VERSION = '0.071'; # VERSION
 
 1;
 # ABSTRACT: List/show errno
@@ -22,7 +22,7 @@ App::errno - List/show errno
 
 =head1 VERSION
 
-This document describes version 0.070 of App::errno (from Perl distribution App-errno), released on 2023-11-23.
+This document describes version 0.071 of App::errno (from Perl distribution App-errno), released on 2023-11-23.
 
 =head1 DESCRIPTION
 
@@ -37,6 +37,8 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-errno>
 Source repository is at L<https://github.com/perlancar/perl-App-errno>.
 
 =head1 SEE ALSO
+
+L<Errno>.pm
 
 L<errno>
 

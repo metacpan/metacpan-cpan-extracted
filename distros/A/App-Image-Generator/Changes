@@ -1,3 +1,10 @@
+0.05 2023-12-05T13:35:12+01:00
+ - Fix test of run on Windows.
+ - Move bugtracker to github.
+ - Rename example file to better name.
+ - Update Module::Install to 1.21 version.
+ - Update copyright years.
+
 0.04 2022-01-06T15:12:35+01:00
  - Fix hardcoded relative path in test.
  - Update copyright years.

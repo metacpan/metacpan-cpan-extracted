@@ -3,7 +3,7 @@ Locale::Codes::Country_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Tue Aug 29 11:10:03 EDT 2023
+#    Generated on: Fri Dec  1 15:38:44 EST 2023
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.76';
+$VERSION='3.77';
 
 $Locale::Codes::Retired{'country'}{'alpha-2'}{'code'} = {
    q(an) => q(Netherlands Antilles),
@@ -538,6 +538,7 @@ $Locale::Codes::Retired{'country'}{'dom'}{'name'} = {
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'name'} = {
+   q(bonaire, sint eustatius, and saba) => [ q(BQ), q(Bonaire, Sint Eustatius, and Saba) ],
    q(czech republic) => [ q(CZ), q(Czech Republic) ],
    q(entity 6) => [ q(A3), q(Entity 6) ],
    q(macedonia) => [ q(MK), q(MACEDONIA) ],
@@ -547,6 +548,7 @@ $Locale::Codes::Retired{'country'}{'genc-alpha-2'}{'name'} = {
 };
 
 $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
+   q(bonaire, sint eustatius, and saba) => [ q(BES), q(Bonaire, Sint Eustatius, and Saba) ],
    q(czech republic) => [ q(CZE), q(Czech Republic) ],
    q(entity 6) => [ q(AX3), q(Entity 6) ],
    q(macedonia) => [ q(MKD), q(MACEDONIA) ],
@@ -556,6 +558,7 @@ $Locale::Codes::Retired{'country'}{'genc-alpha-3'}{'name'} = {
 };
 
 $Locale::Codes::Retired{'country'}{'genc-numeric'}{'name'} = {
+   q(bonaire, sint eustatius, and saba) => [ q(535), q(Bonaire, Sint Eustatius, and Saba) ],
    q(czech republic) => [ q(203), q(Czech Republic) ],
    q(entity 6) => [ q(914), q(Entity 6) ],
    q(macedonia) => [ q(807), q(MACEDONIA) ],

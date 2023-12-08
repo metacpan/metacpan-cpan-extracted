@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/FileTestUtils.pm','script/dir-empty','script/dir-has-dot-files','script/dir-has-dot-subdirs','script/dir-has-files','script/dir-has-non-dot-files','script/dir-has-non-dot-subdirs','script/dir-has-subdirs','script/dir-not-empty'];
+my $filenames = ['lib/App/FileTestUtils.pm','script/dir-empty','script/dir-has-dot-files','script/dir-has-dot-subdirs','script/dir-has-files','script/dir-has-non-dot-files','script/dir-has-non-dot-subdirs','script/dir-has-subdirs','script/dir-not-empty','script/dir-only-has-dot-files','script/dir-only-has-dot-subdirs','script/dir-only-has-files','script/dir-only-has-non-dot-files','script/dir-only-has-non-dot-subdirs','script/dir-only-has-subdirs'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

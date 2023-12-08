@@ -7,9 +7,9 @@ use warnings;
 require App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-19'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.071'; # VERSION
+our $VERSION = '1.073'; # VERSION
 
 our %SPEC;
 
@@ -81,7 +81,7 @@ App::lcpan::Cmd::dists_by_mod_count - List distributions ranked by number of inc
 
 =head1 VERSION
 
-This document describes version 1.071 of App::lcpan::Cmd::dists_by_mod_count (from Perl distribution App-lcpan), released on 2022-09-19.
+This document describes version 1.073 of App::lcpan::Cmd::dists_by_mod_count (from Perl distribution App-lcpan), released on 2023-07-09.
 
 =head1 FUNCTIONS
 
@@ -194,7 +194,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

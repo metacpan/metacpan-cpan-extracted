@@ -3,7 +3,7 @@ package Database::Async::ORM::Extension;
 use strict;
 use warnings;
 
-our $VERSION = '0.018'; # VERSION
+our $VERSION = '0.019'; # VERSION
 
 sub new {
     my ($class) = shift;

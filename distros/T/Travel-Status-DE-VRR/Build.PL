@@ -20,6 +20,7 @@ Module::Build->new(
 		'perl' => '5.10.1',
 		'Carp' => 0,
 		'Class::Accessor' => 0,
+		'DateTime' => 0,
 		'Getopt::Long' => 0,
 		'List::Util' => 0,
 		'LWP::UserAgent' => 0,

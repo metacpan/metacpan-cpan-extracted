@@ -1,6 +1,6 @@
 package SPVM::Go;
 
-our $VERSION = "0.005001";
+our $VERSION = "0.007002";
 
 1;
 
@@ -10,7 +10,7 @@ SPVM::Go - Goroutines of The Go Programming Language
 
 =head1 Description
 
-The Go class of L<SPVM> has methods to create goroutines and manipulate channels.
+The Go class in L<SPVM> has methods to create goroutines and manipulate channels.
 
 Goroutines and channels are features of the Go programming language.
 
@@ -115,6 +115,22 @@ Exceptions:
 This method must be called from the main thread. Otherwise an exception is thrown.
 
 $seconds must be less than or equal to Fn->INT_MAX. Otherwise an exception is thrown.
+
+=head1 Modules
+
+=over 2
+
+=item * L<Go::Channel|SPVM::Go::Channel>
+
+=item * L<Go::Select|SPVM::Go::Select>
+
+=item * L<Go::Select::Result|SPVM::Go::Select::Result>
+
+=item * L<Go::Sync::WaitGroup|SPVM::Go::Sync::WaitGroup>
+
+=item * L<Go::OS::Signal|SPVM::Go::OS::Signal>
+
+=back
 
 =head1 Repository
 

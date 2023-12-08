@@ -4,58 +4,80 @@ NAME
 
 SYNOPSIS
      use Person::ID::CZ::RC::Generator;
+
      my $obj = Person::ID::CZ::RC::Generator->new(%params);
      my $rc = $obj->rc;
 
 METHODS
-    "new(%params)"
-             Constructor.
+  "new"
+     my $obj = Person::ID::CZ::RC::Generator->new(%params);
 
-            *       "alternate"
+    Constructor.
 
-                     Alternate flag.
-                     Default value is undef.
+    *       "alternate"
 
-            *       "day"
+            Alternate flag.
 
-                     Day.
-                     Default value is undef.
+            Default value is undef.
 
-            *       "month"
+    *       "day"
 
-                     Month.
-                     Default value is undef.
+            Day.
 
-            *       "rc_sep"
+            Default value is undef.
 
-                     RC number separator.
-                     Possible values are:
-                     - empty string
-                     - /
-                     Default value is empty string.
+    *       "month"
 
-            *       "serial"
+            Month.
 
-                     Serial number from 1 to 999.
-                     Default value is undef.
+            Default value is undef.
 
-            *       "sex"
+    *       "rc_sep"
 
-                     Sex.
-                     Possible values are:
-                     - male
-                     - female
-                     Default value is undef.
+            RC number separator.
 
-            *       "year"
+            Possible values are:
 
-                     Year.
-                     Possible values are between 1946 and 2054.
-                     Default value is undef.
+            *   empty string
 
-    "rc()"
-             Get rc identification.
-             Returns string with rc identification.
+            *   /
+
+            Default value is empty string.
+
+    *       "serial"
+
+            Serial number from 1 to 999.
+
+            Default value is undef.
+
+    *       "sex"
+
+            Sex.
+
+            Possible values are:
+
+            *   male
+
+            *   female
+
+            Default value is undef.
+
+    *       "year"
+
+            Year.
+
+            Possible values are between 1946 and 2054.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "rc"
+     my $rc = $obj->rc;
+
+    Get rc identification.
+
+    Returns string.
 
 ERRORS
      new():
@@ -70,11 +92,9 @@ ERRORS
                      Unknown parameter '%s'.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Person::ID::CZ::RC::Generator;
 
      # Object.
@@ -94,11 +114,9 @@ EXAMPLE1
      # Personal number: 840501/1330
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Person::ID::CZ::RC::Generator;
 
      # Object.
@@ -118,11 +136,9 @@ EXAMPLE2
      # Personal number: 520501/133
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Person::ID::CZ::RC::Generator;
 
      # Object.
@@ -137,8 +153,8 @@ EXAMPLE3
      # Personal number: qr{\d\d\d\d\d\d\/\d\d\d\d?}
 
 DEPENDENCIES
-    Class::Utils, DateTime, English, Error::Pure, List::MoreUtils,
-    Random::Day, Readonly.
+    Class::Utils, DateTime, English, Error::Pure, List::Util, Random::Day,
+    Readonly.
 
 SEE ALSO
     Business::DK::CPR
@@ -154,17 +170,18 @@ SEE ALSO
         Module for validating and generating a Swedish personnummer.
 
 REPOSITORY
-    <https://github.com/tupinek/Person::ID::CZ::RC::Generator>
+    <https://github.com/michal-josef-spacek/Person::ID::CZ::RC::Generator>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © Michal Špaček 2013-2015
-     BSD 2-Clause License
+    © Michal Josef Špaček 2013-2023
+
+    BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

@@ -9,7 +9,7 @@ use Carp;
 
 # The following must be on the same line to ensure that $VERSION is read
 # correctly by PAUSE and installer tools. See docu of 'version'.
-use version 0.77; our $VERSION = version->declare("v2.3.0");
+use version 0.77; our $VERSION = version->declare("v2.3.1");
 
 
 sub new {
@@ -484,7 +484,7 @@ Text::Table::Read::RelationOn::Tiny - Read binary "relation on (over) a set" fro
 
 =head1 VERSION
 
-Version v2.3.0
+Version v2.3.1
 
 
 =head1 SYNOPSIS
@@ -567,7 +567,7 @@ this can be changed by argument C<allow_subset> of method C<get>.
 
 =head3 new
 
-The constructor takes the following optional named scalar arguments:
+The constructor takes the following optional named arguments:
 
 =over
 

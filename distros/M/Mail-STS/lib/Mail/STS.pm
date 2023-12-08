@@ -2,7 +2,7 @@ package Mail::STS;
 
 use Moose;
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 # ABSTRACT: library for looking up MTA-STS policies
 
 use LWP::UserAgent;
@@ -97,7 +97,7 @@ Mail::STS - library for looking up MTA-STS policies
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 

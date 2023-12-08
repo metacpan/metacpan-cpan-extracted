@@ -1,3 +1,23 @@
+0.007002 2023-12-07
+  [Requrement Changes]
+    * Require SPVM::Sys 0.510.
+0.007001 2023-11-30
+  [Internal Changes]
+    * Use Sys->kill instead of Sys::Signal->raise.
+0.007 2023-11-30
+  [Requrement Changes]
+    * Require SPVM::Time::HiRes 0.004.
+    * Require SPVM::Sys 0.504.
+0.006 2023-11-29
+  [Requrement Changes]
+    * Require SPVM 0.989063.
+    * Require SPVM::Time::HiRes 0.003.
+    * Require SPVM::Sys 0.502.
+  [Bug Fix]
+    * Fix the bug that after or timeout is not culcurated by double.
+  [New Features]
+    * Use CLOCK_MONOTONIC if the sysmtem support it.
+    
 0.005001 2023-11-26
   [Test Fix]
     * Catch up with the latest Sys class.

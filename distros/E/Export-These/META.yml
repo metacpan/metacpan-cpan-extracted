@@ -20,7 +20,7 @@ no_index:
 requires: {}
 resources:
   repository: git://github.com/drclaw1394/perl-export-these.git
-version: v0.2.0
+version: v0.2.1
 x_bugtracker:
   web: https://github.com/drclaw1394/perl-export-these/issues
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,15 +1,13 @@
 package Person::ID::CZ::RC::Generator;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Modules.
 use Class::Utils qw(set_params);
 use DateTime;
 use English qw(-no_match_vars);
 use Error::Pure qw(err);
-use List::MoreUtils qw(none);
+use List::Util 1.33 qw(none);
 use Random::Day;
 use Readonly;
 
@@ -18,8 +16,7 @@ Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Scalar our $YEAR_FROM => 1855;
 Readonly::Scalar our $YEAR_TO => 2054;
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -177,69 +174,95 @@ Person::ID::CZ::RC::Generator - Perl class for Czech RC identification generatio
 =head1 SYNOPSIS
 
  use Person::ID::CZ::RC::Generator;
+
  my $obj = Person::ID::CZ::RC::Generator->new(%params);
  my $rc = $obj->rc;
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $obj = Person::ID::CZ::RC::Generator->new(%params);
 
- Constructor.
+Constructor.
 
 =over 8
 
 =item * C<alternate>
 
- Alternate flag.
- Default value is undef.
+Alternate flag.
+
+Default value is undef.
 
 =item * C<day>
 
- Day.
- Default value is undef.
+Day.
+
+Default value is undef.
 
 =item * C<month>
 
- Month.
- Default value is undef.
+Month.
+
+Default value is undef.
 
 =item * C<rc_sep>
 
- RC number separator.
- Possible values are:
- - empty string
- - /
- Default value is empty string.
+RC number separator.
+
+Possible values are:
+
+=over
+
+=item * empty string
+
+=item * /
+
+=back
+
+Default value is empty string.
 
 =item * C<serial>
 
- Serial number from 1 to 999.
- Default value is undef.
+Serial number from 1 to 999.
+
+Default value is undef.
 
 =item * C<sex>
 
- Sex.
- Possible values are:
- - male
- - female
- Default value is undef.
+Sex.
+
+Possible values are:
+
+=over
+
+=item * male
+
+=item * female
+
+=back
+
+Default value is undef.
 
 =item * C<year>
 
- Year.
- Possible values are between 1946 and 2054.
- Default value is undef.
+Year.
+
+Possible values are between 1946 and 2054.
+
+Default value is undef.
 
 =back
 
-=item C<rc()>
+Returns instance of object.
 
- Get rc identification.
- Returns string with rc identification.
+=head2 C<rc>
 
-=back
+ my $rc = $obj->rc;
+
+Get rc identification.
+
+Returns string.
 
 =head1 ERRORS
 
@@ -256,11 +279,11 @@ Person::ID::CZ::RC::Generator - Perl class for Czech RC identification generatio
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=gen_rc_with_checksum.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Person::ID::CZ::RC::Generator;
 
  # Object.
@@ -281,11 +304,11 @@ Person::ID::CZ::RC::Generator - Perl class for Czech RC identification generatio
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=gen_rc.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Person::ID::CZ::RC::Generator;
 
  # Object.
@@ -306,11 +329,11 @@ Person::ID::CZ::RC::Generator - Perl class for Czech RC identification generatio
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=gen_rc_default.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Person::ID::CZ::RC::Generator;
 
  # Object.
@@ -330,7 +353,7 @@ L<Class::Utils>,
 L<DateTime>,
 L<English>,
 L<Error::Pure>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Random::Day>,
 L<Readonly>.
 
@@ -358,21 +381,22 @@ Module for validating and generating a Swedish personnummer.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Person::ID::CZ::RC::Generator>
+L<https://github.com/michal-josef-spacek/Person::ID::CZ::RC::Generator>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © Michal Špaček 2013-2015
- BSD 2-Clause License
+© Michal Josef Špaček 2013-2023
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

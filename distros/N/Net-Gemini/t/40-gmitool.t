@@ -144,7 +144,7 @@ command {
     command {
         args    => [ '-H', $The_Sni, '-t', '17', "$base/ISO-8859-1b" ],
         binmode => ':encoding(UTF-8)',
-        stdout => qr/^\x{a9}$/,
+        stdout  => qr/^\x{a9}$/,
     };
 
     command {
@@ -201,11 +201,21 @@ command {
 
 command {
     stdin  => "=> gemini://example.org\n",
-    stdout => "gemini://example.org/\n"
+    stdout => "gemini://example.org/\n",
 };
 command {
     stdin  => "=> https://example.org\n",
-    stdout => "https://example.org/\n"
+    stdout => "https://example.org/\n",
+};
+command {
+    args   => [ '-b', 'file:///' ],
+    stdin  => "=>https://example.org\n=>foo\n",
+    stdout => "https://example.org/\nfile:///foo\n",
+};
+command {
+    args   => ['-r'],
+    stdin  => "=>https://example.org\n=>foo\n",
+    stdout => "foo\n",
 };
 
 # hosts file must be present but empty for commit or make dist

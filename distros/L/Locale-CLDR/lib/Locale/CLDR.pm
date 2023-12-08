@@ -8,7 +8,7 @@ Locale::CLDR - A Module to create locale objects with localisation data from the
 
 =head1 VERSION
 
-Version 0.34.3
+Version 0.34.4
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ or
 
 use v5.10.1;
 use version;
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use open ':encoding(utf8)';
 use utf8;
@@ -1418,7 +1418,6 @@ sub BUILD {
 }
 
 after 'BUILD' => sub {
-
 	my $self = shift;
 	
 	# Fix up likely sub tags
@@ -1427,7 +1426,7 @@ after 'BUILD' => sub {
 	my $likely_subtag;
 	my ($language_id, $script_id, $region_id) = ($self->language_id, $self->script_id, $self->region_id);
 	
-	unless ($language_id ne 'und' && $script_id && $region_id ) {
+	unless ($language_id && $script_id && $region_id ) {
 		$likely_subtag = $likely_subtags->{join '_', grep { length() } ($language_id, $script_id, $region_id)};
 		
 		if (! $likely_subtag ) {

@@ -1,0 +1,16 @@
+t/fixtures/tests/simple-fail.st .. 
+1..1
+not ok 1 - simple-fail-msg
+
+  ---
+  at:
+    filename: t/fixtures/tests/simple-fail.st
+    line: 14
+    test_num: 0
+  emitter: Test::More::ok
+  message: "Failed test 'simple-fail-msg'\nat t/fixtures/tests/simple-fail.st line 14."
+  ...
+
+# Looks like you failed 1 test of 1.
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/1 subtests

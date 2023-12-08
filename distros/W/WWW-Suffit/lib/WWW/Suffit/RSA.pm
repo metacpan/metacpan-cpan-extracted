@@ -8,10 +8,6 @@ use utf8;
 
 WWW::Suffit::RSA - The RSA encryption and signing subclass
 
-=head1 VERSION
-
-Version 1.00
-
 =head1 SYNOPSIS
 
     use WWW::Suffit::RSA;
@@ -124,7 +120,7 @@ See C<LICENSE> file and L<https://dev.perl.org/licenses/>
 
 =cut
 
-our $VERSION = "1.00";
+our $VERSION = '1.01';
 
 use Mojo::Base -base;
 use Mojo::Util qw/b64_encode b64_decode/;

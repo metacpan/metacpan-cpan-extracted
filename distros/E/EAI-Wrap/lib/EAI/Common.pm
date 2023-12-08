@@ -1,4 +1,4 @@
-package EAI::Common 1.902;
+package EAI::Common 1.904;
 
 use strict; use feature 'unicode_strings'; use warnings; no warnings 'uninitialized';
 use Exporter qw(import); use EAI::DateUtil; use Data::Dumper qw(Dumper); use Getopt::Long qw(:config no_ignore_case); use Log::Log4perl qw(get_logger); use MIME::Lite (); use Scalar::Util qw(looks_like_number);
@@ -7,7 +7,7 @@ BEGIN {
 	if ($^O =~ /MSWin/) {require Win32::Console::ANSI; Win32::Console::ANSI->import();}
 }
 
-our @EXPORT = qw($EAI_WRAP_CONFIG_PATH $EAI_WRAP_SENS_CONFIG_PATH %common %config %execute @loads @optload %opt readConfigFile getKeyInfo setupConfigMerge getOptions setupEAIWrap dumpFlat extractConfigs checkHash checkParam getLogFPathForMail getLogFPath MailFilter setErrSubject setupLogging checkStartingCond sendGeneralMail looks_like_number get_logger);
+our @EXPORT = qw($EAI_WRAP_CONFIG_PATH $EAI_WRAP_SENS_CONFIG_PATH %common %config %execute @loads @optload %opt readConfigFile getSensInfo setupConfigMerge getOptions setupEAIWrap dumpFlat extractConfigs checkHash checkParam getLogFPathForMail getLogFPath MailFilter setErrSubject setupLogging checkStartingCond sendGeneralMail looks_like_number get_logger);
 
 my %hashCheck = (
 	common => {
@@ -25,7 +25,7 @@ my %hashCheck = (
 		executeOnInit => "", # code to be executed during INIT of EAI::Wrap to allow for assignment of config/execute parameters from commandline params BEFORE Logging!
 		folderEnvironmentMapping => {}, # ref to hash {Test => "Test", Dev => "Dev", "" => "Prod"}, mapping for $execute{envraw} to $execute{env}
 		fromaddress => "", # from address for central logcheck/errmail sending, also used as default sender address for sendGeneralMail
-		historyFolder => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where downloaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
+		historyFolder => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where downloaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder". historyFolder, historyFolderUpload, logRootPath and redoDir are always built with an environment subfolder, the default is built as folderPath/endFolder/environ, otherwise it is built as folderPath/environ/endFolder. Environment subfolders (environ) are also built depending on prodEnvironmentInSeparatePath: either folderPath/endFolder/$execute{env} (prodEnvironmentInSeparatePath = true, Prod has own subfolder) or folderPath/endFolder/$execute{envraw} (prodEnvironmentInSeparatePath = false, Prod is in common folder, other environments have their own folder)
 		historyFolderUpload => {}, # ref to hash {"scriptname.pl + optional addToScriptName" => "folder"}, folders where uploaded files are historized, lookup key as in checkLookup, default in "" => "defaultfolder"
 		logCheckHoliday => "", # calendar for business days in central logcheck/errmail sending. builtin calendars are AT (Austria), TG (Target), UK (United Kingdom) and WE (for only weekends). Calendars can be added with EAI::DateUtil::addCalendar
 		logs_to_be_ignored_in_nonprod => qr//, # regular expression to specify logs to be ignored in central logcheck/errmail sending
@@ -94,6 +94,7 @@ my %hashCheck = (
 		ignoreDuplicateErrs => 1, # ignore any duplicate errors in dumpDataIntoDB/storeInDB
 		keyfields => [], # used for readFromDBHash, list of field names to be used as the keys of the returned hash
 		longreadlen => 1024, # used for setting database handles LongReadLen parameter for DB connection, if not set defaults to 1024
+		lookups => {}, # similar to $config{sensitive}, a hash lookup table ({"prefix" => {remoteHost=>""},...} or {"prefix" => {remoteHost=>{Prod => "", Test => ""}},...}) for centrally looking up DSN Settings depending on $DB{prefix}. Overrides $DB{DSN} set in config, but is overriden by script-level settings in %common.
 		noDBTransaction => 1, # don't use a DB transaction for dumpDataIntoDB
 		noDumpIntoDB => 1, # if files from this load should not be dumped to the database
 		postDumpExecs => [], # array for execs done in dumpDataIntoDB after postDumpProcessing and before commit/rollback: [{execs => ['',''], condition => ''}]. doInDB all execs if condition (evaluated string or anonymous sub: condition => sub {...}) is fulfilled
@@ -155,23 +156,29 @@ my %hashCheck = (
 		optional => 1, # to avoid error message for missing optional files, set this to 1
 	},
 	FTP => { # FTP specific configs
+		additionalParamsGet => {}, # additional parameters for Net::SFTP::Foreign get.
+		additionalMoreArgs => [], # additional more args for Net::SFTP::Foreign new (args passed to ssh command).
+		additionalParamsNew => {}, # additional parameters for Net::SFTP::Foreign new.
+		additionalParamsPut => {}, # additional parameters for Net::SFTP::Foreign put.
 		archiveDir => "", # folder for archived files on the FTP server
 		dontMoveTempImmediately => 1, # if 0 oder missing: rename/move files immediately after writing to FTP to the final name, otherwise/1: a call to EAI::FTP::moveTempFiles is required for that
 		dontDoSetStat => 1, # for Net::SFTP::Foreign, no setting of time stamp of remote file to that of local file (avoid error messages of FTP Server if it doesn't support this)
 		dontDoUtime => 1, # don't set time stamp of local file to that of remote file
 		dontUseQuoteSystemForPwd => 0, # for windows, a special quoting is used for passing passwords to Net::SFTP::Foreign that contain [()"<>& . This flag can be used to disable this quoting.
 		dontUseTempFile => 1, # directly upload files, without temp files
-		fileToArchive => 1, # should file be archived on FTP server? requires archiveDir to be set
+		fileToArchive => 1, # should file be archived on FTP server? if archiveDir is not set, then file is archived (rolled) in the same folder
 		fileToRemove => 1, # should file be removed on FTP server?
 		FTPdebugLevel => 0, # debug ftp: 0 or ~(1|2|4|8|16|1024|2048), loglevel automatically set to debug for module EAI::FTP
 		hostkey => "", # hostkey to present to the server for Net::SFTP::Foreign, either directly (insecure -> visible) or via sensitive lookup
+		hostkey2 => "", # additional hostkey to be presented (e.g. in case of round robin DNS)
 		localDir => "", # optional: local folder for files to be placed, if not given files are downloaded into current folder
+		lookups => {}, # similar to $config{sensitive}, a hash lookup table ({"prefix" => {remoteHost=>""},...} or {"prefix" => {remoteHost=>{Prod => "", Test => ""}},...}) for centrally looking up remoteHost and port settings depending on $FTP{prefix}.
 		maxConnectionTries => 5, # maximum number of tries for connecting in login procedure
 		noDirectRemoteDirChange => 1, # if no direct change into absolute paths (/some/path/to/change/into) ist possible then set this to 1, this separates the change into setcwd(undef) and setcwd(remoteDir)
 		onlyArchive => 0, # only archive/remove on the FTP server, requires archiveDir to be set
 		path => "", # additional relative FTP path (under remoteDir which is set at login), where the file(s) is/are located
-		port => 22, # ftp/sftp port (leave empty for default port 22)
-		prefix => "ftp", # key for sensitive information (e.g. pwd and user) in config{sensitive} or system wide remoteHost in config{FTP}{prefix}{remoteHost}. respects environment in $execute{env} if configured.
+		port => 22, # ftp/sftp port (leave empty for default port 22 when using Net::SFTP::Foreign, or port 21 when using Net::FTP)
+		prefix => "ftp", # key for sensitive information (e.g. pwd and user) in config{sensitive} or system wide remoteHost/port in config{FTP}{prefix}{remoteHost} or config{FTP}{prefix}{port}. respects environment in $execute{env} if configured.
 		privKey => "", # sftp key file location for Net::SFTP::Foreign, either directly (insecure -> visible) or via sensitive lookup
 		pwd => "", # for password setting, either directly (insecure -> visible) or via sensitive lookup
 		queue_size => 1, # queue_size for Net::SFTP::Foreign, if > 1 this causes often connection issues
@@ -181,7 +188,7 @@ my %hashCheck = (
 		SFTP => 0, # to explicitly use SFTP, if not given SFTP will be derived from existence of privKey or hostkey
 		simulate => 0, # for removal of files using removeFilesinFolderOlderX/removeFilesOlderX only simulate (1) or do actually (0)?
 		sshInstallationPath => "", # path were ssh/plink exe to be used by Net::SFTP::Foreign is located
-		type => "", # (A)scii or (B)inary
+		type => "", # (A)scii or (B)inary, only applies to Net::FTP
 		user => "", # set user directly, either directly (insecure -> visible) or via sensitive lookup
 	},
 	process => { # used to pass information within each process (data, additionalLookupData, filenames, hadErrors or commandline parameters starting with interactive) and for additional configurations not suitable for DB, File or FTP (e.g. uploadCMD* and onlyExecFor)
@@ -224,6 +231,7 @@ my %alternateType = (
 	Fileformat_skip => 1, # can be "skip until pattern" string or line number (int)
 	Fileformat_sep => qr//, # can be separator string or regex split
 	FilelineCode => sub {}, # can be eval string or anonymous sub
+	FTPremoteHost => "", # can also be string
 	taskskipHolidays => 1, # can be calendar string or true (1)
 	taskskipForFirstBusinessDate => 1, # can be calendar string or true (1)
 );
@@ -246,18 +254,17 @@ sub readConfigFile ($) {
 		close CONFIGFILE;
 	}
 	unless (my $return = eval $siteCONFIGFILE) {
-		die("Error parsing config file $configfilename: $@") if $@;
-		die("Error executing config file $configfilename: $!") unless defined $return;
-		die("Error executing config file $configfilename") unless $return;
+		die("Error parsing config file $configfilename for script $execute{homedir}/$execute{scriptname}: $@") if $@;
+		die("Error executing config file $configfilename for script $execute{homedir}/$execute{scriptname}: $!") unless defined $return;
 	}
 	print STDOUT "read $configfilename\n";
 }
 
-# get key info from $config{$area}{$prefix}{$key} (e.g. $config{sensitive}{$prefix}{$key}). Also checks if $config{$area}{$prefix}{$key} is a hash, then get info from $config{$area}{$prefix}{$key}{$execute{env}}
-sub getKeyInfo ($$$) {
-	my ($prefix,$key,$area) = @_;
+# get key info from $config{sensitive}{$prefix}{$key}. Also checks if $config{sensitive}{$prefix}{$key} is a hash, then get info from $config{sensitive}{$prefix}{$key}{$execute{env}}
+sub getSensInfo ($$) {
+	my ($prefix,$key) = @_;
 	# depending on queried key being a ref to hash, get the environment lookup hash key value or the value directly
-	return (ref($config{$area}{$prefix}{$key}) eq "HASH" ? $config{$area}{$prefix}{$key}{$execute{env}} : $config{$area}{$prefix}{$key});
+	return (ref($config{sensitive}{$prefix}{$key}) eq "HASH" ? $config{sensitive}{$prefix}{$key}{$execute{env}} : $config{sensitive}{$prefix}{$key});
 }
 
 # setupConfigMerge creates cascading inheritance of config/DB/File/FTP/process/task settings
@@ -283,7 +290,15 @@ sub setupConfigMerge {
 						$logger->debug("creating empty $hashName\{$defkey\} in load $check instead of inheriting as ${hashName}_ is given here");
 					}
 				}
-				delete $loads[$check]{$hashName."_"}; # need to remove otherwise checkHash below throws an error for these...
+				delete $loads[$check]{$hashName."_"}; # need to remove, otherwise checkHash further below throws an error for these...
+			}
+		}
+	}
+	# fall back to config level prefix defined settings (in lookups subhash) if given/defined
+	for my $hashName (@commonCoreConfig) {
+		for my $defkey (keys %{$hashCheck{$hashName}}) {
+			if (defined($config{$hashName}{lookups}) and defined($config{$hashName}{lookups}{$common{$hashName}{prefix}}) and defined($config{$hashName}{lookups}{$common{$hashName}{prefix}}{$defkey})) {
+				$config{$hashName}{$defkey} = $config{$hashName}{lookups}{$common{$hashName}{prefix}}{$defkey};
 			}
 		}
 	}
@@ -470,6 +485,8 @@ sub setErrSubject ($) {
 
 # setup logging for Log4perl
 sub setupLogging {
+	my $prodEnvironmentInSeparatePath = ($config{checkLookup}{$execute{scriptname}.$execute{addToScriptName}}{prodEnvironmentInSeparatePath} ne "" ? $config{checkLookup}{$execute{scriptname}.$execute{addToScriptName}}{prodEnvironmentInSeparatePath} : $config{prodEnvironmentInSeparatePath});
+
 	# get logRootPath, historyFolder, historyFolderUpload and redoDir from lookups in config.
 	# if they are not in the script home directory (having an absolute path) then build environment-path separately for end folder (script home directory is already in its environment)
 	for my $foldKey ("redoDir","logRootPath","historyFolder","historyFolderUpload") {
@@ -485,9 +502,17 @@ sub setupLogging {
 		$folder =~ s/\\/\//g;
 		if ($folder =~ /^(\S:)*\/(.*?)$/ and !$opt{config}{$foldKey}) {
 			my ($folderPath,$endFolder) = ($folder =~ /(.*)\/(.*?)$/); # slash acts as path separator for last part
-			# default Folder is built differently: folderPath/endFolder/environ instead of folderPath/environ/endFolder
-			$execute{$foldKey} = ($defaultFolder ? $folderPath."/".$endFolder.($execute{envraw} ? "/".$execute{envraw} : "") : $folderPath.($execute{envraw} ? "/".$execute{envraw} : "")."/".$endFolder);
+			# default Folder is built with environment: folderPath/endFolder/environ instead of folderPath/environ/endFolder
+			# environments are built depending on prodEnvironmentInSeparatePath: either folderPath/endFolder/$execute{env} (Prod has own subfolder) or folderPath/endFolder/$execute{envraw} (Prod is in common folder, other environments have their own folder)
+			$execute{$foldKey} = ($defaultFolder 
+									? $folderPath."/".$endFolder.($prodEnvironmentInSeparatePath 
+										? '/'.$execute{env}
+										: ($execute{envraw} ? '/'.$execute{envraw} : ""))
+									: $folderPath."/".($prodEnvironmentInSeparatePath 
+										? '/'.$execute{env}
+										: ($execute{envraw} ? '/'.$execute{envraw} : "")).$endFolder);
 		} else {
+			# folders without slashes are assumed to be relative to home, so now amendment with environment needed.
 			$execute{$foldKey} = $folder;
 		}
 	}
@@ -510,8 +535,8 @@ sub setupLogging {
 		Log::Log4perl->appenders()->{"FILE"}->{"appender"}->{"fh"}->autoflush;
 	}
 	if ($config{smtpServer}) {
-		# remove explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl)
-		for my $lookupKey (keys(%{$config{checkLookup}})) {
+		# remove explicitly enumerated lookups (1:scriptname.pl, 2:scriptname.pl), the first such entry will be taken here
+		for my $lookupKey (reverse sort keys(%{$config{checkLookup}})) {
 			if ($lookupKey =~ /^\d:.*/) {
 				my $lookupKeyAdd = $lookupKey;
 				$lookupKeyAdd =~ s/^\d://;
@@ -568,12 +593,14 @@ sub dumpFlat ($;$$) {
 	my $compressDump = shift;
 	$Data::Dumper::Indent = 0; # temporarily flatten dumper output for single line
 	$Data::Dumper::Sortkeys = 1 if $sortDump; # sort keys to get outputs easier to read
+	$Data::Dumper::Deepcopy = 1;
 	my $dump = Dumper($arg);
 	if ($compressDump) {
 		$dump =~ s/\s+//g;$dump =~ s/,'/,/g;$dump =~ s/{'/{/g;$dump =~ s/'=>/=>/g; # compress information
 	}
 	$dump =~ s/\$VAR1//;
 	$Data::Dumper::Indent = 2;
+	$Data::Dumper::Deepcopy = 0;
 	return $dump;
 }
 
@@ -743,11 +770,11 @@ EAI::Common contains common used functions for L<EAI::Wrap>. This is for reading
 
 read given config file (eval perl code in site.config and related files)
 
-=item getKeyInfo ($$$)
+=item getSensInfo ($$)
 
-arguments are $prefix, $key and $area
+arguments are $prefix and $key
 
-get sensitive info from $config{$area}{$prefix}{$key}, depending on queried key being a ref to hash, get the environment lookup hash key value or the value directly. Area can be "sensitive" or any of the categories (sub-hashes), e.g. "FTP".
+get sensitive info from $config{getSensInfo}{$prefix}{$key}, if queried key is a ref to hash, get the key value using the environment lookup hash ($config{sensitive}{$prefix}{$key}{$execute{env}}).
 
 =item setupConfigMerge
 
@@ -784,8 +811,8 @@ check existence of parameter $hashName within first argument $subhash, returns 0
 =item setupEAIWrap
 
 Usually this is the first call after the configuration (assignments to %common and @loads) was defined.
-This sets up the configuration internally and merges the hierarchy of configurations. 
-Correctness of the configuration and starting conditions are also checked, preventing the task script's starting; finally all used parameters are written into the initial log line.
+This sets up the configuration datastructure and merges the hierarchy of configurations. 
+Correctness of the configuration and all conditions preventing the task script's actual starting are also checked; finally all used parameters are written into the initial log line, which is used by the logchecker (see L<checkLogExist.pl>).
 
 following three functions can be used in the central log.config as coderefs for callback.
 

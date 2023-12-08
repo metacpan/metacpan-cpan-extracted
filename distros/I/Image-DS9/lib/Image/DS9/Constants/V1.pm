@@ -6,7 +6,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 use List::Util 'max';
 use CXC::Exporter::Util ':all';
@@ -208,6 +208,10 @@ install_CONSTANTS( {
 
         FRAME_COORD_SYSTEMS =>
           _normalize( 'FRAME_COORDSYS', 'image', 'physical', 'amplifier', 'detector', 'wcs', WCS ),
+
+        FRAME_COORD_SYSTEMS_NON_WCS =>
+          _normalize( 'FRAME_COORDSYS_NON_WCS', 'image', 'physical', 'amplifier', 'detector' ),
+
         VIEW_BOOL_COMPONENTS => _normalize(
             VIEW_BOOL_COMPONENT => 'buttons',
             'colorbar',
@@ -276,7 +280,7 @@ Image::DS9::Constants::V1 - predefined constants
 
 =head1 VERSION
 
-version v1.0.0
+version v1.0.1
 
 =head1 SYNOPSIS
 

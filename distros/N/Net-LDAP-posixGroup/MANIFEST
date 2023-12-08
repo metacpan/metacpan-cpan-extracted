@@ -1,8 +1,10 @@
 Changes
 MANIFEST
 Makefile.PL
-README
+README.md
 lib/Net/LDAP/posixGroup.pm
 t/00-load.t
 t/pod-coverage.t
 t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

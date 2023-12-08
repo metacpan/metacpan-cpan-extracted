@@ -6,10 +6,10 @@ use 5.010;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '1.23';
+our $VERSION = '2.00';
 
 Travel::Status::DE::EFA::Stop->mk_ro_accessors(
-	qw(arr_date arr_time dep_date dep_time name name_suf platform));
+	qw(arr dep name name_suf platform));
 
 sub new {
 	my ( $obj, %conf ) = @_;
@@ -39,14 +39,15 @@ in a Travel::Status::DE::EFA::Result's route
     for my $stop ($departure->route_post) {
         printf(
             "%s -> %s : %40s %s\n",
-            $stop->arr_time // q{     }, $stop->dep_time // q{     },
+            $stop->arr ? $stop->arr->strftime('%H:%M') : q{--:--},
+            $stop->dep ? $stop->dep->strftime('%H:%M') : q{--:--},
             $stop->name, $stop->platform
         );
     }
 
 =head1 VERSION
 
-version 1.23
+version 2.00
 
 =head1 DESCRIPTION
 
@@ -60,21 +61,15 @@ delays or changed platforms are not taken into account.
 
 =over
 
-=item $stop->arr_date
+=item $stop->arr
 
-arrival date (DD.MM.YYYY). undef if this is the first scheduled stop.
+DateTime(3pm) object holding arrival date and time. undef if this is the
+first scheduled stop.
 
-=item $stop->arr_time
+=item $stop->dep
 
-arrival time (HH:MM). undef if this is the first scheduled stop.
-
-=item $stop->dep_date
-
-departure date (DD.MM.YYYY). undef if this is the final scehduled stop.
-
-=item $stop->dep_time
-
-departure time (HH:MM). undef if this is the final scehduled stop.
+DateTime(3pm) object holding departure date and time. undef if this is the
+final scheduled stop.
 
 =item $stop->name
 
@@ -128,7 +123,7 @@ Travel::Status::DE::EFA(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2023 by Birte Kristina Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

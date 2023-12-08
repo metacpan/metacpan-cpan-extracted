@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Kiev;
+
      my $obj = Map::Tube::Kiev->new;
      my $routes_ar = $obj->get_all_routes($from, $to);
      my $line = $obj->get_line_by_id($line_id);
@@ -23,55 +24,88 @@ DESCRIPTION
     <https://en.wikipedia.org/wiki/Kiev_Metro>.
 
 METHODS
-    "new()"
-             Constructor.
+  "new"
+     my $obj = Map::Tube::Kiev->new;
 
-    "get_all_routes($from, $to)" [EXPERIMENTAL]
-             Get all routes from station to station.
-             Returns reference to array with Map::Tube::Route objects.
+    Constructor.
 
-    "get_all_routes($from, $to)" [EXPERIMENTAL]
-             Get all routes from station to station.
-             Returns reference to array with Map::Tube::Route objects.
+    Returns instance of object.
 
-    "get_line_by_id($line_id)"
-             Get line object defined by id.
-             Returns Map::Tube::Line object.
+  "get_all_routes" [EXPERIMENTAL]
+     my $routes_ar = $obj->get_all_routes($from, $to);
 
-    "get_lines()"
-             Get lines in metro map.
-             Returns reference to unsorted array with Map::Tube::Line objects.
+    Get all routes from station to station.
 
-    "get_node_by_id($station_id)"
-             Get station node by id.
-             Returns Map::Tube::Node object.
+    Returns reference to array with Map::Tube::Route objects.
 
-    "get_node_by_name($station_name)"
-             Get station node by name.
-             Returns Map::Tube::Node object.
+  "get_line_by_id"
+     my $line = $obj->get_line_by_id($line_id);
 
-    "get_shortest_route($from, $to)"
-             Get shortest route between $from and $to node names. Node names in $from and $to are case insensitive.
-             Returns Map::Tube::Route object.
+    Get line object defined by id.
 
-    "get_stations($line)"
-             Get list of stations for concrete metro line.
-             Returns reference to array with Map::Tube::Node objects.
+    Returns Map::Tube::Line object.
 
-    "name()"
-             Get metro name.
-             Returns string with metro name.
+  "get_line_by_name"
+     my $line = $obj->get_line_by_name($line_name);
 
-    "xml()"
-             Get XML specification of Kiev metro.
-             Returns string with XML.
+    Get line object defined by name.
+
+    Returns Map::Tube::Line object.
+
+  "get_lines"
+     my $lines_ar = $obj->get_lines;
+
+    Get lines in metro map.
+
+    Returns reference to unsorted array with Map::Tube::Line objects.
+
+  "get_node_by_id"
+     my $station = $obj->get_node_by_id($station_id);
+
+    Get station node by id.
+
+    Returns Map::Tube::Node object.
+
+  "get_node_by_name"
+     my $station = $obj->get_node_by_name($station_name);
+
+    Get station node by name.
+
+    Returns Map::Tube::Node object.
+
+  "get_shortest_route"
+     my $route = $obj->get_shortest_route($from, $to);
+
+    Get shortest route between $from and $to node names. Node names in $from
+    and $to are case insensitive.
+
+    Returns Map::Tube::Route object.
+
+  "get_stations"
+     my $stations_ar = $obj->get_stations($line);
+
+    Get list of stations for concrete metro line.
+
+    Returns reference to array with Map::Tube::Node objects.
+
+  "name"
+     my $metro_name = $obj->name;
+
+    Get metro name.
+
+    Returns string with metro name.
+
+  "xml"
+     my $xml_file = $obj->xml;
+
+    Get XML specification of Kiev metro.
+
+    Returns string with XML.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(decode_utf8 encode_utf8);
      use Map::Tube::Kiev;
 
@@ -88,12 +122,10 @@ EXAMPLE1
      # Route: Берестейська (Святошинсько-Броварська лінія), Шулявська (Святошинсько-Броварська лінія), Політехнічний інститут (Святошинсько-Броварська лінія), Вокзальна (Святошинсько-Броварська лінія), Університет (Святошинсько-Броварська лінія), Театральна (Святошинсько-Броварська лінія), Хрещатик (Святошинсько-Броварська лінія), Поштова площа (Куренівсько-Червоноармійська лінія), Контрактова площа (Куренівсько-Червоноармійська лінія), Тараса Шевченка (Куренівсько-Червоноармійська лінія), Петрівка (Куренівсько-Червоноармійська лінія), Оболонь (Куренівсько-Червоноармійська лінія)
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use utf8;
      use warnings;
 
-     # Modules.
      use Map::Tube::Kiev;
 
      # Object.
@@ -109,11 +141,9 @@ EXAMPLE2
      # XML file: .*/kiev-map.xml
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Map::Tube::GraphViz;
      use Map::Tube::GraphViz::Utils qw(node_color_without_label);
      use Map::Tube::Kiev;
@@ -138,11 +168,9 @@ EXAMPLE3
      # -rw-r--r-- 1 skim skim 163162 Jan 10 14:20 Kiev.png
 
 EXAMPLE4
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Encode qw(encode_utf8);
      use Map::Tube::Kiev;
 
@@ -160,6 +188,53 @@ EXAMPLE4
      # Святошинсько-Броварська лінія
      # Сирецько-Печерська лінія
 
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Encode qw(decode_utf8 encode_utf8);
+     use Map::Tube::Kiev;
+
+     # Arguments.
+     if (@ARGV < 1) {
+             print STDERR "Usage: $0 line\n";
+             exit 1;
+     }
+     my $line = decode_utf8($ARGV[0]);
+
+     # Object.
+     my $obj = Map::Tube::Kiev->new;
+
+     # Get stations for line.
+     my $stations_ar = $obj->get_stations($line);
+
+     # Print out.
+     map { print encode_utf8($_->name)."\n"; } @{$stations_ar};
+
+     # Output:
+     # Usage: __PROG__ line
+
+     # Output with 'foo' argument.
+     # Map::Tube::get_stations(): ERROR: Invalid Line Name [foo]. (status: 105) file __PROG__ on line __LINE__
+
+     # Output with 'Сирецько-Печерська лінія' argument.
+     # Сирець
+     # Дорогожичі
+     # Лук'янівська
+     # Золоті ворота
+     # Палац спорту
+     # Кловська
+     # Печерська
+     # Дружби народів
+     # Видубичі
+     # Славутич
+     # Осокорки
+     # Позняки
+     # Харківська
+     # Вирлиця
+     # Бориспільська
+     # Червоний хутір
+
 DEPENDENCIES
     File::Share, Map::Tube, Moo, namespace::clean.
 
@@ -174,18 +249,20 @@ SEE ALSO
         Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Kiev>
+    <https://github.com/michal-josef-spacek/Map-Tube-Kiev>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

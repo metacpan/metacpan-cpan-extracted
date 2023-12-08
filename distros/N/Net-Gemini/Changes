@@ -1,5 +1,10 @@
 Revision history for Net-Gemini
 
+0.09    2023-11-30
+        gmitool "link" now supports -r to only show relative links,
+        and only applies -b (base) if that is supplied. Add tests for
+        these flags.
+
 0.08    2023-06-29
         Use IO::Socket::IP for better IPv6 support. Break the verify_ssl
         callback, again, passing a hash reference of details. Notably

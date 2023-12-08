@@ -20,6 +20,7 @@ my $start_memory_blocks_count = SPVM::api->get_memory_blocks_count();
   ok(SPVM::TestCase::IO::Socket->fileno);
   ok(SPVM::TestCase::IO::Socket->inet);
   ok(SPVM::TestCase::IO::Socket->blocking);
+  ok(SPVM::TestCase::IO::Socket->goroutine);
 }
 
 

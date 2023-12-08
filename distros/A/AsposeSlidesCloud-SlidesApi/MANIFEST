@@ -136,6 +136,8 @@ lib/AsposeSlidesCloud/Object/ObjectExist.pm
 lib/AsposeSlidesCloud/Object/OleObjectFrame.pm
 lib/AsposeSlidesCloud/Object/OneValueChartDataPoint.pm
 lib/AsposeSlidesCloud/Object/OneValueSeries.pm
+lib/AsposeSlidesCloud/Object/Operation.pm
+lib/AsposeSlidesCloud/Object/OperationProgress.pm
 lib/AsposeSlidesCloud/Object/OrderedMergeRequest.pm
 lib/AsposeSlidesCloud/Object/OuterShadowEffect.pm
 lib/AsposeSlidesCloud/Object/OutputFile.pm
@@ -205,6 +207,7 @@ lib/AsposeSlidesCloud/Object/SlideProperties.pm
 lib/AsposeSlidesCloud/Object/SlideReplaceResult.pm
 lib/AsposeSlidesCloud/Object/Slides.pm
 lib/AsposeSlidesCloud/Object/SlideShowProperties.pm
+lib/AsposeSlidesCloud/Object/SlideShowTransition.pm
 lib/AsposeSlidesCloud/Object/SmartArt.pm
 lib/AsposeSlidesCloud/Object/SmartArtNode.pm
 lib/AsposeSlidesCloud/Object/SmartArtShape.pm
@@ -251,6 +254,7 @@ lib/AsposeSlidesCloud/Object/XYSeries.pm
 lib/AsposeSlidesCloud/Object/ZoomFrame.pm
 lib/AsposeSlidesCloud/Object/ZoomObject.pm
 lib/AsposeSlidesCloud/SlidesApi.pm
+lib/AsposeSlidesCloud/SlidesAsyncApi.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files

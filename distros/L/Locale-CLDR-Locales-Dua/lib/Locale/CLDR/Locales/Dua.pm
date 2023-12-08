@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dua - Package for language Duala
 
 package Locale::CLDR::Locales::Dua;
 # This file auto generated from Data\common\main\dua.xml
-#	on Sat  4 Nov  5:58:39 pm GMT
+#	on Tue  5 Dec  1:06:45 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

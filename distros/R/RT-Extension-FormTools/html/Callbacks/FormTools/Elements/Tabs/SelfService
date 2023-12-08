@@ -1,0 +1,11 @@
+<%init>
+
+my $formtools = Menu->child('home')->child(
+    formtools => title => loc('Forms'),
+    path      => '/SelfService/Forms.html',
+);
+
+</%init>
+<%args>
+$Path
+</%args>

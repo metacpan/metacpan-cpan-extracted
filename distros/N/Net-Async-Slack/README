@@ -60,6 +60,38 @@ METHODS
     Returns a Future, although the content of the response is subject to
     change.
 
+ files_upload
+
+    Upload file(s) to a channel or thread.
+
+    Supports the following named parameters:
+
+      * channel - who to send the message to, can be a channel ID or
+      #channel name, or user ID
+
+      * text - the message, see
+      https://api.slack.com/docs/message-formatting for details
+
+      * attachments - more advanced messages, see
+      https://api.slack.com/docs/message-attachments
+
+      * parse - whether to parse content and convert things like links
+
+    and the following named boolean parameters:
+
+      * link_names - convert @user and #channel to links
+
+      * unfurl_links - show preview for URLs
+
+      * unfurl_media - show preview for things that look like media links
+
+      * as_user - send as user
+
+      * reply_broadcast - send to all users when replying to a thread
+
+    Returns a Future, although the content of the response is subject to
+    change.
+
  conversations_info
 
     Provide information about a channel.

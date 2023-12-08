@@ -1,5 +1,46 @@
 Revision history for RT-Extension-FormTools
 
+1.01 2023-12-01
+ - Update screenshot image source to use https and limit its width too
+
+1.0 2023-12-01
+ - Save queue name instead of id for better portability
+ - Show a message to indicate there are pending changes to save
+ - Correctly show the first page after a page deletion
+ - Make sure there is always room to drop new form fields on a page
+ - Display an alert when leaving a page with pending changes
+ - Label Core Fields separately from Custom Fields in the editor
+ - Fix bugs saving hr and textarea elements
+ - Name "Next" button to make sure the form has data to submit, avoiding a data truncated error on form POST
+ - Fix handling of internal validation arguments
+ - Allow customization of alignment of <p> elements
+ - Fix bug causing duplicate checkbox IDs when adding new items
+ - Allow fields to be marked as hidden (allows form admins to set values that form users can't edit)
+ - Fix badge and text alignment in field list
+ - Allow client side validation (fields on forms may be required, but not required when creating/editing a ticket)
+ - Grant all users the right to see/set custom field values on forms
+ - Always enable core CF validations
+ - Support dependent fields based on selection of values in select/radio inputs
+ - Fix browser-related bugs in selectpicker controls
+ - Skip check for required fields when pressing Back button on form
+ - Clear CF invalid CF values when pressing Back button
+ - Abort in advance if form user lacks rights to create tickets
+ - Remove label from content fields
+ - Show Required for fields marked required in form
+ - Allow checkboxes to be fully clickable
+ - Make core and custom fields consistent with other HTML elements
+ - Sync page name and tab text on name update
+ - Remove duplicate form tag
+ - Put Select and Create under one menu (for consistency)
+ - Make placeholders appear lighter than other text elements
+ - Validate errors in real time
+ - Fix HTML element IDs for custom fields
+ - On form edit page, show label text next to CF names
+ - Rename Save button on modal popups to Update
+ - Fix edit link for newly added items
+ - Center paragraph content on form pages
+ - Create a graphical editor for forms
+
 0.60 2022-07-06
  - Migrate to RT 5
 

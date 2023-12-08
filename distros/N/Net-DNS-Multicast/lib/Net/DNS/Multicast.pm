@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION = '0.10';
+$VERSION = '1.00';
 
 use Net::DNS qw(:DEFAULT);
 use base     qw(Exporter Net::DNS);
@@ -92,18 +92,22 @@ sub Net::DNS::Resolver::send {
 sub Net::DNS::Resolver::bgsend {
 	my ( $self, @argument ) = @_;
 	my $packet = $self->_make_query_packet(@argument);
-	my ($q) = $packet->question;
+	my ($query) = $packet->question;
 
 	return IO::Select->new( Net::DNS::Resolver::Base::bgsend( $self, $packet ) )
-			unless $q->qname =~ /$NAME_REGEX/oi;
+			unless $query->qname =~ /$NAME_REGEX/oi;
 
-	local @{$self}{qw(nameservers nameserver4 nameserver6 port)};
 	my $select = IO::Select->new();
-	my $port   = $self->port($multicast_port);
 	my $expire = time() + $multicast_timeout;
 	$self->_reset_errorstring;
-	$packet->{status} = 0;
+	local $packet->{status} = 0;
+	my $qm = $packet->data;
+	local $query->{qclass};
+	$query->unicast_response(1);
+	my $qu = $packet->data;
 
+	local @{$self}{qw(nameservers nameserver4 nameserver6 port)};
+	my $port = $self->port($multicast_port);
 	foreach my $ip ( $self->nameservers(@multicast_group) ) {
 		my $socket = $self->_create_udp_socket($ip);
 		next unless $socket;				# uncoverable branch true
@@ -121,14 +125,14 @@ sub Net::DNS::Resolver::bgsend {
 				Sockopts  => [SOCKOPT],
 				);
 			if ($multicast) {			# uncoverable branch false
-				${*$multicast}{net_dns_bg} = [$expire, $packet];
+				${*$multicast}{net_dns_bg} = [$expire];
 				$select->add($multicast);
-				$multicast->send( $packet->data, 0, $destaddr );
+				$multicast->send( $qm, 0, $destaddr );
 			}
 		}
 
 		$select->add($socket);
-		$socket->send( $packet->data, 0, $destaddr );	# unicast
+		$socket->send( $qu, 0, $destaddr );		# unicast
 	}
 	return $select;
 }
@@ -155,7 +159,7 @@ sub Net::DNS::Resolver::bgread {
 
 sub Net::DNS::Question::unicast_response {
 	my ( $self, $value ) = @_;				# uncoverable pod
-	my $class = $self->{qclass};
+	my $class = $self->{qclass} || 1;			# IN implicit
 	$self->{qclass} = $class |= 0x8000 if $value;		# set only
 	return $class >> 15;
 }

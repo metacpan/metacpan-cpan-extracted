@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TkUI 1.377;
+package Config::Model::TkUI 1.379;
 
 use 5.10.1;
 use strict;
@@ -242,8 +242,10 @@ sub Populate {
         -variable => \$cw->{auto_save_mode},
     );
 
+    my $weak_cw = $cw;
+    weaken($weak_cw);
     $cw->{instance}->on_change_cb( sub {
-        $cw->save if $cw->{auto_save_mode};;
+        $weak_cw->save if $weak_cw->{auto_save_mode};;
     });
 
     # create frame for location entry
@@ -1267,7 +1269,9 @@ sub create_element_widget {
 
     my $widget = $widget_table{$mode}{$type}
         || die "Cannot find $mode widget for type $type";
-    my @store = $mode eq 'edit' ? ( -store_cb => sub { $cw->reload(@_) } ) : ();
+    my $weak_cw = $cw;
+    weaken($weak_cw);
+    my @store = $mode eq 'edit' ? ( -store_cb => sub { $weak_cw->reload(@_) } ) : ();
     $cw->{current_mode} = $mode;
 
     my $tk_font = $cw->cget('-font');

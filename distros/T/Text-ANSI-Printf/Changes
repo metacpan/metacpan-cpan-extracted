@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Printf
 
+2.06 2023-11-28T02:17:16Z
+
+    - Initialize $REORDER variable only when not already defined.
+
 2.05 2023-10-25T10:50:47Z
 
     - Simplify warning message of script/ansiprintf.

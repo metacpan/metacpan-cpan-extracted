@@ -97,17 +97,13 @@ class IO::Select {
     my $fds = Sys::Select::Fd_set->new;
     Sys::Select->FD_ZERO($fds);
     
-    my $max_handle = 0;
     for (my $i = 0; $i < @$handles; $i++) {
       my $handle = $handles->[$i];
       Sys::Select->FD_SET($handle, $fds);
-      if ($handle > $max_handle) {
-        $max_handle = $handle;
-      }
     }
     
     # select
-    my $success_count = Sys->select($max_handle + 1, $fds, undef, undef, $tv);
+    my $success_count = &select($fds, undef, undef, $tv);
     
     # Can handles
     my $can_handles = new int[$success_count];
@@ -139,17 +135,13 @@ class IO::Select {
     my $fds = Sys::Select::Fd_set->new;
     Sys::Select->FD_ZERO($fds);
     
-    my $max_handle = 0;
     for (my $i = 0; $i < @$handles; $i++) {
       my $handle = $handles->[$i];
       Sys::Select->FD_SET($handle, $fds);
-      if ($handle > $max_handle) {
-        $max_handle = $handle;
-      }
     }
     
     # select
-    my $success_count = Sys->select($max_handle + 1, undef, $fds, undef, $tv);
+    my $success_count = &select(undef, $fds, undef, $tv);
     
     # Can handles
     my $can_handles = new int[$success_count];
@@ -181,17 +173,13 @@ class IO::Select {
     my $fds = Sys::Select::Fd_set->new;
     Sys::Select->FD_ZERO($fds);
     
-    my $max_handle = 0;
     for (my $i = 0; $i < @$handles; $i++) {
       my $handle = $handles->[$i];
       Sys::Select->FD_SET($handle, $fds);
-      if ($handle > $max_handle) {
-        $max_handle = $handle;
-      }
     }
     
     # select
-    my $success_count = Sys->select($max_handle + 1, undef, undef, $fds, $tv);
+    my $success_count = &select(undef, undef, $fds, $tv);
     
     # Can handles
     my $can_handles = new int[$success_count];
@@ -206,5 +194,11 @@ class IO::Select {
     }
     
     return $can_handles;
+  }
+  
+  static method select : int ($readfds : Sys::Select::Fd_set, $writefds : Sys::Select::Fd_set, $exceptfds : Sys::Select::Fd_set, $timeout : Sys::Time::Timeval) {
+    my $nfds = 1024;
+    my $fd_number = Sys::Select->select($nfds, $readfds, $writefds, $exceptfds, $timeout);
+    return $fd_number;
   }
 }

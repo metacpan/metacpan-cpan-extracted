@@ -20,21 +20,23 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
 =head1 Fields
 
+=head2 fd
+
+  has fd : protected int;
+
+A file descriptor.
+
 =head2 autoflush
 
   has autoflush : rw byte;
-
-=head2 input_line_number
-
-  has input_line_number : ro int;
 
 =head2 opened
 
   has opened : ro protected int;
 
-=head2 blocking_flag
+=head2 Blocking
 
-  has blocking_flag : rw protected int;
+  has Blocking : rw protected int;
   
 =head1 Class methods
 
@@ -48,57 +50,39 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
   method init : void ($options : object[] = undef);
 
-=head2 close
+=head2 opened
 
-  method close : int ();
+  method opened : int ();
 
-=head2 eof
-
-  method eof : int ();
+If the return value of L</"fileno"> is greater than or equal to 0, returns 1. Otherwise returns 0.
 
 =head2 fileno
 
   method fileno : int ();
 
-=head2 getc
-
-  method getc : int ();
+Gets L</"fh"> field.
 
 =head2 print
 
-  method print : int ($string : string);
-
-=head2 say
-
-  method say : int ($string : string);
+  method print : void ($string : string);
 
 =head2 printf
 
-  method printf : int ($format : string, $args : object[]...);
+  method printf : void ($format : string, $args : object[]...);
 
-=head2 clearerr
+=head2 say
 
-  method clearerr : void ();
-
-=head2 error
-
-  method error : int ();
-
-=head2 flush
-
-  method flush : int ();
-
-=head2 ungetc
-
-  method ungetc : int ($c : int);
-
-=head2 printflush
-
-  method printflush : int ($string : string);
+  method say : void ($string : string);
 
 =head2 truncate
 
-  method truncate : int ($legnth : long);
+  method truncate : void ($legnth : long);
+
+Truncates to a size of precisely length bytes.
+
+This method is planed to be implemented in a child class.
+
+This method always throws an exception.
 
 =head2 ioctl
 
@@ -106,35 +90,51 @@ C<SPVM::IO::Handle> is the L<SPVM>'s C<IO::Handle> class for I/O handling.
 
 =head2 sync
 
-  method sync : int ();
+  method sync : void ();
 
 =head2 stat
 
-  method stat : int ($stat : Sys::IO::Stat);
-
-=head2 getline
-
-  method getline : string ();
-
-=head2 getlines
-
-  method getlines : string ();
+  method stat : Sys::IO::Stat ();
 
 =head2 fcntl
 
   method fcntl : int ($command : int, $command_arg : object = undef of Int|Sys::IO::Flock|object);
 
-=head2 blocking
+=head2 set_blocking
 
-  method blocking : void ($blocking : int);
+  method set_blocking : void ($blocking : int);
+
+=head2 syswrite
+
+  method syswrite : int ($string : string, $length : int = -1, $offset : int = 0) {
+
+=head2 sysread
+
+  method sysread : int ($string : mutable string, $length : int = -1, $offset : int = 0) {
 
 =head2 write
 
   method write : int ($string : string, $length : int = -1, $offset : int = 0);
 
+Exceptions:
+
+Not implemented.
+
 =head2 read
 
   method read : int ($string : mutable string, $length : int = -1, $offset : int = 0);
+
+Exceptions:
+
+Not implemented.
+
+=head2 close
+
+  method close : int ();
+
+Exceptions:
+
+Not implemented.
 
 =head1 Well Known Child Classes
 

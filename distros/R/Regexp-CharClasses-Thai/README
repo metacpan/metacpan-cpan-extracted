@@ -1,0 +1,465 @@
+NAME
+      Regexp::CharClasses::Thai - useful character properties for
+                                  Thai regular expressions (regex)
+
+SYNOPSIS
+      use Regexp::CharClasses::Thai;
+
+      $c = "...";  # some UTF8 string
+
+      $c =~ /\p{InThaiCons}/;  # match only Thai consonants
+      $c =~ /\p{InThaiTone}/;  # match only Thai tone marks
+
+            - OR -
+
+      $c =~ /\p{IsThaiCons}/;  # match only Thai consonants
+      $c =~ /\p{IsThaiTone}/;  # match only Thai tone marks
+
+     # see description for full set of terms
+
+DESCRIPTION
+      This module supplements the UTF-8 character-class definitions 
+      available to regular expressions (regex) with special groups 
+      relevant to Thai linguistics.  The following classes are defined:
+
+            โมดูลนี้เป็นส่วนเสริมคำจำกัดความคลาสอักขระ UTF-8
+            ใช้ได้กับ (regex) ทั่วไป ด้วยกลุ่มพิเศษ
+            ที่เกี่ยวข้องกับภาษาไทย มีการกำหนดคลาสต่อไปนี้:
+
+    InThai / IsThai
+          Matches ALL characters in the Thai unicode code-point range.
+  
+          จับคู่อักขระทั้งหมดในช่วงจุดโค้ดยูนิโค้ดภาษาไทย
+
+    InThaiCons / IsThaiCons
+          Matches Thai consonant letters, leaving out vowels (but including
+          those vowels which are sometimes consonants).
+  
+          จับคู่พยัญชนะไทย (รวมสระที่บางครั้งเป็นพยัญชนะด้วย)
+
+    InThaiVowel / IsThaiVowel
+          Matches Thai vowels only, including compounded and free-standing 
+          vowels.  Exceptions here include several of the “consonants” which 
+          also serve as vowels: o-ang, yo-yak, double ro-rua, lu and ru, and 
+          wo-waen (อ, ย, รร, ฦ, ฤ, ว), which are also included except for 
+          the two-character รร.
+
+          NOTE: Thai vowels cannot stand alone: they are always connected 
+          with a consonant.  Many of these, without their consonant 
+          companions, will appear with the unicode dotted-circle character 
+          (U+25CC) when rendered, showing a character is missing.  
+          Conversely, Thai consonants can exist without a vowel, and some 
+          Thai words do not have written vowels (the vowel is implied).
+  
+          จับคู่สระไทยเท่านั้น รวมทั้งสระประกอบ และสระอิสระ ข้อยกเว้น
+          ในที่นี้รวมถึง “พยัญชนะ” หลายตัวซึ่งทำหน้าที่เป็นสระด้วย เช่น 
+          (อ, ย, รร, ฦ, ฤ, ว) ซึ่งรวมอยู่ด้วยยกเว้นอักขระสองตัว รร
+
+    InThaiAlpha / IsThaiAlpha
+          Matches only the Thai alphabetic characters (consonants & vowels),
+          excluding all digits, tone marks, and punctuation marks.
+  
+          จับคู่เฉพาะตัวอักษรไทย (พยัญชนะและสระ) ไม่รวมตัวเลข 
+          เครื่องหมายวรรณยุกต์ และเครื่องหมายวรรคตอนทั้งหมด
+
+    InThaiWord / IsThaiWord
+          Matches all Thai characters used to form words, including:
+          consonants, vowels, and tone marks; but excluding all digits
+          and punctuation marks.
+  
+          จับคู่ตัวอักษรไทยทั้งหมดที่ใช้สร้างคำ รวมทั้ง
+          พยัญชนะ สระ และเครื่องหมายวรรณยุกต์ แต่ไม่รวมตัวเลขทั้งหมด
+          และเครื่องหมายวรรคตอน
+
+    InThaiTone / IsThaiTone
+          Matches only the Thai tone marks, leaving out all letters,
+          digits and punctuation marks.
+  
+          จับคู่เฉพาะเครื่องหมายวรรณยุกต์ไทยโดยไม่รวม ตัวอักษร
+          ตัวเลข หรือ เครื่องหมายวรรคตอน ทั้งหมด
+
+    InThaiMute / IsThaiMute
+          The single character U+0E4C (Thai Thanthakhat/Garan), as it seems 
+          neither typical of a tone mark, nor a punctuation mark.  It comes 
+          nearer to usage as a tone mark, but instead of affecting the tone 
+          of a vowel, it silences one or more consonants.
+  
+          อักษรตัวเดียว ธัณฑฆาต/การันต์
+
+    InThaiPunct / IsThaiPunct
+          Matches Thai punctuation characters, not including tone marks,
+          white space, digits or alphabetic characters, and not including
+          non-Thai punctuation marks (such as English [.,'"!?] etc.).
+  
+          จับคู่อักขระเครื่องหมายวรรคตอนภาษาไทย ไม่รวมเครื่องหมายวรรณยุกต์
+          ช่องว่าง ตัวเลข หรือ ตัวอักษร และไม่รวม เครื่องหมายวรรคตอน
+          ที่ไม่ใช่ภาษาไทย (เช่น อังกฤษ [.,'"!?] เป็นต้น)
+
+    InThaiCompVowel / IsThaiCompVowel
+          Matches only the Thai vowels which are compounded with a Thai 
+          consonant, and matching only the vowel portion of the compounded 
+          character:  ◌ั ◌ิ ◌ี ◌ึ ◌ื ◌ุ ◌ู ◌็ ◌ํ
+  
+          จับคู่เฉพาะสระไทยที่ประกอบกับพยัญชนะไทยเท่านั้น
+          และจับคู่เฉพาะส่วนสระของตัวอักษรนั้นที่ประสมเท่านั้น
+          นั่นคือ: ◌ั ◌ิ ◌ี ◌ึ ◌ื ◌ุ ◌ู ◌็ ◌ํ
+
+    InThaiPreVowel / IsThaiPreVowel
+          Matches only the subset of vowels which appear before the 
+          consonant with which they are associated (though in Thai they 
+          are sounded after said consonant); this excludes all 
+          consonant-vowels and does not include any of the compounded vowels.
+  
+          จับคู่เฉพาะชุดย่อยของสระที่ปรากฏ ก่อน พยัญชนะที่เกี่ยวข้อง 
+          (แต่เป็นภาษาไทยถูกฟัง หลัง พยัญชนะดังกล่าว); 
+          นี่ไม่รวมทั้งหมด พยัญชนะ-สระ และไม่รวมถึงสระประสมใดๆ
+
+    InThaiPostVowel / IsThaiPostVowel
+          Matches only the vowels which appear after the consonant 
+          with which they are associated; this excludes all consonant-vowels 
+          and does not include any of the compounded vowels.
+  
+          จับคู่เฉพาะสระนั้นที่ปรากฏ หลัง พยัญชนะ ที่เกี่ยวข้อง 
+          ไม่รวมพยัญชนะ-สระทั้งหมด และ ไม่รวมถึงสระประสมใดๆ
+
+    InThaiHCons / IsThaiHCons
+          Matches Thai high-class consonants: ข ฃ ฉ ฐ ถ ผ ฝ ศ ษ ส ห.
+  
+          จับคู่พยัญชนะไทยชั้นสูง: ข ฃ ฉ ฐ ถ ผ ฝ ศ ษ ส ห.
+
+    InThaiMCons / IsThaiMCons
+          Matches Thai middle-class consonants: ก จ ฎ ฏ ด ต บ ป อ.
+  
+          จับคู่พยัญชนะไทยชนชั้นกลาง: ก จ ฎ ฏ ด ต บ ป อ.
+
+    InThaiLCons / IsThaiLCons
+          Matches Thai low-class consonants: จับคู่พยัญชนะไทยชั้นต่ำ:
+  
+          ค ฅ ฆ ง ช ซ ฌ ญ ฑ ฒ ณ ท ธ น พ ฟ ภ ม ย ร ฤ ล ฦ ว ฬ ฮ.
+
+    InThaiFinCons / IsThaiFinCons
+          Matches Thai consonants which can occur as the final consonant
+          of a syllable.  This excludes ฉ, ซ, ผ, ฝ, ห, ฮ, which never 
+          appear at the end of a Thai syllable, as well as ย, ว, อ, which 
+          only appear at the end of a syllable when used as a vowel.
+
+          NOTE: Any Thai consonant can be an initial consonant, so there is 
+          no separate designation for these: just use 'InThaiCons' or 
+          'IsThaiCons'.
+  
+          จับคู่พยัญชนะไทยซึ่งอาจเป็นพยัญชนะตัวสุดท้ายของพยางค์ได้ 
+          ทั้งนี้ ไม่รวมถึง ฉ ซ ผ ฝ ห ห ฮ ซึ่งไม่เคยปรากฏต่อท้ายพยางค์ไทย 
+          และ ไม่รวมถึง ย ว อ ซึ่งปรากฏที่ท้ายพยางค์เมื่อใช้เป็นสระเท่านั้น
+
+          หมายเหตุ: พยัญชนะไทยใดๆ ก็สามารถเป็นพยัญชนะเริ่มต้นได้ 
+          ดังนั้นจึงไม่มีการกำหนดแยกสำหรับพยัญชนะเหล่านี้: 
+          เพียงใช้ 'InThaiCons' หรือ 'IsThaiCons'
+
+    InThaiDualCons / IsThaiDualCons
+          Matches Thai consonants which are often paired as the primary 
+          “consonant” of the syllable (the leading ones), around which a 
+          single vowel or vowel combination will be centered.  Many 
+          combinations of consonants, unassociated by a single vowel, may 
+          occur in Thai: this does not address them.   For example: 
+          the “hm” in “hma” (dog) function together as if they were 
+          a single consonant--the high-class “h” giving its tone to the “m”.
+          This attempts to address these common consonant pairs.  
+          IT MAY NOT BE EXHAUSTIVE.
+
+          Pairs considered:
+          กว กล กร ขร ขล ขว คร คล คว ตร ปร ปล บร บล ดร ผล พร พล ทร สร จร ซร
+          [and the sonorant consonants] หม หน หล หย หง หว หญ อย 
+  
+          จับคู่พยัญชนะไทยซึ่งมักจับคู่เป็น “พยัญชนะ” หลักของพยางค์ (ตัวนำ) 
+          โดยจะเน้นการใช้สระเดี่ยวหรือสระรวมกัน 
+          พยัญชนะหลายตัวที่ไม่เกี่ยวข้องกันด้วยสระตัวเดียวอาจเกิดขึ้นในภาษาไทย 
+          แต่ไม่ได้กล่าวถึง ตัวนั้น เช่น: “หม” ใน “หมา” ทำงานร่วมกันราวกับว่า
+          เป็นพยัญชนะตัวเดียว - “ห” ระดับสูงที่ให้เสียงของ “ม”
+          นี่เป็นการพยายามพูดถึงคู่พยัญชนะทั่วไปเหล่านี้
+          มันอาจจะไม่ละเอียดถี่ถ้วน
+
+    InThaiDualC1 / IsThaiDualC1
+          Matches the initial consonant of a dual-consonant as described 
+          above: ก ข ค จ ซ ด ต ท บ ป ผ พ ส ห อ.
+  
+          จับคู่พยัญชนะเริ่มต้นของพยัญชนะคู่ตามที่อธิบายไว้ข้างบน: 
+          ก ข ค จ ซ ด ต ท บ ป ผ พ ส ห อ.
+
+    InThaiDualC2 / IsThaiDualC2
+          Matches the second consonant of a dual-consonant as described 
+          above: ง ญ น ม ย ร ล ว.
+  
+          จับคู่พยัญชนะตัวที่สองของพยัญชนะคู่ตามที่อธิบายไว้ข้างต้น: ง ญ น ม ย ร ล ว.
+
+    InThaiConsVowel / IsThaiConsVowel
+          Matches Thai characters which can function as either consonants 
+          or vowels: ย ร ฤ ฦ ว อ.
+  
+          จับคู่ตัวอักษรไทยซึ่งทำหน้าที่เป็นพยัญชนะหรือสระได้: ย ร ฤ ฦ ว อ.
+  
+          Note: Thais consider 0E33 (◌ำ) to be only a vowel, and it can 
+          never function as only a consonant (it must always have a vowel 
+          component), so it is NOT included here: but it is actually a 
+          vowel-consonant combination, phonetically, finishing with the 
+          “m” sound.  This class addresses only Thai characters which can 
+          be either consonant or vowel, but not both at the same time.
+          Additionally, 0E23 (ร) is a consonant which, when doubled (รร), 
+          functions as a vowel.  (In actual fact, it functions as a
+          vowel-consonant combination as well, with the final consonant sound
+          varying based on its usage context.)  Though it can never be a 
+          vowel if it occurs singly, these properties cannot be defined to 
+          span two consecutive characters, so it IS included here.
+
+          หมายเหตุ: คนไทยถือว่า 0E33 (◌ำ) เป็นเพียงสระเท่านั้น และไม่สามารถ
+          ทำหน้าที่เป็นเพียงพยัญชนะได้ (จะต้องมีส่วนประกอบของสระเสมอ) 
+          จึงไม่รวมไว้ที่นี่ แต่จริงๆ แล้วเป็นสระผสมพยัญชนะ ตามสัทศาสตร์ 
+          ลงท้ายด้วยเสียง “ม” กลุ่มนี้ี้เน้นเฉพาะตัวอักษรไทย
+          ที่เป็นพยัญชนะหรือสระก็ได้ แต่ไม่ใช่ทั้งสองตัวพร้อมกัน 
+          นอกจากนี้ 0E23 (ร) ยังเป็นพยัญชนะซึ่งเมื่อเติม (รร) สองตัวแล้ว 
+          จะทำหน้าที่เป็นสระ (ในความเป็นจริง มันทำหน้าที่เป็นเสียงสระ
+          ผสมพยัญชนะด้วย โดยเสียงพยัญชนะตัวสุดท้ายจะแตกต่างกันไปตามบริบท
+          การใช้งาน) แม้ว่าจะเป็นสระเดี่ยวไม่ได้หากเกิดขึ้นเพียงตัวเดียว 
+          แต่คุณสมบัติเหล่านี้ไม่สามารถกำหนดให้ขยายสองช่วงติดต่อกันได้ 
+          ตัวอักษร จึงรวมไว้ที่นี่
+
+    InThaiDigit / IsThaiDigit
+          Matches Thai numerical digits only: ๐ ๑ ๒ ๓ ๔ ๕ ๖ ๗ ๘ ๙.
+  
+          จับคู่ตัวเลขไทยเท่านั้น: ๐ ๑ ๒ ๓ ๔ ๕ ๖ ๗ ๘ ๙.
+
+    InThaiCurrency / IsThaiCurrency
+          Matches the Thai baht currency character: ฿.
+  
+          จับคู่อักขระสกุลเงินบาทไทย: ฿.
+
+EXPORTS
+      Exports 'classes' by default.
+
+PROPERTIES
+    The following properties are exported from Regexp::CharClasses::Thai:
+
+      :classes
+        InThai InThaiAlpha InThaiWord InThaiCons InThaiHCons InThaiMCons 
+        InThaiLCons InThaiVowel InThaiPreVowel InThaiPostVowel 
+        InThaiCompVowel InThaiDigit InThaiTone InThaiMute InThaiPunct 
+        InThaiCurrency InThaiFinCons InThaiDualCons InThaiDualC1 
+        InThaiDualC2 InThaiConsVowel
+        
+        IsThai IsThaiAlpha IsThaiWord IsThaiCons IsThaiHCons IsThaiMCons 
+        IsThaiLCons IsThaiVowel IsThaiPreVowel IsThaiPostVowel 
+        IsThaiCompVowel IsThaiDigit IsThaiTone IsThaiMute IsThaiPunct 
+        IsThaiCurrency IsThaiFinCons IsThaiDualCons IsThaiDualC1
+        IsThaiDualC2 IsThaiConsVowel
+
+      :characters
+        InKokai InKhokhai InKhokhuat InKhokhwai InKhokhon 
+        InKhorakhang InNgongu InChochan InChoching InChochang InSoso 
+        InShochoe InYoying InDochada InTopatak InThothan InThonangmontho 
+        InThophuthao InNonen InDodek InTotao InThothung InThothahan 
+        InThothong InNonu InBobaimai InPopla InPhophung InFofa InPhophan 
+        InFofan InPhosamphao InMoma InYoyak InRorua InRu InLoling InLu 
+        InWowaen InSosala InSorusi InSosua InHohip InLochula InOang 
+        InHonokhuk InPaiyannoi InSaraa InMaihanakat InSaraaa InSaraam 
+        InSarai InSaraii InSaraue InSarauee InSarau InSarauu InPhinthu 
+        InBaht InSarae InSaraae InSarao InSaraaimaimuan InSaraaimaimalai 
+        InLakkhangyao InMaiyamok InMaitaikhu InMaiek InMaitho InMaitri 
+        InMaichattawa InThanthakhat InGaran InNikhahit InYamakkan 
+        InFongman InThZero InThOne InThTwo InThThree InThFour InThFive 
+        InThSix InThSeven InThEight InThNine InAngkhankhu InKhomut
+    
+        IsKokai IsKhokhai IsKhokhuat IsKhokhwai IsKhokhon 
+        IsKhorakhang IsNgongu IsChochan IsChoching IsChochang IsSoso 
+        IsShochoe IsYoying IsDochada IsTopatak IsThothan IsThonangmontho 
+        IsThophuthao IsNonen IsDodek IsTotao IsThothung IsThothahan 
+        IsThothong IsNonu IsBobaimai IsPopla IsPhophung IsFofa IsPhophan 
+        IsFofan IsPhosamphao IsMoma IsYoyak IsRorua IsRu IsLoling IsLu 
+        IsWowaen IsSosala IsSorusi IsSosua IsHohip IsLochula IsOang 
+        IsHonokhuk IsPaiyannoi IsSaraa IsMaihanakat IsSaraaa IsSaraam 
+        IsSarai IsSaraii IsSaraue IsSarauee IsSarau IsSarauu IsPhinthu 
+        IsBaht IsSarae IsSaraae IsSarao IsSaraaimaimuan IsSaraaimaimalai 
+        IsLakkhangyao IsMaiyamok IsMaitaikhu IsMaiek IsMaitho IsMaitri 
+        IsMaichattawa IsThanthakhat IsGaran IsNikhahit IsYamakkan 
+        IsFongman IsThZero IsThOne IsThTwo IsThThree IsThFour IsThFive 
+        IsThSix IsThSeven IsThEight IsThNine IsAngkhankhu IsKhomut
+
+EXAMPLES
+      use Regexp::CharClasses::Thai qw( :all );
+
+      'ก' =~ /\p{InThai}/;           # Match
+      'ก' =~ /\p{InThaiAlpha}/;      # Match
+      'ก' =~ /\p{InThaiCons}/;       # Match
+      'ก' =~ /\p{InThaiHCons}/;      # No match
+      'ก' =~ /\p{InThaiMCons}/;      # Match
+      'ก' =~ /\p{InThaiLCons}/;      # No match
+      'ก' =~ /\p{InThaiDigit}/;      # No match
+      'ก' =~ /\p{InThaiTone}/;       # No match
+      'ก' =~ /\p{InThaiVowel}/;      # No match
+      'ก' =~ /\p{InThaiCompVowel}/;  # No match
+      'ก' =~ /\p{InThaiPreVowel}/;   # No match
+      'ก' =~ /\p{InThaiPostVowel}/;  # No match
+      'ก' =~ /\p{InThaiPunct}/;      # No match
+      'ก' =~ /\p{IsKokai}/;          # Match 
+
+      'ไ' =~ /\p{InThai}/;           # Match
+      'ไ' =~ /\p{InThaiAlpha}/;      # Match
+      'ไ' =~ /\p{InThaiCons}/;       # No match
+      'ไ' =~ /\p{InThaiHCons}/;      # No match
+      'ไ' =~ /\p{InThaiMCons}/;      # No match
+      'ไ' =~ /\p{InThaiLCons}/;      # No match
+      'ไ' =~ /\p{InThaiDigit}/;      # No match
+      'ไ' =~ /\p{InThaiTone}/;       # No match
+      'ไ' =~ /\p{InThaiVowel}/;      # Match
+      'ไ' =~ /\p{InThaiCompVowel}/;  # No match
+      'ไ' =~ /\p{InThaiPreVowel}/;   # Match
+      'ไ' =~ /\p{InThaiPostVowel}/;  # No match
+      'ไ' =~ /\p{InThaiPunct}/;      # No match
+      'ไ' =~ /\p{IsSaraaimaimalai}/; # Match
+
+MORE COMPLEX USAGE EXAMPLE
+        my $phrase = 'ข่าวนี้ได้แพร่สะพัดออกไปอย่างรวดเร็ว';
+        print "A phrase with multiple syllables: $phrase\n";
+
+        my $prevowel_syllables = $phrase  =~ s/
+        (
+          (?:\p{InThaiPreVowel})
+          (?:
+            (?:\p{InThaiDualC1}\p{InThaiDualC2})
+            |
+            (?:\p{InThaiCons}){1}
+          )
+          (?:[\p{InThaiTone}\p{InThaiCompVowel}\p{InThaiPostVowel}]){0,3}
+          (?:
+            (?:[\p{InThaiFinCons}\p{IsYoyak}\p{IsWowaen}]){0,5}
+            (?!\p{InThaiPostVowel})
+          )*
+          (?:\p{InThaiMute})?
+        )
+        /($1)/gx;
+
+        print "Syllables with pre-vowels marked: $phrase\n";
+        print "Number of these marked syllables: $prevowel_syllables\n";
+
+UNICODE
+      All of the character codepoints in this module are based on the 
+      official unicode designations for Thai as found in this chart:
+
+      จุดโค้ดอักขระทั้งหมดในโมดูลนี้อิงตามการกำหนดยูนิโค้ดอย่าง
+      เป็นทางการสำหรับภาษาไทยดังที่พบในแผนภูมินี้:  
+  
+      http://www.unicode.org/charts/PDF/U0E00.pdf
+  
+      The spellings of these latinized/transliterated character names
+      as used in the property definitions for each character come 
+      directly from this unicode chart, sans spaces, and with only their 
+      first letter in uppercase.  The “Garan” (a common name) is added 
+      as an alias for its official name, Thanthakhat (of uncommon usage).
+  
+      การสะกดของชื่ออักขระแบบลาติน/ทับศัพท์ที่ใช้ในคำจำกัดความของ
+      คุณสมบัติสำหรับอักขระแต่ละตัวนั้นมาจากแผนภูมิยูนิโค้ดนี้ 
+      การเว้นวรรคแบบไม่มี และมีเพียงอักษรตัวแรกเป็นตัวพิมพ์ใหญ่เท่านั้น 
+      มีการเพิ่ม “Garan” (การันต์ - ชื่อสามัญ) เป็นนามแฝงสำหรับชื่อ
+      อย่างเป็นทางการว่า ธัณฑฆาต (ซึ่งเป็นคำที่ใช้ไม่ธรรมดา)
+
+USAGE NOTES
+      Each of the defined properties may be accessed by either form:
+  
+      \p{InProperty} -OR-
+      \p{IsProperty}
+  
+      For example, \p{InThaiVowel} and \p{IsThaiVowel} have identical
+      implementation--there is no difference between them.  This 
+      flexibility is built-in on account of ambiguities in the formats
+      used by various codebases, and the fact that Perl supports both.
+
+TO VIEW ALL CHARACTERS OF A CLASS...
+      You may list the codepoints of a character class by simply
+      calling that class as an ordinary function.  For example:
+  
+          my @chars = &InThaiCompVowel;
+          print @chars;
+  
+      This will print:
+  
+          0E31
+          0E34
+          0E35
+          0E36
+          0E37
+          0E38
+          0E39
+          0E3A
+          0E47
+          0E4D
+
+      To print them as the actual UTF8 characters these codepoints
+      represent, try this:
+  
+          my @chars = split(/\n/, InThaiPreVowel);
+          foreach my $char (@chars) {
+              print chr(hex($char));
+          }
+
+INSTALLATION
+      To install this module type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+BUGS
+      COMBINATIONS
+        Combinations cannot be handled by this module.
+        The doubled ร consonant (รร) in some syllables becomes 
+        vowel + consonant; whereas it will only be counted as 
+        a consonant here.
+    
+      CONSONANT CLUSTERS
+        This feature (InThaiDualCons, InThaiDualC1, InThaiDualC2, etc.)
+        is considered experimental and likely incomplete.  Please send
+        the author additions for this list if you find it incomplete.
+
+      AMBIGUITIES
+        Where a character can function as either consonant or vowel, 
+        it may get included in both categories, i.e. it may match 
+        either one. This includes the Thai 0E24 (ฤ) and 0E26 (ฦ) 
+        characters which are considered “sonorant” consonants by some, 
+        and strictly as vowels by others.
+
+PREREQUISITES
+      Perl 5.8.3 or newer
+      Exporter 5.57 or newer
+      utf8
+
+AUTHOR
+      Erik Mundall <emundall@biblasia.com>.
+
+COPYRIGHT and LICENSE
+        Regexp::CharClasses::Thai is designed to enable detailed 
+        regular expressions, with the ability to identify important 
+        characteristics of Thai alphabetic characters, digits and symbols.
+
+        Copyright (C) 2023  Erik Mundall
+
+        This program is free software: you can redistribute it and/or 
+        modify it under the terms of the GNU General Public License as 
+        published by the Free Software Foundation, either version 3 of 
+        the License, or (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see: 
+        https://www.gnu.org/licenses/.
+
+CHALLENGE
+    “Whatever your hand finds to do, do it with your might; for there is
+    no work, nor device, nor knowledge, nor wisdom, in the grave, where you
+    go.” --Ecclesiastes 9:10
+
+    “มือของเจ้าจับทำการงานอะไร จงกระทำการนั้นด้วยเต็มกำลังของเจ้า
+    เพราะว่าในแดนคนตายที่เจ้าจะไปนั้นไม่มีการงาน หรือแนวความคิด หรือความรู้
+    หรือสติปัญญา” --ปัญญาจารย์ ๙:๑๐

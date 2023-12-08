@@ -11,6 +11,7 @@ build_requires:
   Test::LWP::UserAgent: '0'
   Test::Most: '0'
   Test::NoWarnings: '0'
+  TimeZone::TimeZoneDB: '0'
   WWW::RT::CPAN: '0'
   autodie: '0'
 configure_requires:
@@ -35,7 +36,7 @@ requires:
   constant: '0'
   perl: '5.006002'
 resources:
-  bugtracker: https://github.com/nigelhorne/Weather-Meto/issues
-  repository: git://github.com/nigelhorne/Weather-Meto.git
-version: '0.07'
+  bugtracker: https://github.com/nigelhorne/Weather-Meteo/issues
+  repository: git://github.com/nigelhorne/Weather-Meteo.git
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

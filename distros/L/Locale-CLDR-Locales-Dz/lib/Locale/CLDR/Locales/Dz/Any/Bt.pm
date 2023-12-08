@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Dz::Any::Bt - Package for language Dzongkha
 
 package Locale::CLDR::Locales::Dz::Any::Bt;
 # This file auto generated from Data\common\main\dz_BT.xml
-#	on Sat  4 Nov  5:58:45 pm GMT
+#	on Tue  5 Dec  1:06:51 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

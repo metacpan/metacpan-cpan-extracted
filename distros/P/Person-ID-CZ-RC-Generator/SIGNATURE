@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.79.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,43 +12,48 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 3eab69f9e6bd9de2759817f815635e5fd2226b58 Changes
-SHA1 7654f94a28d1b969efb6c0a4581d90146e35ee30 Generator.pm
-SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
-SHA1 b4704d215544b569c4c7978cc5ba00130494d30e MANIFEST
-SHA1 21bffb1c4928d684781972ef93154d969b91b09a META.yml
-SHA1 cb1edada212ffabb65f39bda476b7f7463e9be1d Makefile.PL
-SHA1 9b3c03146943d650fd2a1a17a74c06a754ce1241 README
-SHA1 13ca755551cbfc2a07488d0dc00e20e43f2f666f examples/ex1.pl
-SHA1 9b21bb95e5d3eb706cec509ffbe439b97f7a0b2c examples/ex2.pl
-SHA1 23b48ee433f48cb99f5e06a06ea531d7a5942cb5 examples/ex3.pl
-SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
-SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
-SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
-SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
-SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
-SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
-SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
-SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
-SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
-SHA1 34c002753b5cea2c331358419941906d6ad9ad59 t/Person-ID-CZ-RC-Generator/01-use.t
-SHA1 7e6c84599502c75d9c99714af9364ef9f84c6592 t/Person-ID-CZ-RC-Generator/02-version.t
-SHA1 de2daf148bb304364febcd23d5df8df08d74d0d1 t/Person-ID-CZ-RC-Generator/04-new.t
-SHA1 2d763e01def8e5427f6a20a5fce9c5484a7de520 t/Person-ID-CZ-RC-Generator/05-rc.t
-SHA1 240f0d5cb64e9b53cd37e65a24a78778cd27bbe7 xt/Person-ID-CZ-RC-Generator/01-pod_coverage.t
-SHA1 82efecc33032f9d49c450c4d97c1dd7cfc188bbb xt/Person-ID-CZ-RC-Generator/02-pod.t
+SHA256 9da6af3de2951db86484c565966631123d6be7b619411e0f3d07704f7e0c108b Changes
+SHA256 efb040b560e83da442fcea30c954d7dce4f9d4e1bd6c428e4ead27945b471f20 Generator.pm
+SHA256 16e519f1cbc291b44fcc60e62249456c7f5432e29ad17f3ac82faf65b624cff4 LICENSE
+SHA256 2687339cf61df769e0812c4e3a89da31640498a87b6f5107a36dfde3fac68529 MANIFEST
+SHA256 079948606a352c2e261675913b6d883b01f59585d7892ab1a81ed3407e48e27e META.yml
+SHA256 900e1e785c305abb4e72815069f208ed52fdff0999847df1febdac04256b3b87 Makefile.PL
+SHA256 2d28038be15ecc89567111290b36c93c999b97413fd160023d145968814e4296 README
+SHA256 a522a5821e2c1aaa6071aaae2a3abb32348586b479de9d3df40f4444b8187c5b examples/gen_rc.pl
+SHA256 78e5ffed5101b5497be7f33d02a59b60beb4d67e6a6766670c0fc283246bdf66 examples/gen_rc_default.pl
+SHA256 4d9642d67fbff4763bd32cba1bdfc04f50bb9309c1026cdd50b6a1302dd63c28 examples/gen_rc_with_checksum.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 41f3aa78f47da96daac863c6b092153b588ea47f411d1a956cbc176223120319 t/Person-ID-CZ-RC-Generator/01-use.t
+SHA256 d16cf4136a9ca16e808b317d996d178529d6b15d9a59a0b460bdb0ceadf8ddba t/Person-ID-CZ-RC-Generator/02-version.t
+SHA256 0b461766f89c8c7ecd14c1ce3773840cbfd6fe7d6f71d147e2b76ec7b4a8e414 t/Person-ID-CZ-RC-Generator/04-new.t
+SHA256 270e90ee805d84dc1a9237733fc4922bf932db21e54257de2cacff82cbf4e6ff t/Person-ID-CZ-RC-Generator/05-rc.t
+SHA256 ee829c0f31c3237769640a8a5b6189103e629f2d34e87ebe0f5fbb3376d96a45 xt/Person-ID-CZ-RC-Generator/01-pod_coverage.t
+SHA256 b91d43288165478af57e34caad6a738c7f5584a0f5f1aa82be343514018e6ae4 xt/Person-ID-CZ-RC-Generator/02-pod.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
 
-iQEcBAEBAgAGBQJWCWMkAAoJEJe+XXKaIuTl6a0H/1Hr6DJI2AnoLreXHtbs8gKT
-seWfCGh2t1VtVXlEpNXZOb6iyZtMBgdJR0SBF/43i4PRJaQi6zB70zKjMPWaqMDq
-pV8jnV1yS1GRIWVfGkviMsTsXRn2dRmNeIXtwdF6m5WT2lY8FX1cEKzHZWbWnTPJ
-HvMbd32XlvlR1kcLotFaF1EJ2znAlnAsU/yIlLYH/DkTMS+ObOWlg6SdrMD0ySxo
-dB/C/B1gQjV9EHGxvYQgPJzxDK9jzodGHxdP/UFzbVN035dC7sliwE0y7si1UPz5
-3mo5kdvEiTQyPI12yF6spzwO1a1sn/MG0V2r15ph78FOjDbwG49zPqUHsBr1rNA=
-=krKn
+iQIzBAEBAwAdFiEEbEiOwSagsghKcON6ojV9Rpe/B8sFAmVsrcYACgkQojV9Rpe/
+B8tVAhAAhACAvxyqxPzh0hkxNcKkHSF2kHo14KhEaV8IiL0jK1vNOJIHw1IeIkQ6
+kNj0Hcp1zJiZDjSgyqPIX/pjnpeA7hRX1j+gk1mZZrZcMrcXFvRcbmB23PZigcoW
+UW07BujiK3mhjtzUL+cx7+sB3ZzE/jyk5bGlSYsxjCVl9PwQTFwDY5jCvxxDNChQ
+Y5U68LPPHPz7c5iVahyXEPk3zEjhxQ+U55xjl7NLbgR0AM4t5bp1v1FuOYzn5avk
+E9bWXU4Rw7ZLz5pQHA1MbpfGaS192xIQqI5a7gMSlLNTurbQwJV/5lvq9IdAGjdD
+YlRY/q687yytaUlRIsQgMzFrfa3m+K++tccuhJEDgUy/zu02rDIPLjT5nYsbhaI/
+iRK1OKxnm6z082o77/8ELPzFz6q45jLcF0jYTTh2AVOCITYDKCCof+xfyzLLFuuG
+PslYy8+pciGHbaa2qXU51HPF1ykgE4cgMeNY/MRUMtDTqjvgYEAFIkIvGbrGeiVF
+ZjUBzr9LL2AXE6bj4FZsz9r8uPndVdfCjjdMGaapYfTz/ShKTxcAWKcaJVoFf1BI
+2Q2wdEvdGvmMctrafQQ5sY0bXPw2aZzLICY0owmbunNmmRhVnylpQqfQrtDR/zGz
+6hF4vHHsVpk1Jn7MrrxDU9MvdZQJXTJwwBcJSMBQ3Y/QkbU5X54=
+=U+00
 -----END PGP SIGNATURE-----

@@ -4,7 +4,7 @@
       "Jeremy Mates <jeremy.mates@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "bsd"
    ],
@@ -41,15 +41,15 @@
    "provides" : {
       "Music::RhythmSet" : {
          "file" : "lib/Music/RhythmSet.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Music::RhythmSet::Util" : {
          "file" : "lib/Music/RhythmSet/Util.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Music::RhythmSet::Voice" : {
          "file" : "lib/Music/RhythmSet/Voice.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -61,6 +61,6 @@
          "url" : "https://thrig.me/src/Music-RhythmSet.git"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

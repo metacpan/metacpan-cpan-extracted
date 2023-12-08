@@ -1,6 +1,7 @@
 Changes
-examples/ex1.pl
+examples/print_shortest.pl
 inc/Module/Install.pm
+inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/Base.pm
 inc/Module/Install/Can.pm
 inc/Module/Install/Fetch.pm
@@ -17,7 +18,8 @@ META.yml
 README
 Shortest.pm
 SIGNATURE
-t/Map-Tube-Text-Shortest/00-use.t
-t/Map-Tube-Text-Shortest/01-version.t
-t/Map-Tube-Text-Shortest/02-pod_coverage.t
-t/Map-Tube-Text-Shortest/03-pod.t
+t/Map-Tube-Text-Shortest/01-use.t
+t/Map-Tube-Text-Shortest/02-version.t
+t/Map-Tube-Text-Shortest/03-new.t
+xt/Map-Tube-Text-Shortest/01-pod_coverage.t
+xt/Map-Tube-Text-Shortest/02-pod.t

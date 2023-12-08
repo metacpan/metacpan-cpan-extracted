@@ -169,47 +169,47 @@
    "provides" : {
       "Image::DS9" : {
          "file" : "lib/Image/DS9.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Command" : {
          "file" : "lib/Image/DS9/Command.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Constants" : {
          "file" : "lib/Image/DS9/Constants.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Constants::V0" : {
          "file" : "lib/Image/DS9/Constants/V0.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Constants::V1" : {
          "file" : "lib/Image/DS9/Constants/V1.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Daemon" : {
          "file" : "lib/Image/DS9/Daemon.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Grammar" : {
          "file" : "lib/Image/DS9/Grammar.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Grammar::V8_5" : {
          "file" : "lib/Image/DS9/Grammar/V8_5.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::PConsts" : {
          "file" : "lib/Image/DS9/PConsts.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Parser" : {
          "file" : "lib/Image/DS9/Parser.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       },
       "Image::DS9::Util" : {
          "file" : "lib/Image/DS9/Util.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -224,7 +224,7 @@
          "web" : "https://gitlab.com/djerius/image-ds9"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_generated_by_perl" : "v5.36.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "GPL-3.0-only"

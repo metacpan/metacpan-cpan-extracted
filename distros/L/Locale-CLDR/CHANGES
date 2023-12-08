@@ -183,3 +183,6 @@ All dates are in ISO 8601 Format
     
 0.34.3 2023-11-05
     Fixes to Bundles to allow languages ane regions to co-exist
+    
+0.34.4 2023-12-02
+    Fixed recursion with likely_subtags

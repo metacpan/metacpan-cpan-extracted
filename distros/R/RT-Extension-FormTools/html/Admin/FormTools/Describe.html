@@ -1,0 +1,114 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<&| /Widgets/TitleBox, title => '', class => 'formtools-admin-description ml-auto mr-auto' &>
+  <p>Forms are shown to users on a page in the RT Self Service interface. Below you can manage how the form details will appear to end users.</p>
+  <form name="EditFormDescription" action="<%RT->Config->Get('WebPath')%>/Admin/FormTools/Describe.html" method="post" enctype="multipart/form-data">
+  <input type="hidden" class="hidden" name="id" value="<% $id %>" />
+  <&| /Widgets/TitleBox, title => loc('Icon') &>
+% if ( $current_form_icon ) {
+<& /Elements/Forms/ShowFormIcon, FormID => $id &>
+% } else {
+      <p>Upload an icon to be shown to users on the Forms page or select a color for the background of graphical box users can click.</p>
+% }
+
+      <div class="row">
+        <div class="col ml-5 mr-5">
+          <div class="custom-file">
+            <input type="file" name="FormUploadIcon" class="custom-file-input" id="formtools-upload-icon" />
+            <label class="custom-file-label" for="formtools-upload-icon"><&|/l&>Upload an icon for this form</&></label>
+          </div>
+        </div>
+      </div>
+  </&>
+  <&| /Widgets/TitleBox, title => loc('Description') &>
+    <p>Describe what the form should be used for and include instructions to help users pick the correct form.</p>
+      <div class="form-row">
+        <div class="col-12">
+          <input type="hidden" class="hidden" name="FormDescriptionType" value="text/html" />
+          <textarea autocomplete="off" class="form-control messagebox richtext" cols="80" rows="15" name="FormDescription"><% $ARGS{'FormDescription'} || $form->{'form-description'} %></textarea>
+        </div>
+      </div>
+  </&>
+</&>
+<div class="form-row">
+  <div class="col-12">
+    <& /Elements/Submit, Label => loc('Save'), Name => 'SubmitDescription' &>
+  </div>
+</div>
+</form>
+<%init>
+use Digest::MD5 'md5_hex';
+
+# Handle id getting submitted twice and becoming an array
+my @id = ( ref $id eq 'ARRAY' ) ? @{$id} : ($id);
+$id = $id[0];
+Abort("No form id found") unless $id;
+
+my $form_attribute = RT::Attribute->new($session{'CurrentUser'});
+my ($ok, $msg) = $form_attribute->Load($id);
+
+unless ( $ok ) {
+    Abort("Unable to load form with id $id");
+}
+
+my $form = $form_attribute->Content;
+
+my ($title, @results);
+$title = loc("Description for form [_1]", $form_attribute->Description);
+
+if ( $ARGS{'SubmitDescription'} ) {
+    Abort( loc('Permission Denied') )
+        unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
+
+    if ( $form->{'form-description'} ne $ARGS{'FormDescription'} ) {
+        $form->{'form-description'} = $ARGS{'FormDescription'};
+        my ( $ret, $msg ) = $form_attribute->SetContent($form);
+        if ($ret) {
+            push @results, loc('Updated description');
+        }
+        else {
+            push @results, loc( "Could not update description: [_1]", $msg );
+        }
+    }
+}
+
+my ($current_form_icon) = RT::Extension::FormTools::LoadFormIcon( $session{'CurrentUser'}, $form_attribute->Id );
+
+if ( my $file_hash = _UploadedFile( 'FormUploadIcon' ) ) {
+
+    my ($form_icon, $msg) = RT::Extension::FormTools::LoadFormIcon( $session{'CurrentUser'}, $form_attribute->Id );
+
+    if ( $form_icon ) {
+        # Delete the existing icon
+        my ( $del_ok, $del_msg ) = $form_icon->Delete;
+
+        RT->Logger->error("Unable to delete icon attribute id $ok, $del_msg") unless $del_ok;
+    }
+
+    my $new_form_icon = RT::Attribute->new( $session{CurrentUser} );
+    ( $ok, $msg ) = $new_form_icon->Create(
+        Name        => "FormTools Icon",
+        Description => "Icon for " . $form_attribute->Description,
+        Object      => $form_attribute,
+        Content     => {
+            type => $file_hash->{ContentType},
+            data => $file_hash->{LargeContent},
+            hash => md5_hex($file_hash->{LargeContent}),
+        },
+    );
+
+    push @results, loc("Unable to set form icon") unless $ok;
+    RT->Logger->error("Unable to set form icon: $msg") unless $ok;
+}
+
+MaybeRedirectForResults(
+    Actions   => \@results,
+    Arguments => { id => $id, FormDescription => $ARGS{'FormDescription'} },
+);
+
+</%init>
+<%args>
+$id => undef
+</%args>

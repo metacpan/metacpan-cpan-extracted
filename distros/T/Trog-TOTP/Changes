@@ -1,0 +1,10 @@
+Revision history for Perl extension Trog-TOTP
+
+1.003 2023-12-06 TEODESIAN
+    - More fixes to POD
+
+1.002 2023-12-06 TEODESIAN
+    - Adjust POD and correct license
+
+1.001 2023-10-11 TEODESIAN
+    - Forked from Authen-TOTP

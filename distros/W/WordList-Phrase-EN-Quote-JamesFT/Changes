@@ -1,3 +1,9 @@
+0.002   2023-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Update module name: Tables::Quote::JamesFT ->
+          TableData::Quote::JamesFT.
+
+
 0.001   2020-06-01  Released-By: PERLANCAR
 
         - First release.

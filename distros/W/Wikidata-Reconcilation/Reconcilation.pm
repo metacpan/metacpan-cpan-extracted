@@ -6,11 +6,10 @@ use warnings;
 use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use LWP::UserAgent;
-use Unicode::UTF8 qw(encode_utf8);
 use WQS::SPARQL;
 use WQS::SPARQL::Result;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -49,6 +48,7 @@ sub new {
 
 	$self->{'_q'} = WQS::SPARQL->new(
 		'lwp_user_agent' => $self->{'lwp_user_agent'},
+		'verbose' => $self->{'verbose'},
 	);
 
 	return $self;
@@ -65,10 +65,6 @@ sub reconcile {
 		print "SPARQL queries:\n";
 	}
 	foreach my $sparql (@sparql) {
-		if ($self->{'verbose'}) {
-			print encode_utf8($sparql)."\n";
-		}
-
 		$ret_hr = $self->{'_q'}->query($sparql);
 		my @ret = map { $_->{'item'} } WQS::SPARQL::Result->new(
 			'verbose' => $self->{'verbose'},
@@ -256,7 +252,6 @@ Returns list of strings.
 L<Class::Utils>,
 L<Error::Pure>,
 L<LWP::UserAgent>,
-L<Unicode::UTF8>,
 L<WQS::SPARQL>,
 L<WQS::SPARQL::Result>.
 
@@ -288,6 +283,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

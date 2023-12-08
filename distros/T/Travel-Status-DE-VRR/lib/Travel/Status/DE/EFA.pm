@@ -5,9 +5,10 @@ use warnings;
 use 5.010;
 use utf8;
 
-our $VERSION = '1.23';
+our $VERSION = '2.00';
 
-use Carp   qw(confess cluck);
+use Carp qw(confess cluck);
+use DateTime;
 use Encode qw(encode);
 use Travel::Status::DE::EFA::Line;
 use Travel::Status::DE::EFA::Result;
@@ -194,33 +195,6 @@ sub place_candidates {
 	return;
 }
 
-sub sprintf_date {
-	my ($e) = @_;
-
-	if ( $e->getAttribute('day') == -1 ) {
-		return;
-	}
-
-	return sprintf( '%02d.%02d.%d',
-		$e->getAttribute('day'),
-		$e->getAttribute('month'),
-		$e->getAttribute('year'),
-	);
-}
-
-sub sprintf_time {
-	my ($e) = @_;
-
-	if ( $e->getAttribute('minute') == -1 ) {
-		return;
-	}
-
-	return sprintf( '%02d:%02d',
-		$e->getAttribute('hour'),
-		$e->getAttribute('minute'),
-	);
-}
-
 sub check_for_ambiguous {
 	my ($self) = @_;
 
@@ -368,17 +342,45 @@ sub parse_route {
 		my @dates = $e->findnodes($xp_routepoint_date);
 		my @times = $e->findnodes($xp_routepoint_time);
 
+		my ( $arr, $dep );
+
 		# note that the first stop has an arrival node with an invalid
 		# timestamp and the terminal stop has a departure node with an
-		# invalid timestamp.  sprintf_{date,time} return undef in these
-		# cases.
+		# invalid timestamp.
+
+		if ( $dates[0] and $times[0] and $dates[0]->getAttribute('day') != -1 )
+		{
+			$arr = DateTime->new(
+				year      => $dates[0]->getAttribute('year'),
+				month     => $dates[0]->getAttribute('month'),
+				day       => $dates[0]->getAttribute('day'),
+				hour      => $times[0]->getAttribute('hour'),
+				minute    => $times[0]->getAttribute('minute'),
+				second    => $times[0]->getAttribute('second') // 0,
+				time_zone => 'Europe/Berlin'
+			);
+		}
+
+		if (    $dates[-1]
+			and $times[-1]
+			and $dates[-1]->getAttribute('day') != -1 )
+		{
+			$dep = DateTime->new(
+				year      => $dates[-1]->getAttribute('year'),
+				month     => $dates[-1]->getAttribute('month'),
+				day       => $dates[-1]->getAttribute('day'),
+				hour      => $times[-1]->getAttribute('hour'),
+				minute    => $times[-1]->getAttribute('minute'),
+				second    => $times[-1]->getAttribute('second') // 0,
+				time_zone => 'Europe/Berlin'
+			);
+		}
+
 		push(
 			@ret,
 			Travel::Status::DE::EFA::Stop->new(
-				arr_date => sprintf_date( $dates[0] ),
-				arr_time => sprintf_time( $times[0] ),
-				dep_date => sprintf_date( $dates[-1] ),
-				dep_time => sprintf_time( $times[-1] ),
+				arr      => $arr,
+				dep      => $dep,
 				name     => $e->getAttribute('name'),
 				name_suf => $e->getAttribute('nameWO'),
 				platform => $e->getAttribute('platformName'),
@@ -432,11 +434,31 @@ sub results {
 			next;
 		}
 
-		my $date = sprintf_date($e_date);
-		my $time = sprintf_time($e_time);
+		my ( $sched_dt, $real_dt );
 
-		my $rdate = $e_rdate ? sprintf_date($e_rdate) : $date;
-		my $rtime = $e_rtime ? sprintf_time($e_rtime) : $time;
+		if ( $e_date and $e_time and $e_date->getAttribute('day') != -1 ) {
+			$sched_dt = DateTime->new(
+				year      => $e_date->getAttribute('year'),
+				month     => $e_date->getAttribute('month'),
+				day       => $e_date->getAttribute('day'),
+				hour      => $e_time->getAttribute('hour'),
+				minute    => $e_time->getAttribute('minute'),
+				second    => $e_time->getAttribute('second') // 0,
+				time_zone => 'Europe/Berlin'
+			);
+		}
+
+		if ( $e_rdate and $e_rtime and $e_rdate->getAttribute('day') != -1 ) {
+			$real_dt = DateTime->new(
+				year      => $e_rdate->getAttribute('year'),
+				month     => $e_rdate->getAttribute('month'),
+				day       => $e_rdate->getAttribute('day'),
+				hour      => $e_rtime->getAttribute('hour'),
+				minute    => $e_rtime->getAttribute('minute'),
+				second    => $e_rtime->getAttribute('second') // 0,
+				time_zone => 'Europe/Berlin'
+			);
+		}
 
 		my $platform      = $e->getAttribute('platform');
 		my $platform_name = $e->getAttribute('platformName');
@@ -496,28 +518,26 @@ sub results {
 		push(
 			@results,
 			Travel::Status::DE::EFA::Result->new(
-				date          => $rdate,
-				time          => $rtime,
-				platform      => $platform,
-				platform_db   => $platform_is_db,
-				platform_name => $platform_name,
-				key           => $key,
-				lineref       => $line_obj[0] // undef,
-				line          => $line,
-				train_type    => $train_type,
-				train_name    => $train_name,
-				train_no      => $train_no,
-				destination   => $dest,
-				occupancy     => $occupancy,
-				countdown     => $countdown,
-				info          => $info,
-				delay         => $delay,
-				sched_date    => $date,
-				sched_time    => $time,
-				type          => $type,
-				mot           => $mot,
-				prev_route    => \@prev_route,
-				next_route    => \@next_route,
+				rt_datetime    => $real_dt,
+				platform       => $platform,
+				platform_db    => $platform_is_db,
+				platform_name  => $platform_name,
+				key            => $key,
+				lineref        => $line_obj[0] // undef,
+				line           => $line,
+				train_type     => $train_type,
+				train_name     => $train_name,
+				train_no       => $train_no,
+				destination    => $dest,
+				occupancy      => $occupancy,
+				countdown      => $countdown,
+				info           => $info,
+				delay          => $delay,
+				sched_datetime => $sched_dt,
+				type           => $type,
+				mot            => $mot,
+				prev_route     => \@prev_route,
+				next_route     => \@next_route,
 			)
 		);
 	}
@@ -638,13 +658,14 @@ Travel::Status::DE::EFA - unofficial EFA departure monitor
     for my $d ($status->results) {
         printf(
             "%s %-8s %-5s %s\n",
-            $d->time, $d->platform_name, $d->line, $d->destination
+            $d->datetime->strftime('%H:%M'),
+            $d->platform_name, $d->line, $d->destination
         );
     }
 
 =head1 VERSION
 
-version 1.23
+version 2.00
 
 =head1 DESCRIPTION
 
@@ -769,6 +790,8 @@ None.
 =over
 
 =item * Class::Accessor(3pm)
+
+=item * DateTime(3pm)
 
 =item * LWP::UserAgent(3pm)
 

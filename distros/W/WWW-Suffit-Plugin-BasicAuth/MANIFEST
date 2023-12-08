@@ -1,0 +1,22 @@
+# MANIFEST Thu 07 Dec 2023 15:43:38 MSK
+
+# General
+Changes                                  Changes list
+INSTALL.md                               Installation instructions
+LICENSE                                  License file
+Makefile.PL                              Makefile builder
+MANIFEST                                 This file
+README.md                                !!! README FIRST !!!
+TODO                                     TO DO
+
+# Libs
+lib/WWW/Suffit/Plugin/BasicAuth.pm       Plugin library
+
+# Tests
+t/00-fixme.t                             FIXME/TODO/BUG warnings
+t/00-pod-coverage.t                      POD::Coverage testing
+t/00-pod.t                               Checking all POD documents
+t/00-trailingspace.t                     Style test: TrailingSpace
+t/01-use.t                               Test script
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

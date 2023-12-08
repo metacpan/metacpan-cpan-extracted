@@ -14,7 +14,7 @@ struct stat *
 stat___stat(const char *filename)
 {
   struct stat *self;
-  self = calloc(1, sizeof(struct stat));
+  self = malloc(sizeof(struct stat));
   if(stat(filename, self) == -1)
   {
     free(self);
@@ -27,7 +27,7 @@ struct stat *
 stat___lstat(const char *filename)
 {
   struct stat *self;
-  self = calloc(1, sizeof(struct stat));
+  self = malloc(sizeof(struct stat));
 #if !defined(_WIN32) || defined(__CYGWIN__)
   if(lstat(filename, self) == -1)
 #else
@@ -44,7 +44,7 @@ struct stat *
 stat___fstat(int fd)
 {
   struct stat *self;
-  self = calloc(1, sizeof(struct stat));
+  self = malloc(sizeof(struct stat));
   if(fstat(fd, self) == -1)
   {
     free(self);
@@ -54,12 +54,27 @@ stat___fstat(int fd)
 }
 
 struct stat *
-stat__clone(struct stat *self)
+stat___new(void)
 {
-  struct stat *other;
-  other = calloc(1, sizeof(struct stat));
-  memcpy(other, self, sizeof(struct stat));
-  return other;
+  struct stat *self;
+  self = malloc(sizeof(struct stat));
+  return self;
+}
+
+struct stat *
+stat__clone(struct stat *other)
+{
+  struct stat *self;
+  self = malloc(sizeof(struct stat));
+  if(other == NULL)
+  {
+    memset(self, 0, sizeof(struct stat));
+  }
+  else
+  {
+    memcpy(self, other, sizeof(struct stat));
+  }
+  return self;
 }
 
 dev_t

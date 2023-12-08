@@ -5,13 +5,14 @@ $include_header      => 1
 $include_page_layout => 1
 $include_tabs        => 0
 $ShowBar             => 1
-$validation          => 0
 $enable_persisting   => 1
 $forbid_persisting   => {}
 $form_id             => undef
 $form_name           => undef
 $form_classes        => undef
 $self_service        => 0
+$results_ref         => []
+$form_config         => undef
 </%args>
 <%init>
 use RT::Extension::FormTools;
@@ -31,7 +32,7 @@ my %request_args = $m->request_args;
 
 my @results;
 my $real_next = delete $request_args{_form_tools_next};
-if ($validation && $real_next) {
+if ($real_next) {
     my $queue = $m->notes('queue');
     # registered validation
     if (my $validation = $m->notes('validation')) {
@@ -53,20 +54,24 @@ if ($validation && $real_next) {
         }
     }
 
-    # cf validation based on record pattern
-    foreach my $key (keys %request_args) {
-        next if $key =~ /Values-Magic$/;
-        next unless ($key =~ /CustomField-(\d+)/ );
-        my $id = $1;
-        my $cf = RT::CustomField->new($session{'CurrentUser'});
-        $cf->Load($id);
-        next unless exists $request_args{"Object-RT::Ticket--CustomField-@{[ $cf->Id ]}-Values-Magic"};
-        my ($ok, @res) = RT::Extension::FormTools::validate_cf($cf, \%request_args);
-        push @results, @res unless $ok;
+    my %labels = map { $_->{arguments}{name} => $_->{arguments}{label} }
+        grep { ( $_->{comp_name} // '' ) eq 'Field' && $_->{arguments}{name} && $_->{arguments}{label} }
+        map { @{ $_->{content} } } values %{ $form_config->{'formtools-pages'} };
 
+    my ($status, @msg) = $m->comp(
+        '/Elements/ValidateCustomFields',
+        CustomFields    => $queue->TicketCustomFields,
+        ARGSRef         => \%request_args,
+        Labels          => \%labels,
+    );
+    unless ($status) {
+        push @results, @msg;
     }
+
     unless (@results) {
-        my $next_comp = $real_next;
+        # Flag to show validation passed
+        $ARGS{'validation_ok'} = 1;
+
         $real_next = $m->caller(1)->dir_path . '/' . $real_next
             unless $real_next =~ m'^/';
         $m->subexec("$real_next", %ARGS, %request_args);
@@ -84,6 +89,10 @@ foreach my $key (keys %request_args) {
    next unless RT::Extension::FormTools::is_core_field($key);
    delete $request_args{$key} if ($core_fields{$key});
 }
+
+# Add in any @results passed in. These should not be errors,
+# so they will be shown on the next page.
+push @results, @{$results_ref};
 
 $next_for_validation ||= $m->caller(1)->path;
 
@@ -105,18 +114,16 @@ $next_for_validation ||= $m->caller(1)->path;
 % }
 
 <& /Elements/ListActions, actions => \@results &>
-
+<div id="formtools-form-body" class="container p-4 formtools-base-style">
 <form
     method="POST"
-    action="<% $validation ? $next_for_validation : $next %>"
+    action="<% $next_for_validation %>"
     enctype="multipart/form-data"
     <% defined $form_id ? ' id="'.$form_id.'"' : '' |n %>
     <% defined $form_name ? ' name="'.$form_name.'"' : '' |n %>
     <% defined $form_classes ? ' class="'.$form_classes.'"' : '' |n %>
 >
-% if ($validation) {
 <input type="hidden" name="_form_tools_next" value="<%$next%>" />
-% }
 <%$content|n%>
 
 % if ($enable_persisting) {
@@ -125,9 +132,12 @@ $next_for_validation ||= $m->caller(1)->path;
 % foreach my $val ( ref ($request_args{$key}) ? @{$request_args{$key}} : ($request_args{$key})) {
 % next if $forbid_persisting->{$key};
 % next if ($key eq 'user' or $key eq 'pass');
+% next if $key eq 'Submit'; # No need to pass through "Next" button value
+% next if $key =~ /^(?:validation|validation_ok|next_for_validation)$/;
 <input type="hidden" name="<%$key%>" value="<%$val%>" />
 % }
 % }
 % }
 
 </form>
+</div>

@@ -2,7 +2,7 @@
 # MIT License
 
 class File::Spec {
-  version "0.081002";
+  version "0.081003";
   
   use File::Spec::Instance;
   

@@ -1,4 +1,11 @@
+0.618   2023-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - Add function: complete_hash_value.
+
+
 0.617   2023-01-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
 
         - [test] Avoid perl warning about comma in qw(), in test script.
 

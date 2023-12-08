@@ -24,10 +24,15 @@ recursive_author_tests('xt');
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Curses-UI-Char';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Curses-UI-Char';
 resources 'repository' => 'git://github.com/michal-josef-spacek/Curses-UI-Char';
+test_requires 'Carp' => 0;
+test_requires 'DynaLoader' => 0;
+test_requires 'Exporter' => 0;
+test_requires 'Curses::UI' => 0;
+test_requires 'FindBin' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.01';
+version '0.02';
 
 # Run.
 WriteAll();

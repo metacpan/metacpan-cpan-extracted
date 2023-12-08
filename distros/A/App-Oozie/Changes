@@ -1,5 +1,8 @@
 Revision history for App-Oozie
 
+0.016     2023-12-05 18:19:59+01:00 Europe/Brussels
+- Switch to _ttree_obj() for the template processor.
+
 0.015     2023-11-02 14:09:50+01:00 Europe/Brussels
 - Revert back to PodWeaver in build tooling.
 

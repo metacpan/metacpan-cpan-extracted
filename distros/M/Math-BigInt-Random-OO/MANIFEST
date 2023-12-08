@@ -1,25 +1,30 @@
-Changes
+CHANGES
 lib/Math/BigInt/Random/OO.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+README.md
 t/00-signature.t
 t/01-load.t
 t/10-new.t
 t/11-min-max.t
 t/12-length-base.t
-t/author-changelog.t
-t/author-git.t
-t/release-cpan-changes.t
-t/release-kwalitee.t
-t/release-pod-coverage.t
-t/release-pod-syntax.t
-t/release-portability.t
-t/release-synopsis.t
-t/release-test-version.t
-t/release-unused-vars.t
-t/release-whitespaces.t
+xt/release/changelog.t
+xt/release/cpan-changes.t
+xt/release/dist-manifest.t
+xt/release/distmeta.t
+xt/release/git.t
+xt/release/kwalitee.t
+xt/release/minimum-version.t
+xt/release/pod-coverage.t
+xt/release/pod-linkcheck.t
+xt/release/pod-syntax.t
+xt/release/portability.t
+xt/release/synopsis.t
+xt/release/unused-vars.t
+xt/release/version.t
+xt/release/whitespaces.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 SIGNATURE                                Public-key signature (added by MakeMaker)

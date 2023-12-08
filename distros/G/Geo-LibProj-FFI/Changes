@@ -1,5 +1,24 @@
 Revision history for Geo::LibProj::FFI
 
+0.06  2023-12-05
+
+ - Fix compatibility with Perl v5.26 and older. (GH #3)
+
+0.05  2023-12-01
+
+ - Add new PJ_COORD struct member accessors. Instead of calling $c->xyz->x(),
+   you can now simply call $c->xyz_x(), which is faster and more likely to
+   remain stable with future updates. The old syntax is now discouraged,
+   but there are currently no plans to remove it.
+
+ - Deprecate creating PJ_COORD union member structs with new(). Unions are not
+   well supported by FFI::Platypus. For best forward compatibility, creating
+   new PJ_COORD values should only be done by using proj_coords().
+
+ - Internal change: The PJ_COORD implementation is now based on the vector
+   union member. This means the fastest way to access coordinates is now
+   via $c->v(...) instead of $c->xyzt->...
+
 0.04  2021-05-24
 
  - Add area of interest functions

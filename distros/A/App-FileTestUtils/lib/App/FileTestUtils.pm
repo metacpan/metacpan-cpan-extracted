@@ -4,14 +4,14 @@ use strict 'subs', 'vars';
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-10-13'; # DATE
+our $DATE = '2023-11-30'; # DATE
 our $DIST = 'App-FileTestUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Getopt::Long qw(:config auto_help auto_version gnu_getopt no_ignore_case);
 
 sub do_script {
-    require File::MoreUtil;
+    require File::Util::Test;
     my ($func) = @_;
 
     (my $script = $func) =~ s/_/-/g;
@@ -27,14 +27,14 @@ sub do_script {
         my @files = @ARGV;
         unless (@files) { chomp(@files = <STDIN>) }
         for my $file (@files) {
-            if (&{"File::MoreUtil::$func"}($file) xor $opt_invert_match) { print $file, "\n" }
+            if (&{"File::Util::Test::$func"}($file) xor $opt_invert_match) { print $file, "\n" }
         }
         exit 0;
     } else {
         unless (@ARGV == 1) {
             die "Usage: $script <path>\n";
         }
-        exit(&{"File::MoreUtil::$func"}($ARGV[0]) ? 0:1);
+        exit(&{"File::Util::Test::$func"}($ARGV[0]) ? 0:1);
     }
 }
 
@@ -53,7 +53,7 @@ App::FileTestUtils - More CLIs for file testing
 
 =head1 VERSION
 
-This document describes version 0.003 of App::FileTestUtils (from Perl distribution App-FileTestUtils), released on 2021-10-13.
+This document describes version 0.005 of App::FileTestUtils (from Perl distribution App-FileTestUtils), released on 2023-11-30.
 
 =head1 DESCRIPTION
 
@@ -62,21 +62,33 @@ related to file testing:
 
 =over
 
-=item * L<dir-empty>
+=item 1. L<dir-empty>
 
-=item * L<dir-has-dot-files>
+=item 2. L<dir-has-dot-files>
 
-=item * L<dir-has-dot-subdirs>
+=item 3. L<dir-has-dot-subdirs>
 
-=item * L<dir-has-files>
+=item 4. L<dir-has-files>
 
-=item * L<dir-has-non-dot-files>
+=item 5. L<dir-has-non-dot-files>
 
-=item * L<dir-has-non-dot-subdirs>
+=item 6. L<dir-has-non-dot-subdirs>
 
-=item * L<dir-has-subdirs>
+=item 7. L<dir-has-subdirs>
 
-=item * L<dir-not-empty>
+=item 8. L<dir-not-empty>
+
+=item 9. L<dir-only-has-dot-files>
+
+=item 10. L<dir-only-has-dot-subdirs>
+
+=item 11. L<dir-only-has-files>
+
+=item 12. L<dir-only-has-non-dot-files>
+
+=item 13. L<dir-only-has-non-dot-subdirs>
+
+=item 14. L<dir-only-has-subdirs>
 
 =back
 
@@ -94,7 +106,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-FileTestUtils>.
 
 The file testing operators in L<perlfunc>, e.g. C<-s>, C<-x>, C<-r>, etc.
 
-L<File::MoreUtil>
+L<File::Util::Test>
 
 =head1 AUTHOR
 
@@ -113,13 +125,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2019 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2021, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

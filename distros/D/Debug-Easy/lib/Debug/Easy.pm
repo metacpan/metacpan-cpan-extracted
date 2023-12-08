@@ -20,19 +20,24 @@ use Time::HiRes qw(time);
 use File::Basename;
 
 use Data::Dumper;
-eval {use Data::Dumper::Simple;};
+eval {    # Data::Dumper::Simple is preferred.  Try to load it without dying.
+    require Data::Dumper::Simple;
+    Data::Dumper::Simple->import();
+    1;
+};
+
 $Data::Dumper::Sortkeys = TRUE;
 $Data::Dumper::Purity   = TRUE;
 $Data::Dumper::Deparse  = TRUE;
 
 use Config;
-eval {use threads;};
+eval { use threads; };
 
 BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION = '2.10';
+    our $VERSION = '2.11';
 
     # Inherit from Exporter to export functions and variables
     our @ISA = qw(Exporter);

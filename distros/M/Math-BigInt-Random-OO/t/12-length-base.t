@@ -1,131 +1,52 @@
-#!perl
+# -*- mode: perl; -*-
 
 use strict;
 use warnings;
 
-local $| = 1;                   # disable buffering
+use Test::More tests => 70;
 
 use Math::BigInt::Random::OO;
 
 use Math::BigInt;
 use Math::BigFloat;
 
-print "1..70\n";
-
 my $class = 'Math::BigInt::Random::OO';
 
-########################
-
-# bigint2str BIGINT, BASE
-#
-# Converts a non-negative bigint to a string in the given base,
-# where 2 <= BASE <= 36.
-
-sub bigint2str {
-    my $name = 'bigint2str';
-    my $bint = $_[0];   # clones the input
-    my $base = $_[1];
-
-    # Check the base.
-
-    die "$name: the base must be defined"
-      unless defined $base;
-    die "$name: the base must be an integer"
-      unless $base == int $base;
-    die "$name: the base must be in the range 2..36, inclusive"
-      if $base < 2 || $base > 36;
-
-    # Check the bigint.
-
-    die "$name: the bigint must be defined"
-      unless defined $bint;
-    die "$name: the bigint must be a Math::BigInt object"
-      unless UNIVERSAL::isa($bint, 'Math::BigInt');
-    die "$name: the bigint must be non-negative"
-      if $bint < 0;
-
-    # Quick exit when the bigint is zero.
-
-    if ($bint == 0) {
-        return '0';
-    }
-
-    # Set of symbols for each digit.
-
-    my $symset = '0123456789abcdefghijklmnopqrstuvwxyz';
-
-    # Convert the bigint to a string.
-
-    my $str = '';
-    while ($bint > 0) {
-        my $num = $bint % $base;
-        my $sym = substr $symset, $num, 1;
-        $str = $sym . $str;
-        $bint /= $base;
-    }
-
-    return $str;
-}
-
-########################
-
-my $testno = 0;
-
 for my $base (2, 4, 8, 10, 16, 25, 36) {
-    for my $len (5, 10, 20, 50, 100) {
-       TEST: for my $num (1, 50) {
+    for my $len (5, 10, 20, 50, 75) {
+        for my $num (1, 50) {
 
-            ++ $testno;
+            my $test = qq|\@x = $class -> new("length" => $len, |
+                     . qq|"base" => $base) -> generate($num)|;
 
-            my $test = "\@x = $class -> new(length => $len, " .
-                                           "base => $base) -> generate($num)";
+            my @x;
+            note "\n", $test, "\n\n";
+            eval $test;
+            die "\nThe following code failed to eval():\n\n",
+              "    ", $test, "\n\n", $@, "\n" if $@;
 
-            my @x = $class -> new(length => $len, base => $base)
-                           -> generate($num);
+            subtest $test => sub {
+                plan tests => 1 + 2 * @x;
 
-            # Check the number of output arguments.
+                # Check number of output argument.
 
-            unless (@x == $num) {
-                print "not ok ", $testno, " - $test\n";
-                print "  wrong number of output arguments\n";
-                print "  actual number .........: ", scalar(@x), "\n";
-                print "  expected number .......: $num\n";
-                next TEST;
-            }
+                cmp_ok(scalar(@x), "==", $num,
+                       "Number of output arguments");
 
-            # Check each output argument.
+                # Check each output argument.
 
-            for my $x (@x) {
-
-                unless (defined $x) {
-                    print "not ok ", $testno, " - $test\n";
-                    print "  array element was undefined\n";
-                    next TEST;
+                for (my $i = 0 ; $i <= $#x ; ++$i) {
+                    is(ref($x[$i]), "Math::BigInt",
+                       "Output argument '\$x[$i]' is a 'Math::BigInt'");
+                    my $str = $x[$i] -> to_base($base);
+                    cmp_ok(length($str), '==', $len,
+                           "Output argument '\$x[$i]' has the correct length")
+                      or diag("  The value '\$x[$i]' in base '$base'\n",
+                              "         got: '$str'\n",
+                              "    expected: a $len-character string of",
+                              " random base $base digits");
                 }
-
-                my $refx = ref $x;
-                unless ($refx eq 'Math::BigInt') {
-                    print "not ok ", $testno, " - $test\n";
-                    print "  array element was a ",
-                              $refx ? $refx : "Perl scalar",
-                              ", expected a Math::BigInt\n";
-                    next TEST;
-                }
-
-                my $str = bigint2str $x, $base;
-                my $strlen = length $str;
-
-                unless ($strlen == $len) {
-                    print "not ok ", $testno, " - $test\n";
-                    print "  output length is incorrect\n";
-                    print "  actual length .....: $strlen\n";
-                    print "  expected length ...: $len\n";
-                    next TEST;
-                }
-
-            }
-
-            print "ok ", $testno, " - $test\n";
+            };
         }
     }
 }

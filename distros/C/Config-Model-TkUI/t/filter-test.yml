@@ -1,4 +1,19 @@
 ---
+default_output:
+  '': show
+  hcl1: ''
+  hcl1 check_list: ''
+  hcl1 hash_a: ''
+  hcl2: ''
+  hcl2 check_list: ''
+  hcl2 hash_a: ''
+  hcld1: ''
+  hcld1 a_string: ''
+  hcld1 check_list: ''
+  hcld1 hash_a: ''
+  hcld1 hash_b: ''
+  hnode: ''
+
 tests:
   - label: no filter at all
     load: &basic
@@ -6,38 +21,47 @@ tests:
         hash_a:
           foo: bar
     output:
-      '': show
-      hcl1: ''
-      hcl1 check_list: ''
-      hcl1 hash_a: ''
       hcl1 hash_a:foo: ''
-      hcl2: ''
-      hcl2 check_list: ''
-      hcl2 hash_a: ''
-      hcld1: ''
-      hcld1 a_string: ''
-      hcld1 check_list: ''
-      hcld1 hash_a: ''
-      hcld1 hash_b: ''
+
+  - label: filter str_a
+    load:
+      hnode:
+        foo:
+          str_a: bar
+    input:
+      elt_filter_value: str_a
+    output:
+      hcl1: 'hide'
+      hcl1 check_list: 'hide'
+      hcl1 hash_a: 'hide'
+      hcl2: 'hide'
+      hcl2 check_list: 'hide'
+      hcl2 hash_a: 'hide'
+      hcld1: 'hide'
+      hcld1 a_string: 'hide'
+      hcld1 check_list: 'hide'
+      hcld1 hash_a: 'hide'
+      hcld1 hash_b: 'hide'
+      hnode: 'show'
+      hnode:foo: 'show'
+      hnode:foo str_a: 'show'
+      hnode:foo str_b: 'hide'
+
   - label: hide empty filter
     load: *basic
     input:
       hide_empty_values: 1
     output:
-      '': show
-      hcl1: ''
       hcl1 check_list: hide
-      hcl1 hash_a: ''
-      hcl1 hash_a:foo: ''
-      hcl2: ''
       hcl2 check_list: hide
       hcl2 hash_a: 'hide'
-      hcld1: ''
-      hcld1 a_string: ''
+      hcl1 hash_a:foo: ''
       # contains default -> not hidden
       hcld1 check_list: ''
       hcld1 hash_a: hide
       hcld1 hash_b: hide
+      hnode: hide
+
   - label: show custom values
     load: *basic
     input:
@@ -57,6 +81,8 @@ tests:
       hcld1 check_list: hide
       hcld1 hash_a: hide
       hcld1 hash_b: 'hide'
+      hnode: hide
+
   - label: checklist and no filter at all
     load:
       hcl1:
@@ -66,19 +92,7 @@ tests:
       hcl2:
         check_list: [B, C]
     output:
-      '': show
-      hcl1: ''
-      hcl1 check_list: ''
-      hcl1 hash_a: ''
       hcl1 hash_a:foo: ''
-      hcl2: ''
-      hcl2 check_list: ''
-      hcl2 hash_a: ''
-      hcld1: ''
-      hcld1 a_string: ''
-      hcld1 check_list: ''
-      hcld1 hash_a: ''
-      hcld1 hash_b: ''
 
   # filter applied at top level
   - label: filter hcl1
@@ -88,17 +102,16 @@ tests:
     output:
       '': show
       hcl1: 'show'
-      hcl1 check_list: ''
-      hcl1 hash_a: ''
       hcl1 hash_a:foo: ''
       hcl2: hide
-      hcl2 check_list: ''
-      hcl2 hash_a: ''
+      hcl2 check_list: hide
+      hcl2 hash_a: 'hide'
       hcld1: hide
-      hcld1 a_string: ''
-      hcld1 check_list: ''
-      hcld1 hash_a: ''
-      hcld1 hash_b: ''
+      hcld1 a_string: hide
+      hcld1 check_list: hide
+      hcld1 hash_a: hide
+      hcld1 hash_b: 'hide'
+      hnode: hide
 
   # filter applied one level below for an element common to all sub nodes
   - label: filter hash_a
@@ -119,6 +132,7 @@ tests:
       hcld1 check_list: hide
       hcld1 hash_a: 'show'
       hcld1 hash_b: hide
+      hnode: hide
 
   # filter applied one level below for an element not common to all sub nodes
   - label: filter hash_b
@@ -127,18 +141,19 @@ tests:
       elt_filter_value: hash_b
     output:
       '': show
-      hcl1: ''
-      hcl1 check_list: ''
-      hcl1 hash_a: ''
+      hcl1: 'hide'
+      hcl1 check_list: hide
+      hcl1 hash_a: 'hide'
       hcl1 hash_a:foo: ''
-      hcl2: ''
-      hcl2 check_list: ''
-      hcl2 hash_a: ''
+      hcl2: 'hide'
+      hcl2 check_list: hide
+      hcl2 hash_a: 'hide'
       hcld1: 'show'
       hcld1 a_string: hide
       hcld1 check_list: hide
       hcld1 hash_a: hide
       hcld1 hash_b: 'show'
+      hnode: hide
 
   - label: filter hash_a and non-empty values
     load: *basic
@@ -159,6 +174,8 @@ tests:
       hcld1 check_list: hide
       hcld1 hash_a: show
       hcld1 hash_b: 'hide'
+      hnode: hide
+
   - label: filter hash_b and non-empty values
     load: *basic
     input:
@@ -166,11 +183,11 @@ tests:
       hide_empty_values: 1
     output:
       '': show
-      hcl1: ''
+      hcl1: 'hide'
       hcl1 check_list: hide
-      hcl1 hash_a: ''
+      hcl1 hash_a: 'hide'
       hcl1 hash_a:foo: ''
-      hcl2: ''
+      hcl2: hide
       hcl2 check_list: hide
       hcl2 hash_a: hide
       hcld1: show
@@ -178,6 +195,7 @@ tests:
       hcld1 check_list: hide
       hcld1 hash_a: hide
       hcld1 hash_b: show
+      hnode: hide
 
   - label: filter hcl1 and hide non-empty values
     load: *basic
@@ -188,16 +206,16 @@ tests:
       '': show
       hcl1: 'show'
       hcl1 check_list: hide
-      hcl1 hash_a: ''
       hcl1 hash_a:foo: ''
       hcl2: hide
       hcl2 check_list: hide
       hcl2 hash_a: hide
       hcld1: hide
-      hcld1 a_string: ''
-      hcld1 check_list: ''
+      hcld1 a_string: hide
+      hcld1 check_list: hide
       hcld1 hash_a: hide
       hcld1 hash_b: hide
+      hnode: hide
 
   - label: filter hcl1 and show custom values
     load:
@@ -218,12 +236,14 @@ tests:
       hcl1 check_list: hide
       hcl1 hash_a: show
       hcl1 hash_a:foo: show
-      hcl2: hide
+      hcl2: show
       hcl2 check_list: hide
       hcl2 hash_a: show
       hcl2 hash_a:foo: show
-      hcld1: hide
+      # showing a custom value trumps a filter
+      hcld1: show
       hcld1 a_string: show
       hcld1 check_list: hide
       hcld1 hash_a: hide
       hcld1 hash_b: hide
+      hnode: hide

@@ -4,22 +4,32 @@ NAME
 
 SYNOPSIS
      use Map::Tube::Test::Shortest;
-     my $obj = Map::Tube::Text::Shortest->new;
+
+     my $obj = Map::Tube::Text::Shortest->new(%params);
      print $obj->print($from, $to);
 
 METHODS
-    "new()"
-             Constructor.
+  "new"
+     my $obj = Map::Tube::Text::Shortest->new(%params);
 
-            *       "tube"
+    Constructor.
 
-                     Map::Tube object.
-                     Parameter is required.
-                     Default value is undef.
+    *       "tube"
 
-    print($from, $to)>
-             Print shortest route table.
-             Returns string with table.
+            Map::Tube object.
+
+            Parameter is required.
+
+            Default value is undef.
+
+    Returns instance of object.
+
+  "print"
+     print $obj->print($from, $to);
+
+    Print shortest route table.
+
+    Returns string with table.
 
 ERRORS
      new():
@@ -27,11 +37,9 @@ ERRORS
              Parameter 'tube' must be 'Map::Tube' object.
 
 EXAMPLE
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use English;
      use Encode qw(decode_utf8 encode_utf8);
      use Error::Pure qw(err);
@@ -101,22 +109,27 @@ DEPENDENCIES
     Class::Utils, Error::Pure, List::Util, Readonly, Scalar::Util.
 
 SEE ALSO
-    Map::Tube, Map::Tube::Graph, Map::Tube::GraphViz,
-    Map::Tube::Plugin::Graph, Map::Tube::Text::Table, Task::Map::Tube.
+    Task::Map::Tube
+        Install the Map::Tube modules.
+
+    Task::Map::Tube::Metro
+        Install the Map::Tube concrete metro modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Map-Tube-Text-Shortest>
+    <https://github.com/michal-josef-spacek/Map-Tube-Text-Shortest>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     Artistic License
-     BSD 2-Clause License
+    © 2014-2023 Michal Josef Špaček
+
+    Artistic License
+
+    BSD 2-Clause License
 
 VERSION
-    0.01
+    0.02
 

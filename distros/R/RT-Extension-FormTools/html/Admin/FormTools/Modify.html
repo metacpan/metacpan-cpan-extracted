@@ -1,0 +1,738 @@
+<& /Admin/Elements/Header, Title => $title &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+<div id="formtools-edit">
+<& /Admin/Elements/FormToolsHelp &>
+<div class="row">
+  <div class="formtools-component-menu boxcontainer col-md-3" id="formtools-component-wrapper">
+    <&| /Widgets/TitleBox, title => loc('FormTools Components') &>
+      <div class="filters">
+        <div class="form-row">
+          <div class="col-12">
+            <input type="search" class="m-1 field form-control" name="search" placeholder="<&|/l&>Search...</&>" autocomplete="off">
+          </div>
+        </div>
+      </div>
+      <div class="d-block text-center">
+% foreach my $item ( @html_components ) {
+        <div id="formtools-element-<% $item %>" class="formtools-element" draggable="true" ondragstart="formTools.dragstart(event);" ondragend="formTools.dragend(event);" data-value="<% JSON({ type => 'raw_html', $item eq 'hr' ? ( wrapper => 'hr', html => "<$item>" ) : () }) %>">
+          <p class="formtools-element-placeholder m-1 p-2 border rounded"><% loc('Place here') %></p>
+          <p class="m-1 p-2 border rounded">
+            <span class="badge badge-primary align-text-bottom"><% $item eq 'html' ? 'HTML' : uc($item) %></span>
+            <span class="content"><% loc('[_1] Element', uc($item)) %></span>
+%           if ( $item ne 'hr' ) {
+            <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-modal">
+              <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
+            </a>
+%           }
+            <a href="#" class="remove" onclick="return formTools.deleteElement(event);">
+              <span class="far fa-times-circle" alt="<% loc('Remove') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Remove') %>"></span>
+            </a>
+          </p>
+        </div>
+%       if ( $item ne 'hr' ) {
+        <div class="modal fade formtools-element-modal" id="formtools-element-<% $item %>-modal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <form class="formtools-element-form">
+                <div class="modal-header">
+                  <h5 class="modal-title"><% loc('Modify Element') %></h5>
+                  <a href="javascript:void(0)" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                </div>
+                <div class="modal-body">
+                  <&| /Elements/LabeledValue, Label => loc("Content") &>
+%                   if ( $item =~ /^h\d/ ) {
+                    <input name="content" class="form-control" data-wrapper="<% $item %>" />
+%                   } elsif ( $item eq 'p' ) {
+                    <textarea name="content" class="form-control" data-wrapper="<% $item %>"></textarea>
+%                   } elsif ( $item eq 'html' ) {
+                    <textarea name="content" class="form-control"></textarea>
+%                   }
+                  </&>
+
+%               if ( $item eq 'p' ) {
+                  <&| /Elements/LabeledValue, Label => loc("Alignment") &>
+                    <select name="alignment" class="form-control">
+                      <option value="left"><% loc('Left') %></option>
+                      <option value="center"><% loc('Center') %></option>
+                      <option value="right"><% loc('Right') %></option>
+                    </select>
+                  </&>
+%               }
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+%       }
+% }
+        <hr />
+% foreach my $item ( @core_components ) {
+        <div id="formtools-element-<% $item %>" class="formtools-element" draggable="true" ondragstart="formTools.dragstart(event);" ondragend="formTools.dragend(event);" data-value="<% JSON({ type => 'component', comp_name => 'Field', arguments => { name => $item } }) %>">
+          <p class="formtools-element-placeholder m-1 p-2 border rounded"><% loc('Place here') %></p>
+          <p class="m-1 p-2 border rounded">
+            <span class="badge badge-primary align-text-bottom"><% loc('Core Field') %></span>
+            <span class="content"><% $item %> <span class="label"></span></span>
+            <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-modal">
+              <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
+            </a>
+            <a href="#" class="remove" onclick="return formTools.deleteElement(event);">
+              <span class="far fa-times-circle" alt="<% loc('Remove') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Remove') %>"></span>
+            </a>
+          </p>
+        </div>
+        <div class="modal fade formtools-element-modal" id="formtools-element-<% $item %>-modal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <form class="formtools-element-form">
+                <div class="modal-header">
+                  <h5 class="modal-title"><% loc('Modify Element') %></h5>
+                  <a href="javascript:void(0)" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                </div>
+                <div class="modal-body">
+%               if ( $item ne 'Content' ) {
+                  <&| /Elements/LabeledValue, Label => loc('Label') &>
+                    <input name="label" type="text" class="form-control" placeholder="<% $item %>" value="" />
+                  </&>
+%               }
+                  <&| /Elements/LabeledValue, Label => loc('Default Value') &>
+                    <input name="default" type="text" class="form-control" placeholder="<% $default_values{$item} %>" value="" />
+                  </&>
+%               if ( $item ne 'Content' ) {
+                  <&| /Elements/LabeledValue, Label => loc('Tooltip') &>
+                    <input name="tooltip" type="text" class="form-control" value="" />
+                  </&>
+%               }
+                  <&| /Elements/LabeledValue, Label => '' &>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" id="<% CSSClass($item) %>-validation" type="checkbox" name="validation" value="1" />
+                      <label class="custom-control-label" for="<% CSSClass($item) %>-validation">
+                        <&|/l&>Require</&>
+                      </label>
+                    </div>
+                  </&>
+                  <&| /Elements/LabeledValue, Label => '' &>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" id="<% CSSClass($item) %>-hide" type="checkbox" name="hide" value="1" />
+                      <label class="custom-control-label" for="<% CSSClass($item) %>-hide">
+                        <&|/l&>Hide</&>
+                      </label>
+                    </div>
+                  </&>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+% }
+        <hr />
+% foreach my $item ( @custom_fields ) {
+        <div id="formtools-element-<% CSSClass($item) %>" class="formtools-element" draggable="true" ondragstart="formTools.dragstart(event);" ondragend="formTools.dragend(event);" data-value="<% JSON({ type => 'component', comp_name => 'Field', arguments => { name => $item } }) %>">
+          <p class="formtools-element-placeholder m-1 p-2 border rounded"><% loc('Place here') %></p>
+          <p class="m-1 p-2 border rounded">
+            <span class="badge badge-primary align-text-bottom"><% loc('Custom Field') %></span>
+            <span class="content"><% $item %> <span class="label"></span></span>
+            <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-modal">
+              <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
+            </a>
+            <a href="#" class="remove" onclick="return formTools.deleteElement(event);">
+              <span class="far fa-times-circle" alt="<% loc('Remove') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Remove') %>"></span>
+            </a>
+          </p>
+        </div>
+        <div class="modal fade formtools-element-modal" id="formtools-element-<% CSSClass($item) %>-modal" data-type="component" data-name="<% $item %>" tabindex="-1" role="dialog">
+          <div class="modal-dialog <% %dependent_custom_fields ? 'modal-lg' : '' %>" role="document">
+            <div class="modal-content">
+              <form class="formtools-element-form">
+                <div class="modal-header">
+                  <h5 class="modal-title"><% loc('Modify Element') %></h5>
+                  <a href="javascript:void(0)" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                </div>
+                <div class="modal-body">
+                  <&| /Elements/LabeledValue, Label => loc('Label') &>
+                    <input name="label" type="text" class="form-control" placeholder="<% $item %>" value="" />
+                  </&>
+                  <&| /Elements/LabeledValue, Label => loc('Default Value') &>
+                    <input name="default" type="text" class="form-control" placeholder="<% $default_values{$item} %>" value="" />
+                  </&>
+                  <&| /Elements/LabeledValue, Label => loc('Tooltip') &>
+                    <input name="tooltip" type="text" class="form-control" placeholder="<% $tooltips{$item} // '' %>" value="" />
+                  </&>
+                  <&| /Elements/LabeledValue, Label => '' &>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" id="<% CSSClass($item) %>-validation" type="checkbox" name="validation" value="1" />
+                      <label class="custom-control-label" for="<% CSSClass($item) %>-validation">
+                        <&|/l&>Require</&>
+                      </label>
+                    </div>
+                  </&>
+%                 if ( %dependent_custom_fields ) {
+                  <&| /Elements/LabeledValue, Label => '' &>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" id="<% CSSClass($item) %>-depedent-validation" type="checkbox" name="dependent_validation" value="1" />
+                      <label class="custom-control-label has-text-input" for="<% CSSClass($item) %>-depedent-validation">
+                        <&|/l&>Require if</&>
+                        <div class="d-inline-block">
+                          <select name="dependent_name" class="form-control">
+                            <option value=""><&|/l&>(no value)</&></option>
+%                         for my $name ( sort keys %dependent_custom_fields ) {
+                            <option value="<% $name %>"><% $name %></option>
+%                         }
+                          </select>
+                        </div>
+                        is
+                        <div class="d-inline-block">
+                          <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-control">
+                            <option value=""><&|/l&>(no value)</&></option>
+%                         for my $name ( sort keys %dependent_custom_fields ) {
+                            <optgroup label="<% $name %>">
+%                           for my $value ( @{$dependent_custom_fields{$name}} ) {
+                              <option value="<% $value %>"><% $value %></option>
+%                           }
+                            </optgroup>
+%                         }
+                          </select>
+                        </div>
+                      </label>
+                    </div>
+                  </&>
+%                 }
+                  <&| /Elements/LabeledValue, Label => '' &>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" id="<% CSSClass($item) %>-hide" type="checkbox" name="hide" value="1" />
+                      <label class="custom-control-label" for="<% CSSClass($item) %>-hide">
+                        <&|/l&>Hide</&>
+                      </label>
+                    </div>
+                  </&>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+% }
+
+        <hr />
+% foreach my $item ( sort keys %other_components ) {
+        <div id="formtools-element-<% $item %>" class="formtools-element" draggable="true" ondragstart="formTools.dragstart(event);" ondragend="formTools.dragend(event);" data-value="<% JSON($other_components{$item}) %>">
+          <p class="formtools-element-placeholder m-1 p-2 border rounded"><% loc('Place here') %></p>
+          <p class="m-1 p-2 border rounded">
+            <span class="badge badge-primary align-text-bottom"><% $other_components{$item}{type} eq 'hidden' ? loc('Hidden') : loc('Component') %></span>
+            <span class="content"><% $item %></span>
+%         if ( $item eq 'Hidden' ) {
+            <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-modal">
+              <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
+            </a>
+%         }
+            <a href="#" class="remove" onclick="return formTools.deleteElement(event);">
+              <span class="far fa-times-circle" alt="<% loc('Remove') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Remove') %>"></span>
+            </a>
+          </p>
+        </div>
+%       if ( $item eq 'Hidden' ) {
+        <div class="modal fade formtools-element-modal" id="formtools-element-<% $item %>-modal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <form class="formtools-element-form">
+                <div class="modal-header">
+                  <h5 class="modal-title"><% loc('Modify Element') %></h5>
+                  <a href="javascript:void(0)" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                </div>
+                <div class="modal-body">
+                  <&| /Elements/LabeledValue, Label => loc('Name') &>
+                    <input name="name" type="text" class="form-control" value="" />
+                  </&>
+                  <&| /Elements/LabeledValue, Label => loc('Value') &>
+                    <input name="value" type="text" class="form-control" value="" />
+                  </&>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+%       }
+% }
+      </div>
+    </&>
+  </div>
+  <div class="formtools-form-pages boxcontainer col-md-9" id="formtools-pages-wrapper">
+  <&| /Widgets/TitleBox, title => loc('FormTools Pages') &>
+    <div class="mb-3 mx-3 mt-0 alert alert-warning pending-changes hidden">
+      <&|/l&>New changes pending. Click "Save Changes" to update the form.</&>
+    </div>
+
+    <ul class="nav nav-<% $nav_type %>s" id="formtools-pages">
+%   my $current_context = {};
+%   foreach my $page_name (@form_pages) {
+%     my( $active, $aria_selected) = $form_page_id{$page_name} eq $active_context->{tab} ? ('active', 'true') : ('', 'false');
+%     my $nav_id = join '-', 'formtools', 'nav', $form_page_id{$page_name};
+%     my $content_id = join '-', 'formtools', 'content', $form_page_id{$page_name};
+      <li class="nav-item">
+        <a class="nav-link <% $active %>" id="formtools-tab-<% $nav_id %>" data-toggle="<% $nav_type %>" href="#<% $content_id %>" role="<% $nav_type %>" aria-controls="formtools-<% $content_id %>" aria-selected="<% $aria_selected %>"><% $form->{'formtools-pages'}{$page_name}{name} %></a>
+      </li>
+% }
+      <li class="nav-item">
+        <a class="nav-link" id="formtools-tab-add" href="?id=<% $id %>;AddPage=1">
+          <span class="fas fa-plus" alt="<% loc('Add Page') %>" data-toggle="tooltip" data-original-title="<% loc('Add Page') %>"></span>
+        </a>
+      </li>
+    </ul>
+    <div class="tab-content">
+%   foreach my $page_name (@form_pages) {
+      <div id="formtools-content-<% $form_page_id{$page_name} %>" class="tab-pane <% $form_page_id{$page_name} eq $active_context->{tab} ? 'show active' : 'fade' %>" role="tabpanel">
+        <div class="modal fade formtools-page-modal" id="formtools-element-<% $form_page_id{$page_name} %>-basics-modal" tabindex="-1" role="dialog">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <form class="formtools-page-form">
+                <div class="modal-header">
+                  <h5 class="modal-title"><% loc('Modify Basics') %></h5>
+                  <a href="javascript:void(0)" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </a>
+                </div>
+                <div class="modal-body">
+                  <&| /Elements/LabeledValue, Label => loc('Page Name') &>
+                    <input name="name" class="form-control" value="<% $form->{'formtools-pages'}{$page_name}{name} %>" />
+                  </&>
+                  <&| /Elements/LabeledValue, Label => loc('Sort Order') &>
+                    <input name="sort_order" class="form-control" value="<% $form->{'formtools-pages'}{$page_name}{sort_order} %>" />
+                  </&>
+
+%                   # Do not delete the last one
+%                   if ( $form->{'formtools-pages'}{$page_name}{next} ) {
+                  <&| /Elements/LabeledValue, Label => '' &>
+                    <a class="formtools-delete-page btn btn-primary button" data-page="<% $page_name %>" href="#"><% loc('Delete Page') %></a>
+                  </&>
+%                   }
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+%       my $loc_basics = loc('Basics');
+        <&| /Widgets/TitleBox, title => loc('Content'), titleright_raw => qq{<a href="#" data-toggle="modal" data-target="#formtools-element-$form_page_id{$page_name}-basics-modal"><span class="fas fa-cog icon-bordered fa-2x" alt="$loc_basics" data-toggle="tooltip" data-placement="top" data-original-title="$loc_basics"></span></a>} &>
+          <div class="formtools-content w-100 border rounded mt-3" data-page="<% $page_name %>" data-page-id="<% $form_page_id{$page_name} %>" ondrop="formTools.drop(event);" ondragover="formTools.dragover(event);" ondragend="formTools.dragend(event);">
+%         my $i = 0;
+%         for my $item ( grep { $_->{type} ne 'hidden' || $_->{'input-name'} ne 'create_ticket' } @{$form->{'formtools-pages'}{$page_name}{content} || []} ) {
+            <div id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>" class="formtools-element" draggable="true" ondragstart="formTools.dragstart(event);" ondragend="formTools.dragend(event);" ondragenter="formTools.dragenter(event)" ondragleave="formTools.dragleave(event)" data-value="<% JSON($item) %>">
+              <p class="formtools-element-placeholder m-1 p-2 border rounded"><% loc('Place here') %></p>
+              <p class="m-1 p-2 border rounded">
+                <span class="badge badge-primary align-text-bottom">
+%                 if ( $item->{type} eq 'raw_html' ) {
+                    <% uc($item->{wrapper} || 'HTML') %>
+%                 } elsif ( ( $item->{comp_name} // '' ) eq 'ShowChoices' ) {
+                    <% loc('Component') %>
+%                 } elsif ( $item->{type} eq 'hidden' ) {
+                    <% loc('Hidden') %>
+%                 } elsif ( RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ) {
+                    <% loc('Core Field') %>
+%                 } else {
+                    <% loc('Custom Field') %>
+%                 }
+                </span>
+                <span class="content">
+%               if ( $item->{type} eq 'raw_html' ) {
+%                 if ( $item->{wrapper} ) {
+                    <% length $item->{content} > 40 ? substr($item->{content}, 0, 40) . '...' : $item->{content} %>
+%                 } else {
+                    <% length $item->{html} > 40 ? substr($item->{html}, 0, 40) . '...' : $item->{html} %>
+%                 }
+%               } elsif ( $item->{type} eq 'hidden' ) {
+                  <% $item->{'input-name'} %>: <% $item->{'input-value'} %>
+%               } elsif ( $item->{type} eq 'component' && $item->{comp_name} eq 'Field' ) {
+                  <% $item->{arguments}{name} || $item->{comp_name} %>
+                  <span class="label"><% $item->{arguments}{label} ? "($item->{arguments}{label})" : '' %></span>
+%               } else {
+                  <% $item->{comp_name} %>
+%               }
+                </span>
+%             if ( ( $item->{type} eq 'raw_html' && ( $item->{wrapper} // '' ) ne 'hr' ) || ( $item->{type} eq 'component' && $item->{comp_name} eq 'Field' ) || $item->{type} eq 'hidden' ) {
+                <a href="#" class="edit" data-toggle="modal" data-target="#formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-modal">
+                  <span class="fas fa-pencil-alt" alt="<% loc('Edit') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Edit') %>"></span>
+                </a>
+%             }
+                <a href="#" class="remove" onclick="return formTools.deleteElement(event);">
+                  <span class="far fa-times-circle" alt="<% loc('Remove') %>" data-toggle="tooltip" data-placement="top" data-original-title="<% loc('Remove') %>"></span>
+                </a>
+              </p>
+            </div>
+%           $i++;
+%         }
+            <p class="formtools-element-placeholder m-1 p-2 border rounded"><% loc('Place here') %></p>
+            <div class="formtools-element-empty-room"></div>
+          </div>
+          <div class="modal-wrapper">
+%         $i = 0;
+%         for my $item ( grep { $_->{type} ne 'hidden' || $_->{'input-name'} ne 'create_ticket' } @{$form->{'formtools-pages'}{$page_name}{content} || []} ) {
+            <div class="modal fade formtools-element-modal" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-modal" tabindex="-1" role="dialog" data-type="<% $item->{type} %>" data-name="<% $item->{arguments} && $item->{arguments}{name} ? $item->{arguments}{name} : '' %>">
+              <div class="modal-dialog <% $item->{type} eq 'component' && %dependent_custom_fields && !RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ? 'modal-lg' : '' %>" role="document">
+                <div class="modal-content">
+                  <form class="formtools-element-form">
+                    <div class="modal-header">
+                      <h5 class="modal-title"><% loc('Modify Element') %></h5>
+                      <a href="javascript:void(0)" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </a>
+                    </div>
+                    <div class="modal-body">
+%                   if ( $item->{type} eq 'raw_html' ) {
+                      <&| /Elements/LabeledValue, Label => loc("Content") &>
+%                     if ( ($item->{wrapper} // '') =~ /^h\d/i ) {
+                        <input name="content" class="form-control" data-wrapper="<% $item->{wrapper} %>" value="<% $item->{content} %>"/>
+%                     } elsif ( lc ($item->{wrapper} // '') eq 'p' ) {
+                        <textarea name="content" class="form-control" data-wrapper="<% $item->{wrapper} %>"><% $item->{content} %></textarea>
+%                     } else {
+                        <textarea name="content" class="form-control"><% $item->{html} %></textarea>
+%                     }
+                      </&>
+%                     if ( ($item->{wrapper} // '') eq 'p' ) {
+                      <&| /Elements/LabeledValue, Label => loc("Alignment") &>
+                        <select name="alignment" class="form-control selectpicker">
+                          <option value="left" <% lc($item->{alignment} // '') eq 'left' ? 'selected' : '' %>><% loc('Left') %></option>
+                          <option value="center" <% lc($item->{alignment} // '') eq 'center' ? 'selected' : '' %>><% loc('Center') %></option>
+                          <option value="right" <% lc($item->{alignment} // '') eq 'right' ? 'selected' : '' %>><% loc('Right') %></option>
+                        </select>
+                      </&>
+%                     }
+%                   } elsif ( $item->{type} eq 'component' && $item->{comp_name} eq 'Field' ) {
+%                     if ( $item->{arguments}{name} ne 'Content' ) {
+                      <&| /Elements/LabeledValue, Label => loc('Label') &>
+                        <input name="label" type="text" class="form-control" placeholder="<% $item->{arguments}{name} %>" value="<% $item->{arguments}{label} // ''  %>" />
+                      </&>
+%                     }
+                      <&| /Elements/LabeledValue, Label => loc('Default Value') &>
+                        <input name="default" type="text" class="form-control" placeholder="<% $default_values{$item->{arguments}{name}} %>" value="<% $item->{arguments}{default} // '' %>" />
+                      </&>
+%                     if ( $item->{arguments}{name} ne 'Content' ) {
+                      <&| /Elements/LabeledValue, Label => loc('Tooltip') &>
+                        <input name="tooltip" type="text" class="form-control" placeholder="<% $tooltips{$item->{arguments}{name}} // '' %>" value="<% $item->{arguments}{tooltip} // '' %>" />
+                      </&>
+%                     }
+                      <&| /Elements/LabeledValue, Label => '' &>
+                        <div class="custom-control custom-checkbox">
+                          <input class="custom-control-input" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-validation" type="checkbox" name="validation" value="1" <% $item->{arguments}{validation} ? q{checked="checked"} : '' |n %> />
+                          <label class="custom-control-label" for="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-validation">
+                            <&|/l&>Require</&>
+                          </label>
+                        </div>
+                      </&>
+%                     if ( !RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ) {
+%                     if ( %dependent_custom_fields ) {
+                      <&| /Elements/LabeledValue, Label => '' &>
+                        <div class="custom-control custom-checkbox">
+                          <input class="custom-control-input" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-depedent-validation" type="checkbox" name="dependent_validation" value="1" <% $item->{arguments}{dependent_validation}{enabled} ? 'checked="checked"' : '' |n %> />
+                          <label class="custom-control-label has-text-input" for="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-depedent-validation">
+                            <&|/l&>Require if</&>
+                            <div class="d-inline-block">
+                              <select name="dependent_name" class="form-control selectpicker">
+                                <option value=""><&|/l&>(no value)</&></option>
+%                               for my $name ( sort keys %dependent_custom_fields ) {
+                                  <option value="<% $name %>" <% ($item->{arguments}{dependent_validation}{name} // '') eq $name ? 'selected="selected"' : '' |n %>><% $name %></option>
+%                               }
+                                </select>
+                              </div>
+                              is
+                              <div class="d-inline-block">
+                                <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-control selectpicker">
+                                  <option value=""><&|/l&>(no value)</&></option>
+%                               for my $name ( sort keys %dependent_custom_fields ) {
+                                  <optgroup label="<% $name %>">
+%                                 for my $value ( @{$dependent_custom_fields{$name}} ) {
+                                    <option value="<% $value %>" <% ($item->{arguments}{dependent_validation}{name} // '') eq $name && grep( { $value eq $_ } @{$item->{arguments}{dependent_validation}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
+%                                 }
+                                  </optgroup>
+%                               }
+                                </select>
+                              </div>
+                            </label>
+                          </div>
+                        </&>
+%                     }
+%                     }
+
+                      <&| /Elements/LabeledValue, Label => '' &>
+                        <div class="custom-control custom-checkbox">
+                          <input class="custom-control-input" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-hide" type="checkbox" name="hide" value="1" <% ( $item->{arguments}{render_as} // '' ) eq 'hidden' ? q{checked="checked"} : '' |n %> />
+                          <label class="custom-control-label" for="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-hide">
+                            <&|/l&>Hide</&>
+                          </label>
+                        </div>
+                      </&>
+%                   } elsif ( $item->{type} eq 'hidden' ) {
+                      <&| /Elements/LabeledValue, Label => loc('Name') &>
+                        <input name="name" type="text" class="form-control" value="<% $item->{'input-name'} // ''  %>" />
+                      </&>
+                      <&| /Elements/LabeledValue, Label => loc('Value') &>
+                        <input name="value" type="text" class="form-control" value="<% $item->{'input-value'} // '' %>" />
+                      </&>
+%                   }
+                    </div>
+                    <div class="modal-footer">
+                      <button type="submit" class="btn btn-primary button form-control"><% loc('Update') %></button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+%           $i++;
+%         }
+          </div>
+        </&>
+      </div>
+%   }
+    </div>
+
+    <form method="POST" action="Modify.html" id="formtools-form-modify">
+      <input type="hidden" name="id" value="<% $id %>">
+      <input type="hidden" name="ActiveTab" value="">
+      <input type="hidden" name="Content">
+      <div class="row">
+        <div class="col-12" style="padding-right: 25px">
+          <& /Elements/Submit, Name => 'Update', Label => loc('Save Changes') &>
+        </div>
+      </div>
+    </form>
+  </&>
+  </div><!-- row -->
+</div><!-- formtools-form-pages -->
+</div><!-- formtools-edit -->
+
+<script type="text/javascript">
+jQuery(function() {
+    jQuery('#formtools-form-modify').on('submit', formTools.submit);
+    formTools.submit(); // Keep track of current values
+
+    jQuery('.formtools-element-form').on('submit', formTools.elementSubmit);
+    jQuery('.formtools-page-form').on('submit', formTools.pageSubmit);
+    jQuery('.formtools-delete-page').on('click', formTools.deletePage);
+    jQuery('.formtools-component-menu input[name=search]').on('propertychange change keyup paste input', formTools.refreshSource);
+
+    // Alert before leaving the page if there are pending changes
+    window.addEventListener('beforeunload', (event) => {
+        if ( !document.querySelector('#formtools-form-modify.submitting')
+          && !document.querySelector('.pending-changes.hidden') ) {
+            event.preventDefault();
+
+            // Included for legacy support, e.g. Chrome/Edge < 119
+            event.returnValue = true;
+        }
+    });
+
+    jQuery('[name=dependent_name]').change(function () {
+        const modal = jQuery(this).closest('.modal');
+        const target = modal.find('[data-dependent-name="' + jQuery(this).attr('name') + '"');
+        const name = jQuery(this).val();
+        target.find('optgroup').addClass('hidden');
+        target.find('optgroup[label="' + name + '"]').removeClass('hidden');
+        target.selectpicker('refresh');
+        // Hide duplicate dividers
+        target.closest('div').find('li.dropdown-divider').slice(1).hide();
+    });
+
+    jQuery('.formtools-element-modal').on('shown.bs.modal', function (e) {
+        const name = jQuery(this).attr('data-name');
+
+        const select = jQuery(this).find('select[name=dependent_name]');
+
+        select.find('option').addClass('hidden');
+        jQuery('.formtools-form-pages [data-type=component][data-name]').each(function () {
+            const available_name = jQuery(this).attr('data-name');
+            if ( available_name !== name ) {
+                select.find('option[value="' + available_name + '"]').removeClass('hidden');
+            }
+        });
+
+        select.change();
+        select.selectpicker('refresh');
+    });
+});
+</script>
+<%INIT>
+
+Abort("No form id found") unless $id;
+
+my $form_attribute = RT::Attribute->new($session{'CurrentUser'});
+my ($ok, $msg) = $form_attribute->Load($id);
+
+unless ( $ok ) {
+    Abort("Unable to load form with id $id");
+}
+
+my $form = $form_attribute->Content;
+
+my @results;
+
+if ( $AddPage ) {
+    Abort( loc('Permission Denied') )
+        unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
+
+    my @orders = sort { $a <=> $b } map { $form->{'formtools-pages'}{$_}{sort_order} } keys %{$form->{'formtools-pages'}};
+
+    my $new_page = RT::Extension::FormTools->GeneratePageId($form);
+    $form->{'formtools-pages'}{$new_page} = {
+        name       => 'Page New',
+        sort_order => ( $orders[-2] || 0 ) + 1,
+    };
+    my ( $ret, $msg ) = $form_attribute->SetContent($form);
+    if ($ret) {
+        push @results, loc('Updated content');
+    }
+    else {
+        push @results, loc( "Couldn't update content: [_1]", $msg );
+    }
+
+    MaybeRedirectForResults(
+        Actions   => \@results,
+        Path      => '/Admin/FormTools/Modify.html',
+        Arguments => { id => $id, ActiveTab => $new_page },
+    );
+}
+elsif ( $Update ) {
+    Abort( loc('Permission Denied') )
+        unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'AdminForm' );
+
+    my $new_content = eval { JSON::from_json( $ARGS{Content} ) };
+    if ( $@ ) {
+        push @results, loc( "Couldn't decode JSON" );
+    }
+    else {
+        require List::Util;
+        my %order_name = map { $new_content->{$_}{sort_order} => $_ } keys %$new_content;
+        my @orders = sort { $a <=> $b } keys %order_name;
+
+        my ( $first_page, $submit_page );
+        for my $page ( sort { $new_content->{$a}{sort_order} <=> $new_content->{$b}{sort_order} } keys %$new_content ) {
+            if ( $new_content->{$page}{sort_order} == $orders[0] ) {
+                $form->{'formtools-start-page'} = $page;
+            }
+
+            if ( $orders[-2] && $new_content->{$page}{sort_order} == $orders[-2] ) {
+                push @{ $new_content->{$page}{content} },
+                    { type => 'hidden', 'input-name' => 'create_ticket', 'input-value' => 'create_ticket' };
+            }
+
+            if ( my $next_order = List::Util::first { $_ > $new_content->{$page}{sort_order} } @orders ) {
+                $new_content->{$page}{next} = $order_name{$next_order};
+            }
+            else {
+                $new_content->{$page}{next} = '';
+            }
+        }
+
+        $form->{'formtools-pages'} = $new_content;
+
+        if ( $form_attribute->_SerializeContent($form) ne $form_attribute->_Value('Content') ) {
+            my ( $ret, $msg ) = $form_attribute->SetContent($form);
+            if ($ret) {
+                push @results, loc('Updated content');
+            }
+            else {
+                push @results, loc( "Couldn't update content: [_1]", $msg );
+            }
+        }
+    }
+
+    MaybeRedirectForResults(
+        Actions   => \@results,
+        Path      => '/Admin/FormTools/Modify.html',
+        Arguments => { id => $id, ActiveTab => $ActiveTab },
+    );
+}
+
+my $title = loc("Modify form [_1]", $form_attribute->Description);
+
+my $nav_type = 'pill'; # 'tab' or 'pill'
+
+my @html_components = qw( h1 h2 h3 hr p html );
+my @core_components = qw( Requestors Owner Subject Content );
+
+my $queue = RT::Queue->new($session{'CurrentUser'});
+$queue->Load($form->{queue});
+my $cfs = $queue->TicketCustomFields;
+my @custom_fields;
+my %default_values;
+my %tooltips;
+my %dependent_custom_fields;
+
+while ( my $cf = $cfs->Next ) {
+    push @custom_fields, $cf->Name;
+    if ( $cf->SupportDefaultValues ) {
+        if ( defined( my $default_values = $cf->DefaultValues(Object => $queue) ) ) {
+            $default_values{$cf->Name} = ref $default_values eq 'ARRAY' ? join(', ', @$default_values) : $default_values;
+        }
+    }
+    $tooltips{$cf->Name} = $cf->EntryHint // '';
+
+    if ( $cf->Type eq 'Select' ) {
+        $dependent_custom_fields{$cf->Name} = [ map { $_->Name } @{$cf->Values->ItemsArrayRef || {}} ];
+    }
+}
+
+my %other_components = (
+    ShowChoices => { type => 'component', comp_name => 'ShowChoices' },
+    Hidden      => { type => 'hidden' },
+);
+
+
+
+$form->{'formtools-pages'} ||= {
+    RT::Extension::FormTools->GeneratePageId() => { sort_order => 1, name => 'Page 1' },
+    RT::Extension::FormTools->GeneratePageId() => {
+        sort_order => 999,
+        name       => 'Result',
+        content    => [
+            {
+               "content" => "Request Submitted",
+               "html"    => "<h2>Request Submitted</h2>",
+               "type"    => "raw_html",
+               "wrapper" => "h2"
+            },
+            {
+               "content" => "Your request has been submitted.",
+               "html"    => "<p>Your request has been submitted.</p>",
+               "type"    => "raw_html",
+               "wrapper" => "p"
+            },
+        ],
+    },
+};
+
+
+my @form_pages
+    = sort { ( $form->{'formtools-pages'}{$a}{sort_order} || 0 ) <=> ( $form->{'formtools-pages'}{$b}{sort_order} || 0 ) }
+    keys %{ $form->{'formtools-pages'} };
+
+
+my %form_page_id = map { $_ => CSSClass($_) } @form_pages;
+my $active_context = { tab => $ActiveTab || $form_page_id{$form_pages[0]} };
+</%INIT>
+<%ARGS>
+$id => undef
+$ActiveTab => ''
+$Update => undef
+$AddPage => undef
+</%ARGS>

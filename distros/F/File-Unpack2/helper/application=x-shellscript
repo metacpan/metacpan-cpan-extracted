@@ -1,0 +1,262 @@
+#! /usr/bin/perl -w
+# 
+# text/x-shellscript unpack helper
+# 
+# A shell script may or may not contain an extractable payload.
+# Actually multiple payloads are possible.
+# 
+# This unpack helper scans through a shell script (without actually 
+# executing anything) and tries to find suspicious looking payloads.
+#
+# If nothing could be found, we signal this to our caller by symlinking 
+# destfile to src, (meaning "take it as it is")
+#
+# Scanning is done line by line, looking for a range of potential archive starts:
+# a) well known begin lines, such as those produced by shar, uuencode, or any here-document.
+#      sed 's/^X//' << 'SHAR_EOF' > 'zypper' &&
+#      ...
+#      SHAR_EOF
+#
+#      begin \d\d\d name
+#      end
+#
+#      begin-base64 \d\d\d name
+#      ====
+#
+# b) suspicious repetitive patterns (NOT YET IMPLEMENTED):
+#    Lines of same length, without any whitespace
+#    -> this might be base64, we can only try and see if it works.
+#       charset [A-Za-z0-9+/=], length is a multiple of 4.
+#    -> in this case, we save it with one additional header line
+#	begin-base64 \d\d\d name
+#       and a trailer line "====" so that the mime type engine can
+#       do its header magic.
+#    One trailing shorter line with the same charset and lenght conditions
+#    is accepted at the end, otherwise any non-conforming line ends it.
+#
+# c) binary data in a line.
+#    whenever a line has characters with 8th bit set, we 
+#    pass an open filedescriptor seeked to the start of the line
+#    to mime(fd => \*FD), and see if it says something interesting.
+#    -> this mode copies until end of file, as we never know.
+#    but a series of 5 typical shell script lines restarts the scanner.
+#    (typical shell script lines only have 7bit ascii, 
+#    and are shorter than 200 bytes.)
+############
+#   $1      $2           $3          $4       $5        $6
+# %(src)s %(destfile)s %(destdir)s %(mime)s %(descr)s %(configdir)s
+#
+# 2010-08-31, jw V0.1, initial draft...
+#
+# FIXME: if not is_ascii, and could not find a nice mimetype, we should
+#  still dump lines somewhere. Either cleansed lines to OUT, if there were only 
+#  few non_ascii chars, or small individual _$lnr.bin files, if there were many.
+
+BEGIN
+{
+  eval "use File::Unpack2;";
+  eval "use File::LibMagic;";
+}
+#use Data::Dumper;
+
+my $verbose = 0;
+my $fu = eval "File::Unpack2->new(logfile => '/dev/null', verbose => 0);";
+my $flm = File::LibMagic->new() unless defined $fu;
+
+my $input_file = shift;
+my $suggested_name = shift;
+my $output_file = $suggested_name||'_out.txt';
+die "$0: need at least one parameter: input_file\n" unless defined $input_file;
+
+open IN, "<", $input_file or die "$0: open($input_file) failed: $!\n";
+my $offset = tell IN;
+my $lnr = 0;
+my $ascii_count = 4; # how many consecutive lines of ascii did we see?
+my $components_found = 0;
+
+open OUT, ">", $output_file;
+print OUT qq{#
+#################################################################
+## left over shell code from shell archive $input_file
+## parsed by $0 }. scalar(localtime) . qq{
+#################################################################
+#
+};
+
+while (defined(my $line = <IN>))
+  {
+    $lnr++;
+    # NUL SOH STX ETX EOT ENQ ACK, 
+    # SO SI DLE DC1 DC2 DC3 DC4 NAC SYN ETB CAN EM SUB, 
+    # >= DEL	none of these should occur in pure ASCII
+    my $is_ascii = ($line =~ m{[\000-\006\016-\032\177-\377]}s) ? 0 : 1;
+
+    if (!$is_ascii and $ascii_count > 4)
+      {
+        my $new_off = tell IN;
+	seek IN, $offset, 0;
+	die "$0: use File::Unpack2 failed. Fallback to File::LibMagic not impl." unless $fu;
+
+	if (my $m = $fu->mime(fd => \*IN))
+	  {
+	    # print "$lnr: $m->[0], ascii_count=$ascii_count\n" if $verbose;
+	    if ($m->[0] ne 'application/octet-stream')
+	      {
+		seek IN, $new_off, 0;
+		open BIN, ">", "_$lnr.bin";
+		print BIN $line;
+		while (defined(my $bin = <IN>))
+		  {
+		    # We have no sane way to learn where this might end. 
+		    # Pump it all.
+		    print BIN $bin;
+		  }
+		close BIN or die "$0: could not write '_$lnr.bin': $!\n";
+		$components_found++;
+	      }
+	  }
+	seek IN, $new_off, 0;
+      }
+
+    if ($is_ascii)
+      {
+        # print "$lnr: ascii_count=$ascii_count\n";
+        my $redirect = $1 if $line =~ m{>\s*(.*)};
+	if (defined $redirect)
+	  {
+	    if ($redirect =~ s{^'}{}s)
+	      {
+	        $redirect =~ s{'[^']*$}{}s;	# toss trailing "' && stuff"
+	      }
+	    else
+	      {
+	        $redirect =~ s{\s+.*$}{}s;	# toss trailing " && stuff"
+	      }
+	    $redirect =~ s{.*/}{}s;		# toss any directories
+	    $redirect =~ s{[\\'\s]+}{_}gs;	# toss any fancy chars
+	  }
+	# print "$lnr: redirect='$redirect': $line" if $line =~ m{SHAR_EOF};
+
+        if ($line =~ m{^begin [0-7]{3} (.*)}s)
+	  {
+	    $redirect = $1;
+	    $redirect =~ s{.*/}{}s;
+	    $redirect =~ s{\s*$}{}s;
+	    $redirect =~ s{[\s\\']+}{_}gs;
+	    print OUT $line . "###################### see $redirect.uu\n";
+
+	    # pump to file, until 'end'
+	    open O, ">", "$redirect.uu";
+	    print O "begin 644 $redirect\n";
+	    my $linelength;
+	    my $component_offset = tell IN;
+	    my $uu;
+	    while (defined($uu = <IN>))
+	      {
+	        $linelength = length($uu) unless defined $linelength;
+	        print O $uu;
+		last if $uu =~ m{^end\s+$}s;
+		last if length($uu) != $linelength;
+	        $component_offset = tell IN;
+	      }
+	    unless (($uu||'') =~ m{^end\s+$}s)	# usually a single '`' missing.
+	      {
+	        $uu = <IN>;
+		print O $uu;
+	      }
+	    # put the end there, if still missing.
+	    print O "end\n" unless (($uu||'') =~ m{^end\s+$}s);	
+	    close O or die "$0: failed to write $redirect.uu: $!\n";
+	    seek IN, $component_offset, 0;
+	    $components_found++;
+	  }
+	elsif ($line =~ m{^begin-base64 [0-7]{3} (.*)}s)
+	  {
+	    $redirect = $1;
+	    $redirect =~ s{.*/}{}s;
+	    $redirect =~ s{\s*$}{}s;
+	    $redirect =~ s{[\s\\']+}{_}gs;
+	    print OUT $line . "###################### see $redirect.b64\n====\n";
+	    # pump to file, until '===='
+	
+	    open O, ">", "$redirect.b64";
+	    print O "begin-base64 644 $redirect\n";
+	    my $linelength;
+	    my $component_offset = tell IN;
+	    my $uu;
+	    while (defined($uu = <IN>))
+	      {
+	        $linelength = length($uu) unless defined $linelength;
+	        print O $uu;
+		last if $uu =~ m{^====\s+$}s;
+		last if length($uu) != $linelength;
+	        $component_offset = tell IN;
+	      }
+	    print O "====\n" unless (($uu||'') =~ m{^====\s+$}s);
+	    close O or die "$0: failed to write $redirect.b64: $!\n";
+	    seek IN, $component_offset, 0;
+	    $components_found++;
+	  }
+	elsif (defined($redirect) and $line =~ m{^\s*sed 's/\^X//'\s*<<\s*'SHAR_EOF'\s*>}s)
+	  {
+	    # ${echo} 'x - extracting ''zypper'' (text)'
+	    #   sed 's/^X//' << 'SHAR_EOF' > 'zypper' &&
+	    # X                       jw, Thu Aug 12 20:41:31 CEST 2010
+            ####################################################################
+	    # pump to file, until 'SHAR_EOF'
+	    $redirect = "_$lnr.here" unless defined $redirect;
+	    print OUT $line . "###################### see $redirect\n";
+	    open O, ">", $redirect;
+	    my $component_offset = tell IN;
+	    while (defined(my $shar = <IN>))
+	      {
+	        $shar =~ s{^X}{}s;
+		last if $shar =~ m{^SHAR_EOF\s+$}s;
+	        print O $shar;
+	        $component_offset = tell IN;
+	      }
+	    close O or die "$0: failed to write $redirect: $!\n";
+	    seek IN, $component_offset, 0;
+	    $components_found++;
+	  }
+	elsif (defined($redirect) and $line =~ m{\b<<\s*(\'?\w+\'?)\b})
+	  {
+	    my $end_here = $1;
+	    $end_here =~ s{^'(.*)'$}{$1};
+	    $redirect = "_$lnr.here" unless defined $redirect;
+	    print OUT $line . "###################### see $redirect\n";
+	    # pump to file, until '$end_here'
+	    open O, ">", $redirect;
+	    my $component_offset = tell IN;
+	    while (defined(my $here = <IN>))
+	      {
+		last if $here =~ m{^\Q$end_here\E\s+$}s;
+	        print O $here;
+	        $component_offset = tell IN;
+	      }
+	    close O or die "$0: failed to write $redirect: $!\n";
+	    seek IN, $component_offset, 0;
+	    $components_found++;
+	  }
+	else
+	  {
+	    $line =~ s{[^\s[:print:]]+}{}sg;
+	    print OUT $line;
+	  }
+      }
+
+
+    # epilog;
+    $ascii_count = $is_ascii ? ($ascii_count+1) : 0;
+    $offset = tell IN;
+  }
+close IN;
+close OUT or die "$0: could not write $output_file: $!\n";
+
+if (defined $suggested_name and !$components_found)
+  {
+    # signal to caller to stop recursion.
+    unlink $suggested_name;
+    symlink $input_file, $suggested_name;
+  }
+exit 0;

@@ -13,13 +13,13 @@ use parent qw( Plack::Middleware );
 use HTTP::Status qw/ HTTP_FORBIDDEN HTTP_TOO_MANY_REQUESTS /;
 use List::Util   1.29 qw/ pairs /;
 use Module::Load qw/ load /;
-use Net::IP::Match::Trie;
+use Net::IP::LPM;
 use Plack::Util;
-use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retry_after /;
+use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retry_after cache_config /;
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.5.1';
+our $VERSION = 'v0.6.0';
 
 
 sub prepare_app {
@@ -29,22 +29,27 @@ sub prepare_app {
 
     die "default_rate must be a positive integer" unless $self->default_rate =~ /^[1-9][0-9]*$/;
 
-    $self->retry_after( ONE_MINUTE + 1 ) unless defined $self->retry_after;
-    die "retry_after must be a positive integer greater than ${ \ONE_MINUTE} seconds"
-      unless $self->retry_after =~ /^[1-9][0-9]*$/ && $self->retry_after > ONE_MINUTE;
+    my $config = $self->cache_config;
+    $self->cache_config($config) unless defined $config;
+
+    $config->{init_file}                //= 0;
+    $config->{unlink_on_exit}           //= !$config->{init_file};
+    $config->{serializer}               //= '';
+    my $expiry = $config->{expire_time} //= ONE_MINUTE;
+
+    $self->retry_after( $config->{expire_time} + 1 ) unless defined $self->retry_after;
+    die "retry_after must be a positive integer greater than $expiry seconds"
+      unless $self->retry_after =~ /^[1-9][0-9]*$/ && $self->retry_after > $expiry;
 
     unless ( $self->cache ) {
 
-        my $file = $self->file // die "No cache was set";
+      my $file = $self->file // $config->{share_file};
+      die "No cache was set" unless defined $file;
+      $config->{share_file} = "$file";
 
         load Cache::FastMmap;
 
-        my $cache = Cache::FastMmap->new(
-            share_file  => "$file",
-            init_file   => 1,
-            serializer  => '',
-            expire_time => ONE_MINUTE,
-        );
+        my $cache = Cache::FastMmap->new( %$config );
 
         $self->cache(
             sub {
@@ -62,9 +67,9 @@ sub prepare_app {
 
     }
 
-    my $match = Net::IP::Match::Trie->new;
+    my $match = Net::IP::LPM->new;
 
-    $self->_match( sub { return $match->match_ip(@_) } );
+    $self->_match( sub { $match->lookup(@_) } );
 
     my @blocks;
 
@@ -95,7 +100,7 @@ sub prepare_app {
         }
 
         $rules->{$block} = [ $rate, $mask ];
-        $match->add( $block => [$block] );
+        $match->add( $block => $block );
     }
 
 }
@@ -172,7 +177,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.5.1
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -223,10 +228,13 @@ Omitting it will disable the global rate.
 
 =head2 retry_after
 
-This sets the C<Retry-After> header value, in seconds. It defaults to 61 seconds, which is the minimum allowed value.
+This sets the C<Retry-After> header value, in seconds. It defaults to 1 + C<expiry_time> (61) seconds, which is the
+minimum allowed value.
 
 Note that this does not enforce that a client has waited that amount of time before making a new request, as long as the
 number of hits per minute is within the allowed rate.
+
+This option was added in v0.2.0
 
 =head2 greylist
 
@@ -274,7 +282,44 @@ The limit may be larger than L</default_rate>, to allow hosts to exceed the defa
 
 This is the path of the throttle count file used by the L</cache>.
 
-It is required unless you are defining your own L</cache>.
+It is required unless you are defining your own L</cache> or you have specified a C<share_file> in L</cache_config>.
+
+=head2 cache_config
+
+This is a hash reference for configuring L<Cache::FastMmap>.  If it's omitted, defaults will be used.
+
+The following options can be configured:
+
+=over
+
+=item *
+
+C<init_file>
+
+This is boolean that configures whether L</file> will be re-initialised in startup. Unless you are preloading the
+application before forking, this should be false (default).
+
+=item *
+
+C<unlink_on_exit>
+
+When true, the cache file will be deleted on exit. This defaults the negation of C<init_file>.
+
+=item *
+
+C<expire_time>
+
+This sets the expiration time, which defaults to 60 seconds.
+
+The L</retry_after> attribute will default to 1 + C<expiry_time>.
+
+=back
+
+Note that the L</file> attribute will be used to set the C<share_file>.
+
+See L<Cache::FastMmap/new> for more information.
+
+This option was added in v0.5.5.
 
 =head2 cache
 
@@ -286,7 +331,7 @@ e.g. one minute.  If you use a different time interval, then you may need to adj
 
 =head1 KNOWN ISSUES
 
-This does not try and enforce any consistency or block overlapping netblocks.  It trusts L<Net::IP::Match::Trie> to
+This does not try and enforce any consistency or block overlapping netblocks.  It trusts L<Net::IP::LPM> to
 handle any overlapping or conflicting network ranges, or to specify exceptions for larger blocks.
 
 When configuring the L</greylist> netblocks from a configuration file using L<Config::General>, duplicate netblocks may
@@ -317,7 +362,7 @@ requests. This is probably not something that you want.
 
 This module requires Perl v5.12 or later.
 
-Future releases may only support Perl versions released in the last ten years
+Future releases may only support Perl versions released in the last ten years.
 
 =head1 SOURCE
 

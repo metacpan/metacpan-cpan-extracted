@@ -1,3 +1,21 @@
+0.006   2023-12-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [clis mv-*-download-here] Add options --overwrite (-O), --as; by
+          default do not overwrite.
+
+
+0.005   2023-11-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Update dependency name: App::FileSortUtils -> File::Util::Sort.
+
+
+0.004   2023-11-16  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Fix link to programs.
+
+
 0.003   2023-11-16  Released-By: PERLANCAR; Urgency: medium
 
         - Add utilities:

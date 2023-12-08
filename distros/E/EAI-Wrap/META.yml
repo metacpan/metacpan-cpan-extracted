@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/rkapl123/EAI-Wrap/issues
   repository: https://github.com/rkapl123/EAI-Wrap.git
-version: '1.902'
+version: '1.904'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,29 @@
+---
+abstract: 'Transparency & Consent String version 2 parser '
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj+gdpr-iab-tcfv2@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0.43'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: GDPR-IAB-TCFv2
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/peczenyj/GDPR-IAB-TCFv2/issues
+  homepage: https://github.com/peczenyj/GDPR-IAB-TCFv2
+  repository: https://github.com/peczenyj/GDPR-IAB-TCFv2.git
+version: '0.07'
+x_authority: cpan:PACMAN

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use parent q{Sub::Genius};
+use Util::H2O::More qw/ddd/;
 
 # dispatch for invocation method
 my $invocation = {
@@ -103,16 +104,18 @@ sub subs2perl {
     foreach my $sub ( @subs ) {
         ++$uniq{$sub};
     }
+    delete $uniq{q{}} if $uniq{q{}};
 
+    @subs          = ();
   SUBS:
     foreach my $sub ( keys %uniq ) {
-        next SUBS if $sub =~ m/^ *$/;
         push @subs,       $sub;
         push @pre_tokens, $sub;
         push @perlsubpod, qq{ =item * C<$sub>\n};
     }
 
     my $perlsub    = $self->_dump_subs( \@subs );
+
     my $perlpre    = $opts{preplan};
     $perlpre =~ s/\n$//;
     $perlpre =~ s/^/  /gm; 
@@ -192,9 +195,9 @@ sub _dump_subs {
         $perl .= qq/
  #TODO - implement the logic!
  sub $sub {
-   my \$scope      = shift;    # execution context passed by Sub::Genius::run_once
-   state \$mystate = {};       # sticks around on subsequent calls
-   my    \$myprivs = {};       # reaped when execution is out of sub scope
+   my    \$scope   = shift;    # execution context passed by Sub::Genius::run_once
+   my    \$private = {};       # private variable hash, reaped when execution is out of sub scope
+   state \$mystate = {};       # gives subroutine state from call to call
  
    #-- begin subroutine implementation here --#
    print qq{Sub $sub: ELOH! Replace me, I am just placeholder!\\n};
@@ -230,14 +233,14 @@ sub plan2nodeps {
     $preplan =~ s/\n$//g;
 
     my $perl = qq{ #!/usr/bin/env perl
- use strict;
- use warnings;
- use feature 'state';
+use strict;
+use warnings;
+use feature 'state';
 
- # Sub::Genius is not used, but this call list has been generated
- # using Sub::Genius::Util::plan2nodeps,
- # 
- ## intialize hash ref as container for global memory
+# Sub::Genius is not used, but this call list has been generated
+# using Sub::Genius::Util::plan2nodeps,
+# 
+## intialize hash ref as container for global memory
 # The following sequence of calls is consistent with the original preplan,
 # my \$preplan = q{
 $preplan
@@ -260,6 +263,8 @@ $preplan
 
     # get uniq list of subs for sub stub generation
     my %uniq = map { $_ => 1 } @subs;
+
+    delete $uniq{q{}} if $uniq{q{}};
 
     $perl .= $self->_dump_subs( [ keys %uniq ] );
 

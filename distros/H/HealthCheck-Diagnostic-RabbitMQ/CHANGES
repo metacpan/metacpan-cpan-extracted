@@ -1,6 +1,13 @@
 Changelog for HealthCheck-Diagnostic-RabbitMQ
 
-v1.3.0 2023-02-13T21:59:41
+v1.3.1 2023-12-04T19:26:19
+ - Update README (Andrew Hewus Fresh)
+ - Pull request #7: Patch - SM-4514 - Make strict an author test (Andrew
+   Hewus Fresh)
+ - Pull in Makefile update from upstream (Andrew Hewus Fresh)
+ - Make strict.t an author test (Andrew Hewus Fresh)
+
+v1.3.0 2023-02-13T21:55:45
  - Update README and LICENSE (Andrew Hewus Fresh)
  - Update Makefile (Andrew Hewus Fresh)
  - Pull request #6: SM-4039 Return server_properties even with queue (Paul
@@ -12,9 +19,9 @@ v1.2.0 2022-05-16T18:45:59
  - Pull request #5: SM-2947 (Mitch McCracken)
  - Switch to sprintf() and avoid 80-char width issue (Mitch McCracken)
  - Improve info for failing health checks (Matthew Ito)
-
-v1.1.6 2020-07-03T00:25:23
  - Update README (Andrew Hewus Fresh)
+
+v1.1.6 2020-07-02T22:27:03
  - SM-2578  Allow specifying "should_disconnect" (Larry Leszczynski)
 
 v1.1.5 2020-04-13T15:18:53
@@ -33,30 +40,17 @@ v1.1.3 2019-11-07T20:30:39
 
 v1.1.2.1 2019-10-18T21:48:59
  - Create distribution files (Andrew Hewus Fresh)
- - Convert to Bitbucket workflow (Andrew Hewus Fresh)
  - Remove gitc metadata (Andrew Hewus Fresh)
+ - Convert to Bitbucket workflow (Andrew Hewus Fresh)
 
 v1.1.2.0 2019-05-07T14:22:25
- - The file t/strict.t has been added to this commit. (Fred Kontur)
- - Created a test file to ensure that all files in the directory use the
-   "strict" pragma. (Fred Kontur)
-
-v1.1.1 2019-10-18T21:39:53
- - Merge remote-tracking branch 'origin/test' into stage (Andrew Hewus
-   Fresh)
+ - No changes found
 
 v1.1.1.0 2018-12-06T18:15:00
  - Merge remote-tracking branch 'origin/stage' into prod (Andrew Fresh)
- - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
- - Merge remote-tracking branch 'origin/master' into test (Jon Rubin)
- - SM-1641 Handle bad rabbit_mq parameter (Jon Rubin)
- - SM-1641 Test bad rabbit_mq parameter (Jon Rubin)
-
-v1.1.0 2018-12-06T18:14:46
- - Merge remote-tracking branch 'origin/test' into stage (Andrew Fresh)
 
 v1.1.0.0 2018-10-16T19:35:12
- - No changes found
+ - Merge remote-tracking branch 'origin/stage' into prod (Brandon Messineo)
 
 v1.0.0 2018-10-16T19:21:00
  - Merge remote-tracking branch 'origin/test' into stage (Brandon Messineo)

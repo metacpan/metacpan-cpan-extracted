@@ -1,3 +1,8 @@
+0.031 2023-12-05
+  [Requirement Changes]
+    * Require SPVM::Sys 0.509.
+  [License Changes]
+    * License becomes MIT.
 0.03 2023-02-10
   [Prerequirement Changes]
     * SPVM::Basename 0.02+ is needed.

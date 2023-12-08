@@ -1,5 +1,12 @@
 Revision history for Sys-User-UIDhelper
 
+0.1.0	2023-12-04/01:30
+		- massive doc cleanup
+		- add in error checking for min/max when calling new
+		- bump max default to something larger, 131068
+		- firstfree -> first_free, firstfree is now a alias
+		- lastfree -> lastfree, lastfree is now a alias
+
 0.0.1	2009-09-06/12:00
 		-Correct setting min.
 

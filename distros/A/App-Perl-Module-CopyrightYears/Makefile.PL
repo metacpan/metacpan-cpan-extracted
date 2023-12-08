@@ -24,7 +24,7 @@ requires 'File::Find::Rule' => 0;
 requires 'File::Spec::Functions' => 0;
 requires 'Getopt::Std' => 0;
 requires 'IO::Barf' => 0;
-requires 'Pod::CopyrightYears' => 0;
+requires 'Pod::CopyrightYears' => 0.03;
 requires 'Perl6::Slurp' => 0;
 requires 'String::UpdateYears' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/App-Perl-Module-CopyrightYears/issues',
@@ -38,7 +38,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

@@ -3,7 +3,7 @@ package Net::Async::Slack::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use utf8;
@@ -4653,57 +4653,6 @@ async sub files_shared_public_url {
     die $res unless $res->{ok};
     return $res;
 }
-
-
-=head2 files_upload
-
-Uploads or creates a file.
-
-L<API method documentation|https://api.slack.com/methods/files.upload>
-
-Takes the following named parameters:
-
-=over 4
-
-=item * C<file> - File contents via `multipart/form-data`. If omitting this parameter, you must submit `content`. (string, optional)
-
-=item * C<content> - File contents via a POST variable. If omitting this parameter, you must provide a `file`. (string, optional)
-
-=item * C<filetype> - A [file type](/types/file#file_types) identifier. (string, optional)
-
-=item * C<filename> - Filename of file. (string, optional)
-
-=item * C<title> - Title of file. (string, optional)
-
-=item * C<initial_comment> - The message text introducing the file in specified `channels`. (string, optional)
-
-=item * C<channels> - Comma-separated list of channel names or IDs where the file will be shared. (string, optional)
-
-=item * C<thread_ts> - Provide another message's `ts` value to upload this file as a reply. Never use a reply's `ts` value; use its parent instead. (number, optional)
-
-=back
-
-Resolves to a structure representing the response.
-
-=cut
-
-async sub files_upload {
-    my ($self, %args) = @_;
-    my $uri = $self->endpoint(
-        'files_upload',
-    );
-    my $content = encode_json_utf8({
-        %args{grep { exists $args{$_} } qw(file content filetype filename title initial_comment channels thread_ts)}
-    });
-    my ($res) = await $self->http_post(
-        $uri,
-        $content,
-        content_type => 'application/json; charset=utf-8',
-    );
-    die $res unless $res->{ok};
-    return $res;
-}
-
 
 =head2 migration_exchange
 

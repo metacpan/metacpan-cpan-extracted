@@ -121,6 +121,165 @@ put '/api/agency/v1.1/entity/invoice/:external_id' => sub {
 	);
 };
 
+get "/api/agency/v1.1/tags" => sub {
+	my ( $self ) = @_;
+
+	return $self->render(
+		status => 200,
+		json => _get_tags()
+	);
+};
+
+post "/api/agency/v1.1/tags" => sub {
+	my ( $self ) = @_;
+
+	my $name = $self->req->json->{name};
+
+	return $self->render(
+		status => 200,
+		json => shift @{ [ grep { $_->{name} eq $name } _get_tags()->{items}->@* ] }
+	);
+};
+
+post "/api/agency/v1.1/tags/entities/:enity_type/:entity_id" => sub {
+	my ( $self ) = @_;
+
+	return $self->render(
+		status => 200,
+		json => { items => [ map { { id => $_->{id}, name => $_->{name} } } _get_tags()->{items}->@* ] }
+	);
+};
+
+put "/api/agency/v1.1/tags/:external_id" => sub {
+	my ( $self ) = @_;
+
+	my $req_content = $self->req->json;
+	my $external_id = $self->param('external_id');
+
+	my $response_data = [
+		map {
+			{
+				id => $_->{id},
+				name => $_->{name},
+				%$req_content,
+			}
+		} grep { $_->{id} eq $external_id } _get_tags()->{items}->@*
+	];
+
+	return $self->render(
+		status => 200,
+		json => shift $response_data->@*,
+	);
+};
+
+del "/api/agency/v1.1/tags/:external_id" => sub {
+	my ( $self ) = @_;
+
+	return $self->render(
+		status => 200,
+		json => { message => 'Tag has been successfully deleted.' }
+	);
+};
+
+del "/api/agency/v1.1/tags/:external_id/entities" => sub {
+	my ( $self ) = @_;
+
+	return $self->render(
+		status => 200,
+		json => { message => 'Tag link successfully removed from entity.' }
+	);
+};
+
+get "/api/agency/v1.1/tags/:external_id/entities" => sub {
+	my ( $self ) = @_;
+
+	return $self->render(
+		status => 200,
+		json => {
+			items => [
+				{
+					id => "qv1pKQBXdN",
+					name => "Fontana Road 51, Lephalale",
+					type => "property"
+				},
+				{
+					id => "BRXEKW75ZO",
+					name => "Abass Samson",
+					type => "tenant"
+				}
+			],
+			pagination => {
+				page => 1,
+				rows => 2,
+				total_pages => 1,
+				total_rows => 2
+			}
+		}
+	);
+};
+
+# TODO: move to a JSON file
+sub _get_tags {
+
+	my @mock_data = (
+		{
+			"id" => "woRZQl1mA4",
+			"links" => {
+				"entities" => [
+					{
+						"count" => 0,
+						"type" => "tenant"
+					},
+					{
+						"count" => 0,
+						"type" => "property"
+					},
+					{
+						"count" => 0,
+						"type" => "beneficiary"
+					}
+				],
+				"total" => 0
+			},
+			"name" => "New tag1"
+		},
+		{
+			"id" => "oz2JkGJbgm",
+			"links" => {
+				"entities" => [
+					{
+						"count" => 0,
+						"type" => "tenant"
+					},
+					{
+						"count" => 1,
+						"type" => "property"
+					},
+					{
+						"count" => 0,
+						"type" => "beneficiary"
+					}
+				],
+				"total" => 1
+			},
+			"name" => "new_tag2"
+		}
+	);
+
+	my $mock_results_count = scalar @mock_data;
+
+	return {
+		status => 200,
+		items => \@mock_data,
+		pagination => {
+			page => 1,
+			total_pages => 1,
+			rows => $mock_results_count,
+			total_rows => $mock_results_count,
+		},
+	};
+}
+
 # TODO: move to a JSON file
 sub _get_export_beneficiaries {
 	my ( $params ) = @_;

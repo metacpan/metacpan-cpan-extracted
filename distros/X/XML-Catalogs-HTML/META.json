@@ -26,7 +26,8 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.52"
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::Share::Install" : "0"
          }
       },
       "develop" : {
@@ -65,6 +66,6 @@
          "web" : "https://github.com/ikegami/perl-XML-Catalogs-HTML"
       }
    },
-   "version" : "v1.6.0",
+   "version" : "v1.8.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

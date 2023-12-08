@@ -1,2 +1,6 @@
+0.02 2023-12-06T18:04:15+01:00
+ - Add test for constructor.
+ - Add tests for char().
+
 0.01 2023-06-26T09:35:55+02:00
  - First version.

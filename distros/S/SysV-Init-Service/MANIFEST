@@ -1,5 +1,5 @@
 Changes
-examples/ex1.pl
+examples/create_fake_service_and_print_its_commands.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

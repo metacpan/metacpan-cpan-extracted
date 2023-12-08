@@ -8,13 +8,13 @@ Locale::CLDR::Locales::Twq::Any::Ne - Package for language Tasawaq
 
 package Locale::CLDR::Locales::Twq::Any::Ne;
 # This file auto generated from Data\common\main\twq_NE.xml
-#	on Sat  4 Nov  6:28:37 pm GMT
+#	on Tue  5 Dec  1:36:26 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

@@ -9,15 +9,15 @@ use Encode qw(decode);
 require App::lcpan;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-19'; # DATE
+our $DATE = '2023-07-09'; # DATE
 our $DIST = 'App-lcpan'; # DIST
-our $VERSION = '1.071'; # VERSION
+our $VERSION = '1.073'; # VERSION
 
 our %SPEC;
 
 $SPEC{'handle_cmd'} = {
     v => 1.1,
-    summary => 'Show POD documentation of module/.pod/script',
+    summary => 'Show POD documentation of module/POD/script',
     description => <<'_',
 
 This command extracts module (.pm)/.pod/script from release tarballs and render
@@ -206,7 +206,7 @@ LIMIT 1", {}, @bind);
         }
     }
 
-    return [404, "No such module/.pod/script"] unless $row;
+    return [404, "No such module/POD/script"] unless $row;
 
     my $path = App::lcpan::_fullpath(
         $row->{release}, $state->{cpan}, $row->{author});
@@ -272,7 +272,7 @@ LIMIT 1", {}, @bind);
 }
 
 1;
-# ABSTRACT: Show POD documentation of module/.pod/script
+# ABSTRACT: Show POD documentation of module/POD/script
 
 __END__
 
@@ -282,11 +282,11 @@ __END__
 
 =head1 NAME
 
-App::lcpan::Cmd::doc - Show POD documentation of module/.pod/script
+App::lcpan::Cmd::doc - Show POD documentation of module/POD/script
 
 =head1 VERSION
 
-This document describes version 1.071 of App::lcpan::Cmd::doc (from Perl distribution App-lcpan), released on 2022-09-19.
+This document describes version 1.073 of App::lcpan::Cmd::doc (from Perl distribution App-lcpan), released on 2023-07-09.
 
 =head1 FUNCTIONS
 
@@ -297,7 +297,7 @@ Usage:
 
  handle_cmd(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Show POD documentation of moduleE<sol>.podE<sol>script.
+Show POD documentation of moduleE<sol>PODE<sol>script.
 
 Examples:
 
@@ -346,6 +346,8 @@ Location of your local CPAN mirror, e.g. E<sol>pathE<sol>toE<sol>cpan.
 Defaults to C<~/cpan>.
 
 =item * B<format> => I<str> (default: "man")
+
+(No description)
 
 =item * B<index_name> => I<filename> (default: "index.db")
 
@@ -438,7 +440,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,13 +4,13 @@
       "Markus Benning <ich@markusbenning.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mail-STS",
    "prereqs" : {
@@ -65,27 +65,27 @@
    "provides" : {
       "Mail::STS" : {
          "file" : "lib/Mail/STS.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Mail::STS::Domain" : {
          "file" : "lib/Mail/STS/Domain.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Mail::STS::Policy" : {
          "file" : "lib/Mail/STS/Policy.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Mail::STS::SSKV" : {
          "file" : "lib/Mail/STS/SSKV.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Mail::STS::STSRecord" : {
          "file" : "lib/Mail/STS/STSRecord.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Mail::STS::TLSRPTRecord" : {
          "file" : "lib/Mail/STS/TLSRPTRecord.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -100,8 +100,9 @@
          "web" : "https://github.com/benningm/perl-Mail-STS.git"
       }
    },
-   "version" : "0.04",
-   "x_generated_by_perl" : "v5.24.1",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.35",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

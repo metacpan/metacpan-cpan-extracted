@@ -9,9 +9,9 @@ use Complete::Common qw(:all);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2023-01-19'; # DATE
+our $DATE = '2023-12-01'; # DATE
 our $DIST = 'Complete-Util'; # DIST
-our $VERSION = '0.617'; # VERSION
+our $VERSION = '0.618'; # VERSION
 
 our @EXPORT_OK = qw(
                        hashify_answer
@@ -23,6 +23,7 @@ our @EXPORT_OK = qw(
                        answer_num_entries
                        complete_array_elem
                        complete_hash_key
+                       complete_hash_value
                        complete_comma_sep
                        complete_comma_sep_pair
                );
@@ -600,6 +601,51 @@ sub complete_hash_key {
     );
 }
 
+
+$SPEC{complete_hash_value} = {
+    v => 1.1,
+    summary => 'Complete from hash values',
+    args => {
+        %arg_word,
+        hash      => { schema=>['hash*'=>{}], req=>1 },
+        summaries => { schema=>['hash*'=>{}] },
+        summaries_from_hash_keys => { schema=>'true*' },
+    },
+    result_naked => 1,
+    result => {
+        schema => 'array',
+    },
+    args_rels => {
+        choose_one => ['summaries', 'summaries_from_hash_keys'],
+    },
+};
+sub complete_hash_value {
+    my %args  = @_;
+    my $hash      = delete $args{hash} or die "Please specify hash";
+    my $word      = delete($args{word}) // "";
+    my $summaries = delete $args{summaries};
+    my $summaries_from_hash_keys = delete $args{summaries_from_hash_keys};
+    die "complete_hash_values(): Unknown argument(s): ".join(", ", keys %args)
+        if keys %args;
+
+    my @keys   = keys %$hash;
+    my @values = map { "$hash->{$_}" } @keys;
+    my @summaries;
+    my $has_summary;
+    if ($summaries) {
+        $has_summary++;
+        for (@values) { push @summaries, $summaries->{$_} }
+    } elsif ($summaries_from_hash_keys) {
+        $has_summary++;
+        @summaries = @keys;
+    }
+
+    complete_array_elem(
+        word=>$word, array=>\@values,
+        (summaries=>\@summaries) x !!$has_summary,
+    );
+}
+
 my %complete_comma_sep_args = (
     %complete_array_elem_args,
     sep => {
@@ -1108,7 +1154,7 @@ Complete::Util - General completion routine
 
 =head1 VERSION
 
-This document describes version 0.617 of Complete::Util (from Perl distribution Complete-Util), released on 2023-01-19.
+This document describes version 0.618 of Complete::Util (from Perl distribution Complete-Util), released on 2023-12-01.
 
 =head1 DESCRIPTION
 
@@ -1541,6 +1587,43 @@ Arguments ('*' denotes required arguments):
 (No description)
 
 =item * B<summaries_from_hash_values> => I<true>
+
+(No description)
+
+=item * B<word>* => I<str> (default: "")
+
+Word to complete.
+
+
+=back
+
+Return value:  (array)
+
+
+
+=head2 complete_hash_value
+
+Usage:
+
+ complete_hash_value(%args) -> array
+
+Complete from hash values.
+
+This function is not exported by default, but exportable.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<hash>* => I<hash>
+
+(No description)
+
+=item * B<summaries> => I<hash>
+
+(No description)
+
+=item * B<summaries_from_hash_keys> => I<true>
 
 (No description)
 

@@ -10,7 +10,7 @@ unless($ENV{'INTERNET_TESTING'}) {
   plan skip_all => 'No remote tests. (to enable set INTERNET_TESTING=1)';
 }
 
-plan tests => 24;
+plan tests => 26;
 
 use_ok('Mail::STS');
 use_ok('Mail::STS::Domain');
@@ -53,3 +53,8 @@ ok($p->is_tlsa_secure, 'TLSA record is secure');
 ok(!defined $p->tlsrpt, 'has no TLSRPT record');
 ok(!defined $p->sts, 'has no STS record');
 
+# CNAME follow domain
+$p = $sts->domain('mail-sts-test.errror.org');
+isa_ok($p->sts, 'Mail::STS::STSRecord');
+$p = $sts->domain('mail-sts-fail.errror.org');
+ok(!defined $p->sts, 'has no STS record');

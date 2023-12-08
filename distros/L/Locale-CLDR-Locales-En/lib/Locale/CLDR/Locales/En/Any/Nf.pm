@@ -8,13 +8,13 @@ Locale::CLDR::Locales::En::Any::Nf - Package for language English
 
 package Locale::CLDR::Locales::En::Any::Nf;
 # This file auto generated from Data\common\main\en_NF.xml
-#	on Sat  4 Nov  5:59:59 pm GMT
+#	on Tue  5 Dec  1:08:03 pm GMT
 
 use strict;
 use warnings;
 use version;
 
-our $VERSION = version->declare('v0.34.3');
+our $VERSION = version->declare('v0.34.4');
 
 use v5.10.1;
 use mro 'c3';

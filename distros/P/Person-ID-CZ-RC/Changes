@@ -1,3 +1,17 @@
+0.05 2023-12-05T15:15:36+01:00
+ - Add tests for sex() method.
+ - Fix SYNOPSIS section in doc.
+ - Fix use lib '.' in Makefile.PL.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Rename example files to better names.
+ - Rewrite doc to use of =head2.
+ - Update Module::Install to 1.21 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.04 2015-09-28T17:50:11+02:00
  - Add 'readme_from' directive to Makefile.PL.
  - Add tests.

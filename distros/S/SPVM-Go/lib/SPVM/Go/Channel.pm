@@ -10,7 +10,7 @@ SPVM::Go::Channel - Golang Compatible Channel
 
 =head1 Description
 
-Go::Channel class of L<SPVM> has methods to manipulate channels.
+The Go::Channel class in L<SPVM> has methods to manipulate channels.
 
 =head1 Usage
 
